@@ -1,0 +1,101 @@
+
+body {
+    background-color: var(--bg);
+    color: var(--text-standard);
+}
+
+div.button {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+/*Edição danilo*/
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    font-family: arial;
+    /*background: url("logo.png");
+	background-size:100%;*/
+}
+
+ul {
+    top: 70px;
+    position: absolute;
+    list-style: none;
+    width: 100%;
+}
+
+img {
+    width: 40px;
+}
+
+.imglogo {
+    align-self: center;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+    input[type="checkbox"]:checked ~ nav {
+        transform: translateX(350px);
+    }
+
+
+nav {
+    position: absolute;
+    background-color: rgba(16,16,16,.5);
+    width: 300px;
+    height: 100%;
+    left: -350px;
+    transition: all .5s;
+    z-index: 1;
+    overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+a {
+    align-self: end;
+    text-decoration: none;
+    display: block;
+    padding: 20px 5px;
+    color: #a80636;
+}
+
+    a:hover {
+        background-color: rgba(30, 188, 255, 0.6);
+        color: white;
+    }
+
+label {
+    padding: 15px;
+    position: absolute;
+    z-index: 10;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+/*Edição danilo*/
