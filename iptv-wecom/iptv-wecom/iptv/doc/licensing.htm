@@ -84,11 +84,11 @@
     </p>
     <p>
         The information if the user got a license is then transmitted to the app as part of the login.
-        This is done using the unlicensed attribute in the <a href="appwebsocket/AppWebsocket.htm#info">info</a> object of the <a href="appwebsocket/AppWebsocket.htm#AppLogin">AppLogin</a> message.
+        This is done using the unlicensed property in the <a href="appwebsocket/AppWebsocket.htm#info">info</a> object of the <a href="appwebsocket/AppWebsocket.htm#AppLogin">AppLogin</a> message.
         The structure is protected by the login digest.
     </p>
     <p>
-        In the JavaScript code of your app, you can check the App license like that (no check for Service license available here):
+        In the client JavaScript code of your app, you can check the App license after an AppWebsocket connection is established by accessing the property <em>unlicensed</em> (no check for Service license available here):
 <pre><code lang="javascript">var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
 app.onconnected = app_connected;
 
@@ -103,7 +103,7 @@ function app_connected(domain, user, dn, appdomain) {
 </code></pre>
     </p>
     <p>
-        In the C++ code of an app service, you can do the same check on incoming websocket connections. Note that you might need to distinguish between the connections from different apps.
+        In the C++ code of an app service, you can do the same check on incoming AppWebsocket connections. Note that you might need to distinguish between the connections from different apps.
         <pre><code lang="cpp">bool NewApp1Session::AppWebsocketConnectComplete(class json_io & msg, word info)
 {
     bool unlicensed = msg.get_bool(info, "unlicensed");
@@ -127,9 +127,9 @@ function app_connected(domain, user, dn, appdomain) {
 }</code></pre>
     </p>
     <p>
-        In the JavaScript code of an app service, you can check the JsonApiConnection.unlicensed attribute. Note that you might need to distinguish between the connections from different apps.
+        In the JavaScript code of an app service you can check the JsonApiConnection.unlicensed attribute of the AppWebsocket connection from the myApps client to the app service. Note that you might need to distinguish between the connections from different apps.
         <pre><code lang="cpp">new JsonApi("test").onconnected(function(conn) {
-    if (conn.app == "manufacturer-newapp1") {
+    if (conn.app === "manufacturer-newapp1") {
         if (conn.unlicensed) {
             // unlicensed mode
         }
@@ -137,14 +137,35 @@ function app_connected(domain, user, dn, appdomain) {
             // licensed mode
         }
     }
-    else if (conn.app == "manufacturer-newapp1admin") {
+    else if (conn.app === "manufacturer-newapp1admin") {
         // no license needed
     }
 
     // amount of Service licenses
-    var licenses = con.lics;
+    var licenses = conn.lics;
 });</code></pre>
     </p>
+
+    <p>
+        It is also possible to check if a specific user object has a valid specific app license assigned. This check require access to the PbxAdminApi in order to use message <a href="/appwebsocket/PbxAdminApi.htm#CheckAppLic">CheckAppLic</a> for this purpose. This must be done on the AppWebsocket connection from the PBX to the app service, therefore PbxApi library of the JavaScript environment is used.
+        <pre><code lang="cpp">new PbxApi("PbxAdminApi").onconnected(function (conn) {
+    conn.send(JSON.stringify({ api: "PbxAdminApi", mt: "CheckAppLic", cn: "Atlantis", lic: "App(manufacturer-newapp1)" }));
+
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+
+        if (obj.mt === "CheckAppLicResult") {
+            if (obj.ok === true) {
+                // licensed mode
+            } else {
+                // unlicensed mode
+            }
+        }
+    }
+
+});</code></pre>
+    </p>
+
 
     <h3>Unlicensed mode</h3>
     <p>
@@ -154,6 +175,11 @@ function app_connected(domain, user, dn, appdomain) {
             <li>Activate a demo mode if there is no license.</li>
             <li>The app works without a license. But the license unlocks some premium functionality.</li>
         </ul>
+    </p>
+
+    <a name="other"></a><h2>Other license checks</h2>
+    <p>
+        Depending on license requirements other license information available form the PBX can be used, like overall number of Port Licenses. The messages <a href="/appwebsocket/PbxAdminApi.htm#GetPbxLicenses">GetPbxLicenses</a> and <a href="/appwebsocket/PbxAdminApi.htm#GetAppLics">GetAppLics</a> are a good starting point to implement a custom license requirement.
     </p>
 
     <a name="license-own"></a><h2>Your own licensing model</h2>

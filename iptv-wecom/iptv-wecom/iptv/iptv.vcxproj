@@ -122,6 +122,7 @@
     <None Include="build.ps1" />
     <None Include="iptv.mak" />
     <None Include="iptv\httpfiles\modal.css" />
+    <None Include="iptv\httpfiles\video-js.css" />
     <None Include="iptv\httpfiles\video.js" />
     <None Include="iptv\iptv.mak" />
     <None Include="iptv\config.json" />

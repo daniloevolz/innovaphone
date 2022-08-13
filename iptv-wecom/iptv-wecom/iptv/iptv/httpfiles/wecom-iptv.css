@@ -3,6 +3,9 @@ body {
     background-color: var(--bg);
     color: var(--text-standard);
 }
+.vjs-modal-dialog-content {
+    z-index: 0;
+}
 
 div.button {
     position: absolute;

@@ -3,6 +3,9 @@ body {
     background-color: var(--bg);
     color: var(--text-standard);
 }
+.vjs-modal-dialog-content {
+    z-index: 0;
+}
 
 div.button {
     position: absolute;
@@ -18,7 +21,7 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-/*Edição danilo*/
+/*EdiÃ§Ã£o danilo*/
 * {
     padding: 0px;
     margin: 0px;
@@ -56,11 +59,11 @@ input[type="checkbox"] {
 
 nav {
     position: absolute;
-    background-color: rgba(16,16,16,.5);
+    background-color: rgba(75, 71, 71, 0.5);
     width: 300px;
     height: 100%;
-    left: -350px;
-    transition: all .5s;
+    left: -370px;
+    transition: all .6s;
     z-index: 1;
     overflow-y: scroll;
 }
@@ -72,15 +75,22 @@ nav {
 a {
     align-self: end;
     text-decoration: none;
-    display: block;
-    padding: 20px 5px;
-    color: #a80636;
+    display: flex;
+    padding: 20.4px 4px;
+    color: #a80939;
+ /*COR ORIGINAL DO MENU:*/   /*color: #b60c3f;*/
+    font-weight: bold;
+    width: 100%;
+    margin-left: 13%;
+    
 }
+    ul li:hover{
+        background-color: rgba(32, 248, 255, 0.2);
+        width: 100%;
 
-    a:hover {
-        background-color: rgba(30, 188, 255, 0.6);
-        color: white;
+        
     }
+    
 
 label {
     padding: 15px;
@@ -97,5 +107,20 @@ label {
     justify-content: center;
     align-items: center;
 }
+#listchanenels{
+    margin-left: 5%;
+    display: block;
+  
+}
+.logo{
+    display: flex; width: 25px; height: 25px; position: absolute; margin-left: 4.4%;margin-top: -14.3%;
+}
 
-/*Edição danilo*/
+
+
+
+
+
+
+
+/*Ediï¿½ï¿½o danilo*/

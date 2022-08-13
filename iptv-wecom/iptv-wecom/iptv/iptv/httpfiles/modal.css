@@ -5,7 +5,8 @@
     height: auto;
     left: 25vw;
     top: 50vh;
-    background-color: white;
+    background-color: var(--bg);
+    color: var(--text-standard);
     transform: translateY(-25%);
     padding: 1rem;
     border: 1px solid silver;
