@@ -5,6 +5,7 @@
 
 var Wecom = Wecom || {};
 Wecom.iptv = Wecom.iptv || function (start, args) {
+
     this.createNode("body");
     var that = this;
 
@@ -32,7 +33,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     app.onmessage = app_message;
 
     var elteste = document.getElementById("teste");
-    elteste.addEventListener("click", function () { getChannels() }, false);
+    elteste.addEventListener("click", function () { deleteChannel(6) }, false);
 
 
     var elcloseModal = document.getElementById("closeModal");
@@ -47,7 +48,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     var elAddVideoModal = document.getElementById("newVideoModal");
     elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
 
-    var player = videojs('hls-example');
+    var dis = start.consumeApi("com.innovaphone.launcher")
 
 
     function insertChannel() {
@@ -58,6 +59,12 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
             app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo) });
         }
+    }
+
+    function deleteChannel(id) {
+        //var idVideo = document.getElementById("idVideo").value;
+        console.log(id);
+        app.send({ api: "channel", mt: "DeleteChannelMessage", id: id});
     }
 
     function getChannels() {
@@ -87,29 +94,20 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             closeModal();
             getChannels();
         }
+        if (obj.api == "channel" && obj.mt == "DeleteChannelMessageResultSuccess") {
+            getChannels();
+        }
         
 }
 
-    function selectplayer(channel) {
-        //const queryString = window.location.search;
-        //var x = document.getElementById("hls-source").src;
-        //console.log(x);
-        //console.log(queryString);
-        //var y = document.getElementById("channelLink").fonte;
-        //var params = new URLSearchParams(queryString);
-        //let channel = params.get('chn');
-        //let url = params.get('url');
-        var video = document.getElementById("hls-example_html5_api");
-
-        console.log(channel);
-
-        video.pause();
-        document.getElementById('hls-source').src = channel;
-        var x = document.getElementById("hls-source").src;
-        console.log(x);                                        // porque repetir o X dnv?
-        
-        video.load();
-        video.play();
+    function onChange(url) {
+        var video = videojs('hls-example');
+        document.getElementById('hls-source').src = url;
+        video.src({ type: 'application/x-mpegURL', src: url });
+        video.ready(function () {
+            video.play();
+        });
+       
     }
 
     function newVideoModal(e) {
@@ -145,6 +143,17 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
 
     function insereLi(channels) {
         //var temphref = "?url="+url;
+        try {
+            var li = document.getElementById('playChannel');
+            while (li.firstChild) {
+                li.removeChild(li.firstChild);
+            }
+            console.log("Limpou o LI")
+        } catch {
+            console.log("o LI estava limpo!")
+        }
+        
+
 
         channels.forEach(function (item, index) {
             console.log(item.name);
@@ -172,7 +181,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 const el = event.target || event.srcElement;
                 const nonce = el.nonce;
                 console.log(nonce);
-                selectplayer(nonce);
+                canal = nonce;
+                onChange(nonce);
             });
 
         });

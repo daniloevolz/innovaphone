@@ -48,6 +48,17 @@ new JsonApi("channel").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText)}));
                     });
             }
+            if (obj.mt == "DeleteChannelMessage") {
+                conn.send(JSON.stringify({ api: "channel", mt: "DeleteChannelMessageResult" }));
+                Database.exec("DELETE FROM channels WHERE id="+obj.id+";")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "channel", mt: "DeleteChannelMessageResultSuccess"}));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                    });
+            }
         });
         conn.messageComplete();
     }
