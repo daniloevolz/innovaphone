@@ -91,7 +91,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
                 checkedValue = inputElements[i].value;
                 console.log(checkedValue);
                 app.send({ api: "channel", mt: "DeleteChannelMessage", id: checkedValue });
-                break;
+                //break;  Vamos testar sem o break para ver como o codigo se comporta.
             }
         }
 
