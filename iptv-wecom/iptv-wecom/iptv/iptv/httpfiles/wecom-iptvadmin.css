@@ -82,27 +82,27 @@ label {
 
 /* Edição Pietro */
 .tdborder{
-    border: 1px solid black;
+    border: 1px solid ;
     text-align: center; 
 }
 .tdborder2{
-    border: 1px solid black;
+    border: 1px solid ;
     text-align: center;
 }
 .tdborder3{
-    border: 1px solid black;
+    border: 1px solid ;
     text-align: center;
 }
 .tdborder4{
-    border: 1px solid black;
+    border: 1px solid ;
     text-align: center;
 }
 .tdborder5{
-    border: 1px solid black;
+    border: 1px solid ;
     text-align: center;
 }
 .truetable{
-    border: 3px solid black;
+    border: 3px solid ;
     text-align: center;
     margin: auto;
     width: 55%;
