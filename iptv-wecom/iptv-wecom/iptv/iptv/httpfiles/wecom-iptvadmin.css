@@ -78,5 +78,44 @@ label {
     align-self: center;
 }
 
-
 /*Edição danilo*/
+
+/* Edição Pietro */
+.tdborder{
+    border: 1px solid black;
+    text-align: center;
+   
+}
+.tdborder2{
+    border: 1px solid black;
+    text-align: center;
+}
+.tdborder3{
+    border: 1px solid black;
+    text-align: center;
+}
+.tdborder4{
+    border: 1px solid black;
+    text-align: center;
+}
+.tdborder5{
+    border: 1px solid black;
+    text-align: center;
+}
+.truetable{
+    border: 3px solid black;
+    text-align: center;
+    margin-left: 27%;
+    width: 50%;
+    height: 200px;
+    margin-top: 1%;
+}
+
+th{
+    border: 2px solid;
+    text-align: center;
+}
+.btn {
+    margin-left: 43%;
+    margin-top: 0.2%;
+}
