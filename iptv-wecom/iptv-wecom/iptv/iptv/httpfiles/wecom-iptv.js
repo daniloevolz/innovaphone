@@ -2,6 +2,8 @@
 /// <reference path="../../web1/lib1/innovaphone.lib1.js" />
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
+/// <reference path="./flv.min.js" />
+/// <reference path="./video.js" />
 
 var Wecom = Wecom || {};
 Wecom.iptv = Wecom.iptv || function (start, args) {
@@ -44,8 +46,6 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         }
     }
 
-    
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -76,22 +76,76 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     }
 
     function onChange(url, type) {
-        var video = videojs('hls-example');
-        document.getElementById('hls-source').src = url;
-        document.getElementById('hls-source').type = type;
-        video.src({ type: type, src: url });
-        video.ready(function () {
-            video.play();
-        });
-       
+        document.getElementById("container").innerHTML = "";
+        if (type == "video/flv") {
+            var script = document.createElement("script");
+            script.src = "./flv.min.js";
+            document.getElementById("container").appendChild(script);
+            //if (flvjs.isSupported()) {
+                var videoElement = document.createElement("video");
+                videoElement.setAttribute("allow", "autoplay");
+                videoElement.setAttribute("autoplay", "true");
+                videoElement.setAttribute("muted", "muted");
+                videoElement.setAttribute("width", "80%");
+                videoElement.setAttribute("height", "50%");
+                videoElement.setAttribute("controls", "controls");
+                videoElement.setAttribute("class", "video-js vjs-default-skin");
+      
+                document.getElementById("container").appendChild(videoElement);
+
+                var flvPlayer = flvjs.createPlayer({
+                    type: 'video/flv',
+                    url: url
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load();
+                flvPlayer.play();
+            //}
+        }
+        if (type == "youtube") {
+            var iframe = document.createElement("iframe");
+            iframe.src = url;
+            iframe.frameBorder = "0";
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.setAttribute("autoplay", "true");
+            iframe.setAttribute("muted", "muted");
+            iframe.width = "80%";
+            iframe.height = "50%";
+            document.getElementById("container").appendChild(iframe);
+        }
+        if (type == "application/x-mpegURL") {
+            var script = document.createElement("script");
+            script.src = "./video.js";
+            document.getElementById("container").appendChild(script);
+            var videoElement = document.createElement("video");
+            videoElement.setAttribute("allow", "autoplay");
+            videoElement.setAttribute("autoplay", "true");
+            videoElement.setAttribute("muted", "muted");
+            videoElement.setAttribute("width", "800%");
+            videoElement.setAttribute("height", "470%");
+            videoElement.setAttribute("controls", "controls");
+            videoElement.setAttribute("class", "video-js vjs-default-skin");
+            videoElement.setAttribute("id", "video-js");
+
+            videoElement.setAttribute("src", url);
+            videoElement.setAttribute("type", type);
+            document.getElementById("container").appendChild(videoElement);
+            var video = videojs('video-js');
+            video.src({ type: type, src: url });
+            video.ready(function () {
+                video.play();
+            });
+
+        }
     }
 
     function insereLi(channels) {
         try {
-            var lis = document.querySelectorAll('#playChannel');
-            for (var i = 0; li = lis[i]; i++) {
-                li.parentNode.removeChild(li);
-            }
+            //var lis = document.querySelectorAll('#listchanenels');
+            //for (var i = 0; li = lis[i]; i++) {
+            //    li.parentNode.removeChild(li);
+            //}
+            document.getElementById("listchanenels").innerHTML = "";
             console.log("Limpou o LI")
         } catch {
             console.log("o LI estava limpo!")
@@ -108,7 +162,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             newImg.setAttribute("class", "logo");
             newImg.setAttribute("src", item.img);
             newA.setAttribute("nonce", item.url);
-            newA.setAttribute("sourceType", item.type);
+            newA.setAttribute("type", item.type);
             newA.setAttribute("href", "#");
             newA.setAttribute("id", "playChannel");
             newA.appendChild(newText); //colocar o texto no <a>
@@ -123,7 +177,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             button.addEventListener("click", function (event) {
                 const el = event.target || event.srcElement;
                 const nonce = el.nonce;
-                const type = el.sourceType;
+                const type = el.type;
                 console.log(nonce);
                 onChange(nonce, type);
             });

@@ -121,6 +121,7 @@
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
     <None Include="iptv.mak" />
+    <None Include="iptv\httpfiles\flv.min.js" />
     <None Include="iptv\httpfiles\modal.css" />
     <None Include="iptv\httpfiles\video-js.css" />
     <None Include="iptv\httpfiles\video.js" />
