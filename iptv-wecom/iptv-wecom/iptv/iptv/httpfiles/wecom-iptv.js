@@ -32,44 +32,19 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var elteste = document.getElementById("teste");
-    elteste.addEventListener("click", function () { deleteChannel(6) }, false);
-
-
-    var elcloseModal = document.getElementById("closeModal");
-    elcloseModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elCancelModal = document.getElementById("cancelModal");
-    elCancelModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elSalvarCloseModal = document.getElementById("salvarCloseModal");
-    elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
-
-    var elAddVideoModal = document.getElementById("newVideoModal");
-    elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
-
-    var dis = start.consumeApi("com.innovaphone.launcher")
-
 
     function insertChannel() {
         var nameVideo = document.getElementById("nomeVideo").value;
         var urlVideo = document.getElementById("urlVideo").value;
         var urlLogo = document.getElementById("urlImg").value;
+        var typeVideo = document.getElementById("selectType").value;
         console.log(nameVideo);
         if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
-            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo) });
+            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo) });
         }
     }
 
-    function deleteChannel(id) {
-        //var idVideo = document.getElementById("idVideo").value;
-        console.log(id);
-        app.send({ api: "channel", mt: "DeleteChannelMessage", id: id});
-    }
-
-    function getChannels() {
-        app.send({ api: "channel", mt: "SelectChannelMessage" });
-    }
+    
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
@@ -90,71 +65,37 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             insereLi(channels);
 
         }
-        if (obj.api == "channel" && obj.mt == "InsertChannelMessageSucess") {
-            closeModal();
-            getChannels();
-        }
-        if (obj.api == "channel" && obj.mt == "DeleteChannelMessageResultSuccess") {
-            getChannels();
-        }
-        
-}
+    }
 
-    function onChange(url) {
+    const myInterval = window.setInterval(function () {
+        getChannels();
+    }, 60000);
+
+    function getChannels() {
+        app.send({ api: "channel", mt: "SelectChannelMessage" });
+    }
+
+    function onChange(url, type) {
         var video = videojs('hls-example');
         document.getElementById('hls-source').src = url;
-        video.src({ type: 'application/x-mpegURL', src: url });
+        document.getElementById('hls-source').type = type;
+        video.src({ type: type, src: url });
         video.ready(function () {
             video.play();
         });
        
     }
 
-    function newVideoModal(e) {
-        const modalNewVideo = document.querySelector('.modal');
-        modalNewVideo.classList.add('visivel');
-
-    }
-
-    function closeModal(e) {
-        console.log('function closemodal.');
-        const modalNewVideo = document.querySelector('.modal');
-        modalNewVideo.classList.remove('visivel');
-    }
-
-    function populateChannelList(e) {
-        //var token = Config.token;
-        //console.log(token);
-        //Config.token = "xxxx";
-        //Config.save();
-        //var token = Config.token;
-        //console.log(token);
-
-        var channels = [{ name: "TNT", href: "tnt", src: "https://glxlmn026c.singularcdn.net.br/playout_05/playlist.m3u8", logo: "./images/tnt-logo.png" },
-            { name: "BandNews", href: "band", src: "https://evpp.mm.uol.com.br/geob_band/bandnewstv/playlist.m3u8", logo: "./images/bandnews.png" },
-            { name: "NASA", href: "nasa", src: "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master_2000.m3u8", logo: "./images/nasa.png" },
-            { name: "CNN", hfef: "cnn", src: "https://cnn-cnninternational-1-de.samsung.wurl.com/manifest/playlist.m3u8", logo: "./images/CNN-Logo.png" },
-            { name: "SBT", href: "sbt", src: "http://wz4.dnip.com.br/bemtv/bemtv.sdp/playlist.m3u8", logo: "./images/sbt.png" },
-            { name: "Anime", href: "anime", src: "https://stmv1.srvif.com/animetv/animetv/playlist.m3u8", logo: "./images/anime-logo2.png" },
-            { name: "AllSports", href: "allsports", src: "https://5cf4a2c2512a2.streamlock.net/dgrau/dgrau/chunklist.m3u8", logo: "./images/AllSports.png" },
-            { name: "TVE", href: "tve", src: "http://selpro1348.procergs.com.br:1935/tve/stve/playlist.m3u8", logo: "./images/tve-logo.png" },
-            { name: "Futura", href: "futura", src: "https://tv.unisc.br/hls/test.m3u8", logo: "./images/futura-logo.png" }];
-    }
-
     function insereLi(channels) {
-        //var temphref = "?url="+url;
         try {
-            var li = document.getElementById('playChannel');
-            while (li.firstChild) {
-                li.removeChild(li.firstChild);
+            var lis = document.querySelectorAll('#playChannel');
+            for (var i = 0; li = lis[i]; i++) {
+                li.parentNode.removeChild(li);
             }
             console.log("Limpou o LI")
         } catch {
             console.log("o LI estava limpo!")
         }
-        
-
-
         channels.forEach(function (item, index) {
             console.log(item.name);
             var ul = document.getElementById('listchanenels');
@@ -167,12 +108,14 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             newImg.setAttribute("class", "logo");
             newImg.setAttribute("src", item.img);
             newA.setAttribute("nonce", item.url);
+            newA.setAttribute("sourceType", item.type);
             newA.setAttribute("href", "#");
             newA.setAttribute("id", "playChannel");
             newA.appendChild(newText); //colocar o texto no <a>
-            newEl.appendChild(newA); //e o <a> dentro do <li>
+            newEl.appendChild(newA);
+            newEl.appendChild(newImg);//e o <a> dentro do <li>
             ul.appendChild(newEl);
-            ul.appendChild(newImg);
+            //ul.appendChild(newImg);
         });
 
         document.querySelectorAll("a").forEach(function (button) {
@@ -180,9 +123,9 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             button.addEventListener("click", function (event) {
                 const el = event.target || event.srcElement;
                 const nonce = el.nonce;
+                const type = el.sourceType;
                 console.log(nonce);
-                canal = nonce;
-                onChange(nonce);
+                onChange(nonce, type);
             });
 
         });

@@ -52,9 +52,9 @@ input[type="checkbox"] {
     display: none;
 }
 
-    input[type="checkbox"]:checked ~ nav {
-        transform: translateX(350px);
-    }
+input[type="checkbox"]:checked ~ nav {
+    transform: translateX(350px);
+}
 
 
 nav {

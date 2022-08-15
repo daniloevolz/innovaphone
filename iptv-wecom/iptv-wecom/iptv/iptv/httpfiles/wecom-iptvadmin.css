@@ -1,10 +1,16 @@
-
+﻿
 body {
     background-color: var(--bg);
     color: var(--text-standard);
+    font-family: arial;
 }
+
 .vjs-modal-dialog-content {
     z-index: 0;
+}
+td {
+    text-align: start; /* alinhamento horizontal */
+    vertical-align: middle; /* alinhamento vertical */
 }
 
 div.button {
@@ -27,46 +33,10 @@ div.button {
     margin: 0px;
 }
 
-body {
-    font-family: arial;
-    /*background: url("logo.png");
-	background-size:100%;*/
-}
-
-ul {
-    top: 70px;
-    position: absolute;
-    list-style: none;
-    width: 100%;
-}
-
-img {
-    width: 40px;
-}
-
-.imglogo {
-    align-self: center;
-}
-
 input[type="checkbox"] {
-    display: none;
+    display: block;
 }
 
-input[type="checkbox"]:checked ~ nav {
-    transform: translateX(350px);
-}
-
-
-nav {
-    position: absolute;
-    background-color: rgba(75, 71, 71, 0.5);
-    width: 300px;
-    height: 100%;
-    left: -370px;
-    transition: all .6s;
-    z-index: 1;
-    overflow-y: scroll;
-}
 
 ::-webkit-scrollbar {
     display: none;
@@ -78,19 +48,13 @@ a {
     display: flex;
     padding: 20.4px 4px;
     color: #a80939;
- /*COR ORIGINAL DO MENU:*/   /*color: #b60c3f;*/
+    /*COR ORIGINAL DO MENU:*/ /*color: #b60c3f;*/
     font-weight: bold;
     width: 100%;
     margin-left: 13%;
-    
 }
-    ul li:hover{
-        background-color: rgba(32, 248, 255, 0.2);
-        width: 100%;
 
-        
-    }
-    
+
 
 label {
     padding: 15px;
@@ -107,20 +71,12 @@ label {
     justify-content: center;
     align-items: center;
 }
-#listchanenels{
-    margin-left: 5%;
-    display: block;
-  
-}
-.logo{
-    display: flex; width: 25px; height: 25px; position: absolute; margin-left: 4.4%;margin-top: -14.3%;
+
+.logo {
+    width: 25px;
+    height: 25px;
+    align-self: center;
 }
 
 
-
-
-
-
-
-
-/*Edi��o danilo*/
+/*Edição danilo*/

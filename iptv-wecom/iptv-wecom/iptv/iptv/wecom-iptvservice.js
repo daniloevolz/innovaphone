@@ -27,7 +27,7 @@ new JsonApi("channel").onconnected(function (conn) {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AddChannelMessage") {
-                Database.insert("INSERT INTO channels (name, url, img) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "')")
+                Database.insert("INSERT INTO channels (name, url, img, type) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "','"+obj.type+"')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "channel", mt: "InsertChannelMessageSucess"}));
                     })
@@ -53,6 +53,46 @@ new JsonApi("channel").onconnected(function (conn) {
                 Database.exec("DELETE FROM channels WHERE id="+obj.id+";")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "channel", mt: "DeleteChannelMessageResultSuccess"}));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                    });
+            }
+        });
+        conn.messageComplete();
+    }
+    if (conn.app == "wecom-iptvadmin") {
+        conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
+        conn.onmessage(function (msg) {
+            var obj = JSON.parse(msg);
+            if (obj.mt == "AddChannelMessage") {
+                Database.insert("INSERT INTO channels (name, url, img, type) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "','" + obj.type + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "channel", mt: "InsertChannelMessageSucess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(error) }));
+                    });
+
+            }
+            if (obj.mt == "SelectChannelMessage") {
+                conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
+                Database.exec("SELECT * FROM channels")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "DeleteChannelMessage") {
+                conn.send(JSON.stringify({ api: "channel", mt: "DeleteChannelMessageResult" }));
+                Database.exec("DELETE FROM channels WHERE id=" + obj.id + ";")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "channel", mt: "DeleteChannelMessageResultSuccess" }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {

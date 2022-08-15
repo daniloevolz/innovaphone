@@ -18,12 +18,17 @@
           {
             "cmd": "column",
             "name": "url",
-            "type": "VARCHAR(128) UNIQUE NOT NULL"
+            "type": "VARCHAR(128) NOT NULL"
           },
           {
             "cmd": "column",
             "name": "img",
-            "type": "VARCHAR(128) UNIQUE NOT NULL"
+            "type": "VARCHAR(128) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "type",
+            "type": "VARCHAR(128)"
           }
         ]
       }
