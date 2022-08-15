@@ -83,8 +83,7 @@ label {
 /* Edição Pietro */
 .tdborder{
     border: 1px solid black;
-    text-align: center;
-   
+    text-align: center; 
 }
 .tdborder2{
     border: 1px solid black;
@@ -105,10 +104,9 @@ label {
 .truetable{
     border: 3px solid black;
     text-align: center;
-    margin-left: 27%;
+    margin: auto;
     width: 50%;
-    height: 200px;
-    margin-top: 1%;
+    margin-top: 2%;
 }
 
 th{
@@ -116,6 +114,19 @@ th{
     text-align: center;
 }
 .btn {
-    margin-left: 43%;
-    margin-top: 0.2%;
+    display: flex;
+    margin-top: 0.3%;
+}
+#divbtn{
+    text-align: center;
+}
+
+td:first-child { width: 0px }
+td:first-child + td {  width: 20%;}   
+td:first-child + td + td {  width: 20%; }
+td:first-child + td + td + td{  width: 40%; }
+td:first-child + td + td + td + td{  width: 5%; }
+
+table{
+    border-collapse: collapse;
 }
