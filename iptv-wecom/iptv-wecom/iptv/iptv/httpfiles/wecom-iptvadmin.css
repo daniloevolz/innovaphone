@@ -4,7 +4,7 @@ body {
     color: var(--text-standard);
     font-family: arial;
 }
-
+/*Edição danilo*/
 .vjs-modal-dialog-content {
     z-index: 0;
 }
@@ -27,7 +27,7 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-/*Edição danilo*/
+
 * {
     padding: 0px;
     margin: 0px;

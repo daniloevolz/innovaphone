@@ -2,8 +2,9 @@
 /// <reference path="../../web1/lib1/innovaphone.lib1.js" />
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
-/// <reference path="./flv.min.js" />
+/// <reference path="./flv.js" />
 /// <reference path="./video.js" />
+//import flvjs from 'flv.js'
 
 var Wecom = Wecom || {};
 Wecom.iptv = Wecom.iptv || function (start, args) {
@@ -34,18 +35,6 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-
-    function insertChannel() {
-        var nameVideo = document.getElementById("nomeVideo").value;
-        var urlVideo = document.getElementById("urlVideo").value;
-        var urlLogo = document.getElementById("urlImg").value;
-        var typeVideo = document.getElementById("selectType").value;
-        console.log(nameVideo);
-        if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
-            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo) });
-        }
-    }
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -69,7 +58,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
 
     const myInterval = window.setInterval(function () {
         getChannels();
-    }, 60000);
+    }, 30000);
 
     function getChannels() {
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -79,22 +68,22 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         document.getElementById("container").innerHTML = "";
         if (type == "video/flv") {
             var script = document.createElement("script");
-            script.src = "./flv.min.js";
+            script.src = "./flv.js";
             document.getElementById("container").appendChild(script);
             //if (flvjs.isSupported()) {
                 var videoElement = document.createElement("video");
                 videoElement.setAttribute("allow", "autoplay");
                 videoElement.setAttribute("autoplay", "true");
                 videoElement.setAttribute("muted", "muted");
-                videoElement.setAttribute("width", "80%");
-                videoElement.setAttribute("height", "50%");
+                videoElement.setAttribute("width", "800%");
+                videoElement.setAttribute("height", "470%");
                 videoElement.setAttribute("controls", "controls");
                 videoElement.setAttribute("class", "video-js vjs-default-skin");
       
                 document.getElementById("container").appendChild(videoElement);
 
                 var flvPlayer = flvjs.createPlayer({
-                    type: 'video/flv',
+                    type: 'flv',
                     url: url
                 });
                 flvPlayer.attachMediaElement(videoElement);

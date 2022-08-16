@@ -128,12 +128,13 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         var table = document.getElementById('tableChannels');
         data.forEach(function (object) {
             var tr = document.createElement('tr');
+            tr.setAttribute("class", "tr1");
             tr.setAttribute('id', 'channelLine');
-            tr.innerHTML = '<td><input type="checkbox" id="checkChannels" class="checkChannels" value="' + object.id + '"></td>' +
-                '<td>' + object.name + '</td>' +
-                '<td>' + object.type + '</td>' +
-                '<td>' + object.url + '</td>' +
-                '<td><img id="imglogo" class="logo" src="' + object.img + '"></td>';
+            tr.innerHTML = '<td class="tdborder"><input type="checkbox" id="checkChannels" class="checkChannels" value="' + object.id + '"></td>' +
+                '<td class="tdborder2">' + object.name + '</td>' +
+                '<td class="tdborder3">' + object.type + '</td>' +
+                '<td class="tdborder4">' + object.url + '</td>' +
+                '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
             table.appendChild(tr);
         });
     }
