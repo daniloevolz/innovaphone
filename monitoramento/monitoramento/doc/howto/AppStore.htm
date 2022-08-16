@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - AppStore App</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>The AppStore App</h1>
+
+    <p>
+        The AppStore App is used to store Apps, Firmware, Software and App Platforms and these can be downloaded afterwards from the app itself or from the download page.
+        To upload a new release to the AppStore App, 3 uploads must be done: one for the Apps, one for the Firmware and one for the Software.
+        For every app, device and software there must be a file named like <b>itemID_files</b>, which contains the names of the binaries that should be uploaded to the AppStore App for this item.
+    </p>
+
+    <h2>Table of content</h2>
+    <h4><a href="#add_item">How to add items to the AppStore App</a></h4>
+    <ul>
+        <li><a href="#add_app">How to add an app</a></li>
+        <li><a href="#add_firmware">How to add a firmware</a></li>
+        <li><a href="#add_software">How to add a software</a></li>
+        <li><a href="#add_appplatform">How to add an app platform</a></li>
+    </ul>
+    <h4><a href="#upload_item">How to upload items to the AppStore App</a></h4>
+    <ul>
+        <li><a href="#upload_app">How to upload an app</a></li>
+        <li><a href="#upload_firmware">How to upload a firmware</a></li>
+        <li><a href="#upload_software">How to upload a software</a></li>
+        <li><a href="#upload_appplatform">How to upload an app platform</a></li>
+    </ul>
+    <h4><a href="#sources">How to use another AppStore App as a source</a></h4>
+    <ul>
+        <li><a href="#sources_add">How to add a source</a></li>
+        <li><a href="#sources_get">How to get items from a source</a></li>
+        <li><a href="#sources_update">How to update cascaded items</a></li>
+    </ul>
+    <h4><a href="#folder_structure">Folder Structure</a></h4>
+    <ul>
+        <li><a href="#folder_apps">Apps</a></li>
+        <li><a href="#folder_firmware">Firmware</a></li>
+        <li><a href="#folder_software">Software</a></li>
+        <li><a href="#folder_appplatform">App Platform</a></li>
+    </ul>
+    <h4><a href="#json_structure">JSON Files Structure</a></h4>
+    <ul>
+        <li><a href="#json_apps">Apps</a></li>
+        <li><a href="#json_firmware">Firmware</a></li>
+        <li><a href="#json_software">Software</a></li>
+        <li><a href="#json_appplatform">App Platform</a></li>
+    </ul>
+
+    <br />
+
+    <!-- Add Items -->
+
+    <h2><a name="add_item">How to add items to the AppStore App</a></h2>
+
+    <h3><a name="add_app">How to add an app</a></h3>
+    <p>
+        The add of a new app the <b>Add</b> button must be clicked (upper-right corner). After that, a dialog like this one will be displayed:
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Add_Apps.jpg">
+        <br />
+        <br />
+        The <b>ID</b> must be unique and there should be a file named id_files which contains the names of the files that must be uploaded for the given app.
+        The <b>Path</b> should point to where the folders for the builds are. Those folders must contain the id_files file and 3 folders: arm, arm64 and x86_64.
+        The <b>Folder</b> must be the name of the folder inside arm, inside arm64 and inside x86_64, which contains the binaries and <b>Binary</b> must be the name of the binaries (in this case, apidemo.bin, apidemo.debug and apidemo.png).
+        <br />
+        <br />
+        So the whole path of the binaries should be something like: <i>path</i>/<i>build_number</i>/<i>arm</i>/<i>folder</i>/<i>binary</i>.bin
+    </p>
+
+    <h3><a name="add_firmware">How to add a firmware</a></h3>
+    <p>
+        The add of a new firmware the <b>Add</b> button must be clicked (upper-right corner). After that, a dialog like this one will be displayed:
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Add_Firmware.jpg">
+        <br />
+        <br />
+        The <b>Name</b> must be the id of the firmware and <b>Project</b> is the name of the folder that contains the builds.
+        The <b>Path</b> must point to the folder that contains the folders for the builds (which should contain the binaries and the id_files file for the given device). If the id_files file is not found, the boot and ip files will be uploaded as default.
+    </p>
+
+    <h3><a name="add_software">How to add a software</a></h3>
+    <p>
+        The add of a new software the <b>Add</b> button must be clicked (upper-right corner). After that, a dialog like this one will be displayed:
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Add_Software.jpg">
+        <br />
+        <br />
+        The <b>ID</b> must be unique and there should be a file named id_files which contains the names of the files that must be uploaded for the given software. If this file is not found, the one specified on <b>Binary</b> will be uploaded.
+        The <b>Path</b> must point to the folder that contains the binaries of the given software and the id_files file.
+    </p>
+
+    <h3><a name="add_appplatform">How to add an app platform</a></h3>
+    <p>
+        The add of a new app platform the <b>Add</b> button must be clicked (upper-right corner). After that, a dialog like this one will be displayed:
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Add_App_Platform.jpg">
+        <br />
+        <br />
+        The <b>Path</b> should point to where the folder called "app-platform" is placed, which contains the builds for the given app platform. The <b>ID</b> must be unique and the fields File, Update file, First ZIP file and second ZIP file can be used to specify which files must be uploaded for the given app platform.
+    </p>
+
+    <!-- Upload Items -->
+
+    <h2><a name="upload_item">How to upload items to the AppStore App</a></h2>
+
+    <h3><a name="upload_app">How to upload an app</a></h3>
+    <p>
+        The upload of a new build for the apps can be done with the upload menu, which is displayed by clicking on the <b>Update</b> button (upper-right corner). To upload the build for all the current apps on the AppStore App, click on <b>Select all</b> and edit the Release, Build and Label data on the first row. The changes will be automatically applied to all the apps. With the Upload button the binaries of the selected apps are uploaded to the AppStore App.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Upload_Apps.jpg">
+        <br />
+        <br />
+        If an error is displayed after the upload saying that some file could not be found, please check if the path of the apps are correct. These should be like this one (where xxxx is the id of the app):
+        <br />
+        <ul>
+            <li>http://build-dfs.innovaphone.com/13r1/apps/xxxx</li>
+        </ul>
+        If the path is correct, check that inside that folder there is a folder named as the build number. It should contain a file called xxxx_files (which contains the names of the files that will be uploaded to the AppStore App for the given app) and 3 folders with the binaries (arm, arm64 and x86_64).
+    </p>
+
+    <h3><a name="upload_firmware">How to upload a firmware</a></h3>
+    <p>
+        The upload of a new build for the firmware can be done with the upload menu, which is displayed by clicking on the <b>Update</b> button (upper-right corner). To upload the build for all the current devices on the AppStore App, click on <b>Select all</b> and edit the Release, Build, SR and Wiki (optionally) data on the first row. The changes will be automatically applied to all the devices. With the Upload button the binaries of the selected devices are uploaded to the AppStore App.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Upload_Firmware.jpg">
+        <br />
+        <br />
+        If an error is displayed saying that some file could not be found, please check the path of the device. This should be like this one (where ipxxxx is the id of the project):
+        <br />
+        <ul>
+            <li>http://build-dfs.innovaphone.com/13r1/ipxxxx</li>
+        </ul>
+        If the path is correct, check that the folder contains a folder named as the build number. These should contain the binaries and the id_files file for the given device. For example, for the device IP1200, inside <i>http://build-dfs.innovaphone.com/13r1/ip1200/131779</i> you should find: boot1200.bin, ip1200.bin and ip1200_files. For 12r2 and older it is ok if the ipxxxx_files files are not found on firmware. On this case, the boot and ip files are uploaded as default.
+    </p>
+
+    <h3><a name="upload_software">How to upload a software</a></h3>
+    <p>
+        The upload of a new build for the software can be done with the upload menu, which is displayed by clicking on the <b>Update</b> button (upper-right corner). To upload the build for all the current softwares on the AppStore App, click on <b>Select all</b> and edit the Release, Build and Label data on the first row. The changes will be automatically applied to all the software. With the Upload button the binaries of the selected softwares are uploaded to the AppStore App.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Upload_Software.jpg">
+        <br />
+        <br />
+        If an error is displayed saying that some file could not be found, please check the path of the software. This should be like this one (where xxxx is the folder containing the binaries of the given software and the id_files file):
+        <br />
+        <ul>
+            <li>http://build-dfs.innovaphone.com/13r1/client/xxxx</li>
+        </ul>
+        The last part of the path (xxxx) is not set automatically the first time that a software is uploaded.
+    </p>
+
+    <h3><a name="upload_appplatform">How to upload an app platform</a></h3>
+    <p>
+        The upload of a new build for the app platform can be done with the upload menu, which is displayed by clicking on the <b>Update</b> button (upper-right corner). To upload the build for all the current app platforms on the AppStore App, click on <b>Select all</b> and edit the Version data on the first row. The changes will be automatically applied to all the app platforms. With the Upload button the binaries of the selected items are uploaded to the AppStore App.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Upload_App_Platform.jpg">
+        <br />
+        <br />
+        If an error is displayed saying that some file could not be found, please check the path of the item. This should be like this one, which points to a folder called "app-platform" that contains the builds for the given app platform):
+        <br />
+        <ul>
+            <li>http://build-dfs.innovaphone.com/</li>
+        </ul>
+    </p>
+
+    <!-- AppStore App as a source -->
+
+    <h2><a name="sources">How to use another AppStore App as a source</a></h2>
+    <p>
+        Another AppStore App can be used as a source, so other AppStore Apps can get items from there.
+    </p>
+
+    <h3><a name="sources_add">How to add a source</a></h3>
+    <p>
+        To add a new source, the <b>Hamburger-Menu</b> button must be clicked and the option <b>Configure sources</b> must be selected.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Source_Button.jpg">
+        <br />
+        <br />
+        After that, the button <b>Connect source</b> will display a dialog to add a new source. There the most important field is the path, with should be the path from the source AppStore ending with "/download".
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Source_Add.jpg">
+        <br />
+        <br />
+    </p>
+    <h3><a name="sources_get">How to get items from a source</a></h3>
+    <p>
+        To add items from the source AppStore App to your own one, you just have to expand the list and select the items that you want to get. After that, they will be uploaded after clicking on the <b>Upload</b> button.
+        A source can be deleted at any moment using the <b>Delete</b> button without losing the items that have already been uploaded.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Source_Get.jpg">
+        <br />
+        <br />
+    </p>
+    <h3><a name="sources_update">How to update cascaded items</a></h3>
+    <p>
+        When a new build is available for a certain item, a green button will be displayed, which can be used to upload the latest build to your AppStore App. If this button is not clicked, the latest builds are uploaded once a day automatically.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_Source_new_build.jpg">
+        <br />
+        <br />
+    </p>
+
+    <!-- Folder Structure -->
+
+    <h2><a name="folder_structure">Folder Structure</a></h2>
+    <p>
+        To upload apps, firmwares, softwares and app platforms a <i>path</i> is required, which has to point to a folder that contains the builds. These must be named after the build number.
+        <br />
+        <br />
+        <img src="../pics/HowTo_AppStore_path_builds.jpg">
+        <br />
+        <br />
+    </p>
+
+    <h3><a name="folder_apps">Apps</a></h3>
+    <p>
+        Every build folder must contain an <b>appid_files</b> file where a list of the files that must be uploaded will be splited by commas (without white spaces). For example, "appstore.bin,appstore.debug,appstore.png".
+        The binaries must be placed inside 2 folders which paths should look like this:
+        <ul>
+            <li><i>path</i>/130001/<b>arm</b>/appstore</li>
+			<li><i>path</i>/130001/<b>arm64</b>/appstore</li>
+            <li><i>path</i>/130001/<b>x86_64</b>/appstore</li>
+        </ul>
+
+        So if <i>path</i> is the path given in the appstore, the paths of all the files must be:
+        <ul>
+            <li><i>path</i>/130001/appstore_files</li>
+            <li><i>path</i>/130001/arm/appstore/appstore.bin</li>
+            <li><i>path</i>/130001/arm/appstore/appstore.debug</li>
+            <li><i>path</i>/130001/arm/appstore/appstore.png</li>
+			<li><i>path</i>/130001/arm64/appstore/appstore.bin</li>
+            <li><i>path</i>/130001/arm64/appstore/appstore.debug</li>
+            <li><i>path</i>/130001/arm64/appstore/appstore.png</li>
+            <li><i>path</i>/130001/x86_64/appstore/appstore.bin</li>
+            <li><i>path</i>/130001/x86_64/appstore/appstore.debug</li>
+            <li><i>path</i>/130001/x86_64/appstore/appstore.png</li>
+        </ul>
+    </p>
+
+    <h3><a name="folder_firmware">Firmware</a></h3>
+    <p>
+        Every build folder must contain an <b>firmwareid_files</b> file where a list of the files that must be uploaded will be splited by commas (without white spaces). For example, "ip0001.bin,boot0001.bin".
+        So if <i>path</i> is the path given in the appstore, the paths of all the files must be:
+        <ul>
+            <li><i>path</i>/130001/ip0001_files</li>
+            <li><i>path</i>/130001/ip0001.bin</li>
+            <li><i>path</i>/130001/boot0001.bin</li>
+        </ul>
+    </p>
+
+    <h3><a name="folder_software">Software</a></h3>
+    <p>
+        Every build folder must contain an <b>softwareid_files</b> file where a list of the files that must be uploaded will be splited by commas (without white spaces). For example, "myAppsSetup.exe".
+        So if <i>path</i> is the path given in the appstore, the paths of all the files must be:
+        <ul>
+            <li><i>path</i>/130001/myappswindows_files</li>
+            <li><i>path</i>/130001/myAppsSetup.exe</li>
+        </ul>
+    </p>
+
+    <h3><a name="folder_appplatform">App Platform</a></h3>
+    <p>
+        The files that must be uploaded should be specified inside the fields File, Update, ZIP and ZIP2. Those must be inside a folder named as the build number, which is inside a folder named app-platform.
+        So if <i>path</i> is the path given in the appstore, the paths of all the files must look like:
+        <ul>
+            <li><i>path</i>/<b>app-platform</b>/80008/file.bin</li>
+        </ul>
+    </p>
+
+    <!-- JSON Structure -->
+
+    <h2><a name="json_structure">JSON Files Structure</a></h2>
+    <p>
+        For apps, firmwares, softwares and app platforms a <i>JSON</i> file is generated, where all the items present on the App Store are declared.
+        This files are used by Devices App and Manager App to know which versions are available on the App Store.
+        They are also used to know which items are available when cascading from another App Store.
+        <br />
+    </p>
+
+    <h3><a name="json_apps">Apps</a></h3>
+    <p>
+        The <i>apps.json</i> file includes a list with all the available apps.
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the app, which has to be unique. The format should be <i>manufacturer_appname</i>.</dd>
+            <dt>folder</dt>
+            <dd>The name of the folder where the app binaries are located.</dd>
+            <dt>binary</dt>
+            <dd>The name of the app binaries.</dd>
+            <dt>versions</dt>
+            <dd>Array with the latest version from every release.</dd>
+            <dt>manufacturer</dt>
+            <dd>The manufacturar of the app.</dd>
+            <dt>title</dt>
+            <dd>The title of the app.</dd>
+            <dt>description (optional)</dt>
+            <dd>The description of the app.</dd>
+            <dt>support (optional)</dt>
+            <dd>The support contact.</dd>
+            <dt>impressum (optional)</dt>
+            <dd>The link to the imprint of the manufacturer.</dd>
+            <dt>license_type</dt>
+            <dd>The app could be license <i>free</i>, licensed by <i>innovaphone</i> or licensed by the <i>partner</i>.</dd>
+            <dt>license_info (optional)</dt>
+            <dd>The link with the information about the licensing by the partner.</dd>
+            <dt>eula (optional)</dt>
+            <dd>The link with the license agreement information.</dd>
+            <dt>langs (optional)</dt>
+            <dd>Array with all the languages available on the app.</dd>
+            <dt>categories (optional)</dt>
+            <dd>Array with the categories where the app could be sorted.</dd>
+        </dl>
+
+        <pre><code class="language-json">{ "apps": [{
+	"id": "manufacturer_apidemo",
+	"folder": "apidemo",
+	"binary": "apidemo",
+	"versions": [
+			{"id": "13r1","build": "130001","label": "sr01"},
+			{"id": "13r2","build": "134003","label": "sr01"}
+	],
+	"manufacturer": "manufacturer",
+	"title": "Apidemo",
+	"description": "This is a demo app.",
+	"support": "support@manufacturer.com",
+	"impressum": "https://www.manufacturer.com/impressum.html",
+	"license_type": "free",
+	"license_info": "",
+	"eula": "https://www.manufacturer.com/eula.html",
+	"langs": ["cs","nl","en","fr","de","it","pl","pt","ru","sl","es"],
+	"categories": ["administration","tools"]
+	}]
+}</code></pre>
+    </p>
+
+    <h3><a name="json_firmware">Firmware</a></h3>
+    <p>
+        The <i>firmware.json</i> file includes a list with all the available devices and their lastest versions for every release.
+        <br><br>
+        <b>Devices array</b>
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the device, which has to be unique.</dd>
+            <dt>versions</dt>
+            <dd>Array with every release available for the device.</dd>
+        </dl>
+        <b>Versions array</b>
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the release.</dd>
+            <dt>build</dt>
+            <dd>The latest build for the given release.</dd>
+            <dt>text</dt>
+            <dd>A text label with format is "<i>release</i> <i>service_release</i> [<i>build_number</i>]".</dd>
+            <dt>wiki (optional)</dt>
+            <dd>A wiki article with information about how to upgrade from the previous release.</dd>
+        </dl>
+        <pre><code class="language-json">{ "devices": [{
+		"id": "IP0010",
+		"versions": ["10.00","13r1"]
+	},
+	{
+		"id": "IP0011",
+		"versions": ["10.00","13r1"]
+	}],
+	"versions": [{
+		"id": "10.00",
+		"build": "100017",
+		"text": "10.00 sr01 [100017]",
+		"wiki": "http://wiki.innovaphone.com/index.php?title=Howto:Firmware_Upgrade_V9_V10"
+	},
+	{
+		"id": "13r1",
+		"build": "130001",
+		"text": "13r1 sr01 [130001]",
+		"wiki": "https://wiki.innovaphone.com/index.php?title=Howto:Firmware_Upgrade"
+	}]
+}</code></pre>
+    </p>
+
+    <h3><a name="json_software">Software</a></h3>
+    <p>
+        The <i>software.json</i> file includes a list with all the available softwares.
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the software, which has to be unique. The format should be <i>manufacturer_appname</i>.</dd>
+            <dt>folder</dt>
+            <dd>The name of the folder where the software binaries are located.</dd>
+            <dt>binary</dt>
+            <dd>The name of the software binaries.</dd>
+            <dt>versions</dt>
+            <dd>Array with the latest version from every release.</dd>
+            <dt>manufacturer</dt>
+            <dd>The manufacturar of the software.</dd>
+            <dt>title</dt>
+            <dd>The title of the software.</dd>
+            <dt>description (optional)</dt>
+            <dd>The description of the software.</dd>
+        </dl>
+
+        <pre><code class="language-json">{ "software": [{
+    "id": "manufacturer_toolbox",
+    "folder": "toolbox",
+    "binary": "toolbox",
+    "versions": [
+    {"id": "13r1","build": "130001","label": "sr01"},
+    {"id": "13r1","build": "130003","label": "sr02"}
+    ],
+    "manufacturer": "manufacturer",
+    "title": "Toolbox",
+    "description": "This is a demo software."
+    }]
+}</code></pre>
+    </p>
+
+    <h3><a name="json_appplatform">App Platform</a></h3>
+    <p>
+        The <i>linux.json</i> file includes a list with all the available platforms and another list with all the devices that can install those platforms.
+        <br><br>
+        <b>Platforms array</b>
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the platform.</dd>
+            <dt>text</dt>
+            <dd>The title of the platform.</dd>
+            <dt>file (optional)</dt>
+            <dd>The file to install the platform.</dd>
+            <dt>update (optional)</dt>
+            <dd>The file to update the platform.</dd>
+            <dt>zip (optional)</dt>
+            <dd>Extra files needed by the platform.</dd>
+            <dt>zip2 (optional)</dt>
+            <dd>Extra files needed by the platform.</dd>
+            <dt>version</dt>
+            <dd>The latest version available.</dd>
+        </dl>
+
+        <b>Devices array</b>
+        <dl>
+            <dt>id</dt>
+            <dd>The id of the device.</dd>
+            <dt>platforms</dt>
+            <dd>Array with the ids of the platforms available for a given device.</dd>
+        </dl>
+
+        <pre><code class="language-json">{ "platforms": [{
+    "id": "arm",
+    "text": "App Platform",
+    "file": "app-platform/10001/app-platform-armel.img",
+    "update": "app-platform/10001/update-armel.img",
+    "version": "10001"
+    }],
+    "devices": [{
+    "id": "IP0011",
+    "platforms": ["arm"]
+    },
+    {
+    "id": "IP811",
+    "platforms": ["arm"]
+    }]
+}</code></pre>
+    </p>
+
+</body>
+</html>

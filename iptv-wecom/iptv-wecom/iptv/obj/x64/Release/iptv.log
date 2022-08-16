@@ -1,0 +1,30 @@
+﻿  Cleaning previous build x86_64...
+  Comando de limpeza remoto não configurado, ignorando.
+  Cleaning previous build x86_64...
+  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64/iptv" -temp "x86_64/obj/" -project "iptv" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-iptvservice.js," -copyRTM 1
+  Building project ...
+      Project output dirctory : x86_64/iptv
+      Temp directory          : x86_64\obj\iptv
+      Runtime binary          : jse/x86_64/generic
+      Build Number            : 13B265
+  
+  Copying runtime jse/x86_64/generic to x86_64\iptv\iptv...
+  Copying icon iptv/iptv.png to x86_64\iptv\iptv.png...
+  Removing old files from x86_64\obj\iptv...
+  Creating directories...
+  Checking for new items to add...
+      .\iptv\..\web1\appwebsocket\innovaphone.appwebsocket.Connection.js => x86_64\obj\iptv\web1\appwebsocket
+      .\iptv\..\web1\lib1\*.js => x86_64\obj\iptv\web1\lib1
+      .\iptv\..\web1\lib1\*.css => x86_64\obj\iptv\web1\lib1
+      .\iptv\..\web1\ui1.lib\*.js => x86_64\obj\iptv\web1\ui1.lib
+      .\iptv\..\web1\ui1.svg\*.js => x86_64\obj\iptv\web1\ui1.svg
+      .\iptv\..\web1\fonts\*.ttf => x86_64\obj\iptv\web1\fonts
+      .\iptv\httpfiles\* => x86_64\obj\iptv
+      .\iptv\build.txt => x86_64\obj\iptv
+      .\iptv\label.txt => x86_64\obj\iptv
+      .\iptv\config.json => x86_64\obj\iptv
+      .\iptv\plugins.json => x86_64\obj\iptv
+      .\iptv\wecom-iptvservice.js => x86_64\obj\iptv
+  
+  Compressing files to x86_64\iptv\httpfiles.zip...
+  Comando Recompilar remoto não configurado, ignorando.

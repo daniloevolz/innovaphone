@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.monitoramentomanager",
+            "icon": "wecom-monitoramento.png",
+            "lang": "wecom.monitoramentomanagertexts",
+            "domains": false
+        }
+    ]
+}

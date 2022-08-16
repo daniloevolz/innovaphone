@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Player Admin</title>
+    <link rel="stylesheet" href="web1/lib1/innovaphone.lib1.css" type="text/css" />
+    <link rel="stylesheet" href="wecom-iptvadmin.css" type="text/css" />
+    <link rel="stylesheet" href="modal.css" type="text/css" />
+    <script src="web1/lib1/innovaphone.lib1.js" type="text/javascript"></script>
+    <script src="web1/ui1.lib/innovaphone.ui1.lib.js" type="text/javascript"></script>
+    <script src="web1/ui1.svg/innovaphone.ui1.svg.js" type="text/javascript"></script>
+    <script src="web1/appwebsocket/innovaphone.appwebsocket.Connection.js" type="text/javascript"></script>
+    <script src="wecom-iptvadmin.js" type="text/javascript"></script>
+    <script src="wecom-iptvtexts.js" type="text/javascript"></script>
+</head>
+<body onload="innovaphone.lib1.Start(function (start) { new Wecom.iptvAdmin(start, { }); })">
+    <table id="tableChannels" class="truetable">
+        <colgroup>
+            <col class="twenty" />
+            <col class="thirtyfive" />
+            <col class="twentyfive" />
+            <col class="fourty" />
+            <col class="twentyfive" />
+        </colgroup>
+        <tr>
+            <th><span class="glyphicon glyphicon-sort" class="bordth"></span>&nbsp&nbspSELECIONAR</th>
+            <th><span class="glyphicon glyphicon-sort" class="bordth"></span>&nbsp&nbspNOME</th>
+            <th><span class="glyphicon glyphicon-sort" class="bordth"></span>&nbsp&nbspTIPO</th>
+            <th><span class="glyphicon glyphicon-sort" class="bordth"></span>&nbsp&nbspURL</th>
+            <th><span class="glyphicon glyphicon-sort" class="bordth"></span>&nbsp&nbspLOGO</th>
+        </tr>
+        <!-- Tabela dos canais atualizada-->
+    </table>
+    <div id="divbtn">
+    <button id="deleteVideo" class="btn btn-close btn-lg">Apagar Vídeo</button>
+    <button id="newVideoModal" class="btn btn-save btn-lg">Adicionar Vídeo</button>
+
+    </div>
+    <div class="modal">
+        <header>
+            <h2>Adicionar Vídeo</h2>
+            <span id="closeModal" class="fechar-modal">×</span>
+        </header>
+        <div class="corpo-modal">
+            <p>Nome:</p>
+            <input id="nomeVideo" type="text" class="input" />
+            <br />
+            <p>Tipo:</p>
+            <select id="selectType" name="selectType">
+                <option value="video/mp4">mp4</option>
+                <option value="application/x-mpegURL" selected>m3u8</option>
+                <option value="youtube">youtube</option>
+                <option value="video/ogg">opus</option>
+                <option value="video/x-matroska">mkv</option>
+                <option value="audio/mpeg">mp3</option>
+                <option value="audio/aac">aac</option>
+                <option value="video/flv">flv</option>
+            </select>
+            <br />
+            <p>URL:</p>
+            <input id="urlVideo" type="url" class="input" />
+            <p>URL Logo:</p>
+            <input id="urlImg" type="url" class="input" />
+        </div>
+        <footer><button id="cancelModal" class="btn btn-close btn-lg">Cancelar</button><button id="salvarCloseModal" class="btn btn-save btn-lg">Salvar</button></footer>
+    </div>
+    <div id="mascara"></div>
+</body>
+</html>
