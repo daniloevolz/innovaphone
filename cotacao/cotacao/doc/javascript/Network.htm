@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Network</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>Network</h1>
+    <p>
+        This document describes the Network library available in the JavaScript environment for app serivices.
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#Network">Network</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#socket">socket</a><br />
+                <a href="#server">server</a><br />
+                <a href="#localAddresses">localAddresses</a><br />
+                <a href="#macAddress">macAddress</a><br />
+                <a href="#socketContext">socketContext</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Object</b></td>
+            <td>
+                <b><a href="#Socket">Socket</a></b><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#socket-connect">connect</a><br />
+                <a href="#socket-send">send</a><br />
+                <a href="#socket-recv">recv</a><br />
+                <a href="#socket-close">close</a><br />
+                <a href="#socket-onbind">onbind</a><br />
+                <a href="#socket-onconnect">onconnect</a><br />
+                <a href="#socket-onrecv">onrecv</a><br />
+                <a href="#socket-onsend">onsend</a><br />
+                <a href="#socket-onclose">onclose</a><br />
+                <a href="#socket-localAddress">localAddress</a><br />
+                <a href="#socket-localPort">localPort</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Object</b></td>
+            <td>
+                <b><a href="#Server">Server</a></b><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#server-close">close</a><br />
+                <a href="#server-onbind">onbind</a><br />
+                <a href="#server-onconnect">onsocket</a><br />
+                <a href="#server-onclose">onclose</a><br />
+                <a href="#server-localAddress">localAddress</a><br />
+                <a href="#server-localPort">localPort</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Object</b></td>
+            <td>
+                <b><a href="#SocketContext">SocketContext</a></b><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#setCertificate">setCertificate</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#Example-Telnet">A simple telnet server</a><br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="Network">Network</a></h2>
+
+    <a name="socket"><div class="fnhead" style="margin-top:5px">socket</div></a>
+    <dd>
+        Creates a socket. Use this function for
+        <ul>
+            <li>Outgoing TCP conncections</li>
+            <li>Outgoing TLS conncections</li>
+            <li>UDP sockets</li>
+        </ul>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">string <b>protocol</b></td>
+                <td>The protocol to be used. Supported values are "tcp", "tls" and "udp".</td>
+            </tr>
+            <tr>
+                <td class="param">string <b>addr</b></td>
+                <td>
+                    Optional. The address of the local network interface that should be used for the socket. If not specified, the socket will be bound to all interfaces.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">unsigned <b>port</b></td>
+                <td>
+                    Optional. The local port that shall be used for the socket. If not specified, the socket will be bound to any free port.
+                    In that case you can find out the actual port using the the <a href="#onbind">onbind</a> callback.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">bool <b>ipv6</b></td>
+                <td>
+                    Optional, defaulting to false. If true, the socket will use IPv6, otherwise it will use IPv4.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">string <b>socketContextId</b></td>
+                <td>
+                    Optional, only used for TLS sockets. The ID of the <a href="#SocketContext">SocketContext</a> to be used.
+                    If not specified, the default context is used.
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param"><a href="#Socket">Socket</a></td>
+                <td>The created socket object.</td>
+            </tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Establish an outgoing TCP connection, and close it again.
+Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket) {
+        socket.close();
+    });
+</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Establish an outgoing TLS connection, and close it again.
+Network.socket("tcp")
+    .connect("10.0.0.1", 443)
+    .onconnect(function(socket) {
+        socket.close();
+    });
+</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Receive datagrams on UDP port 8000 and send them back to the original sender
+Network.socket("udp", null, "8000")
+    .onbind(function(socket, addr, port) {
+        socket.recv(1024, true);
+    });
+    .onrecv(function(socket, data, addr, port) {
+        socket.send(data, addr, port);
+        socket.recv(1024, true);
+    });
+</code></pre>
+    </dd>
+
+    <a name="server"><div class="fnhead" style="margin-top:5px">server</div></a>
+    <dd>
+        Creates a server that receives incoming connections. Use this function for
+        <ul>
+            <li>Incoming TCP connections</li>
+            <li>Incoming TLS connections</li>
+        </ul>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">string <b>protocol</b></td>
+                <td>The protocol to be used. Supported values are "tcp" and "tls".</td>
+            </tr>
+            <tr>
+                <td class="param">string <b>addr</b></td>
+                <td>
+                    Optional. The address of the local network interface on which the server should listen. If not specified, the server will listen on all interfaces.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">unsigned <b>port</b></td>
+                <td>
+                    Optional. The local port that shall be used for the server. If not specified, the server will be bound to any free port.
+                    In that case you can find out the actual port using the the <a href="#onbind">onbind</a> callback.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">bool <b>ipv6</b></td>
+                <td>
+                    Optional, defaulting to false. If true, the server will use IPv6, otherwise it will use IPv4.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">string <b>socketContextId</b></td>
+                <td>
+                    Optional, only used for TLS servers. The ID of the <a href="#SocketContext">SocketContext</a> to be used.
+                    If not specified, the default context is used.
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param"><a href="#Server">Server</a></td>
+                <td>The created server object.</td>
+            </tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// TCP server listening on port 80 that rejects incoming connections right away
+Network.server("tcp", null, 80)
+    .onsocket(function(server, socket, addr, port) {
+        socket.close();
+    });
+</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// TLS server listening on port 443 that rejects incoming connections right away
+Network.server("tls", null, 443)
+    .onsocket(function(server, socket, addr, port) {
+        socket.close();
+    });
+</code></pre>
+    </dd>
+
+    <a name="localAddresses"><div class="fnhead" style="margin-top:5px">localAddresses</div></a>
+    <dd>
+        Returns an all local IP addresses.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">[addrInfo]</td>
+                <td>
+                    An array containing information about all local IP addresses.<br />
+                    Each addrInfo object has the parameters addr and ipv6.<br />
+                    Example: <code class="JS">[{ addr: "192.168.0.1", ipv6: false }, { addr: "10.0.0.1", ipv6: false }]</code>
+                </td>
+            </tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Write the addresses of the local network interfaces to the log
+var addrs = Network.localAddresses();
+log("local addresses:");
+addrs.forEach(function(a) {
+    log("   " + a.addr);
+});
+</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Bind a TLS server on the first interface
+var addrs = Network.localAddresses();
+
+if (addrs.length) {
+    Network.server("tls", addrs[0].addr, 443, addrs[0].ipv6)
+        .onsocket(function(server, socket, addr, port) {
+            // handle connection using the socket object
+        });
+}
+</code></pre>
+    </dd>
+
+    <a name="macAddress"><div class="fnhead" style="margin-top:5px">macAddress</div></a>
+    <dd>
+        Returns the MAC address of the app platform.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">string</td>
+                <td>
+                    A hexstring containing the MAC address.<br />
+                    Example: <code class="JS">"029033410fcb"</code>
+                </td>
+            </tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Write the MAC address of the AP to the log
+var mac = Network.macAddress();
+log("mac address: " + mac);
+</code></pre>
+    </dd>
+
+    <a name="socketContext"><div class="fnhead" style="margin-top:5px">socketContext</div></a>
+    <dd>
+        TLS sockets use a context that includes the certificates to be used and a session cache for resuming sessions.
+        There is a default context that includes a self-signed cerificate that is used for all TLS sockets by default.
+    </dd>
+    <dd>
+        Use this function
+        <ul>
+            <li>if you want to configure a custom certificate.</li>
+            <li>if you want to use different certificates for different TLS connections.</li>
+        </ul>
+    </dd>
+    <dd>
+        This function returns a socket context for a given ID. If the ID does not exist yet, the context is explicitly created.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">string <b>socketContextId</b></td>
+                <td>
+                    Optional. The ID of the context.<br />
+                    If not defined, the default context is returned.<br />
+                    If no context for the given ID exists, it is explicitly created.
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#SocketContext">SocketContext</a></td><td>The socket context.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// change the default certificate for all TLS connections
+Network.socketContext().setCertificate(null, customCertPemFile);</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// LDAPS client socket using a separate context with a specific certificate
+Network.socketContext("ldaps").setCertificate("client", ldapsCertPemFile);
+
+Network.socket("tls", null, 0, false, "ldaps")
+    .connect("10.0.0.1", 389)
+    .onconnect(function(socket) {
+        // do something with the connection
+    });</code></pre>
+    </dd>
+
+    <h2><a name="Socket">Socket</a></h2>
+    <p>
+        This object is used to handle TCP, TLS and UDP communication. Use <a href="#Network">Network</a>.<a href="#socket">socket</a> to create a socket.
+    </p>
+
+    <a name="socket-connect"><div class="fnhead" style="margin-top:5px">connect</div></a>
+    <dd>
+        This function is used to establish a connection on TCP and TLS client sockets.
+        When the socket has been connected the <a href="#socket-onconnect">onconnect</a> callback is triggered.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>addr</b></td><td>The IP address of the server.</td></tr>
+            <tr><td class="param">string <b>port</b></td><td>The TCP port of the server</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Establish a TCP connection to 10.0.0.1:80
+Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket) {
+        // do something with the connection
+    });</code></pre>
+    </dd>
+
+    <a name="socket-send"><div class="fnhead" style="margin-top:5px">send</div></a>
+    <dd>
+        Sends data on the socket.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">Uint8Array <b>data</b></td><td>The data to be sent.</td></tr>
+            <tr><td class="param">string <b>addr</b></td><td>Optional, UDP only. The IP address of the remote endpoint.</td></tr>
+            <tr><td class="param">unsigned <b>port</b></td><td>Optional, UDP only. The UDP port of the remote endpoint.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Send a UDP datagram containing a null byte to 10.0.0.1:1000
+socket.send(new Uint8Array([ 0x00 ]), "10.0.0.1", 1000);</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Send a HTTP request on a TCP connection
+var request = Encoding.stringToBin(
+    "GET / HTTP/1.1\r\n" +
+    "Host: www.example.com\r\n" +
+    "Connection: close\r\n" +
+    "\r\n"
+);
+            
+socket.send(request);</code></pre>
+    </dd>
+
+    <a name="socket-recv"><div class="fnhead" style="margin-top:5px">recv</div></a>
+    <dd>
+        Tells the socket to receive the next chunk of data.
+        The <a href="#socket-onrecv">onrecv</a> callback will be invoked when the data has been received.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned <b>bytes</b></td><td>The (maximum) number of bytes to receive.</td></tr>
+            <tr>
+                <td class="param">bool <b>partial</b></td>
+                <td>
+                    Optional, defaulting to false.<br />
+                    If false, the <a href="#socket-onrecv">onrecv</a> will only be triggered if the requested number of bytes has been fully received.<br />
+                    If true, the <a href="#socket-onrecv">onrecv</a> will be triggered if the requested number of bytes or less has been received.<br />
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS"> // receive excactly 5 bytes
+socket.recv(5)
+    .onrecv(function(socket, data) {
+        // data.length == 5
+    });</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS"> // receive up to 1024 bytes
+socket.recv(1024, true)
+    .onrecv(function(socket, data) {
+        // data.length <= 1024
+    });</code></pre>
+    </dd>
+
+    <a name="socket-close"><div class="fnhead" style="margin-top:5px">close</div></a>
+    <dd>
+        Closes the socket.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">socket.close();</code></pre>
+    </dd>
+
+    <a name="socket-onbind"><div class="fnhead" style="margin-top:5px">onbind</div></a>
+    <dd>
+        Sets a callback function that is invoked when the socket is bound to a network interface.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Socket">Socket</a> socket, string addr, unsigned port)</td><td>A callback that will be called when the socket is bound. It can be used to determine the local address and port of the socket.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS"> // Create a UDP socket and write the bound port to the log
+Network.socket("udp")
+    .onbind(function(socket, addr, port) {
+        log("socket bound to port UDP/" + port);
+    });</code></pre>
+    </dd>
+
+    <a name="socket-onconnect"><div class="fnhead" style="margin-top:5px">onconnect</div></a>
+    <dd>
+        Sets a callback function that is invoked when a TCP or TLS connection has been established after calling <a href="#socket-connect">connect</a>.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Socket">Socket</a> socket, string addr, unsigned port)</td><td>A callback that will be invoked when the socket is connected. The additional parameters represent the address and port of the remote endpoint.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Establish a TCP connection to 10.0.0.1:80
+Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket, addr, port) {
+        log("connected to " + addr + ":" + port);
+    });</code></pre>
+    </dd>
+
+    <a name="socket-onrecv"><div class="fnhead" style="margin-top:5px">onrecv</div></a>
+    <dd>
+        Sets a callback function that is invoked when data has been received after calling <a href="#socket-recv">recv</a>.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Socket">Socket</a> socket, Uint8Array data, string addr, unsigned port)</td><td>A callback that will be invoked when data has been received. Addr and port are only set for UDP sockets.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// receive data and write it to the log
+socket.recv(1024, true)
+    .onrecv(function(socket, data) {
+        log("onrecv:");
+        hexdump(data);
+        socket.recv(1024, true);
+    });</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Receive datagrams on UDP port 8000 and send them back to the original sender
+Network.socket("udp", null, "8000")
+    .onbind(function(socket, addr, port) {
+        socket.recv(1024, true);
+    });
+    .onrecv(function(socket, data, addr, port) {
+        socket.send(data, addr, port);
+        socket.recv(1024, true);
+    });
+</code></pre>
+    </dd>
+
+    <a name="socket-onsend"><div class="fnhead" style="margin-top:5px">onsend</div></a>
+    <dd>
+        Sets a callback function that is invoked when data has been completely sent after calling <a href="#socket-send">send</a>.
+        This function is useful for implementing flow-control.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Socket">Socket</a> socket)</td><td>A callback that will be invoked when data has been sent.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">socket.send(new Uint8Array([0]))
+    .onsend(function(socket, data) {
+        // data has been sent, ready to send the next chunk
+    });</code></pre>
+    </dd>
+
+    <a name="socket-onclose"><div class="fnhead" style="margin-top:5px">onclose</div></a>
+    <dd>
+        Sets a callback function that is invoked when the socket has been closed.
+        After the callback the Socket object is deleted implicitly and can't be used anymore.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">function <b>callback</b>(<a href="#Socket">Socket</a> socket, error)</td>
+                <td>
+                    A callback that will be invoked when the socket has been closed.<br />
+                    error is a string representation of <a href="../../sdk/common/interface/socket.htm#shutdownreason_t">shutdownreason_t</a> or null.<br />
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Socket">Socket</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Establish an outgoing TCP connection, and close it again.
+Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket) {
+        socket.close();
+    })
+    .onclose(function(socket, error) {
+        log("socket closed");
+        if (error) log("error=" + error);
+    });
+</code></pre>
+    </dd>
+
+    <a name="socket-localAddress"><div class="fnhead" style="margin-top:5px">localAddress</div></a>
+    <dd>
+        Returns the local address the socket is bound to.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The IP address the socket is bound to.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket) {
+        log("local " + socket.localAddress() + ":" + socket.localPort());
+    });</code></pre>
+    </dd>
+
+    <a name="socket-localPort"><div class="fnhead" style="margin-top:5px">localPort</div></a>
+    <dd>
+        Returns the local port the socket is bound to.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned</td><td>The TCP or UDP port the socket is bound to.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">Network.socket("tcp")
+    .connect("10.0.0.1", 80)
+    .onconnect(function(socket) {
+        log("local " + socket.localAddress() + ":" + socket.localPort());
+    });</code></pre>
+    </dd>
+
+    <h2><a name="Server">Server</a></h2>
+    <p>
+        This object represents a TCP or TLS server. Use <a href="#Network">Network</a>.<a href="#server">server</a> to create it.
+    </p>
+    <p>
+        The server opens a TCP port and listens on it for incoming connections. On each incoming connection the <a href="server-onsocket">onsocket</a> callback is invoked.
+        The callback hands a <a href="#Socket">Socket</a> object to the application that represents the individual connection.
+    </p>
+
+    <a name="server-close"><div class="fnhead" style="margin-top:5px">close</div></a>
+    <dd>
+        Stop listening on the server port and delete the object.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Server">Server</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// create a TCP server and close it right away
+Network.server("tcp").close();</code></pre>
+    </dd>
+
+    <a name="server-onbind"><div class="fnhead" style="margin-top:5px">onbind</div></a>
+    <dd>
+        Sets a callback function that is invoked when the server is bound to a port.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Server">Server</a> server, string addr, unsigned port)</td><td>A callback that will be called when the server is bound. It can be used to determine the local address and port of the socket.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Server">Server</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Create a TCP server and write the listen port to the log
+Network.server("tcp")
+    .onbind(function(socket, addr, port) {
+        log("server bound to port TCP/" + port);
+    });</code></pre>
+    </dd>
+
+    <a name="server-onsocket"><div class="fnhead" style="margin-top:5px">onsocket</div></a>
+    <dd>
+        <p>
+            Sets a callback function that is invoked on incoming connections. Optional.<br />
+            The callback passes a <a href="#Socket">Socket</a> object to the application, that represents the incoming connection.
+        </p>
+        <p>
+            Usage:
+            <ul>
+                <li>If no onsocket callback is set the server will reject all connections.</li>
+                <li>
+                    If the onsocket callback is set you have to handle the connection using the socket object.
+                    <ul>
+                        <li>Call <a href="#socket-close">close</a> on the socket object to reject the connection.</li>
+                        <li>
+                            Use the socket object like a regular TCP or TLS socket in connecting state if you want to accept the connection.<br />
+                            Set a <a href="#onconnect">onconnect</a> callback on the socket, to get notified when the connection has been accepted.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </p>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#Server">Server</a> server, <a href="#Socket">Socket</a> socket, string addr, unsigned port)</td><td>A callback that will be invoked when the socket is connected.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Server">Server</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// TCP server that only accepts local connections
+Network.server("tcp", "127.0.0.1", 1000)
+    .onsocket(function(server, socket, addr, port) {
+        if (addr != "127.0.0.1") socket.close();
+        else handleConnection(socket);
+    });
+
+function handleConnection(socket) {
+    // justs send "Bye!" and close again
+    socket.onconnect(function(socket) {
+        socket.send(Encoding.stringToBin("Bye!"));
+    })
+    .onsend(function(socket) {
+        socket.close();
+    });
+}
+</code></pre>
+    </dd>
+
+    <a name="server-onclose"><div class="fnhead" style="margin-top:5px">onclose</div></a>
+    <dd>
+        Sets a callback function that is invoked when the server port has been closed.
+        After the callback the server object is deleted implicitly and can't be used anymore.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">function <b>callback</b>(<a href="#Server">Server</a> server, error)</td>
+                <td>
+                    A callback that will be invoked when the server has been closed.<br />
+                    error is a string representation of <a href="../../sdk/common/interface/socket.htm#shutdownreason_t">shutdownreason_t</a> or null.<br />
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#Server">Server</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// Write something to the log if the server has been closed.
+Network.server("tcp", null, 1000)
+    .onsocket(function(server, socket, addr, port) {
+        // handle incoming connections, e.g. reject
+        socket.close();
+    })
+    .onclose(function(socket, error) {
+        log("server closed");
+        if (error) log("error=" + error);
+    });
+</code></pre>
+    </dd>
+
+    <a name="server-localAddress"><div class="fnhead" style="margin-top:5px">localAddress</div></a>
+    <dd>
+        Returns the local address the server is bound to.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The IP address the server is bound to.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">log("server bound to " + socket.localAddress() + ":" + socket.localPort());</code></pre>
+    </dd>
+
+    <a name="server-localPort"><div class="fnhead" style="margin-top:5px">localPort</div></a>
+    <dd>
+        Returns the local port the server is bound to.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned</td><td>The TCP or UDP port the server is bound to.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">log("server bound to " + socket.localAddress() + ":" + socket.localPort());</code></pre>
+    </dd>
+
+
+    <h2><a name="SocketContext">SocketContext</a></h2>
+    <p>
+        This object encapsulates the context for TLS sockets. It can be created or accessed using <a href="#Network">Network</a>.<a href="#socketContext">socketContext</a>.
+    <p />
+    <p>
+        It holds the following data:
+        <ul>
+            <li>The certificates and private keys (separate pairs for client- and server-side).</li>
+            <li>The TLS session cache.</li>
+        </ul>
+    </p>
+    <p>
+        Socket contexts are referenced by a string ID. They can be assigned to a <a href="#Server">Server</a> or <a href="#Socket">Socket</a> using that ID, in the <a href="#Network">Network</a>.<a href="#server">server</a> and <a href="#Network">Network</a>.<a href="#socket">socket</a> functions.
+    </p>
+    <p>
+        There is a default context with the ID undefined, that is used for all servers or sockets unless a specific context is specified.
+    </p>
+
+    <a name="setCertificate"><div class="fnhead" style="margin-top:5px">setCertificate</div></a>
+    <dd>
+        Sets the certificate to be used.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">string type</td>
+                <td>
+                    "client" - sets the certificate for TLS connections in the client role.<br />
+                    "server" - sets the certificate for TLS connections in the server role.<br />
+                    null - sets the same certificate for both roles.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">Uint8Array pemData</td>
+                <td>A certificate chain and the corresponding private key in PEM format.</td>
+            </tr>
+            <tr>
+                <td class="param">string hostName</td>
+                <td>
+                    The host name of the endpoint.<br />
+                    (currently unused by the underlying implementation)
+                </td>
+            </tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#SocketContext">SocketContext</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// change the default certificate for TLS connections
+Network.socketContext().setCertificate(null, customCertPemFile);</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">// LDAPS client socket using a separate context with a specific certificate
+Network.socketContext("ldaps").setCertificate("client", ldapsCertPemFile);
+
+Network.socket("tls", null, 0, false, "ldaps")
+    .connect("10.0.0.1", 389)
+    .onconnect(function(socket) {
+        // do something with the connection
+    });</code></pre>
+    </dd>
+
+    <h2>Examples</h2>
+    <h3><a name="Example-Telnet">A simple telnet server</a></h3>
+    <p>
+        In this example we create a very simple telnet server that implements a number of (useless) commands:
+        <ul>
+            <li>"random" - prints a random number</li>
+            <li>"exit" - closes the connection</li>
+        </ul>
+        For that we create a TCP server listening on port 23 that handles the telnet connections.
+    </p>
+
+    <pre><code class="JS">// Server
+Network.server("tcp", null, 23)
+    .onsocket(function(server, socket) {
+        telnetConnection(socket);
+    });
+
+// Telnet connection
+function telnetConnection(socket) {
+    var command = "";
+    var skip = 0;
+    var closed = false;
+
+    socket.onconnect(function(socket) {
+            socket.send(Encoding.stringToBin("\Hello!\r\n\r\n> "));
+            socket.recv(1);
+        })
+        .onrecv(function(socket, data) {
+            parse(data);
+            if (!closed) socket.recv(1);
+        })
+        .onsend(function(socket) {
+            if (closed) socket.close();
+        });
+
+    function parse(data) {
+        if (data[0] == 255) skip = 3;
+        
+        if (skip > 0) {
+            // just ignore all telnet messages
+            skip--;
+        }
+        else if (data[0] > 31 && data[0] < 127) {
+            // add text to command
+            command += Encoding.binToString(data);
+        }
+        else if (data[0] == 13) {
+            // execute command on return
+            execute();
+        }
+    }
+
+    function execute() {
+        if (command == "random") {
+            socket.send(Encoding.stringToBin("" + Random.dword() + "\r\n"));
+        }
+        else if (command == "exit") {
+            socket.send(Encoding.stringToBin("Bye!\r\n\r\n"));
+            closed = true;
+        }
+        else {
+            socket.send(Encoding.stringToBin("unknown command\r\n"));
+        }
+
+        command = "";
+        if (!closed) socket.send(Encoding.stringToBin("\r\n> "));
+    }
+}
+</code></pre>
+
+    <p>
+        Now we can use a telnet client to connect to our server for testing.
+    </p>
+    <pre>telnet> open 192.168.0.220
+Trying 192.168.0.220...
+Connected to 192.168.0.220.
+Escape character is '^]'.
+Hello!
+
+> random
+535786860
+
+> random
+67404851
+
+> ls -lha
+unknown command
+
+> exit
+Bye!
+
+Connection closed by foreign host.</pre>
+
+
+</body>
+</html>

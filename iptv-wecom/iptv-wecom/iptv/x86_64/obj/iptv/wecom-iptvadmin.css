@@ -117,8 +117,9 @@ th{
     display: flex;
     margin-top: 0.3%;
 }
-#divbtn{
+#divbtn {
     text-align: center;
+    z-index: 10;
 }
 
 td:first-child { width: 0% }

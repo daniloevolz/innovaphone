@@ -1,0 +1,6 @@
+﻿  Cleaning previous build x86_64-debug...
+  Comando de limpeza remoto não configurado, ignorando.
+  Cleaning previous build x86_64-debug...
+  'common' não é reconhecido como um comando interno
+  ou externo, um programa operável ou um arquivo em lotes.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Application Type\Linux\1.0\Linux.Makefile.Targets(353,5): error MSB3073: O comando "make -f Money.mak clean-x86_64 DEBUG=1 && call common/build/buildnum Money.mak clean-x86_64 "DEBUG=1"" foi encerrado com o código 1.

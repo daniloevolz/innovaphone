@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.moneymanager",
+            "icon": "wecom-money.png",
+            "lang": "wecom.moneymanagertexts",
+            "domains": false
+        }
+    ]
+}

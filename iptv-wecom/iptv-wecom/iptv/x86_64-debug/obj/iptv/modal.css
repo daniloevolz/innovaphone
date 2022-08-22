@@ -1,6 +1,6 @@
 .modal {
+    display:none;
     position: fixed;
-    z-index: 10;
     width: 50vw;
     height: auto;
     left: 25vw;
@@ -19,6 +19,8 @@
     .modal.visivel {
         opacity: 1;
         transform: translateY(-50%);
+        z-index:10;
+        display:block;
     }
 
     .modal > header {

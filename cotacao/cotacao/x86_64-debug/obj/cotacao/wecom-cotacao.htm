@@ -1,0 +1,88 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Início</title>
+    <link rel="stylesheet" href="web1/lib1/innovaphone.lib1.css" type="text/css" />
+    <link rel="stylesheet" href="wecom-cotacao.css" type="text/css" />
+    <script src="web1/lib1/innovaphone.lib1.js" type="text/javascript"></script>
+    <script src="web1/ui1.lib/innovaphone.ui1.lib.js" type="text/javascript"></script>
+    <script src="web1/ui1.svg/innovaphone.ui1.svg.js" type="text/javascript"></script>
+    <script src="web1/appwebsocket/innovaphone.appwebsocket.Connection.js" type="text/javascript"></script>
+    <script src="wecom-cotacao.js" type="text/javascript"></script>
+    <script src="wecom-cotacaotexts.js" type="text/javascript"></script>
+</head>
+<body onload="innovaphone.lib1.Start(function (start) { new Wecom.cotacao(start, { }); })">
+    <div class="containervertical">
+        <div class="colunaesquerda">
+            <nav>
+                <ul>
+                    <li><a id="inicio" href="#">Início</a></li>
+                    <li><a id="b3" href="#">B3</a></li>
+                    <li><a id="todas" href="#">Todas as Fontes</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="colunadireita">
+            <div class="linha1">
+            </div>
+            <div id="linha2" class="linha2">
+
+                <div class="div-dolar">
+                    <img class="img-item" src="img-dolar.png" />
+                    <label class="item-dolar" id="item-dolar"></label>
+                </div>
+                <div class="div-euro">
+                    <img class="img-item" src="img-euro.png" />
+                    <label class="item-euro" id="item-euro"></label>
+                </div>
+                <div class="div-libra">
+                    <img class="img-item" src="img-libra.png" />
+                    <label class="item-libra" id="item-libra"></label>
+                </div>
+                <div class="div-data">
+                    <h1 id="item-data" style="font-size:10px; font-family:'Century Gothic'">Dados do BCB: </h1>
+                </div>
+                <a href="https://wecom.com.br" target="_blank">
+                    <div id="logowecom">
+                        <img src="logo.png" alt="wecom" class="imglogo">
+                    </div>
+                </a>
+            </div>
+            <div id="linha2b3" class="linha2b3" style="display:none;">
+                <div style="width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;">
+                    <iframe id="tradingview_8c59f" src="https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV" style="width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;" frameborder="0" allowtransparency="true" scrolling="no" allowfullscreen=""></iframe>
+                </div>
+            </div>
+            <div id="linha2todas" class="linha2todas" style="display:none;">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container" style="width: auto; z-index: 1000; height: auto; background: transparent; padding: 0 !important; margin-left: 0px;">
+                    <div style="z-index: 1000;" id="tradingview_f9a16"></div>
+                    <div style="z-index: 1000;" class="tradingview-widget-copyright"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                        new TradingView.widget(
+                            {
+                                "autosize": true,
+                                "symbol": "BITSTAMP:BTCUSD",
+                                "interval": "D",
+                                "timezone": "America/Sao_Paulo",
+                                "theme": "dark",
+                                "style": "1",
+                                "locale": "br",
+                                "toolbar_bg": "#f1f3f6",
+                                "enable_publishing": false,
+                                "hide_side_toolbar": false,
+                                "allow_symbol_change": true,
+                                "details": true,
+                                "container_id": "tradingview_f9a16"
+                            }
+                        );
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
