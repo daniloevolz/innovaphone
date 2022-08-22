@@ -85,7 +85,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 videoElement.setAttribute("muted", "muted");
                 //videoElement.setAttribute("width", "800%");
                 //videoElement.setAttribute("height", "470%");
-                videoElement.setAttribute("controls");
+                videoElement.setAttribute("controls", "");
                 videoElement.setAttribute("class", "video-flv vjs-default-skin");
                 videoElement.setAttribute("id", "video-flv");
 
@@ -105,8 +105,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 iframe.src = url +"?autoplay=1&mute=1";
                 iframe.frameBorder = "0";
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.width = "auto";
-                iframe.height = "50%";
+                iframe.width = "80%";
+                iframe.height = "60%";
                 document.getElementById("container").appendChild(iframe);
             }
             if (type == "application/x-mpegURL") {
