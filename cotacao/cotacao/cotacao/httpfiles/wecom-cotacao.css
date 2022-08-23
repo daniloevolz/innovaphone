@@ -182,13 +182,16 @@ label {
 
 @media screen and (max-width: 500px) {
     .linha1 {
-        display: none;
+        position: absolute;
         float: right;
-        width: 50%;
+        width: 100%;
+        margin-top: 0%;
+        height: 15.5%;
     }
     .linha2{
         width:100%;
         height:100%;
+        margin-top: 30%;
     }
     .colunadireita {
         width: 100%;
@@ -198,9 +201,13 @@ label {
     .colunaesquerda {
         background-image: url("bg_lateral500px.png");
         background-size: cover;
-        height: 12%;
+        height: 15.5%;
         width: 100%;
         margin-left: 0%;
+        display: flex;
+        margin-top: 23%;
+        position: absolute;
+        
     }
     .img-item {
         width: 50px;
