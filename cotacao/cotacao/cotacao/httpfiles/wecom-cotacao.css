@@ -231,7 +231,7 @@ label {
         align-items: center;
         justify-content: center;
     }
-    div-data {
+    .div-data {
         width: 300px;
         margin-top: 24px;
         display: flex;
