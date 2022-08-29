@@ -54,6 +54,7 @@ div#logowecom {
     background-size: cover;
     width: auto;
     height: 23.1%;
+    position:absolute;
 }
 .logo-inn{
     width: 20%;
@@ -78,7 +79,7 @@ div#logowecom {
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 0%;
+    margin-top: 8%;
 }
 
 .linha2b3 {
@@ -97,6 +98,7 @@ div#logowecom {
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    margin-top: 10%; /*teste aqui*/
 }
 
 .linha2todas {
@@ -115,6 +117,7 @@ div#logowecom {
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    margin-top: 10%;
 }
 
 .item-data {
@@ -168,11 +171,12 @@ a {
 }
 
 .img-item {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
 }
 #img-itemdol{               /* tirei o logo do USA de dentro da imagem principal, assim o app se torna d*/
-    margin-top: 3%;
+   margin-top: 12%;
+   
 }
 
 label {
@@ -182,6 +186,12 @@ label {
     color: darkslategrey;
     padding: 10px;
     border-radius: 20px;
+}
+#item-dolar{
+    margin-top: 8%;
+}
+.div-dolar {
+    margin-top: 1%;
 }
 
 
@@ -231,6 +241,7 @@ label {
         align-items: center;
         justify-content: center;
     }
+
     .div-data {
         width: 300px;
         margin-top: 24px;
@@ -239,6 +250,70 @@ label {
         justify-content: center;
     }
 
+    .logo-inn {
+        width: 30%;
+        height: auto;
+        padding-top: 30px;
+        padding-left: 30px;
+    }
 
+    .item-dolar {
+        font-size: 20px;
+    }
+    /*TESTE*/
+    @media screen and (max-height: 500px) {
+        .linha1 {
+            position: absolute;
+            float: right;
+            width: 20%;
+            margin-top: 0%;
+            height: 14.5%;
+        }
+
+        .linha2 {
+            width: 100%;
+            height: 100%;
+            margin-top: 30%;
+        }
+
+        .colunadireita {
+            width: 100%;
+            height: 80%;
+        }
+
+        .colunaesquerda {
+            background-image: url("bg_lateral500px.png");
+            background-size: cover;
+            height: 15.5%;
+            width: 100%;
+            margin-left: 0%;
+            display: flex;
+            margin-top: 23%;
+            position: absolute;
+        }
+
+        .img-item {
+            width: px;
+            height: 50px;
+        }
+
+        .imglogo {
+            width: 50%;
+            height: 50%;
+        }
+
+        div#logowecom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .div-data {
+            width: 300px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
 }
-
