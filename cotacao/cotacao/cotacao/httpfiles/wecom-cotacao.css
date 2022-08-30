@@ -8,6 +8,8 @@ body {
     background-size: cover;
     background-size: 100%;
     margin: 0px;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 div.button {
@@ -105,19 +107,19 @@ div#logowecom {
     order: 2;
     background-image: url("bg.png");
     background-size: cover;
-    align-content: center;
+    /*align-content: center;*/
     width: 100%;
-    height: 80%;
+    height: 79.1%;
     top: 45%;
-    align-items: flex-start;
+    /*align-items: flex-start;*/
     justify-content: center;
     display: flex;
     align-items: center;
     display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+    /*flex-direction: column;*/
+   /* flex-wrap: wrap ;*/
     justify-content: center;
-    margin-top: 10%;
+    margin-top: 10.9%;
 }
 
 .item-data {
@@ -174,7 +176,7 @@ a {
     width: 90px;
     height: 90px;
 }
-#img-itemdol{               /* tirei o logo do USA de dentro da imagem principal, assim o app se torna d*/
+#img-itemdol{               
    margin-top: 12%;
    
 }
@@ -194,8 +196,10 @@ label {
     margin-top: 1%;
 }
 
+/* EDIÇÃO PARA CELULAR - PIETRO 😎 */
 
 @media screen and (max-width: 500px) {
+
     .linha1 {
         position: absolute;
         float: right;
@@ -258,10 +262,68 @@ label {
     }
 
     .item-dolar {
-        font-size: 20px;
+        font-size: 17px;
     }
-    /*TESTE*/
-    @media screen and (max-height: 500px) {
+
+    .item-euro {
+        font-size: 17px;
+    }
+
+    .item-libra {
+        font-size: 17px;
+    }
+
+    .linha2todas {
+        order: 2;
+        background-image: url("bg.png");
+        background-size: cover;
+        align-content: center;
+        width: 100%;
+        height: 90%;
+        top: 45%;
+        align-items: flex-start;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 50%;
+    }
+
+    .linha2b3 {
+        order: 2;
+        background-image: url("bg.png");
+        background-size: cover;
+        align-content: center;
+        width: 100%;
+        height: 97%;
+        top: 45%;
+        align-items: flex-start;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 38%; /*teste aqui*/
+    }
+
+    /*TESTE DESIGN HORIZONTAL */
+    @media screen and (orientation: landscape) {
+        html {
+            transform: rotate(-90deg);
+            transform-origin: left top;
+            width: 100vh;
+            overflow-x: hidden;
+            position: absolute;
+            top: 100%;
+            left: 0;
+        }
+    
+
         .linha1 {
             position: absolute;
             float: right;
@@ -293,13 +355,13 @@ label {
         }
 
         .img-item {
-            width: px;
-            height: 50px;
+            width: 5px;
+            height: 5px;
         }
 
         .imglogo {
-            width: 50%;
-            height: 50%;
+            width: 30%;
+            height: 30%;
         }
 
         div#logowecom {
