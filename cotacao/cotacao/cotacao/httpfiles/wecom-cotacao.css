@@ -198,8 +198,8 @@ label {
 
 /* EDIÇÃO PARA CELULAR - PIETRO 😎 */
 
-@media screen and (max-width: 500px) {
-
+@media screen and (max-width: 500px)  {
+    
     .linha1 {
         position: absolute;
         float: right;
@@ -311,71 +311,4 @@ label {
         margin-top: 38%; /*teste aqui*/
     }
 
-    /*TESTE DESIGN HORIZONTAL */
-    @media screen and (orientation: landscape) {
-        html {
-            transform: rotate(-90deg);
-            transform-origin: left top;
-            width: 100vh;
-            overflow-x: hidden;
-            position: absolute;
-            top: 100%;
-            left: 0;
-        }
-    
-
-        .linha1 {
-            position: absolute;
-            float: right;
-            width: 20%;
-            margin-top: 0%;
-            height: 14.5%;
-        }
-
-        .linha2 {
-            width: 100%;
-            height: 100%;
-            margin-top: 30%;
-        }
-
-        .colunadireita {
-            width: 100%;
-            height: 80%;
-        }
-
-        .colunaesquerda {
-            background-image: url("bg_lateral500px.png");
-            background-size: cover;
-            height: 15.5%;
-            width: 100%;
-            margin-left: 0%;
-            display: flex;
-            margin-top: 23%;
-            position: absolute;
-        }
-
-        .img-item {
-            width: 5px;
-            height: 5px;
-        }
-
-        .imglogo {
-            width: 30%;
-            height: 30%;
-        }
-
-        div#logowecom {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .div-data {
-            width: 300px;
-            margin-top: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
 }
