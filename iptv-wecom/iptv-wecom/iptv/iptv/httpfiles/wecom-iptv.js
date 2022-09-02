@@ -67,9 +67,9 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     function onChange(url, type) {
         try {
             var oldPlayer = document.getElementById('video-flv');
-            videojs(oldPlayer).dispose();
+            flvjs(oldPlayer).dispose();
         } catch {
-            var oldPlayer = document.getElementById('video-js');
+            var oldPlayer = document.getElementById('video-js_html5_api');
             videojs(oldPlayer).dispose();
         } finally {
             document.getElementById("container").innerHTML = "";
@@ -132,10 +132,18 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 //videoElement.setAttribute("type", type);
                 document.getElementById("container").appendChild(videoElement);
                 document.getElementById("video-js").appendChild(source);
-                var video = videojs('video-js');
+                var video = videojs('video-js', {
+                    html5: {
+                        vhs: {
+                            overrideNative: !videojs.browser.IS_SAFARI
+                        },
+                        nativeAudioTracks: false,
+                        nativeVideoTracks: false
+                    }
+                });
                 //video.src({ type: type, src: url });
                 video.ready(function () {
-                    video.play();
+                    video.src({ type: type, src: url });
                 });
 
             }
@@ -165,7 +173,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 var video = videojs('video-js');
                 //video.src({ type: type, src: url });
                 video.ready(function () {
-                    video.play();
+                    video.src({ type: type, src: url });
                 });
             }
             if (type == "audio/mpeg" || type =="audio/wav") {

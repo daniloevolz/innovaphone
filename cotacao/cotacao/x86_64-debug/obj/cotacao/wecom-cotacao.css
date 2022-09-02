@@ -25,7 +25,7 @@ div.button {
     cursor: pointer;
 }
 
-/*EdiÁ„o Vers„o Cesar*/
+/*Edi√ß√£o Vers√£o Cesar*/
 div#logowecom {
     position: fixed;
     right: 20px;
@@ -54,6 +54,12 @@ div#logowecom {
     background-size: cover;
     width: auto;
     height: 20%;
+}
+.logo-inn{
+    width: 20%;
+    height: auto;
+    padding-top: 30px;
+    padding-left: 30px;
 }
 
 .linha2 {
@@ -176,11 +182,16 @@ label {
 
 @media screen and (max-width: 500px) {
     .linha1 {
-        display:none;
+        position: absolute;
+        float: right;
+        width: 100%;
+        margin-top: 0%;
+        height: 15.5%;
     }
     .linha2{
         width:100%;
         height:100%;
+        margin-top: 30%;
     }
     .colunadireita {
         width: 100%;
@@ -190,24 +201,26 @@ label {
     .colunaesquerda {
         background-image: url("bg_lateral500px.png");
         background-size: cover;
-        height: 20%;
+        height: 15.5%;
         width: 100%;
         margin-left: 0%;
+        display: flex;
+        margin-top: 23%;
+        position: absolute;
+        
     }
     .img-item {
         width: 50px;
         height: 50px;
     }
     .imglogo {
-        width: 40%;
-        height: 40%;
+        width: 50%;
+        height: 50%;
     }
     div#logowecom {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        padding: 0px;
-        right:5%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
 }

@@ -139,9 +139,11 @@
   <ItemGroup>
     <Image Include="cotacao\httpfiles\bg.png" />
     <Image Include="cotacao\httpfiles\bg_lateral.png" />
+    <Image Include="cotacao\httpfiles\bg_lateral500px.png" />
     <Image Include="cotacao\httpfiles\img-dolar.png" />
     <Image Include="cotacao\httpfiles\img-euro.png" />
     <Image Include="cotacao\httpfiles\img-libra.png" />
+    <Image Include="cotacao\httpfiles\logo-inn.png" />
     <Image Include="cotacao\httpfiles\logo.png" />
     <Image Include="cotacao\httpfiles\money_header.png" />
     <Image Include="cotacao\httpfiles\wecom-cotacao.png" />
