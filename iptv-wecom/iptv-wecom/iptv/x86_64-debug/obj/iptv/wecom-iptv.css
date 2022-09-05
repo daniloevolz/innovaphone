@@ -48,6 +48,7 @@ img {
     width: 40px;
 }
 
+
 .imglogo {
     align-self: center;
 }
@@ -63,7 +64,7 @@ input[type="checkbox"]:checked ~ nav {
 
 nav {
     position: absolute;
-    background-color: rgba(75, 71, 71, 0.5);
+    background-color: var(--nav-bg);
     width: 300px;
     height: 100%;
     left: -370px;

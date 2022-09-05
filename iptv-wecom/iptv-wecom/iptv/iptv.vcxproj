@@ -142,6 +142,7 @@
     <None Include="iptv\httpfiles\wecom.iptvmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="iptv\httpfiles\menu-icon-white.png" />
     <Image Include="iptv\httpfiles\menu-icon.png" />
     <Image Include="iptv\httpfiles\wecom-iptv.png" />
     <Image Include="iptv\httpfiles\wecom-iptvadmin.png" />

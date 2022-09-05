@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - calendar service api</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>com.innovaphone.calendar</h1>
+
+    <p>
+        The com.innovaphone.calendar services api enables apps to use the whole websocket communication API from calendar. The users App uses this functionality on the C++ part of the 
+        app for reading, creating and modifying appointments as well as special requests that can be used for syncing.<br>
+        All messages are send as JSON strings and must use the <b>mt</b> property which is the message type.
+	</p>
+
+	<a name="GetService"><h2>GetService</h2></a>
+    
+    <p>
+        See <a href="../common/interface/services.htm">services</a> for the information how to exactly work with IServices!<br/>
+        When accessing the calendar using the service api
+        (which means, that the user to access will be authenticated by the PBX), the acces to the calendar is on admin level. That means, that full access to the calendar database
+        for all users is granted. Appointments for all users can be read (ignoring the private flag), updated and created. This comes in handy for synchronizing purposes.
+    </p>
+<pre><code class="c++">IServicesApi * services = ...;    // must be retrieved within the PBX websocket connection PbxInfo message to the app service.
+IService * service = services->GetService("com.innovaphone.calendar");
+class IAppWebsocketClient * awsClient = IAppWebsocketClient::Create(iomux, this, tcpSocketProvider, tlsSocketProvider, dns, log);
+awsClient->Connect(service->GetWebsocketUrl(), service->GetName(), session->services->CreateAuthenticator());
+</code></pre>
+    
+    <h2>AppLogin</h2>
+    <p>
+        If you do not work with IServices and you know the intance password of the calendar instance, you can also use the standard AppLogin mechanism to login to calendar.<br>
+        Note that using AppLogin doesn't give the ability to access the data of all users for synchronizing purposes. For this, admin rights are needed, which only will be granted
+        for connections comming over a service, authenticated by the PBX.
+    </p>
+    
+    <h2>Messages send to the service</h2>
+    <a href="#Header" style="text-decoration:none;">Header</a><br/>
+    <a href="#GetAppointments" style="text-decoration:none;">GetAppointments</a><br/>
+    <a href="#GetAppointment" style="text-decoration:none;">GetAppointment</a><br/>
+    <a href="#WriteAppointment" style="text-decoration:none;">WriteAppointment</a><br/>
+    <a href="#DeleteAppointment" style="text-decoration:none;">DeleteAppointment</a><br/>
+    <a href="#GetUser" style="text-decoration:none;">GetUser</a><br/>
+
+    <h2>Messages received by the service</h2>
+    <a href="#AppointmentInfo" style="text-decoration:none;">AppointmentInfo</a><br/>
+    <a href="#GetAppointmentsResult" style="text-decoration:none;">GetAppointmentsResult</a><br/>
+    <a href="#GetAppointmentResult" style="text-decoration:none;">GetAppointmentResult</a><br/>
+    <a href="#WriteAppointmentResult" style="text-decoration:none;">WriteAppointmentResult</a><br/>
+    <a href="#DeleteAppointmentResult" style="text-decoration:none;">DeleteAppointmentResult</a><br/>
+    <a href="#UserInfo" style="text-decoration:none;">UserInfo</a><br/>
+    <a href="#GetUserResult" style="text-decoration:none;">GetUserResult</a><br/>
+
+    <h2>Additional infos</h2>
+    <a href="#Properties" style="text-decoration:none;">Appointment properties</a><br/>
+
+    <h1>Calendar JSON messages</h1>
+    <p>
+        Below is a detailed description of each message. The messages have all the same header. Note that all messages MUST include the header properties.
+    </p>
+
+    <a name="Header"><h2>Header</h2></a>
+    <pre><code class="json">{
+    "mt": MessageID,
+    "src": "string"
+}</code></pre>
+    <p>
+        This header must be set for all messages. The properties that will be added below depending on the message sent. Details about that fields
+        can be found in the description of each message below.
+    </p>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>msg</b></td><td>The name of the message. Must be given.</td></tr>
+        <tr><td class="param">string <b>src</b></td><td>(Optional) A string that will be echoed in the result message. This field is optional.</td></tr>
+    </table>
+
+    <a name="GetAppointments"><h3>GetAppointments</h3></a>
+    <pre><code class="json">{
+    "mt": "GetAppointments",
+    "src": "uniqueIDString",
+    "userID": number,
+    "start": number,
+    "end": number,
+    "syncID": number,
+    "syncDatabase": string,
+    "close": bool
+    "properties": [appointmentProperties]
+}</code></pre>
+    <p>
+        This message returns all appointments for the given time range and also registeres the app receiving continous updates. The src property is obligatory for that message. Each response will echo the value of src. With this, an app can define different sets of parameters to get appointments for (as well as further updates).<br/>
+        <br/>
+        The message leads to a couple of responses. Aft first, a <a href="#GetAppointmentsResult">GetAppointmentsResult</a> message will be received as answer. The status of the message tells, what
+        is going to happen. If the status is "ok", then the calendar will send all available appointments for the given time range via <a href="#AppointmentInfo">AppointmentInfo</a> messages. The last message will also have the property last set to true, to signal that all available data had been send. After that, the calendar will observe the database for changed and send each change for the requested user and time range with another AppointmentInfo message. Each appointment will be send with an own AppointmentInfo message.<br/>
+        <br/>
+        The parameters for an existing observation can be changed by sending GetAppointments with the same src value again. That will lead to the same process as sending the message the first time. Note that each AppointmentInfo sended before the GetAppointmentResult response can be ignored, because they are part of the previous and now outdated GetAppointments message.<br/>
+        <br/>
+        To stop from getting further updates, GetAppointments must be send again with the property close set to true. This will lead to an GetAppointmentsResult message, too, showing that the observation for changes is stopped. To continue receiving updates, GetAppointments must be send. When the connection closes, each observation will be canceled automatically.<br/>
+        <br/>
+        The message can also be used to synchronize with the calendar database. For this, the property syncID and syncDatabase must be set. To do a first-time sync, set syncDatabase to an empty string and syncID to 0. To sync all data changed from the time of the last sync, set syncID and syncDatabase to the lastest values received. The syncID is a <a href="#Property">property</a> of an appointment and must be requested via the properties array, while the syncDatabase will be received through the <a href="#GetAppointments">GetAppointments</a> message (only if syncID and syncDatabase are given to GetAppointments). Note that for synchronizing purposes it will be a good idea to request all appointment properties. If there is need to syhcnronize multiple users, each user should be synchronized seperately. So at first send a GetAppointments message for the first user, until AppointmentInfo with last set to true will arraive (or GetAppointmentsResult with status set to noData). After that, only the incomming updates must be handled.<br/>
+        <br/>
+        When requesting appointments from other users, the title will set to "Private" if the private flag of an appointment is set to true. Except for connections established by a service (authenticated through the PBX). In that case, the title will be as saved in the database. This is important for synchronizing purposes. Be careful and respect the users  privacy! If there is need to synchronize the appointments of all users, one user after an other should be synchronized to spare resources.
+    </p>
+
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>src</b></td><td>The required unique string that will be used as id for all resulting AppointmentInfo and GetAppointmentsDone messages. The string must be unique per connection only and can be freely choosen.</td></tr>
+        <tr><td class="param">ulong64 <b>userID</b></td><td>(Optional) The id for the user to get the appointments for. If not given, the user authenticated for the appWebsocket connection will be used.</td></tr>
+        <tr><td class="param">ulong64 <b>start</b></td><td>(Default 0) The start of the time range.</td></tr>
+        <tr><td class="param">ulong64 <b>end</b></td><td>(Default max of ulong64) The end of the time range.</td></tr>
+        <tr><td class="param">ulong64 <b>syncID</b></td><td>(Optional) The id of the last sync. Set to 0 to initiate a first-time sync. If syncID is given, the property syncDatabase must be given, too.</td></tr>
+        <tr><td class="param">string <b>syncDatabase</b></td><td>(Optional) The id for the database synced with. Set to an empty string to initiate a first-time sync. If syncDatabase is given, the property syncID must be given, too.</td></tr>
+        <tr><td class="param">bool <b>close</b></td><td>(Optional, default false) If the property exists and is set to true, the stream will be closed. To close a stream, the src and close property are enough, other properties (if sent) will be ignored.</td></tr>
+        <tr><td class="param">array <b>properties</b></td><td>The array holding the requested properties the calendar should send for each appointments. If not given, all for an appointment relevant properties will be sent. See <a href="#Properties">Appointment properties</a> for a detailed description.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        If the syncID property is given, the synchronizing mode will be enabled. That leads to the following differences:
+    </p>
+    <ul>
+        <li>Only appointments changed or created since the time, the given sync id had been created, will be send.</li>
+        <li>Appointment series won't be calculated. The recurring masters will be send instead.</li>
+        <li>If the value of syncDatabase won't combine with the value from the database of the calendar, an error will be reported.</li>
+    </ul>
+    
+    <a name="GetAppointmentsResult"><h3>GetAppointmentsResult</h3></a>
+    <pre><code class="json">{
+    "mt": "GetAppointmentsResult",
+    "src": "streamIDString",
+    "syncDatabase": string,
+    "status": "statusCodeString",
+    "errorMsg": "errorMessageString"
+}</code></pre>
+    <p>
+        This is the response for GetAppointments.
+    </p>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>src</b></td><td>The id given to GetAppointments.</td></tr>
+        <tr><td class="param">string <b>syncDatabase</b></td><td>The id of the database - used for syncing.</td></tr>
+        <tr><td class="param">string <b>status</b></td><td>The status code.</td></tr>
+        <tr><td class="param">string <b>errorMsg</b></td><td>The error message (only exists, if status is error).</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        The values for status are:
+    </p>
+    <ul>
+        <li><b>ok</b>: No error - everything is fine.</li>
+        <li><b>noData</b>: Everything is fine, but no appointment exists for the given time range. Only further updates combining with the time range will be send.</li>
+        <li><b>closed</b>: The current observation had been closed by GetAppointments with property close set to true.</li>
+        <li><b>userNotFound</b>: The given userID doesn't exist in the users database.</li>
+        <li><b>syncDatabaseMissmatch</b>: The given syncDatabase id doesn't match with the one of the calendar.</li>
+        <li><b>srcMissing</b>: The source property is missing - note that src is obligatory for GetAppointments.</li>
+        <li><b>error</b>: An unexpected error occured. The error message will be send with the errorMsg property.</li>
+    </ul>
+
+    <a name="AppointmentInfo"><h3>AppointmentInfo</h3></a>
+    <pre><code class="json">{
+    "mt": "AppointmentInfo",
+    "src": "uniqueIDString",
+    "last": bool,
+    "status": "statusCodeString",
+    "properties": {
+        appointmentProperties
+    }
+}</code></pre>
+    <p>
+        This message will be send to an open appointment stream.
+    </p>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>src</b></td><td>The id given to GetAppointments.</td></tr>
+        <tr><td class="param">status <b>status</b></td><td>The status code for the appointment.</td></tr>
+        <tr><td class="param">bool <b>last</b></td><td>This property will be send (and set to true) if the message will hold the last appointment read from the database. Each AppointmentInfo send from now on are send because of updates to the calendar database.</td></tr>
+        <tr><td class="param">object <b>appointment</b></td><td>An object with the requested properties for the appointment.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        When sending GetAppointments, the calendar will send all appointents for the requested time range available first. These messages won't have a status property. AppointmentInfos send later because of changes to the calendar database (in the defined time range), will be send with the status property to tell the reason for the update. In that case, status have one of the following values:
+    </p>
+    <ul>
+        <li><b>created</b>: The appointment had been created an thus added to the database.</li>
+        <li><b>modified</b>: The appointment had been changed. You need to check the timestamp of the appointment to make sure, it still lies inside the defined time range.</li>
+        <li><b>deleted</b>: The appointment had been deleted. In this case, only the id and user id will be send.</li>
+        <li><b>recurringMasterChanged</b>: Will be send with the id of an  recurring master that had been changed. The app needs to discard all occurrences. The new, updated occurrences will be send after that message, too. Only for streams that have not set the resolveSeries property to false.</li>
+    </ul>
+
+    <a name="GetAppointment"><h3>GetAppointment</h3></a>
+    <pre><code class="json">{
+    "src": optionalString,
+    "mt": "GetAppointment",
+    "id": number
+}</code></pre>
+    <p>
+        Returns the appointment with the requested id. The message will lead to a <a href="#GetAppointmentDone">GetAppointmentDone</a> response message with the requested appointment.
+    </p>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>id</b></td><td>The id of the requested appointment.</td></tr>
+    </table>
+
+    <a name="GetAppointmentResult"><h3>GetAppointmentResult</h3></a>
+    <pre><code class="json">{
+    "mt": "GetAppointmentResult",
+    "src": optionalString,
+    "status": "statusString",
+    "errorMsg": "errorMessageString",
+    "properties": [appointmentProperties]
+}</code></pre>
+    <p>
+        The answer for GetAppointment with the requested appointment.
+    </p>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>status</b></td><td>The status of the request.</td></tr>
+        <tr><td class="param">string <b>errorMsg</b></td><td>The error message, if status is error.</td></tr>
+        <tr><td class="param">object <b>properties</b></td><td>An object with the requested properties of the appointment. See <a href="#Properties">Appointment properties</a> for a detailed description</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        Status will be one of the following values:
+    </p>
+    <ul>
+        <li><b>ok</b>: Everything is fine, no special status reported.</li>
+        <li><b>missing</b>: The requested appointment could not be found.</li>
+        <li><b>deleted</b>: The requested appointment had been deleted.</li>
+        <li><b>idMissing</b>: The message was send without the id property.</li>
+        <li><b>error</b>: An unexpected error occurred - details will be send with errorMsg.</li>
+    </ul>
+
+    <a name="WriteAppointment"><h3>WriteAppointment</h3></a>
+    <pre><code class="json">{
+    "mt": "WriteAppointment",
+    "src": optionalString,
+    "properties": [appointmentProperties]
+}</code></pre>
+    <p>
+        Write the appointment with the given properties to the database. This message will lead to a <a href="#WriteAppointmentResult">WriteAppointmentResult</a> response message.
+        The message will be used to create or change an appointment. The details of an appoimtment are defined by the <a href="#Properties">appointment properties</a> inside the properties object. In general, all properties must be set, with some exceptions:
+    </p>
+    <ul>
+        <li>To create a new appointment, the id must not be given. If an id will be part of the property list, the appointment will be updated.</li>
+        <li>If userID is not given, the user of the current connection will be used. If that user is a service connection, an error will be raised.</li>
+        <li>The type must be set to define the type of the appointment to write / update. If type is <i>RECURRING_EXCEPTION</i>, the fields for the rrecurring exception must be given, too. Same for the fields for recurring masters, if type is <i>RECURRING_MASTER</i>. If type is <i>NORMAL</i>, properties for recurring exceptions or recurring masters will be ignored.</li>
+        <li>The type <i>OCCURRENCE</i> is invalid for WriteAppointment and will be rejected. To create an exception for a recurring master, user <i>DELETED_EXCEPTION</i> or <i>MODIFIED_EXCEPTION</i>.</li>
+        <li>The organizer property is optional.</li>
+        <li>The location property also is optional.</li>
+        <li>The readonly fields changedAt and syncID will be ignored, if set.</li>
+        <li>Missing properties will lead to an error reported by the response for the message send.</li>
+    </ul>
+    <h4>Properties</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>properties</b></td><td>The properties for the appointment Must be all properties necessary for the type of appointment to write. See <a href="#Properties">Appointment properties</a> for a detailed description.</td></tr>
+    </table>
+
+    <a name="WriteAppointmentResult"><h3>WriteAppointmentResult</h3></a>
+    <pre><code class="json">{
+    "mt": "WriteAppointmentResult",
+    "src": optionalString,
+    "id": number,
+    "status": "status",
+    "errMsg": "errorMessageString"
+}</code></pre>
+    <p>
+        Will be sent as a result of WriteAppointment.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>id</b></td><td>The id of the appoitment written.</td></tr>
+        <tr><td class="param">string <b>status</b></td><td>The status of the process.</td></tr>
+        <tr><td class="param">string <b>errMsg</b></td><td>The error message if status is error.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        Status will be one of the following values:
+    </p>
+    <ul>
+        <li><b>created</b>: The appointment had been created successfully.</li>
+        <li><b>updated</b>: The appointment had been updated successfully.</li>
+        <li><b>missing</b>: The appointment to update could not be found.</li>
+        <li><b>deleted</b>: The appointment to update had been already deleted.</li>
+        <li><b>userNotFound</b>: The user given in the appointments userID property doesn't exist.</li>
+        <li><b>error</b>: An unexpected error occurred - details will be send with errorMsg.</li>
+    </ul>
+
+    <a name="DeleteAppointment"><h3>DeleteAppointment</h3></a>
+    <pre><code class="json">{
+    "mt": "DeleteAppointment",
+    "src": optionalString,
+    "id": number
+}</code></pre>
+    <p>
+        Will delete the appointment with the given id. This message will lead to a <a href="#DeleteAppointmentResult">DeleteAppointmentResult</a> response message.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>id</b></td><td>The id of the appointment to delete.</td></tr>
+    </table>
+
+    <a name="DeleteAppointmentResult"><h3>DeleteAppointmentResult</h3></a>
+    <pre><code class="json">{
+    "mt": "DeleteAppointmentResult",
+    "src": optionalString,
+    "status": "status",
+    "errMsg": "errorMessageString"
+}</code></pre>
+    <p>
+        Will be sent as a result of DeleteAppointment.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>status</b></td><td>The status of the process.</td></tr>
+        <tr><td class="param">string <b>errMsg</b></td><td>The error message if status is error.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        Status will be one of the following values:
+    </p>
+    <ul>
+        <li><b>ok</b>: The appointment had been deleted successfully.</li>
+        <li><b>missing</b>: The appointment to delete could not be found.</li>
+        <li><b>deleted</b>: The appointment to delete had been deleted.</li>
+        <li><b>error</b>: An unexpected error occurred - details will be send with errorMsg.</li>
+    </ul>
+
+    <a name="GetUser"><h3>GetUser</h3></a>
+    <pre><code class="json">{
+    "mt": "GetUser",
+    "src": optionalString,
+    "close": bool
+}</code></pre>
+    <p>
+        Get all available users and observes the user database of the calendar for changes. Instead of GetAppointments only on observation per connection will be allowed.<br/>
+        <br/>
+        The message will lead to couple of responses. At first, a <a href="#GetUserResult">GetUserResult</a> message will be send. If the status of that message
+		is not error, a bunch of <a href="#UserInfo">UserInfo</a> messages will follow. The last user for the request will be send the the last flag of the
+		UserInfo message set. After that, update for a user or the user list will be send with additional UserInfo messages. The updates will be send until the
+		connection had been closed or GetUsers will be send again with the close flag set to true.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">bool <b>close</b></td><td>(Optional, default false) If the property exist and is set to true, the observation will be canceled.</td></tr>
+    </table>
+
+    <a name="UserInfo"><h3>UserInfo</h3></a>
+    <pre><code class="json">{
+    "mt": "UserInfo",
+    "src": optionalString,
+    "status": "statusString",
+    "last" : boolean
+    "userID": number,
+    "userName": string
+}</code></pre>
+    <p>
+        Will be send for each user after sending GetUser as well as every time, if something changes in the user database.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>status</b></td><td>The status of the user.</td></tr>
+        <tr><td class="param">bool <b>last</b></td><td>This property will be send (and set to true) if the message will hold the last user read from the database. Each AppointmentInfo send from now on are send because of updates to the calendar users database.</td></tr>
+        <tr><td class="param">ulong64 <b>userID</b></td><td>The id of the user.</td></tr>
+        <tr><td class="param">string <b>name</b></td><td>The user name.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        Status only will be send for update messages and will be one of the following values:
+    </p>
+    <ul>
+        <li><b>created</b>: The The user had been created.</li>
+        <li><b>deleted</b>: The user had been deleted.</li>
+        <li><b>modified</b>: The user name had been changed.</li>
+    </ul>
+
+    <a name="GetUserResult"><h3>GetUserResult</h3></a>
+    <pre><code class="json">{
+    "mt": "GetUserResult",
+    "src": optionalString,
+    "status": "statusString",
+    "errorMsg": "errorMessageString"
+}</code></pre>
+    <p>
+        Will be send after sending a GetUser message, If the status will be ok (GetUser sent the first time) or restarted (GetUser sent again to get a while refresh), a bunch uf <a href="#UserInfo">UserInfo</a> messages will folow, whith the last UserInfo message
+		having the last flag set to true. That message also occures after the observation had been closed because of a GetUser message with close set to true.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>status</b></td><td>The status of the GetUser process.</td></tr>
+        <tr><td class="param">string <b>errMsg</b></td><td>The error message, if status is error.</td></tr>
+    </table>
+    <h4>Remarks</h4>
+    <p>
+        Status will be one of the following values:
+    </p>
+    <ul>
+        <li><b>ok</b>: No errors - everything is fine.</li>
+        <li><b>error</b>: An error occurred. Details of the error will be send in errorMsg.</li>
+        <li><b>restarted</b>: The observation had been canceled due another GetUser message.</li>
+    </ul>
+
+
+    <a name="Properties"><h2>Appointment properties</h2></a>
+    <pre><code class="json">{
+    appointmentProperties
+}</code></pre>
+    <p>
+        Each message that writes, requests or sends appointments need a list of properties of the appointment. The requested properties will be send in the respose and can be one of the properties below. For creating or updating appointments, all relevant properties must be set. For requesting appointments, the properties id, userID and type will always be send. Note that the properties array will be optional for messages that request appointments (GetAppointments, GetAppointment). In that case, all relevant properties for an appointment will be send. Only properties that exist for an appointment will be part of the answer. Readonly properties (type, syncID, changedAt) will be ignored if tried to use for WriteAppointment.<br/>
+        <br/>
+        <b>Note:</b> The recurring masters have additional fields to calculate the series. The calculation will be done by the calendar using functions provided by the innovaphone SDK. The properties for the recurring masters depending highly on that functions, so it is recommended to read the <a href="../../common/lib/time_occurrence.htm">time occurrence</a> documentation to understand the usage of the properties as well as the values of the fields (like for the days property, which is a bitfield).<br/>
+    </p>
+    <table style="margin-left:-12px">
+        <tr><th style="text-align: right">Property</th><th style="text-align: left; padding-left: 8px">Datatype</th><th style="text-align: left; padding-left: 10px">Description</th></tr>
+        <tr><td class="param">id</td><td>long64</td><td>(Will always be send) The id of the appointment in the calendars database. A negative value indicates a calulated occurrence of a recurrign master.</td></tr>
+        <tr><td class="param">userID</td><td>long64</td><td>(Will always be send) The id of the user the appointment belongs to.</td></tr>
+        <tr><td class="param">type</td><td>string</td><td>(Will always be send) The type of the appointment. Will be <i>NORMAL</i>, <i>RECURRING_MASTER</i>, <i>DELETED_EXCEPTION</i>, <i>MODIFIED_EXCEPTION</i> or <i>OCCURRENCE</i>. Note that OCCURRENCE canot be used for WriteAppointment.</td></tr>
+        <tr><td class="param">syncID</td><td>long64</td><td>(Readonly) The sync id of appointment.</td></tr>
+        <tr><td class="param">title</td><td>string</td><td>The title of the appointment. Will be "Private", if the appointment is private and requested by another user which is not a service.</td></tr>
+        <tr><td class="param">startDate</td><td>long64</td><td>(UTC) The start of the appointment. For recurring masters, this will be the start of the series.</td></tr>
+        <tr><td class="param">endDate</td><td>long64</td><td>(UTC) The end of the appointment. For recurring masters, this will be the end of the series (while 0 means, that the series will never end).</td></tr>
+        <tr><td class="param">location</td><td>string</td><td>The location for that appointment. If missing, no location is set.</td></tr>
+        <tr><td class="param">allDay</td><td>bool</td><td>Flag whether the item is an whole-day appointment or not.</td></tr>
+        <tr><td class="param">private</td><td>bool</td><td>Flag whether the item is private not.</td></tr>
+        <tr><td class="param">activity</td><td>string</td><td>The activity. Will be free, busy, away or tentative.</td></tr>
+        <tr><td class="param">changedAt</td><td>long64</td><td>(Readonly) The timestamp of the last changes made.</td></tr>
+        <tr><td class="param">organizer</td><td>string</td><td>The organizer who created the appointment. If not given, no organizer is set.</td></tr>
+        <tr><td class="param">notes</td><td>string</td><td>The notes of the appointment.</td></tr>
+
+        <tr><td class="param"></td><td></td><td style="padding-top: 10px; padding-bottom: 2px"><i><u>Additional properties for occurrences (calculated from recurring masters):</u></i></td></tr>
+        <tr><td class="param">recurringMasterID</td><td>long64</td><td>(Readonly) The id of the recurring master, the occurrence had been created from.</td></tr>
+        
+        <tr><td class="param"></td><td></td><td style="padding-top: 10px; padding-bottom: 2px"><i><u>Additional properties for recurring exceptions:</u></i></td></tr>
+        <tr><td class="param">recurringMasterID</td><td>long64</td><td>The id of the recurring master, the exception belongs to.</td></tr>
+        <tr><td class="param">recurringExceptionOrgDate</td><td>long64</td><td>(UTC) The original date of the occurrence for that exception.</td></tr>
+
+        <tr><td class="param"></td><br/><td></td><td style="padding-top: 10px; padding-bottom: 2px"><i><u>Additional properties for recurring masters:</u></i></td></tr>
+        <tr><td class="param">duration</td><td>dword</td><td>The duration of an occurrence.</td></tr>
+        <tr><td class="param">timeZone</td><td>string</td><td>The time zone the appointment had been created for (as tz database name - see the <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">Wikipedia articel</a>) for details.</td></tr>
+        <tr><td class="param">recurringType</td><td>string</td><td>The type of the series which will be <i>DAILY</i>, <i>WEEKLY</i>, <i>MONTHLY</i> or <i>YEARLY</i>.</td></tr>
+        <tr><td class="param">interval</td><td>dword</td><td>The interval for that series.</td></tr>
+        <tr><td class="param">maxOccurrence</td><td>dword</td><td>(Optional) The maximum number of occurrences that will be calculated for the series, if the series should end after x occurrences. In that case, endDate will be ignored for writing appointments!</td></tr>
+        <tr><td class="param">days</td><td>dword</td><td>A set of days. Will be a bitmask of the recurring_days_t values an used as the days parameter for TimeOccurrence::SetWeeklyMaster(), TimeOccurrence::SetMonthlyMaster and TimeOccurrence::SetYearlyMaster().</td></tr>
+        <tr><td class="param">dayNum</td><td>dword</td><td>The number of the day the series will occure. Will be uses as dayNum parameter for TimeOccurrence::SetMonthlyMaster and TimeOccurrence::SetYearlyMaster().</td></tr>
+        <tr><td class="param">monthNum</td><td>dword</td><td>The month number the series will occure. Will a recurring_month_t value and used for the monthNum parameter for TimeOccurrence::SetYearlyMaster().</td></tr>
+        <tr><td class="param">weekDays</td><td>dword</td><td>A bitfield of the day values from the recurring_days_t set, to define the weekdays and weekend days. Bit set means, the day is a week day, bit not set means, day is a weekend day.</td></tr>
+    </table>
+  </body>
+</html>

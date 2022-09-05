@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.restaurantemanager",
+            "icon": "wecom-restaurante.png",
+            "lang": "wecom.restaurantemanagertexts",
+            "domains": false
+        }
+    ]
+}

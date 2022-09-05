@@ -4,7 +4,7 @@
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
 /// <reference path="./flv.js" />
 /// <reference path="./video.js" />
-//import flvjs from 'flv.js'
+
 
 var Wecom = Wecom || {};
 Wecom.iptv = Wecom.iptv || function (start, args) {
@@ -17,15 +17,27 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             "--bg": "#191918",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--nav-bg": "rgba(255, 255, 255, 0.5)",
+
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--nav-bg": "rgba(75, 71, 71, 0.5)",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
-    start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
+    start.onschemechanged.attach(function () {
+        if (start.scheme  == "dark"){
+            document.getElementById('menu-icon').setAttribute('src', 'menu-icon-white.png');
+        }
+        if (start.scheme == "light") {
+            document.getElementById('menu-icon').setAttribute('src', 'menu-icon.png');
+        }
+        
+        schemes.activate(start.scheme)
+    });
 
     var texts = new innovaphone.lib1.Languages(Wecom.iptvTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
@@ -35,9 +47,12 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    var launcher = start.consumeApi("com.innovaphone.launcher")
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
+        app.send({ mt: "AddLocalNotification", title: "Teste", text: null, acceptTitle: "Aceitar", rejectTitle: "Rejeitar", largeIcon: null }, "*", "1234567890");
     }
 
     function app_message(obj) {
