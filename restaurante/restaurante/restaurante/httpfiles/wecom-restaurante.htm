@@ -202,8 +202,36 @@
 
             </div>
             <footer style="text-align: center;">
-                <div id="modal">
-                    <a href="./sugestoes.html"><input type="button" style="margin-top: 3%;" id="sugest" value="Sugestões"></a>
+                <button id="myBtn">Sugestões</button>
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        form method="get">
+        <h1> Sugestões </h1>
+        <p> <h3> Como podemos melhorar?</h3></p>
+
+        <div id="res">
+            <span>Seu nome:</span> <input type="text" id="name2">
+        </div>
+
+        <div id="comida">
+            <br> <span id="span">Como estava a comida?</span> <br>
+            <br><label for="radio" id="radio">
+                <input type="radio">Muito bom!
+                <input type="radio">Bom!
+                <input type="radio">Razoável
+                <input type="radio">Ruim!
+                <input type="radio">Muito ruim!!
+
+            </label>
+        </div>
+        <div id="sugestoes">
+            <span>  Deixe aqui suas sugestões! <br></span> <br>
+            <textarea id="type"> </textarea>
+        </div>
+        <input type="button" value="Enviar!" id="button">
+    </form>
+                      </div>
                 </div>
             </footer>
 
