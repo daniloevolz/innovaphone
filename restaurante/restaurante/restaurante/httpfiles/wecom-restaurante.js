@@ -39,6 +39,33 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
         }
     }
+    
+    // Modal JS Edição Pietro
+  
+var modal = document.getElementById("myModal");
+
+// botão que abre o modal
+var btn = document.getElementById("myBtn");
+
+// botão que fecha o modal
+var span = document.getElementsByClassName("close")[0];
+
+// clicar e abrir o modal
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// clicar e fechar o modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// clicar fora do modal e fechar ele 
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
 }
 
 Wecom.restaurante.prototype = innovaphone.ui1.nodePrototype;

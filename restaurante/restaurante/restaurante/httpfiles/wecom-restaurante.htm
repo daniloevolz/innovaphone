@@ -201,21 +201,22 @@
                 </table>
 
             </div>
+            <!-- MODAL HTML-->
             <footer style="text-align: center;">
                 <button id="myBtn">Sugestões</button>
                 <div id="myModal" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        form method="get">
-        <h1> Sugestões </h1>
+                        <form method="get">
+        <h1 id="h1sugest"> Sugestões </h1>
         <p> <h3> Como podemos melhorar?</h3></p>
 
         <div id="res">
-            <span>Seu nome:</span> <input type="text" id="name2">
+            <span style="font-size: 16px;">Seu nome:</span> <input type="text" id="name2">
         </div>
 
         <div id="comida">
-            <br> <span id="span">Como estava a comida?</span> <br>
+            <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
             <br><label for="radio" id="radio">
                 <input type="radio">Muito bom!
                 <input type="radio">Bom!
@@ -226,7 +227,7 @@
             </label>
         </div>
         <div id="sugestoes">
-            <span>  Deixe aqui suas sugestões! <br></span> <br>
+            <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
             <textarea id="type"> </textarea>
         </div>
         <input type="button" value="Enviar!" id="button">

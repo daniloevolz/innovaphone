@@ -2,7 +2,7 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    background-image: url(./teste1.jpg);
+    background-image: url(./teste2.jpg);
 }
 
 div.button {
@@ -19,7 +19,7 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-
+    /*EDIÇÃO PIETRO DESKTOP*/
 * {
     margin: 0;
     border: 0;
@@ -31,7 +31,7 @@ h1{
 }
 header#header2 {
     text-align: center;
-    background-image: url(./money_header.png);
+    /*background-image: url(./money_header.png);*/
     height: 100px;
     width: 100%;
     background-repeat: repeat;
@@ -52,6 +52,7 @@ div#seg {
     width: 22%;
     margin-left: 5%;
     background-color: rgba(224, 224, 224,0.5);
+    display: block;
 }
 
 section {
@@ -67,6 +68,7 @@ div#segunda {
     background-color: rgb(55, 170, 161);
     margin-left: 5%;
     text-align: center;
+    display: block;
 }
 
 div#terc {
@@ -74,7 +76,7 @@ div#terc {
     width: 22%;
     margin-left: 38%;
     margin-top: 0%;
-    display: flex;
+    display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
 
@@ -87,6 +89,7 @@ div#terca {
     background-color: rgb(55, 170, 161);
     margin-left: 38%;
     margin-top: -10%;
+    display: block;
 }
 
 div#quart {
@@ -94,7 +97,7 @@ div#quart {
     width: 22%;
     margin-left: 72%;
     margin-top: 0%;
-    display: flex;
+    display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
 
@@ -107,6 +110,7 @@ div#quarta {
     background-color: rgb(55, 170, 161);
     margin-left: 72%;
     margin-top: -10%;
+    display: block;
 }
 
 div#quint {
@@ -114,8 +118,8 @@ div#quint {
     width: 22%;
     margin-left: 20%;
     margin-top: 0%;
-    display: flex;
     background-color: rgba(224, 224, 224,0.5);
+    display: block;
 }
 
 div#quinta {
@@ -127,6 +131,7 @@ div#quinta {
     background-color: rgb(55, 170, 161);
     margin-left: 20%;
     margin-top: 2%;
+    display: block;
 }
 
 div#sext {
@@ -134,7 +139,7 @@ div#sext {
     width: 22%;
     margin-left: 60%;
     margin-top: 0%;
-    display: flex;
+    display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
 
@@ -147,6 +152,7 @@ div#sexta {
     background-color: rgb(55, 170, 161);
     margin-left: 60%;
     margin-top: -10%;
+    display: block;
 }
 
 div {
@@ -173,15 +179,145 @@ input#sugest {
     position: absolute;
 }
 
-/*DESIGN MOBILE EM DESENVOLVIMENTO..*/
+/*MODAL DESKTOP*/
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+  }
+  
+
+.modal-content {
+    background-color: #8ab5bd;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 12px;
+}
+  
+  /* Fechar Botão */
+  .close {
+    color: #00000086;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  button#myBtn{
+    width: 10%;
+    background-color: rgb(50, 187, 141);
+    height: 35px;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+  }
+
+ /*MODAL CSS */
+
+form {
+    text-align: center;
+    width: 100%;
+    margin-left: 0%;
+   /* background-color: rgba(240, 240, 240,0.1);*/
+    height: 500px;
+    margin-top: 2%;
+    border-radius: 10px;
+}
+
+h1#h1sugest {
+    margin-top: 1%;
+}
+
+h3 {
+    margin-top: 1%;
+    font-size: 13px;
+}
+
+div#res {
+    margin-top: 3%;
+}
+
+span#span {
+    font-weight: bold;
+    margin-top: -1%;
+    font-size: 16px;
+}
+
+div#comida {
+    margin-top: 3%;
+}
+
+span {
+    font-weight: bold;
+}
+
+div#sugestoes {
+    margin-top: 4%;
+    width: 100%;
+}
+
+textarea {
+    width: 50%;
+    height: 100px;
+}
+
+input {
+    border-radius: 5px;
+}
+
+    input#button {
+        margin: 1%;
+        position: fixed;
+        width: 10%;
+        height: 35px;
+        border-radius: 10px;
+        font-weight: bold;
+        background-color: rgb(64, 62, 185);
+        color: white;
+        font-size: 15px;
+        text-align: center;
+    }
+
+div#anom {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 2%;
+    margin-left: 2%;
+}
+input#name2{
+    width: 25%;
+}
+
+/*DESIGN MOBILE*/
+
 @media screen and (max-width: 500px) {
     body {
         background-image: url(./teste2.jpg);
+    }
+    h3{
+        width: 100%;
     }
     h1{
         font-family: 'Arial';
         margin-top: 1%;
         font-size: 34px;
+        text-align: center;
     }
 
     header#header2 {
@@ -189,6 +325,9 @@ input#sugest {
         background-image: url();
         height: 100px;
         width: 100%;
+    }
+    input#name2{
+        width: 40%;
     }
 
     header#header1 {
@@ -318,8 +457,9 @@ input#sugest {
     #wecom {
         margin-top: 14%;
         position: absolute;
-        margin-left: -38%;
+        margin-left: -30%;
         text-align: center;
+        align-items: center;
     }
 
     #logoinnova {
@@ -333,4 +473,177 @@ input#sugest {
     div#all {
         margin-top: 5%;
     }
+
+    /*MODAL MOBILE*/
+    
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+  }
+  
+  .modal-content {
+    background-color: #8ab5bd;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 85%;
+    border-radius: 12px;
+  }
+  
+  /* FECHAR BOTÃO */
+  .close {
+    color: #00000086;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  button#myBtn{
+    width: 30%;
+    background-color: rgb(50, 187, 141);
+    height: 35px;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+    margin-top: 3%;
+  }
+
+ /*MODAL MOBILE CSS */
+
+form {
+    text-align: center;
+    width: 100%;
+    margin-left: 0%;
+   /* background-color: rgba(240, 240, 240,0.1);*/
+    height: 500px;
+    margin-top: 2%;
+    border-radius: 10px;
+}
+
+h1#h1sugest {
+    margin-top: 1%;
+}
+
+h3 {
+    margin-top: 1%;
+    font-size: 13px;
+}
+
+div#res {
+    margin-top: 3%;
+}
+
+span#span {
+    font-weight: bold;
+    margin-top: -1%;
+    font-size: 16px;
+    width: 100%;
+}
+label#radio{
+    width: 100%;
+}
+
+div#comida {
+    margin-top: 3%;
+    width: 100%;
+}
+
+span {
+    font-weight: bold;
+}
+
+div#sugestoes {
+    margin-top: 4%;
+}
+
+textarea {
+    width: 75%;
+    height: 100px;
+}
+span#spansugest{
+    width: 100%;
+}
+
+input {
+    border-radius: 5px;
+}
+
+    input#button {
+        margin: 1%;
+        position: fixed;
+        width: 20%;
+        height: 35px;
+        border-radius: 10px;
+        font-weight: bold;
+        background-color: rgb(64, 62, 185);
+        color: white;
+        font-size: 15px;
+        text-align: center;
+    }
+
+div#anom {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 2%;
+    margin-left: 2%;
+}
+    /*TESTE PARA TELAS GRANDES*/
+@media screen and (min-width:1500px){
+    div#quint {
+        border: 4px solid rgb(55, 170, 161);
+        width: 22%;
+        margin-left: 20%;
+        margin-top: 8%;
+        display: flex;
+        background-color: rgba(224, 224, 224,0.5);
+    }
+    
+    div#quinta {
+        font-size: 20px;
+        font-weight: bold;
+        border: 4px solid rgb(55, 170, 161);
+        width: 22%;
+        text-align: center;
+        background-color: rgb(55, 170, 161);
+        margin-left: 20%;
+        margin-top: 10%;
+    }
+    
+    div#sext {
+        border: 4px solid rgb(55, 170, 161);
+        width: 22%;
+        margin-left: 60%;
+        margin-top: 8%;
+        display: flex;
+        background-color: rgba(224, 224, 224,0.5);
+    }
+    
+    div#sexta {
+        font-size: 20px;
+        font-weight: bold;
+        border: 4px solid rgb(55, 170, 161);
+        width: 22%;
+        text-align: center;
+        background-color: rgb(55, 170, 161);
+        margin-left: 60%;
+        margin-top: 5%;
+    }
+    
+}
 }

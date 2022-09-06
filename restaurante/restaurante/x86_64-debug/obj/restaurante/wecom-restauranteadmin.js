@@ -38,6 +38,8 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
         }
     }
+    
+
 }
 
 Wecom.restauranteAdmin.prototype = innovaphone.ui1.nodePrototype;
