@@ -66,6 +66,11 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+
+
+
+
+
 }
 
 Wecom.restaurante.prototype = innovaphone.ui1.nodePrototype;

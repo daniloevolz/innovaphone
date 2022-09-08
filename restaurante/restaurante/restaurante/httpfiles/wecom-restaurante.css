@@ -2,7 +2,53 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    background-image: url(./teste2.jpg);
+    background-image: url(./teste3.jpg);
+    overflow-x: hidden;
+    background-repeat: repeat;
+}
+/* RESTAURANTE ADMIN DESKTOP */
+
+button#duvidas{
+    background-color: #11a3c0;
+    position: absolute;
+    margin-top: 0%;
+    margin-left: 15%;
+    height: 60px;
+    width: 120px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+section#info{
+    background-color: aquamarine;
+    position: absolute;
+    width: 25%;
+    margin-left: 1%;
+    height: 40%;
+    text-align: center;
+    border-radius: 15px;
+    
+}
+button#limpar{
+    position: absolute;
+    background-color: #ce4949;
+    width: 200px;
+    height: 70px;
+    margin-left: 50%;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+button#atualizar{
+    position: absolute;
+    background-color: #41d407;
+    width: 200px;
+    height: 70px;
+    margin-left: 50%;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: -5%;
 }
 
 div.button {
@@ -19,7 +65,7 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-    /*EDIÇÃO PIETRO DESKTOP*/
+    /*EDIÇÃO PIETRO DESKTOP RESTAURANTE*/
 * {
     margin: 0;
     border: 0;
@@ -29,12 +75,17 @@ h1{
     margin-top: 1%;
     font-size: 40px;
 }
+div#center{
+   width: 100%;
+   margin-left: 30%;
+}
 header#header2 {
     text-align: center;
     /*background-image: url(./money_header.png);*/
     height: 100px;
     width: 100%;
     background-repeat: repeat;
+    margin-top: 1%;
 }
 
 header#header1 {
@@ -43,39 +94,36 @@ header#header1 {
 }
 
 div#info {
-    /*background-color: aqua;*/
     text-align: center;
+}
+section {
+    margin-top: 3%;
+
+
 }
 
 div#seg {
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
-    margin-left: 5%;
+    width: 40%;
     background-color: rgba(224, 224, 224,0.5);
     display: block;
 }
 
-section {
-    margin-top: 3%;
-    /*background-color: brown;*/
-}
+
 
 div#segunda {
     font-size: 20px;
     font-weight: bold;
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
+    width: 40%;
     background-color: rgb(55, 170, 161);
-    margin-left: 5%;
     text-align: center;
     display: block;
 }
 
 div#terc {
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
-    margin-left: 38%;
-    margin-top: 0%;
+    width: 40%;
     display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
@@ -84,19 +132,15 @@ div#terca {
     font-size: 20px;
     font-weight: bold;
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
+    width: 40%;
     text-align: center;
     background-color: rgb(55, 170, 161);
-    margin-left: 38%;
-    margin-top: -10%;
     display: block;
 }
 
 div#quart {
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
-    margin-left: 72%;
-    margin-top: 0%;
+    width: 40%;
     display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
@@ -105,40 +149,33 @@ div#quarta {
     font-size: 20px;
     font-weight: bold;
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
+    width: 40%;
     text-align: center;
     background-color: rgb(55, 170, 161);
-    margin-left: 72%;
-    margin-top: -10%;
     display: block;
 }
 
 div#quint {
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
-    margin-left: 20%;
-    margin-top: 0%;
+    width: 40%;
     background-color: rgba(224, 224, 224,0.5);
     display: block;
+    
 }
 
 div#quinta {
     font-size: 20px;
     font-weight: bold;
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
+    width: 40%;
     text-align: center;
     background-color: rgb(55, 170, 161);
-    margin-left: 20%;
-    margin-top: 2%;
     display: block;
 }
 
 div#sext {
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
-    margin-left: 60%;
-    margin-top: 0%;
+    width: 40%;
     display: block;
     background-color: rgba(224, 224, 224,0.5);
 }
@@ -147,11 +184,9 @@ div#sexta {
     font-size: 20px;
     font-weight: bold;
     border: 4px solid rgb(55, 170, 161);
-    width: 22%;
+    width: 40%;
     text-align: center;
     background-color: rgb(55, 170, 161);
-    margin-left: 60%;
-    margin-top: -10%;
     display: block;
 }
 
@@ -166,16 +201,17 @@ input#sugest {
     border-radius: 10px;
     font-weight: bold;
 }
+*/
 
 #wecom {
-    margin-top: 1.5%;
+    margin-top: 3%;
 }
 
 #logoinnova {
     width: 10%;
     float: left;
     margin-left: -30%;
-    margin-top: 1.5%;
+    margin-top: 0%;
     position: absolute;
 }
 
@@ -203,6 +239,7 @@ input#sugest {
     border: 1px solid #888;
     width: 50%;
     border-radius: 12px;
+    margin-top: -6.5%;
 }
   
   /* Fechar Botão */
@@ -221,7 +258,7 @@ input#sugest {
   }
   button#myBtn{
     width: 10%;
-    background-color: rgb(50, 187, 141);
+    background-color: rgb(55, 170, 161);
     height: 35px;
     color: black;
     font-weight: bold;
@@ -235,17 +272,17 @@ form {
     width: 100%;
     margin-left: 0%;
    /* background-color: rgba(240, 240, 240,0.1);*/
-    height: 500px;
+    height: 450px;
     margin-top: 2%;
     border-radius: 10px;
 }
 
 h1#h1sugest {
-    margin-top: 1%;
+    margin-top: 0%;
 }
 
 h3 {
-    margin-top: 1%;
+    margin-top: 0%;
     font-size: 13px;
 }
 
@@ -275,6 +312,7 @@ div#sugestoes {
 textarea {
     width: 50%;
     height: 100px;
+    border-radius: 10px;
 }
 
 input {
@@ -308,7 +346,7 @@ input#name2{
 
 @media screen and (max-width: 500px) {
     body {
-        background-image: url(./teste2.jpg);
+        background-image: url(./teste2-mobile.jpg);
     }
     h3{
         width: 100%;
@@ -325,6 +363,7 @@ input#name2{
         background-image: url();
         height: 100px;
         width: 100%;
+        align-items: center;
     }
     input#name2{
         width: 40%;
@@ -342,8 +381,8 @@ input#name2{
 
     div#seg {
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
-        margin-left: 5%;
+        width: 85%;
+        margin-left: -25%;
         background-color: rgba(224, 224, 224,0.5);
     }
 
@@ -356,16 +395,16 @@ input#name2{
         font-size: 20px;
         font-weight: bold;
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
+        width: 85%;
         background-color: rgb(55, 170, 161);
         ;
-        margin-left: 5%;
+        margin-left: -25%;
     }
 
     div#terc {
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
-        margin-left: 5%;
+        width: 85%;
+        margin-left: -25%;
         margin-top: 0%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
@@ -375,18 +414,18 @@ input#name2{
         font-size: 20px;
         font-weight: bold;
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
+        width: 85%;
         text-align: center;
         background-color: rgb(55, 170, 161);
         ;
-        margin-left: 5%;
-        margin-top: 10%;
+        margin-left: -25%;
+        margin-top: 0%;
     }
 
     div#quart {
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
-        margin-left: 5%;
+        width: 85%;
+        margin-left: -25%;
         margin-top: 0%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
@@ -396,18 +435,18 @@ input#name2{
         font-size: 20px;
         font-weight: bold;
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
+        width: 85%;
         text-align: center;
         background-color: rgb(55, 170, 161);
         ;
-        margin-left: 5%;
-        margin-top: 10%;
+        margin-left: -25%;
+        margin-top: 0%;
     }
 
     div#quint {
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
-        margin-left: 5%;
+        width: 85%;
+        margin-left: -25%;
         margin-top: 0%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
@@ -417,18 +456,18 @@ input#name2{
         font-size: 20px;
         font-weight: bold;
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
+        width: 85%;
         text-align: center;
         background-color: rgb(55, 170, 161);
         ;
-        margin-left: 5%;
-        margin-top: 10%;
+        margin-left: -25%;
+        margin-top: 0%;
     }
 
     div#sext {
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
-        margin-left: 5%;
+        width: 85%;
+        margin-left: -25%;
         margin-top: 0%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
@@ -438,12 +477,12 @@ input#name2{
         font-size: 20px;
         font-weight: bold;
         border: 4px solid rgb(55, 170, 161);
-        width: 90%;
+        width: 85%;
         text-align: center;
         background-color: rgb(55, 170, 161);
         ;
-        margin-left: 5%;
-        margin-top: 10%;
+        margin-left: -25%;
+        margin-top: 0%;
     }
 
     div {
@@ -457,7 +496,7 @@ input#name2{
     #wecom {
         margin-top: 14%;
         position: absolute;
-        margin-left: -30%;
+        margin-left: -32%;
         text-align: center;
         align-items: center;
     }
@@ -498,6 +537,7 @@ input#name2{
     border: 1px solid #888;
     width: 85%;
     border-radius: 12px;
+    margin-top: -6.5%;
   }
   
   /* FECHAR BOTÃO */
@@ -516,7 +556,7 @@ input#name2{
   }
   button#myBtn{
     width: 30%;
-    background-color: rgb(50, 187, 141);
+    background-color: rgb(55, 170, 161);
     height: 35px;
     color: black;
     font-weight: bold;
@@ -575,6 +615,7 @@ div#sugestoes {
 textarea {
     width: 75%;
     height: 100px;
+    border-radius: 10px;
 }
 span#spansugest{
     width: 100%;
@@ -602,48 +643,5 @@ div#anom {
     font-weight: bold;
     margin-top: 2%;
     margin-left: 2%;
-}
-    /*TESTE PARA TELAS GRANDES*/
-@media screen and (min-width:1500px){
-    div#quint {
-        border: 4px solid rgb(55, 170, 161);
-        width: 22%;
-        margin-left: 20%;
-        margin-top: 8%;
-        display: flex;
-        background-color: rgba(224, 224, 224,0.5);
-    }
-    
-    div#quinta {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 22%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        margin-left: 20%;
-        margin-top: 10%;
-    }
-    
-    div#sext {
-        border: 4px solid rgb(55, 170, 161);
-        width: 22%;
-        margin-left: 60%;
-        margin-top: 8%;
-        display: flex;
-        background-color: rgba(224, 224, 224,0.5);
-    }
-    
-    div#sexta {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 22%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        margin-left: 60%;
-        margin-top: 5%;
-    }
-    
 }
 }

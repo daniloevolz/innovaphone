@@ -24,6 +24,7 @@
         <br>
         <div id="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
         <section>
+            <div id="center">
             <div id="segunda">Segunda</div>
             <div id="seg">
                 <table cellpadding="3" cellspacing="0">
@@ -35,7 +36,7 @@
                     </tr>
                     <tr>
                         <!-- AUMENTAR LARGURA DA CEDULA-->
-                        <td style="width: 150px;">Batata frita </td>
+                        <td style="width: 200px;">Batata frita </td>
                         <td></td>
 
 
@@ -58,9 +59,8 @@
 
 
                 </table>
-
             </div>
-
+            <br></br>
             <div id="terca">Terça</div>
             <div id="terc">
                 <table cellpadding="3" cellspacing="0">
@@ -71,7 +71,7 @@
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
-                        <td style="width: 150px;">Batata frita </td>
+                        <td style="width: 200px;">Batata frita </td>
                         <td></td>
 
 
@@ -96,6 +96,7 @@
                 </table>
 
             </div>
+            <br></br>
             <div id="quarta">Quarta</div>
             <div id="quart">
                 <table cellpadding="3" cellspacing="0">
@@ -106,7 +107,7 @@
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
-                        <td style="width: 150px;">Batata frita </td>
+                        <td style="width: 200px;">Batata frita </td>
                         <td></td>
 
 
@@ -131,6 +132,7 @@
                 </table>
 
             </div>
+            <br></br>
             <div id="quinta">Quinta</div>
             <div id="quint">
                 <table cellpadding="3" cellspacing="0">
@@ -141,7 +143,7 @@
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
-                        <td style="width: 150px;">Batata frita </td>
+                        <td style="width: 200px;">Batata frita </td>
                         <td></td>
 
 
@@ -166,6 +168,7 @@
                 </table>
 
             </div>
+            <br></br>
             <div id="sexta">Sexta</div>
             <div id="sext">
                 <table cellpadding="3" cellspacing="0">
@@ -176,7 +179,7 @@
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
-                        <td style="width: 150px;">Batata frita </td>
+                        <td style="width: 200px;">Batata frita </td>
                         <td></td>
 
 
@@ -201,6 +204,8 @@
                 </table>
 
             </div>
+            <br></br>
+        </div>
             <!-- MODAL HTML-->
             <footer style="text-align: center;">
                 <button id="myBtn">Sugestões</button>
@@ -218,11 +223,11 @@
         <div id="comida">
             <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
             <br><label for="radio" id="radio">
-                <input type="radio">Muito bom!
-                <input type="radio">Bom!
-                <input type="radio">Razoável
-                <input type="radio">Ruim!
-                <input type="radio">Muito ruim!!
+                <input type="radio" name="Muito bom!">Muito bom!
+                <input type="radio" name="Bom!">Bom!
+                <input type="radio" name="Razoável">Razoável
+                <input type="radio" name="Ruim!">Ruim!
+                <input type="radio" name="Muito Ruim!">Muito ruim!
 
             </label>
         </div>
@@ -230,7 +235,7 @@
             <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
             <textarea id="type"> </textarea>
         </div>
-        <input type="button" value="Enviar!" id="button">
+        <input type="button" value="Enviar!" id="button" onclick="Clicar()">
     </form>
                       </div>
                 </div>
