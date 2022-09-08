@@ -12,6 +12,13 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     this.createNode("body");
     var that = this;
 
+    if (start.scheme == "dark") {
+        document.getElementById('menu-icon').setAttribute('src', 'menu-icon-white.png');
+    }
+    if (start.scheme == "light") {
+        document.getElementById('menu-icon').setAttribute('src', 'menu-icon.png');
+    }
+
     var colorSchemes = {
         dark: {
             "--bg": "#191918",
@@ -24,7 +31,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
-            "--nav-bg": "rgba(75, 71, 71, 0.5)",
+            "--nav-bg": "rgba(75, 71, 71, 0.7)",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -47,13 +54,11 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var launcher = start.consumeApi("com.innovaphone.launcher");
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
-        app.send({ mt: "AddLocalNotification", title: "Teste", text: null, acceptTitle: "Aceitar", rejectTitle: "Rejeitar", largeIcon: null }, "*", "1234567890");
-    }
+        }
 
     function app_message(obj) {
         console.log(obj);
@@ -120,8 +125,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 iframe.src = url +"?autoplay=1&mute=1";
                 iframe.frameBorder = "0";
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.width = "80%";
-                iframe.height = "60%";
+                iframe.width = "800px";
+                iframe.height = "470px";
                 document.getElementById("container").appendChild(iframe);
             }
             if (type == "application/x-mpegURL") {
