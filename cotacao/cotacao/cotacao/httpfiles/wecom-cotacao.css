@@ -78,7 +78,7 @@ div#logowecom {
     display: flex;
     align-items: center;
     display: flex;
-    flex-direction: column;
+    flex-direction:row;
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 8%;

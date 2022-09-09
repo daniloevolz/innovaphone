@@ -2,9 +2,54 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    background-image: url(./teste3.jpg);
+    background-image: url(./teste2.jpg);
     overflow-x: hidden;
     background-repeat: repeat;
+}
+/* RESTAURANTE ADMIN DESKTOP */
+
+
+button#duvidas{
+    background-color: #11a3c0;
+    position: absolute;
+    margin-top: 0%;
+    margin-left: 15%;
+    height: 60px;
+    width: 120px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+section#info{
+    background-color: aquamarine;
+    position: absolute;
+    width: 25%;
+    margin-left: 1%;
+    height: 40%;
+    text-align: center;
+    border-radius: 15px;
+    
+}
+button#limpar{
+    position: absolute;
+    background-color: #ce4949;
+    width: 200px;
+    height: 70px;
+    margin-left: 50%;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+button#atualizar{
+    position: absolute;
+    background-color: #41d407;
+    width: 200px;
+    height: 70px;
+    margin-left: 50%;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: -5%;
 }
 
 div.button {
@@ -21,7 +66,7 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-    /*EDIÇÃO PIETRO DESKTOP*/
+    /*EDIÇÃO PIETRO DESKTOP RESTAURANTE*/
 * {
     margin: 0;
     border: 0;
@@ -30,124 +75,156 @@ h1{
     font-family: 'Arial';
     margin-top: 1%;
     font-size: 40px;
-}
-div#center{
-   width: 100%;
-   margin-left: 30%;
-}
-header#header2 {
     text-align: center;
-    /*background-image: url(./money_header.png);*/
-    height: 100px;
-    width: 100%;
-    background-repeat: repeat;
-    margin-top: 1%;
 }
+/*
+div#center{
+    width: 100%;
+    margin-left: 30%;
+ }
+ */
 
 header#header1 {
     /*background-color: blue;*/
     text-align: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.day{
+    background-color: rgb(55, 170, 161);
+    text-align: center;
+    width: 200px;
+    border: 0px solid rgb(55, 170, 161);
+}
+table tr td{
+    border: 0px solid black;
+}
+table{
+    border: 4px solid rgb(55, 170, 161);
 }
 
 div#info {
     text-align: center;
 }
-section {
-    margin-top: 3%;
-
+section#main {
+    margin-top: 0.5%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+align-items: center;
+   
+}
+.colunadireita {
+    width: 88%;
+    height: 100%;
+    float: right;
 
 }
+footer{
+    flex-direction: row;
+justify-content: center;
+align-items: center;
+}
+
+.colunaesquerda {
+    background-image: url("bg_lateral.png");
+    background-size: cover;
+    height: 100%;
+    width: 12%;
+    margin-left: 0%;
+    float: left;
+    position: absolute;
+}
+li {
+    padding: 4px;
+    margin-top: 5%;
+}
+
+a {
+    color: darkslategrey;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: darkslategrey;
+        font-weight: bold;
+    }
+
+
+.linha1 {
+    order: 1;
+    background-image: url("money_header.png");
+    background-size: cover;
+    width: auto;
+    height: 26.1%;
+    padding-top: 40px;
+    padding-left: 30px;
+    
+   
+    
+}
+.logo-inn{
+    width: 20%;
+    height: auto;
+    padding-bottom: 20px;
+    
+
+}
+
 
 div#seg {
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    background-color: rgba(224, 224, 224,0.5);
+    
+    width: 25%;
     display: block;
+   
+    
 }
 
-
-
-div#segunda {
-    font-size: 20px;
-    font-weight: bold;
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    background-color: rgb(55, 170, 161);
-    text-align: center;
-    display: block;
-}
 
 div#terc {
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
+    
+    width: 25%;
     display: block;
-    background-color: rgba(224, 224, 224,0.5);
+    
+    
 }
 
-div#terca {
-    font-size: 20px;
-    font-weight: bold;
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    text-align: center;
-    background-color: rgb(55, 170, 161);
-    display: block;
-}
 
 div#quart {
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
+    
+    width: 25%;
     display: block;
-    background-color: rgba(224, 224, 224,0.5);
+    
+    
 }
 
-div#quarta {
-    font-size: 20px;
-    font-weight: bold;
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    text-align: center;
-    background-color: rgb(55, 170, 161);
-    display: block;
-}
+
+
 
 div#quint {
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    background-color: rgba(224, 224, 224,0.5);
+    
+    width: 25%;
+    
     display: block;
     
 }
 
-div#quinta {
-    font-size: 20px;
-    font-weight: bold;
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    text-align: center;
-    background-color: rgb(55, 170, 161);
-    display: block;
-}
+
+
 
 div#sext {
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
+    
+    width: 25%;
     display: block;
-    background-color: rgba(224, 224, 224,0.5);
-}
-
-div#sexta {
-    font-size: 20px;
-    font-weight: bold;
-    border: 4px solid rgb(55, 170, 161);
-    width: 40%;
-    text-align: center;
-    background-color: rgb(55, 170, 161);
-    display: block;
+    
 }
 
 div {
     font-weight: bold;
+    
 }
 
 input#sugest {
@@ -195,7 +272,7 @@ input#sugest {
     border: 1px solid #888;
     width: 50%;
     border-radius: 12px;
-    margin-top: -5%;
+    margin-top: -6.5%;
 }
   
   /* Fechar Botão */
@@ -213,12 +290,14 @@ input#sugest {
     cursor: pointer;
   }
   button#myBtn{
-    width: 10%;
-    background-color: rgb(50, 187, 141);
+    width: 13%;
+    background-color: rgb(55, 170, 161);
     height: 35px;
     color: black;
     font-weight: bold;
     border-radius: 10px;
+    text-align: center;
+    margin-top: 0.5%;
   }
 
  /*MODAL CSS */
@@ -268,6 +347,7 @@ div#sugestoes {
 textarea {
     width: 50%;
     height: 100px;
+    border-radius: 10px;
 }
 
 input {
@@ -492,7 +572,7 @@ input#name2{
     border: 1px solid #888;
     width: 85%;
     border-radius: 12px;
-    margin-top: -5%;
+    margin-top: -6.5%;
   }
   
   /* FECHAR BOTÃO */
@@ -511,7 +591,7 @@ input#name2{
   }
   button#myBtn{
     width: 30%;
-    background-color: rgb(50, 187, 141);
+    background-color: rgb(55, 170, 161);
     height: 35px;
     color: black;
     font-weight: bold;
@@ -570,6 +650,7 @@ div#sugestoes {
 textarea {
     width: 75%;
     height: 100px;
+    border-radius: 10px;
 }
 span#spansugest{
     width: 100%;

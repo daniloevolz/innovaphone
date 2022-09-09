@@ -67,22 +67,9 @@ window.onclick = function(event) {
   }
 }
 
-//Scripts criados para caso o usuario deseje responder anonimamene ou tenha esquecido seu nome/ esquecido de selecionar uma das opções
 
-function Clicar(){
 
-var nome = document.getElementById("name2").value; 
-var anom = prompt(" Voce esqueceu de digitar seu nome. Deseja responder anonimamente?? ")   
-var none = document.getElementById('res')
 
-if (nome === ' '){
-  return anom
-}
-if (anom.toLowerCase() == 'sim') {
-  none.innerHTML = ' '
-}
-
-}
 
 }
 
