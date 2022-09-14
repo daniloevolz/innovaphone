@@ -1,95 +1,112 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8"/>
-    <title>Topic</title>
+    <meta charset="utf-8" />
+    <title>Cardápio Admin</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="web1/lib1/innovaphone.lib1.css" type="text/css" />
     <link rel="stylesheet" href="wecom-restaurante.css" type="text/css" />
     <script src="web1/lib1/innovaphone.lib1.js" type="text/javascript"></script>
     <script src="web1/ui1.lib/innovaphone.ui1.lib.js" type="text/javascript"></script>
     <script src="web1/ui1.svg/innovaphone.ui1.svg.js" type="text/javascript"></script>
     <script src="web1/appwebsocket/innovaphone.appwebsocket.Connection.js" type="text/javascript"></script>
-    <script src="wecom-restauranteadmin.js" type="text/javascript"></script>
+    <script src="wecom-restaurante.js" type="text/javascript"></script>
     <script src="wecom-restaurantetexts.js" type="text/javascript"></script>
 </head>
-<body onload="innovaphone.lib1.Start(function (start) { new Wecom.restauranteAdmin(start, { }); })">
-
-    <header id="header2"> <img src="./logo-inn.png" id="logoinnova"><img src="./logo.png" id="wecom">
-    <button id="duvidas" value="Duvidas">DUVIDAS</button>
-    </header>
-
-
+<body onload="innovaphone.lib1.Start(function (start) { new Wecom.restaurante(start, { }); })">
+    <div class="containervertical">
+        <div class="colunaesquerda">
+            <nav>
+                <ul>
+                    <li><a id="inicio" href="#">Início</a></li>
+                    <li><a id="b3" href="#">Cardápio</a></li>
+                    <li><a id="todas" href="#">Novidades</a></li>
+                    
+                </ul>
+                <button type="submit" id="duvidas">DUVIDAS</button>
+                <input type= "button" id="atualizar"  value="Atualizar" onclick="Clicar()">
+                <button type="submit" id="limpar">Limpar dados</button>
+                <button id="myBtn2" >Sugestões</button>
+            </nav>
+        </div>
+        <div class="colunadireita">
+            <div class="linha1">
+                <img class="logo-inn" src="logo-inn.png"/>
+            </div>
+            <div id="linha2" class="linha2">
+    
     <div id="all">
         <header id="header1"> <h1>Cardápio</h1></header>
         <br>
         <div id="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
-        <section id="info">INFORMATIVO SOBRE COMO <br> ATUALIZAR A TABELA</section>
-        <section>
-            <div id="center">
-            <div id="segunda">Segunda</div>
+        <section id="main">
+            <div class="break" style="width: 0px;" ></div>
             <div id="seg">
                 <table cellpadding="3" cellspacing="0">
+                    <tr >
+                        <td class="day" colspan="4">SEGUNDA</td></tr>
                     <tr>
-                        <td>Arroz</td>
-                        <td></td>
+                        <td><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
+                        
 
-                        <td>Filé de frango</td>
+                        <td><input type="text" name="comidaseg2" class="allinput"></td>
                     </tr>
                     <tr>
-                        <!-- AUMENTAR LARGURA DA CEDULA-->
-                        <td style="width: 200px;">Batata frita </td>
-                        <td></td>
+                  
+                        <td style="width: 200px;"> <input type="text" name="comidaseg3" class="allinput"> </td>
+                        
 
 
-                        <td>Feijão </td>
+                        <td><input type="text" name="comidaseg4" class="allinput"> </td>
                     </tr>
                     <tr>
-                        <td>Polenta</td>
-                        <td></td>
+                        <td><input type="text" name="comidaseg5" class="allinput"></td>
+                       
 
 
-                        <td>Salada</td>
+                        <td><input type="text" name="comidaseg6" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td>Massa</td>
-                        <td></td>
+                        <td><input type="text" name="comidaseg7" class="allinput"></td>
+                        
 
-                        <td>Batata suiça</td>
+                        <td><input type="text" name="comidaseg8" class="allinput"></td>
                     </tr>
 
 
 
                 </table>
             </div>
-            <button id="atualizar"> Atualizar os Dados</button>
-            <br></br>
-            <button id="limpar"> Limpar Dados</button>
-            <div id="terca">Terça</div>
+            <div class="break" style="width: 50px;" ></div>
             <div id="terc">
-                <table cellpadding="3" cellspacing="0">
+                <table cellpadding="3" cellspacing="0" id="terca">
+                    <tr>
+                    <td class="day" colspan="4">TERÇA</td>
+                    </tr>
                     <tr>
                         <td>Arroz</td>
-                        <td></td>
+                        
 
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
                         <td style="width: 200px;">Batata frita </td>
-                        <td></td>
+                        
 
 
                         <td>Feijão </td>
                     </tr>
                     <tr>
                         <td>Polenta</td>
-                        <td></td>
+                        
 
 
                         <td>Salada</td>
                     </tr>
                     <tr>
                         <td>Massa</td>
-                        <td></td>
+                        
 
                         <td>Batata suiça</td>
                     </tr>
@@ -99,33 +116,36 @@
                 </table>
 
             </div>
-            <br></br>
-            <div id="quarta">Quarta</div>
+            
+            <div class="break" style="width: 50px;" ></div>
             <div id="quart">
                 <table cellpadding="3" cellspacing="0">
                     <tr>
+                        <td class="day" colspan="4">QUARTA</td>
+                        </tr>
+                    <tr>
                         <td>Arroz</td>
-                        <td></td>
+                        
 
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
                         <td style="width: 200px;">Batata frita </td>
-                        <td></td>
+                        
 
 
                         <td>Feijão </td>
                     </tr>
                     <tr>
                         <td>Polenta</td>
-                        <td></td>
+                        
 
 
                         <td>Salada</td>
                     </tr>
                     <tr>
                         <td>Massa</td>
-                        <td></td>
+                        
 
                         <td>Batata suiça</td>
                     </tr>
@@ -135,33 +155,38 @@
                 </table>
 
             </div>
-            <br></br>
-            <div id="quinta">Quinta</div>
-            <div id="quint">
-                <table cellpadding="3" cellspacing="0">
+            
+            
+            <div class="break2" style="width: 0px; flex-basis: 100%; height: 30px;"> </div>
+            
+            <div class="break2" style="width: 0px; height: 30px;"> </div>  <div id="quint">
+                <table cellpadding="3" cellspacing="0" id="quinta">
+                    <tr>
+                        <td class="day" colspan="4">QUINTA</td>
+                        </tr>
                     <tr>
                         <td>Arroz</td>
-                        <td></td>
+                        
 
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
                         <td style="width: 200px;">Batata frita </td>
-                        <td></td>
+                       
 
 
                         <td>Feijão </td>
                     </tr>
                     <tr>
                         <td>Polenta</td>
-                        <td></td>
+                        
 
 
                         <td>Salada</td>
                     </tr>
                     <tr>
                         <td>Massa</td>
-                        <td></td>
+                       
 
                         <td>Batata suiça</td>
                     </tr>
@@ -171,33 +196,39 @@
                 </table>
 
             </div>
-            <br></br>
-            <div id="sexta">Sexta</div>
+            
+            <div class="break" style="width: 100px;">
+                
+            </div>
+            
             <div id="sext">
                 <table cellpadding="3" cellspacing="0">
                     <tr>
+                        <td class="day" colspan="4">SEXTA</td>
+                        </tr>
+                    <tr>
                         <td>Arroz</td>
-                        <td></td>
+                        
 
                         <td>Filé de frango</td>
                     </tr>
                     <tr>
                         <td style="width: 200px;">Batata frita </td>
-                        <td></td>
+                        
 
 
                         <td>Feijão </td>
                     </tr>
                     <tr>
                         <td>Polenta</td>
-                        <td></td>
+                        
 
 
                         <td>Salada</td>
                     </tr>
                     <tr>
                         <td>Massa</td>
-                        <td></td>
+                        
 
                         <td>Batata suiça</td>
                     </tr>
@@ -207,48 +238,31 @@
                 </table>
 
             </div>
-            <br></br>
+            
         </div>
+    </div>
+    </div>
+    </div>
+    <!-- div teste  -->
+    <div id="alltd" style="position: absolute; margin-left: 50%; font-size: 20px;">TESTANDO...</div> 
+    
+</section>
             <!-- MODAL HTML-->
-            <footer style="text-align: center;">
-                <button id="myBtn">Sugestões</button>
-                <div id="myModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <form method="get">
-        <h1 id="h1sugest"> Sugestões </h1>
-        <p> <h3> Como podemos melhorar?</h3></p>
-
-        <div id="res">
-            <span style="font-size: 16px;">Seu nome:</span> <input type="text" id="name2">
-        </div>
-
-        <div id="comida">
-            <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
-            <br><label for="radio" id="radio">
-                <input type="radio" name="Muito bom!">Muito bom!
-                <input type="radio" name="Bom!">Bom!
-                <input type="radio" name="Razoável">Razoável
-                <input type="radio" name="Ruim!">Ruim!
-                <input type="radio" name="Muito Ruim!">Muito ruim!
-
-            </label>
-        </div>
-        <div id="sugestoes">
-            <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-            <textarea id="type"> </textarea>
-        </div>
-        <input type="button" value="Enviar!" id="button" onclick="Clicar()">
-    </form>
+            <footer style="text-align: center; margin-left: 3%; height: auto; width: 100%;">
+     
                       </div>
                 </div>
-            </footer>
+            
 
-        </section>
+        
     </div>
 
-
-
+</footer>
 
 </body>
+<script>
+
+    
+</script>
 </html>
+

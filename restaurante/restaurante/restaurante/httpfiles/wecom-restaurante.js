@@ -40,7 +40,7 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
         }
     }
     
-    // Modal JS Edição Pietro
+    // Modal JS Edição Pietrooo
   
 var modal = document.getElementById("myModal");
 
@@ -66,11 +66,53 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+         // Modal JS Edição Pietrooo
+  
+         var modal2 = document.getElementById("myModal2");
+
+         // botão que abre o modal
+         var btn2 = document.getElementById("myBtn3");
+         
+         // botão que fecha o modal
+         var span2 = document.getElementsByClassName("close2")[0];
+         
+         // clicar e abrir o modal
+         btn2.onclick = function() {
+           modal2.style.display = "block";
+         }
+         
+         // clicar e fechar o modal
+         span2.onclick = function() {
+           modal2.style.display = "none";
+         }
+         
+         // clicar fora do modal e fechar ele 
+         window.onclick = function(event) {
+           if (event.target == modal2) {
+             modal2.style.display = "none";
+           }
+         }
+         function Clicar(){
+           var comida1 = document.getElementById("allinput").value; 
+           //console.log(turmaUsuario);
+         
+           // Enviar os dados para o formulario do arquivo index.html utilizando o atributo ID
+         //  document.getElementById("receber_turma_usuario").value = turmaUsuario;
+         
+           // Enviar os dados para o arquivo index.html utilizando o atributo ID
+          //var testezada =  document.getElementById("valor_form_turma_usuario").innerHTML = comida1;
+          var res =   document.getElementById("alltd");
+          res.innerHTML = comida1;
+           
+         
+         
+         }
+
+
 
 
 
 
 
 }
-
 Wecom.restaurante.prototype = innovaphone.ui1.nodePrototype;

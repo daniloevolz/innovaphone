@@ -7,49 +7,56 @@ body {
     background-repeat: repeat;
 }
 /* RESTAURANTE ADMIN DESKTOP */
+.allinput{
+    width: 100px;
+    height: 20px;
+    border: 1px solid #3c92a3;
+}
+button#myBtn2{
+    margin-top: 220%;
+    background-color: #c99164;
+    position: absolute;
+    margin-left: 3%;
+    height: 70px;
+    width: 120px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
 
 
 button#duvidas{
-    background-color: #11a3c0;
+    background-color: #76b4c0;
     position: absolute;
-    margin-top: 0%;
-    margin-left: 15%;
-    height: 60px;
+    margin-top: 40%;
+    margin-left: 3%;
+    height: 70px;
     width: 120px;
-    border-radius: 10px;
+    border-radius: 20px;
     text-transform: uppercase;
     font-weight: bold;
-}
-section#info{
-    background-color: aquamarine;
-    position: absolute;
-    width: 25%;
-    margin-left: 1%;
-    height: 40%;
-    text-align: center;
-    border-radius: 15px;
-    
 }
 button#limpar{
     position: absolute;
-    background-color: #ce4949;
-    width: 200px;
+    background-color: #c24747;
+    width: 120px;
     height: 70px;
-    margin-left: 50%;
+    margin-left: 3%;
     border-radius: 20px;
     font-weight: bold;
     text-transform: uppercase;
+    margin-top: 160%;
 }
-button#atualizar{
+#atualizar{
     position: absolute;
-    background-color: #41d407;
-    width: 200px;
+    background-color: #7cbb63;
+    width: 120px;
     height: 70px;
-    margin-left: 50%;
+    margin-left: 3%;
     border-radius: 20px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-top: -5%;
+    margin-top: 100%;
 }
 
 div.button {
@@ -66,10 +73,58 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
+/* RESTAURANTE ADMIN MODAL*/
+.modal2 {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+  }
+  
+
+.modal-content2 {
+    background-color: #8ab5bd;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 12px;
+    margin-top: -6.5%;
+}
+  
+  /* Fechar Botão */
+  .close2 {
+    color: #00000086;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close2:hover,
+  .close2:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+
     /*EDIÇÃO PIETRO DESKTOP RESTAURANTE*/
 * {
     margin: 0;
     border: 0;
+}
+#myBtn3{
+    background-color: rgba(121, 121, 121, 0.3);
+    color: red;
+    border-radius: 10px;
+    font-weight: bold;
 }
 h1{
     font-family: 'Arial';
@@ -96,12 +151,13 @@ header#header1 {
     text-align: center;
     width: 200px;
     border: 0px solid rgb(55, 170, 161);
+    
 }
 table tr td{
     border: 0px solid black;
 }
 table{
-    border: 4px solid rgb(55, 170, 161);
+    border: 3px solid rgb(55, 170, 161);
 }
 
 div#info {
@@ -138,6 +194,7 @@ align-items: center;
     float: left;
     position: absolute;
 }
+
 li {
     padding: 4px;
     margin-top: 5%;
@@ -159,9 +216,10 @@ a {
     background-image: url("money_header.png");
     background-size: cover;
     width: auto;
-    height: 26.1%;
-    padding-top: 40px;
+    height: auto;
+    padding-top: 30px;
     padding-left: 30px;
+    padding-bottom: 25px;
     
    
     
@@ -169,7 +227,7 @@ a {
 .logo-inn{
     width: 20%;
     height: auto;
-    padding-bottom: 20px;
+    padding-bottom: 0px;
     
 
 }
@@ -376,6 +434,58 @@ div#anom {
 input#name2{
     width: 25%;
 }
+/*MODAL ADMIN TESTES*/
+.modal2 {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 0px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+    
+  }
+  
+
+.modal-content2 {
+    /*background-color: #8ab5bd;*/
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 98%;
+    height: 100%;
+    position: fixed;
+    border-radius: 12px;
+    background-image: url(./teste2.jpg);
+}
+  
+  /* Fechar Botão */
+  .close2 {
+    color: #00000086;
+    float: right;
+    font-size: 40px;
+    font-weight: bold;
+  }
+  
+  .close2:hover,
+  .close2:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .colunaesquerda2 {
+    background-image: url("bg_lateral.png");
+    background-size: cover;
+    height: 100%;
+    width: 12%;
+    margin-left: 0%;
+    float: left;
+    position: absolute;
+}
 
 /*DESIGN MOBILE*/
 
@@ -413,11 +523,23 @@ input#name2{
         /*background-color: aqua;*/
         text-align: center;
     }
+    .day{
+        background-color: rgb(55, 170, 161);
+        text-align: center;
+        width: 200px;
+        border: 0px solid rgb(55, 170, 161);
+        
+    }
+    table tr td{
+        border: 0px solid black;
+    }
+    table{
+        border: 2px solid rgb(55, 170, 161);
+    }
 
     div#seg {
-        border: 4px solid rgb(55, 170, 161);
         width: 85%;
-        margin-left: -25%;
+        margin-left: -36%;
         background-color: rgba(224, 224, 224,0.5);
     }
 
@@ -425,100 +547,136 @@ input#name2{
         margin-top: 3%;
         /*background-color: brown;*/
     }
-
-    div#segunda {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 85%;
-        background-color: rgb(55, 170, 161);
-        ;
-        margin-left: -25%;
+    table{
+        width: 100%;
     }
+    table#quinta{
+        margin-left: -3.5%;
+    }
+    table#terca{
+        margin-left: -21.1%;
+    }
+    
 
     div#terc {
-        border: 4px solid rgb(55, 170, 161);
+        
         width: 85%;
-        margin-left: -25%;
-        margin-top: 0%;
+        margin-left: 0%;
+        margin-top: 4%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
     }
 
-    div#terca {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 85%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        ;
-        margin-left: -25%;
-        margin-top: 0%;
-    }
+    
 
     div#quart {
-        border: 4px solid rgb(55, 170, 161);
+        
         width: 85%;
-        margin-left: -25%;
-        margin-top: 0%;
+        margin-left: -36%;
+        margin-top: 4%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
     }
 
-    div#quarta {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 85%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        ;
-        margin-left: -25%;
-        margin-top: 0%;
-    }
-
+    
     div#quint {
-        border: 4px solid rgb(55, 170, 161);
+        
         width: 85%;
-        margin-left: -25%;
-        margin-top: 0%;
+        margin-left: -30%;
+        margin-top: 4%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
+        
     }
-
-    div#quinta {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 85%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        ;
-        margin-left: -25%;
-        margin-top: 0%;
+    .break2{
+        display: none;
+    }
+    .break{
+        display: none;
     }
 
     div#sext {
-        border: 4px solid rgb(55, 170, 161);
+        
         width: 85%;
-        margin-left: -25%;
-        margin-top: 0%;
+        margin-left: -36%;
+        margin-top: 4%;
         display: flex;
         background-color: rgba(224, 224, 224,0.5);
     }
-
-    div#sexta {
-        font-size: 20px;
-        font-weight: bold;
-        border: 4px solid rgb(55, 170, 161);
-        width: 85%;
-        text-align: center;
-        background-color: rgb(55, 170, 161);
-        ;
-        margin-left: -25%;
-        margin-top: 0%;
+    section#main {
+        margin-top: 5%;
+        height: 100%;
+        margin-left: 20%;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+       
     }
+    .colunadireita {
+        width: 100%;
+        height: 80%;
+        float: right;
+    
+    }
+    footer{
+        flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    }
+    
+    .colunaesquerda {
+        background-image: url("bg_lateral.png");
+        background-size: cover;
+        height: 15%;
+        width: 100%;
+        margin-top: 28%;
+        
+        
+        
+    }
+    li {
+        padding: 4px;
+        margin-top: 5%;
+        margin-left: -0%;
+    }
+    ul{
+        position:absolute;
+    }
+    
+    a {
+        color: darkslategrey;
+        text-decoration: none;
+    }
+    
+        a:hover {
+            color: darkslategrey;
+            font-weight: bold;
+        }
+    
+    
+    .linha1 {
+        order: 1;
+        background-image: url("money_header.png");
+        background-size: cover;
+        width: auto;
+        height: auto;
+        padding-top: 20px;
+        padding-left: 30px;
+        padding-bottom: 24px;
+        
+        
+        
+       
+        
+    }
+    .logo-inn{
+        width: 44%;
+        height: auto;
+        padding-bottom: 5px;
+        
+    
+    }
+    
 
     div {
         font-weight: bold;
@@ -545,7 +703,10 @@ input#name2{
     }
 
     div#all {
-        margin-top: 5%;
+        margin-top: 33%;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
     }
 
     /*MODAL MOBILE*/
@@ -660,7 +821,7 @@ input {
     border-radius: 5px;
 }
 
-    input#button {
+input#button {
         margin: 1%;
         position: fixed;
         width: 20%;
