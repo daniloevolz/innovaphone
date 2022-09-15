@@ -26,7 +26,7 @@
                 </ul>
                 <button type="submit" id="duvidas">DUVIDAS</button>
                 <input type= "button" id="atualizar"  value="Atualizar" onclick="Clicar()">
-                <button type="submit" id="limpar">Limpar dados</button>
+                <input type="button" id="limpar" value="Limpar Dados" onclick="Apagar()">
                 <button id="myBtn2" >Sugestões</button>
             </nav>
         </div>
@@ -44,17 +44,18 @@
             <div class="break" style="width: 0px;" ></div>
             <div id="seg">
                 <table cellpadding="3" cellspacing="0">
-                    <tr >
-                        <td class="day" colspan="4">SEGUNDA</td></tr>
+                  <tr>
+                     <td class="day" colspan="4"> <input type="checkbox" id="check"> SEGUNDA</td>
+                    </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
+                        <td id="clean"><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
                         
 
                         <td><input type="text" name="comidaseg2" class="allinput"></td>
                     </tr>
                     <tr>
                   
-                        <td style="width: 200px;"> <input type="text" name="comidaseg3" class="allinput"> </td>
+                        <td style="width: 200px;"> <input type="text" name="comidaseg3" id="allinput2" class="allinput"> </td>
                         
 
 
@@ -261,7 +262,23 @@
 
 </body>
 <script>
-
+function Clicar(){
+           var comida1 = document.getElementById("allinput").value; 
+          var res =   document.getElementById("alltd");
+          res.innerHTML = comida1;
+}
+function Apagar(){
+    
+    var limpado = document.getElementById("allinput");
+    var limpado2 = document.getElementById("allinput2");
+    var check = document.getElementById("check");
+    if (check.checked){
+        var limpado = document.getElementById("allinput").value = "";
+        var limpado2 = document.getElementById("allinput").value = "";
+    }
+    
+ 
+}
     
 </script>
 </html>

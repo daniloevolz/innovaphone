@@ -36,7 +36,7 @@ button#duvidas{
     text-transform: uppercase;
     font-weight: bold;
 }
-button#limpar{
+#limpar{
     position: absolute;
     background-color: #c24747;
     width: 120px;
