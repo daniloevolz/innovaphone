@@ -260,9 +260,46 @@
     </div>
 
 </footer>
-
+            <!-- MODAL 2 TESTE-->
+            <div id="myModal3" class="modal3">
+                <div class="modal-content3">
+                    <span class="close3">&times;</span>
+                    <p></p>
+                    <h1>Como Limpar os dados da tabela?</h1>
+                    <div style="text-align: center;">
+                    <br>
+                    <h2> Para apagar os dados basta selecionar a tabela que deseja limpar e clicar no botão <span style="color: red;"><b>Limpar dados</b></span> 
+                    <br>    como mostra a foto abaixo</h2>
+                    </div>
+                    <br></br>
+                    <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1)">&#10094;</button>
+                    <div style="text-align: center;">
+                    <img src="./limpar-dados-pic.png" width="90%" class="slide">
+                    <img src="./logo-inn.png" width="90%" class="slide">
+                    </div>
+                    <button class="btnright" onclick="plusDivs(1)" >&#10095;</button>
+                </div>
+            </div>
+            
 </body>
 <script>
+    var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("slide");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";  
+  }
+  x[slideIndex-1].style.display = "block";  
+}
     // Edição Pietro
 
     // Função de testes - Necessita de atualizações funcionais
@@ -334,6 +371,37 @@ function Apagar(){
     
  
 }
+// Modal JS Edição Pietrooo
+  
+var modal2 = document.getElementById("myModal3");
+
+// botão que abre o modal
+var btn2 = document.getElementById("duvidas");
+
+// botão que fecha o modal
+var span2 = document.getElementsByClassName("close3")[0];
+
+// clicar e abrir o modal
+btn2.onclick = function() {
+  modal2.style.display = "block";
+}
+
+// clicar e fechar o modal
+span2.onclick = function() {
+  modal2.style.display = "none";
+}
+
+// clicar fora do modal e fechar ele 
+window.onclick = function(event) {
+  if (event.target == modal2) {
+    modal2.style.display = "none";
+  }
+}
+
+  
+
+
+
     
 </script>
 </html>
