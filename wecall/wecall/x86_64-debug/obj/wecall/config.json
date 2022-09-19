@@ -1,0 +1,32 @@
+{
+  "javascript": {
+    "eval": [
+      "wecom-wecallservice.js"
+    ]
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "url",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urladmin",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urldash",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      }
+    ]
+  }
+}
