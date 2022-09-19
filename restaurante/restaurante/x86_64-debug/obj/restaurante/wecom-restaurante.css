@@ -36,7 +36,7 @@ button#duvidas{
     text-transform: uppercase;
     font-weight: bold;
 }
-button#limpar{
+#limpar{
     position: absolute;
     background-color: #c24747;
     width: 120px;
@@ -312,32 +312,38 @@ input#sugest {
     display: none; 
     position: fixed; 
     z-index: 1; 
-    padding-top: 100px; 
+    padding-top: 0px; 
     left: 0;
     top: 0;
     width: 100%; 
     height: 100%; 
-    overflow: auto; 
+    overflow: hidden; 
     background-color: rgb(0,0,0); 
     background-color: rgba(0,0,0,0.4); 
+    flex-direction: wrap;
+    justify-content: center;
   }
   
 
 .modal-content {
-    background-color: #8ab5bd;
+    background-color: #80a3aa;
     margin: auto;
-    padding: 20px;
+    padding: 0px;
     border: 1px solid #888;
-    width: 50%;
+    width: 80%;
+    height: 100%;
     border-radius: 12px;
-    margin-top: -6.5%;
+    flex-direction: wrap;
+    justify-content: center;
+    
 }
   
   /* Fechar Botão */
   .close {
-    color: #00000086;
+    color: #000000bb;
     float: right;
-    font-size: 28px;
+    font-size: 50px;
+    padding-right: 20px;
     font-weight: bold;
   }
   
@@ -365,9 +371,10 @@ form {
     width: 100%;
     margin-left: 0%;
    /* background-color: rgba(240, 240, 240,0.1);*/
-    height: 450px;
-    margin-top: 2%;
+    height: 100%;
+    margin-top: 0%;
     border-radius: 10px;
+    overflow: hidden;
 }
 
 h1#h1sugest {
@@ -433,6 +440,11 @@ div#anom {
 }
 input#name2{
     width: 25%;
+    height: auto;
+    border:2px solid rgb(76, 105, 160);
+}
+textarea{
+    border:2px solid rgb(76, 105, 160);   
 }
 /*MODAL ADMIN TESTES*/
 .modal2 {
@@ -449,26 +461,35 @@ input#name2{
     background-color: rgba(0,0,0,0.4); 
     
   }
-  
+  .logo-inn2{
+    width: 20%;
+    height: auto;
+    padding-bottom: 0px;
+    padding-left: 20px;
+    
+
+}
 
 .modal-content2 {
     /*background-color: #8ab5bd;*/
     margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 98%;
+    padding: 0px;
+    border: 0px solid #888;
+    width: 100%;
     height: 100%;
     position: fixed;
-    border-radius: 12px;
+    border-radius: 0px;
     background-image: url(./teste2.jpg);
 }
   
   /* Fechar Botão */
   .close2 {
-    color: #00000086;
+    color: #000000c2;
     float: right;
-    font-size: 40px;
+    font-size: 60px;
     font-weight: bold;
+    padding-left: 0px;
+    padding-right: 0px;
   }
   
   .close2:hover,
@@ -486,6 +507,138 @@ input#name2{
     float: left;
     position: absolute;
 }
+/*MODAL 2 - DUVIDAS */
+.modal3 {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 0px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+    overflow: hidden;
+  }
+  
+
+.modal-content3 {
+    background-color: #8ab5bd;
+    margin: auto;
+    padding: 0px;
+    border: 1px solid #888;
+    width: 90%;
+    border-radius: 12px;
+    margin-top: 0%;
+    height: 100%;
+    overflow: hidden;
+    background-image: url(./teste2.jpg);
+}
+  
+  /* Fechar Botão */
+  .close3 {
+    color: #000000a8;
+    float: right;
+    font-size: 60px;
+    font-weight: bold;
+    padding-right: 20px;
+  }
+  
+  .close3:hover,
+  .close3:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* TESTE SLIDESHOW  */
+.mySlides {display: none}
+img {vertical-align: middle;}
+
+/* Slideshow container */
+.slideshow-container {
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  font-size: 20px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+.prev{
+    border-radius: 3px 0 0 3px;
+    margin-left: 0%;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* Caption text */
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: rgb(160, 158, 158);
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #646464;
+}
+
+/* Fading animation */
+.fade {
+  animation-name: fade;
+  animation-duration: 1.0s;
+}
+@keyframes fade {
+    from {opacity: .4} 
+    to {opacity: 1}
+  }
+
+/* On smaller screens, decrease text size */
+@media only screen and (max-width: 300px) {
+  .prev, .next,.text {font-size: 11px}
+}
+  
+
 
 /*DESIGN MOBILE*/
 

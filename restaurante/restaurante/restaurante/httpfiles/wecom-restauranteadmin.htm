@@ -265,40 +265,81 @@
                 <div class="modal-content3">
                     <span class="close3">&times;</span>
                     <p></p>
-                    <h1>Como Limpar os dados da tabela?</h1>
                     <div style="text-align: center;">
-                    <br>
-                    <h2> Para apagar os dados basta selecionar a tabela que deseja limpar e clicar no botão <span style="color: red;"><b>Limpar dados</b></span> 
-                    <br>    como mostra a foto abaixo</h2>
+                    <h1>Como Utilizar o App Admin:</h1>
                     </div>
                     <br></br>
-                    <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1)">&#10094;</button>
-                    <div style="text-align: center;">
-                    <img src="./limpar-dados-pic.png" width="90%" class="slide">
-                    <img src="./logo-inn.png" width="90%" class="slide">
-                    </div>
-                    <button class="btnright" onclick="plusDivs(1)" >&#10095;</button>
+
+                    <div class="slideshow-container">
+
+                        <div class="mySlides fade">
+                            <p style="font-size: 22px; text-align: center;"> Para Limpar os dados da tabela é só selecionar a tabela que deseja limpar e 
+                            clicar no botão <b><span style="color: red;">Limpar Dados</span> como mostra a foto abaixo.</b>
+                            </p>
+                            <!-- <br> -->
+                          <img src="limpar-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                        <div class="mySlides fade">
+                           <p style="font-size: 22px; text-align: center;"> Para Atualizar os dados da tabela é so clicar
+                            no botão <b><span style="color:rgb(13, 100, 13); ">Atualizar Dados</span></b> como mostra a foto abaixo.
+                        </p>
+                        <br></br>
+                          <img src="./atualizar-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                        <div class="mySlides fade">
+                            <p style="font-size: 22px; text-align: center;"> Para visualizar as sugestões dos usuarios é so clicar
+                                no botão <span style="color: rgb(230, 87, 43);"><b>Sugestões</b></span> como mostra a foto abaixo.
+                            </p>
+                            <br></br>
+                          <img src="./sugestoes-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                       
+                        <a class="prev" style="margin-left: -5%;" onclick="plusSlides(-1)">&#10094;</a>
+                        <a class="next" style="margin-left: 0%;" onclick="plusSlides(1)">&#10095;</a>
+                      </div>
+                      <br>
+                      
+                      
+                      <div style="text-align:center">
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
+                        <span class="dot" onclick="currentSlide(3)"></span>
+                      </div>
                 </div>
             </div>
             
 </body>
 <script>
-    var slideIndex = 1;
-showDivs(slideIndex);
+  let slideIndex = 1;
+showSlides(slideIndex);
 
-function plusDivs(n) {
-  showDivs(slideIndex += n);
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
 }
 
-function showDivs(n) {
-  var i;
-  var x = document.getElementsByClassName("slide");
-  if (n > x.length) {slideIndex = 1}
-  if (n < 1) {slideIndex = x.length}
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";  
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName("mySlides");
+  let dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
   }
-  x[slideIndex-1].style.display = "block";  
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
 }
     // Edição Pietro
 

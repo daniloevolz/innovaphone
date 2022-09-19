@@ -26,7 +26,7 @@
                 </ul>
                 <button type="submit" id="duvidas">DUVIDAS</button>
                 <input type= "button" id="atualizar"  value="Atualizar" onclick="Clicar()">
-                <button type="submit" id="limpar">Limpar dados</button>
+                <input type="button" id="limpar" value="Limpar Dados" onclick="Apagar()">
                 <button id="myBtn2" >Sugestões</button>
             </nav>
         </div>
@@ -44,71 +44,73 @@
             <div class="break" style="width: 0px;" ></div>
             <div id="seg">
                 <table cellpadding="3" cellspacing="0">
-                    <tr >
-                        <td class="day" colspan="4">SEGUNDA</td></tr>
+                  <tr>
+                     <td class="day" colspan="4"> <input type="checkbox" id="check"> SEGUNDA</td>
+                    </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
+                        <td id="clean"><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
                         
 
-                        <td><input type="text" name="comidaseg2" class="allinput"></td>
+                        <td><input type="text" name="comidaseg2" class="allinput" id="allinput1"></td>
                     </tr>
                     <tr>
                   
-                        <td style="width: 200px;"> <input type="text" name="comidaseg3" class="allinput"> </td>
+                        <td style="width: 200px;"> <input type="text" name="comidaseg3" id="allinput2" class="allinput"> </td>
                         
 
 
-                        <td><input type="text" name="comidaseg4" class="allinput"> </td>
+                        <td><input type="text" name="comidaseg4" class="allinput" id="allinput3"> </td>
                     </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg5" class="allinput"></td>
+                        <td><input type="text" name="comidaseg5" class="allinput" id="allinput4"></td>
                        
 
 
-                        <td><input type="text" name="comidaseg6" class="allinput"></td>
+                        <td><input type="text" name="comidaseg6" class="allinput" id="allinput5"></td>
                     </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg7" class="allinput"></td>
+                        <td><input type="text" name="comidaseg7" class="allinput" id="allinput6"></td>
                         
 
-                        <td><input type="text" name="comidaseg8" class="allinput"></td>
+                        <td><input type="text" name="comidaseg8" class="allinput" id="allinput7"></td>
                     </tr>
 
 
 
                 </table>
             </div>
+            <!-- SEGUNDA TABELA (TERÇA-FEIRA) -->
             <div class="break" style="width: 50px;" ></div>
             <div id="terc">
                 <table cellpadding="3" cellspacing="0" id="terca">
                     <tr>
-                    <td class="day" colspan="4">TERÇA</td>
+                    <td class="day" colspan="4"> <input type="checkbox" id="check1"> TERÇA</td>
                     </tr>
                     <tr>
-                        <td>Arroz</td>
+                        <td><input type="text" name="comidaterca" class="allinput" id="comidaterca"></td>
                         
 
-                        <td>Filé de frango</td>
+                        <td><input type="text" name="comidaterca1" class="allinput" id="comidaterca1"></td>
                     </tr>
                     <tr>
-                        <td style="width: 200px;">Batata frita </td>
-                        
-
-
-                        <td>Feijão </td>
-                    </tr>
-                    <tr>
-                        <td>Polenta</td>
+                        <td style="width: 200px;"><input type="text" class="allinput" id="comidaterca2" ></td>
                         
 
 
-                        <td>Salada</td>
+                        <td><input type="text" class="allinput" name="comidaterca3" id="comidaterca3"></td>
                     </tr>
                     <tr>
-                        <td>Massa</td>
+                        <td><input type="text" class="allinput" name="comidaterca4" id="comidaterca4"></td>
                         
 
-                        <td>Batata suiça</td>
+
+                        <td><input type="text" class="allinput" name="comidaterca5" id="comidaterca5"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="allinput" name="comidaterca6" id="comidaterca6"></td>
+                        
+
+                        <td><input type="text" class="allinput" name="comidaterca7" id="comidaterca7"></td>
                     </tr>
 
 
@@ -116,38 +118,38 @@
                 </table>
 
             </div>
-            
+            <!-- TERCEIRA TABELA (QUARTA-FEIRA)-->
             <div class="break" style="width: 50px;" ></div>
             <div id="quart">
                 <table cellpadding="3" cellspacing="0">
                     <tr>
-                        <td class="day" colspan="4">QUARTA</td>
+                        <td class="day" colspan="4"> <input type="checkbox" id="check2">QUARTA</td>
                         </tr>
                     <tr>
-                        <td>Arroz</td>
+                        <td><input type="text" id="comidaquarta" class="allinput"></td>
                         
 
-                        <td>Filé de frango</td>
+                        <td><input type="text" id="comidaquarta1" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td style="width: 200px;">Batata frita </td>
+                        <td style="width: 200px;"><input type="text" id="comidaquarta2" class="allinput"> </td>
                         
 
 
-                        <td>Feijão </td>
+                        <td><input type="text" id="comidaquarta3" class="allinput"> </td>
                     </tr>
                     <tr>
-                        <td>Polenta</td>
+                        <td><input type="text" id="comidaquarta4" class="allinput"></td>
                         
 
 
-                        <td>Salada</td>
+                        <td><input type="text" id="comidaquarta5" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td>Massa</td>
+                        <td><input type="text" id="comidaquarta6" class="allinput"></td>
                         
 
-                        <td>Batata suiça</td>
+                        <td> <input type="text" id="comidaquarta7" class="allinput"></td>
                     </tr>
 
 
@@ -156,39 +158,39 @@
 
             </div>
             
-            
+            <!-- QUARTA TABELA (QUINTA-FEIRA)-->
             <div class="break2" style="width: 0px; flex-basis: 100%; height: 30px;"> </div>
             
             <div class="break2" style="width: 0px; height: 30px;"> </div>  <div id="quint">
                 <table cellpadding="3" cellspacing="0" id="quinta">
                     <tr>
-                        <td class="day" colspan="4">QUINTA</td>
+                        <td class="day" colspan="4"> <input type="checkbox" id="check3">QUINTA</td>
                         </tr>
                     <tr>
-                        <td>Arroz</td>
+                        <td><input type="text" id="comidaquinta" class="allinput"></td>
                         
 
-                        <td>Filé de frango</td>
+                        <td><input type="text" id="comidaquinta1" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td style="width: 200px;">Batata frita </td>
+                        <td style="width: 200px;"><input type="text" id="comidaquinta2" class="allinput"></td>
                        
 
 
-                        <td>Feijão </td>
+                        <td><input type="text" id="comidaquinta3" class="allinput"> </td>
                     </tr>
                     <tr>
-                        <td>Polenta</td>
+                        <td><input type="text" id="comidaquinta4" class="allinput"></td>
                         
 
 
-                        <td>Salada</td>
+                        <td><input type="text" id="comidaquinta5" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td>Massa</td>
+                        <td><input type="text" id="comidaquinta6" class="allinput"></td>
                        
 
-                        <td>Batata suiça</td>
+                        <td><input type="text" id="comidaquinta7" class="allinput"></td>
                     </tr>
 
 
@@ -200,37 +202,37 @@
             <div class="break" style="width: 100px;">
                 
             </div>
-            
+            <!-- ULTIMA TABELA (SEXTA-FEIRA)-->
             <div id="sext">
                 <table cellpadding="3" cellspacing="0">
                     <tr>
-                        <td class="day" colspan="4">SEXTA</td>
+                        <td class="day" colspan="4"> <input type="checkbox" id="check4">SEXTA</td>
                         </tr>
                     <tr>
-                        <td>Arroz</td>
+                        <td><input type="text" id="comidasexta" class="allinput"></td>
                         
 
-                        <td>Filé de frango</td>
+                        <td><input type="text" id="comidasexta1" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td style="width: 200px;">Batata frita </td>
+                        <td style="width: 200px;"><input type="text" id="comidasexta2" class="allinput"></td>
                         
 
 
-                        <td>Feijão </td>
+                        <td><input type="text" id="comidasexta3" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td>Polenta</td>
+                        <td><input type="text" id="comidasexta4" class="allinput"></td>
                         
 
 
-                        <td>Salada</td>
+                        <td><input type="text" id="comidasexta5" class="allinput"></td>
                     </tr>
                     <tr>
-                        <td>Massa</td>
+                        <td><input type="text" id="comidasexta6" class="allinput"></td>
                         
 
-                        <td>Batata suiça</td>
+                        <td><input type="text" id="comidasexta7" class="allinput"></td>
                     </tr>
 
 
@@ -258,9 +260,188 @@
     </div>
 
 </footer>
+            <!-- MODAL 2 TESTE-->
+            <div id="myModal3" class="modal3">
+                <div class="modal-content3">
+                    <span class="close3">&times;</span>
+                    <p></p>
+                    <div style="text-align: center;">
+                    <h1>Como Utilizar o App Admin:</h1>
+                    </div>
+                    <br></br>
 
+                    <div class="slideshow-container">
+
+                        <div class="mySlides fade">
+                            <p style="font-size: 22px; text-align: center;"> Para Limpar os dados da tabela é só selecionar a tabela que deseja limpar e 
+                            clicar no botão <b><span style="color: red;">Limpar Dados</span> como mostra a foto abaixo.</b>
+                            </p>
+                            <!-- <br> -->
+                          <img src="limpar-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                        <div class="mySlides fade">
+                           <p style="font-size: 22px; text-align: center;"> Para Atualizar os dados da tabela é so clicar
+                            no botão <b><span style="color:rgb(13, 100, 13); ">Atualizar Dados</span></b> como mostra a foto abaixo.
+                        </p>
+                        <br></br>
+                          <img src="./atualizar-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                        <div class="mySlides fade">
+                            <p style="font-size: 22px; text-align: center;"> Para visualizar as sugestões dos usuarios é so clicar
+                                no botão <span style="color: rgb(230, 87, 43);"><b>Sugestões</b></span> como mostra a foto abaixo.
+                            </p>
+                            <br></br>
+                          <img src="./sugestoes-dados-pic.png" style="width:100%">
+                        </div>
+                      
+                       
+                        <a class="prev" style="margin-left: -5%;" onclick="plusSlides(-1)">&#10094;</a>
+                        <a class="next" style="margin-left: 0%;" onclick="plusSlides(1)">&#10095;</a>
+                      </div>
+                      <br>
+                      
+                      
+                      <div style="text-align:center">
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
+                        <span class="dot" onclick="currentSlide(3)"></span>
+                      </div>
+                </div>
+            </div>
+            
 </body>
 <script>
+  let slideIndex = 1;
+showSlides(slideIndex);
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName("mySlides");
+  let dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
+}
+    // Edição Pietro
+
+    // Função de testes - Necessita de atualizações funcionais
+function Clicar(){
+           var comida1 = document.getElementById("allinput").value; 
+          var res =   document.getElementById("alltd");
+          res.innerHTML = comida1;
+}
+// Função referente ao button Limpar dados
+function Apagar(){
+    var check = document.getElementById("check");
+    var check2 = document.getElementById("check1");
+    var check3 = document.getElementById("check2")
+    var check4 = document.getElementById("check3")
+    var check5 = document.getElementById("check4")
+
+    if (check.checked){
+        var limpado = document.getElementById("allinput").value = "";
+        var limpado2 = document.getElementById("allinput2").value = "";
+        var limpado1 = document.getElementById("allinput1").value = "";
+        var limpado3 = document.getElementById("allinput3").value = "";
+        var limpado4 = document.getElementById("allinput4").value = "";
+        var limpado5 = document.getElementById("allinput5").value = "";
+        var limpado6 = document.getElementById("allinput6").value = "";
+        var limpado7 = document.getElementById("allinput7").value = "";
+    }
+    if (check2.checked){
+        var limpado9 = document.getElementById("comidaterca").value = "";
+        var limpado10 = document.getElementById("comidaterca1").value = "";
+        var limpado11 = document.getElementById("comidaterca2").value = "";
+        var limpado12 = document.getElementById("comidaterca3").value = "";
+        var limpado13 = document.getElementById("comidaterca4").value = "";
+        var limpado14 = document.getElementById("comidaterca5").value = "";
+        var limpado15 = document.getElementById("comidaterca6").value = "";
+        var limpado16 = document.getElementById("comidaterca7").value = "";
+    }
+    if (check3.checked){
+        var limpado17 = document.getElementById("comidaquarta").value = "";
+        var limpado18 = document.getElementById("comidaquarta1").value = "";
+        var limpado19 = document.getElementById("comidaquarta2").value = "";
+        var limpado20 = document.getElementById("comidaquarta3").value = "";
+        var limpado21 = document.getElementById("comidaquarta4").value = "";
+        var limpado22 = document.getElementById("comidaquarta5").value = "";
+        var limpado23 = document.getElementById("comidaquarta6").value = "";
+        var limpado24 = document.getElementById("comidaquarta7").value = "";
+    }
+    if (check4.checked){
+        var limpado25 = document.getElementById("comidaquinta").value = "";
+        var limpado26 = document.getElementById("comidaquinta1").value = "";
+        var limpado27 = document.getElementById("comidaquinta2").value = "";
+        var limpado28 = document.getElementById("comidaquinta3").value = "";
+        var limpado29 = document.getElementById("comidaquinta4").value = "";
+        var limpado30 = document.getElementById("comidaquinta5").value = "";
+        var limpado31 = document.getElementById("comidaquinta6").value = "";
+        var limpado32 = document.getElementById("comidaquinta7").value = "";
+    }
+    if (check5.checked){
+        var limpado33 = document.getElementById("comidasexta").value = "";
+        var limpado34 = document.getElementById("comidasexta1").value = "";
+        var limpado35 = document.getElementById("comidasexta2").value = "";
+        var limpado36 = document.getElementById("comidasexta3").value = "";
+        var limpado37 = document.getElementById("comidasexta4").value = "";
+        var limpado38 = document.getElementById("comidasexta5").value = "";
+        var limpado39 = document.getElementById("comidasexta6").value = "";
+        var limpado40 = document.getElementById("comidasexta7").value = "";  
+    }
+
+
+    
+ 
+}
+// Modal JS Edição Pietrooo
+  
+var modal2 = document.getElementById("myModal3");
+
+// botão que abre o modal
+var btn2 = document.getElementById("duvidas");
+
+// botão que fecha o modal
+var span2 = document.getElementsByClassName("close3")[0];
+
+// clicar e abrir o modal
+btn2.onclick = function() {
+  modal2.style.display = "block";
+}
+
+// clicar e fechar o modal
+span2.onclick = function() {
+  modal2.style.display = "none";
+}
+
+// clicar fora do modal e fechar ele 
+window.onclick = function(event) {
+  if (event.target == modal2) {
+    modal2.style.display = "none";
+  }
+}
+
+  
+
+
 
     
 </script>
