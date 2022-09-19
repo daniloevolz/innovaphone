@@ -310,6 +310,23 @@
                       </div>
                 </div>
             </div>
+            <!--MODAL SUGESTÕES TESTE-->
+            <div id="myModal4" class="modal4">
+                <div class="modal-content4">
+                    <span class="close4">&times;</span>
+                    <p></p>
+                    <div style="text-align: center;">
+                    <h1>Sugestões dos Usuários</h1>
+                    </div>
+                    <br></br>
+                    <div style="text-align: center; font-size: 30px"> VER COM DANILO OQUE PODE SER FEITO AQUI</div>
+
+                </div>
+            </div>
+            
+
+
+
             
 </body>
 <script>
@@ -437,8 +454,35 @@ window.onclick = function(event) {
   if (event.target == modal2) {
     modal2.style.display = "none";
   }
+
+
+  // Modal sugestões admin
+  
+var modal3 = document.getElementById("myModal4");
+
+// botão que abre o modal
+var btn3 = document.getElementById("myBtn2");
+
+// botão que fecha o modal
+var span3 = document.getElementsByClassName("close4")[0];
+
+// clicar e abrir o modal
+btn3.onclick = function() {
+  modal3.style.display = "block";
 }
 
+// clicar e fechar o modal
+span3.onclick = function() {
+  modal3.style.display = "none";
+}
+
+// clicar fora do modal e fechar ele 
+window.onclick = function(event) {
+  if (event.target == modal3) {
+    modal3.style.display = "none";
+  }
+}
+}
   
 
 
