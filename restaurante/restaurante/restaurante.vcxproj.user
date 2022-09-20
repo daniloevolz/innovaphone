@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteTarget>-1281635173;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteTarget>-2031488834;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
     <RemoteDebuggerCommandArguments>--app-name=restaurante --app-domain=wecom.com.br --app-password=pwd --webserver-path=restaurante --db-name=restaurante --db-user=restaurante --db-password=restaurante --service-id=restaurante</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

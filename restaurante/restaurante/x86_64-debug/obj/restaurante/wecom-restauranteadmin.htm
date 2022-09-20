@@ -11,10 +11,10 @@
     <script src="web1/ui1.lib/innovaphone.ui1.lib.js" type="text/javascript"></script>
     <script src="web1/ui1.svg/innovaphone.ui1.svg.js" type="text/javascript"></script>
     <script src="web1/appwebsocket/innovaphone.appwebsocket.Connection.js" type="text/javascript"></script>
-    <script src="wecom-restaurante.js" type="text/javascript"></script>
+    <script src="wecom-restauranteadmin.js" type="text/javascript"></script>
     <script src="wecom-restaurantetexts.js" type="text/javascript"></script>
 </head>
-<body onload="innovaphone.lib1.Start(function (start) { new Wecom.restaurante(start, { }); })">
+<body onload="innovaphone.lib1.Start(function (start) { new Wecom.restauranteAdmin(start, { }); })">
     <div class="containervertical">
         <div class="colunaesquerda">
             <nav>
@@ -48,31 +48,31 @@
                      <td class="day" colspan="4"> <input type="checkbox" id="check"> SEGUNDA</td>
                     </tr>
                     <tr>
-                        <td id="clean"><input type="text" name="comidaseg1" id="allinput" class="allinput"></td>
+                        <td id="clean"><input type="text" name="comidaseg1" id="comidasegunda" class="allinput" value="teste"></td>
                         
 
-                        <td><input type="text" name="comidaseg2" class="allinput" id="allinput1"></td>
+                        <td><input type="text" name="comidaseg2" class="allinput" id="comidasegunda1"></td>
                     </tr>
                     <tr>
                   
-                        <td style="width: 200px;"> <input type="text" name="comidaseg3" id="allinput2" class="allinput"> </td>
+                        <td style="width: 200px;"> <input type="text" name="comidaseg3" id="comidasegunda2" class="allinput"> </td>
                         
 
 
-                        <td><input type="text" name="comidaseg4" class="allinput" id="allinput3"> </td>
+                        <td><input type="text" name="comidaseg4" class="allinput" id="comidasegunda3"> </td>
                     </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg5" class="allinput" id="allinput4"></td>
+                        <td><input type="text" name="comidaseg5" class="allinput" id="comidasegunda4"></td>
                        
 
 
-                        <td><input type="text" name="comidaseg6" class="allinput" id="allinput5"></td>
+                        <td><input type="text" name="comidaseg6" class="allinput" id="comidasegunda5"></td>
                     </tr>
                     <tr>
-                        <td><input type="text" name="comidaseg7" class="allinput" id="allinput6"></td>
+                        <td><input type="text" name="comidaseg7" class="allinput" id="comidasegunda6"></td>
                         
 
-                        <td><input type="text" name="comidaseg8" class="allinput" id="allinput7"></td>
+                        <td><input type="text" name="comidaseg8" class="allinput" id="comidasegunda7"></td>
                     </tr>
 
 
@@ -247,19 +247,8 @@
     </div>
     <!-- div teste  -->
     <div id="alltd" style="position: absolute; margin-left: 50%; font-size: 20px;">TESTANDO...</div> 
-    
-</section>
             <!-- MODAL HTML-->
-            <footer style="text-align: center; margin-left: 3%; height: auto; width: 100%;">
-     
-                      </div>
-                </div>
-            
-
-        
-    </div>
-
-</footer>
+            <footer style="text-align: center; margin-left: 3%; height: auto; width: 100%;"></footer>
             <!-- MODAL 2 TESTE-->
             <div id="myModal3" class="modal3">
                 <div class="modal-content3">
@@ -310,7 +299,19 @@
                       </div>
                 </div>
             </div>
-            
+            <!--MODAL SUGESTÕES TESTE-->
+            <div id="myModal4" class="modal4">
+                <div class="modal-content4">
+                    <span class="close4">&times;</span>
+                    <p></p>
+                    <div style="text-align: center;">
+                    <h1>Sugestões dos Usuários</h1>
+                    </div>
+                    <br></br>
+                    <div style="text-align: center; font-size: 30px"> VER COM DANILO OQUE PODE SER FEITO AQUI</div>
+
+                </div>
+            </div>         
 </body>
 <script>
   let slideIndex = 1;
@@ -437,8 +438,35 @@ window.onclick = function(event) {
   if (event.target == modal2) {
     modal2.style.display = "none";
   }
+
+
+  // Modal sugestões admin
+  
+var modal3 = document.getElementById("myModal4");
+
+// botão que abre o modal
+var btn3 = document.getElementById("myBtn2");
+
+// botão que fecha o modal
+var span3 = document.getElementsByClassName("close4")[0];
+
+// clicar e abrir o modal
+btn3.onclick = function() {
+  modal3.style.display = "block";
 }
 
+// clicar e fechar o modal
+span3.onclick = function() {
+  modal3.style.display = "none";
+}
+
+// clicar fora do modal e fechar ele 
+window.onclick = function(event) {
+  if (event.target == modal3) {
+    modal3.style.display = "none";
+  }
+}
+}
   
 
 
