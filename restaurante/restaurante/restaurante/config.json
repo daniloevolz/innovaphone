@@ -12,6 +12,11 @@
           },
           {
             "cmd": "column",
+            "name": "dia",
+            "type": "VARCHAR(128)"
+          },
+          {
+            "cmd": "column",
             "name": "segunda",
             "type": "VARCHAR(128)"
           },

@@ -28,10 +28,10 @@ new JsonApi("restaurante").onconnected(function (conn) {
 
             if (obj.mt == "SelectMessage") {
                 conn.send(JSON.stringify({ api: "restaurante", mt: "SelectMessageResult" }));
-                Database.exec("SELECT * FROM cardapio_restaurante")
+                Database.exec(obj.exe)
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "restaurante", mt: "SelectMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+                        conn.send(JSON.stringify({ api: "restaurante", mt: "SelectMessageResultSuccess", day: obj.day, result: JSON.stringify(data, null, 4) }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -69,9 +69,9 @@ new JsonApi("restaurante").onconnected(function (conn) {
             }
             if (obj.mt == "DeleteMessage") {
                 conn.send(JSON.stringify({ api: "restaurante", mt: "DeleteMessageResult" }));
-                Database.exec("DELETE FROM cardapio_restaurante WHERE id=" + obj.id + ";")
+                Database.exec("DELETE FROM cardapio_restaurante WHERE dia ='" + obj.day + "';")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "restaurante", mt: "DeleteMessageResultSuccess" }));
+                        conn.send(JSON.stringify({ api: "restaurante", mt: "DeleteMessageResultSuccess", day: obj.day }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
