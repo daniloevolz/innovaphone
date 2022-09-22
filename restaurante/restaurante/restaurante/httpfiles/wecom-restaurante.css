@@ -27,7 +27,7 @@ button#myBtn2{
 
 button#duvidas{
     background-color: #76b4c0;
-    position: absolute;
+   position: absolute; 
     margin-top: 40%;
     margin-left: 3%;
     height: 70px;
@@ -37,7 +37,7 @@ button#duvidas{
     font-weight: bold;
 }
 #limpar{
-    position: absolute;
+   position: absolute; 
     background-color: #c24747;
     width: 120px;
     height: 70px;
@@ -48,7 +48,7 @@ button#duvidas{
     margin-top: 160%;
 }
 #atualizar{
-    position: absolute;
+    position: absolute; 
     background-color: #7cbb63;
     width: 120px;
     height: 70px;
