@@ -326,7 +326,7 @@ input#sugest {
   
 
 .modal-content {
-    background-color: #80a3aa;
+    background-color: #94b7bd;
     margin: auto;
     padding: 0px;
     border: 1px solid #888;
@@ -418,11 +418,9 @@ textarea {
 input {
     border-radius: 5px;
 }
-
     input#button {
         margin: 1%;
-        position: fixed;
-        width: 10%;
+        width: 15%;
         height: 35px;
         border-radius: 10px;
         font-weight: bold;

@@ -1,3 +1,6 @@
+
+/*Design Mobile Admin*/
+
 @media screen and (max-width:500px){
     div#all{
         margin-top: 47%;
@@ -40,8 +43,8 @@
         margin-top: -30px;
         margin-top: 50px;
         display: flex;
-       margin-left: 38.2%;
-       display: block;
+        margin-left: 38.2%;
+        display: block;
     }
     /*  MODAL 3 - SUGESTÕES */
 .modal4 {

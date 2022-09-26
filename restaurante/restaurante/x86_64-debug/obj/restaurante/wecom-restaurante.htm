@@ -15,14 +15,14 @@
     <script src="wecom-restaurantetexts.js" type="text/javascript"></script>
 </head>
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.restaurante(start, { }); })">
-    <body>
+    <body id="body">
         <div class="containervertical">
             <div class="colunaesquerda">
                 <nav>
                     <ul>
                         <li><a id="inicio" href="#">Início</a></li>
                         <li><a id="b3" href="#">Cardápio</a></li>
-                        <li><a id="todas" href="#">Novidades</a></li>
+                        <li onclick="New()" id="todas"><a id="todas" href="#">Novidades</a></li>
                     </ul>
                 </nav>
             </div>
@@ -238,7 +238,7 @@
             </div>
         </div>
         </div>
-        </div>
+        </div>  
     </section>
                 <!-- MODAL HTML-->
                 <footer style="text-align: center; margin-left: 3%; height: auto; width: 100%;">
@@ -246,30 +246,32 @@
                     <div id="myModal" class="modal">
                         <div class="modal-content">
                             <span class="close">&times;</span>
-                            <form method="get" style="text-align: center;">
+                            <form method="post" style="text-align: center;">
             <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
             <p> <h3> Como podemos melhorar?</h3></p>
     
             <div id="res">
-                <span style="font-size: 16px;">Seu nome:</span> <input type="text" id="name2">
+                <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
             </div>
     
             <div id="comida">
                 <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
                 <br><label for="radio" id="radio">
-                    <input type="radio" name="Muito bom!">Muito bom!
-                    <input type="radio" name="Bom!">Bom!
-                    <input type="radio" name="Razoável">Razoável
-                    <input type="radio" name="Ruim!">Ruim!
-                    <input type="radio" name="Muito Ruim!">Muito ruim!
+                    <input type="radio" name="Muito bom!" value="1">Muito bom!
+                    <input type="radio" name="Bom!" value="2">Bom!
+                    <input type="radio" name="Razoável" value="3">Razoável
+                    <input type="radio" name="Ruim!" value="4">Ruim!
+                    <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
     
                 </label>
             </div>
             <div id="sugestoes">
                 <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-                <textarea id="type"> </textarea>
+                     <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
             </div>
-            <input type="button" value="Enviar!" id="button">
+            <div style="text-align: center;">
+            <input type="submit" value="Enviar!" id="button">
+            </div>
         </form>
                           </div>
                     </div>
@@ -279,10 +281,24 @@
         </div>
     
     </footer>
-        
-    </body>
+    <div id="news" style="display: none; ">
+    <iframe src="compressed.tracemonkey-pldi-09.pdf" style="height:1000px; " width="100%"></iframe> 
+   </div>
+ </body>
     <script>
-             // Modal JS Edição Pietrooo
+             // Modal JS Edição Pietro
+var news = document.getElementById("todas");
+var modal5 = document.getElementById("news");
+var divall = document.getElementById("all");
+var footbtn = document.getElementById("myBtn");
+
+news.onclick = function(){
+    modal5.style.display = "block";
+    divall.style.display = "none";
+    footbtn.style.display = "none";
+}
+
+    
   
 var modal2 = document.getElementById("myModal");
 

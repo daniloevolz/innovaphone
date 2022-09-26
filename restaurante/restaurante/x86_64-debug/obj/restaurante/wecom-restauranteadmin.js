@@ -86,7 +86,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
                     
                     break;
                 case 'terca':
-                    console.log('terça');
+                    console.log('terï¿½a');
                     try {
                         document.getElementById("comidaterca").value = pratos[0].terca;
                         document.getElementById("comidaterca1").value = pratos[1].terca;
@@ -201,7 +201,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
                     break;
 
                 case 'terca':
-                    console.log('terça');
+                    console.log('terï¿½a');
                     app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
                     break;
 
@@ -342,7 +342,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
 
         }
     }
-    // Função referente ao button Limpar dados
+    // FunÃ§Ã£o referente ao button Limpar dados
     function limparLista() {
 
         var check = document.getElementById("check");
@@ -372,6 +372,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
             document.getElementById("restaurante").style.fontWeight = 'normal';
             document.getElementById("novidades").style.fontWeight = 'normal';
             document.getElementById("inicio").style.fontWeight = 'bold';
+       document.getElementById('body').style.display = 'block';  // apagar depois
             document.getElementById('linha2').style.display = 'flex';
             document.getElementById('linha2b3').style.display = 'none';
             document.getElementById('linha2todas').style.display = 'none';
