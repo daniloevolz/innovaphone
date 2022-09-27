@@ -4,6 +4,7 @@ body {
     color: var(--text-standard);
     background-image: url(./teste2.jpg);
     overflow-x: hidden;
+    overflow: hidden;
     background-repeat: repeat;
 }
 /* RESTAURANTE ADMIN DESKTOP */
@@ -170,7 +171,7 @@ section#main {
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
-align-items: center;
+    align-items: center;
    
 }
 .colunadireita {
@@ -221,9 +222,10 @@ a {
     padding-left: 30px;
     padding-bottom: 25px;
     
-   
     
 }
+  
+
 .logo-inn{
     width: 20%;
     height: auto;
@@ -260,8 +262,6 @@ div#quart {
 }
 
 
-
-
 div#quint {
     
     width: 25%;
@@ -269,8 +269,6 @@ div#quint {
     display: block;
     
 }
-
-
 
 
 div#sext {
@@ -420,7 +418,7 @@ input {
 }
     input#button {
         margin: 1%;
-        width: 15%;
+        width: 17%;
         height: 35px;
         border-radius: 10px;
         font-weight: bold;

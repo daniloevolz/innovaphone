@@ -21,8 +21,8 @@
                 <nav>
                     <ul>
                         <li><a id="inicio" href="#">Início</a></li>
-                        <li><a id="b3" href="#">Cardápio</a></li>
-                        <li onclick="New()" id="todas"><a id="todas" href="#">Novidades</a></li>
+                        <li><a id="restaurante" href="#">Cardápio</a></li>
+                        <li onclick="New()" id="novidades"><a id="todas" href="#">Novidades</a></li>
                     </ul>
                 </nav>
             </div>
@@ -30,11 +30,18 @@
                 <div class="linha1">
                     <img class="logo-inn" src="logo-inn.png" />
                 </div>
-                <div id="linhainicio">
-                    <iframe src="newsjully.pdf#toolbar=0" width="100%" height="500px">
+ <div id="linhacardapio" class="linha2">
+
+                <div id="linhanews" style="display: none;">
+                    <iframe src="newsjully.pdf#toolbar=0" style="position: absolute; height: 100%; width: 100%;">
                     </iframe>
                 </div>
-                <div id="linhacardapio" class="linha2">
+
+                <div id="linhainicio">
+                   <!-- <iframe src="newsjully.pdf#toolbar=0" width="100%" height="500px" style="position: absolute;">
+                    </iframe>-->
+                
+              
 
                     <div id="all">
                         <header id="header1"> <h1>Cardápio</h1></header>
@@ -241,48 +248,83 @@
                             </div>
 
                     </div>
-                </div>
-                <div id="linhanews">
-                    <iframe src="newsjully.pdf#toolbar=0" width="100%" height="500px">
-                    </iframe>
-                </div>
-            </div>
+                
+            
+                
+             <!-- MODAL HTML-->
+             <footer style="text-align: center;height: auto; width: 100%;">
+                <button id="myBtn" >Sugestões</button>
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <form method="post" style="text-align: center;">
+                            <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
+                            <p> <h3> Como podemos melhorar?</h3></p>
+
+                            <div id="res">
+                                <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
+                            </div>
+
+                            <div id="comida">
+                                <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
+                                <br><label for="radio" id="radio">
+                                    <input type="radio" name="Muito bom!" value="1">Muito bom!
+                                    <input type="radio" name="Bom!" value="2">Bom!
+                                    <input type="radio" name="Razoável" value="3">Razoável
+                                    <input type="radio" name="Ruim!" value="4">Ruim!
+                                    <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
+
+                                </label>
+                            </div>
+                            <div id="sugestoes">
+                                <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
+                                     <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
+                            </div>
+                        
+                              <input type="submit" value="Enviar!" id="button">
+                            
+                        </form>
+                    </div>
+                </div>  
+                    
+            </footer>
         </div>  
-                <!-- MODAL HTML-->
-                <footer style="text-align: center; margin-left: 3%; height: auto; width: 100%;">
-                    <button id="myBtn" >Sugestões</button>
-                    <div id="myModal" class="modal">
-                        <div class="modal-content">
-                            <span class="close">&times;</span>
-                            <form method="post" style="text-align: center;">
-                                <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
-                                <p> <h3> Como podemos melhorar?</h3></p>
-    
-                                <div id="res">
-                                    <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
-                                </div>
-    
-                                <div id="comida">
-                                    <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
-                                    <br><label for="radio" id="radio">
-                                        <input type="radio" name="Muito bom!" value="1">Muito bom!
-                                        <input type="radio" name="Bom!" value="2">Bom!
-                                        <input type="radio" name="Razoável" value="3">Razoável
-                                        <input type="radio" name="Ruim!" value="4">Ruim!
-                                        <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
-    
-                                    </label>
-                                </div>
-                                <div id="sugestoes">
-                                    <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-                                         <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
-                                </div>
-                                <div style="text-align: center;">
-                                    <input type="submit" value="Enviar!" id="button">
-                                </div>
-                            </form>
-                        </div>
-                    </div>            
-                </footer>
+
+        
+
+            <script>
+// ABA DE TESTES AQUI  --> 
+var elInicioDiv = document.getElementById("inicio");
+    elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
+    var elRestauranteDiv = document.getElementById("restaurante");
+    elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
+    var elNovidadesDiv = document.getElementById("novidades");
+    elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
+
+    function MudarDiv(el) {
+        if (el == "inicio") {
+            document.getElementById("restaurante").style.fontWeight = 'normal';
+            document.getElementById("novidades").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'bold';
+            document.getElementById('linhainicio').style.display = 'block';
+            document.getElementById('linhacardapio').style.display = 'block';
+            document.getElementById('linhanews').style.display = 'none';
+        } else if (el == "restaurante") {
+            document.getElementById("restaurante").style.fontWeight = 'bold';
+            document.getElementById("novidades").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+            document.getElementById('linhainicio').style.display = 'block';
+            document.getElementById('linhacardapio').style.display = 'block';
+            document.getElementById('linhanews').style.display = 'none';
+        } else if (el == "novidades") {
+            document.getElementById("restaurante").style.fontWeight = 'normal';
+            document.getElementById("novidades").style.fontWeight = 'bold';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhacardapio').style.display = 'block';
+            document.getElementById('linhanews').style.display = 'block';
+        }
+    }
+            </script>
  </body>
 </html>

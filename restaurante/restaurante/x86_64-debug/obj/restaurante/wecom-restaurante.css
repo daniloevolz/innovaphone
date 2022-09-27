@@ -4,6 +4,7 @@ body {
     color: var(--text-standard);
     background-image: url(./teste2.jpg);
     overflow-x: hidden;
+    overflow: hidden;
     background-repeat: repeat;
 }
 /* RESTAURANTE ADMIN DESKTOP */
@@ -420,7 +421,7 @@ input {
 }
     input#button {
         margin: 1%;
-        width: 15%;
+        width: 20%;
         height: 35px;
         border-radius: 10px;
         font-weight: bold;

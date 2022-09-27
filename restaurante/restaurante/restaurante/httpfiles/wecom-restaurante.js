@@ -49,29 +49,29 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
     }
 
     function MudarDiv(el) {
-        if (el == "inicio") {
-            document.getElementById("restaurante").style.fontWeight = 'normal';
-            document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'bold';
-            document.getElementById('linhainicio').style.display = 'flex';
-            document.getElementById('linhacardapio').style.display = 'none';
-            document.getElementById('linhanews').style.display = 'none';
-        } else if (el == "restaurante") {
-            document.getElementById("restaurante").style.fontWeight = 'bold';
-            document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'none';
-            document.getElementById('linhacardapio').style.display = 'flex';
-            document.getElementById('linhanews').style.display = 'none';
-        } else if (el == "novidades") {
-            document.getElementById("restaurante").style.fontWeight = 'normal';
-            document.getElementById("novidades").style.fontWeight = 'bold';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'none';
-            document.getElementById('linhacardapio').style.display = 'none';
-            document.getElementById('linhanews').style.display = 'block';
-        }
-    }
+      if (el == "inicio") {
+          document.getElementById("restaurante").style.fontWeight = 'normal';
+          document.getElementById("novidades").style.fontWeight = 'normal';
+          document.getElementById("inicio").style.fontWeight = 'bold';
+          document.getElementById('linhainicio').style.display = 'block';
+          document.getElementById('linhacardapio').style.display = 'block';
+          document.getElementById('linhanews').style.display = 'none';
+      } else if (el == "restaurante") {
+          document.getElementById("restaurante").style.fontWeight = 'bold';
+          document.getElementById("novidades").style.fontWeight = 'normal';
+          document.getElementById("inicio").style.fontWeight = 'normal';
+          document.getElementById('linhainicio').style.display = 'block';
+          document.getElementById('linhacardapio').style.display = 'block';
+          document.getElementById('linhanews').style.display = 'none';
+      } else if (el == "novidades") {
+          document.getElementById("restaurante").style.fontWeight = 'normal';
+          document.getElementById("novidades").style.fontWeight = 'bold';
+          document.getElementById("inicio").style.fontWeight = 'normal';
+          document.getElementById('linhainicio').style.display = 'none';
+          document.getElementById('linhacardapio').style.display = 'block';
+          document.getElementById('linhanews').style.display = 'block';
+      }
+  }
 
     
     // Modal JS Edição Pietrooo
@@ -133,8 +133,8 @@ window.onclick = function(event) {
 
 
 
+        
 
 
 
-}
 Wecom.restaurante.prototype = innovaphone.ui1.nodePrototype;
