@@ -372,26 +372,47 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
             document.getElementById("restaurante").style.fontWeight = 'normal';
             document.getElementById("novidades").style.fontWeight = 'normal';
             document.getElementById("inicio").style.fontWeight = 'bold';
-       document.getElementById('body').style.display = 'block';  // apagar depois
-            document.getElementById('linha2').style.display = 'flex';
-            document.getElementById('linha2b3').style.display = 'none';
-            document.getElementById('linha2todas').style.display = 'none';
+            document.getElementById('linhainicio').style.display = 'block';
+            document.getElementById('linhacardapio').style.display = 'none';
+            document.getElementById('linhanews').style.display = 'none';
         } else if (el == "restaurante") {
             document.getElementById("restaurante").style.fontWeight = 'bold';
             document.getElementById("novidades").style.fontWeight = 'normal';
             document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linha2').style.display = 'none';
-            document.getElementById('linha2b3').style.display = 'block';
-            document.getElementById('linha2todas').style.display = 'none';
+            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhacardapio').style.display = 'flex';
+            document.getElementById('linhanews').style.display = 'none';
         } else if (el == "novidades") {
             document.getElementById("restaurante").style.fontWeight = 'normal';
             document.getElementById("novidades").style.fontWeight = 'bold';
             document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linha2').style.display = 'none';
-            document.getElementById('linha2b3').style.display = 'none';
-            document.getElementById('linha2todas').style.display = 'block';
+            document.getElementById('linhacardapio').style.display = 'none';
+            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhanews').style.display = 'block';
         }
     }
+    const input = document.querySelector('input[type="file"]');
+    input.addEventListener('change', (e) => {
+
+        const fd = new FormData();
+
+        // add all selected files
+        e.target.files.forEach((file) => {
+            fd.append(e.target.name, file, file.name);
+        });
+
+        // create the request
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // we done!
+            }
+        };
+
+        // path to server would be where you'd normally post the form to
+        xhr.open('POST', '', true);
+        xhr.send(fd);
+    });
 
 }
 

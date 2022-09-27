@@ -31,6 +31,14 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    var elInicioDiv = document.getElementById("inicio");
+    elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
+    var elRestauranteDiv = document.getElementById("restaurante");
+    elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
+    var elNovidadesDiv = document.getElementById("novidades");
+    elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
+
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
     }
@@ -39,6 +47,32 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
         }
     }
+
+    function MudarDiv(el) {
+        if (el == "inicio") {
+            document.getElementById("restaurante").style.fontWeight = 'normal';
+            document.getElementById("novidades").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'bold';
+            document.getElementById('linhainicio').style.display = 'flex';
+            document.getElementById('linhacardapio').style.display = 'none';
+            document.getElementById('linhanews').style.display = 'none';
+        } else if (el == "restaurante") {
+            document.getElementById("restaurante").style.fontWeight = 'bold';
+            document.getElementById("novidades").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhacardapio').style.display = 'flex';
+            document.getElementById('linhanews').style.display = 'none';
+        } else if (el == "novidades") {
+            document.getElementById("restaurante").style.fontWeight = 'normal';
+            document.getElementById("novidades").style.fontWeight = 'bold';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhacardapio').style.display = 'none';
+            document.getElementById('linhanews').style.display = 'block';
+        }
+    }
+
     
     // Modal JS Edição Pietrooo
   
@@ -91,19 +125,7 @@ window.onclick = function(event) {
            if (event.target == modal2) {
              modal2.style.display = "none";
            }
-         }
-         function Clicar(){
-           var comida1 = document.getElementById("allinput").value; 
-           //console.log(turmaUsuario);
-         
-           // Enviar os dados para o formulario do arquivo index.html utilizando o atributo ID
-         //  document.getElementById("receber_turma_usuario").value = turmaUsuario;
-         
-           // Enviar os dados para o arquivo index.html utilizando o atributo ID
-          //var testezada =  document.getElementById("valor_form_turma_usuario").innerHTML = comida1;
-          var res =   document.getElementById("alltd");
-          res.innerHTML = comida1;
-           
+         }        
          
          
          }

@@ -126,6 +126,7 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="restaurante\httpfiles\sugestoes.js" />
+    <None Include="restaurante\httpfiles\newsjully.pdf" />
     <None Include="restaurante\restaurante.mak" />
     <None Include="restaurante\config.json" />
     <None Include="restaurante\plugins.json" />
