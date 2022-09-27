@@ -379,7 +379,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
             document.getElementById("restaurante").style.fontWeight = 'bold';
             document.getElementById("novidades").style.fontWeight = 'normal';
             document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'none';
+            document.getElementById('linhainicio').style.display = 'block';
             document.getElementById('linhacardapio').style.display = 'flex';
             document.getElementById('linhanews').style.display = 'none';
         } else if (el == "novidades") {
