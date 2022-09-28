@@ -12,7 +12,7 @@ body {
     width: 100px;
     height: 20px;
     border: 1px solid #3c92a3;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(255, 255, 255, 0.233);
 }
 button#myBtn2{
     margin-top: 220%;
@@ -182,7 +182,7 @@ section#main {
 
 }
 footer{
-    flex-direction: row;
+flex-direction: row;
 justify-content: center;
 align-items: center;
 }
@@ -227,6 +227,7 @@ a {
     
     
 }
+
   
 
 .logo-inn{
@@ -521,7 +522,9 @@ textarea{
     background-color: rgba(0,0,0,0.4); 
     overflow: hidden;
   }
-  
+  #pdf{
+    display: none;   
+  }
 
 .modal-content4 {
     background-color: #8ab5bd;
@@ -665,6 +668,9 @@ img {vertical-align: middle;}
 .active, .dot:hover {
   background-color: #646464;
 }
+#iframemobile{
+    display: none;
+}
 
 /* Fading animation */
 .fade {
@@ -698,6 +704,22 @@ img {vertical-align: middle;}
         font-size: 34px;
         text-align: center;
     }
+    #iframedesktop{
+        display: none;
+    }
+
+    #iframemobile{
+        display: block;
+        margin-top: 22%;
+    }
+
+   div#mob{
+        display:block; 
+        text-align: center;
+        margin-top: 36%;
+    }
+
+
 
     header#header2 {
         text-align: center;
@@ -731,12 +753,15 @@ img {vertical-align: middle;}
     }
     table{
         border: 2px solid rgb(55, 170, 161);
+        
     }
-
     div#seg {
         width: 85%;
         margin-left: -36%;
         
+    }
+    h1{
+        margin-left: 2%;
     }
 
     section {
@@ -853,7 +878,6 @@ img {vertical-align: middle;}
             font-weight: bold;
         }
     
-    
     .linha1 {
         order: 1;
         background-image: url("money_header.png");
@@ -864,11 +888,8 @@ img {vertical-align: middle;}
         padding-bottom: 24px;
         width: 100%;
         
-        
-        
-       
-        
     }
+
     .logo-inn{
         width: 44%;
         height: auto;
@@ -905,10 +926,9 @@ img {vertical-align: middle;}
     div#all {
         margin-top: 33%;
         width: 100%;
-        flex-direction: row;
-        justify-content: center;
+       
     }
-
+    
     /*MODAL MOBILE*/
     
 
