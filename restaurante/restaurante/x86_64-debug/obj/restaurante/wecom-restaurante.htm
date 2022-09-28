@@ -20,9 +20,8 @@
             <div class="colunaesquerda">
                 <nav>
                     <ul>
-                        <li><a id="inicio" href="#">Início</a></li>
+                        <li><a style="font-weight:bold;" id="novidades" href="#">Início</a></li>
                         <li><a id="restaurante" href="#">Cardápio</a></li>
-                        <li onclick="New()" id="novidades"><a id="todas" href="#">Novidades</a></li>
                     </ul>
                 </nav>
             </div>
@@ -30,19 +29,12 @@
                 <div class="linha1">
                     <img class="logo-inn" src="logo-inn.png" />
                 </div>
- <div id="linhacardapio" class="linha2">
-
-                <div id="linhanews" style="display: none;">
+                <div id="linhanews" style="display: block;">
                     <iframe src="newsjully.pdf#toolbar=0" style="position: absolute; height: 100%; width: 100%;">
                     </iframe>
                 </div>
 
-                <div id="linhainicio">
-                   <!-- <iframe src="newsjully.pdf#toolbar=0" width="100%" height="500px" style="position: absolute;">
-                    </iframe>-->
-                
-              
-
+                <div id="linhacardapio" style="display: none;">
                     <div id="all">
                         <header id="header1"> <h1>Cardápio</h1></header>
                         <br>
@@ -55,35 +47,22 @@
                                         <td class="day" colspan="4">SEGUNDA</td>
                                     </tr>
                                     <tr>
-                                        <td><div id="alltd">AAAA</div></td>
-
-
-                                        <td>Filé de frango</td>
+                                        <td id="comidasegunda"></td>
+                                        <td id="comidasegunda1"></td>
                                     </tr>
                                     <tr>
 
-                                        <td style="width: 200px;">Batata frita </td>
-
-
-
-                                        <td>Feijão </td>
+                                        <td id="comidasegunda2"></td>
+                                        <td id="comidasegunda3"> </td>
                                     </tr>
                                     <tr>
-                                        <td>Polenta</td>
-
-
-
-                                        <td>Salada</td>
+                                        <td id="comidasegunda4"></td>
+                                        <td id="comidasegunda5"></td>
                                     </tr>
                                     <tr>
-                                        <td>Massa</td>
-
-
-                                        <td>Batata suiça</td>
+                                        <td id="comidasegunda6"></td>
+                                        <td id="comidasegunda7"></td>
                                     </tr>
-
-
-
                                 </table>
                             </div>
                             <div class="break" style="width: 50px;"></div>
@@ -93,34 +72,21 @@
                                         <td class="day" colspan="4">TERÇA</td>
                                     </tr>
                                     <tr>
-                                        <td>Arroz</td>
-
-
-                                        <td>Filé de frango</td>
+                                        <td id="comidaterca">Arroz</td>
+                                        <td id="comidaterca1">Filé de frango</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;">Batata frita </td>
-
-
-
-                                        <td>Feijão </td>
+                                        <td id="comidaterca2">Batata frita </td>
+                                        <td id="comidaterca3">Feijão </td>
                                     </tr>
                                     <tr>
-                                        <td>Polenta</td>
-
-
-
-                                        <td>Salada</td>
+                                        <td id="comidaterca4">Polenta</td>
+                                        <td id="comidaterca5">Salada</td>
                                     </tr>
                                     <tr>
-                                        <td>Massa</td>
-
-
-                                        <td>Batata suiça</td>
+                                        <td id="comidaterca6">Massa</td>
+                                        <td id="comidaterca7">Batata suiça</td>
                                     </tr>
-
-
-
                                 </table>
 
                             </div>
@@ -132,199 +98,118 @@
                                         <td class="day" colspan="4">QUARTA</td>
                                     </tr>
                                     <tr>
-                                        <td>Arroz</td>
-
-
-                                        <td>Filé de frango</td>
+                                        <td id="comidaquarta">Arroz</td>
+                                        <td id="comidaquarta1">Filé de frango</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;">Batata frita </td>
-
-
-
-                                        <td>Feijão </td>
+                                        <td id="comidaquarta2">Batata frita </td>
+                                        <td id="comidaquarta3">Feijão </td>
                                     </tr>
                                     <tr>
-                                        <td>Polenta</td>
-
-
-
-                                        <td>Salada</td>
+                                        <td id="comidaquarta4">Polenta</td>
+                                        <td id="comidaquarta5">Salada</td>
                                     </tr>
                                     <tr>
-                                        <td>Massa</td>
-
-
-                                        <td>Batata suiça</td>
+                                        <td id="comidaquarta6">Massa</td>
+                                        <td id="comidaquarta7">Batata suiça</td>
                                     </tr>
-
-
-
                                 </table>
 
                             </div>
-
-
                             <div class="break2" style="width: 0px; flex-basis: 100%; height: 30px;"> </div>
 
-                            <div class="break2" style="width: 0px; height: 30px;"> </div>  <div id="quint">
+                            <div class="break2" style="width: 0px; height: 30px;"> </div>
+                            <div id="quint">
                                 <table cellpadding="3" cellspacing="0" id="quinta">
                                     <tr>
                                         <td class="day" colspan="4">QUINTA</td>
                                     </tr>
                                     <tr>
-                                        <td>Arroz</td>
-
-
-                                        <td>Filé de frango</td>
+                                        <td id="comidaquinta">Arroz</td>
+                                        <td id="comidaquinta1">Filé de frango</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;">Batata frita </td>
-
-
-
-                                        <td>Feijão </td>
+                                        <td id="comidaquinta2">Batata frita </td>
+                                        <td id="comidaquinta3">Feijão </td>
                                     </tr>
                                     <tr>
-                                        <td>Polenta</td>
-
-
-
-                                        <td>Salada</td>
+                                        <td id="comidaquinta4">Polenta</td>
+                                        <td id="comidaquinta5">Salada</td>
                                     </tr>
                                     <tr>
-                                        <td>Massa</td>
-
-
-                                        <td>Batata suiça</td>
+                                        <td id="comidaquinta6">Massa</td>
+                                        <td id="comidaquinta7">Batata suiça</td>
                                     </tr>
-
-
-
                                 </table>
 
                             </div>
-
                             <div class="break" style="width: 100px;">
-
                             </div>
-
                             <div id="sext">
                                 <table cellpadding="3" cellspacing="0">
                                     <tr>
                                         <td class="day" colspan="4">SEXTA</td>
                                     </tr>
                                     <tr>
-                                        <td>Arroz</td>
-
-
-                                        <td>Filé de frango</td>
+                                        <td id="comidasexta">Arroz</td>
+                                        <td id="comidasexta1">Filé de frango</td>
                                     </tr>
                                     <tr>
-                                        <td style="width: 200px;">Batata frita </td>
-
-
-
-                                        <td>Feijão </td>
+                                        <td id="comidasexta2">Batata frita </td>
+                                        <td id="comidasexta3">Feijão </td>
                                     </tr>
                                     <tr>
-                                        <td>Polenta</td>
-
-
-
-                                        <td>Salada</td>
+                                        <td id="comidasexta4">Polenta</td>
+                                        <td id="comidasexta5">Salada</td>
                                     </tr>
                                     <tr>
-                                        <td>Massa</td>
-
-
-                                        <td>Batata suiça</td>
+                                        <td id="comidasexta6">Massa</td>
+                                        <td id="comidasexta7">Batata suiça</td>
                                     </tr>
-
-
-
                                 </table>
 
                             </div>
 
                     </div>
-                
-            
-                
-             <!-- MODAL HTML-->
-             <footer style="text-align: center;height: auto; width: 100%;">
-                <button id="myBtn" >Sugestões</button>
-                <div id="myModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <form method="post" style="text-align: center;">
-                            <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
-                            <p> <h3> Como podemos melhorar?</h3></p>
 
-                            <div id="res">
-                                <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
-                            </div>
 
-                            <div id="comida">
-                                <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
-                                <br><label for="radio" id="radio">
-                                    <input type="radio" name="Muito bom!" value="1">Muito bom!
-                                    <input type="radio" name="Bom!" value="2">Bom!
-                                    <input type="radio" name="Razoável" value="3">Razoável
-                                    <input type="radio" name="Ruim!" value="4">Ruim!
-                                    <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
 
-                                </label>
-                            </div>
-                            <div id="sugestoes">
-                                <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-                                     <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
-                            </div>
-                        
-                              <input type="submit" value="Enviar!" id="button">
-                            
-                        </form>
+                    <!-- MODAL HTML-->
+                    <footer style="text-align: center; height: auto; width: 100%;">
+                        <button id="myBtn">Sugestões</button>
+                        <div id="myModal" class="modal">
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <form method="post" style="text-align: center;">
+                                    <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
+                                    <p> <h3> Como podemos melhorar?</h3></p>
+
+                                    <div id="res">
+                                        <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
+                                    </div>
+
+                                    <div id="comida">
+                                        <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
+                                        <br><label for="radio" id="radio">
+                                            <input type="radio" name="Muito bom!" value="1">Muito bom!
+                                            <input type="radio" name="Bom!" value="2">Bom!
+                                            <input type="radio" name="Razoável" value="3">Razoável
+                                            <input type="radio" name="Ruim!" value="4">Ruim!
+                                            <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
+
+                                        </label>
+                                    </div>
+                                    <div id="sugestoes">
+                                        <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
+                                        <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
+                                    </div>
+
+                                <input type="submit" value="Enviar!" id="button">
+                            </form>
+                        </div>
                     </div>
-                </div>  
-                    
-            </footer>
-        </div>  
-
-        
-
-            <script>
-// ABA DE TESTES AQUI  --> 
-var elInicioDiv = document.getElementById("inicio");
-    elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
-    var elRestauranteDiv = document.getElementById("restaurante");
-    elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
-    var elNovidadesDiv = document.getElementById("novidades");
-    elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
-
-    function MudarDiv(el) {
-        if (el == "inicio") {
-            document.getElementById("restaurante").style.fontWeight = 'normal';
-            document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'bold';
-            document.getElementById('linhainicio').style.display = 'block';
-            document.getElementById('linhacardapio').style.display = 'block';
-            document.getElementById('linhanews').style.display = 'none';
-        } else if (el == "restaurante") {
-            document.getElementById("restaurante").style.fontWeight = 'bold';
-            document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'block';
-            document.getElementById('linhacardapio').style.display = 'block';
-            document.getElementById('linhanews').style.display = 'none';
-        } else if (el == "novidades") {
-            document.getElementById("restaurante").style.fontWeight = 'normal';
-            document.getElementById("novidades").style.fontWeight = 'bold';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'none';
-            document.getElementById('linhacardapio').style.display = 'block';
-            document.getElementById('linhanews').style.display = 'block';
-        }
-    }
-            </script>
- </body>
+               </footer>
+            </div>
+        </div>
+    </body>
 </html>

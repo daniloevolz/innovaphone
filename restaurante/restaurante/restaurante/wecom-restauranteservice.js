@@ -82,3 +82,53 @@ new JsonApi("restaurante").onconnected(function (conn) {
         conn.messageComplete();
     }
 });
+
+// the variable containing the string value
+var value = null;
+var baseUrl = WebServer.url;
+log("url: " + baseUrl);
+
+WebServer.onurlchanged(function (newUrl) {
+    baseUrl = newUrl;
+    log("url: " + baseUrl);
+});
+
+WebServer.onrequest("value", function (req) {
+    if (req.method == "GET") {
+        if (value) {
+            // value exists, send it back as text/plain
+            req.responseContentType("txt")
+                .sendResponse()
+                .onsend(function (req) {
+                    req.send(new TextEncoder("utf-8").encode(value), true);
+                });
+        }
+        else {
+            // value does not exist, send 404 Not Found
+            req.cancel();
+        }
+    }
+    else if (req.method == "PUT") {
+        // overwrite existing value with newValue
+
+        var newValue = "";
+        req.onrecv(function (req, data) {
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+            }
+        });
+    }
+    else if (req.method == "DELETE") {
+        // delete value
+        value = null;
+        req.sendResponse();
+    }
+    else {
+        req.cancel();
+    }
+});

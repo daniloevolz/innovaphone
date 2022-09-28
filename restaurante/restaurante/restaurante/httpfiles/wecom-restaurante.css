@@ -8,10 +8,11 @@ body {
     background-repeat: repeat;
 }
 /* RESTAURANTE ADMIN DESKTOP */
-.allinput{
+.allinput {
     width: 100px;
     height: 20px;
     border: 1px solid #3c92a3;
+    background-color: rgba(0, 0, 0, 0);
 }
 button#myBtn2{
     margin-top: 220%;
@@ -204,11 +205,13 @@ li {
 a {
     color: darkslategrey;
     text-decoration: none;
+    font-size: 16px;
 }
 
     a:hover {
         color: darkslategrey;
         font-weight: bold;
+        font-size: 23px;
     }
 
 

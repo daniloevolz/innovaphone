@@ -20,10 +20,8 @@
         <div class="colunaesquerda">
             <nav>
                 <ul>
-                    <li><a id="inicio" href="#">Início</a></li>
                     <li><a id="restaurante" href="#">Cardápio</a></li>
-                    <li><a id="novidades" href="#">Novidades</a></li>
-                    
+                    <li><a id="novidades" href="#">Início</a></li>
                 </ul>
                 <button type="submit" id="duvidas">DUVIDAS</button>
                 <input type= "button" id="atualizar"  value="Atualizar"">
@@ -35,11 +33,9 @@
             <div class="linha1">
                 <img class="logo-inn" src="logo-inn.png" />
             </div>
-            <div id="linhacardapio" class="linha2">
+            <div id="linhacardapio" class="linha2" style="display:none;">
                 <div id="all">
                     <header id="header1"> <h1>Cardápio</h1></header>
-                    <br>
-                    <div id="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
                     <section id="main">
                         <div class="break" style="width: 0px;"></div>
                         <div id="seg">
@@ -243,8 +239,9 @@
 
                 </div>
             </div>
-            <div id="linhanews" class="linha2b3" style="display:none;">
-                <input type="file" name="my_files[]" multiple />
+            <div id="linhanews" class="linha2b3" style="display:block;">
+                <label for="myfile" style="font-size: 16px;">Escolha um arquivo...</label>
+                <input type="file" id="myfile" name="myfile" accept="application/pdf">
             </div>
             <div id="linhanicio" class="linha2todas" style="display:none; text-align: center;">
                 <h1>Novidades!!</h1>

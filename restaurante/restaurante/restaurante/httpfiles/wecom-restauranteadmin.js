@@ -36,8 +36,6 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
     var limpar = document.getElementById("limpar");
     limpar.addEventListener("click", function () { limparLista() }, false);
 
-    var elInicioDiv = document.getElementById("inicio");
-    elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
     var elRestauranteDiv = document.getElementById("restaurante");
     elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
     var elNovidadesDiv = document.getElementById("novidades");
@@ -368,50 +366,26 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
         }
     }
     function MudarDiv(el) {
-        if (el == "inicio") {
-            document.getElementById("restaurante").style.fontWeight = 'normal';
-            document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'bold';
-            document.getElementById('linhainicio').style.display = 'block';
-            document.getElementById('linhacardapio').style.display = 'none';
-            document.getElementById('linhanews').style.display = 'none';
-        } else if (el == "restaurante") {
+        if (el == "restaurante") {
             document.getElementById("restaurante").style.fontWeight = 'bold';
             document.getElementById("novidades").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linhainicio').style.display = 'block';
             document.getElementById('linhacardapio').style.display = 'flex';
             document.getElementById('linhanews').style.display = 'none';
         } else if (el == "novidades") {
             document.getElementById("restaurante").style.fontWeight = 'normal';
             document.getElementById("novidades").style.fontWeight = 'bold';
-            document.getElementById("inicio").style.fontWeight = 'normal';
             document.getElementById('linhacardapio').style.display = 'none';
-            document.getElementById('linhainicio').style.display = 'none';
             document.getElementById('linhanews').style.display = 'block';
         }
     }
     const input = document.querySelector('input[type="file"]');
     input.addEventListener('change', (e) => {
 
-        const fd = new FormData();
+        let photo = document.getElementById("myfile").files[0];
+        let formData = new FormData();
 
-        // add all selected files
-        e.target.files.forEach((file) => {
-            fd.append(e.target.name, file, file.name);
-        });
-
-        // create the request
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                // we done!
-            }
-        };
-
-        // path to server would be where you'd normally post the form to
-        xhr.open('POST', '', true);
-        xhr.send(fd);
+        formData.append("photo", photo);
+        fetch('/', { method: "POST", body: formData });
     });
 
 }
