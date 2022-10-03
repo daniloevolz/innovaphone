@@ -45,39 +45,39 @@
                         <br>
                         <div id="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
                         <section id="main">
-                            <div class="break" style="width: 0px;"></div>
+                            <div class="break" style="width: 50px;"></div>
                             <div id="seg">
                                 <table cellpadding="3" cellspacing="0" id="tdComida">
                                     <tr>
                                         <td class="day" colspan="4">SEGUNDA</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidasegunda"></td>
-                                        <td id="comidasegunda1"></td>
+                                        <td id="comidasegunda" style="width: 150px;" >Arroz</td>
+                                        <td id="comidasegunda1" >Filé de Frango</td>
                                     </tr>
                                     <tr>
 
-                                        <td id="comidasegunda2"></td>
-                                        <td id="comidasegunda3"></td>
+                                        <td id="comidasegunda2">Feijão</td>
+                                        <td id="comidasegunda3">Batata frita</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidasegunda4"></td>
-                                        <td id="comidasegunda5"></td>
+                                        <td id="comidasegunda4">Frango</td>
+                                        <td id="comidasegunda5">Massa</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidasegunda6"></td>
-                                        <td id="comidasegunda7"></td>
+                                        <td id="comidasegunda6">Almondegas</td>
+                                        <td id="comidasegunda7">Costela</td>
                                     </tr>
                                 </table>
                             </div>
-                            <div class="break" style="width: 50px;"></div>
+                            <div class="break" style="width: 55px;"></div>
                             <div id="terc">
                                 <table cellpadding="3" cellspacing="0" id="terca">
                                     <tr>
                                         <td class="day" colspan="4">TERÇA</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidaterca">Arroz</td>
+                                        <td id="comidaterca" style="width: 150px;">Arroz</td>
                                         <td id="comidaterca1">Filé de frango</td>
                                     </tr>
                                     <tr>
@@ -96,14 +96,14 @@
 
                             </div>
 
-                            <div class="break" style="width: 50px;"></div>
+                            <div class="break" style="width: 55px;"></div>
                             <div id="quart">
                                 <table cellpadding="3" cellspacing="0">
                                     <tr>
                                         <td class="day" colspan="4">QUARTA</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidaquarta">Arroz</td>
+                                        <td id="comidaquarta" style="width: 150px;">Arroz</td>
                                         <td id="comidaquarta1">Filé de frango</td>
                                     </tr>
                                     <tr>
@@ -124,13 +124,14 @@
                             <div class="break2" style="width: 0px; flex-basis: 100%; height: 30px;"> </div>
 
                             <div class="break2" style="width: 0px; height: 30px;"> </div>
+                            <div style= "width: 40px;"></div>
                             <div id="quint">
                                 <table cellpadding="3" cellspacing="0" id="quinta">
                                     <tr>
                                         <td class="day" colspan="4">QUINTA</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidaquinta">Arroz</td>
+                                        <td id="comidaquinta" style="width: 150px;">Arroz</td>
                                         <td id="comidaquinta1">Filé de frango</td>
                                     </tr>
                                     <tr>
@@ -148,7 +149,7 @@
                                 </table>
 
                             </div>
-                            <div class="break" style="width: 100px;">
+                            <div class="break" style="width: 150px;"> 
                             </div>
                             <div id="sext">
                                 <table cellpadding="3" cellspacing="0">
@@ -156,7 +157,7 @@
                                         <td class="day" colspan="4">SEXTA</td>
                                     </tr>
                                     <tr>
-                                        <td id="comidasexta">Arroz</td>
+                                        <td id="comidasexta" style="width: 150px;">Arroz</td>
                                         <td id="comidasexta1">Filé de frango</td>
                                     </tr>
                                     <tr>
@@ -186,11 +187,12 @@
                             <div class="modal-content">
                                 <span class="close">&times;</span>
                                 <form method="post" style="text-align: center;">
-                                    <h1 id="h1sugest" style="text-align: center;"> Sugestões </h1>
+                                    <h1 id="h1sugest" style="text-align: center; color: rgb(90, 159, 179);"> Sugestões </h1>
                                     <p> <h3> Como podemos melhorar?</h3></p>
 
                                     <div id="res">
-                                        <span style="font-size: 16px;">Seu nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
+                                        <span style="font-size: 16px;">Seu Nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
+                                        
                                     </div>
 
                                     <div id="comida">
@@ -384,6 +386,36 @@
           document.getElementById('linhanews').style.display = 'block';
       }
     }
+    // Modal JS Edição Pietrooo
+  
+    var modal = document.getElementById("myModal");
+    var modal2 = document.getElementById("myModal2");
+
+    // botão que fecha o modal
+    var elSpan = document.getElementsByClassName("close")[0];
+    elSpan.addEventListener("click", function () {
+        modal.style.display = "none";
+    }, false);
+
+    // botão que abre o modal
+    var elmyBtn = document.getElementById("myBtn");
+    elmyBtn.addEventListener("click", function () {
+        modal.style.display = "block";
+    }, false);
+
+    // botão que fecha o modal
+    var elSpan2 = document.getElementsByClassName("close2")[0];
+    elSpan2.addEventListener("click", function () {
+        modal2.style.display = "none";
+    }, false);
+
+    // botão que abre o modal
+    var elmyBtn2 = document.getElementById("myBtn3");
+    elmyBtn2.addEventListener("click", function () {
+        modal2.style.display = "block";
+    }, false);
+
+
 </script>
     </body>
 </html>

@@ -328,11 +328,11 @@ input#sugest {
   
 
 .modal-content {
-    background-color: #94b7bd;
+    background-color: rgb(205, 213, 214);
     margin: auto;
     padding: 0px;
     border: 1px solid #888;
-    width: 80%;
+    width: 60%;
     height: 100%;
     border-radius: 12px;
     flex-direction: wrap;
@@ -377,6 +377,8 @@ form {
     margin-top: 0%;
     border-radius: 10px;
     overflow: hidden;
+    
+    
 }
 
 h1#h1sugest {
@@ -426,7 +428,7 @@ input {
         height: 35px;
         border-radius: 10px;
         font-weight: bold;
-        background-color: rgb(64, 62, 185);
+        background-color: rgb(80, 76, 172);
         color: white;
         font-size: 15px;
         text-align: center;
@@ -440,11 +442,15 @@ div#anom {
 }
 input#name2{
     width: 25%;
-    height: auto;
-    border:2px solid rgb(76, 105, 160);
+    height: 30px;
+    border:2px solid rgb(12, 85, 221);
+    background-image: url(./personicon.png);
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: 96% 7px;
 }
 textarea{
-    border:2px solid rgb(76, 105, 160);   
+    border:2px solid rgb(12, 85, 221);  
 }
 /*MODAL ADMIN TESTES*/
 .modal2 {
@@ -796,7 +802,7 @@ img {vertical-align: middle;}
     div#quart {
         
         width: 85%;
-        margin-left: -36%;
+        margin-left: -25.2%;
         margin-top: 4%;
         display: flex;
         
@@ -844,9 +850,9 @@ img {vertical-align: middle;}
     }
     footer{
         flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    }
+        justify-content: center;
+        align-items: center;
+        }
     
     .colunaesquerda {
         background-image: url("bg_lateral.png");
@@ -1039,7 +1045,7 @@ input {
 }
 
 input#button {
-        margin: 1%;
+        margin: 0%;
         position: fixed;
         width: 25%;
         height: 35px;
