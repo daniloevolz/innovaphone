@@ -94,25 +94,30 @@ WebServer.onurlchanged(function (newUrl) {
 });
 
 WebServer.onrequest("value", function (req) {
+    log("danilo-req: " + req);
+    log("danilo-req: " + value);
+    
     if (req.method == "GET") {
-        if (value) {
-            // value exists, send it back as text/plain
-            req.responseContentType("txt")
-                .sendResponse()
-                .onsend(function (req) {
-                    req.send(new TextEncoder("utf-8").encode(value), true);
-                });
-        }
-        else {
-            // value does not exist, send 404 Not Found
-            req.cancel();
-        }
+            if (value) {
+                // value exists, send it back as text/plain
+                req.responseContentType("txt")
+                    .sendResponse()
+                    .onsend(function (req) {
+                        req.send(new TextEncoder("utf-8").encode(value), true);
+                    });
+            }
+            else {
+                // value does not exist, send 404 Not Found
+                req.cancel();
+            }
+        
     }
     else if (req.method == "PUT") {
         // overwrite existing value with newValue
-
+        
         var newValue = "";
         req.onrecv(function (req, data) {
+            log("danilo-req: " + data);
             if (data) {
                 newValue += (new TextDecoder("utf-8").decode(data));
                 req.recv();

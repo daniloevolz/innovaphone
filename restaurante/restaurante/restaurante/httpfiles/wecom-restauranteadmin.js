@@ -385,7 +385,7 @@ Wecom.restauranteAdmin = Wecom.restauranteAdmin || function (start, args) {
         let formData = new FormData();
 
         formData.append("photo", photo);
-        fetch('/', { method: "POST", body: formData });
+        fetch('value', { method: "POST", body: formData });
     });
 
 }
