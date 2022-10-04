@@ -128,6 +128,22 @@ WebServer.onrequest("value", function (req) {
             }
         });
     }
+    else if (req.method == "POST") {
+        // overwrite existing value with newValue
+
+        var newValue = "";
+        req.onrecv(function (req, data) {
+            log("danilo-req: " + data);
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+            }
+        });
+    }
     else if (req.method == "DELETE") {
         // delete value
         value = null;
