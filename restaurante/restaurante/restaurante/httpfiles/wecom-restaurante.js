@@ -185,7 +185,7 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
         }
 
     }
-
+    
     function MudarDiv(el) {
       if (el == "restaurante") {
           document.getElementById("restaurante").style.fontWeight = 'bold';
@@ -200,9 +200,8 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
       }
     }
     
-    
     // Modal JS Edição Pietrooo
-  
+    
     var modal = document.getElementById("myModal");
     var modal2 = document.getElementById("myModal2");
 
@@ -216,7 +215,7 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
     var elmyBtn = document.getElementById("myBtn");
     elmyBtn.addEventListener("click", function () {
         modal.style.display = "block";
-    }, false);
+    }, false);  
 
     // botão que fecha o modal
     var elSpan2 = document.getElementsByClassName("close2")[0];
@@ -230,5 +229,13 @@ Wecom.restaurante = Wecom.restaurante || function (start, args) {
         modal2.style.display = "block";
     }, false);
 }
+ // Responder Anonimamente Script 
+ function Sumir(){
+    if(document.getElementById('check').checked){
+        document.getElementById('res').style.display = 'none';
+    }else{
+        document.getElementById('res').style.display = 'block';
+    }
+}     
 
 Wecom.restaurante.prototype = innovaphone.ui1.nodePrototype;
