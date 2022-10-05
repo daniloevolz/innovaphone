@@ -861,9 +861,7 @@ img {vertical-align: middle;}
         width: 100%;
         margin-top: 27%;
         width: 100%;
-        
-        
-        
+         
     }
     li {
         padding: 4px;
@@ -957,7 +955,7 @@ img {vertical-align: middle;}
   }
   
   .modal-content {
-    background-color: rgb(169, 211, 218);
+    background-color: rgb(217, 228, 230);
     margin: auto;
     border: 1px solid rgba(0, 255, 242, 0.473);
     width: 100%;

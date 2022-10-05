@@ -185,8 +185,8 @@
                         <button id="myBtn">Sugestões</button>
                         <div id="myModal" class="modal">
                             <div class="modal-content">
-                                <br></br>
-                                <h2><input type="checkbox" id="checkbox"> Deseja responder anonimamente? </h2>
+                                <br>
+                                <h2><input type="checkbox" id="check" onclick="Sumir()"> Deseja responder anonimamente? </h2>
                                 <span class="close">&times;</span>
                                 <form method="post" style="text-align: center;">
                                     <h1 id="h1sugest" style="text-align: center; color: rgb(43, 84, 146);"> Sugestões </h1>
@@ -200,11 +200,11 @@
                                     <div id="comida">
                                         <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
                                         <br><label for="radio" id="radio">
-                                            <input type="radio" name="Muito bom!" value="1">Muito bom!
-                                            <input type="radio" name="Bom!" value="2">Bom!
-                                            <input type="radio" name="Razoável" value="3">Razoável
-                                            <input type="radio" name="Ruim!" value="4">Ruim!
-                                            <input type="radio" name="Muito Ruim!" value="5">Muito ruim!
+                                            <input type="radio" name="group" value="1">Muito bom!
+                                            <input type="radio" name="group" value="2">Bom!
+                                            <input type="radio" name="group" value="3">Razoável
+                                            <input type="radio" name="group" value="4">Ruim!
+                                            <input type="radio" name="group" value="5">Muito ruim!
 
                                         </label>
                                     </div>
@@ -221,6 +221,19 @@
             </div>
         </div>
 <script>
+    // Depois vou apagar todos scripts escritos aqui kk
+
+    // responder anonimamente script test
+    function Sumir(){
+    if(document.getElementById('check').checked){
+        document.getElementById('res').style.display = 'none';
+    }else{
+        document.getElementById('res').style.display = 'block';
+    }
+}                  
+
+
+
     var elRestauranteDiv = document.getElementById("restaurante");
     elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
     var elNovidadesDiv = document.getElementById("novidades");
