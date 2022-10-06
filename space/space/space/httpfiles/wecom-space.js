@@ -227,14 +227,15 @@ Wecom.space = Wecom.space || function (start, args) {
     elmyBtn2.addEventListener("click", function () {
         modal2.style.display = "block";
     }, false);
-}
- // Responder Anonimamente Script 
+} 
+// Responder Anonimamente Script 
  function Sumir(){
     if(document.getElementById('check').checked){
         document.getElementById('res').style.display = 'none';
     }else{
         document.getElementById('res').style.display = 'block';
     }
-}     
+} 
+
 
 Wecom.space.prototype = innovaphone.ui1.nodePrototype;

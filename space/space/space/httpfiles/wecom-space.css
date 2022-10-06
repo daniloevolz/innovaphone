@@ -2,7 +2,7 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    background-image: url(./images/teste2.jpg);
+    background-image: url(./images/imgfundo.jpg);
     overflow-x: hidden;
     overflow: hidden;
     background-repeat: repeat;
@@ -119,7 +119,7 @@ button#duvidas{
   }
 
 
-    /*EDIÇÃO PIETRO DESKTOP RESTAURANTE*/
+/*EDIÇÃO DESKTOP RESTAURANTE*/
 * {
     margin: 0;
     border: 0;
@@ -143,6 +143,7 @@ div#center{
  }
  */
 
+
 header#header1 {
     /*background-color: blue;*/
     text-align: center;
@@ -150,6 +151,9 @@ header#header1 {
     justify-content: center;
     align-items: center;
 }
+
+/*  TABLE  CSS  */
+
 .day{
     background-color: rgb(55, 170, 161);
     text-align: center;
@@ -177,6 +181,7 @@ section#main {
     align-items: center;
    
 }
+
 .colunadireita {
     width: 88%;
     height: 100%;
@@ -190,7 +195,7 @@ align-items: center;
 }
 
 .colunaesquerda {
-    background-image: url("./images/bg_lateral.png");
+    background-image: url("./images/imglateral.png");
     background-size: cover;
     height: 100%;
     width: 12%;
@@ -219,7 +224,7 @@ a {
 
 .linha1 {
     order: 1;
-    background-image: url("./images/money_header.png");
+    background-image: url("./images/imgheader.png");
     background-size: cover;
     width: auto;
     height: auto;
@@ -446,7 +451,7 @@ input#name2{
     width: 25%;
     height: 30px;
     border:2px solid rgb(12, 85, 221);
-    background-image: url(./images/personicon.png);
+    background-image: url(./images/imgperson.png);
     background-size: 20px;
     background-repeat: no-repeat;
     background-position: 96% 7px;
@@ -487,7 +492,7 @@ textarea{
     height: 800%;
     position: fixed;
     border-radius: 0px;
-    background-image: url(./images/teste2.jpg);
+    background-image: url(./images/imgfundo.jpg);
 }
   
   /* Fechar Botão */
@@ -507,7 +512,7 @@ textarea{
     cursor: pointer;
   }
   .colunaesquerda2 {
-    background-image: url("./images/bg_lateral.png");
+    background-image: url("./images/imglateral.png");
     background-size: cover;
     height: 100%;
     width: 12%;
@@ -543,7 +548,7 @@ textarea{
     border-radius: 12px;
     height: 100%;
     overflow: hidden;
-    background-image: url(./images/teste2.jpg);
+    background-image: url(./images/imgfundo.jpg);
 }
   
   /* Fechar Botão */
@@ -588,7 +593,7 @@ textarea{
     border-radius: 12px;
     height: 100%;
     overflow: hidden;
-    background-image: url(./images/teste2.jpg);
+    background-image: url(./images/imgfundo.jpg);
 }
   
   /* Fechar Botão */
@@ -701,7 +706,7 @@ img {vertical-align: middle;}
 
 @media screen and (max-width: 500px) {
     body {
-        background-image: url(./images/teste2-mobile.jpg);
+        background-image: url(./images/imgfundomobile.jpg);
     }
     h3{
         width: 100%;
@@ -857,7 +862,7 @@ img {vertical-align: middle;}
         }
     
     .colunaesquerda {
-        background-image: url("./images/bg_lateral.png");
+        background-image: url("./images/imglateral.png");
         background-size: cover;
         height: 16%;
         width: 100%;
@@ -886,7 +891,7 @@ img {vertical-align: middle;}
     
     .linha1 {
         order: 1;
-        background-image: url("./images/money_header.png");
+        background-image: url("./images/imgheader.png");
         background-size: cover;
         height: auto;
         padding-top: 20px;
