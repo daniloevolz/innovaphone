@@ -342,7 +342,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     }
     // Função referente ao button Limpar dados
     function limparLista() {
-
+        
         var check = document.getElementById("check");
         var check2 = document.getElementById("check1");
         var check3 = document.getElementById("check2")

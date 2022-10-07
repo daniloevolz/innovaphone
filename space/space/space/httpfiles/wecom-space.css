@@ -118,7 +118,6 @@ button#duvidas{
     cursor: pointer;
   }
 
-
 /*EDIÇÃO DESKTOP RESTAURANTE*/
 * {
     margin: 0;
@@ -221,7 +220,6 @@ a {
         font-size: 23px;
     }
 
-
 .linha1 {
     order: 1;
     background-image: url("./images/imgheader.png");
@@ -235,8 +233,6 @@ a {
     
 }
 
-  
-
 .logo-inn{
     width: 20%;
     height: auto;
@@ -245,48 +241,9 @@ a {
 
 }
 
-
-div#seg {
-    
+.tabelas {
     width: 25%;
     display: block;
-   
-    
-}
-
-
-div#terc {
-    
-    width: 25%;
-    display: block;
-    
-    
-}
-
-
-div#quart {
-    
-    width: 25%;
-    display: block;
-    
-    
-}
-
-
-div#quint {
-    
-    width: 25%;
-    
-    display: block;
-    
-}
-
-
-div#sext {
-    
-    width: 25%;
-    display: block;
-    
 }
 
 div {
@@ -333,7 +290,6 @@ input#sugest {
     justify-content: center;
   }
   
-
 .modal-content {
     background-color: rgb(226, 229, 229);
     margin: auto;
