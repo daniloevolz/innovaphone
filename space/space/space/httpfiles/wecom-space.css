@@ -291,7 +291,7 @@ input#sugest {
   }
   
 .modal-content {
-    background-color: rgb(226, 229, 229);
+    background-image: linear-gradient(rgb(143, 207, 207),rgb(201, 164, 154));
     margin: auto;
     padding: 0px;
     border: 1px solid #888;
@@ -391,8 +391,8 @@ input {
         height: 35px;
         border-radius: 10px;
         font-weight: bold;
-        background-color: rgb(80, 76, 172);
-        color: white;
+        background-image: linear-gradient( rgb(17, 94, 156),rgb(118, 223, 209));
+        color: black;
         font-size: 15px;
         text-align: center;
     }
@@ -406,7 +406,7 @@ div#anom {
 input#name2{
     width: 25%;
     height: 30px;
-    border:2px solid rgb(12, 85, 221);
+    border:2px solid rgb(45, 88, 168);
     background-image: url(./images/imgperson.png);
     background-size: 20px;
     background-repeat: no-repeat;
