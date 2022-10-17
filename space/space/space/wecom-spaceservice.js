@@ -20,8 +20,10 @@ new JsonApi("admin").onconnected(function(conn) {
         });
     }
 });
+
+
 new JsonApi("restaurante").onconnected(function (conn) {
-    if (conn.app == "wecom-restaurante") {
+    if (conn.app == "wecom-space") {
         conn.send(JSON.stringify({ api: "restaurante", mt: "SelectMessageResult" }));
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
@@ -41,7 +43,7 @@ new JsonApi("restaurante").onconnected(function (conn) {
         });
         conn.messageComplete();
     }
-    if (conn.app == "wecom-restauranteadmin") {
+    if (conn.app == "wecom-spaceadmin") {
         conn.send(JSON.stringify({ api: "restaurante", mt: "SelectMessageResult" }));
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);

@@ -310,7 +310,6 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
 
             app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta1) + "')" });
             app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta2) + "')" });
-            app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta2) + "')" });
             app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta3) + "')" });
             app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta4) + "')" });
             app.send({ api: "restaurante", mt: "AddMessage", exe: "INSERT INTO cardapio_restaurante(dia, quinta) VALUES('quinta','" + String(quinta5) + "')" });
