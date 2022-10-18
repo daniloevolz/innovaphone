@@ -181,18 +181,12 @@
                     <button id="myBtn">Sugestões</button>
                     <div id="myModal" class="modal">
                         <div class="modal-content">
-                            <br>
-                            <h2><input type="checkbox" id="check" onclick="Sumir()"> Deseja responder anonimamente? </h2>
                             <span class="close">&times;</span>
                             <form method="post" style="text-align: center;">
                                 <h1 id="h1sugest" style="text-align: center; color: rgb(43, 84, 146);"> Sugestões </h1>
-                                <p> <h3> Como podemos melhorar?</h3></p>
-
                                 <div id="res">
-                                    <span style="font-size: 16px;">Seu Nome:</span> <input required type="text" id="name2" placeholder="Digite seu nome">
-                                    
+                                    <span style="font-size: 16px;" id="spanNameUsuario"></span><span style="font-size: 16px;">, como podemos melhorar?</span>
                                 </div>
-
                                 <div id="comida">
                                     <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
                                     <br><label for="radio" id="radio">
@@ -206,12 +200,14 @@
                                 </div>
                                 <div id="sugestoes">
                                     <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-                                    <textarea rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
+                                    <textarea id="textareaSugestao" rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
                                 </div>
+                                <br>
+                                <h2><input type="checkbox" id="check" onclick="Sumir()"> Deseja responder anonimamente? </h2>
 
-                            <input type="submit" value="Enviar!" id="button">
-                        </form>
-                    </div>
+                                <input type="submit" value="Enviar!" id="buttonEnviarAvaliacao">
+                            </form>
+                        </div>
                 </div>
            </footer>
         </div>

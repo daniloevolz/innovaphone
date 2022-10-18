@@ -38,6 +38,7 @@ Wecom.space = Wecom.space || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
+        document.getElementById("spanNameUsuario").innerText = dn;
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });

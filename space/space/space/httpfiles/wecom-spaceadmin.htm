@@ -227,16 +227,11 @@
         <div id="mob">
         <div id="linhanews" class="linha2b3" style="display:block; text-align: center; margin-top: 0%;">
             <h1> Novidades!!</h1>
-            <br></br>
-            <label for="myfile" style="font-size: 20px;">Escolha um arquivo...</label>
-            <input type="file" id="myfile" name="myfile" accept="application/pdf">
+            <form action="/space/value" enctype="multipart/form-data" method="post">
+                <input type="file" name="someCoolFiles"><br>
+                <button>Upload</button>
+            </form>
         </div>
-        </div>
-        <div id="linhanicio" class="linha2todas" style="display:none; text-align: center;">
-            <h1>Novidades!!</h1>
-            <br> </br>
-            <label for="myfile" style="font-size: 16px;">Escolha um arquivo...</label>
-            <input type="file" id="myfile" name="myfile" accept="application/pdf">
         </div>
     </div>
 </div>
