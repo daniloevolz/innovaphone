@@ -40,7 +40,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
-    // falar com Danilo sobre trocar esse api:"restaurante" para o nome correto.  api:"space"??
+    
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });

@@ -22,9 +22,11 @@ div.button {
     text-align:center;
     cursor:pointer;
 }
+
+
 /* RESTAURANTE ADMIN DESKTOP */
 .allinput {
-    width: 100px;
+    width: 150px;
     height: 20px;
     border: 1px solid #3c92a3;
     background-color: rgba(255, 255, 255, 0.233);
@@ -34,7 +36,7 @@ button#myBtn2{
     background-color: #c99164;
     position: absolute;
     margin-left: 3%;
-    height: 70px;
+    height: 50px;
     width: 120px;
     border-radius: 20px;
     text-transform: uppercase;
@@ -47,7 +49,7 @@ button#duvidas{
    position: absolute; 
     margin-top: 40%;
     margin-left: 3%;
-    height: 70px;
+    height: 50px;
     width: 120px;
     border-radius: 20px;
     text-transform: uppercase;
@@ -57,7 +59,7 @@ button#duvidas{
    position: absolute; 
     background-color: #c24747;
     width: 120px;
-    height: 70px;
+    height: 50px;
     margin-left: 3%;
     border-radius: 20px;
     font-weight: bold;
@@ -68,7 +70,7 @@ button#duvidas{
     position: absolute; 
     background-color: #7cbb63;
     width: 120px;
-    height: 70px;
+    height: 50px;
     margin-left: 3%;
     border-radius: 20px;
     font-weight: bold;
@@ -291,15 +293,17 @@ input#sugest {
   }
   
 .modal-content {
-    background-image: linear-gradient(rgb(143, 207, 207),rgb(201, 164, 154));
+    background-image: linear-gradient(rgb(142, 189, 189),rgb(202, 176, 169));
     margin: auto;
     padding: 0px;
     border: 1px solid #888;
     width: 60%;
-    height: 100%;
+    height: 94%;
     border-radius: 12px;
     flex-direction: wrap;
     justify-content: center;
+    margin-top: 16px;
+    
     
 }
   
@@ -310,6 +314,7 @@ input#sugest {
     font-size: 50px;
     padding-right: 20px;
     font-weight: bold;
+    height: 30px;
   }
   
   .close:hover,
@@ -385,17 +390,14 @@ textarea {
 input {
     border-radius: 5px;
 }
-    input#button {
-        margin: 1%;
-        width: 17%;
-        height: 35px;
-        border-radius: 10px;
-        font-weight: bold;
-        background-image: linear-gradient( rgb(17, 94, 156),rgb(118, 223, 209));
-        color: black;
-        font-size: 15px;
-        text-align: center;
-    }
+#buttonEnviarAvaliacao{
+    height: 30px;
+    width: 100px;
+    color: #000;
+    font-weight: bold;
+    background-color:rgb(87, 170, 156);
+   
+}
 
 div#anom {
     font-size: 20px;
