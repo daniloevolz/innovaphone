@@ -42,7 +42,11 @@ button#myBtn2{
     text-transform: uppercase;
     font-weight: bold;
 }
-
+button#uploadpdf{
+    background-color: #79b4c0;
+    font-weight: bold;
+    border-radius: 10px;
+}
 
 button#duvidas{
     background-color: #76b4c0;
