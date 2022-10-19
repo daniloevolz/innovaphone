@@ -46,7 +46,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
-        app.send({ mt: "DbFilesList", src: "wecom-spaceadmin", name:"news", folder:"0"});
+        app.send({ mt: "DbFilesList", src: "news", name:"news", folder:"0"});
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });
@@ -384,16 +384,62 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
-    const uploadbtn = document.getElementById('uploadpdf');
-    uploadbtn.addEventListener('click', (e) => {
+    // Select your input type file and store it in a variable
+    const input = document.getElementById('myfile');
 
-        let photo = document.getElementById("myfile").files[0];
-        let formData = new FormData();
+    // This will upload the file after having read it
+    const upload = (file) => {
+        fetch('?dbfiles=news&folder=0&name=news&key=' + sessionKey, { // Your POST endpoint
+            method: 'POST',
+            headers: {
+                // Content-Type may need to be completely **omitted**
+                // or you may need something
+                "Content-Type": "application/pdf"
+            },
+            body: file // This is your file object
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    };
 
-        formData.append("photo", photo);
-        fetch('?dbfiles=news&folder=0&name=news.pdf&key=' + sessionKey, { method: "POST", body: formData });
-    });
+    // Event handler executed when a file is selected
+    const onSelectFile = () => upload(input.files[0]);
+
+    // Add a listener on your input
+    // It will be triggered when a file will be selected
+    input.addEventListener('change', onSelectFile, false);
+
+    
+    //const uploadbtn = document.getElementById('uploadpdf');
+    //uploadbtn.addEventListener('click', (e) => {
+
+        //let photo = document.getElementById("myfile").files[0];
+        //let formData = new FormData();
+
+        //formData.append("photo", photo);
+        //fetch('?dbfiles=news&folder=0&name=news.pdf&key=' + sessionKey, { method: "POST", photo });
+    //});
 // Edição Pietro
 
 // Modal JS Edição Pietro
