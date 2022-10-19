@@ -30,6 +30,9 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
+    console.log(sessionKey);
+
     var atualizar = document.getElementById("atualizar");
     atualizar.addEventListener("click", function () { insertTable() }, false);
 
@@ -43,6 +46,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
+        app.send({ mt: "DbFilesList", src: "wecom-spaceadmin", name:"news", folder:"0"});
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });
@@ -51,6 +55,8 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     }
 
     function app_message(obj) {
+        console.log("log-danilo: "+obj);
+
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
         }
         if (obj.api == "restaurante" && obj.mt == "MessageError") {
@@ -377,6 +383,8 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
             document.getElementById('linhanews').style.display = 'block';
         }
     }
+
+    sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
     const uploadbtn = document.getElementById('uploadpdf');
     uploadbtn.addEventListener('click', (e) => {
 
@@ -384,7 +392,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
         let formData = new FormData();
 
         formData.append("photo", photo);
-        fetch('http://10.10.20.198:8080/fileupload', { method: "POST", body: formData });
+        fetch('?dbfiles=news&folder=0&name=news.pdf&key=' + sessionKey, { method: "POST", body: formData });
     });
 // Edição Pietro
 

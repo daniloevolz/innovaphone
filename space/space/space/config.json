@@ -67,6 +67,17 @@
             "type": "TEXT"
           }
         ]
+      },
+      {
+        "cmd": "table",
+        "name": "news_space",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          }
+        ]
       }
     ]
   },
@@ -75,7 +86,7 @@
       {
         "cmd": "start",
         "name": "news",
-        "folder": "BIGINT REFERENCES news(id) ON DELETE CASCADE"
+        "folder": "BIGINT REFERENCES news_space(id) ON DELETE CASCADE"
       }
     ]
   },

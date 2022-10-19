@@ -149,5 +149,8 @@
       <ProjectType>JSAPP</ProjectType>
       <SDKVersion>13r2</SDKVersion>
     </innovaphone>
+    <VisualStudio>
+      <UserProperties space_4config_1json__JsonSchema="" />
+    </VisualStudio>
   </ProjectExtensions>
 </Project>
