@@ -377,14 +377,14 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
             document.getElementById('linhanews').style.display = 'block';
         }
     }
-    const input = document.querySelector('input[type="file"]');
-    input.addEventListener('change', (e) => {
+    const uploadbtn = document.getElementById('uploadpdf');
+    uploadbtn.addEventListener('click', (e) => {
 
         let photo = document.getElementById("myfile").files[0];
         let formData = new FormData();
 
         formData.append("photo", photo);
-        fetch('/', { method: "POST", body: formData });
+        fetch('http://10.10.20.198:8080/fileupload', { method: "POST", body: formData });
     });
 // Edição Pietro
 
