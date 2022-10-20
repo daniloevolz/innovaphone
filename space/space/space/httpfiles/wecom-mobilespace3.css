@@ -1,14 +1,15 @@
-@media  screen and (max-width: 1000px) and (min-width: 601px){
+@media  screen and (max-width: 600px) and (min-width: 501px) {
     body {
         background-image: url(./images/imgfundomobile.jpg);
         overflow-y: auto;
     }
-    .tdwidth{
-        width: 400px;
-    }
     h3{
         width: 100%;
     }
+    .tdwidth{
+        width: 320px;
+    }
+
     h1{
         font-family: 'Arial';
         margin-top: 1%;
@@ -21,7 +22,7 @@
 
     #iframemobile{
         display: block;
-        margin-top: 11%;
+        margin-top: 17%;
     }
 
    div#mob{
@@ -69,7 +70,6 @@
     div#seg {
         width: 85%;
         margin-left: -36%;
-        display: block;
         
     }
     h1{
@@ -90,12 +90,14 @@
         margin-left: -0.8%;
         width: 95%;
     }
+    
+
     div#terc {
         
         width: 89%;
         margin-left: -30%;
         margin-top: 4%;
-        display: block;
+        display: flex;
         
 
        
@@ -106,23 +108,24 @@
     div#quart {
         
         width: 85%;
-        margin-left: -31.2%;
+        margin-left: -27.9%;
         margin-top: 4%;
         display: block;
         
     }
-
+    .tabelas{
+        display: block;
+    }
     
     div#quint {
         
         width: 85%;
-        margin-left: -30.2%;
+        margin-left: -30%;
         margin-top: 4%;
-        display: block;
+        display: flex;
         
         
     }
-
     .break2{
         display: none;
     }
@@ -133,9 +136,9 @@
     div#sext {
         
         width: 85%;
-        margin-left: -36.5%;
+        margin-left: -36%;
         margin-top: 4%;
-        display: block;
+        display: flex;
        
     }
     section#main {
@@ -164,7 +167,7 @@
         background-size: cover;
         height: 16%;
         width: 100%;
-        margin-top: 13.6%;
+        margin-top: 25%;
         width: 100%;
          
     }
@@ -194,13 +197,13 @@
         height: auto;
         padding-top: 20px;
         padding-left: 30px;
-        padding-bottom: 20px;
+        padding-bottom: 24px;
         width: 100%;
         
     }
 
     .logo-inn{
-        width: 25%;
+        width: 44%;
         height: auto;
         padding-bottom: 5px;
         
@@ -233,7 +236,7 @@
     }
 
     div#all {
-        margin-top: 15%;
+        margin-top: 23%;
         width: 100%;
        
     }
@@ -266,7 +269,6 @@
     width: 95%;
     border-radius: 12px;
     height: 90%;
-    
  }
   
   /* FECHAR BOTÃO */
@@ -367,4 +369,5 @@ div#anom {
     margin-top: 2%;
     margin-left: 2%;
 }
+
 }
