@@ -36,6 +36,7 @@ Wecom.space = Wecom.space || function (start, args) {
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
 
+    
 
     function app_connected(domain, user, dn, appdomain) {
         document.getElementById("spanNameUsuario").innerText = dn;
@@ -227,7 +228,11 @@ Wecom.space = Wecom.space || function (start, args) {
     elmyBtn2.addEventListener("click", function () {
         modal2.style.display = "block";
     }, false);
+
+
+
 } 
+
 // Responder Anonimamente Script 
  function Sumir(){
     if(document.getElementById('check').checked){

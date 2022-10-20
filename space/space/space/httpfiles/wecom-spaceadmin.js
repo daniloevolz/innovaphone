@@ -44,9 +44,12 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
     
+    
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ mt: "DbFilesList", src: "news", name:"news", folder:"0"});
+        app.send({ api: "restaurante", mt: "SelectEvaluation", name: "nome", rate: "avaliacao", sugest: "comentario"});
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });

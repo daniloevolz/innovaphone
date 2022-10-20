@@ -1,10 +1,13 @@
-@media  screen and (max-width: 601px) and (min-width: 401px) {
+@media  screen and (max-width: 500px) and (min-width: 401px) {
     body {
         background-image: url(./images/imgfundomobile.jpg);
         overflow-y: auto;
     }
     h3{
         width: 100%;
+    }
+    .tdwidth{
+        width: 250px;
     }
     h1{
         font-family: 'Arial';
@@ -232,7 +235,7 @@
     }
 
     div#all {
-        margin-top: 33%;
+        margin-top: 26%;
         width: 100%;
        
     }
@@ -262,7 +265,7 @@
     background-color: rgb(217, 228, 230);
     margin: auto;
     border: 1px solid rgba(0, 255, 242, 0.473);
-    width: 100%;
+    width: 95%;
     border-radius: 12px;
     height: 90%;
  }
