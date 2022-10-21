@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteTarget>846713302;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteTarget>-1911174340;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
     <RemoteDebuggerCommandArguments>--app-name=iptv --app-domain=wecom.com.br --app-password=pwd --webserver-path=iptv --db-name=iptv --db-user=iptv --db-password=iptv --service-id=iptv</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
