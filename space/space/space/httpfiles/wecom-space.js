@@ -79,7 +79,7 @@ Wecom.space = Wecom.space || function (start, args) {
                         document.getElementById("comidasegunda6").innerText = "";
                         document.getElementById("comidasegunda7").innerText = "";
                     }
-
+    
                     break;
                 case 'terca':
                     console.log('ter�a');
