@@ -30,33 +30,60 @@ div.button {
     height: 20px;
     border: 1px solid #3c92a3;
     background-color: rgba(255, 255, 255, 0.233);
-}
-button#myBtn2{
-    margin-top: 220%;
-    background-color: #c99164;
-    position: absolute;
-    margin-left: 3%;
-    height: 50px;
-    width: 120px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-button#uploadpdf{
+
+}button#uploadpdf{
     background-image: linear-gradient(rgb(194, 152, 137),rgb(79, 189, 226));
     font-weight: bold;
     border-radius: 10px;
     height: 30px;
     width: 90px;
 }
+/* Edição Pietro */
+.truetable{
+    border: 2px solid ;
+    text-align: center;
+    width: 100%;
+    padding: 5px;
+   
+}
+th{
+    border: 2px solid;
+    text-align: center;
+}
+thead{
+    font-weight: bold;
+}
+
+th:first-child { width: 0% }
+th:first-child + th {  width: 20%;}   
+th:first-child + th + th{  width: 20%; }
+th:first-child + th + th + th{  width: 50%; }
+
+
+table{
+    border-collapse: collapse;
+}
+
+button#myBtn2{
+    margin-top: 220%;
+    background-color: #c99164;
+    position: absolute;
+    margin-left: 3%;
+    height: 50px;
+    width: 115px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
 
 button#duvidas{
     background-color: #76b4c0;
-   position: absolute; 
+    position: absolute; 
     margin-top: 40%;
     margin-left: 3%;
     height: 50px;
-    width: 120px;
+    width: 115px;
     border-radius: 20px;
     text-transform: uppercase;
     font-weight: bold;
@@ -64,7 +91,7 @@ button#duvidas{
 #limpar{
    position: absolute; 
     background-color: #c24747;
-    width: 120px;
+    width: 115px;
     height: 50px;
     margin-left: 3%;
     border-radius: 20px;
@@ -75,7 +102,7 @@ button#duvidas{
 #atualizar{
     position: absolute; 
     background-color: #7cbb63;
-    width: 120px;
+    width: 115px;
     height: 50px;
     margin-left: 3%;
     border-radius: 20px;
@@ -160,7 +187,9 @@ header#header1 {
 }
 
 /*  TABLE  CSS  */
-
+.tdwidth{
+    width: 150px;
+}
 .day{
     background-color: rgb(55, 170, 161);
     text-align: center;
@@ -391,6 +420,7 @@ textarea {
     width: 50%;
     height: 100px;
     border-radius: 10px;
+
 }
 
 input {
@@ -401,7 +431,7 @@ input {
     width: 100px;
     color: #000;
     font-weight: bold;
-    background-color:rgb(87, 170, 156);
+    background-color:rgb(97, 192, 175);
    
 }
 
@@ -676,6 +706,7 @@ img {vertical-align: middle;}
     h3{
         width: 100%;
     }
+    
     h1{
         font-family: 'Arial';
         margin-top: 1%;
@@ -690,7 +721,7 @@ img {vertical-align: middle;}
         display: block;
         margin-top: 22%;
     }
-
+    
    div#mob{
         display:block; 
         text-align: center;
@@ -768,15 +799,13 @@ img {vertical-align: middle;}
 
        
     }
-
-    
-
+   
     div#quart {
         
         width: 85%;
         margin-left: -25.7%;
         margin-top: 4%;
-        display: block;
+        display: flex;
         
     }
     .tabelas{
@@ -902,7 +931,7 @@ img {vertical-align: middle;}
     }
 
     div#all {
-        margin-top: 33%;
+        margin-top: 32%;
         width: 100%;
        
     }
@@ -932,7 +961,7 @@ img {vertical-align: middle;}
     background-color: rgb(217, 228, 230);
     margin: auto;
     border: 1px solid rgba(0, 255, 242, 0.473);
-    width: 100%;
+    width: 95%;
     border-radius: 12px;
     height: 90%;
  }
