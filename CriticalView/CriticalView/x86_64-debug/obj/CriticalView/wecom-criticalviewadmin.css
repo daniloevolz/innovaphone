@@ -1,0 +1,133 @@
+﻿
+body {
+    background-color: var(--bg);
+    color: var(--text-standard);
+    font-family: arial;
+}
+/*Edição danilo*/
+.vjs-modal-dialog-content {
+    z-index: 0;
+}
+td {
+    text-align: start; /* alinhamento horizontal */
+    vertical-align: middle; /* alinhamento vertical */
+}
+
+div.button {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+input[type="checkbox"] {
+    display: block;
+}
+
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+a {
+    align-self: end;
+    text-decoration: none;
+    display: flex;
+    padding: 20.4px 4px;
+    color: #a80939;
+    /*COR ORIGINAL DO MENU:*/ /*color: #b60c3f;*/
+    font-weight: bold;
+    width: 100%;
+    margin-left: 13%;
+}
+
+
+
+label {
+    padding: 15px;
+    position: absolute;
+    z-index: 10;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 25px;
+    height: 25px;
+    align-self: center;
+}
+
+/*Edição danilo*/
+
+/* Edição Pietro */
+.tdborder{
+    border: 1px solid ;
+    text-align: center; 
+}
+.tdborder2{
+    border: 1px solid ;
+    text-align: center;
+}
+.tdborder3{
+    border: 1px solid ;
+    text-align: center;
+}
+.tdborder4{
+    border: 1px solid ;
+    text-align: center;
+}
+.tdborder5{
+    border: 1px solid ;
+    text-align: center;
+}
+.truetable{
+    border: 3px solid ;
+    text-align: center;
+    margin: auto;
+    width: 65%;
+    margin-top: 2%;
+}
+
+th{
+    border: 2px solid;
+    text-align: center;
+}
+.btn {
+    display: flex;
+    margin-top: 0.3%;
+}
+#divbtn {
+    text-align: center;
+}
+
+td:first-child { width: 0% }
+td:first-child + td {  width: 20%;}   
+td:first-child + td + td {  width: 20%; }
+td:first-child + td + td + td{  width: 50%; }
+td:first-child + td + td + td + td{  width: 5%; }
+
+table{
+    border-collapse: collapse;
+}
+/* Edição Pietro */

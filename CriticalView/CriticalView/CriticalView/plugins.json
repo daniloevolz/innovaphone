@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.criticalviewmanager",
+            "icon": "wecom-criticalview.png",
+            "lang": "wecom.criticalviewmanagertexts",
+            "domains": false
+        }
+    ]
+}

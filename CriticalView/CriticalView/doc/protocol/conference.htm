@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - conference protocol</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>Conference protocol</h1>
+
+    <p>
+        The protocol described in this article is used between the PBX conference object in the PBX and a conference interface.
+        It's purpose is to handle additional calls from a client endpoint to the conference interface. This calls are established to handle more than one video streams from the conference interface.
+        The following facility messages are currently known:
+        <ul>
+            <li>Video setup</li>
+            <li>Video connect</li>
+        </ul>
+    </p>
+
+    <a name="FacilityObjects"><h2>Facility objects</h2></a>
+    <p>
+        Depending on the value of the type property, different objects are defined. The following
+        types are known:
+        <table>
+            <tr><td><a href="#fty_video_setup">video_setup</a></td><td>Video setup</td></tr>
+            <tr><td><a href="#fty_video_conn">video_conn</a></td><td>Video connect</td></tr>
+        </table>
+    </p>
+
+    <a name="fty_video_setup"><div class="fnhead">Video setup facility</div></a>
+    <p>
+        This facility marks the call as a video call, informs about the direction and requests optionally a individual video stream with a given id.
+        The bitrate argument informs about the own quality capability or the quality of a requested stream.
+    </p>
+    <pre><code class="json">{
+    "type": "video_setup",
+    "mode": <a href="#video_direction_mode">Video Direction Mode</a>,
+    "guid": string,
+    "id": unsigned,
+    "bitrate": unsigned,
+}</code></pre><br/>
+
+    <a name="video_direction_mode"><div class="fnhead">Video Direction Mode</div></a>
+    <p>
+        This is a string defining the mode of the video direction. The following values are defined for this property:
+        <table>
+            <tr><td><b>send</b></td><td>The call sends only video.</td></tr>
+            <tr><td><b>recv</b></td><td>The call receives only video.</td></tr>
+            <tr><td><b>sendrecv</b></td><td>The call sends and receives video.</td></tr>
+        </table>
+    </p>
+
+    <a name="fty_video_conn"><div class="fnhead">Video connect facility</div></a>
+    <p>
+        This facility informs about the guid and video stream id and is an optional response to a created video channel or a message to set the requested stream quality.
+    </p>
+    <pre><code class="json">{
+    "type": "video_conn",
+    "guid": string,
+    "id": unsigned,
+    "bitrate": unsigned,
+}</code></pre><br/>
+
+</body>
+</html>

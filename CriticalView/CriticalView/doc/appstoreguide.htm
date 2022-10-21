@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone App SDK</title>
+    <link rel="stylesheet" href="../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../web1/doc/vs.css">
+    <script src="../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+    <h1 id="app-store-guide">App Store Guide</h1>
+    <p>The scope of this article are the technical aspects and the required steps to publish your own App for innovaphone myApps App Platform on the <a href="https://store.innovaphone.com">innovaphone App Store</a>.</p>
+
+    
+    <h2>Table of Contents</h2>
+    <dl>
+        <dt><a href="#prerequisites">Prerequisites</a></dt>
+        <dd>
+            An overview of required steps.
+        </dd>
+        <dt><a href="#app-id-texts-and-icons">App-ID, Texts and Icons</a></dt>
+        <dd>
+            App Store related metadata.
+        </dd>
+        <dt><a href="#app-binaries">App Binaries</a></dt>
+        <dd>
+            App binary files.
+        </dd>
+        <dt><a href="#local-app-store-instance">Local App Store Instance</a></dt>
+        <dd>
+            Local developer App Store instance required for deployment.
+        </dd>
+        <dt><a href="#app-entry-in-the-local-app-store">App Entry in the Local App Store</a></dt>
+        <dd>
+            App Entry in the local App Store.
+        </dd>
+        <dt><a href="#publish-a-new-version-of-the-app">Publish a new Version of the App</a></dt>
+        <dd>
+            Publishing of a new version of the binary files.  
+        </dd>
+        <dt><a href="#notify-innovaphone-3rd-party-team">Notify innovaphone 3rd-Party Team</a></dt>
+        <dd>
+            Notification request for App Review and Publishing.
+        </dd>
+        <dt><a href="#troubleshooting">Troubleshooting</a></dt>
+        <dd>
+            Troubleshooting hints.
+        </dd>
+    </dl>
+
+    
+    <h2 id="prerequisites">Prerequisites</h2>
+    <p>In order to successfully publish an App a number of necessary preparation requirements must be fulfilled:</p>
+    <ul>
+        <li>Preparation of the App-ID, Icons and Texts</li>
+        <li>Preparation of the App Binaries</li>
+        <li>Configuration of the App Store Instance</li>
+    </ul>
+    <p>In the course of this article, we will take a closer look at the individual steps.</p>
+    
+
+    <h2 id="app-id-texts-and-icons">App-ID, Texts and Icons</h2>
+    <p>This chapter covers various settings that are relevant for an App Store entry.</p>
+    <h3 id="app-id">App-ID</h3>
+    <p>As a unique identifier of your app in the innovaphone App Store an App-ID must be defined. The App-ID must contain a manufacturer name followed by the app name, separated by a dash, e.g.: <code>company-application</code></p>
+    <p>The App-ID is also used in the folder structure of a web server to point the App Store to the relevant files of the App.</p>
+    <p>The App-ID is also used in <a href="licensing.htm">the naming scheme of the license</a> of the App.</p>
+    <h3 id="manufacturer">Manufacturer</h3>
+    <p>The manufacturer ID is defined while running through the innovaphone SDK Setup under the <em>"source-code" company name</em> field and is used to create new App projects in Visual Studio in the App templates for C++ and JavaScript. This ID is also used as prefix in the App-ID, App binary name etc.</p>
+    <h3 id="texts">Texts</h3>
+    <p>An App Store entry contains various text fields that must be filled with relevant information:</p>
+    <ul>
+        <li><strong>Description</strong> - a marketing relevant description of the App, should contain at least an english version of the description</li>
+        <li><strong>Info-Link</strong> - a URL to the manufacturer info website for this app</li>
+        <li><strong>Support Info</strong> - contact information for the support of this app</li>
+        <li><strong>License Information</strong> - in case a license is required, license related information that is displayed to the user</li>
+        <li><strong>End User License Agreement</strong> - a license text that must be accepted prior installation of the App on the App Platform</li>
+        <li><strong>Languages</strong> - list of languages, supported by the App</li>
+        <li><strong>Categories</strong> - at least single or multiple categories relevant for the App</li>
+    </ul>
+    <h3 id="icons">Icons</h3>
+    <p>Despite the icons used in the App itself for the myApps UI, an additional icon for the App Store is required. This icon must have a resolution of 110x110 pixels and be in PNG format.</p>
+    
+
+    <h2 id="app-binaries">App Binaries</h2>
+    <p>The binaries of the Apps have the following properties, which are relevant in connection with the publication on the App Store and are defined at the compilation time:</p>
+    <ul>
+        <li><strong>App Project Name</strong> - is defined by the VS project name that was used to create this App and is also used as the name of the executable binary file while developing the App</li>
+        <li><strong>Build Number</strong> - specifies a consecutive version number, which allows a unique assignment of the version of the App, so it is used by the AP Manager and Devices App to detect newer Versions of the App</li>
+        <li><strong>Release State Label</strong> - specifies a label for the build (e.g. beta1, final, hotfix2, sr3) that is used to identify the version</li>
+        <li><strong>Target Platform</strong> - specifies a target platform architecture of the binary file</li>
+        <li><strong>innovaphone SDK Version</strong> - is defined by the innovaphone SDK version that was used to build this App</li>
+    </ul>
+    <h3 id="app-project-name">App Project Name</h3>
+    <p>We recommend to use preferably short, lowercase strings as name for the Visual Studio project, while creating an App from template. This string will be used later in URLs and in the folder structure of the App Store related web server, so it should contain only URL-safe characters.</p>
+    <p>Instead using a space in the name, consider to use a dash and eliminate any other non-alphanumeric characters.</p>
+    <blockquote>
+        <p>For example, instead of using <code>Fancy App</code> as project name, consider to use <code>fancy-app</code> or even better <code>fancyapp</code></p>
+    </blockquote>
+    <p>At the end the project name, prefixed by the manufacturer name, will be used for App-ID, App License, App Binary Name etc.</p>
+    <h3 id="build-number">Build Number</h3>
+    <p>The build number should be an incrementing integer number. This number will be used in the file structure of the App Store. To avoid increasing the number of digits in the build number, we recommend to start from higher numbers like 1000.</p>
+    <p>For every consecutive version of the App, that should be released, a larger build number should be used.</p>
+    <h3 id="release-state-label">Release State Label</h3>
+    <p>The Release State Label is a human readable label of a version, that can be identified by a user and should be unique in the domain of a major SDK release version.</p>
+    <blockquote>
+        <p>E.g. a release state label <code>hotfix3</code> in <code>V13r2</code>  represents a third hotfix for the App, that was build for V13r2 App Platform</p>
+    </blockquote>
+    <h3 id="target-platform-and-sdk-version">Target Platform and SDK Version</h3>
+    <p>The binaries should be built using current service release of the innovaphone SDK V13r2 with following platforms as targets for the build:</p>
+    <ul>
+        <li>arm</li>
+        <li>arm64</li>
+        <li>x86_64</li>
+    </ul>
+    <p>This will make sure the App can be used on all types of AP capable innovaphone Gateways and Virtual Appliances.</p>
+    <h3 id="building-the-app-binaries-for-the-release">Building the App Binaries for the Release</h3>
+    <p>In contrast to the development builds via Visual Studio (Build solution) the binaries for the release on the App Store should have set correct values for the buid number, a release state label and manufacturer prefix in the file names.</p>
+    <p>The Visual Studio project created from a template in the innovaphone SDK contains a batch script <code>build-release.bat</code> that can be used to build the App binaries with specific build numbers and release state labels for all platforms.</p>
+    <p>For example, to build release binaries from an App <code>demoapp</code> with the build number <code>1002</code> and release state label <code>sr2</code> use following command:</p>
+        <pre><code class="language-bat">C:\projects\demoapp\demoapp&gt;build-release.bat 1002 sr2 company
+    </code></pre>
+    <p>The third command line parameter should match the <em>Manufacturer</em> value used while creating the app entry. If set properly in the bat file directly, the third command line parameter can be omitted.</p>
+    <p>Execute the script from the command line in the project folder. The resulting builds will be placed in the project folder, in the subfolder <code>release</code> in the corresponding platform subfolders (arm, arm64, x86_64).</p>
+    <p>It is recommended to perform <em>Clear solution</em> in the Visual Studio before running the script.</p>
+    <h3 id="binaries-for-javascript-runtime-based-apps">Binaries for JavaScript Runtime based Apps</h3>
+    <p>In a special case of a JavaScript Runtime based App a so called <em>generic</em> binary (same for all JavaScript Runtime Apps) is supplemented by a custom ZIP file (httpfiles.zip) with a JavaScript implementation of the App. For the JavaScript Runtime based App Service the generic App binaries from the current service release should be used. This can be achieved by installing SDK from the current Service Release.</p>
+    <p>The JavaScript Runtime binaries that are used to build a JavaScript Runtime App are located in the sub-folder <code>jse</code> of the Visual Studio Project.</p>
+    <p>In order to update a JavaScript Runtime version, download the current JavaScript Runtime App from the innovaphone App Store and place the binaries into the <code>jse</code> of your project (replace older binaries).</p>
+    <h3 id="debug-files">Debug Files</h3>
+    <p>While building a binary, a separate <code>.debug</code> file for GDP is created. This file is useful to analyse the crash dumps, to be able to attach a debugger and see the exception and the stack trace.</p>
+    <p>However, debug files enables easier reverse engineering of your binaries. Please consider it, while deciding to deliver debug files with binaries, or not.</p>
+    
+
+    <h2 id="local-app-store-instance">Local App Store Instance</h2>
+    <p>A local App Store instance is used to prepare an App Store entry for your App and to deploy it to the innovaphone Release App Store. It must be hosted at an innovaphone App Platform and be reachable via an HTTPS URL.</p>
+    <p>This chapter provides a detailed description of a process of setting up a local App Store. In case a local App Store is already running or a hosted App Store is used, the current chapter can be skipped.</p>
+    <h3 id="prepare-local-web-server">Prepare Local Web Server</h3>
+    <p>The App Store relies on a web server which should be reachable from the App Store instance via HTTP, in order the files for the App can be fetched into the App Store instance.</p>
+    <p>A following folder structure is expected by the Store App:</p>
+        <pre><code class="language-cpp">&lt;http-path-to-root-folder-of-the-app&gt;/&lt;build-number&gt;/&lt;platform&gt;/&lt;icon-binary-debug-zip-file&gt;
+    </code></pre>
+
+    <p>The file tree with essential folders:</p>
+        <pre><code>+-- build-number
+|   +--app_files-file
+|   +-- platform-folder
+|       +-- sub-folder
+|           +-- binary-files
+    </code></pre>
+    <p>The file tree of the app folder should look like this:</p>
+        <pre><code>+-- 1001
+|   +-- innovaphone-demoapp_files
+|   +-- arm
+|       +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp.png
+|           +-- innovaphone-demoapp.debug
+|   +-- arm64
+|       +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp.png
+|           +-- innovaphone-demoapp.debug
+|   +-- x86_64
+|       +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp.png
+|           +-- innovaphone-demoapp.debug
++-- 1002
+|   +-- innovaphone-demoapp_files
+|   +-- arm
+|       +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp
+|           +-- innovaphone-demoapp.png
+|           +-- innovaphone-demoapp.debug
+...
+    </code></pre>
+    <p>For example, the icon file should be reachable via following URL:
+    <code>http://web.example.com/appreleases/demoapp/1002/arm/innovaphone-demoapp/innovaphone-demoapp.png</code></p>
+    <p>The file <code>innovaphone-demoapp_files</code> contains a comma separated list of binary files of the App.</p>
+    <p>For example (notice no spaces between the filenames):</p>
+        <pre><code class="language-cpp">innovaphone-demoapp,innovaphone-demoapp.debug,innovaphone-demoapp.png,httpfiles.zip
+    </code></pre>
+    <h3 id="setup-local-app-store">Setup Local App Store</h3>
+    <p>The local App Store App must be installed on an innovaphone App Platform as all other apps.</p>
+    <p>At the moment the latest version of the App Store App (13r3 beta1), that is compatible to the official innovaphone App Store, is available on the Beta Store (https://store.innovaphone.com/beta/download.htm). Therefore, to be able to install this version of the App Store App the <em>App Store URL</em> on your App Platform must be set to <code>https://store.innovaphone.com/beta/download/apps.json</code> (configurable under <em>Settings</em> on AP Manager).</p>
+
+    <p>To install the App Store App on your local App Platform, perform following steps:
+    <ul>
+        <li>login to the AP Manager via web browser</li>
+        <li>install the <em>App Store</em> App from the innovaphone App Store</li>
+        <li>add a new App Store instance with following parameters:
+            <ul>
+                <li>the <em>Name</em> of the instance: use lowercase, no spaces, only URL safe characters</li>
+                <li>the <em>Domain</em> of the instance: should be the same as domain for the PBX. In case no PBX is used, set some URL safe value, like <code>company-name.com</code>, since this will be a part of a web server path</li>
+                <li>the <em>Password</em> for the instance and the database</li>
+                <li>left <em>Database name</em> and <em>Database user</em> unchanged</li>
+            </ul>
+        </li>
+        <li>start an instance</li>
+    </ul>
+    </p>
+    <p><img src="pics/HowtoAppStore_start_local_appstore_instance.png" alt="start an app store instance"/></p>
+    <p>When an empty <em>Apps</em> screen appears the App Store is ready to be equipped with your app.</p>
+    
+
+    <h2 id="app-entry-in-the-local-app-store">App Entry in the Local App Store</h2>
+    <p>In this example an App with the App-ID <code>innovaphone-demoapp</code> is used.</p>
+    <p>To add a new App Store entry, click on plus (+) symbol in the right top corner of the App Store App. The <em>Add new app</em> window will appear.</p>
+    <p>In the <em>Edit App</em> window provide the corresponding settings for the App:</p>
+    <ul>
+        <li><strong>Icon</strong> - the icon of the App is added to the entry by clicking on the plus (+) button (optional, if icon is available from the web server)</li>
+        <li><strong>Title</strong> - the title of the App as displayed on the App Store. It can include spaces an url-unsafe characters</li>
+        <li><strong>Manufacturer</strong> - the name of the company, that developed the App. It should be the same manufacturer name, used to create an App in the Visual Studio and must contain only URL-safe characters</li>
+        <li><strong>ID</strong> - the App-ID is a unique identification of the App on the  App Store</li>
+        <li><strong>Folder</strong> - the name of the sub-folder in the platform specific build directory, that contains the binary files</li>
+        <li><strong>Binary</strong> - the filename of the first executable binary file of the App that is started by the AP Manager</li>
+        <li><strong>Path</strong> - the URL to the web server with the App builds</li>
+        <li><strong>Release</strong> - SDK-Version used to build the App, e.g. <em>13r2</em> (optional)</li>
+        <li><strong>Build</strong> - Build Number used to build the App (optional)</li>
+        <li><strong>Label</strong> - Release State Label used to build the App (optional)</li>
+    </ul>
+    <p><img src="pics/HowtoAppStore_add_app_entry_011.png" alt="Add an App Entry" /></p>
+    <p>Click on the <em>Confirm</em> button in the upper right corner of the <em>Add new app</em> window. In case values for Release, Build and Label was provided, the App Store App will fetch the files for the release from the web server (if not, ignore the error message).</p>
+    <p>After the app files are transferred you should see the app entry in the App Store:</p>
+    <p><img src="pics/HowtoAppStore_add_app_entry_added_01.png" alt="Add an App Entry" /></p>
+    <p>Try to install the app from your app store and check if it is installed correctly.</p>
+    <p>
+        To be able to install your App from the local App Store you have to configure the AP Manager to use your local App Store instance instead of the official innovaphone App Store. Find out the URL of your local App Store Instance first - check the settings of the App Store instance (select instance and click on <em>Edit</em>). In the <em>Edit instance</em> UI dialogue you will see the actual URL used to reach this instance. For example, if the URL pointing to the Store App is following: <code>https://172.16.0.123/example.com/ExampleAppStore/innovaphone-appstore</code> . The corresponding <code>apps.json</code> URL would be following: <code>https://172.16.0.123/example.com/ExampleAppStore/download/apps.json</code>
+        <ul>
+            <li>To switch the current App Store, navigate to <em>Settings</em> of the AP Manager.</li>
+            <li>Set the URL pointing to the apps.json file of your local App Store instance under <em>App Store URL</em> (is usually empty or is pointing to Alpha or Beta Store).</li>
+            <li>Navigate to <em>App Store</em> of the AP Manager and install your App. While installing the App check for the correct information about the version.</li>
+        </ul>
+    </p>
+    <p>The corresponding App screen of an installed App in the AP Manager should show correct information about version of the App (sdk-version, build number, release state label):</p>
+    <p><img src="pics/HowtoAppStore_add_app_entry_041.png" alt="Add an App Entry" border="1"/></p>
+    
+
+    <h2 id="publish-a-new-version-of-the-app">Publish a new Version of the App</h2>
+    <p>The new versions of a released App can be added to an app entry in the App Store App by placing the App files in the corresponding folder on the web server (see chapter <em>Prepare Local Web Server</em>).</p>
+    <p>The subsequent releases of the App must have higher build numbers, than previous releases (e.g. 1000, 1001, 1005, etc).</p>
+    <p>To upload a new build, click on <em>Update</em> button in the upper right corner of the App Store App:</p>
+    <p><img src="pics/HowtoAppStore_add_app_entry_02.png" alt="Update Notification" /></p>
+    <p>In the <em>Add new official build</em> window tick on the app, that will be released, and provide values for <em>Release</em>, <em>Build</em> and <em>Label</em>:</p>
+    <p><img src="pics/HowtoAppStore_add_app_entry_021.png" alt="Update Notification" /></p>
+    <p>To fetch the new version from the web server, click on <em>Upload</em> button.</p>
+    <p>The upload will start and will take few minutes, depending on number of files and their size:</p>
+    <p><img src="pics/HowtoAppStore_add_app_new_build_02.png" alt="Update Notification" /></p>
+    <p>After upload is finished you should be able to see new version of the App below the App Entry:</p>
+    <p><img src="pics/HowtoAppStore_add_app_new_build_03.png" alt="Update Notification"/></p>
+    <p>Only the latest version is displayed. To see older versions, click on the arrow button in the lower right corner of the App Entry.</p>
+    
+    
+    <h2 id="notify-innovaphone-3rd-party-team">Notify innovaphone 3rd-Party Team</h2>
+    <p>After you have tested your App Release using your own App Store and your App Platform a notification to <em>3rd-party@innovaphone.com</em> must be sent in order innovaphone Team can review and publish your App on the official innovaphone App Store.</p>
+
+    <p>Prior publishing a new App on the innovaphone App Store, innovaphone team take the app through an App Review process to make sure, the App itself and the App Entry in the App Store meets the minimal technical requirements for publishing.</p>
+    
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    <h3 id="missing-app-files">Missing app files</h3>
+    <p>Make sure in every build folder a <em>innovaphone-demoapp_files</em> file exists and contains all the files, that should be released. Usually it should contain at least the binary file of the app, icon file, debug file and httpfiles.zip (for JS Runtime apps).</p>
+    <h3 id="app-store-can-not-locate-files-even-if-they-are-on-the-web-server">App Store cannot locate files even if they are on the web server</h3>
+    <p>The <em>Path</em> URL of the App Entry should not contain a trailing slash (e.g. <a href="http://web.example.com/apps/demoapp/">http://web.example.com/apps/demoapp/</a> is incorrect).</p>
+    <h3 id="build-number-and-release-label-are-incorrect">Build number and release label are incorrect</h3>
+    <p>Before building the App for release make sure to run <em>Cleanup Solution</em> in the Visual Studio.</p>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Random</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>Random</h1>
+    <p>
+        This document describes the Random library available in the JavaScript environment for app serivices.
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#Random">Random</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#dword">dword</a><br />
+                <a href="#bytes">bytes</a><br />
+                <a href="#string">string</a><br />
+                <br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="Random">Random</a></h2>
+
+    <a name="dword"><div class="fnhead" style="margin-top:5px">dword</div></a>
+    <dd>
+        Generates a random 32bit number ranging from 0 to 4294967295 (0x00000000 to 0xffffffff).
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned</td><td>The random number.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var rand = Random.dword();</code></pre>
+    </dd>
+
+    <a name="bytes"><div class="fnhead" style="margin-top:5px">bytes</div></a>
+    <dd>
+        Creates random bytes.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned <b>size</b></td><td>The number of bytes that shall be returned.</td></tr>
+            <tr><td class="param">bool <b>binary</b></td><td>Optional, defaulting to false. If false, a hexstring is returned. If true, a Uint8Array containing the random bytes is returned.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string / Uint8Array</td><td>The hexstring or Uint8Array representing the generated random bytes.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var random128BitKey = Random.bytes(16);</code></pre>
+    </dd>
+
+    <a name="string"><div class="fnhead" style="margin-top:5px">string</div></a>
+    <dd>
+        Creates a random string.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">unsigned <b>size</b></td><td>The desired length of the generated random string.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">sting</td><td>The generated random string.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var randomPassword = Random.string(24);</code></pre>
+    </dd>
+
+</body>
+</html>
