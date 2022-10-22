@@ -23,59 +23,60 @@
     </label>
     <nav>
         <ul id="listchanenels">
-            <li>
-            </li>
-            <li><a nonce="https://tv.unisc.br/hls/test.m3u8" type="application/x-mpegURL" href="#" id="playChannel">Canal Futura</a><img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Canal_Futura.png/300px-Canal_Futura.png"></li>
+            <li><a nonce="1">Página 1</a></li>
+            <li><a nonce="2">Página 2</a></li>
+            <li><a nonce="3">Página 3</a></li>
+            <li><a nonce="4">Página 4</a></li>
+            <li><a nonce="5">Página 5</a></li>
+            <li><a nonce="6">Página 6</a></li>
         </ul>
     </nav>
-    <div id="container" class="container">
-        <div class="grid">
-            <div class="player">
-                <video id="videoElement"></video>
-                <script>
-                    if (flvjs.isSupported()) {
-                        var videoElement = document.getElementById('videoElement');
-                        var flvPlayer = flvjs.createPlayer({
-                            type: 'flv',
-                            url: 'https://mediaserver.wecom.com.br:4443/cctv/048.flv'
-                        });
-                        flvPlayer.attachMediaElement(videoElement);
-                        flvPlayer.load();
-                        flvPlayer.play();
-                    }
-                </script>
+        <div class="grid" id="grid">
+            <!--<div class="player">
+                    <video id="videoElement"></video>
+                    <script>
+                        if (flvjs.isSupported()) {
+                            var videoElement = document.getElementById('videoElement');
+                            var flvPlayer = flvjs.createPlayer({
+                                type: 'flv',
+                                url: 'https://mediaserver.wecom.com.br:4443/cctv/048.flv'
+                            });
+                            flvPlayer.attachMediaElement(videoElement);
+                            flvPlayer.load();
+                            flvPlayer.play();
+                        }
+                    </script>
             </div>
             <div class="player">
-                <video id="my_video_1" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
-                       data-setup='{}'>
-                    <source src="https://tv.unisc.br/hls/test.m3u8" type="application/x-mpegURL">
-                </video>
-                <script>
-                    var player = videojs('my_video_1');
-                    player.play();
-                </script>
+                    <video id="my_video_1" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
+                           data-setup='{}'>
+                        <source src="https://tv.unisc.br/hls/test.m3u8" type="application/x-mpegURL">
+                    </video>
+                    <script>
+                        var player = videojs('my_video_1');
+                        player.play();
+                    </script>
             </div>
             <div class="player">
-                <video id="my_video_2" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
-                       data-setup='{}'>
-                    <source src="https://mediaserver.wecom.com.br:4443/live/room/index.m3u8" type="application/x-mpegURL">
-                </video>
-                <script>
-                    var player = videojs('my_video_2');
-                    player.play();
-                </script>
+                    <video id="my_video_2" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
+                           data-setup='{}'>
+                        <source src="https://mediaserver.wecom.com.br:4443/live/room/index.m3u8" type="application/x-mpegURL">
+                    </video>
+                    <script>
+                        var player = videojs('my_video_2');
+                        player.play();
+                    </script>
             </div>
             <div class="player">
-                <video id="my_video_3" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
-                       data-setup='{}'>
-                    <source src="https://mediaserver.wecom.com.br:4443/live/floripa/index.m3u8" type="application/x-mpegURL">
-                </video>
-                <script>
-                    var player = videojs('my_video_3');
-                    player.play();
-                </script>
-            </div>
+                    <video id="my_video_3" class="video-js vjs-fluid vjs-default-skin" controls preload="auto"
+                           data-setup='{}'>
+                        <source src="https://mediaserver.wecom.com.br:4443/live/floripa/index.m3u8" type="application/x-mpegURL">
+                    </video>
+                    <script>
+                        var player = videojs('my_video_3');
+                        player.play();
+                    </script>
+            </div>-->
         </div>
-    </div>
 </body>
 </html>

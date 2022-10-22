@@ -76,9 +76,10 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         var urlVideo = document.getElementById("urlVideo").value;
         var urlLogo = document.getElementById("urlImg").value;
         var typeVideo = document.getElementById("selectType").value;
+        var pageVideo = document.getElementById("selectPage").value;
         console.log(nameVideo);
         if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
-            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo) });
+            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo), page: parseInt(pageVideo) });
         }
     }
 
@@ -132,8 +133,9 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             tr.setAttribute('id', 'channelLine');
             tr.innerHTML = '<td class="tdborder"><input type="checkbox" id="checkChannels" class="checkChannels" value="' + object.id + '"></td>' +
                 '<td class="tdborder2">' + object.name + '</td>' +
-                '<td class="tdborder3">' + object.type + '</td>' +
-                '<td class="tdborder4">' + object.url + '</td>' +
+                '<td class="tdborder3">' + object.page + '</td>' +
+                '<td class="tdborder4">' + object.type + '</td>' +
+                '<td class="tdborder5">' + object.url + '</td>' +
                 '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
             table.appendChild(tr);
         });

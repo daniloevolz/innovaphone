@@ -30,6 +30,8 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    document.getElementById("novidades").style.fontWeight = 'bold';
+
     sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
     console.log(sessionKey);
 
@@ -43,12 +45,11 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
-    
-    
+
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
-        app.send({ mt: "DbFilesList", src: "news", name:"news", folder:"0"});
+        app.send({ mt: "DbFilesList", src: "news", name:"news", folder:"1"});
         app.send({ api: "restaurante", mt: "SelectEvaluation", name: "nome", rate: "avaliacao", sugest: "comentario"});
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
@@ -93,7 +94,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
                     
                     break;
                 case 'terca':
-                    console.log('ter�a');
+                    console.log('terca');
                     try {
                         document.getElementById("comidaterca").value = pratos[0].terca;
                         document.getElementById("comidaterca1").value = pratos[1].terca;
@@ -193,11 +194,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
                 default:
                     console.log(`Sorry, we are out of ${expr}.`);
             }
-
-            
-
         }
-
         if (obj.api == "restaurante" && obj.mt == "DeleteMessageResultSuccess") {
 
             console.log(obj.mt);
@@ -234,6 +231,8 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
 
         }
     }
+
+
     function insertTable() {
 
         limparLista();
@@ -387,29 +386,13 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
     // Select your input type file and store it in a variable
     const input = document.getElementById('myfile');
 
     // This will upload the file after having read it
     const upload = (file) => {
-        fetch('?dbfiles=news&folder=0&name=news&key=' + sessionKey, { // Your POST endpoint
+        fetch('?dbfiles=news&folder=1&name=news&key=' + sessionKey, { // Your POST endpoint
             method: 'POST',
             headers: {
                 // Content-Type may need to be completely **omitted**
@@ -431,74 +414,68 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
 
     // Add a listener on your input
     // It will be triggered when a file will be selected
-    input.addEventListener('change', onSelectFile, false);
+    //input.addEventListener('change', onSelectFile, false);
 
     
-    //const uploadbtn = document.getElementById('uploadpdf');
-    //uploadbtn.addEventListener('click', (e) => {
+    const uploadbtn = document.getElementById('uploadpdf');
+    uploadbtn.addEventListener('click', function () { onSelectFile() }, false);
 
-        //let photo = document.getElementById("myfile").files[0];
-        //let formData = new FormData();
+    // Edição Pietro
 
-        //formData.append("photo", photo);
-        //fetch('?dbfiles=news&folder=0&name=news.pdf&key=' + sessionKey, { method: "POST", photo });
-    //});
-// Edição Pietro
-
-// Modal JS Edição Pietro
+    // Modal JS Edição Pietro
   
-var modal2 = document.getElementById("myModal3");
+    var modal2 = document.getElementById("myModal3");
 
-// botão que abre o modal
-var btn2 = document.getElementById("duvidas");
+    // botão que abre o modal
+    var btn2 = document.getElementById("duvidas");
 
-// botão que fecha o modal
-var span2 = document.getElementsByClassName("close3")[0];
+    // botão que fecha o modal
+    var span2 = document.getElementsByClassName("close3")[0];
 
-// clicar e abrir o modal
-btn2.onclick = function() {
-  modal2.style.display = "block";
-}
+    // clicar e abrir o modal
+    btn2.onclick = function() {
+      modal2.style.display = "block";
+    }
 
-// clicar e fechar o modal
-span2.onclick = function() {
-  modal2.style.display = "none";
-}
+    // clicar e fechar o modal
+    span2.onclick = function() {
+      modal2.style.display = "none";
+    }
 
-// clicar fora do modal e fechar ele 
-window.onclick = function(event) {
-  if (event.target == modal2) {
-    modal2.style.display = "none";
-  }
+    // clicar fora do modal e fechar ele 
+    window.onclick = function(event) {
+      if (event.target == modal2) {
+        modal2.style.display = "none";
+      }
 
 
-  // Modal sugestões admin
+      // Modal sugestões admin
   
-var modal3 = document.getElementById("myModal4");
+    var modal3 = document.getElementById("myModal4");
 
-// botão que abre o modal
-var btn3 = document.getElementById("myBtn2");
+    // botão que abre o modal
+    var btn3 = document.getElementById("myBtn2");
 
-// botão que fecha o modal
-var span3 = document.getElementsByClassName("close4")[0];
+    // botão que fecha o modal
+    var span3 = document.getElementsByClassName("close4")[0];
 
-// clicar e abrir o modal
-btn3.onclick = function() {
-  modal3.style.display = "block";
-}
+    // clicar e abrir o modal
+    btn3.onclick = function() {
+      modal3.style.display = "block";
+    }
 
-// clicar e fechar o modal
-span3.onclick = function() {
-  modal3.style.display = "none";
-}
+    // clicar e fechar o modal
+    span3.onclick = function() {
+      modal3.style.display = "none";
+    }
 
-// clicar fora do modal e fechar ele 
-window.onclick = function(event) {
-  if (event.target == modal3) {
-    modal3.style.display = "none";
-  }
-}
-}    
+    // clicar fora do modal e fechar ele 
+    window.onclick = function(event) {
+      if (event.target == modal3) {
+        modal3.style.display = "none";
+      }
+    }
+    }    
 
 }
 

@@ -78,7 +78,9 @@ nav {
 ::-webkit-scrollbar {
     display: none;
 }
-
+#videoElement{
+    width:75%;
+}
 a {
     align-self: end;
     text-decoration: none;
@@ -102,17 +104,6 @@ label {
     position: absolute;
     z-index: 10;
 }
-
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100vw;
-    height: 100vh;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-
 #listchanenels {
     margin-left: 5%;
     display: block;
@@ -127,23 +118,43 @@ label {
     margin-top: -14.3%;
 }
 
-
 .grid {
+    height: 60%;
     display: grid;
-    height: 90%;
-    width: 90%;
-    border: blue 5px solid;
+    grid-template-columns: repeat(2, minmax(150px, 2fr));
+    grid-template-rows: repeat(2, minmax(150px, 2fr));
+    border: grey 5px solid;
 }
 
 .player {
-    border: red 5px solid;
+    border: black 5px solid;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-/* 4 players  */
-.player:nth-child(4):last-child {
-    grid-column: 2;
+.player0 {
+    border: black 5px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player1 {
+    border: black 2px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player2 {
+    border: black 2px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player3 {
+    border: black 5px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /*Edição danilo*/

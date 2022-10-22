@@ -47,7 +47,7 @@ new JsonApi("channel").onconnected(function (conn) {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AddChannelMessage") {
-                Database.insert("INSERT INTO channels (name, url, img, type) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "','" + obj.type + "')")
+                Database.insert("INSERT INTO channels (name, url, img, type, page) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "','" + obj.type + "','" + obj.page + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "channel", mt: "InsertChannelMessageSucess" }));
                     })

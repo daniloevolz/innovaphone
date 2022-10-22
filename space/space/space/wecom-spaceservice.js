@@ -40,6 +40,18 @@ new JsonApi("restaurante").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "restaurante", mt: "MessageError", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "InsertReview") {
+
+                log(obj);
+                Database.insert("INSERT INTO avaliacao_restaurante (nome, avaliacao, comentario, data, visualizada) VALUES('" + obj.nome + "', '" + obj.avaliacao + "', '" + obj.comentario + "', '" + obj.data + "', " + obj.visualizada +")")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "restaurante", mt: "InsertReviewSucess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "restaurante", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
         });
         conn.messageComplete();
     }
@@ -84,6 +96,27 @@ new JsonApi("restaurante").onconnected(function (conn) {
         conn.messageComplete();
     }
 });
+
+new PbxApi("PbxAdminApi").onconnected(function (conn) {
+    conn.send(JSON.stringify({ api: "PbxAdminApi", mt: "CheckAppLic", cn: "Danilo Volz", lic: "App(wecom-space)" }));
+
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+
+        if (obj.mt === "CheckAppLicResult") {
+            if (obj.ok === true) {
+                // licensed mode
+            } else {
+                // unlicensed mode
+            }
+        }
+    }
+
+});
+
+
+
+
 
 // the variable containing the string value
 var value = null;
@@ -156,3 +189,5 @@ WebServer.onrequest("value", function (req) {
         req.cancel();
     }
 });
+
+

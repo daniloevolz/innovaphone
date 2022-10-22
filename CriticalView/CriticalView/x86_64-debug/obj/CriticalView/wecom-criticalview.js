@@ -7,6 +7,7 @@ var Wecom = Wecom || {};
 Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     this.createNode("body");
     var that = this;
+    var storeObject;
 
     var colorSchemes = {
         dark: {
@@ -39,6 +40,20 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    document.querySelectorAll("a").forEach(function (button) {
+
+        button.addEventListener("click", function (event) {
+            const el = event.target || event.srcElement;
+            const nonce = el.nonce;
+            //const type = el.type;
+
+            console.log(nonce);
+            onChangePage(nonce);
+            //onChange(nonce, type);
+        });
+
+    });
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -54,13 +69,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             console.log(obj.mt);
             var channels = JSON.parse(obj.result);
 
-            insereLi(channels);
+            storeObject = channels;
+            onChangePage("1");
 
         }
     }
-    const myInterval = window.setInterval(function () {
-        getChannels();
-    }, 30000);
+    //const myInterval = window.setInterval(function () {
+    //    getChannels();
+    //}, 30000);
 
     function getChannels() {
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -242,12 +258,159 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             button.addEventListener("click", function (event) {
                 const el = event.target || event.srcElement;
                 const nonce = el.nonce;
-                const type = el.type;
+                //const type = el.type;
+
                 console.log(nonce);
-                onChange(nonce, type);
+                onChangePage(nonce);
+                //onChange(nonce, type);
             });
 
         });
+    }
+
+    function onChangePage(page) {
+        try {
+            var oldPlayer = document.getElementById('my_video_1');
+            flvjs(oldPlayer).dispose();
+        } catch {
+            var oldPlayer = document.getElementById('my_video_1');
+            videojs(oldPlayer).dispose();
+        } finally {
+            document.getElementById("grid").innerHTML = "";
+
+            for (let i = 0; i < 4; i++) {
+                var playerElement = document.createElement("div");
+                playerElement.setAttribute("class", "player" + i);
+                playerElement.setAttribute("id", "player" + i);
+                document.getElementById("grid").appendChild(playerElement);
+
+                if (storeObject[i].type == "video/flv") {
+                    //var script = document.createElement("script");
+                    //script.src = "flv.js";
+                    //script.type = "text/javascript";
+                    //document.getElementById("container").appendChild(script);
+                    //if (flvjs.isSupported()) {
+                    var videoElement = document.createElement("video");
+                    videoElement.setAttribute("allow", "autoplay");
+                    videoElement.setAttribute("autoplay", "true");
+                    videoElement.setAttribute("muted", "muted");
+                    //videoElement.setAttribute("width", "800%");
+                    //videoElement.setAttribute("height", "470%");
+                    videoElement.setAttribute("controls", "");
+                    videoElement.setAttribute("class", "video-flv vjs-default-skin");
+                    videoElement.setAttribute("id", "video-flv");
+
+                    document.getElementById("player" + i).appendChild(videoElement);
+
+                    var flvPlayer = flvjs.createPlayer({
+                        type: 'flv',
+                        url: storeObject[i].url
+                    });
+                    flvPlayer.attachMediaElement(videoElement);
+                    flvPlayer.load();
+                    flvPlayer.play();
+                    //}
+                }
+                if (storeObject[i].type == "youtube") {
+                    var iframe = document.createElement("iframe");
+                    iframe.src = storeObject[i].url + "?autoplay=1&mute=1";
+                    iframe.frameBorder = "0";
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.width = "800px";
+                    iframe.height = "470px";
+                    document.getElementById("player" + i).appendChild(iframe);
+                }
+                if (storeObject[i].type == "application/x-mpegURL") {
+                    //var script = document.createElement("script");
+                    //script.src = "video.js";
+                    //script.type = "text/javascript";
+                    var source = document.createElement("source");
+                    source.setAttribute("src", storeObject[i].url);
+                    source.setAttribute("type", storeObject[i].type);
+
+                    //document.getElementById("container").appendChild(script);
+                    var videoElement = document.createElement("video");
+                    videoElement.setAttribute("allow", "autoplay");
+                    videoElement.setAttribute("autoplay", "true");
+                    videoElement.setAttribute("muted", "muted");
+                    videoElement.setAttribute("width", "800%");
+                    videoElement.setAttribute("height", "470%");
+                    videoElement.setAttribute("controls", "");
+                    videoElement.setAttribute("class", "video-js vjs-default-skin");
+                    videoElement.setAttribute("id", "video-js"+i);
+
+                    //videoElement.setAttribute("src", url);
+                    //videoElement.setAttribute("type", type);
+                    document.getElementById("player" + i).appendChild(videoElement);
+                    document.getElementById("video-js"+i).appendChild(source);
+                    var video = videojs('video-js'+i, {
+                        html5: {
+                            vhs: {
+                                overrideNative: !videojs.browser.IS_SAFARI
+                            },
+                            nativeAudioTracks: false,
+                            nativeVideoTracks: false
+                        }
+                    });
+                    //video.src({ type: type, src: url });
+                    video.ready(function () {
+                        video.src({ type: storeObject[i].type, src: storeObject[i].url });
+                    });
+
+                }
+                if (storeObject[i].type == "video/mp4" || storeObject[i].type == "video/ogg") {
+                    //var script = document.createElement("script");
+                    //script.src = "video.js";
+                    //script.type = "text/javascript";
+                    var source = document.createElement("source");
+                    source.setAttribute("src", storeObject[i].url);
+                    source.setAttribute("type", storeObject[i].type);
+
+                    //document.getElementById("container").appendChild(script);
+                    var videoElement = document.createElement("video");
+                    videoElement.setAttribute("allow", "autoplay");
+                    videoElement.setAttribute("autoplay", "true");
+                    videoElement.setAttribute("muted", "muted");
+                    videoElement.setAttribute("width", "800%");
+                    videoElement.setAttribute("height", "470%");
+                    videoElement.setAttribute("controls", "");
+                    videoElement.setAttribute("class", "video-js vjs-default-skin");
+                    videoElement.setAttribute("id", "video-js"+i);
+
+                    //videoElement.setAttribute("src", url);
+                    //videoElement.setAttribute("type", type);
+                    document.getElementById("player" + i).appendChild(videoElement);
+                    document.getElementById("video-js"+i).appendChild(source);
+                    var video = videojs('video-js'+i);
+                    //video.src({ type: type, src: url });
+                    video.ready(function () {
+                        video.src({ type: storeObject[i].type, src: storeObject[i].url });
+                    });
+                }
+                if (storeObject[i].type == "audio/mpeg" || storeObject[i].type == "audio/wav") {
+                    //var script = document.createElement("script");
+                    //script.src = "video.js";
+                    //script.type = "text/javascript";
+                    var source = document.createElement("source");
+                    source.setAttribute("src", storeObject[i].url);
+                    source.setAttribute("type", storeObject[i].type);
+
+                    //document.getElementById("container").appendChild(script);
+                    var videoElement = document.createElement("audio");
+                    videoElement.setAttribute("controls", "");
+                    videoElement.setAttribute("autoplay", "");
+                    videoElement.setAttribute("muted", "");
+                    videoElement.setAttribute("class", "video-js vjs-default-skin");
+                    videoElement.setAttribute("id", "video-js"+i);
+
+                    //videoElement.setAttribute("src", url);
+                    //videoElement.setAttribute("type", type);
+                    document.getElementById("player" + i).appendChild(videoElement);
+                    document.getElementById("video-js"+i).appendChild(source);
+                }
+
+            }
+        }
     }
 }
 

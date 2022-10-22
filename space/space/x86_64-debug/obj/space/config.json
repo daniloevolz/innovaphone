@@ -44,7 +44,7 @@
       },
       {
         "cmd": "table",
-        "name": "cardapio_restaurante",
+        "name": "avaliacao_restaurante",
         "init": [
           {
             "cmd": "column",
@@ -65,6 +65,16 @@
             "cmd": "column",
             "name": "comentario",
             "type": "TEXT"
+          },
+          {
+            "cmd": "column",
+            "name": "data",
+            "type": "TEXT"
+          },
+          {
+            "cmd": "column",
+            "name": "visualizada",
+            "type": "BIT"
           }
         ]
       },
@@ -86,7 +96,7 @@
       {
         "cmd": "start",
         "name": "news",
-        "folder": "BIGINT REFERENCES news_space(id) ON DELETE CASCADE"
+        "folder": "BIGINT REFERENCES cardapio_restaurante(id) ON DELETE CASCADE"
       }
     ]
   },

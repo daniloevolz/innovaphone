@@ -33,10 +33,10 @@
             </div>
             <div id="linhanews" style="display: block;">
                        
-                <iframe src="https://mediaserver.wecom.com.br:4443/news.pdf#toolbar=0" id="iframedesktop" style="position: absolute; height: 100%; width: 100%;">
+                <iframe src="./news/news.pdf#toolbar=0" id="iframedesktop" style="position: absolute; height: 100%; width: 100%;">
                 </iframe>
 
-                <iframe src="https://mediaserver.wecom.com.br:4443/news.pdf#toolbar=0" id="iframemobile" style="position: absolute; height: 100%; width: 100%;">
+                <iframe src="./news/news.pdf#toolbar=0" id="iframemobile" style="position: absolute; height: 100%; width: 100%;">
                 </iframe>
 
             </div>
@@ -185,9 +185,8 @@
                 <footer style="text-align: center; height: auto; width: 100%;">
                     <button id="myBtn">Sugestões</button>
                     <div id="myModal" class="modal">
-                        <div class="modal-content">
+                        <div class="modal-content" style="text-align: center;">
                             <span class="close">&times;</span>
-                            <form method="post" style="text-align: center;">
                                 <h1 id="h1sugest" style="text-align: center; color: rgb(43, 84, 146);"> Sugestões </h1>
                                 <div id="res">
                                     <span style="font-size: 16px;" id="spanNameUsuario"></span><span style="font-size: 16px;">, como podemos melhorar?</span>
@@ -195,11 +194,11 @@
                                 <div id="comida">
                                     <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
                                     <br><label for="radio" id="radio">
-                                        <input type="radio" name="group" value="1" class="rate">Muito bom!
-                                        <input type="radio" name="group" value="2" class="rate">Bom!
-                                        <input type="radio" name="group" value="3" class="rate">Razoável
-                                        <input type="radio" name="group" value="4" class="rate">Ruim!
-                                        <input type="radio" name="group" value="5" class="rate">Muito ruim!
+                                        <input type="radio" name="rate" value="1" class="rate">Muito bom!
+                                        <input type="radio" name="rate" value="2" class="rate">Bom!
+                                        <input type="radio" name="rate" value="3" class="rate">Razoável
+                                        <input type="radio" name="rate" value="4" class="rate">Ruim!
+                                        <input type="radio" name="rate" value="5" class="rate">Muito ruim!
 
                                     </label>
                                 </div>
@@ -208,12 +207,11 @@
                                     <textarea id="textareaSugestao" rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
                                 </div>
                                 <br>
-                                <h2><input type="checkbox" id="check" onclick="Sumir()"> Deseja responder anonimamente? </h2>
+                                <h2><input type="checkbox" id="checkAnonimo" onclick="Sumir()"> Deseja responder anonimamente? </h2>
                                 <br>
                                 <input type="submit" value="Enviar!" id="buttonEnviarAvaliacao">
-                            </form>
                         </div>
-                </div>
+                    </div>
            </footer>
         </div>
     </div>

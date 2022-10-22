@@ -7,6 +7,7 @@ var Wecom = Wecom || {};
 Wecom.space = Wecom.space || function (start, args) {
     this.createNode("body");
     var that = this;
+    const username = "";
 
     var colorSchemes = {
         dark: {
@@ -36,10 +37,23 @@ Wecom.space = Wecom.space || function (start, args) {
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
 
+    var avaliar = document.getElementById("buttonEnviarAvaliacao");
+    avaliar.addEventListener("click", function () { insertReview() }, false);
     
 
     function app_connected(domain, user, dn, appdomain) {
+        if (app.logindata.info.unlicensed) {
+            // unlicensed mode
+            console.log("Unlicensed mode");
+        }
+        else {
+            // licensed mode
+            console.log("Licensed mode");
+        }
+
+
         document.getElementById("spanNameUsuario").innerText = dn;
+        username = dn;
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });
@@ -184,6 +198,27 @@ Wecom.space = Wecom.space || function (start, args) {
             }
         }
 
+        if (obj.api = "restaurante" && obj.mt == "InsertReviewSucess") {
+            console.log("Sugestão Registrada!!!!!");
+            closeModal();
+        }
+
+    }
+
+    function insertReview() {
+        var annonimous = document.getElementById("checkAnonimo");
+        if (annonimous.checked) {
+            var name = "anonimo";
+        } else {
+            var name = username;
+        }
+        var rate = document.querySelector('input[name="rate"]:checked').value;
+        var comment = document.getElementById("textareaSugestao").value;
+        const timeElapsed = Date.now();
+        const today = new Date(timeElapsed);
+
+        app.send({ api: "restaurante", mt: "InsertReview", nome: name, avaliacao: rate, comentario: comment, data: today.toISOString(), vizualizada: 0 });
+
     }
     
     function MudarDiv(el) {
@@ -207,9 +242,11 @@ Wecom.space = Wecom.space || function (start, args) {
 
     // botão que fecha o modal
     var elSpan = document.getElementsByClassName("close")[0];
-    elSpan.addEventListener("click", function () {
+    elSpan.addEventListener("click", function () { closeModal() }, false);
+
+    function closeModal() {
         modal.style.display = "none";
-    }, false);
+    }
 
     // botão que abre o modal
     var elmyBtn = document.getElementById("myBtn");

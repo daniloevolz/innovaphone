@@ -29,6 +29,12 @@
             "cmd": "column",
             "name": "type",
             "type": "VARCHAR(128)"
+          },
+
+          {
+            "cmd": "column",
+            "name": "page",
+            "type": "INT"
           }
         ]
       }
