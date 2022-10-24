@@ -48,7 +48,7 @@ body {
 }
 .allbutton{
    
-    height: 17%;
+    height: 20%;
     border-color: rgb(99, 137, 175);
     background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
     width: 100%;
@@ -130,6 +130,7 @@ label {
 .grid {
     height: 60%;
     display: grid;
+    margin-left: 3%;
     grid-template-columns: repeat(2, minmax(150px, 2fr));
     grid-template-rows: repeat(2, minmax(150px, 2fr));
     border: grey 5px solid;
