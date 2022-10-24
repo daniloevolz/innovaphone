@@ -337,9 +337,13 @@ input#sugest {
     border-radius: 12px;
     flex-direction: wrap;
     justify-content: center;
+    text-align: center;
     margin-top: 16px;
     
     
+}
+h1#h1sugest{
+    padding-left: 35px;
 }
   
   /* Fechar Botão */
@@ -347,7 +351,7 @@ input#sugest {
     color: #000000bb;
     float: right;
     font-size: 50px;
-    padding-right: 20px;
+    padding-right: 15px;
     font-weight: bold;
     height: 30px;
   }
@@ -384,9 +388,6 @@ form {
     
 }
 
-h1#h1sugest {
-    margin-top: 0%;
-}
 
 h3 {
     margin-top: 0%;

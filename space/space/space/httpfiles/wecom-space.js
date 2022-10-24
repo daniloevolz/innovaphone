@@ -266,7 +266,12 @@ Wecom.space = Wecom.space || function (start, args) {
         modal2.style.display = "block";
     }, false);
 
+    var res = document.getElementById('res')
 
+    var myBtn3 = document.getElementById('check').checked;
+    myBtn3.addEventListener("click",function () {
+        res.style.display = "none";
+    })
 
 } 
 
