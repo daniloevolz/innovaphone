@@ -17,21 +17,20 @@
     <script src="./scripts/flv.js" type="text/javascript"></script>
 </head>
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.CriticalView(start, { }); })">
-    <input type="checkbox" id="checkmenu">
-    <label for="checkmenu">
-        <img id="menu-icon" src="./images/menu-icon.png" />
-    </label>
-    <nav>
-        <ul id="listchanenels">
-            <li><a nonce="1">Página 1</a></li>
-            <li><a nonce="2">Página 2</a></li>
-            <li><a nonce="3">Página 3</a></li>
-            <li><a nonce="4">Página 4</a></li>
-            <li><a nonce="5">Página 5</a></li>
-            <li><a nonce="6">Página 6</a></li>
-        </ul>
-    </nav>
-        <div class="grid" id="grid">
+    <div class="colunaesquerda">
+      <input type="button" class="allbutton" value="1"> 
+      <br>
+      <input type="button" class="allbutton" value="2"> 
+      <br>
+      <input type="button" class="allbutton" value="3"> 
+      <br>
+      <input type="button" class="allbutton" value="4"> 
+      <br>
+      <input type="button" class="allbutton" value="5"> 
+      <br>
+      <input type="button" class="allbutton" value="6"> 
+    </div>
+    <div class="grid" id="grid"></div>
             <!--<div class="player">
                     <video id="videoElement"></video>
                     <script>
@@ -78,5 +77,6 @@
                     </script>
             </div>-->
         </div>
+       
 </body>
 </html>
