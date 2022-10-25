@@ -32,7 +32,6 @@ div.button {
     padding: 0px;
     margin: 0px;
 }
-
 body {
     font-family: arial;
     /*background: url("logo.png");
@@ -48,7 +47,8 @@ body {
 }
 .allbutton{
    
-    height: 20%;
+    
+    height: 17%;
     border-color: rgb(99, 137, 175);
     background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
     width: 100%;
@@ -174,3 +174,19 @@ label {
 
 /*Edi��o danilo*/
 
+/*   TESTE DE RESPONSIVIDADE    - vou apagar depois    */
+@media screen and (max-width: 1600px){
+    
+    .allbutton{
+   
+    
+        height: 28%;
+        border-color: rgb(99, 137, 175);
+        background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
+        width: 100%;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+
+}
