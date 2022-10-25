@@ -32,11 +32,19 @@ div.button {
     padding: 0px;
     margin: 0px;
 }
-
+table{
+    text-align: center;
+}
+tr{
+    text-align: center;
+}
 input[type="checkbox"] {
     display: block;
 }
-
+input#checkChannels{
+    text-align: center;
+    width: 100%;
+}
 
 ::-webkit-scrollbar {
     display: none;
@@ -81,8 +89,13 @@ label {
 /*Edição danilo*/
 
 /* Edição Pietro */
+td{
+    text-align: center;
+}
 .tdborder{
     border: 1px solid ;
+    flex-direction: wrap;
+    justify-content: center;
     text-align: center; 
 }
 .tdborder2{
