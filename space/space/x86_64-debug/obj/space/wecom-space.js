@@ -93,7 +93,7 @@ Wecom.space = Wecom.space || function (start, args) {
                         document.getElementById("comidasegunda6").innerText = "";
                         document.getElementById("comidasegunda7").innerText = "";
                     }
-
+    
                     break;
                 case 'terca':
                     console.log('ter�a');
@@ -266,7 +266,12 @@ Wecom.space = Wecom.space || function (start, args) {
         modal2.style.display = "block";
     }, false);
 
+    var res = document.getElementById('res')
 
+    var myBtn3 = document.getElementById('check').checked;
+    myBtn3.addEventListener("click",function () {
+        res.style.display = "none";
+    })
 
 } 
 

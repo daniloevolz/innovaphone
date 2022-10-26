@@ -1,10 +1,13 @@
 /*Design Mobile Admin*/
 
-@media screen and (max-width: 400px){
+@media screen and (max-width: 345px) and (min-width: 310px){ 
   
   div#all{
       margin-top: 47%;
       margin-left: -4%;
+  }
+  .allinput{
+    width: 125px;
   }
   button#duvidas{
       width: 83px;
@@ -38,6 +41,10 @@
   }
   ul{
       margin-left: -5%;
+
+  }
+  h1{
+    width: 100%;
 
   }
   button#myBtn2{

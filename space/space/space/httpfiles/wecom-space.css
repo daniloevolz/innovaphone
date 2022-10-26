@@ -277,7 +277,9 @@ a {
     
 
 }
-
+h1#h1sugest{
+    padding-left: 35px;
+}
 .tabelas {
     width: 25%;
     display: block;
@@ -342,9 +344,7 @@ input#sugest {
     
     
 }
-h1#h1sugest{
-    padding-left: 35px;
-}
+
   
   /* Fechar Botão */
   .close {
