@@ -283,6 +283,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                 playerElement.setAttribute("class", "player" + i);
                 playerElement.setAttribute("id", "player" + i);
                 document.getElementById("grid").appendChild(playerElement);
+                // teste pietro - apagar depois 
+
+                var teste = document.createElement("label");
+                teste.setAttribute("class", "label" + i);
+                var teste2 = document.createTextNode(storeObject[i].name);
+                playerElement.appendChild(teste);
+                teste.appendChild(teste2);
+
 
                 if (storeObject[i].type == "video/flv") {
                     //var script = document.createElement("script");
@@ -333,8 +341,8 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                     videoElement.setAttribute("allow", "autoplay");
                     videoElement.setAttribute("autoplay", "true");
                     videoElement.setAttribute("muted", "muted");
-                    videoElement.setAttribute("width", "800%");
-                    videoElement.setAttribute("height", "470%");
+                    //videoElement.setAttribute("width", "800%");
+                    //videoElement.setAttribute("height", "470%");
                     videoElement.setAttribute("controls", "");
                     videoElement.setAttribute("class", "video-js vjs-default-skin");
                     videoElement.setAttribute("id", "video-js"+i);
@@ -371,8 +379,8 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                     videoElement.setAttribute("allow", "autoplay");
                     videoElement.setAttribute("autoplay", "true");
                     videoElement.setAttribute("muted", "muted");
-                    videoElement.setAttribute("width", "800%");
-                    videoElement.setAttribute("height", "470%");
+                   // videoElement.setAttribute("width", "800%");
+                   // videoElement.setAttribute("height", "470%");
                     videoElement.setAttribute("controls", "");
                     videoElement.setAttribute("class", "video-js vjs-default-skin");
                     videoElement.setAttribute("id", "video-js"+i);
