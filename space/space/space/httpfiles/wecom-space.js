@@ -268,21 +268,12 @@ Wecom.space = Wecom.space || function (start, args) {
 
     var res = document.getElementById('res')
 
-    var myBtn3 = document.getElementById('check').checked;
+    var myBtn3 = document.getElementById('checkAnonimo').checked;
     myBtn3.addEventListener("click",function () {
         res.style.display = "none";
     })
-
 } 
 
-// Responder Anonimamente Script 
- function Sumir(){
-    if(document.getElementById('check').checked){
-        document.getElementById('res').style.display = 'none';
-    }else{
-        document.getElementById('res').style.display = 'block';
-    }
-} 
 
 
 Wecom.space.prototype = innovaphone.ui1.nodePrototype;
