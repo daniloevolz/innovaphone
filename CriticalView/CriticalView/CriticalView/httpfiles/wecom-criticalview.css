@@ -38,6 +38,25 @@ body {
 	background-size:100%;*/
 }
 .colunaesquerda {
+    background-color: rgb(7, 59, 75);
+    width: 100%;
+    text-align: center;
+}
+
+.allbutton{
+    display: inline;
+    width: 13%;
+    height: 25px;
+    background-image: linear-gradient(rgb(122, 144, 165), rgb(62, 197, 168));
+    border-color: rgb(59, 189, 171);
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* COLUNA ESQUERDA NA VERTICAL - TESTES */
+
+/*
+.colunaesquerda {
     background-color: rgb(208, 223, 218);
     position: absolute;
     height: 100%;
@@ -55,6 +74,7 @@ body {
     font-weight: bold;
     font-size: 20px;
 }
+*/
 img {
     width: 40px;
 }
@@ -128,11 +148,10 @@ label {
 }
 
 .grid {
-    height: 60%;
+    height: 100%;
     display: grid;
-    margin-left: 3%;
-    grid-template-columns: repeat(2, minmax(150px, 2fr));
-    grid-template-rows: repeat(2, minmax(150px, 2fr));
+    grid-template-columns: repeat(2, minmax(100px, 2fr));
+    grid-template-rows: repeat(2, minmax(100px, 2fr));
     border: grey 5px solid;
 }
 
@@ -141,13 +160,14 @@ label {
     display: flex;
     justify-content: center;
     align-items: center;
-    
+ 
 }
 .player0 {
     border: black 5px solid;
     display: flex;
     justify-content: center;
     align-items: center;
+  
     
 }
 .player1 {
@@ -156,12 +176,14 @@ label {
     justify-content: center;
     align-items: center;
     
+    
 }
 .player2 {
     border: black 2px solid;
     display: flex;
     justify-content: center;
     align-items: center;
+   
    
 }
 .player3 {
@@ -170,23 +192,7 @@ label {
     justify-content: center;
     align-items: center;
     
+    
 }
 
 /*Edi��o danilo*/
-
-/*   TESTE DE RESPONSIVIDADE    - vou apagar depois    */
-@media screen and (max-width: 1600px){
-    
-    .allbutton{
-   
-    
-        height: 28%;
-        border-color: rgb(99, 137, 175);
-        background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
-        width: 100%;
-        font-weight: bold;
-        font-size: 20px;
-    }
-
-
-}
