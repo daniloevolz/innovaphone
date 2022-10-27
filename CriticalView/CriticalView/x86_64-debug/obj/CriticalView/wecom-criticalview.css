@@ -32,30 +32,16 @@ div.button {
     padding: 0px;
     margin: 0px;
 }
+
 body {
     font-family: arial;
     /*background: url("logo.png");
 	background-size:100%;*/
 }
-.colunaesquerda {
-    background-color: rgb(7, 59, 75);
-    width: 100%;
-    text-align: center;
-}
 
-.allbutton{
-    display: inline;
-    width: 13%;
-    height: 25px;
-    background-image: linear-gradient(rgb(122, 144, 165), rgb(62, 197, 168));
-    border-color: rgb(59, 189, 171);
-    font-weight: bold;
-    font-size: 20px;
-}
 
 /* COLUNA ESQUERDA NA VERTICAL - TESTES */
 
-/*
 .colunaesquerda {
     background-color: rgb(208, 223, 218);
     position: absolute;
@@ -66,7 +52,6 @@ body {
 }
 .allbutton{
    
-    
     height: 17%;
     border-color: rgb(99, 137, 175);
     background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
@@ -74,7 +59,7 @@ body {
     font-weight: bold;
     font-size: 20px;
 }
-*/
+
 img {
     width: 40px;
 }
@@ -148,6 +133,7 @@ label {
 }
 
 .grid {
+    margin-left: 3%;
     height: 100%;
     display: grid;
     grid-template-columns: repeat(2, minmax(100px, 2fr));
@@ -162,11 +148,51 @@ label {
     align-items: center;
  
 }
+.label{
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 32%;
+}
+.label0{
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 32%;
+
+    
+}
+.label1{
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 32%;
+   
+}
+.label2{
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 32%;
+    
+    
+
+}
+.label3{
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    padding-bottom: 32%;
+    
+
+    
+}
 .player0 {
     border: black 5px solid;
     display: flex;
     justify-content: center;
     align-items: center;
+    
   
     
 }
@@ -177,12 +203,14 @@ label {
     align-items: center;
     
     
+    
 }
 .player2 {
     border: black 2px solid;
     display: flex;
     justify-content: center;
     align-items: center;
+    
    
    
 }
@@ -193,6 +221,6 @@ label {
     align-items: center;
     
     
+    
 }
-
 /*Edi��o danilo*/
