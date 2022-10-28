@@ -22,11 +22,6 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-/*Edi��o danilo*/
-.video-flv {
-    width: 600px;
-    height: 470px;
-}
 
 * {
     padding: 0px;
@@ -43,18 +38,19 @@ body {
 /* COLUNA ESQUERDA NA VERTICAL - TESTES */
 
 .colunaesquerda {
-    background-color: rgb(208, 223, 218);
+    background-color: var(--bg);
     position: absolute;
     height: 100%;
-    width: 3%;
+    width: 6%;
     float: left;
-    
+    color: var(--text-standard);
 }
-.allbutton{
-   
-    height: 17%;
+.allbutton {
+    height: 20%;
     border-color: rgb(99, 137, 175);
-    background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
+    background-color: var(--bg);
+    color: var(--text-standard);
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
     width: 100%;
     font-weight: bold;
     font-size: 20px;
@@ -92,9 +88,7 @@ nav {
 ::-webkit-scrollbar {
     display: none;
 }
-#videoElement{
-    width:55%;
-}
+
 a {
     align-self: end;
     text-decoration: none;
@@ -132,22 +126,7 @@ label {
     margin-top: -14.3%;
 }
 
-.grid {
-    margin-left: 3%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(100px, 2fr));
-    grid-template-rows: repeat(2, minmax(100px, 2fr));
-    border: grey 5px solid;
-}
 
-.player {
-    border: black 5px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
- 
-}
 .label{
     color: white;
     font-size: 15px;
@@ -187,40 +166,3 @@ label {
 
     
 }
-.player0 {
-    border: black 5px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-  
-    
-}
-.player1 {
-    border: black 2px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    
-    
-}
-.player2 {
-    border: black 2px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-   
-   
-}
-.player3 {
-    border: black 5px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    
-    
-}
-/*Edi��o danilo*/
