@@ -56,7 +56,7 @@ div#logowecom {
     background-image: url("money_header.png");
     background-size: cover;
     width: auto;
-    height: 23.1%;
+    height: 20%;
     position:absolute;
 }
 .logo-inn{
@@ -72,8 +72,8 @@ div#logowecom {
     background-size: cover;
     align-content: center;
     width: 100%;
-    height: 83%;
-    top: 45%;
+    height: 100%;
+    top: 00%;
     align-items: flex-start;
     justify-content: center;
     display: flex;
@@ -92,7 +92,7 @@ div#logowecom {
     align-content: center;
     width: 100%;
     height: 80%;
-    top: 45%;
+    top: 0%;
     align-items: flex-start;
     justify-content: center;
     display: flex;
@@ -101,7 +101,7 @@ div#logowecom {
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 10%; /*teste aqui*/
+    margin-top: 9.5%; /*teste aqui*/
 }
 
 .linha2todas {
@@ -110,8 +110,8 @@ div#logowecom {
     background-size: cover;
     /*align-content: center;*/
     width: 100%;
-    height: 79.1%;
-    top: 45%;
+    height: 80%;
+    top: 0%;
     /*align-items: flex-start;*/
     justify-content: center;
     display: flex;
@@ -120,7 +120,7 @@ div#logowecom {
     /*flex-direction: column;*/
    /* flex-wrap: wrap ;*/
     justify-content: center;
-    margin-top: 10.9%;
+    margin-top: 9.5%;
 }
 
 .item-data {
@@ -134,11 +134,13 @@ li {
 a {
     color: darkslategrey;
     text-decoration: none;
+    font-size: 16px;
 }
 
     a:hover {
         color: darkslategrey;
         font-weight: bold;
+        font-size: 20px;
     }
 
 .div-dolar {
@@ -189,6 +191,7 @@ label {
     color: darkslategrey;
     padding: 10px;
     border-radius: 20px;
+    font-size: 16px;
 }
 #item-dolar{
     margin-top: 8%;

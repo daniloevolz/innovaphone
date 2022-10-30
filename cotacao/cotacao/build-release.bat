@@ -4,7 +4,7 @@ set PROJECT=cotacao
 
 set BUILD=1001
 set RELEASE_STATE=sr1
-set MANUF=company
+set MANUF=wecom
 
 if not [%1]==[] (set BUILD=%1)
 if not [%2]==[] (set RELEASE_STATE=%2)

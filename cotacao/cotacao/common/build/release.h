@@ -1,6 +1,6 @@
 
 #if !defined(RELEASE_STATE)
-#define RELEASE_STATE "dvl "
+#define RELEASE_STATE "dev 1"
 #endif
 
 #define VERSION_STR_MAJOR "13r2"

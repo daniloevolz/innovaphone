@@ -2,6 +2,7 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
+    overflow: hidden;
 }
 
 .vjs-modal-dialog-content {

@@ -81,366 +81,109 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     //    getChannels();
     //}, 30000);
 
-    function getChannels() {
-        app.send({ api: "channel", mt: "SelectChannelMessage" });
-    }
-
-    function onChange(url, type) {
-        try {
-            var oldPlayer = document.getElementById('video-flv');
-            flvjs(oldPlayer).dispose();
-        } catch {
-            var oldPlayer = document.getElementById('video-js_html5_api');
-            videojs(oldPlayer).dispose();
-        } finally {
-            document.getElementById("container").innerHTML = "";
-            if (type == "video/flv") {
-                //var script = document.createElement("script");
-                //script.src = "flv.js";
-                //script.type = "text/javascript";
-                //document.getElementById("container").appendChild(script);
-                //if (flvjs.isSupported()) {
-                var videoElement = document.createElement("video");
-                videoElement.setAttribute("allow", "autoplay");
-                videoElement.setAttribute("autoplay", "true");
-                videoElement.setAttribute("muted", "muted");
-                //videoElement.setAttribute("width", "800%");
-                //videoElement.setAttribute("height", "470%");
-                videoElement.setAttribute("controls", "");
-                videoElement.setAttribute("class", "video-flv vjs-default-skin");
-                videoElement.setAttribute("id", "video-flv");
-
-                document.getElementById("container").appendChild(videoElement);
-
-                var flvPlayer = flvjs.createPlayer({
-                    type: 'flv',
-                    url: url
-                });
-                flvPlayer.attachMediaElement(videoElement);
-                flvPlayer.load();
-                flvPlayer.play();
-                //}
-            }
-            if (type == "youtube") {
-                var iframe = document.createElement("iframe");
-                iframe.src = url + "?autoplay=1&mute=1";
-                iframe.frameBorder = "0";
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.width = "800px";
-                iframe.height = "470px";
-                document.getElementById("container").appendChild(iframe);
-            }
-            if (type == "application/x-mpegURL") {
-                //var script = document.createElement("script");
-                //script.src = "video.js";
-                //script.type = "text/javascript";
-                var source = document.createElement("source");
-                source.setAttribute("src", url);
-                source.setAttribute("type", type);
-
-                //document.getElementById("container").appendChild(script);
-                var videoElement = document.createElement("video");
-                videoElement.setAttribute("allow", "autoplay");
-                videoElement.setAttribute("autoplay", "true");
-                videoElement.setAttribute("muted", "muted");
-                //videoElement.setAttribute("width", "800%");
-                //videoElement.setAttribute("height", "470%");
-                videoElement.setAttribute("controls", "");
-                videoElement.setAttribute("class", "video-js vjs-default-skin");
-                videoElement.setAttribute("id", "video-js");
-
-                //videoElement.setAttribute("src", url);
-                //videoElement.setAttribute("type", type);
-                document.getElementById("container").appendChild(videoElement);
-                document.getElementById("video-js").appendChild(source);
-                var video = videojs('video-js', {
-                    html5: {
-                        vhs: {
-                            overrideNative: !videojs.browser.IS_SAFARI
-                        },
-                        nativeAudioTracks: false,
-                        nativeVideoTracks: false
-                    }
-                });
-                //video.src({ type: type, src: url });
-                video.ready(function () {
-                    video.src({ type: type, src: url });
-                });
-
-            }
-            if (type == "video/mp4" || type == "video/ogg") {
-                //var script = document.createElement("script");
-                //script.src = "video.js";
-                //script.type = "text/javascript";
-                var source = document.createElement("source");
-                source.setAttribute("src", url);
-                source.setAttribute("type", type);
-
-                //document.getElementById("container").appendChild(script);
-                var videoElement = document.createElement("video");
-                videoElement.setAttribute("allow", "autoplay");
-                videoElement.setAttribute("autoplay", "true");
-                videoElement.setAttribute("muted", "muted");
-                //videoElement.setAttribute("width", "800%");
-                //videoElement.setAttribute("height", "470%");
-                videoElement.setAttribute("controls", "");
-                videoElement.setAttribute("class", "video-js vjs-default-skin");
-                videoElement.setAttribute("id", "video-js");
-
-                //videoElement.setAttribute("src", url);
-                //videoElement.setAttribute("type", type);
-                document.getElementById("container").appendChild(videoElement);
-                document.getElementById("video-js").appendChild(source);
-                var video = videojs('video-js');
-                //video.src({ type: type, src: url });
-                video.ready(function () {
-                    video.src({ type: type, src: url });
-                });
-            }
-            if (type == "audio/mpeg" || type == "audio/wav") {
-                //var script = document.createElement("script");
-                //script.src = "video.js";
-                //script.type = "text/javascript";
-                var source = document.createElement("source");
-                source.setAttribute("src", url);
-                source.setAttribute("type", type);
-
-                //document.getElementById("container").appendChild(script);
-                var videoElement = document.createElement("audio");
-                videoElement.setAttribute("controls", "");
-                videoElement.setAttribute("autoplay", "");
-                videoElement.setAttribute("muted", "");
-                videoElement.setAttribute("class", "video-js vjs-default-skin");
-                videoElement.setAttribute("id", "video-js");
-
-                //videoElement.setAttribute("src", url);
-                //videoElement.setAttribute("type", type);
-                document.getElementById("container").appendChild(videoElement);
-                document.getElementById("video-js").appendChild(source);
-
-            }
-
-        }
-    }
-
-    function insereLi(channels) {
-        try {
-            //var lis = document.querySelectorAll('#listchanenels');
-            //for (var i = 0; li = lis[i]; i++) {
-            //    li.parentNode.removeChild(li);
-            //}
-            document.getElementById("listchanenels").innerHTML = "";
-            console.log("Limpou o LI")
-        } catch {
-            console.log("o LI estava limpo!")
-        }
-        channels.forEach(function (item, index) {
-            console.log(item.name);
-            var ul = document.getElementById('listchanenels');
-            var newEl = document.createElement('li');
-            var newImg = document.createElement('img');
-            var newA = document.createElement('a'); //a tag <a> que faltava
-            var newText = document.createTextNode(item.name);
-            //var position = document.getElementsByTagName('ul')[0];
-            //os atributos do <a>
-            newImg.setAttribute("class", "logo");
-            newImg.setAttribute("src", item.img);
-            newA.setAttribute("nonce", item.url);
-            newA.setAttribute("type", item.type);
-            newA.setAttribute("href", "#");
-            newA.setAttribute("id", "playChannel");
-            newA.appendChild(newText); //colocar o texto no <a>
-            newEl.appendChild(newA);
-            newEl.appendChild(newImg);//e o <a> dentro do <li>
-            ul.appendChild(newEl);
-            //ul.appendChild(newImg);
-        });
-
-        document.querySelectorAll("a").forEach(function (button) {
-
-            button.addEventListener("click", function (event) {
-                const el = event.target || event.srcElement;
-                const nonce = el.nonce;
-                //const type = el.type;
-
-                console.log(nonce);
-                onChangePage(nonce);
-                //onChange(nonce, type);
-            });
-
-        });
-    }
-
     function onChangePage(page) {
         try {
             for (let i = 0; i < 4; i++) {
-                var oldPlayer = document.getElementById('my_video_'+i);
+                var oldPlayer = document.getElementById('my_video_' + i);
                 flvjs(oldPlayer).dispose();
+                document.getElementById('div' + i).innerHTML = "";
             }
-            
+
         } catch {
 
             for (let i = 0; i < 4; i++) {
-                var oldPlayer = document.getElementById('my_video_'+i);
+                var oldPlayer = document.getElementById('my_video_' + i);
                 videojs(oldPlayer).dispose();
+                document.getElementById('div' + i).innerHTML = "";
             }
         } finally {
-            //document.getElementById("grid").innerHTML = "";
             let i = 0;
             storeObject.forEach(function (item, index) {
-                if (item.page = page) {
+                if (String(item.page) == String(page)) {
+                    document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
-                        //playerElement.setAttribute("class", "player" + i);
-                        //playerElement.setAttribute("style", "width:50%; display:inline-block;");
-                        //playerElement.setAttribute("id", "player"+i);
-                        //document.getElementById("grid").appendChild(playerElement);
-                        // teste pietro - apagar depois 
+                    //playerElement.setAttribute("class", "player" + i);
+                    //playerElement.setAttribute("style", "width:50%; display:inline-block;");
+                    //playerElement.setAttribute("id", "player"+i);
+                    //document.getElementById("grid").appendChild(playerElement);
+                    // teste pietro - apagar depois 
 
-                        var labelVideo = document.createElement("label");
-                        labelVideo.setAttribute("class", "label" + i);
-                        var txtNode = document.createTextNode(storeObject[i].name);
-                        playerElement.appendChild(labelVideo);
-                        labelVideo.appendChild(txtNode);
+                    var labelVideo = document.createElement("label");
+                    labelVideo.setAttribute("class", "label" + i);
+                    var txtNode = document.createTextNode(item.name);
+                    playerElement.appendChild(labelVideo);
+                    labelVideo.appendChild(txtNode);
 
 
-                        if (storeObject[i].type == "video/flv") {
-                            //var script = document.createElement("script");
-                            //script.src = "flv.js";
-                            //script.type = "text/javascript";
-                            //document.getElementById("container").appendChild(script);
-                            //if (flvjs.isSupported()) {
-                            var videoElement = document.createElement("video");
-                            videoElement.setAttribute("allow", "autoplay");
-                            videoElement.setAttribute("autoplay", "true");
-                            videoElement.setAttribute("muted", "muted");
-                            //videoElement.setAttribute("width", "800%");
-                            //videoElement.setAttribute("height", "470%");
-                            videoElement.setAttribute("controls", "");
-                            videoElement.setAttribute("class", "video-flv vjs-default-skin");
-                            videoElement.setAttribute("id", "video-flv");
+                    if (item.type == "video/flv") {
+                        var video = document.createElement("video");
+                        video.setAttribute("id", "my_video_" + i);
+                        video.setAttribute("class", "video-flv vjs-fluid vjs-default-skin");
+                        video.setAttribute("controls", "");
+                        video.setAttribute("preload", "auto");
+                        video.setAttribute("allow", "autoplay");
+                        video.setAttribute("autoplay", "true");
+                        video.setAttribute("muted", "muted");
 
-                            document.getElementById("player" + i).appendChild(videoElement);
+                        var source = document.createElement("source");
+                        source.setAttribute("src", item.url);
+                        source.setAttribute("type", "flv");
 
-                            var flvPlayer = flvjs.createPlayer({
-                                type: 'flv',
-                                url: storeObject[i].url
-                            });
-                            flvPlayer.attachMediaElement(videoElement);
-                            flvPlayer.load();
-                            flvPlayer.play();
-                            //}
-                        }
-                        if (storeObject[i].type == "youtube") {
-                            var iframe = document.createElement("iframe");
-                            iframe.src = storeObject[i].url + "?autoplay=1&mute=1";
-                            iframe.frameBorder = "0";
-                            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                            //iframe.width = "800px";
-                            //iframe.height = "470px";
-                            document.getElementById("player" + i).appendChild(iframe);
-                        }
-                        if (storeObject[i].type == "application/x-mpegURL") {
-                            //var playerElement = document.getElementById('div' + i);
-                            //var script = document.createElement("script");
-                            //script.src = "video.js";
-                            //script.type = "text/javascript";
-                            var video = document.createElement("video");
-                            video.setAttribute("id", "my_video_"+i);
-                            video.setAttribute("class", "video-js vjs-fluid vjs-default-skin");
-                            video.setAttribute("controls","");
-                            video.setAttribute("preload", "auto");
+                        video.appendChild(source);
+                        playerElement.appendChild(video);
 
-                            var source = document.createElement("source");
-                            source.setAttribute("src", storeObject[i].url);
-                            source.setAttribute("type", storeObject[i].type);
+                        var flvPlayer = flvjs.createPlayer({
+                            type: 'flv',
+                            url: item.url
+                        });
+                        flvPlayer.attachMediaElement(video);
+                        flvPlayer.load();
+                        flvPlayer.play();
+                        //}
+                    }
+                    if (item.type == "youtube") {
+                        var iframe = document.createElement("iframe");
+                        iframe.src = item.url + "?autoplay=1&mute=1";
+                        iframe.frameBorder = "0";
+                        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                        iframe.width = "100%";
+                        iframe.height = "220%";
+                        iframe.setAttribute("id", "my_video_" + i);
+                        document.getElementById("div" + i).appendChild(iframe);
+                    }
+                    if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
+                        var video = document.createElement("video");
+                        video.setAttribute("id", "my_video_" + i);
+                        video.setAttribute("class", "video-js vjs-fluid vjs-default-skin");
+                        video.setAttribute("controls", "");
+                        video.setAttribute("preload", "auto");
+                        video.setAttribute("allow", "autoplay");
+                        video.setAttribute("autoplay", "true");
+                        video.setAttribute("muted", "muted");
 
-                            video.appendChild(source);
-                            playerElement.appendChild(video);
+                        var source = document.createElement("source");
+                        source.setAttribute("src", item.url);
+                        source.setAttribute("type", item.type);
 
-                            //document.getElementById("container").appendChild(script);
-                            //var videoElement = document.createElement("video");
-                            //videoElement.setAttribute("allow", "autoplay");
-                            //videoElement.setAttribute("autoplay", "true");
-                            //videoElement.setAttribute("muted", "muted");
-                            //videoElement.setAttribute("width", "800%");
-                            //videoElement.setAttribute("height", "470%");
-                            //videoElement.setAttribute("controls", "");
-                            //videoElement.setAttribute("class", "video-js vjs-default-skin");
-                            //videoElement.setAttribute("id", "video-js"+i);
-                            //playerElement.appendChild();
-                            //videoElement.setAttribute("src", url);
-                            //videoElement.setAttribute("type", type);
-                            //document.getElementById("player" + i).appendChild(videoElement);
+                        video.appendChild(source);
+                        playerElement.appendChild(video);
+                        var video = videojs('my_video_' + i, {
+                            html5: {
+                                vhs: {
+                                    overrideNative: !videojs.browser.IS_SAFARI
+                                },
+                                nativeAudioTracks: false,
+                                nativeVideoTracks: false
+                            }
+                        });
+                        //video.src({ type: type, src: url });
+                        video.ready(function () {
+                            video.src({ type: item.type, src: item.url });
+                        });
 
-                            //document.getElementById("video-js"+i).appendChild(source);
-                            var video = videojs('my_video_' + i, {
-                                html5: {
-                                    vhs: {
-                                        overrideNative: !videojs.browser.IS_SAFARI
-                                    },
-                                    nativeAudioTracks: false,
-                                    nativeVideoTracks: false
-                                }
-                            });
-                            //video.src({ type: type, src: url });
-                            video.ready(function () {
-                                video.src({ type: storeObject[i].type, src: storeObject[i].url });
-                            });
-
-                        }
-                        if (storeObject[i].type == "video/mp4" || storeObject[i].type == "video/ogg") {
-                            //var script = document.createElement("script");
-                            //script.src = "video.js";
-                            //script.type = "text/javascript";
-                            var source = document.createElement("source");
-                            source.setAttribute("src", storeObject[i].url);
-                            source.setAttribute("type", storeObject[i].type);
-
-                            //document.getElementById("container").appendChild(script);
-                            var videoElement = document.createElement("video");
-                            videoElement.setAttribute("allow", "autoplay");
-                            videoElement.setAttribute("autoplay", "true");
-                            videoElement.setAttribute("muted", "muted");
-                            // videoElement.setAttribute("width", "800%");
-                            // videoElement.setAttribute("height", "470%");
-                            videoElement.setAttribute("controls", "");
-                            videoElement.setAttribute("class", "video-js vjs-default-skin");
-                            videoElement.setAttribute("id", "video-js" + i);
-
-                            //videoElement.setAttribute("src", url);
-                            //videoElement.setAttribute("type", type);
-                            document.getElementById("player" + i).appendChild(videoElement);
-                            document.getElementById("video-js" + i).appendChild(source);
-                            var video = videojs('video-js' + i);
-                            //video.src({ type: type, src: url });
-                            video.ready(function () {
-                                video.src({ type: storeObject[i].type, src: storeObject[i].url });
-                            });
-                        }
-                        if (storeObject[i].type == "audio/mpeg" || storeObject[i].type == "audio/wav") {
-                            //var script = document.createElement("script");
-                            //script.src = "video.js";
-                            //script.type = "text/javascript";
-                            var source = document.createElement("source");
-                            source.setAttribute("src", storeObject[i].url);
-                            source.setAttribute("type", storeObject[i].type);
-
-                            //document.getElementById("container").appendChild(script);
-                            var videoElement = document.createElement("audio");
-                            videoElement.setAttribute("controls", "");
-                            videoElement.setAttribute("autoplay", "");
-                            videoElement.setAttribute("muted", "");
-                            videoElement.setAttribute("class", "video-js vjs-default-skin");
-                            videoElement.setAttribute("id", "video-js" + i);
-
-                            //videoElement.setAttribute("src", url);
-                            //videoElement.setAttribute("type", type);
-                            document.getElementById("player" + i).appendChild(videoElement);
-                            document.getElementById("video-js" + i).appendChild(source);
-                        }
+                    }
                     i++;
                 }
-
             });
         }
     }
