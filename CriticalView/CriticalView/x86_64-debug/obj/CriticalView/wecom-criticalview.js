@@ -63,13 +63,13 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
         if (app.logindata.info.unlicensed) {
             // unlicensed mode
-            console.log("Versão não licenciada!")
+            console.log("Versï¿½o nï¿½o licenciada!")
         }
         else {
             // licensed mode
-            console.log("Versão licenciada!")
+            console.log("Versï¿½o licenciada!")
         }
-    }
+    } 
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
@@ -96,6 +96,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                 var oldPlayer = document.getElementById('my_video_' + i);
                 flvjs(oldPlayer).dispose();
                 document.getElementById('div' + i).innerHTML = "";
+              
             }
 
         } catch {
@@ -111,17 +112,13 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                 if (String(item.page) == String(page)) {
                     document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
-                    //playerElement.setAttribute("class", "player" + i);
-                    //playerElement.setAttribute("style", "width:50%; display:inline-block;");
-                    //playerElement.setAttribute("id", "player"+i);
-                    //document.getElementById("grid").appendChild(playerElement);
-                    // teste pietro - apagar depois 
 
                     var labelVideo = document.createElement("label");
                     labelVideo.setAttribute("class", "label" + i);
                     var txtNode = document.createTextNode(item.name);
                     playerElement.appendChild(labelVideo);
                     labelVideo.appendChild(txtNode);
+                
 
 
                     if (item.type == "video/flv") {
@@ -156,8 +153,11 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         iframe.frameBorder = "0";
                         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                         iframe.width = "100%";
-                        iframe.height = "220%";
+                        iframe.height = "180%";
                         iframe.setAttribute("id", "my_video_" + i);
+                        var divYT = document.getElementById('div' + i)
+                        divYT.setAttribute("class", "divYT" + i)    // teste apagar depois
+                        
                         document.getElementById("div" + i).appendChild(iframe);
                     }
                     if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
@@ -169,7 +169,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         video.setAttribute("allow", "autoplay");
                         video.setAttribute("autoplay", "true");
                         video.setAttribute("muted", "muted");
-
+                        
                         var source = document.createElement("source");
                         source.setAttribute("src", item.url);
                         source.setAttribute("type", item.type);

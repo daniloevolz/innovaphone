@@ -8,7 +8,6 @@ body {
 .vjs-modal-dialog-content {
     z-index: 0;
 }
-
 div.button {
     position: absolute;
     left: 10px;
@@ -166,4 +165,7 @@ label {
     
 
     
+}
+.divYT2{
+    margin-top: 9%;   /*TESTE APAGAR DEPOIS*/
 }
