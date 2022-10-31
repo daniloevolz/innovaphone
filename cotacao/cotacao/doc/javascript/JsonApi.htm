@@ -129,12 +129,7 @@
 
     <dd>
         <pre><code class="JS">new JsonApi("echo").onconnected(function(conn) {
-    conn.onmessage(function(msg) {
-        var obj = JSON.parse(msg);
-        if (obj.mt == "Echo") {
-            conn.send(JSON.stringify({ api: "echo", mt: "EchoResult", src: obj.src }));
-        }
-    });
+    log("connected user=" + conn.sip + "@" + conn.domain + (conn.unlicensed ? " (unlicensed)" : " (got app license)"));
 });</code></pre>
     </dd>
 
@@ -178,6 +173,7 @@
     log("connected");
     conn.onclose(function() {
         log("closed");
+        conn = null;
     });
 });</code></pre>
     </dd>

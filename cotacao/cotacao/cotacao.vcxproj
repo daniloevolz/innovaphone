@@ -150,6 +150,9 @@
     <Image Include="cotacao\httpfiles\wecom-cotacaoadmin.png" />
     <Image Include="cotacao\cotacao.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="developer.txt" />
+  </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

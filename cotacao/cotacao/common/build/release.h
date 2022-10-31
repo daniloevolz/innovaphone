@@ -1,10 +1,10 @@
 
 #if !defined(RELEASE_STATE)
-#define RELEASE_STATE "dev 1"
+#define RELEASE_STATE "danilo"
 #endif
 
-#define VERSION_STR_MAJOR "13r2"
-#define VERSION_STR "13r2"
+#define VERSION_STR_MAJOR "lula"
+#define VERSION_STR "lula"
 #define VERSION_SOAP 1300
 
 #define BUILD_DO_QUOTE(X)         #X

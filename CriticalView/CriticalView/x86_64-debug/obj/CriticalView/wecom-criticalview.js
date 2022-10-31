@@ -24,10 +24,10 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
     start.onschemechanged.attach(function () {
         if (start.scheme == "dark") {
-            document.getElementById('menu-icon').setAttribute('src', './images/menu-icon-white.png');
+            //document.getElementById('menu-icon').setAttribute('src', './images/menu-icon-white.png');
         }
         if (start.scheme == "light") {
-            document.getElementById('menu-icon').setAttribute('src', './images/menu-icon.png');
+            //document.getElementById('menu-icon').setAttribute('src', './images/menu-icon.png');
         }
 
         schemes.activate(start.scheme)
@@ -60,6 +60,15 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
+
+        if (app.logindata.info.unlicensed) {
+            // unlicensed mode
+            console.log("Versão não licenciada!")
+        }
+        else {
+            // licensed mode
+            console.log("Versão licenciada!")
+        }
     }
 
     function app_message(obj) {

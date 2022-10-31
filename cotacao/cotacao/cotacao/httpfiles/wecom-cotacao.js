@@ -62,31 +62,13 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var date = formatDate(today, 'mm-dd-aaaa');
         var result = dolar(date);
         console.log("Result:" + result);
-        if (result == false) {
+        while (result = false) {
             today.setDate(today.getDate() - 1);
-            console.log("Alterando a Data:" + today);
             date = formatDate(today, 'mm-dd-aaaa');
             result = dolar(date);
-            if (result == false) {
-                today.setDate(today.getDate() - 1);
-                date = formatDate(today, 'mm-dd-aaaa');
-                result = dolar(date);
-                if (result == false) {
-                    today.setDate(today.getDate() - 1);
-                    date = formatDate(today, 'mm-dd-aaaa');
-                    result = dolar(date);
-                } else {
-                    euro(date);
-                    libra(date);
-                };
-            } else {
-                euro(date);
-                libra(date);
-            };
-        } else {
-            euro(date);
-            libra(date);
-        };
+        }
+        euro(date);
+        libra(date);
     }
     function dolar(date) {
         console.log("Dolar Compra!" + date);
