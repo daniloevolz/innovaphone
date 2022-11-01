@@ -137,14 +137,16 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
+                        
+                     
 
-                        var flvPlayer = flvjs.createPlayer({
+                        var flvPlayer = flvjs.createPlayer({    
                             type: 'flv',
                             url: item.url
                         });
                         flvPlayer.attachMediaElement(video);
                         flvPlayer.load();
-                        flvPlayer.play();
+                        flvPlayer.play();   // teste apagar depois
                         //}
                     }
                     if (item.type == "youtube") {
@@ -154,11 +156,12 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                         iframe.width = "100%";
                         iframe.height = "180%";
-                        iframe.setAttribute("id", "my_video_" + i);
-                        var divYT = document.getElementById('div' + i)
-                        divYT.setAttribute("class", "divYT" + i)    // teste apagar depois
-                        
+                        iframe.setAttribute("id", "my_video_" + i);                
                         document.getElementById("div" + i).appendChild(iframe);
+
+                        var divtest = document.getElementById('div' + i );
+                        divtest.setAttribute("class","youtube" + i)
+
                     }
                     if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
                         var video = document.createElement("video");
@@ -173,6 +176,9 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         var source = document.createElement("source");
                         source.setAttribute("src", item.url);
                         source.setAttribute("type", item.type);
+
+                        var divtest = document.getElementById('div' + i );
+                        divtest.setAttribute("class","mpeg" + i)
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
