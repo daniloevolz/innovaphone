@@ -14,11 +14,15 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             "--bg": "#191919",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--colbutton": "#ffffff",
+            "--coltext": "#000000",
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--colbutton": "#000000",
+            "--coltext": "#ffffff",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -113,13 +117,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                     document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
 
-                    var labelVideo = document.createElement("label");
-                    labelVideo.setAttribute("class", "label" + i);
-                    var txtNode = document.createTextNode(item.name);
-                    playerElement.appendChild(labelVideo);
-                    labelVideo.appendChild(txtNode);
-                
-
+                    
 
                     if (item.type == "video/flv") {
                         var video = document.createElement("video");
@@ -160,7 +158,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         document.getElementById("div" + i).appendChild(iframe);
 
                         var divtest = document.getElementById('div' + i );
-                        divtest.setAttribute("class","youtube" + i)
+                        divtest.setAttribute("class","youtube" + i) 
+
+
+                        var labelVideo = document.createElement("label");
+                        labelVideo.setAttribute("class", "label" + i);
+                        var txtNode = document.createTextNode(item.name);
+                        playerElement.appendChild(labelVideo);
+                        labelVideo.appendChild(txtNode);
 
                     }
                     if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
@@ -179,6 +184,12 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         var divtest = document.getElementById('div' + i );
                         divtest.setAttribute("class","mpeg" + i)
+
+                        var labelVideo2 = document.createElement("label");
+                        labelVideo2.setAttribute("class", "labelmpeg" + i);
+                        var txtNode2 = document.createTextNode(item.name);
+                        playerElement.appendChild(labelVideo2);
+                        labelVideo2.appendChild(txtNode2);
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
