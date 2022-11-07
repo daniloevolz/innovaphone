@@ -26,12 +26,12 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     var texts = new innovaphone.lib1.Languages(Wecom.cotacaoTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
 
-    var elInicioDiv = document.getElementById("inicio");
-    elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
-    var elB3Div = document.getElementById("b3");
-    elB3Div.addEventListener("click", function () { MudarDiv("b3") }, false);
-    var elTodasDiv = document.getElementById("todas");
-    elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
+    // var elInicioDiv = document.getElementById("inicio");
+    // elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
+    // var elB3Div = document.getElementById("b3");
+    // elB3Div.addEventListener("click", function () { MudarDiv("b3") }, false);
+    // var elTodasDiv = document.getElementById("todas");
+    // elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
 
     var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
     app.checkBuild = true;
@@ -40,15 +40,44 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
-        app.send({ api: "user", mt: "UserMessage" });
-        cotacao();
-    }
+        if (app.logindata.info.unlicensed) {
+          //sem licenï¿½a
+          var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
+          that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
+             constructor();
+          });
+
+      } else {
+
+          constructor();
+      }
+      
+  }
 
     function app_message(obj) {
-        if (obj.api == "user" && obj.mt == "UserMessageResult") {
-        }
+       
     }
-    ///Edição de Danilo em 28/07/2022
+    ///Ediï¿½ï¿½o de Danilo em 28/07/2022
+    function constructor(){
+      that.clear();
+      colEsquerda();
+      colDireita();
+    }
+    function colEsquerda(){
+        var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
+        var colnav = colesquerda.add(new innovaphone.ui1.Node("nav",null,null,"nav1"))
+        var ul =  colnav.add(new innovaphone.ui1.Node("ul",null,null,null))
+        var li = ul.add(new innovaphone.ui1.Node("li",null,"InÃ­cio","li"));
+        var li2 = ul.add(new innovaphone.ui1.Node("li",null,"B3","li"));
+        var li3 = ul.add(new innovaphone.ui1.Node("li",null,"Todas as Fontes","li"));
+    }
+    function colDireita(){
+        var coldireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
+        var linha1 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
+        var imginn = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
+        imginn.setAttribute("src", "logo-inn.png");
+
+    }
     function cotacao() {
         moedas();
         const myInterval = window.setInterval(function () {
@@ -77,7 +106,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         try {
             console.log(json_obj);
             const dol = json_obj.value[4].cotacaoCompra;
-            console.log("Dólar Compra: " + dol.toString().substr(0, 4));
+            console.log("Dï¿½lar Compra: " + dol.toString().substr(0, 4));
             document.getElementById('item-dolar').innerHTML
                 = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
             document.getElementById('item-data').innerHTML
@@ -86,7 +115,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         } catch {
             try {
                 const dol = json_obj.value[3].cotacaoCompra;
-                console.log("Dólar Compra: " + dol.toString().substr(0, 4));
+                console.log("Dï¿½lar Compra: " + dol.toString().substr(0, 4));
                 document.getElementById('item-dolar').innerHTML
                     = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                 document.getElementById('item-data').innerHTML
@@ -96,7 +125,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                 try {
                     console.log("Dolar Compra! 2");
                     const dol = json_obj.value[2].cotacaoCompra;
-                    console.log("Dólar Compra: " + dol.toString().substr(0, 4));
+                    console.log("Dï¿½lar Compra: " + dol.toString().substr(0, 4));
                     document.getElementById('item-dolar').innerHTML
                         = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                     document.getElementById('item-data').innerHTML
@@ -106,7 +135,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                     try {
                         console.log("Dolar Compra! 1");
                         const dol = json_obj.value[1].cotacaoCompra;
-                        console.log("Dólar Compra: " + dol.toString().substr(0, 4));
+                        console.log("Dï¿½lar Compra: " + dol.toString().substr(0, 4));
                         document.getElementById('item-dolar').innerHTML
                             = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                         document.getElementById('item-data').innerHTML
@@ -116,7 +145,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                         try {
                             console.log("Dolar Compra! 0");
                             const dol = json_obj.value[0].cotacaoCompra;
-                            console.log("Dólar Compra: " + dol.toString().substr(0, 4));
+                            console.log("Dï¿½lar Compra: " + dol.toString().substr(0, 4));
                             document.getElementById('item-dolar').innerHTML
                                 = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                             document.getElementById('item-data').innerHTML
@@ -237,32 +266,32 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         return format.replace(/mm|dd|aaaa|aa/gi, matched => map[matched])
     }
 
-    function MudarDiv(el) {
-        if (el == "inicio") {
-            document.getElementById("b3").style.fontWeight = 'normal';
-            document.getElementById("todas").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'bold';
-            document.getElementById('linha2').style.display = 'flex';
-            document.getElementById('linha2b3').style.display = 'none';
-            document.getElementById('linha2todas').style.display = 'none';
-        } else if (el == "b3") {
-            document.getElementById("b3").style.fontWeight = 'bold';
-            document.getElementById("todas").style.fontWeight = 'normal';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linha2').style.display = 'none';
-            document.getElementById('linha2b3').style.display = 'block';
-            document.getElementById('linha2todas').style.display = 'none';
-        } else if (el == "todas") {
-            document.getElementById("b3").style.fontWeight = 'normal';
-            document.getElementById("todas").style.fontWeight = 'bold';
-            document.getElementById("inicio").style.fontWeight = 'normal';
-            document.getElementById('linha2').style.display = 'none';
-            document.getElementById('linha2b3').style.display = 'none';
-            document.getElementById('linha2todas').style.display = 'block';
-        }
-    }
+    // function MudarDiv(el) {
+    //     if (el == "inicio") {
+    //         document.getElementById("b3").style.fontWeight = 'normal';
+    //         document.getElementById("todas").style.fontWeight = 'normal';
+    //         document.getElementById("inicio").style.fontWeight = 'bold';
+    //         document.getElementById('linha2').style.display = 'flex';
+    //         document.getElementById('linha2b3').style.display = 'none';
+    //         document.getElementById('linha2todas').style.display = 'none';
+    //     } else if (el == "b3") {
+    //         document.getElementById("b3").style.fontWeight = 'bold';
+    //         document.getElementById("todas").style.fontWeight = 'normal';
+    //         document.getElementById("inicio").style.fontWeight = 'normal';
+    //         document.getElementById('linha2').style.display = 'none';
+    //         document.getElementById('linha2b3').style.display = 'block';
+    //         document.getElementById('linha2todas').style.display = 'none';
+    //     } else if (el == "todas") {
+    //         document.getElementById("b3").style.fontWeight = 'normal';
+    //         document.getElementById("todas").style.fontWeight = 'bold';
+    //         document.getElementById("inicio").style.fontWeight = 'normal';
+    //         document.getElementById('linha2').style.display = 'none';
+    //         document.getElementById('linha2b3').style.display = 'none';
+    //         document.getElementById('linha2todas').style.display = 'block';
+    //     }
+    // }
 
-    ///Fim Edição Danilo
+    ///Fim Ediï¿½ï¿½o Danilo
 }
 
 Wecom.cotacao.prototype = innovaphone.ui1.nodePrototype;
