@@ -28,5 +28,10 @@
         "password": false
       }
     ]
+  },
+  "apis": {
+    "wecom-wecall": {
+      "presence": true
+    }
   }
 }
