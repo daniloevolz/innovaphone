@@ -13,7 +13,7 @@ Wecom.space = Wecom.space || function (start, args) {
         dark: {
             "--bg": "#191919",
             "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--text-standard": "#4a4a49",
         },
         light: {
             "--bg": "white",
