@@ -32,10 +32,6 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    //var elSalvarCloseModal = document.getElementById("salvarClose");
-    //elSalvarCloseModal.addEventListener("click", function () { insertUrl() }, false);
-
-
     function app_connected(domain, user, dn, appdomain) {
         if (app.logindata.info.unlicensed) {
             //sem licen�a
@@ -56,32 +52,17 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             if (obj.src == "") {
                 var urlPortal = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:calc(5% - 6px); font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", "btn btn - save btn - lg"));
                 that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "salvarClose").addEvent("click", function () {
-                    //var urlPortal = document.getElementById("urlPortal").value;
                     urlPortal = urlPortal.getValue();
                     if (urlPortal.length > 1) {
                         app.send({ api: "user", mt: "AddMessage", url: String(urlPortal) });
                     }
                 });
-                //document.getElementById('section1').style.display = 'block';
-                //document.getElementById('section2').style.display = 'none';
-
             } else {
                 var bodyIframe = that.add(new innovaphone.ui1.Node("iframe", "position:fixed; top:0px; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;", null, "iframebody"));
                 bodyIframe.setAttribute("src", obj.src);
-                //document.getElementById('section2').style.display = 'block';
-                //document.getElementById('section1').style.display = 'none';
-                //document.getElementById("iframebody").setAttribute("src", obj.src);
-            }
-            
+            } 
         }
     }
-    //function insertUrl(){
-    //    var urlPortal = document.getElementById("urlPortal").value;
-    //    if (urlPortal.length > 1) {
-    //        app.send({ api: "user", mt: "AddMessage", url: String(urlPortal) });
-    //    }
-
-    //}
 }
 
 Wecom.wecall.prototype = innovaphone.ui1.nodePrototype;
