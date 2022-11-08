@@ -1,10 +1,10 @@
-
+ï»¿
 var Wecom = Wecom || {};
 Wecom.wecallTexts = {
     pt: {
         salvarClose: "Salvar",
         urlText: "URL do Iframe",
-        licText: "Não licenciado, solicite ao seu administrador que licencie o uso da aplicação.",
+        licText: "NÃ£o licenciado, solicite ao seu administrador que licencie o uso da aplicaÃ§Ã£o.",
         licContinue: "Entendo os riscos!"
     },
     en: {
