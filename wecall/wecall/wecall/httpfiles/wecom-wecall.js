@@ -38,7 +38,7 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
         if (app.logindata.info.unlicensed) {
-            //sem licen�a
+            //sem licença
             var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
             that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
                 app.send({ api: "user", mt: "UserMessage" });
