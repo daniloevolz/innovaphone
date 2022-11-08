@@ -21,7 +21,7 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt === "GetCount") {
                 conn.send(JSON.stringify({ api: "user", mt: "GetCountResult", count: count, src: obj.src }));
             }
-            if (obj.mt === "CountZero") {
+            if (obj.mt === "DeleteBadge") {
                 count = 0;
                 conn.send(JSON.stringify({ api: "user", mt: "IncrementCountResult", count: count, src: obj.src }));
 
@@ -153,3 +153,122 @@ function updateBadge(ws, callid, count) {
 
     ws.send(JSON.stringify(msg));
 }
+
+// the variable containing the string value
+var value = null;
+var baseUrl = WebServer.url;
+log("url: " + baseUrl);
+
+WebServer.onurlchanged(function (newUrl) {
+    baseUrl = newUrl;
+    log("url: " + baseUrl);
+});
+
+
+WebServer.onrequest("makecall", function (req) {
+    log("danilo-req makecall1: " + req);
+
+    if (req.method == "GET") {
+        if (value) {
+            // value exists, send it back as text/plain
+            req.responseContentType("txt")
+                .sendResponse()
+                .onsend(function (req) {
+                    req.send(new TextEncoder("utf-8").encode(value), true);
+                });
+        }
+        else {
+            // value does not exist, send 404 Not Found
+            req.cancel();
+        }
+
+    }
+    else if (req.method == "PUT") {
+        // overwrite existing value with newValue
+
+        var newValue = "";
+        req.onrecv(function (req, data) {
+            log("danilo-req: " + data);
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+            }
+        });
+    }
+    else if (req.method == "POST") {
+        req.onrecv(function (req, data) {
+            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            log("danilo-req makecall:data " + (new TextDecoder("utf-8").decode(data)));
+            log("danilo-req makecall:user " + obj.user);
+            log("danilo-req makecall:num " + obj.num);
+
+            connectionsUser.forEach(function (connection) {
+                if (connection.sip == obj.user) {
+                    log("danilo-req makecall:connection user" + connection.guid);
+                    connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+                }
+                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+                log("danilo-req makecall:connection NOT user " );
+            });
+            req.recv();
+        });
+        req.sendResponse(200);
+    }
+    else {
+        req.cancel();
+    }
+});
+WebServer.onrequest("disconnectcall", function (req) {
+    log("danilo-req disconnectcall1: " + req);
+    if (req.method == "POST") {
+        req.onrecv(function (req, data) {
+            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            log("danilo-req disconnectcall:data " + (new TextDecoder("utf-8").decode(data)));
+            log("danilo-req disconnectcall:user " + obj.user);
+            log("danilo-req disconnectcall:num " + obj.num);
+
+            connectionsUser.forEach(function (connection) {
+                if (connection.sip == obj.user) {
+                    log("danilo-req disconnectcall:connection user" + connection.guid);
+                    connection.send(JSON.stringify({ api: "user", mt: "DisconnectCall", num: obj.num }));
+                }
+                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+                log("danilo-req disconnectcall:connection NOT user ");
+            });
+            req.recv();
+        });
+        req.sendResponse(200);
+    }
+    else {
+        req.cancel();
+    }
+});
+WebServer.onrequest("incrementbadge", function (req) {
+    log("danilo-req incrementbadge1: " + req);
+    if (req.method == "POST") {
+        req.onrecv(function (req, data) {
+            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            log("danilo-req incrementbadge:data " + (new TextDecoder("utf-8").decode(data)));
+            log("danilo-req incrementbadge:user " + obj.user);
+            log("danilo-req incrementbadge:num " + obj.num);
+
+            connectionsUser.forEach(function (connection) {
+                if (connection.sip == obj.user) {
+                    log("danilo-req incrementbadge:connection user" + connection.guid);
+                    connection.send(JSON.stringify({ api: "user", mt: "IncrementBadge", num: obj.num }));
+                }
+                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+                log("danilo-req incrementbadge:connection NOT user ");
+            });
+            req.recv();
+        });
+        req.sendResponse(200);
+    }
+    else {
+        req.cancel();
+    }
+});

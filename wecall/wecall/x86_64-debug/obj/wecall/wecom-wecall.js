@@ -8,6 +8,9 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     this.createNode("body");
     var that = this;
     var rcc = null;
+    var userUI = null;
+    var phoneApi = start.consumeApi("com.innovaphone.phone");
+    var phoneinfoApi = start.provideApi("com.innovaphone.phoneinfo");
 
     var colorSchemes = {
         dark: {
@@ -32,13 +35,10 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    //var elSalvarCloseModal = document.getElementById("salvarClose");
-    //elSalvarCloseModal.addEventListener("click", function () { insertUrl() }, false);
-
-
     function app_connected(domain, user, dn, appdomain) {
+        userUI = user;
         if (app.logindata.info.unlicensed) {
-            //sem licença
+            //sem licenï¿½a
             var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
             that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
                 app.send({ api: "user", mt: "UserMessage" });
@@ -56,32 +56,43 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             if (obj.src == "") {
                 var urlPortal = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:calc(5% - 6px); font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", "btn btn - save btn - lg"));
                 that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "salvarClose").addEvent("click", function () {
-                    //var urlPortal = document.getElementById("urlPortal").value;
                     urlPortal = urlPortal.getValue();
                     if (urlPortal.length > 1) {
                         app.send({ api: "user", mt: "AddMessage", url: String(urlPortal) });
                     }
                 });
-                //document.getElementById('section1').style.display = 'block';
-                //document.getElementById('section2').style.display = 'none';
-
             } else {
                 var bodyIframe = that.add(new innovaphone.ui1.Node("iframe", "position:fixed; top:0px; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;", null, "iframebody"));
                 bodyIframe.setAttribute("src", obj.src);
-                //document.getElementById('section2').style.display = 'block';
-                //document.getElementById('section1').style.display = 'none';
-                //document.getElementById("iframebody").setAttribute("src", obj.src);
-            }
-            
+            } 
+        }
+        if (obj.api == "user" && obj.mt == "MakeCall") {
+            console.warn("::MakeCall::");
+            phoneApi.send({ mt: "StartCall", num: String(obj.num) });
+        }
+        if (obj.api == "user" && obj.mt == "DisconnectCall") {
+            console.warn("::DisconnectCall::");
+            phoneApi.send({ mt: "DisconnectCall" });
+        }
+        if (obj.api == "user" && obj.mt == "IncrementBadge") {
+            console.warn("::IncrementBadge::");
+            app.send({ api: "user", mt: "IncrementCount" });
+        }
+        if (obj.api == "user" && obj.mt == "DeleteBadge") {
+            console.warn("::DeleteBadge::");
+            app.send({ api: "user", mt: "DeleteBadge" });
         }
     }
-    //function insertUrl(){
-    //    var urlPortal = document.getElementById("urlPortal").value;
-    //    if (urlPortal.length > 1) {
-    //        app.send({ api: "user", mt: "AddMessage", url: String(urlPortal) });
-    //    }
-
-    //}
+    phoneApi.onupdate.attach(function (sender, type) {
+        Object.keys(sender.model).forEach(function (key) {
+            var provider = sender.model[key];
+            if (provider.model.calls) {
+                provider.model.calls.forEach(function (call) {
+                    console.warn("::phoneapionupdate:: Direction=" + String(call.dir) + " State=" + String(call.state) + " Numero=" + String(call.num));
+                });
+            }
+        });
+    });
 }
 
 Wecom.wecall.prototype = innovaphone.ui1.nodePrototype;

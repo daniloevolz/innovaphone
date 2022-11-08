@@ -31,7 +31,16 @@
   },
   "apis": {
     "wecom-wecall": {
-      "presence": true
+      "presence": true,
+      "com.innovaphone.phoneinfo": {
+        "info": {}
+      },
+      "com.innovaphone.phone": {
+        "info": {}
+      },
+      "com.innovaphone.calllist": {
+        "info": {}
+      }
     }
   }
 }
