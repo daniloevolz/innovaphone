@@ -5,7 +5,11 @@ Wecom.cotacaoTexts = {
         salvarClose: "Salvar",
         urlText: "URL do Iframe",
         licText: "Não licenciado, solicite ao seu administrador que licencie o uso da aplicação.",
-        licContinue: "Entendo os riscos!"
+        licContinue: "Entendo os riscos!",
+        licInicio: "Início",
+        licB3: "B3",
+        licTodasFontes: "Todas as Fontes",
+        licBCB: "Dados do BCB:"
     },
     en: {
         salvarClose: "Save",

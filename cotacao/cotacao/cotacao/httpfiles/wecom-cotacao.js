@@ -67,18 +67,59 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
         var colnav = colesquerda.add(new innovaphone.ui1.Node("nav",null,null,"nav1"))
         var ul =  colnav.add(new innovaphone.ui1.Node("ul",null,null,null))
-        var li = ul.add(new innovaphone.ui1.Node("li",null,"Início","li"));
-        var li2 = ul.add(new innovaphone.ui1.Node("li",null,"B3","li"));
-        var li3 = ul.add(new innovaphone.ui1.Node("li",null,"Todas as Fontes","li"));
-        
+        var li = ul.add(new innovaphone.ui1.Node("li",null,null,"li"));
+        var li2 = ul.add(new innovaphone.ui1.Node("li",null,null,"li"));
+        var li3 = ul.add(new innovaphone.ui1.Node("li",null,null,"li"));
+        var a = li.add(new innovaphone.ui1.Node("a",null,texts.text("licInicio"),"a"))
+        var a2 = li2.add(new innovaphone.ui1.Node("a",null,texts.text("licTodasFontes"),"a"))
+        var a3 = li3.add(new innovaphone.ui1.Node("a",null,texts.text("licB3"),"a"))
+        a.setAttribute("href","#")
+        a2.setAttribute("href","#")
+        a3.setAttribute("href","#")
     }
     function colDireita(){
         var coldireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
+        // linha 1
         var linha1 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
         var imginn = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
         imginn.setAttribute("src", "logo-inn.png");
-
+        // linha 2 
+        var linha2 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha2"));
+        //linha 2 - dolar
+        var divDolar = linha2.add(new innovaphone.ui1.Div(null,null,"div-dolar"));
+        var imgDolar = divDolar.add(new innovaphone.ui1.Node("img",null,null,"img-item"));
+        imgDolar.setAttribute("src","img-dolar.png");
+        imgDolar.setAttribute("id","img-itemdol");
+        var labelDolar = divDolar.add(new innovaphone.ui1.Node("label",null,null,"item-dolar"));
+        labelDolar.setAttribute("id","item-dolar");
+        // linha 2 - euro
+        var divEuro = linha2.add(new innovaphone.ui1.Div(null,null,"div-euro"));
+        var imgEuro = divEuro.add(new innovaphone.ui1.Node("img",null,null,"img-item"));
+        imgEuro.setAttribute("src","img-euro.png");
+        var labelEuro = divEuro.add(new innovaphone.ui1.Node("label",null,null,"item-euro"));
+        labelEuro.setAttribute("id","item-euro");
+        //linha 2 - libra 
+        var divLibra = linha2.add(new innovaphone.ui1.Div(null,null,"div-libra"));
+        var imgLibra = divLibra.add(new innovaphone.ui1.Node("img",null,null,"img-item"));
+        imgLibra.setAttribute("src","img-libra.png");
+        var labelLibra = divLibra.add(new innovaphone.ui1.Node("label",null,null,"item-libra"));
+        labelLibra.setAttribute("id","item-libra");
+        // linha2 - Dados do BBC 
+        var divBCB = linha2.add(new innovaphone.ui1.Div(null,null,"div-data"));
+        var h1BCB = divBCB.add(new innovaphone.ui1.Node("h1","font-size:10px; font-family:'Century Gothic'; color:grey",texts.text("licBCB"),null));
+        h1BCB.setAttribute("id","item-data");
+        // linha 2 - LOGO WECOM
+        var wecom = linha2.add(new innovaphone.ui1.Div(null,null,null));
+        wecom.setAttribute("id","logowecom");
+        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+        wecomA.setAttribute("href","https://wecom.com.br")
+        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+        imgwecom.setAttribute("src","logo.png")
     }
+  
+
+
+
     function cotacao() {
         moedas();
         const myInterval = window.setInterval(function () {
