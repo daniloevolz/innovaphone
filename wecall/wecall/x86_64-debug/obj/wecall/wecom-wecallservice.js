@@ -1,5 +1,14 @@
 var count = 1;
-
+var sendCallHistory = Config.sendCallHistory;
+var sendCallEvents = Config.sendCallEvents;
+var urlPhoneApiEvents = Config.urlPhoneApiEvents;
+var urlCallHistory = Config.urlCallHistory;
+Config.onchanged(function () {
+    sendCallHistory = Config.sendCallHistory;
+    sendCallEvents = Config.sendCallEvents;
+    urlPhoneApiEvents = Config.urlPhoneApiEvents;
+    urlCallHistory = Config.urlCallHistory;
+});
 
 var connectionsUser = [];
 new JsonApi("user").onconnected(function (conn) {
@@ -8,6 +17,16 @@ new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-wecall") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
+            if (obj.mt == "PhoneApiEvent") {
+                if (sendCallEvents == "true") {
+                    httpClient(urlPhoneApiEvents, obj.obj);
+                }
+            }
+            if (obj.mt == "CallHistoryEvent") {
+                if (sendCallHistory == "true") {
+                    httpClient(urlCallHistory, obj.obj);
+                }
+            }
             if (obj.mt == "UserMessage") {
                 var url = Config.url;
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
@@ -18,43 +37,12 @@ new JsonApi("user").onconnected(function (conn) {
                 var url = Config.url;
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
             }
-            if (obj.mt === "GetCount") {
-                conn.send(JSON.stringify({ api: "user", mt: "GetCountResult", count: count, src: obj.src }));
-            }
-            if (obj.mt === "DeleteBadge") {
-                count = 0;
-                conn.send(JSON.stringify({ api: "user", mt: "IncrementCountResult", count: count, src: obj.src }));
-
-                log("Sending updates via Presence Signalling");
-                connectionsPbxSignal.forEach(function (connection) {
-                    connection.calls.forEach(function (call) {
-                        updateBadge(connection.ws, call, count);
-                    });
-                });
-
-                log("Sending updates via WS");
-                connectionsUser.forEach(function (connection) {
-                    connection.send(JSON.stringify({ api: "user", mt: "UpdateCount", count: count }));
-                });
-            }
-            if (obj.mt === "IncrementCount") {
-                count++;
-                conn.send(JSON.stringify({ api: "user", mt: "IncrementCountResult", count: count, src: obj.src }));
-
-                log("Sending updates via Presence Signalling");
-                connectionsPbxSignal.forEach(function (connection) {
-                    connection.calls.forEach(function (call) {
-                        updateBadge(connection.ws, call, count);
-                    });
-                });
-
-                log("Sending updates via WS");
-                connectionsUser.forEach(function (connection) {
-                    connection.send(JSON.stringify({ api: "user", mt: "UpdateCount", count: count }));
-                });
-            }
         });
     }
+    conn.onclose(function () {
+        log("User: disconnected");
+        connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+    });
 });
 
 new JsonApi("admin").onconnected(function(conn) {
@@ -99,7 +87,8 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
     // for each PBX API connection an own call array is maintained
     var calls = [];
-    connectionsPbxSignal.push({ ws: conn, calls: calls });
+    var sip = [];
+    connectionsPbxSignal.push({ ws: conn, calls: calls, sip: sip });
 
     // register to the PBX in order to acceppt incoming presence calls
     conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" }));
@@ -123,6 +112,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
             // add callid to the array for calls for this connection
             connectionsPbxSignal.filter(function (v) { return v.ws === conn })[0].calls.push(obj.call);
+            connectionsPbxSignal.filter(function (v) { return v.ws === conn })[0].sip.push(obj.sig.cg.sip);
 
             // send notification with badge count first time the user has connected
             updateBadge(conn, obj.call, count);
@@ -155,7 +145,6 @@ function updateBadge(ws, callid, count) {
 }
 
 // the variable containing the string value
-var value = null;
 var baseUrl = WebServer.url;
 log("url: " + baseUrl);
 
@@ -166,40 +155,7 @@ WebServer.onurlchanged(function (newUrl) {
 
 
 WebServer.onrequest("makecall", function (req) {
-    log("danilo-req makecall1: " + req);
-
-    if (req.method == "GET") {
-        if (value) {
-            // value exists, send it back as text/plain
-            req.responseContentType("txt")
-                .sendResponse()
-                .onsend(function (req) {
-                    req.send(new TextEncoder("utf-8").encode(value), true);
-                });
-        }
-        else {
-            // value does not exist, send 404 Not Found
-            req.cancel();
-        }
-
-    }
-    else if (req.method == "PUT") {
-        // overwrite existing value with newValue
-
-        var newValue = "";
-        req.onrecv(function (req, data) {
-            log("danilo-req: " + data);
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-            }
-        });
-    }
-    else if (req.method == "POST") {
+    if (req.method == "POST") {
         req.onrecv(function (req, data) {
             var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
             log("danilo-req makecall:data " + (new TextDecoder("utf-8").decode(data)));
@@ -212,9 +168,9 @@ WebServer.onrequest("makecall", function (req) {
                     connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
                 }
                 //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
-                log("danilo-req makecall:connection NOT user " );
+                log("danilo-req makecall:connection NOT user ");
             });
-            req.recv();
+            //req.recv();
         });
         req.sendResponse(200);
     }
@@ -223,14 +179,12 @@ WebServer.onrequest("makecall", function (req) {
     }
 });
 WebServer.onrequest("disconnectcall", function (req) {
-    log("danilo-req disconnectcall1: " + req);
     if (req.method == "POST") {
         req.onrecv(function (req, data) {
             var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
             log("danilo-req disconnectcall:data " + (new TextDecoder("utf-8").decode(data)));
             log("danilo-req disconnectcall:user " + obj.user);
             log("danilo-req disconnectcall:num " + obj.num);
-
             connectionsUser.forEach(function (connection) {
                 if (connection.sip == obj.user) {
                     log("danilo-req disconnectcall:connection user" + connection.guid);
@@ -247,28 +201,58 @@ WebServer.onrequest("disconnectcall", function (req) {
         req.cancel();
     }
 });
-WebServer.onrequest("incrementbadge", function (req) {
-    log("danilo-req incrementbadge1: " + req);
+WebServer.onrequest("badge", function (req) {
     if (req.method == "POST") {
         req.onrecv(function (req, data) {
             var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            log("danilo-req incrementbadge:data " + (new TextDecoder("utf-8").decode(data)));
-            log("danilo-req incrementbadge:user " + obj.user);
-            log("danilo-req incrementbadge:num " + obj.num);
+            log("danilo-req badge:data " + (new TextDecoder("utf-8").decode(data)));
+            log("danilo-req badge:user " + obj.user);
+            log("danilo-req badge:num " + obj.num);
+            connectionsPbxSignal.forEach(function (connection) {
+                log("danilo-req badge:connection " + JSON.stringify(connection));
+                //var jsonConns = JSON.parse(connection);
+                var sipConns = connection.sip;
+                var index = sipConns.indexOf(obj.user);
+                log("danilo-req badge:index of user " + String(index));
 
-            connectionsUser.forEach(function (connection) {
-                if (connection.sip == obj.user) {
-                    log("danilo-req incrementbadge:connection user" + connection.guid);
-                    connection.send(JSON.stringify({ api: "user", mt: "IncrementBadge", num: obj.num }));
+                if (String(obj.user) == String(connection.sip[index])) {
+                    log("danilo-req badge:call sip " + connection.calls[index]);
+                    updateBadge(connection.ws, connection.calls[index], obj.num);
+                } else {
+                    log("danilo-req badge:connection NOT user ");
                 }
-                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
-                log("danilo-req incrementbadge:connection NOT user ");
             });
-            req.recv();
+            req.responseContentType("application/json")
+                .sendResponse()
+                .onsend(function (req) {
+                    req.send(new TextEncoder("utf-8").encode("OK"), true);
+                });
+            req.oncomplete(function (req, success) {
+                log("HttpRequest complete");
+            });
         });
-        req.sendResponse(200);
+
     }
     else {
         req.cancel();
     }
 });
+
+function httpClient(url, call) {
+    var req = HttpClient.request("POST", url);
+    var req = HttpClient.timeout(30000);
+    req.header("X-Token", "danilo");
+    req.contentType("application/json");
+    req.onsend(function (req) {
+        req.send(new TextEncoder("utf-8").encode(JSON.Stringfy(call)), true);
+    });
+    req.onrecv(function (req, data, last) {
+        if (!last) req.recv();
+    });
+    req.oncomplete(function (req, success) {
+        log("HttpRequest complete");
+    })
+        .onerror(function (error) {
+            log("HttpRequest error=" + error);
+        });
+}

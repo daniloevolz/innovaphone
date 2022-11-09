@@ -26,6 +26,34 @@
         "type": "STRING",
         "default": "",
         "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallHistory",
+        "type": "STRING",
+        "default": "false",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlCallHistory",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/callhistory",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallEvents",
+        "type": "STRING",
+        "default": "false",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlPhoneApiEvents",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/phoneevents",
+        "password": false
       }
     ]
   },

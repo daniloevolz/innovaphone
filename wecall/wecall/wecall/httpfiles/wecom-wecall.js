@@ -11,6 +11,9 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     var userUI = null;
     var phoneApi = start.consumeApi("com.innovaphone.phone");
     var phoneinfoApi = start.provideApi("com.innovaphone.phoneinfo");
+    var calllistApi = start.consumeApi("com.innovaphone.calllist");
+    calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
+    calllistApi.onmessage.attach(calllistonmessage);
 
     var colorSchemes = {
         dark: {
@@ -74,14 +77,6 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             console.warn("::DisconnectCall::");
             phoneApi.send({ mt: "DisconnectCall" });
         }
-        if (obj.api == "user" && obj.mt == "IncrementBadge") {
-            console.warn("::IncrementBadge::");
-            app.send({ api: "user", mt: "IncrementCount" });
-        }
-        if (obj.api == "user" && obj.mt == "DeleteBadge") {
-            console.warn("::DeleteBadge::");
-            app.send({ api: "user", mt: "DeleteBadge" });
-        }
     }
     phoneApi.onupdate.attach(function (sender, type) {
         Object.keys(sender.model).forEach(function (key) {
@@ -89,10 +84,18 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             if (provider.model.calls) {
                 provider.model.calls.forEach(function (call) {
                     console.warn("::phoneapionupdate:: Direction=" + String(call.dir) + " State=" + String(call.state) + " Numero=" + String(call.num));
+                    app.send({ api: "user", mt: "PhoneApiEvent", obj: JSON.Stringfy( call )});
                 });
             }
         });
     });
+    
+    function calllistonmessage(consumer, obj) {
+        if (obj.msg) {
+            console.log("::calllistApi::onmessage() msg=" + JSON.stringify(obj.msg));
+            app.send({ api: "user", mt: "CallHistoryEvent", obj: JSON.Stringfy(obj.msg) });
+        }
+    }
 }
 
 Wecom.wecall.prototype = innovaphone.ui1.nodePrototype;
