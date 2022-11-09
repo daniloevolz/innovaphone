@@ -50,6 +50,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
       } else {
 
           constructor();
+          
       }
       
   }
@@ -62,6 +63,15 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
       that.clear();
       colEsquerda();
       colDireita();
+      cotacao();
+
+         var elInicioDiv = document.getElementById("inicio");
+     elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
+     var elB3Div = document.getElementById("b3");
+     elB3Div.addEventListener("click", function () { MudarDiv("b3") }, false);
+    var elTodasDiv = document.getElementById("todas");
+    elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
+
     }
     function colEsquerda(){
         var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
@@ -76,6 +86,9 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         a.setAttribute("href","#")
         a2.setAttribute("href","#")
         a3.setAttribute("href","#")
+        a.setAttribute("id","inicio")
+        a2.setAttribute("id","todas")
+        a3.setAttribute("id","b3")
     }
     function colDireita(){
         var coldireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
@@ -115,8 +128,27 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         wecomA.setAttribute("href","https://wecom.com.br")
         var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
         imgwecom.setAttribute("src","logo.png")
+        //linha2b3 
+        var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2b3"))
+        linha2b3.setAttribute("id","linha2b3")
+        var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
+        var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
+        iframelinha2b3.setAttribute("id","tradingview_8c59f")
+        iframelinha2b3.setAttribute("src","https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV")
+        //linha2 todas
+        var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2todas"))
+        linha2todas.setAttribute("id","linha2todas")
     }
-  
+    // function linha2b3(){
+      
+    //     var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:block",null,"linha2b3"))
+    //     linha2b3.setAttribute("id","linha2b3")
+    //     var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
+    //     var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
+    //     iframelinha2b3.setAttribute("id","tradingview_8c59f")
+    //     iframelinha2b3.setAttribute("src","https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV")
+
+    // }
 
 
 
@@ -308,30 +340,31 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         return format.replace(/mm|dd|aaaa|aa/gi, matched => map[matched])
     }
 
-    // function MudarDiv(el) {
-    //     if (el == "inicio") {
-    //         document.getElementById("b3").style.fontWeight = 'normal';
-    //         document.getElementById("todas").style.fontWeight = 'normal';
-    //         document.getElementById("inicio").style.fontWeight = 'bold';
-    //         document.getElementById('linha2').style.display = 'flex';
-    //         document.getElementById('linha2b3').style.display = 'none';
-    //         document.getElementById('linha2todas').style.display = 'none';
-    //     } else if (el == "b3") {
-    //         document.getElementById("b3").style.fontWeight = 'bold';
-    //         document.getElementById("todas").style.fontWeight = 'normal';
-    //         document.getElementById("inicio").style.fontWeight = 'normal';
-    //         document.getElementById('linha2').style.display = 'none';
-    //         document.getElementById('linha2b3').style.display = 'block';
-    //         document.getElementById('linha2todas').style.display = 'none';
-    //     } else if (el == "todas") {
-    //         document.getElementById("b3").style.fontWeight = 'normal';
-    //         document.getElementById("todas").style.fontWeight = 'bold';
-    //         document.getElementById("inicio").style.fontWeight = 'normal';
-    //         document.getElementById('linha2').style.display = 'none';
-    //         document.getElementById('linha2b3').style.display = 'none';
-    //         document.getElementById('linha2todas').style.display = 'block';
-    //     }
-    // }
+        function MudarDiv(el) {
+        if (el == "inicio") {
+            document.getElementById("b3").style.fontWeight = 'normal';
+            document.getElementById("todas").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'bold';
+            document.getElementById("linha2").style.display = 'block'; 
+            document.getElementById("linha2b3").style.display = 'none';
+            document.getElementById("linha2todas").style.display = 'none';
+         } else if (el == "b3") {
+            document.getElementById("b3").style.fontWeight = 'bold';
+            document.getElementById("todas").style.fontWeight = 'normal';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+            document.getElementById("linha2").style.display = 'none';
+            document.getElementById("linha2b3").style.display = 'block';
+            document.getElementById('linha2todas').style.display = 'none';
+        } else if (el == "todas") {
+            document.getElementById("b3").style.fontWeight = 'normal';
+            document.getElementById("todas").style.fontWeight = 'bold';
+            document.getElementById("inicio").style.fontWeight = 'normal';
+           document.getElementById("linha2").style.display = 'none';
+            document.getElementById("linha2b3").style.display = 'none';
+            document.getElementById("linha2todas").style.display = 'block';
+        }
+     }
+
 
     ///Fim Edi��o Danilo
 }
