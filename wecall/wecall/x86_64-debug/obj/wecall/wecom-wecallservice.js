@@ -1,4 +1,4 @@
-var count = 1;
+var count = 0;
 var sendCallHistory = Config.sendCallHistory;
 var sendCallEvents = Config.sendCallEvents;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
@@ -8,9 +8,12 @@ Config.onchanged(function () {
     sendCallEvents = Config.sendCallEvents;
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
     urlCallHistory = Config.urlCallHistory;
+
+    updateConfigUsers();
 });
 
 var connectionsUser = [];
+
 new JsonApi("user").onconnected(function (conn) {
     connectionsUser.push(conn);
 
@@ -45,13 +48,14 @@ new JsonApi("user").onconnected(function (conn) {
     });
 });
 
-new JsonApi("admin").onconnected(function(conn) {
+new JsonApi("admin").onconnected(function (conn) {
+    connectionsUser.push(conn);
     if (conn.app == "wecom-wecalladmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
-                var urladmin = Config.urladmin;
-                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: urladmin }));
+                log("danilo-req AdminMessage:");
+                updateConfigUsers();
             }
             if (obj.mt == "AddMessage") {
                 Config.urladmin = obj.url;
@@ -59,8 +63,35 @@ new JsonApi("admin").onconnected(function(conn) {
                 var urladmin = Config.urladmin;
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: urladmin }));
             }
+            if (obj.mt == "UpdateConfig") {
+                log("danilo-req UpdateConfig:");
+                if (obj.prt == "urlPhoneApiEvents") {
+                    Config.urlPhoneApiEvents = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "urlCallHistory") {
+                    Config.urlCallHistory = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "sendCallHistory") {
+                    Config.sendCallHistory = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "sendCallEvents") {
+                    Config.sendCallEvents = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "urlUser") {
+                        //Implementar função para salvar em Banco de Dados o código de autenticação automática
+                }
+               
+            }
         });
     }
+    conn.onclose(function () {
+        log("UserAdmin: disconnected");
+        connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+    });
 });
 new JsonApi("dash").onconnected(function (conn) {
     if (conn.app == "wecom-wecalldash") {
@@ -142,6 +173,14 @@ function updateBadge(ws, callid, count) {
     };
 
     ws.send(JSON.stringify(msg));
+}
+
+function updateConfigUsers() {
+    log("danilo-req updateConfigUsers:");
+    connectionsUser.forEach(function (connection) {
+        log("danilo-req updateConfigUsers:connection user" + connection.guid);
+        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: String(sendCallHistory), sP: String(sendCallEvents), urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory) }));
+    });
 }
 
 // the variable containing the string value

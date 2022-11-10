@@ -5,7 +5,17 @@ Wecom.wecallTexts = {
         salvarClose: "Salvar",
         urlText: "URL do Iframe",
         licText: "Não licenciado, solicite ao seu administrador que licencie o uso da aplicação.",
-        licContinue: "Entendo os riscos!"
+        licContinue: "Entendo os riscos!",
+        labelTituloAdmin: "Administre seu Wecall",
+        labelCallListAdmin: "CallList API:",
+        labelChkCallList: "Enviar Eventos CallList?",
+        labelURLCallList: "URL eventos CallList",
+        labelPhoneApiAdmin: "PhoneApi API:",
+        labelChkPhoneApi: "Enviar Eventos PhoneApi?",
+        labelURLPhoneApi: "URL eventos PhoneApi",
+        btnUpdate: "Atualizar",
+        urlText:"URL"
+
     },
     en: {
         salvarClose: "Save",
