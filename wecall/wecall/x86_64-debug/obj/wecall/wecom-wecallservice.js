@@ -3,11 +3,13 @@ var sendCallHistory = Config.sendCallHistory;
 var sendCallEvents = Config.sendCallEvents;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var urlCallHistory = Config.urlCallHistory;
+var urlDashboard = Config.urldash;
 Config.onchanged(function () {
     sendCallHistory = Config.sendCallHistory;
     sendCallEvents = Config.sendCallEvents;
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
     urlCallHistory = Config.urlCallHistory;
+    urlDashboard = Config.urldash;
 
     updateConfigUsers();
 });
@@ -20,13 +22,16 @@ new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-wecall") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
+            log("danilo-req : wecom-wecall");
             if (obj.mt == "PhoneApiEvent") {
-                if (sendCallEvents == "true") {
+                log("danilo-req : PhoneApiEvent");
+                if (sendCallEvents) {
                     httpClient(urlPhoneApiEvents, obj.obj);
                 }
             }
             if (obj.mt == "CallHistoryEvent") {
-                if (sendCallHistory == "true") {
+                log("danilo-req : CallHistoryEvent");
+                if (sendCallHistory) {
                     httpClient(urlCallHistory, obj.obj);
                 }
             }
@@ -51,6 +56,7 @@ new JsonApi("user").onconnected(function (conn) {
 new JsonApi("admin").onconnected(function (conn) {
     connectionsUser.push(conn);
     if (conn.app == "wecom-wecalladmin") {
+        log("danilo-req AdminMessage:wecom-wecalladmin");
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
@@ -81,10 +87,10 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.sendCallEvents = obj.vl;
                     Config.save();
                 }
-                if (obj.prt == "urlUser") {
-                        //Implementar função para salvar em Banco de Dados o código de autenticação automática
+                if (obj.prt == "urlDashboard") {
+                    Config.urldash = obj.vl;
+                    Config.save();
                 }
-               
             }
         });
     }
@@ -179,7 +185,7 @@ function updateConfigUsers() {
     log("danilo-req updateConfigUsers:");
     connectionsUser.forEach(function (connection) {
         log("danilo-req updateConfigUsers:connection user" + connection.guid);
-        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: String(sendCallHistory), sP: String(sendCallEvents), urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory) }));
+        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: sendCallHistory, sP: sendCallEvents, urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory), urlD: String(urlDashboard)}));
     });
 }
 
@@ -195,23 +201,20 @@ WebServer.onurlchanged(function (newUrl) {
 
 WebServer.onrequest("makecall", function (req) {
     if (req.method == "POST") {
+        var newValue = "";
+        var value = "";
         req.onrecv(function (req, data) {
-            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            log("danilo-req makecall:data " + (new TextDecoder("utf-8").decode(data)));
-            log("danilo-req makecall:user " + obj.user);
-            log("danilo-req makecall:num " + obj.num);
-
-            connectionsUser.forEach(function (connection) {
-                if (connection.sip == obj.user) {
-                    log("danilo-req makecall:connection user" + connection.guid);
-                    connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
-                }
-                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
-                log("danilo-req makecall:connection NOT user ");
-            });
-            //req.recv();
+            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+                makecallRequest(value);
+            }
         });
-        req.sendResponse(200);
     }
     else {
         req.cancel();
@@ -219,22 +222,20 @@ WebServer.onrequest("makecall", function (req) {
 });
 WebServer.onrequest("disconnectcall", function (req) {
     if (req.method == "POST") {
+        var newValue = "";
+        var value = "";
         req.onrecv(function (req, data) {
-            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            log("danilo-req disconnectcall:data " + (new TextDecoder("utf-8").decode(data)));
-            log("danilo-req disconnectcall:user " + obj.user);
-            log("danilo-req disconnectcall:num " + obj.num);
-            connectionsUser.forEach(function (connection) {
-                if (connection.sip == obj.user) {
-                    log("danilo-req disconnectcall:connection user" + connection.guid);
-                    connection.send(JSON.stringify({ api: "user", mt: "DisconnectCall", num: obj.num }));
-                }
-                //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
-                log("danilo-req disconnectcall:connection NOT user ");
-            });
-            req.recv();
+            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+                disconnectRequest(value);
+            }
         });
-        req.sendResponse(200);
     }
     else {
         req.cancel();
@@ -242,40 +243,99 @@ WebServer.onrequest("disconnectcall", function (req) {
 });
 WebServer.onrequest("badge", function (req) {
     if (req.method == "POST") {
+        var newValue = "";
+        var value = "";
         req.onrecv(function (req, data) {
-            var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            log("danilo-req badge:data " + (new TextDecoder("utf-8").decode(data)));
-            log("danilo-req badge:user " + obj.user);
-            log("danilo-req badge:num " + obj.num);
-            connectionsPbxSignal.forEach(function (connection) {
-                log("danilo-req badge:connection " + JSON.stringify(connection));
-                //var jsonConns = JSON.parse(connection);
-                var sipConns = connection.sip;
-                var index = sipConns.indexOf(obj.user);
-                log("danilo-req badge:index of user " + String(index));
-
-                if (String(obj.user) == String(connection.sip[index])) {
-                    log("danilo-req badge:call sip " + connection.calls[index]);
-                    updateBadge(connection.ws, connection.calls[index], obj.num);
-                } else {
-                    log("danilo-req badge:connection NOT user ");
-                }
-            });
-            req.responseContentType("application/json")
-                .sendResponse()
-                .onsend(function (req) {
-                    req.send(new TextEncoder("utf-8").encode("OK"), true);
-                });
-            req.oncomplete(function (req, success) {
-                log("HttpRequest complete");
-            });
+            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+                badgeRequest(value);
+            }
         });
-
     }
     else {
         req.cancel();
     }
 });
+WebServer.onrequest("value", function (req) {
+    if (req.method == "GET") {
+        var valueteste = "Danilo is the big dev from Wecom..";
+        if (valueteste) {
+            // value exists, send it back as text/plain
+            req.responseContentType("txt")
+                .sendResponse()
+                .onsend(function (req) {
+                    req.send(new TextEncoder("utf-8").encode(valueteste), true);
+                });
+        }
+        else {
+            // value does not exist, send 404 Not Found
+            req.cancel();
+        }
+    }
+});
+
+function badgeRequest(value) {
+
+    log("danilo-req badge:value " + String(value));
+    var obj = JSON.parse(String(value));
+    //log("danilo-req badge:data " + (new TextDecoder("utf-8").decode(data)));
+    log("danilo-req badge:user " + obj.user);
+    log("danilo-req badge:num " + obj.num);
+    connectionsPbxSignal.forEach(function (connection) {
+        log("danilo-req badge:connection " + JSON.stringify(connection));
+        //var jsonConns = JSON.parse(connection);
+        var sipConns = connection.sip;
+        var index = sipConns.indexOf(obj.user);
+        log("danilo-req badge:index of user " + String(index));
+
+        if (String(obj.user) == String(connection.sip[index])) {
+            log("danilo-req badge:call sip " + connection.calls[index]);
+            updateBadge(connection.ws, connection.calls[index], obj.num);
+        } else {
+            log("danilo-req badge:connection NOT user ");
+        }
+    });
+
+}
+
+function disconnectRequest(value) {
+    log("danilo-req disconnectcall:value " + String(value));
+    var obj = JSON.parse(String(value));
+
+    log("danilo-req disconnectcall:user " + obj.user);
+    log("danilo-req disconnectcall:num " + obj.num);
+    connectionsUser.forEach(function (connection) {
+        if (connection.sip == obj.user) {
+            log("danilo-req disconnectcall:connection user" + connection.guid);
+            connection.send(JSON.stringify({ api: "user", mt: "DisconnectCall", num: obj.num }));
+        }
+        //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+        log("danilo-req disconnectcall:connection NOT user ");
+    });
+}
+
+function makecallRequest(value) {
+    log("danilo-req makecall:value " + String(value));
+    var obj = JSON.parse(String(value));
+
+    log("danilo-req makecall:user " + obj.user);
+    log("danilo-req makecall:num " + obj.num);
+
+    connectionsUser.forEach(function (connection) {
+        if (connection.sip == obj.user) {
+            log("danilo-req makecall:connection user" + connection.guid);
+            connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+        }
+        //connection.send(JSON.stringify({ api: "user", mt: "MakeCall", num: obj.num }));
+        log("danilo-req makecall:connection NOT user ");
+    });
+}
 
 function httpClient(url, call) {
     var req = HttpClient.request("POST", url);

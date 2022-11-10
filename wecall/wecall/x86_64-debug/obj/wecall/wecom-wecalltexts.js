@@ -7,14 +7,16 @@ Wecom.wecallTexts = {
         licText: "Não licenciado, solicite ao seu administrador que licencie o uso da aplicação.",
         licContinue: "Entendo os riscos!",
         labelTituloAdmin: "Administre seu Wecall",
-        labelCallListAdmin: "CallList API:",
+        labelCallListAdmin: "CallList API",
         labelChkCallList: "Enviar Eventos CallList?",
-        labelURLCallList: "URL eventos CallList",
-        labelPhoneApiAdmin: "PhoneApi API:",
+        labelURLCallList: "URL eventos CallList:",
+        labelPhoneApiAdmin: "PhoneApi API",
         labelChkPhoneApi: "Enviar Eventos PhoneApi?",
-        labelURLPhoneApi: "URL eventos PhoneApi",
+        labelURLPhoneApi: "URL eventos PhoneApi:",
         btnUpdate: "Atualizar",
-        urlText:"URL"
+        urlText: "URL",
+        labelUrlDashTitulo: "Dashboard APP",
+        labelUrlDash: "URL Dashboard:"
 
     },
     en: {

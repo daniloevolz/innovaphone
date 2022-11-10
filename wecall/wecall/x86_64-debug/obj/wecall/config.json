@@ -30,8 +30,8 @@
       {
         "cmd": "item",
         "name": "sendCallHistory",
-        "type": "STRING",
-        "default": "false",
+        "type": "BOOL",
+        "default": false,
         "password": false
       },
       {
@@ -44,8 +44,8 @@
       {
         "cmd": "item",
         "name": "sendCallEvents",
-        "type": "STRING",
-        "default": "false",
+        "type": "BOOL",
+        "default": false,
         "password": false
       },
       {

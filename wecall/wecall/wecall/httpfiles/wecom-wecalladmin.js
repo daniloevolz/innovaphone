@@ -31,8 +31,10 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    //Título
     var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
+    //CallList
     var labelCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:15px; text-align:center", texts.text("labelCallListAdmin")));
     var labelChkCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:15%; font-size:15px; text-align:right", texts.text("labelChkCallList")));
     var switchCallList = that.add(new innovaphone.ui1.Switch("position:absolute; left:50%; top:15%;"));
@@ -41,10 +43,11 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var labelURLCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:20%; font-size:15px; text-align:right", texts.text("labelURLCallList")));
     var iptUrlCallList = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
-    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:30%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlCallList.getValue()) });
     });
 
+    //PhoneApi
     var labelPhoneApi = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:45%; font-size:15px; text-align:center", texts.text("labelPhoneApiAdmin")));
     var labelChkPhoneApi = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:50%; font-size:15px; text-align:right", texts.text("labelChkPhoneApi")));
     var switchPhoneApi = that.add(new innovaphone.ui1.Switch("position:absolute; left:50%; top:50%;"));
@@ -57,6 +60,16 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "urlPhoneApiEvents", vl: String(iptUrlPhoneApi.getValue())});
     });
 
+    //URL Dashboard
+    var labelUrlDashTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:75%; font-size:15px; text-align:center", texts.text("labelUrlDash")));
+    var labelUrlDash = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:80%; font-size:15px; text-align:right", texts.text("labelUrlDash")));
+    var iptUrlDash = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:80%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+
+    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:85%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlDashboard", vl: String(iptUrlDash.getValue()) });
+    });
+
+
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
@@ -64,33 +77,11 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "UpdateConfigResult") {
-            iptUrlCallList.addHTML(obj.urlH);
-            iptUrlPhoneApi.addHTML(obj.urlP);
+            iptUrlCallList.setValue(obj.urlH);
+            iptUrlPhoneApi.setValue(obj.urlP);
             switchCallList.setValue(obj.sH);
             switchPhoneApi.setValue(obj.sP);
-
-        }
-
-        if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
-            if (obj.src == "") {
-                var urlPortal = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:calc(5% - 6px); font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", "btn btn - save btn - lg"));
-                that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "salvarClose").addEvent("click", function () {
-                    //var urlPortal = document.getElementById("urlPortal").value;
-                    urlPortal = urlPortal.getValue();
-                    if (urlPortal.length > 1) {
-                        app.send({ api: "user", mt: "AddMessage", url: String(urlPortal) });
-                    }
-                });
-                //document.getElementById('section1').style.display = 'block';
-                //document.getElementById('section2').style.display = 'none';
-
-            } else {
-                var bodyIframe = that.add(new innovaphone.ui1.Node("iframe", "position:fixed; top:0px; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;", null, "iframebody"));
-                bodyIframe.setAttribute("src", obj.src);
-                //document.getElementById('section2').style.display = 'block';
-                //document.getElementById('section1').style.display = 'none';
-                //document.getElementById("iframebody").setAttribute("src", obj.src);
-            }
+            iptUrlDash.setValue(obj.urlD);
 
         }
     }
@@ -98,12 +89,12 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
 
         var state = switchPhoneApi.getValue();
             //e.currentTarget.state;
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: String(state) });
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: state });
     }
     function onCallListSwitchCLick() {
         var state = switchCallList.getValue();
             //e.currentTarget.state;
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallHistory", vl: String(state) });
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallHistory", vl: state });
     }
 }
 
