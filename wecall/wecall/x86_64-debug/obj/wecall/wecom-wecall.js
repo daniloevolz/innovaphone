@@ -84,7 +84,7 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             if (provider.model.calls) {
                 provider.model.calls.forEach(function (call) {
                     console.warn("::phoneapionupdate:: Direction=" + String(call.dir) + " State=" + String(call.state) + " Numero=" + String(call.num));
-                    app.send({ api: "user", mt: "PhoneApiEvent", obj: JSON.Stringfy( call )});
+                    app.send({ api: "user", mt: "PhoneApiEvent", obj: JSON.stringify( call )});
                 });
             }
         });
@@ -93,7 +93,7 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {
             console.log("::calllistApi::onmessage() msg=" + JSON.stringify(obj.msg));
-            app.send({ api: "user", mt: "CallHistoryEvent", obj: JSON.Stringfy(obj.msg) });
+            app.send({ api: "user", mt: "CallHistoryEvent", obj: JSON.stringify(obj.msg) });
         }
     }
 }

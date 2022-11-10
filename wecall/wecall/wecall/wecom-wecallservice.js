@@ -338,12 +338,14 @@ function makecallRequest(value) {
 }
 
 function httpClient(url, call) {
+    log("danilo-req : httpClient");
+    
     var req = HttpClient.request("POST", url);
-    var req = HttpClient.timeout(30000);
+
     req.header("X-Token", "danilo");
     req.contentType("application/json");
     req.onsend(function (req) {
-        req.send(new TextEncoder("utf-8").encode(JSON.Stringfy(call)), true);
+        req.send(new TextEncoder("utf-8").encode(JSON.stringify(call)), true);
     });
     req.onrecv(function (req, data, last) {
         if (!last) req.recv();
