@@ -45,8 +45,6 @@ div#logowecom {
 .colunaesquerda {
     background-image: url("bg_lateral.png");
     background-size: cover;
-    height: 100%;
-    width: 12%;
     margin-left: 0%;
     float: left;
 }
@@ -55,9 +53,8 @@ div#logowecom {
     order: 1;
     background-image: url("money_header.png");
     background-size: cover;
-    width: auto;
     height: 20%;
-    position: absolute;
+   
 }
 .logo-inn{
     width: 18%;
@@ -87,28 +84,22 @@ div#logowecom {
 
 .linha2b3 {
     order: 2;
-    background-image: url("bg.png");
     background-size: cover;
-    
     align-content: center;
-    width: 100%;
     height: 80%;
-    top: 0%;
     align-items: flex-start;
     justify-content: center;
-    display: flex;
     align-items: center;
-    display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 8.0%; /*teste aqui*/
-    position: absolute;
+    margin-top: 8.2%; /*teste aqui*/
+
+
 }
 
 .linha2todas {
     order: 2;
-    background-image: url("bg.png");
     background-size: cover;
     /*align-content: center;*/
     width: 100%;
@@ -122,9 +113,9 @@ div#logowecom {
     /*flex-direction: column;*/
    /* flex-wrap: wrap ;*/
     justify-content: center;
-    margin-top: 9.5%;
+    margin-top: 8.2%;
     position: absolute;
-    background-color: blue;
+
 }
 
 .item-data {
