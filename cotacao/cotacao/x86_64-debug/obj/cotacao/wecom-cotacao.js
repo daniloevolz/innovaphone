@@ -65,16 +65,16 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
       colDireita();
       cotacao();
 
-         var elInicioDiv = document.getElementById("inicio");
+     var elInicioDiv = document.getElementById("inicio");
      elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
      var elB3Div = document.getElementById("b3");
      elB3Div.addEventListener("click", function () { MudarDiv("b3") }, false);
-    var elTodasDiv = document.getElementById("todas");
-    elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
+     var elTodasDiv = document.getElementById("todas");
+     elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
 
     }
     function colEsquerda(){
-        var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
+        var colesquerda =  that.add(new innovaphone.ui1.Div("position:absolute;left:0px;width:12%;height:100%;top:0px;font-size:15px;text-align:left;", null,"colunaesquerda"));
         var colnav = colesquerda.add(new innovaphone.ui1.Node("nav",null,null,"nav1"))
         var ul =  colnav.add(new innovaphone.ui1.Node("ul",null,null,null))
         var li = ul.add(new innovaphone.ui1.Node("li",null,null,"li"));
@@ -93,11 +93,12 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     function colDireita(){
         var coldireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
         // linha 1
-        var linha1 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
+        var linha1 = coldireita.add(new innovaphone.ui1.Div("position:absolute;left:12%;width:88%;top:0px;font-size:15px;text-align:left",null,"linha1"));
         var imginn = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
         imginn.setAttribute("src", "logo-inn.png");
         // linha 2 
         var linha2 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha2"));
+        linha2.setAttribute("id","linha2")
         //linha 2 - dolar
         var divDolar = linha2.add(new innovaphone.ui1.Div(null,null,"div-dolar"));
         var imgDolar = divDolar.add(new innovaphone.ui1.Node("img",null,null,"img-item"));
@@ -129,7 +130,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
         imgwecom.setAttribute("src","logo.png")
         //linha2b3 
-        var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2b3"))
+        var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:none;position:absolute;left:12%;width:88%;top 2%;font-size: 15px;text-align: center;",null,"linha2b3"))
         linha2b3.setAttribute("id","linha2b3")
         var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
         var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
@@ -138,6 +139,14 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         //linha2 todas
         var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2todas"))
         linha2todas.setAttribute("id","linha2todas")
+        var divTradingView = linha2todas.add(new innovaphone.ui1.Div("width: auto; z-index: 1000; height: auto; background: transparent; padding: 0 !important; margin-left: 0px;",null,"tradingview-widget-container"))
+        var divinside = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,null))
+        divinside.setAttribute("id","tradingview_f9a16")
+        var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
+        var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
+        TradingViewiframe.setAttribute("src","https://s3.tradingview.com/tv.js")
+       
+        
     }
     // function linha2b3(){
       
@@ -345,7 +354,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
             document.getElementById("b3").style.fontWeight = 'normal';
             document.getElementById("todas").style.fontWeight = 'normal';
             document.getElementById("inicio").style.fontWeight = 'bold';
-            document.getElementById("linha2").style.display = 'block'; 
+            document.getElementById("linha2").style.display = 'flex'; 
             document.getElementById("linha2b3").style.display = 'none';
             document.getElementById("linha2todas").style.display = 'none';
          } else if (el == "b3") {
