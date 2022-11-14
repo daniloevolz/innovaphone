@@ -7,10 +7,7 @@ var Wecom = Wecom || {};
 Wecom.wecall = Wecom.wecall || function (start, args) {
     this.createNode("body");
     var that = this;
-    var rcc = null;
-    var userUI = null;
-    var phoneApi = start.consumeApi("com.innovaphone.phone");
-    var phoneinfoApi = start.provideApi("com.innovaphone.phoneinfo");
+    //var phoneApi = start.consumeApi("com.innovaphone.phone");
     var calllistApi = start.consumeApi("com.innovaphone.calllist");
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
     calllistApi.onmessage.attach(calllistonmessage);
@@ -69,26 +66,26 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
                 bodyIframe.setAttribute("src", obj.src);
             } 
         }
-        if (obj.api == "user" && obj.mt == "MakeCall") {
-            console.warn("::MakeCall::");
-            phoneApi.send({ mt: "StartCall", num: String(obj.num) });
-        }
-        if (obj.api == "user" && obj.mt == "DisconnectCall") {
-            console.warn("::DisconnectCall::");
-            phoneApi.send({ mt: "DisconnectCall" });
-        }
+        //if (obj.api == "user" && obj.mt == "MakeCall") {
+        //    console.warn("::MakeCall::");
+        //    phoneApi.send({ mt: "StartCall", num: String(obj.num) });
+        //}
+        //if (obj.api == "user" && obj.mt == "DisconnectCall") {
+        //    console.warn("::DisconnectCall::");
+        //    phoneApi.send({ mt: "DisconnectCall" });
+        //}
     }
-    phoneApi.onupdate.attach(function (sender, type) {
-        Object.keys(sender.model).forEach(function (key) {
-            var provider = sender.model[key];
-            if (provider.model.calls) {
-                provider.model.calls.forEach(function (call) {
-                    console.warn("::phoneapionupdate:: Direction=" + String(call.dir) + " State=" + String(call.state) + " Numero=" + String(call.num));
-                    app.send({ api: "user", mt: "PhoneApiEvent", obj: JSON.stringify( call )});
-                });
-            }
-        });
-    });
+    //phoneApi.onupdate.attach(function (sender, type) {
+    //    Object.keys(sender.model).forEach(function (key) {
+    //        var provider = sender.model[key];
+    //        if (provider.model.calls) {
+    //            provider.model.calls.forEach(function (call) {
+    //                console.warn("::phoneapionupdate:: Direction=" + String(call.dir) + " State=" + String(call.state) + " Numero=" + String(call.num));
+    //                app.send({ api: "user", mt: "PhoneApiEvent", obj: JSON.stringify( call )});
+    //            });
+    //        }
+    //    });
+    //});
     
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {

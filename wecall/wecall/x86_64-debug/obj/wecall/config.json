@@ -10,7 +10,7 @@
         "cmd": "item",
         "name": "url",
         "type": "STRING",
-        "default": "",
+        "default": "https://wecall.3sales.net/home/desktop/startup/",
         "password": false
       },
       {
@@ -53,6 +53,20 @@
         "name": "urlPhoneApiEvents",
         "type": "STRING",
         "default": "http://wecall.sales3.net/phoneevents",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlSSO",
+        "type": "STRING",
+        "default": "https://wecallsup.3sales.net/api/innovaphone/gettoken",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "CodClient",
+        "type": "STRING",
+        "default": "1234567890876543",
         "password": false
       }
     ]

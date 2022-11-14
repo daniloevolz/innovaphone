@@ -16,7 +16,10 @@ Wecom.wecallTexts = {
         btnUpdate: "Atualizar",
         urlText: "URL",
         labelUrlDashTitulo: "Dashboard APP",
-        labelUrlDash: "URL Dashboard:"
+        labelUrlDash: "URL Dashboard:",
+        labelCodCient: "Código de Cliente Wecall:",
+        labelUrlSSO: "URL provedor SSO Wecall",
+        labelUrl:"URL de Autenticação SSO"
 
     },
     en: {
