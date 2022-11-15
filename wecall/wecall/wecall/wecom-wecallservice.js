@@ -390,16 +390,23 @@ new PbxApi("RCC").onconnected(function (conn) {
             var foundIndex = connectionsPbxSignal[0].sip.indexOf(obj.src);
             log("danilo-req : RCC message::CallInfo foundIndex " + foundIndex);
 
-            var foundCall = chamadas.filter(function (call) { return call.callid === obj.callid });
+            var callIndex = chamadas.indexOf(obj.call);
+            log("danilo-req : RCC message::CallInfo callIndex " + callIndex);
+            var foundCall = chamadas.filter(function (call) { return call.callid === obj.call });
             
-            log("danilo-req : RCC message::CallInfo foundCall " + foundCall);
+            log("danilo-req : RCC message::CallInfo foundCall " + String(foundCall));
             if (foundIndex !== -1 && obj.msg == "x-alert") {
                 //Chamada Receptiva do Ramal ou Grupo????
                 if (String(foundCall) == "") {
                     insertCall(obj);
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
-                        var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: "", call: obj.call, status: "inc" };
+                        var e164 = obj.peer.e164;
+                        if (e164 == "") {
+                            var msg = { user: obj.src, callingNumber: obj.peer.h323, queue: "", call: obj.call, status: "inc" };
+                        } else {
+                            var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: "", call: obj.call, status: "inc" };
+                        }
                         httpClient(urlPhoneApiEvents, msg);
                     }
                 }
@@ -410,7 +417,12 @@ new PbxApi("RCC").onconnected(function (conn) {
                     insertCall(obj);
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
-                        var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: "", call: obj.call, status: "out" };
+                        var e164 = obj.peer.e164;
+                        if (e164 == "") {
+                            var msg = { user: obj.src, callingNumber: obj.peer.h323, queue: "", call: obj.call, status: "out" };
+                        } else {
+                            var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: "", call: obj.call, status: "out" };
+                        }
                         httpClient(urlPhoneApiEvents, msg);
                     }
                 }
@@ -421,7 +433,12 @@ new PbxApi("RCC").onconnected(function (conn) {
                     insertCall(obj);
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
-                        var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: obj.no[0].e164, call: obj.call, status: "inc" };
+                        var e164 = obj.peer.e164;
+                        if (e164 == "") {
+                            var msg = { user: obj.src, callingNumber: obj.peer.h323, queue: obj.no[0].e164, call: obj.call, status: "inc" };
+                        } else {
+                            var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: obj.no[0].e164, call: obj.call, status: "inc" };
+                        }
                         httpClient(urlPhoneApiEvents, msg);
                     }
                 }
@@ -432,20 +449,23 @@ new PbxApi("RCC").onconnected(function (conn) {
                     deleteCall(obj);
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
-                        var msg = { user: obj.src, callingNumber: obj.peer.e164, call: obj.call, status: "del" };
+                        var e164 = obj.peer.e164;
+                        if (e164 == "") {
+                            var msg = { user: obj.src, callingNumber: obj.peer.h323, call: obj.call, status: "del" };
+                        } else {
+                            var msg = { user: obj.src, callingNumber: obj.peer.e164, call: obj.call, status: "del" };
+                        }
+                        
                         httpClient(urlPhoneApiEvents, msg);
                     }
                 }
             }
         }
         else if (obj.mt === "CallDel") {
-            log("danilo req : RCC message:: " + JSON.stringify(obj));
-
-            chamadas.splice(chamadas.indexOf(obj.call), 1);
+            log("danilo req : RCC message:: CallDel");
         }
         else if (obj.mt === "UserCallResult") {
-            insertCall(obj);
-
+            log("danilo req : RCC message:: UserCallResult")
         }
     });
     conn.onclose(function () {
@@ -541,7 +561,7 @@ function rccRequest(value) {
     log("danilo-req rccRequest:num " + obj.num);
 
     connectionsRCC.forEach(function (connection) {
-        log("danilo-req rccRequest:connection " + JSON.stringify(connection));
+        log("danilo-req rccRequest: will callRCC ");
         callRCC(connection.ws, obj.user, obj.mode, obj.num, obj.sip);
     });
     var foundIndex = connectionsPbxSignal[0].sip.indexOf(obj.sip);
@@ -669,14 +689,18 @@ function callRCC(ws,user,mode,num, sip) {
 }
 
 function insertCall(obj) {
-
-    chamadas.push({ sip: String(obj.src), callid: obj.call });
+    var e164 = obj.peer.e164;
+    if (e164 == "") {
+        chamadas.push({ sip: String(obj.src), callid: obj.call, num: obj.peer.h323 });
+    } else {
+        chamadas.push({ sip: String(obj.src), callid: obj.call, num: obj.peer.e164 });
+    }
     log("danilo req : insertCall "+JSON.stringify(chamadas));
 }
 function deleteCall(obj) {
-
+    log("danilo req : before deleteCall " + JSON.stringify(chamadas),"Obj.call "+obj.call);
     chamadas.splice(chamadas.indexOf(obj.call), 1);
-    log("danilo req : deleteCall " + JSON.stringify(chamadas));
+    log("danilo req : after deleteCall " + JSON.stringify(chamadas));
 }
 
 
