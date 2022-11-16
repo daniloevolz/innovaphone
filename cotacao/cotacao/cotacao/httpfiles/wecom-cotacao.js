@@ -40,11 +40,15 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "channel", mt: "SelectChannelMessage" });
+
         if (app.logindata.info.unlicensed) {
           //sem licen�a
           var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
           that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-             constructor();
+             app.send({ api: "user", mt: "UserMessage" })
+            constructor();
           });
 
       } else {
@@ -55,10 +59,11 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
       
   }
 
-    function app_message(obj) {
-       
-    }
-    ///Edi��o de Danilo em 28/07/2022
+  function app_message(obj) {
+
+}
+   
+
     function constructor(){
       that.clear();
       colEsquerda();
@@ -135,7 +140,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
         var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
         iframelinha2b3.setAttribute("id","tradingview_8c59f")
-        iframelinha2b3.setAttribute("src","https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV")
+       // iframelinha2b3.setAttribute("src",obj) //testes verificar dps
         //linha2 todas
         var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2todas"))
         linha2todas.setAttribute("id","linha2todas")
@@ -145,7 +150,8 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
         var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
         TradingViewiframe.setAttribute("src","https://s3.tradingview.com/tv.js")
-       
+        
+        
         
     }
     // function linha2b3(){
