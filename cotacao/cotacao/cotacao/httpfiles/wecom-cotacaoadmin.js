@@ -42,7 +42,7 @@ Wecom.cotacaoAdmin = Wecom.cotacaoAdmin || function (start, args) {
     var iptUrlB3 = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
     iptUrlB3.setAttribute("id","inputB3")
    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-    app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlB3.getValue()) });
+    app.send({ api: "admin", mt: "UpdateConfig", prt: "urlb3", vl: String(iptUrlB3.getValue()) });
 });
    
     
@@ -54,7 +54,7 @@ Wecom.cotacaoAdmin = Wecom.cotacaoAdmin || function (start, args) {
     var iptUrlTodas = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:50%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
     that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:55%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlTodas.getValue()) });
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "urltodas", vl: String(iptUrlTodas.getValue()) });
     });
     
     // Dados do BCB
@@ -65,17 +65,17 @@ Wecom.cotacaoAdmin = Wecom.cotacaoAdmin || function (start, args) {
     var iptUrlBCB = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:80%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
     that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:85%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlBCB.getValue()) });
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlbcb", vl: String(iptUrlBCB.getValue()) });
     });
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
     }
 
     function app_message(obj) {
-        if (obj.api == "admin" && obj.mt == "UpdateConfigResult") {
-            iptUrlB3.setValue(obj.urlB);
-            iptUrlTodas.setValue(obj.urlT);
-            iptUrlBCB.setValue(obj.urlBC);
+        if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
+            iptUrlB3.setValue(obj.urlb3);
+            iptUrlTodas.setValue(obj.urltodas);
+            iptUrlBCB.setValue(obj.urlbcb);
 
         }
     }

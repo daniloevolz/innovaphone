@@ -40,11 +40,15 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "channel", mt: "SelectChannelMessage" });
+
         if (app.logindata.info.unlicensed) {
           //sem licen�a
           var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
           that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-             constructor();
+             app.send({ api: "user", mt: "UserMessage" })
+            constructor();
           });
 
       } else {
@@ -55,10 +59,11 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
       
   }
 
-    function app_message(obj) {
-       
-    }
-    ///Edi��o de Danilo em 28/07/2022
+  function app_message(obj) {
+
+}
+   
+
     function constructor(){
       that.clear();
       colEsquerda();
@@ -135,29 +140,39 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
         var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
         iframelinha2b3.setAttribute("id","tradingview_8c59f")
-        iframelinha2b3.setAttribute("src","https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV")
+        var b3link = "https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV"
+        iframelinha2b3.setAttribute("src",b3link)
         //linha2 todas
-        var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none",null,"linha2todas"))
+        var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none;position:absolute;left:12%;width:88%;top 2%;font-size: 15px;text-align: center;",null,"linha2todas"))
         linha2todas.setAttribute("id","linha2todas")
         var divTradingView = linha2todas.add(new innovaphone.ui1.Div("width: auto; z-index: 1000; height: auto; background: transparent; padding: 0 !important; margin-left: 0px;",null,"tradingview-widget-container"))
         var divinside = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,null))
         divinside.setAttribute("id","tradingview_f9a16")
         var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
         var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
-        TradingViewiframe.setAttribute("src","https://s3.tradingview.com/tv.js")
-       
+       TradingViewiframe.setAttribute("src","https://s3.tradingview.com/tv.js")
+        new TradingView.widget(
+        {
+            "autosize": true,
+            "symbol": "BITSTAMP:BTCUSD",
+            "interval": "D",
+            "timezone": "America/Sao_Paulo",
+            "theme": "light",
+            "style": "1",
+            "locale": "br",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "details": true,
+            "container_id": "tradingview_f9a16"
+        }
+    );
+      // TradingViewiframe.setAttribute("src","https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=uk#")
+        
         
     }
-    // function linha2b3(){
-      
-    //     var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:block",null,"linha2b3"))
-    //     linha2b3.setAttribute("id","linha2b3")
-    //     var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
-    //     var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
-    //     iframelinha2b3.setAttribute("id","tradingview_8c59f")
-    //     iframelinha2b3.setAttribute("src","https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV")
 
-    // }
 
 
 
@@ -368,7 +383,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
             document.getElementById("b3").style.fontWeight = 'normal';
             document.getElementById("todas").style.fontWeight = 'bold';
             document.getElementById("inicio").style.fontWeight = 'normal';
-           document.getElementById("linha2").style.display = 'none';
+            document.getElementById("linha2").style.display = 'none';
             document.getElementById("linha2b3").style.display = 'none';
             document.getElementById("linha2todas").style.display = 'block';
         }

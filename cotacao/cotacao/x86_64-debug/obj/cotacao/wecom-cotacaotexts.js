@@ -9,7 +9,17 @@ Wecom.cotacaoTexts = {
         licInicio: "Início",
         licB3: "B3",
         licTodasFontes: "Todas as Fontes",
-        licBCB: "Dados do BCB:"
+        licBCB: "Dados do BCB:",
+        labelTituloAdmin: "Painel Admin",
+        labelB3Admin: "B3",
+        labelCheckLink: "Adicionar URL",
+        labelURLb3: "URL B3: ",
+        labelTodasFontes: "Todas as Fontes",
+        labelURLTodas: "URL Todas as Fontes: ",
+        labelBCB: "Dados do BCB",
+        labelURLBCB: "URL BCB: ",
+        urlText: "URL",
+        btnUpdate: "Atualizar"
     },
     en: {
         salvarClose: "Save",
