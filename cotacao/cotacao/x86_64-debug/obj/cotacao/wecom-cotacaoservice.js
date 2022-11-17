@@ -2,7 +2,7 @@ var urlb3 = Config.urlb3;
 var urltodas = Config.urltodas;
 var urlbcb = Config.urlbcb;
 Config.onchanged(function(){
-     urlb3 = Config.urlb3;
+    urlb3 = Config.urlb3;
     urltodas = Config.urltodas;
     urlbcb = Config.urlbcb;
 })
@@ -13,7 +13,7 @@ new JsonApi("user").onconnected(function(conn) {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "UserMessage") {
-                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
+                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", urlb3:urlb3, urltodas:urltodas, urlbcb:urlbcb }));
             }
         });
     }

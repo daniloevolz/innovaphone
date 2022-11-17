@@ -26,13 +26,6 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     var texts = new innovaphone.lib1.Languages(Wecom.cotacaoTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
 
-    // var elInicioDiv = document.getElementById("inicio");
-    // elInicioDiv.addEventListener("click", function () { MudarDiv("inicio") }, false);
-    // var elB3Div = document.getElementById("b3");
-    // elB3Div.addEventListener("click", function () { MudarDiv("b3") }, false);
-    // var elTodasDiv = document.getElementById("todas");
-    // elTodasDiv.addEventListener("click", function () { MudarDiv("todas") }, false);
-
     var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
     app.checkBuild = true;
     app.onconnected = app_connected;
@@ -41,29 +34,33 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
-        app.send({ api: "channel", mt: "SelectChannelMessage" });
 
         if (app.logindata.info.unlicensed) {
           //sem licen�a
           var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
           that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
              app.send({ api: "user", mt: "UserMessage" })
-            constructor();
           });
 
       } else {
 
-          constructor();
+        app.send({ api: "user", mt: "UserMessage" })
           
       }
       
   }
+  var bcblink = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27";
+  var b3link = "";
+  var todaslink = "";
 
   function app_message(obj) {
-
-}
-   
-
+    if (obj.api == "user" && obj.mt == "UserMessageResult") {
+        b3link = obj.urlb3;
+        todaslink = obj.urltodas;
+        bcblink = obj.urlbcb;
+        constructor();
+    }
+  }
     function constructor(){
       that.clear();
       colEsquerda();
@@ -96,13 +93,13 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         a3.setAttribute("id","b3")
     }
     function colDireita(){
-        var coldireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
+        var coldireita = that.add(new innovaphone.ui1.Div("display:block",null,"colunadireita"));
         // linha 1
         var linha1 = coldireita.add(new innovaphone.ui1.Div("position:absolute;left:12%;width:88%;top:0px;font-size:15px;text-align:left",null,"linha1"));
         var imginn = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
         imginn.setAttribute("src", "logo-inn.png");
         // linha 2 
-        var linha2 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha2"));
+        var linha2 = coldireita.add(new innovaphone.ui1.Div("display:flex",null,"linha2"));
         linha2.setAttribute("id","linha2")
         //linha 2 - dolar
         var divDolar = linha2.add(new innovaphone.ui1.Div(null,null,"div-dolar"));
@@ -123,9 +120,9 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         imgLibra.setAttribute("src","img-libra.png");
         var labelLibra = divLibra.add(new innovaphone.ui1.Node("label",null,null,"item-libra"));
         labelLibra.setAttribute("id","item-libra");
-        // linha2 - Dados do BBC 
+        // linha2 - Dados do BCB
         var divBCB = linha2.add(new innovaphone.ui1.Div(null,null,"div-data"));
-        var h1BCB = divBCB.add(new innovaphone.ui1.Node("h1","font-size:10px; font-family:'Century Gothic'; color:grey",texts.text("licBCB"),null));
+        var h1BCB = divBCB.add(new innovaphone.ui1.Node("h1","font-size:10px; display:block; font-family:'Century Gothic'; color:grey",texts.text("licBCB"),null));
         h1BCB.setAttribute("id","item-data");
         // linha 2 - LOGO WECOM
         var wecom = linha2.add(new innovaphone.ui1.Div(null,null,null));
@@ -135,13 +132,17 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
         imgwecom.setAttribute("src","logo.png")
         //linha2b3 
+
         var linha2b3 = coldireita.add(new innovaphone.ui1.Div("display:none;position:absolute;left:12%;width:88%;top 2%;font-size: 15px;text-align: center;",null,"linha2b3"))
         linha2b3.setAttribute("id","linha2b3")
         var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
         var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
         iframelinha2b3.setAttribute("id","tradingview_8c59f")
-        var b3link = "https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV"
+       // var b3link = "https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV"
+       // https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV
         iframelinha2b3.setAttribute("src",b3link)
+        
+
         //linha2 todas
         var linha2todas = coldireita.add(new innovaphone.ui1.Div("display:none;position:absolute;left:12%;width:88%;top 2%;font-size: 15px;text-align: center;",null,"linha2todas"))
         linha2todas.setAttribute("id","linha2todas")
@@ -150,26 +151,28 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         divinside.setAttribute("id","tradingview_f9a16")
         var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
         var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
-       TradingViewiframe.setAttribute("src","https://s3.tradingview.com/tv.js")
-        new TradingView.widget(
-        {
-            "autosize": true,
-            "symbol": "BITSTAMP:BTCUSD",
-            "interval": "D",
-            "timezone": "America/Sao_Paulo",
-            "theme": "light",
-            "style": "1",
-            "locale": "br",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "details": true,
-            "container_id": "tradingview_f9a16"
-        }
-    );
-      // TradingViewiframe.setAttribute("src","https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=uk#")
+       // var todaslink = "https://s3.tradingview.com/tv.js"
+        // https://s3.tradingview.com/tv.js
+        //TradingViewiframe.setAttribute("src",todaslink)
+        TradingViewiframe.setAttribute("src",todaslink)
         
+        var trading = new TradingView.widget(
+            {
+                "autosize": true,
+                "symbol": "BITSTAMP:BTCUSD",
+                "interval": "D",
+                "timezone": "America/Sao_Paulo",
+                "theme": "dark",
+                "style": "1",
+                "locale": "br",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "details": true,
+                "container_id": "tradingview_f9a16"
+            }
+        );
         
     }
 
@@ -199,7 +202,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     }
     function dolar(date) {
         console.log("Dolar Compra!" + date);
-        var json_obj = JSON.parse(Get("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27" + date + "%27&@moeda=%27USD%27&$format=json"));
+        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27USD%27&$format=json"));
 
         try {
             console.log(json_obj);
@@ -259,7 +262,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     }
     function euro(date) {
         console.log("Euro Compra!");
-        var json_obj = JSON.parse(Get("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27" + date + "%27&@moeda=%27EUR%27&$format=json"));
+        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27EUR%27&$format=json"));
         try {
             const eur = json_obj.value[4].cotacaoCompra;
             console.log("Euro Compra: " + eur.toString().substr(0, 4));
@@ -304,7 +307,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     }
     function libra(date) {
         console.log("Libra Compra!");
-        var json_obj = JSON.parse(Get("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27" + date + "%27&@moeda=%27GBP%27&$format=json"));
+        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27GBP%27&$format=json"));
         try {
             const lib = json_obj.value[4].cotacaoCompra;
             console.log("Libra Compra: " + lib.toString().substr(0, 4));

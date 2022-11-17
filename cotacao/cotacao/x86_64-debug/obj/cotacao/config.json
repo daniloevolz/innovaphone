@@ -5,21 +5,21 @@
           "cmd": "item",
           "name": "urlb3",
           "type": "STRING",
-          "default": "pietro",
+          "default": "",
           "password": false
         },
         {
             "cmd": "item",
             "name": "urltodas",
             "type": "STRING",
-            "default": "pietro",
+            "default": "",
             "password": false
           },
           {
             "cmd": "item",
             "name": "urlbcb",
             "type": "STRING",
-            "default": "pietro",
+            "default": "",
             "password": false
           }
       ]
