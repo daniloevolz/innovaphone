@@ -51,7 +51,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
   }
   var bcblink = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27";
   var b3link = "";
-  var todaslink = "";
+  var todaslink = "" ;
 
   function app_message(obj) {
     if (obj.api == "user" && obj.mt == "UserMessageResult") {
@@ -150,34 +150,37 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var divinside = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,null))
         divinside.setAttribute("id","tradingview_f9a16")
         var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
-        var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
+       // var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
        // var todaslink = "https://s3.tradingview.com/tv.js"
         // https://s3.tradingview.com/tv.js
         //TradingViewiframe.setAttribute("src",todaslink)
-        TradingViewiframe.setAttribute("src",todaslink)
+        //TradingViewiframe.setAttribute("src",todaslink);
         
-       new TradingView.widget(
-            {
-                "autosize": true,
-                "symbol": "BITSTAMP:BTCUSD",
-                "interval": "D",
-                "timezone": "America/Sao_Paulo",
-                "theme": "dark",
-                "style": "1",
-                "locale": "br",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "hide_side_toolbar": false,
-                "allow_symbol_change": true,
-                "details": true,
-                "container_id": "tradingview_f9a16"
-            }
-        );
-        
-    }
-
-
-
+        /*
+        var scripttrading = divTradingView.add(new innovaphone.ui1.Node("script",null,null,null))
+        scripttrading.setAttribute("type","text/javascript")
+        scripttrading.setAttribute("src",todaslink)
+    
+         var scripttrading2 = divTradingView.add(new innovaphone.ui1.Node("script",null,null,null))
+        scripttrading2.setAttribute("type","text/javascript")
+        scripttrading2.setAttribute(' {
+            "autosize": true,
+            "symbol": "BITSTAMP:BTCUSD",
+            "interval": "D",
+            "timezone": "America/Sao_Paulo",
+            "theme": "dark",
+            "style": "1",
+            "locale": "br",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "details": true,
+            "container_id": "tradingview_f9a16"
+        }')
+        */
+  
+        }
 
     function cotacao() {
         moedas();
@@ -394,6 +397,6 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
 
     ///Fim Edi��o Danilo
-}
 
+    }
 Wecom.cotacao.prototype = innovaphone.ui1.nodePrototype;

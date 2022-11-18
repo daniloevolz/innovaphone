@@ -204,7 +204,7 @@ label {
     margin-top: 1%;
 }
 
-/* EDIÃ‡ÃƒO PARA CELULAR - PIETRO ðŸ˜Ž */
+/* EDICAO PARA CELULAR - PIETRO */
 
 @media screen and (max-width: 400px)  {
     
@@ -322,119 +322,5 @@ label {
 
 }
 
-/* EDIÇÃO PARA CELULAR - PIETRO 😎 */
 
-@media screen and (max-width: 500px)  {
-    
-    .linha1 {
-        position: absolute;
-        float: right;
-        width: 100%;
-        margin-top: 0%;
-        height: 14.5%;
-    }
 
-    .linha2 {
-        width: 100%;
-        height: 100%;
-        margin-top: 30%;
-    }
-
-    .colunadireita {
-        width: 100%;
-        height: 80%;
-    }
-
-    .colunaesquerda {
-        background-image: url("bg_lateral500px.png");
-        background-size: cover;
-        height: 15.5%;
-        width: 100%;
-        margin-left: 0%;
-        display: flex;
-        margin-top: 23%;
-        position: absolute;
-    }
-
-    .img-item {
-        width: 50px;
-        height: 50px;
-    }
-
-    .imglogo {
-        width: 50%;
-        height: 50%;
-    }
-
-    div#logowecom {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .div-data {
-        width: 300px;
-        margin-top: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .logo-inn {
-        width: 30%;
-        height: auto;
-        padding-top: 30px;
-        padding-left: 30px;
-    }
-
-    .item-dolar {
-        font-size: 17px;
-    }
-
-    .item-euro {
-        font-size: 17px;
-    }
-
-    .item-libra {
-        font-size: 17px;
-    }
-
-    .linha2todas {
-        order: 2;
-        background-image: url("bg.png");
-        background-size: cover;
-        align-content: center;
-        width: 100%;
-        height: 90%;
-        top: 45%;
-        align-items: flex-start;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 50%;
-    }
-
-    .linha2b3 {
-        order: 2;
-        background-image: url("bg.png");
-        background-size: cover;
-        align-content: center;
-        width: 100%;
-        height: 97%;
-        top: 45%;
-        align-items: flex-start;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 38%; /*teste aqui*/
-    }
-
-}
