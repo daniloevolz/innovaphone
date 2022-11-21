@@ -28,5 +28,6 @@ Wecom.cotacaoTexts = {
         licContinue: "I accept the risks!"
     },
     de: {
+        
     }
 }
