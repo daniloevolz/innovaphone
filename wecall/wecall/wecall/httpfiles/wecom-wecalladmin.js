@@ -35,61 +35,61 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
     //CallList
-    var labelCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:15px; text-align:center", texts.text("labelCallListAdmin")));
-    var labelChkCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:30%; top:15%; font-size:15px; text-align:right", texts.text("labelChkCallList")));
-    var switchCallList = that.add(new innovaphone.ui1.Switch("position:absolute; left:60%; top:15%;"));
+    var labelCallList = that.add(new innovaphone.ui1.Div("position: absolute;left: 0px;width: 100%; top: 10%; font-size: 15px; text-align: center; text-decoration: underline;color: blue;", texts.text("labelCallListAdmin")));
+    var labelChkCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelChkCallList")));
+    var switchCallList = that.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;"));
     switchCallList.addEvent("click", onCallListSwitchCLick);
 
-    var labelURLCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:20%; top:20%; font-size:15px; text-align:right", texts.text("labelURLCallList")));
-    var iptUrlCallList = that.add(new innovaphone.ui1.Input("position:absolute; left:30%; width:20%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    var labelURLCallList = that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelURLCallList")));
+    var iptUrlCallList = that.add(new innovaphone.ui1.Input("position:absolute; left:36%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:20%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:15%; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlCallList.getValue()) });
     });
 
 
 
-    //PhoneApi
-    var labelPhoneApi = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:35%; font-size:15px; text-align:center", texts.text("labelPhoneApiAdmin")));
-    var labelChkPhoneApi = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:40%; font-size:15px; text-align:right", texts.text("labelChkPhoneApi")));
-    var switchPhoneApi = that.add(new innovaphone.ui1.Switch("position:absolute; left:50%; top:40%;"));
-    switchPhoneApi.addEvent("click", onPhoneApiSwitchCLick);
+    //RCC CallEvents
+    var labelCallEvents = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:25%; font-size:15px; text-align:center;text-decoration: underline;color: blue;", texts.text("labelCallEventsAdmin")));
+    var labelChkCallEvents = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelChkCallEvents")));
+    var switchCallEvents = that.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:30%;"));
+    switchCallEvents.addEvent("click", onCallEventsSwitchCLick);
 
-    var labelURLPhoneApi = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:45%; font-size:15px; text-align:right", texts.text("labelURLPhoneApi")));
-    var iptUrlPhoneApi = that.add(new innovaphone.ui1.Input("position:absolute; left:30%; width:30%; top:45%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    var labelURLCallEvents = that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelURLCallEvents")));
+    var iptUrlCallEvents = that.add(new innovaphone.ui1.Input("position:absolute; left:36%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:45%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlPhoneApiEvents", vl: String(iptUrlPhoneApi.getValue())});
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:30%; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "urlPhoneApiEvents", vl: String(iptUrlCallEvents.getValue())});
     });
 
     //URL Dashboard
-    var labelUrlDashTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:65%; font-size:15px; text-align:center", texts.text("labelUrlDash")));
-    var labelUrlDash = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:70%; font-size:15px; text-align:right", texts.text("labelUrlDash")));
-    var iptUrlDash = that.add(new innovaphone.ui1.Input("position:absolute; left:30%; width:30%; top:70%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    var labelUrlDashTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:40%; font-size:15px; text-align:center; text-decoration: underline;color: blue;", texts.text("labelUrlDashTitulo")));
+    var labelUrlDash = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:45%; font-size:15px; text-align:right", texts.text("labelUrlDash")));
+    var iptUrlDash = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:45%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:70%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:45%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "urlDashboard", vl: String(iptUrlDash.getValue()) });
     });
 
     //URL SSO
-    var labelUrlSSOTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:80%; font-size:15px; text-align:center", texts.text("labelUrlSSO")));
-    var labelUrlSSO = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:85%; font-size:15px; text-align:right", texts.text("labelUrlSSO")));
-    var iptUrlSSO = that.add(new innovaphone.ui1.Input("position:absolute; left:30%; width:30%; top:85%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    var labelUrlSSOTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:55%; font-size:15px; text-align:center; text-decoration: underline;color: blue;", texts.text("labelUrlSSO")));
+    var labelUrlSSO = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:60%; font-size:15px; text-align:right", texts.text("labelUrlSSO")));
+    var iptUrlSSO = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:60%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
 
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:85%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:60%; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "urlSSO", vl: String(iptUrlSSO.getValue()) });
     });
 
     //Código Cliente
-    var labelCodClient = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:20%; top:90%; font-size:15px; text-align:center", texts.text("labelCodCient")));
-    var iptCodClient = that.add(new innovaphone.ui1.Input("position:absolute; left:20%; width:20%; top:90%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:90%; height:auto; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-        app.send({ api: "admin", mt: "UpdateConfig", prt: "CodClient", vl: String(ipturl.getValue()) });
+    var labelCodClient = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:65%; font-size:15px; text-align:right", texts.text("labelCodCient")));
+    var iptCodClient = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:65%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:65%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "CodClient", vl: String(iptCodClient.getValue()) });
     });
     //URL Autenticação SSO
-    var labelUrl = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:20%; top:95%; font-size:15px; text-align:center", texts.text("labelUrl")));
-    var ipturl = that.add(new innovaphone.ui1.Input("position:absolute; left:30%; width:30%; top:95%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
-    that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:95%; height:auto; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+    var labelUrl = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:70%; font-size:15px; text-align:right", texts.text("labelUrl")));
+    var ipturl = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:70%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:70%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "Url", vl: String(ipturl.getValue()) });
     });
 
@@ -102,9 +102,9 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "UpdateConfigResult") {
             iptUrlCallList.setValue(obj.urlH);
-            iptUrlPhoneApi.setValue(obj.urlP);
+            iptUrlCallEvents.setValue(obj.urlP);
             switchCallList.setValue(obj.sH);
-            switchPhoneApi.setValue(obj.sP);
+            switchCallEvents.setValue(obj.sP);
             iptUrlDash.setValue(obj.urlD);
             iptUrlSSO.setValue(obj.urlSSO);
             iptCodClient.setValue(obj.CodCli);
@@ -112,9 +112,9 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
 
         }
     }
-    function onPhoneApiSwitchCLick() {
+    function onCallEventsSwitchCLick() {
 
-        var state = switchPhoneApi.getValue();
+        var state = switchCallEvents.getValue();
             //e.currentTarget.state;
         app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: state });
     }

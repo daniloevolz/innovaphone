@@ -10,16 +10,16 @@ Wecom.wecallTexts = {
         labelCallListAdmin: "CallList API",
         labelChkCallList: "Enviar Eventos CallList?",
         labelURLCallList: "URL eventos CallList:",
-        labelPhoneApiAdmin: "PhoneApi API",
-        labelChkPhoneApi: "Enviar Eventos PhoneApi?",
-        labelURLPhoneApi: "URL eventos PhoneApi:",
+        labelCallEventsAdmin: "RCC API CallEvents",
+        labelChkCallEvents: "Enviar Eventos RCC CallEvents?",
+        labelURLCallEvents: "URL eventos RCC CallEvents:",
         btnUpdate: "Atualizar",
         urlText: "URL",
         labelUrlDashTitulo: "Dashboard APP",
         labelUrlDash: "URL Dashboard:",
         labelCodCient: "Código de Cliente Wecall:",
-        labelUrlSSO: "URL provedor SSO Wecall",
-        labelUrl:"URL de Autenticação SSO"
+        labelUrlSSO: "URL provedor SSO Wecall:",
+        labelUrl:"URL de Autenticação SSO:"
 
     },
     en: {

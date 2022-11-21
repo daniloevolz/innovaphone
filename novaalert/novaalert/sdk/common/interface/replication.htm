@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - mylib</title>
+    <link rel="stylesheet" href="../../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../web1/doc/vs.css">
+    <script src="../../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>replication.h</h1>
+
+    <p>
+        Interfaces used for replication of tables from a server or table provider to a client. On the
+        client side the table will be written into a local database. On the server side the table could
+        be anything.
+        The replication relies on a underlying websocket connection which provides JsonApi for message
+        exchange.
+    </p>
+
+    <p>
+        The libraries for the replicator (client) and publisher (server), cover the following features:
+        <ul>
+            <li>
+                Exchange of information, which columns of the table are requested by the client
+                and which of these can provided by the server
+            </li>
+            <li>
+                Support of change sequence number, so that after the websocket connection is established
+                only updates from after the latest known sequence number have to be replicated.
+            </li>
+            <li>
+                Dynamic updates of the client when the connection is up
+            </li>
+            <li>
+                Updates from client sent to the server
+            </li>
+            <li>
+                Conflict resolution for simultaneous changes when connection is down
+            </li>
+        </ul>
+    </p>
+
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/replication.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#IReplicator">IReplicator</a><br>
+                <a href="#UReplicator">UReplicator</a><br>
+                <a href="#IPublisher">IPublisher</a><br>
+                <a href="#UPublisher">UPublisher</a><br>
+                <br>
+            </td>
+        </tr>
+    </table>
+
+    <h1>Classes</h1>
+
+    <a name="IReplicator"><h2>IReplicator</h2></a>
+
+    <pre><code class="C++">class IReplicator : public UJsonApiContext {
+public:
+    virtual ~IReplicator() {};
+    virtual void <a href="#R-Update">Update</a>(const char * domain, const char * instance) = 0;
+    virtual void <a href="#R-AddColumn">AddColumn</a>(const char * remote, const char * local, enum ReplicationType type, bool update) = 0;
+    virtual class IReplicatorArray * <a href="#R-AddArray">AddArray</a>(const char * remote, const char * local, bool update, const char * reference) = 0;
+    virtual void <a href="#R-Initialize">Initialize</a>(const char * row) = 0;
+    virtual void <a href="#R-Added">Added</a>(ulong64 id) = 0;
+    virtual void <a href="#R-Deleted">Deleted</a>(ulong64 id) = 0;
+    virtual void <a href="#R-DeletedConfirm">DeletedConfirm</a>(ulong64 id) = 0;
+    virtual void <a href="#R-Updated">Updated</a>(ulong64 id, ulong64 mask=0xffffffffffffffffLL) = 0;
+    virtual void <a href="#R-Start">Start</a>() = 0;
+    virtual void <a href="#R-Stop">Stop</a>() = 0;
+
+    static class IReplicator * <a href="#createReplicator">createReplicator</a>(class UReplicator * user, const char * remote, const char * domain, const char * instance, const char * domainProperty, const char * instanceProperty, class IDatabase * database, const char * local, bool add, bool del);
+};</code></pre>
+
+    <p>
+        The IReplicator function is the virtual interface class returned when creating the replicator.
+        The public interface functions of this class are called to perform any operations.
+    </p>
+
+    <h3>Public functions</h3>
+
+    <!-- create Replicator -------------------------------------------------------------------- -->
+
+    <h3 id="createReplicator">createReplicator</h3>
+
+    <p>
+        This functions is called to create the replicator as part of the initialization.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class UReplicator * <b>user</b></td>
+                    <td>
+                        Use the UReplicator class as base class of one of your classes. The virtual
+                        functions of this class are called so signal events from the replicator
+                        the the user of the replicator.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>remote</b></td>
+                    <td>
+                        The remote table name, used to publish the table. This name is used inside
+                        the replication protocol as "api" property.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>domain, instance</b></td>
+                    <td>
+                        If the App Service can receive AppWebsocket connections from multiple
+                        domains and instances, these parameters can be used to only use matching
+                        connections for the replication.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>domainProperty, instanceProperty</b></td>
+                    <td>
+                        The name of the properties used to send domain and instance in the message
+                        which is used to decide, that this AppWebsocket connection can be used for
+                        replication.<br/>
+                        <b>Note:</b>&nbsp;<i>the default value for domainProperty is "domain" and for instanceProperty "pbx" if you replicate from an innovaphone PBX!</i>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">class IDatabase * <b>database</b></td>
+                    <td>
+                        The database pointer
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>local</b></td>
+                    <td>
+                        The name of the local database table, into which the remote table is
+                        replicated
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>add</b></td>
+                    <td>
+                        If true, the replicator announces that it may add to the replicated table.
+                        If this is not possible on the publisher of the table, the replication won't
+                        start.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>del</b></td>
+                    <td>
+                        If true, the replicator announces that it may delete from the replicated table.
+                        If this is not possible on the publisher of the table, the replication won't
+                        start.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+        <dt>Return value</dt>
+        <dd>
+            Pointer to the replicator interface class
+        </dd>
+    </dl>
+
+    <p>
+        For this to work, the AppInstance class needs to use JsonApiContext as base class.
+    </p>
+
+<pre><code class="C++">class &lt;Your App Name&gt;</> : public AppInstance, ... , public JsonApiContext</code></pre>
+
+    <p>
+        After createReplicator is called the interface has to be registered in the JsonApiContext
+    </p>
+<pre><code class="C++">replicator = IReplicator::createReplicator(this, ...);
+RegisterJsonApi(replicator);</code></pre>
+
+    <p>
+        When an AppWebsocket connection is established, which may be used for the replication, this
+        AppWebsocket connection needs to be added to the JsonApiContext:
+    </p>
+
+<pre><code class="C++">class &lt;Your App Session&gt;</> : ..., public AppWebsocket, ... {
+
+    // when receiving a message indicating this session is used for replication
+    class JsonApi * jsonApi = &lt;App Instance class&gt;->CreateJsonApi(&lt;Table Name&gt;, this, msg, base);
+    if (jsonApi) jsonApi->JsonApiStart();</code></pre>
+
+    <!-- Update ------------------------------------------------------------------------------- -->
+
+    <h3 id="R-Update">Update</h3>
+
+    <p>
+        Function may be called to update domain and instance (see creatReplicator). The replication
+        is restarted when this function is called
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>domain, instance</b></td>
+                    <td>
+                        If the App Service can receive AppWebsocket connections from multiple
+                        domains and instances, these parameters can be used to only use matching
+                        connections for the replication.<br/>
+                        If you replicate from an innovaphone PBX, you typically use the App instance domain name for domain and a configurable value for instance, which must match the "PBX Name" of the PBX which is used for replication.<br/>
+                        The configuration of the PBX name can be e.g. done inside a PBX Manager Plugin for your App.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- AddColumn ---------------------------------------------------------------------------- -->
+
+    <h3 id="R-AddColumn">AddColumn</h3>
+
+    <p>
+        After the replicator is created, the columns which should be replicated must be configured.
+        This is done by calling AddColumn for each column.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>remote</b></td>
+                    <td>
+                        The column name under which it is published
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>local</b></td>
+                    <td>
+                        The local database column name
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">enum ReplicationType <b>type</b></td>
+                    <td>
+                        <dl>
+                            <dt>ReplicationString</dt>
+                            <dd>string of arbitrary length</dd>
+                            <dt>ReplicationULong64</dt>
+                            <dd>64bit unsigned integer</dd>
+                            <dt>ReplicationUnsigned</dt>
+                            <dd>32bit unsigned integer</dd>
+                            <dt>ReplicationBool</dt>
+                            <dd>Boolean</dd>
+                            <dt>ReplicationArray</dt>
+                            <dd>
+                                Not used with the AddColumn function, but only used internally for
+                                the AddArray function
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>update</b></td>
+                    <td>
+                        The replicator user may update this column
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- AddArray ----------------------------------------------------------------------------- -->
+
+    <h3 id="R-AddArray">AddArray</h3>
+
+    <p>
+        An column in the table can consist of an array of objects. This array is added with the
+        AddArray function the same way as simple elements are added with AddColumn. The array
+        of objects is represented as table with columns, with each elemnt of the object as column.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>remote</b></td>
+                    <td>
+                        The column name under which it is published
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>local</b></td>
+                    <td>
+                        The local database column name
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>update</b></td>
+                    <td>
+                        The replicator user may update this column
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>reference</b></td>
+                    <td>
+                        The name of the column in the database table used for the join to a column
+                        of "id" in the array table.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+        <dt>Return value</dt>
+        <dd>
+            A pointer to a IReplicatorArray class, which can be used to add columns
+        </dd>
+    </dl>
+
+    <!-- Initialize --------------------------------------------------------------------------- -->
+
+    <h3 id="R-Initialize">Initialize</h3>
+
+    <p>
+        Called to initialize the local database table. Must be called, after the replicator is
+        created and all columns are added. The UReplicator::Initialited function is called
+        when the initialization is complete.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>row</b></td>
+                    <td>
+                        The Initialize creates a database table "replicator_full", which is used to
+                        store the replicated rows after the initial full replication, so that the
+                        rows not present on the publisher anymore can be deleted. This table has a
+                        column "id" as unique id and uses the column "row" to link to the replicated
+                        table. The argument row is the SQL defintion used for the column.
+                        <br />
+                        Example: "BIGINT REFERENCES users(id) ON DELETE CASCADE NOT NULL"
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- Added -------------------------------------------------------------------------------- -->
+
+    <h3 id="R-Added">Added</h3>
+
+    <p>
+        Called when a row was added to the local table, so that the replicator can replicate
+        the change to the publisher
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row added
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- Deleted ------------------------------------------------------------------------------ -->
+
+    <h3 id="R-Deleted">Deleted</h3>
+
+    <p>
+        Called when a row is to be deleted locally, so that the replicator can replicate the
+        deletetion to the publisher. The actual database delete should be done after the
+        DeletedConfirm callback
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row to be deleted
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- DeletedConfirm ----------------------------------------------------------------------- -->
+
+    <h3 id="R-DeletedConfirm">DeletedConfirm</h3>
+
+    <p>
+        Call to acknowlegde an incoming Deleted call. Only after the DeletedConfirm call the row
+        is deleted from the table.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row to be deleted
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- Updated ------------------------------------------------------------------------------ -->
+
+    <h3 id="R-Updated">Updated</h3>
+
+    <p>
+        Called when a row was updated in the local table, so that the replicator can replicate
+        the change to the publisher
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row updated
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- Start -------------------------------------------------------------------------------- -->
+
+    <h3 id="R-Start">Start</h3>
+
+    <p>
+        Call to start the replicator after it was stopped. After initialization the replicator
+        is started automatically, so there is no need to call Start.
+    </p>
+
+    <!-- Stop --------------------------------------------------------------------------------- -->
+
+    <h3 id="R-Stop">Stop</h3>
+
+    <p>
+        Call to stop the replicator
+    </p>
+
+    <h2 id="UReplicator">UReplicator</h2>
+
+    <pre><code class="C++">class UReplicator {
+public:
+    virtual void <a href="#ReplicatorInitialized">ReplicatorInitialized</a>() = 0;
+    virtual void <a href="#ReplicatorAdded">ReplicatorAdded</a>(ulong64 id) = 0;
+    virtual void <a href="#ReplicatorDeleted">ReplicatorDeleted</a>(ulong64 id) = 0;
+    virtual void <a href="#ReplicatorDeletedConfirm">ReplicatorDeletedConfirm</a>(ulong64 id) = 0;
+    virtual void <a href="#ReplicatorDeletedConfirmComplete">ReplicatorDeletedConfirmComplete</a>(ulong64 id) = 0;
+    virtual void <a href="#ReplicatorUpdated">ReplicatorUpdated</a>(ulong64 id, ulong64 mask) = 0;
+    virtual void <a href="#ReplicatorSessionInitialized">ReplicatorSessionInitialized</a>() {}
+    virtual void <a href="#ReplicatorStopped">ReplicatorStopped</a>() = 0;
+
+    virtual void <a href="#ReplicatorUpdate">ReplicatorUpdate</a>(class json_io & msg, word base, bool initial) {};
+    virtual void <a href="#ReplicatorStart">ReplicatorStart</a>(class json_io & msg, word base, char * & tmp) {};
+};</code></pre>
+
+    <!-- ReplicatorInitialized ---------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorInitialized">ReplicatorInitialized</h3>
+
+    <p>
+        Called when replicator initialization is complete
+    </p>
+
+    <!-- ReplicatorAdded ---------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorAdded">ReplicatorAdded</h3>
+
+    <p>
+        Called when a row was added by the replicator
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row added
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ReplicatorDeleted -------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorDeleted">ReplicatorDeleted</h3>
+
+    <p>
+        Called when a row was deleted on the publisher. Locally the row is deleted only after
+        DeletedConfirm is called
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row deleted
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ReplicatorDeletedConfirm ------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorDeleted">ReplicatorDeleted</h3>
+
+    <p>
+        Called when a row can be deleted locally after a Deleted was called
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row deleted
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ReplicatorDeletedConfirmComplete ----------------------------------------------------- -->
+
+    <h3 id="ReplicatorDeletedComplete">ReplicatorDeletedComplete</h3>
+
+    <p>
+        Called when a row was deleted locally after a DeletedConfirm call
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row deleted
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ReplicatorUpdated -------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorUpdated">ReplicatorUpdated</h3>
+
+    <p>
+        Called when a row was updated by the replicator
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ulong64 <b>id</b></td>
+                    <td>
+                        The id of the row deleted
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">ulong64 <b>mask</b></td>
+                    <td>
+                        A 1 is set in this value for each updated column, with the bit position
+                        beeing the position of the column in the AddColumn calls.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ReplicatorSessionInitialized --------------------------------------------------------- -->
+
+    <h3 id="ReplicatorSessionInitialized">ReplicatorSessionInitialized</h3>
+
+    <p>
+        ?
+    </p>
+
+    <!-- ReplicatorStopped -------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorStopped">ReplicatorStopped</h3>
+
+    <p>
+        ?
+    </p>
+
+    <!-- ReplicatorUpdate --------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorUpdate">ReplicatorUpdate</h3>
+
+    <p>
+        ?
+    </p>
+
+    <!-- ReplicatorStart ---------------------------------------------------------------------- -->
+
+    <h3 id="ReplicatorStart">ReplicatorStart</h3>
+
+    <p>
+        Callback to add custom arguments to the ReplicateStart message. The JSON properties, which may be
+        added here depend on the publisher of the table.
+    </p>
+
+    <!-- IPublished --------------------------------------------------------------------------- -->
+
+    <h2 id="IPublisher">IPublisher</h2>
+
+    <pre><code class="C++">class IPublisher : public UJsonApiContext  {
+public:
+    virtual ~IPublisher() {};
+    virtual void <a href="#AddColumn">AddColumn</a>(const char * remote, const char * local, enum ReplicationType type, bool update) = 0;
+    virtual void Initialize(const char * row) = 0;
+    virtual void Added(ulong64 id) = 0;
+    virtual void Deleted(ulong64 id) = 0;
+    virtual void DeletedConfirm(ulong64 id) = 0;
+    virtual void Updated(ulong64 id, ulong64 mask) = 0;
+    virtual void Stop() = 0;
+
+    static class IPublisher * <a href="#createPublisher">createPublisher</a>(class UPublisher * user, const char * remote, class IDatabase * database, const char * local, const char * sequence, bool add, bool del);
+};
+</code></pre>
+
+    <!-- createPublisher ---------------------------------------------------------------------- -->
+
+    <h3 id="createPublisher">createPublisher</h3>
+
+    <p>
+        This functions is called to create a publisher as part of the initialization.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class UPublisher * <b>user</b></td>
+                    <td>
+                        Use the UPublisher class as base class of one of your classes. The virtual
+                        functions of this class are called so signal events from the publisher
+                        to the user of the publisher.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>remote</b></td>
+                    <td>
+                        The remote table name, used to publish the table. This name is used inside
+                        the replication protocol as "api" property.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">class IDatabase * <b>database</b></td>
+                    <td>
+                        The database pointer
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>local</b></td>
+                    <td>
+                        The name of the local database table, from which the remote table is
+                        replicated
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>add</b></td>
+                    <td>
+                        If true, the publisher allows to add to the local table.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>del</b></td>
+                    <td>
+                        If true, the publisher allows to delete from the local table.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+        <dt>Return value</dt>
+        <dd>
+            Pointer to the publisher interface class
+        </dd>
+    </dl>
+
+    <!-- AddColumn ---------------------------------------------------------------------------- -->
+
+    <h3 id="AddColumn">AddColumn</h3>
+
+    <p>
+        After the publisher is created, this function is called to add columns to the replicator.
+        The column in a local database is specified together with the name under which the column
+        is published.
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>remote</b></td>
+                    <td>
+                        The name under which the column is published
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>local</b></td>
+                    <td>
+                        The name of the local database column
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">enum ReplicationType <b>type</b></td>
+                    <td>
+                        The type of the column
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">bool <b>update</b></td>
+                    <td>
+                        Indicates if the column my be updated from remote
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- Initialize --------------------------------------------------------------------------- -->
+
+    <h3 id="Initialize">Initialize</h3>
+
+    <p>
+        To be called after all columns have been added to initialize local datastructures and database
+        tables
+    </p>
+
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>row</b></td>
+                    <td>
+                        SQL type to for a database column used to join to a row of the published table
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+</body>
+</html>
