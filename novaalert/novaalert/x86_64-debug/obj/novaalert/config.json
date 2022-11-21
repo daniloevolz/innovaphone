@@ -1,4 +1,17 @@
-{
+
+    {
+        "config": {
+          "init": [
+            {
+              "cmd": "item",
+              "name": "urlalert",
+              "type": "STRING",
+              "default": "",
+              "password": false
+            }
+          ]
+        
+        },
     "javascript": {
         "eval": [
             "wecom-novaalertservice.js"

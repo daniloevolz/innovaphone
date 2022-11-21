@@ -30,12 +30,27 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+     //Título
+     var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
+
+     //B3
+     var labelNovaAlert = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelNovaAlert")))
+     var labelAdd = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:15%; font-size:15px; text-align:right", texts.text("labelCheck")));
+ 
+     var labelURLNovaAlert = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:20%; font-size:15px; text-align:right", texts.text("labelURLNovaAlert")));
+     var iptUrlNovaAlert = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+     iptUrlNovaAlert.setAttribute("id","inputNovaAlert")
+    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+     app.send({ api: "admin", mt: "UpdateConfig", prt: "urlalert", vl: String(iptUrlNovaAlert.getValue()) });
+ });
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
     }
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
+            iptUrlNovaAlert.setValue(obj.urlalert);
         }
     }
 }
