@@ -47,6 +47,13 @@ div#logowecom {
     background-size: cover;
     margin-left: 0%;
     float: left;
+    position:absolute;
+    left:0px;
+    width:12%;
+    height:100%;
+    top:0px;
+    font-size:15px;
+    text-align:left;
 }
 
 .linha1 {
@@ -54,6 +61,12 @@ div#logowecom {
     background-image: url("money_header.png");
     background-size: cover;
     height: 20%;
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0px;
+    font-size:15px;
+    text-align:left
    
 }
 .logo-inn{
@@ -94,7 +107,13 @@ div#logowecom {
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 8.2%; /*teste aqui*/
-
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0px;
+    font-size:15px;
+    text-align:left;
+    display: none;
 
 }
 
@@ -115,6 +134,12 @@ div#logowecom {
     justify-content: center;
     margin-top: 8.2%;
     position: absolute;
+    display:none;
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0%; /* colocar 2% se der merda */
+    font-size: 15px;text-align: center;
 
 }
 
@@ -204,22 +229,26 @@ label {
     margin-top: 1%;
 }
 
-/* EDIÃ‡ÃƒO PARA CELULAR - PIETRO ðŸ˜Ž */
 
-@media screen and (max-width: 500px)  {
-    
+@media screen and (max-width: 400px)  {
+    body{
+        overflow: auto;
+    }
     .linha1 {
-        position: absolute;
+      /*  position: absolute; */
         float: right;
         width: 100%;
         margin-top: 0%;
-        height: 14.5%;
+        height: 18%;
+        left: 0%;
     }
-
+    ul{
+        margin-top: 8%;
+    }
     .linha2 {
         width: 100%;
         height: 100%;
-        margin-top: 30%;
+        margin-top: 35%;
     }
 
     .colunadireita {
@@ -229,13 +258,18 @@ label {
 
     .colunaesquerda {
         background-image: url("bg_lateral500px.png");
+        position: absolute;
         background-size: cover;
-        height: 15.5%;
+        height: 19%;
         width: 100%;
         margin-left: 0%;
         display: flex;
-        margin-top: 23%;
+        margin-top: 27%;
         position: absolute;
+        float: left;
+        font-size:15px;
+        text-align:left;
+    
     }
 
     .img-item {
@@ -283,158 +317,53 @@ label {
 
     .linha2todas {
         order: 2;
-        background-image: url("bg.png");
         background-size: cover;
-        align-content: center;
-        width: 100%;
-        height: 90%;
-        top: 45%;
-        align-items: flex-start;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 50%;
-
-    }
-
-    .linha2b3 {
-        order: 2;
-        background-image: url("bg.png");
-        background-size: cover;
-        align-content: center;
-        width: 100%;
-        height: 97%;
-        top: 45%;
-        align-items: flex-start;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 38%; /*teste aqui*/
-    }
-
-}
-
-/* EDIÇÃO PARA CELULAR - PIETRO 😎 */
-
-@media screen and (max-width: 500px)  {
-    
-    .linha1 {
-        position: absolute;
-        float: right;
-        width: 100%;
-        margin-top: 0%;
-        height: 14.5%;
-    }
-
-    .linha2 {
-        width: 100%;
-        height: 100%;
-        margin-top: 30%;
-    }
-
-    .colunadireita {
+        /*align-content: center;*/
         width: 100%;
         height: 80%;
-    }
-
-    .colunaesquerda {
-        background-image: url("bg_lateral500px.png");
-        background-size: cover;
-        height: 15.5%;
-        width: 100%;
-        margin-left: 0%;
+        top: 0%;
+        /*align-items: flex-start;*/
+        justify-content: center;
         display: flex;
-        margin-top: 23%;
+        align-items: center;
+        display: flex;
+        /*flex-direction: column;*/
+       /* flex-wrap: wrap ;*/
+        justify-content: center;
+        margin-top:0%;
         position: absolute;
-    }
-
-    .img-item {
-        width: 50px;
-        height: 50px;
-    }
-
-    .imglogo {
-        width: 50%;
-        height: 50%;
-    }
-
-    div#logowecom {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .div-data {
-        width: 300px;
-        margin-top: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .logo-inn {
-        width: 30%;
-        height: auto;
-        padding-top: 30px;
-        padding-left: 30px;
-    }
-
-    .item-dolar {
-        font-size: 17px;
-    }
-
-    .item-euro {
-        font-size: 17px;
-    }
-
-    .item-libra {
-        font-size: 17px;
-    }
-
-    .linha2todas {
-        order: 2;
-        background-image: url("bg.png");
-        background-size: cover;
-        align-content: center;
+        display:none;
+        position:absolute;
+        left: 0%;
         width: 100%;
-        height: 90%;
-        top: 45%;
-        align-items: flex-start;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 50%;
+        top:35%; 
+        font-size: 15px;
+        text-align: center;
+
     }
 
     .linha2b3 {
         order: 2;
-        background-image: url("bg.png");
         background-size: cover;
         align-content: center;
-        width: 100%;
-        height: 97%;
-        top: 45%;
+        height: 80%;
         align-items: flex-start;
         justify-content: center;
-        display: flex;
         align-items: center;
-        display: flex;
         flex-direction: column;
         flex-wrap: wrap;
         justify-content: center;
-        margin-top: 38%; /*teste aqui*/
+        margin-top: 0%; /*teste aqui*/
+        position:absolute;
+        left: 0%;
+        width: 100%;
+        top: 35%;
+        font-size:15px;
+        text-align:left;
+        display: none;
     }
 
 }
+
+
+
