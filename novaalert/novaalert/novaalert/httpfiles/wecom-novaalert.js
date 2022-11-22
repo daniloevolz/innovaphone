@@ -47,6 +47,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             
         }
     }
+    
     var urlnova = "";
 
     function app_message(obj) {
