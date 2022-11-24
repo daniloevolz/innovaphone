@@ -8,6 +8,7 @@ Wecom.novaalertTexts = {
         labelURLNovaAlert: "URL NovaAlert: ",
         urlText: "URL",
         btnUpdate: "Atualizar",
+        btnAlert:"Disparar Alerta!!!"
     },
     en: {
     },
