@@ -30,9 +30,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
-    that.add(new innovaphone.ui1.Div("position:absolute; left:40%; width:20%; top:25%; font-size:12px; text-align:center", null, "button")).addTranslation(texts, "btnAlert").addEvent("click", function () {
-        app.send({ api: "user", mt: "TriggerAlert", prt: "22"});
-    });
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
@@ -50,11 +47,25 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             
         }
     }
+    
+    var urlnova = "";
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+            urlnova = obj.urlalert;
+          
         }
     }
+   /* function constructor(){
+        that.clear();
+        novaalert();
+    }
+  function novaalert(){
+       // var iptTeste = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+        var iframelinha2b3  = that.add(new innovaphone.ui1.Node("iframe",null,null,null))
+        iframelinha2b3.setAttribute("src",urlnova)
+    }
+*/
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
