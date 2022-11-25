@@ -2,6 +2,7 @@
 /// <reference path="../../web1/lib1/innovaphone.lib1.js" />
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
+/// <reference path="../../web1/ui1.popup/innovaphone.ui1.popup.js" />
 
 var Wecom = Wecom || {};
 Wecom.novaalert = Wecom.novaalert || function (start, args) {
@@ -75,6 +76,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var buttons = JSON.parse(obj.result);
             popButtons(buttons);
         }
+        if (obj.api == "user" && obj.mt == "AlarmReceived") {
+            console.log(obj.alarm);
+            makePopup("Alarme Recebido!!!!", obj.alarm);
+        }
     }
 
     function popButtons(buttons) {
@@ -109,6 +114,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+    }
+
+    function makePopup(header, content) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px", styles[0], h[0]);
+        popup.header.addText(header);
+        popup.content.addText(content);
     }
 }
 

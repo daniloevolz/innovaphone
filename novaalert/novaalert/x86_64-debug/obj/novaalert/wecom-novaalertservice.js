@@ -4,6 +4,7 @@ var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var sendCallEvents = Config.sendCallEvents;
 
 var connectionsRCC = [];
+var connectionsApp = [];
 var connections = [];
 var calls = [];
 
@@ -13,8 +14,32 @@ Config.onchanged(function(){
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
 })
 
+WebServer.onrequest("triggedAlarm", function (req) {
+    if (req.method == "POST") {
+        var newValue = "";
+        var value = "";
+        req.onrecv(function (req, data) {
+            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+                alarmReceived(value);
+            }
+        });
+    }
+    else {
+        req.cancel();
+    }
+});
 
-new JsonApi("user").onconnected(function(conn) {
+
+new JsonApi("user").onconnected(function (conn) {
+    log("danilo req: user conn: " + JSON.stringify(conn))
+    connectionsApp.push({ ws: conn });
     if (conn.app == "wecom-novaalert") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
@@ -29,7 +54,7 @@ new JsonApi("user").onconnected(function(conn) {
             }
             if (obj.mt == "SelectMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
-                Database.exec("SELECT * FROM list_buttons")
+                Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip+"'")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
@@ -41,6 +66,10 @@ new JsonApi("user").onconnected(function(conn) {
             }
         });
     }
+    conn.onclose(function () {
+        log("danilo req: user conn: disconnected");
+        connectionsApp.splice(connectionsApp.indexOf(conn), 1);
+    });
 });
 new JsonApi("admin").onconnected(function(conn) {
     if (conn.app == "wecom-novaalertadmin") {
@@ -297,7 +326,18 @@ function httpClient(url, call) {
 
 }
 
+function alarmReceived(value) {
 
+    log("danilo-req alarmReceived:value " + String(value));
+    //var obj = JSON.parse(String(value));
+    connectionsApp.forEach(function (connection) {
+        var ws = connection.ws;
+        log("danilo-req alarmReceived: will send "+JSON.stringify(connection));
+        ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: value }));
+    });
+
+
+}
 function callRCC(ws, user, mode, num, sip) {
     if (mode == "UserInitialize") {
         var msg = { api: "RCC", mt: "UserInitialize", cn: user, src: sip };
