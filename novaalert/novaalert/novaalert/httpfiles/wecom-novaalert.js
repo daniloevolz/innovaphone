@@ -31,7 +31,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    function app_connected(domain, user, dn, appdomain) {
+    function app_connected(domain, user, dn, appdomain) { 
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "user", mt: "SelectMessage" });
  
