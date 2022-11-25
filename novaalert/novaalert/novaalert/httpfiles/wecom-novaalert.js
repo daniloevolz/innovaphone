@@ -48,15 +48,20 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         else {
   
             app.send({ api: "user", mt: "UserMessage" })
-            
-            
+
         }
     }
 
     var buttonClicked = function (evt) {
         // Dentro do objeto evt esta o target, e o target tem um value:
         var value = evt.target.value;
-        app.send({ api: "user", mt: "TriggerAlert", prt: String(value)})
+        var type = evt.target.name;
+        if (type == "Número") {
+            app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
+        } else {
+            app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
+        }
+        
     };
 
     
