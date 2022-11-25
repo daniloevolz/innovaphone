@@ -1,4 +1,4 @@
-
+﻿
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt:{
@@ -8,7 +8,17 @@ Wecom.novaalertTexts = {
         labelURLNovaAlert: "URL NovaAlert: ",
         urlText: "URL",
         btnUpdate: "Atualizar",
-        btnAlert:"Disparar Alerta!!!"
+        btnSave: "Salvar",
+        btnCancel: "Cancelar",
+        btnAlert: "Disparar Alerta!!!",
+        btnAddButton: "Criar Botão",
+        labelTituloAdd: "Criar Botão",
+        iptText: "...",
+        labelName: "Nome:",
+        labelUser: "Usuário:",
+        labelValue: "Valor",
+        labelType: "Tipo:"
+
     },
     en: {
     },

@@ -137,6 +137,7 @@
     <None Include="novaalert\httpfiles\wecom.novaalertmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="novaalert\httpfiles\close.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalert.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalertadmin.png" />
     <Image Include="novaalert\novaalert.png" />

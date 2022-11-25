@@ -1,20 +1,68 @@
-
-    {
-        "config": {
-          "init": [
-            {
-              "cmd": "item",
-              "name": "urlalert",
-              "type": "STRING",
-              "default": "",
-              "password": false
-            }
-          ]
-        
-        },
-    "javascript": {
-        "eval": [
-            "wecom-novaalertservice.js"
+{
+  "database": {
+    "init": [
+      {
+        "cmd": "table",
+        "name": "list_buttons",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "button_name",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_prt",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_user",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type",
+            "type": "VARCHAR(50) NOT NULL"
+          }
         ]
-    }
+      }
+    ]
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "urlalert",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlPhoneApiEvents",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/phoneevents",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallEvents",
+        "type": "BOOL",
+        "default": false,
+        "password": false
+      }
+    ]
+
+  },
+  "javascript": {
+    "eval": [
+      "wecom-novaalertservice.js"
+    ]
+  }
 }

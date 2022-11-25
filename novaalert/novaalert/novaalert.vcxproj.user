@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteTarget>-1801119085;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteTarget>-1818285358;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
     <RemoteDebuggerCommandArguments>--app-name=novaalert --app-domain=wecom.com.br --app-password=pwd --webserver-path=novaalert --db-name=novaalert --db-user=novaalert --db-password=novaalert --service-id=novaalert</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

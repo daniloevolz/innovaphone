@@ -5,6 +5,8 @@ FILES += \
 	../$(SDK-WEB1)/lib1/*.js \
 	../$(SDK-WEB1)/lib1/*.css \
 	../$(SDK-WEB1)/ui1.lib/*.js \
+	../$(SDK-WEB1)/ui1.switch/*.js \
+	../$(SDK-WEB1)/ui1.popup/*.js \
 	../$(SDK-WEB1)/ui1.svg/*.js \
 	../$(SDK-WEB1)/fonts/*.ttf
 	

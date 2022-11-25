@@ -33,39 +33,78 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
-
+        app.send({ api: "user", mt: "SelectMessage" });
+ 
         if (app.logindata.info.unlicensed) {
-            //sem licen�a
-            var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
-            that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-               app.send({ api: "user", mt: "UserMessage" })
-            });
+            //sem licença
+            app.send({ api: "user", mt: "UserMessage" })
+            //var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
+            //that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
+            //    app.send({ api: "user", mt: "UserMessage" })
+            //    app.send({ api: "user", mt: "SelectMessage" });
+            //});
   
-        } else {
+        }
+        else {
   
-          app.send({ api: "user", mt: "UserMessage" })
+            app.send({ api: "user", mt: "UserMessage" })
+            
             
         }
     }
+
+    var buttonClicked = function (evt) {
+        // Dentro do objeto evt esta o target, e o target tem um value:
+        var value = evt.target.value;
+        app.send({ api: "user", mt: "TriggerAlert", prt: String(value)})
+    };
+
     
-    var urlnova = "";
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            urlnova = obj.urlalert;
-          
+
+        }
+        if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
+            console.log(obj.result);
+            var buttons = JSON.parse(obj.result);
+            popButtons(buttons);
         }
     }
-   /* function constructor(){
-        that.clear();
-        novaalert();
+
+    function popButtons(buttons) {
+        var allbtn = that.add(new innovaphone.ui1.Div(null, null, "allbtn"));
+
+        //var allbtn = document.getElementById("allbtn");
+        buttons.forEach(function (object) {
+            
+            var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
+            if (object.button_type == "Alarme") {
+                var img = btn.add(new innovaphone.ui1.Node("img", null, null, "img-icon"));
+                img.setAttribute("src", "alarm.png");
+            } else {
+                var img = btn.add(new innovaphone.ui1.Node("img", null, null, "img-icon"));
+                img.setAttribute("src", "phone.png");
+            }
+            btn.setAttribute("type", "button");
+            btn.setAttribute("nonce", object.button_id);
+            btn.setAttribute("name", object.button_type);
+            btn.setAttribute("value", object.button_prt);
+            btn.addHTML(object.button_name);
+            
+            
+            allbtn.add(btn);
+        });
+
+        var botoes = document.querySelectorAll(".allbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
     }
-  function novaalert(){
-       // var iptTeste = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
-        var iframelinha2b3  = that.add(new innovaphone.ui1.Node("iframe",null,null,null))
-        iframelinha2b3.setAttribute("src",urlnova)
-    }
-*/
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
