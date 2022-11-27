@@ -57,10 +57,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // Dentro do objeto evt esta o target, e o target tem um value:
         var value = evt.target.value;
         var type = evt.target.name;
-        if (type == "Número") {
+        if(type == "number") {
             app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
-        } else {
+        }
+        if (type == "alarm") {
             app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
+        }
+        if (type == "video") {
+            makePopup(texts.text("headerVideoPlayer"), '<video id="my_video_1" class="video - js vjs - fluid vjs -default -skin" controls preload="auto"'+
+                'data - setup="{}" >'+
+                '<source src="' + String(value)+'" type="application/x-mpegURL">'+
+                '</video>')
         }
         
     };
@@ -79,6 +86,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
             console.log(obj.alarm);
             makePopup("Alarme Recebido!!!!", obj.alarm);
+            var alarm = new innovaphone.ui1.Node("scroll-page", null, obj.alarm,null);
+            document.getElementById("scroll-calls").appendChild(alarm.container)
         }
     }
 
@@ -123,7 +132,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px", styles[0], h[0]);
         popup.header.addText(header);
-        popup.content.addText(content);
+        popup.content.addHTML(content);
     }
 }
 

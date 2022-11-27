@@ -3,6 +3,7 @@
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
 /// <reference path="../../web1/ui1.popup/innovaphone.ui1.popup.js" />
+/// <reference path="../../web1/ui1.listview/innovaphone.ui1.listview.js" />
 
 
 var Wecom = Wecom || {};
@@ -11,6 +12,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var that = this;
 
     var iptUrl = "";
+    var list_buttons = [];
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -52,6 +54,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
+            list_buttons = JSON.parse(obj.result);
+            makeDivAdmin();
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
             makePopup("Atenção", "Botão criado com sucesso!");
@@ -90,6 +94,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptType.setAttribute("id", "selectType");
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "alarm", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "number", null));
+        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "video", null));
         //Botão Salvar
         that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             var type = document.getElementById("selectType").value;
@@ -97,7 +102,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), value: String(iptValue.getValue()), sip: String(iptUser.getValue()), type: String(iptType.getValue()) });
+                app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), value: String(iptValue.getValue()), sip: String(iptUser.getValue()), type: String(type) });
                 makeDivAdmin();
             }
              });
@@ -127,6 +132,35 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:35%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
             makeDivAddButton();
         });
+        that.add(new innovaphone.ui1.Div("position:absolute; left:75%; width:15%; top:35%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
+            var selected = listView.getSelectedRows();
+            delButton(selected);
+        });
+        var list = new innovaphone.ui1.Div("position: absolute; left:20px; top:50%; right:20px; height:300px", null, "");
+        var columns = 5;
+        var rows = list_buttons.length;
+        var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
+        }
+
+            
+            list_buttons.forEach(function (b) {
+                var row = [];
+                row.push(b.id);
+                row.push(b.button_name);
+                row.push(b.button_prt);
+                row.push(b.button_type);
+                row.push(b.button_user);
+                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                that.add(list);
+            })
+        
+    }
+    function delButton(selected) {
+        console.log(selected);
+
     }
 }
 

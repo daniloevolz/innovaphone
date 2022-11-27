@@ -17,8 +17,14 @@ Wecom.novaalertTexts = {
         labelName: "Nome:",
         labelUser: "Usuário:",
         labelValue: "Valor",
-        labelType: "Tipo:"
-
+        labelType: "Tipo:",
+        headerVideoPlayer: "Video Câmera",
+        cabecalho0: "ID",
+        cabecalho1: "Nome",
+        cabecalho2:"Valor",
+        cabecalho3: "Tipo",
+        cabecalho4: "Usuário",
+        btnDelButton: "Excluir Botões"
     },
     en: {
     },

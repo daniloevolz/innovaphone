@@ -12,8 +12,24 @@
     <script src="wecom-novaalert.js" type="text/javascript"></script>
     <script src="wecom-novaalerttexts.js" type="text/javascript"></script>
     <script src="web1/ui1.popup/innovaphone.ui1.popup.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js/dist/video.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script>
 </head>
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.novaalert(start, { }); })">
+    <script>
+        var player = videojs("my_video_1");
+        player.play();
+
+        function apagar() {
+            var resultado = document.getElementById('resultado').innerHTML;
+            document.getElementById('resultado').innerHTML = resultado.substring(0, resultado.length - 1);
+        }
+        function insert(num) {
+            var numero = document.getElementById('resultado').innerHTML;
+            document.getElementById('resultado').innerHTML = numero + num;
+        }
+    </script>
     <div class="colunaesquerda">
         <div id="teclado" class="teclado">
             <div id="backspace" class="backspace">
@@ -47,27 +63,16 @@
         </div>
 
         <div id="calls" class="calls">
-            <scroll-container>
-                <scroll-page id="page-1">CHAMADA 1</scroll-page>
+            <scroll-container id="scroll-calls">
+                <!--<scroll-page id="page-1">CHAMADA 1</scroll-page>
                 <scroll-page id="page-2">CHAMADA 2</scroll-page>
                 <scroll-page id="page-3">CHAMADA 3</scroll-page>
                 <scroll-page id="page-1">CHAMADA 4</scroll-page>
                 <scroll-page id="page-2">CHAMADA 5</scroll-page>
-                <scroll-page id="page-3">CHAMADA 6</scroll-page>
+                <scroll-page id="page-3">CHAMADA 6</scroll-page>-->
             </scroll-container>
         </div>
     </div>
 </body>
-<script>
-function apagar()
-{
-    var resultado = document.getElementById('resultado').innerHTML;
-    document.getElementById('resultado').innerHTML = resultado.substring(0, resultado.length -1);
-}
-function insert(num)
-{
-    var numero = document.getElementById('resultado').innerHTML;
-    document.getElementById('resultado').innerHTML = numero + num;
-}
-</script>
+
 </html>
