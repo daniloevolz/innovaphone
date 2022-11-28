@@ -30,20 +30,20 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var elcloseModal = document.getElementById("closeModal");
-    elcloseModal.addEventListener("click", function () { closeModal() }, false);
+    // var elcloseModal = document.getElementById("closeModal");
+    // elcloseModal.addEventListener("click", function () { closeModal() }, false);
 
-    var elCancelModal = document.getElementById("cancelModal");
-    elCancelModal.addEventListener("click", function () { closeModal() }, false);
+    // var elCancelModal = document.getElementById("cancelModal");
+    // elCancelModal.addEventListener("click", function () { closeModal() }, false);
 
-    var elSalvarCloseModal = document.getElementById("salvarCloseModal");
-    elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
+    // var elSalvarCloseModal = document.getElementById("salvarCloseModal");
+    // elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
 
-    var elAddVideoModal = document.getElementById("newVideoModal");
-    elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
+    // var elAddVideoModal = document.getElementById("newVideoModal");
+    // elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
 
-    var elDelVideoModal = document.getElementById("deleteVideo");
-    elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
+    // var elDelVideoModal = document.getElementById("deleteVideo");
+    // elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
@@ -52,6 +52,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
+            table()
         }
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
@@ -59,7 +60,6 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
             var channels = JSON.parse(obj.result);
-
             insereTd(channels);
 
         }
@@ -71,6 +71,27 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             getChannels();
         }
     }
+    function table(){
+      var container = that.add(new innovaphone.ui1.Div(null,null,null));
+      var table = container.add(new innovaphone.ui1.Node("table",null,null,"truetable"));
+      table.setAttribute("id","tableChannels")
+      var tr = table.add(new innovaphone.ui1.Node("tr",null,null,null));
+      
+      var name = {a:"SELECIONAR",b:"NOME",c:"PAGINA",d:"TIPO",e:"URL",f:"LOGO"};
+      for (var x in name) {
+        var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],null));
+      }
+      var divbtn = container.add(new innovaphone.ui1.Div(null,null,null));
+      divbtn.setAttribute("id","divbtn");
+      var btnDelete = divbtn.add(new innovaphone.ui1.Node("buton",null,"Apagar Vídeo","btn btn-close btn-lg"));
+      btnDelete.setAttribute("id","deleteVideo");
+      var btnAdd = divbtn.add(new innovaphone.ui1.Node("buton",null,"Adicionar Vídeo","btn btn-save btn-lg"));
+      btnAdd.setAttribute("id","newVideoModal");
+
+    }
+
+
+
     function insertChannel() {
         var nameVideo = document.getElementById("nomeVideo").value;
         var urlVideo = document.getElementById("urlVideo").value;
