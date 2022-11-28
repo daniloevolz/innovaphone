@@ -91,12 +91,14 @@ background-color: brown;
 height: 15%;
 width: 100%;
 }
-scroll-container {
+.scroll-container {
+    position: absolute;
     display: block;
     width: 100%;
     height: 97%;
     overflow-y: auto;
-    background-color: rgb(12, 12, 12);
+    /* background-color: rgb(12, 12, 12); */
+    background-color: aqua;
   }
 ::-webkit-scrollbar {
     width: 10px;
@@ -104,14 +106,15 @@ scroll-container {
 ::-webkit-scrollbar-thumb {
     background: rgb(19, 33, 71);
 }
-  scroll-page {
+.scroll-page {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 20%;
     font-size: 15px;
     font-weight: bold;
-    background-color: grey;
+    /* background-color: grey; */
+    background-color: brown;
   }
 #apagar{
     background-size: cover;
@@ -182,7 +185,7 @@ scroll-container {
     position: absolute;
     height: 58%;
     width: 100%;
-    background-color: aqua;
+    /* background-color: aqua; */
     top: 42%;
 }
 
