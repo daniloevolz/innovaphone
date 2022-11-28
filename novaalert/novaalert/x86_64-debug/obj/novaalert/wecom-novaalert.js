@@ -59,15 +59,30 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var type = evt.target.name;
         if(type == "number") {
             app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
+            addNotification("<<<  " + type + " " + value);
         }
         if (type == "alarm") {
             app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
+            addNotification("<<<  " + type + " " + value);
         }
         if (type == "video") {
-            makePopup(texts.text("headerVideoPlayer"), '<video id="my_video_1" class="video - js vjs - fluid vjs -default -skin" controls preload="auto"'+
-                'data - setup="{}" >'+
-                '<source src="' + String(value)+'" type="application/x-mpegURL">'+
-                '</video>')
+            makePopup(texts.text("headerVideoPlayer"), '<html>' +
+                '<head>' +
+                '<link href="video-js.css" rel="stylesheet">' +
+                '<meta charset=utf-8 />' +
+                '</head>' +
+                '<body>' +
+                '<video id=example-video width=960 height=540 class="video-js vjs-default-skin" controls>' +
+                '<source ' +
+                'src="https://mediaserver.wecom.com.br:4443/live/room/index.m3u8" ' +
+                'type="application/x-mpegURL">' +
+                '</video>' +
+                '<script>' +
+                'var player = videojs("example-video"); ' +
+                'player.play(); ' +
+                '</script>' +
+                '</body>' +
+                '</html>')
         }
         
     };
@@ -86,9 +101,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
             console.log(obj.alarm);
             makePopup("Alarme Recebido!!!!", obj.alarm);
-            var alarm = new innovaphone.ui1.Node("scroll-page", null, obj.alarm,null);
-            document.getElementById("scroll-calls").appendChild(alarm.container)
+            addNotification(">>>  " + obj.alarm);
         }
+    }
+    function addNotification(msg) {
+        var alarm = new innovaphone.ui1.Node("scroll-page", null, msg, null);
+        document.getElementById("scroll-calls").appendChild(alarm.container)
     }
 
     function popButtons(buttons) {

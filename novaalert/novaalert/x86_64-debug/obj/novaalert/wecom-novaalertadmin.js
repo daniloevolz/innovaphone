@@ -61,6 +61,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             makePopup("Atenção", "Botão criado com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
+            app.send({ api: "admin", mt: "SelectMessage" });
             makePopup("Atenção", "Botão excluído com sucesso!");
         }
     }
@@ -134,7 +135,15 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         });
         that.add(new innovaphone.ui1.Div("position:absolute; left:75%; width:15%; top:35%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
             var selected = listView.getSelectedRows();
-            delButton(selected);
+            console.log(selected);
+            var selectedrows = [];
+
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(listView.getRowData(s))
+                console.log(selectedrows[0]);
+                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+            })
         });
         var list = new innovaphone.ui1.Div("position: absolute; left:20px; top:50%; right:20px; height:300px", null, "");
         var columns = 5;
@@ -144,23 +153,24 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         for (i = 0; i < columns; i++) {
             listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
         }
-
-            
-            list_buttons.forEach(function (b) {
-                var row = [];
-                row.push(b.id);
-                row.push(b.button_name);
-                row.push(b.button_prt);
-                row.push(b.button_type);
-                row.push(b.button_user);
-                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                that.add(list);
-            })
+        //Tabela    
+        list_buttons.forEach(function (b) {
+            var row = [];
+            row.push(b.id);
+            row.push(b.button_name);
+            row.push(b.button_prt);
+            row.push(b.button_type);
+            row.push(b.button_user);
+            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+            that.add(list);
+        })
         
     }
     function delButton(selected) {
         console.log(selected);
-
+        selected.forEach(function (s) {
+            app.send({ api: "admin", mt: "DeleteMessage", id: s.id });
+        })
     }
 }
 
