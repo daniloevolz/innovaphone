@@ -126,8 +126,9 @@ th{
 td:first-child { width: 0% }
 td:first-child + td {  width: 20%;}   
 td:first-child + td + td {  width: 20%; }
-td:first-child + td + td + td{  width: 50%; }
+td:first-child + td + td + td{  width: 40%; }
 td:first-child + td + td + td + td{  width: 5%; }
+td:first-child + td + td + td + td+ td{  width: 5%; }
 
 table{
     border-collapse: collapse;
