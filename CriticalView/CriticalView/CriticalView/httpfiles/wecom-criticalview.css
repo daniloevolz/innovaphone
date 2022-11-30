@@ -54,6 +54,7 @@ body {
     width: 100%;
     font-weight: bold;
     font-size: 20px;
+    
 }
 
 img {
@@ -179,16 +180,28 @@ label {
 
     
 }
-
+#div2{
+    margin-left: -4px;
+}
+.youtube1{
+    margin-left: 5px;
+}
 .youtube2{
-    margin-top: 9%;
-    
-    
+    margin-top: 9.2%;
+}
+.youtube3{
+    margin-left: 5px;
+}
+.mpeg1{
+    margin-left: 5px;
 }
 .mpeg2{
-margin-top: 5px;
-    
+    margin-top: 5px;  
 }
+.mpeg3{
+    margin-left: 5px;
+}
+
 
 .labelmpeg0{
     color: white;

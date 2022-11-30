@@ -198,8 +198,8 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             console.log("o Td estava limpo!")
         }
 
-        var table = document.getElementById('tableChannels');
-        data.forEach(function (object) {
+            var table = document.getElementById('tableChannels');
+            data.forEach(function (object) {
             var tr = document.createElement('tr');
             tr.setAttribute("class", "tr1");
             tr.setAttribute('id', 'channelLine');
@@ -208,9 +208,10 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
                 '<td class="tdborder3">' + object.page + '</td>' +
                 '<td class="tdborder4">' + object.type + '</td>' +
                 '<td class="tdborder5">' + object.url + '</td>' +
-                '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
-            table.appendChild(tr);
-        });
+              '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
+             table.appendChild(tr);
+         });
+         
     }
 }
 

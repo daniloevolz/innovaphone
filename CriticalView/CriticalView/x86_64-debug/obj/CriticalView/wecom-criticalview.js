@@ -45,22 +45,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     app.onmessage = app_message;
 
 
-    var botoes = document.querySelectorAll(".allbutton");
-    for (var i = 0; i < botoes.length; i++) {
-        var botao = botoes[i];
-
-        // O jeito correto e padronizado de incluir eventos no ECMAScript
-        // (Javascript) eh com addEventListener:
-        botao.addEventListener("click", function (event) {
-            const el = event.target || event.srcElement;
-            const value = el.value;
-            //const type = el.type;
-
-            console.log(value);
-            onChangePage(value);
-        });
-    }
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -77,6 +61,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+            constructor();
         }
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
@@ -90,9 +75,41 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
         }
     }
-    //const myInterval = window.setInterval(function () {
-    //    getChannels();
-    //}, 30000);
+
+    function constructor(){
+        colEsquerda();
+        grid();
+
+    var botoes = document.querySelectorAll(".allbutton");
+    for (var i = 0; i < botoes.length; i++) {
+        var botao = botoes[i];
+
+        // O jeito correto e padronizado de incluir eventos no ECMAScript
+        // (Javascript) eh com addEventListener:
+        botao.addEventListener("click", function (event) {
+            const el = event.target || event.srcElement;
+            const value = el.value;
+            //const type = el.type;
+            console.log(value);
+            onChangePage(value);
+        });
+    }
+    }
+    
+    function colEsquerda(){
+     var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
+     for (let i = 1; i < 6; i++) {
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null,i,null,null,"button","allbutton"));
+     }
+    }
+    function grid(){
+        var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        grid.setAttribute("id","grid");
+        for (let i = 0; i < 4; i++) {
+            var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
+            divGrid.setAttribute("id","div"+i)
+        }
+    }
 
     function onChangePage(page) {
         try {

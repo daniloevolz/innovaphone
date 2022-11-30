@@ -87,16 +87,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         
     };
 
-    
-
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+           constructor();
+    
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
             var buttons = JSON.parse(obj.result);
             popButtons(buttons);
-            colEsquerda();
+           
             
         }
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
@@ -106,6 +106,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
+    function constructor(){
+        colEsquerda();
+    }
+    
     function colEsquerda(){
         var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
         var teclado = colesquerda.add(new innovaphone.ui1.Div(null,null,"teclado"));
@@ -131,9 +135,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var btnDesligar = ligar.add(new innovaphone.ui1.Node("button","width: 50%; height: 40px; background-color: rgb(248, 23, 23); color: rgb(0, 0, 0); font-weight: bold;","DESLIGAR",null));
         var calls = colesquerda.add(new innovaphone.ui1.Div(null,null,"calls"));
          calls.setAttribute("id","calls");
-        
     }   
-
+    
     function addNotification(msg) {
         var scroll = new innovaphone.ui1.Node("scroll-container",null,null,"scroll-container")
         scroll.setAttribute("id","scroll-calls")
@@ -167,7 +170,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var botoes = document.querySelectorAll(".allbutton");
         for (var i = 0; i < botoes.length; i++) {
             var botao = botoes[i];
-
             // O jeito correto e padronizado de incluir eventos no ECMAScript
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
