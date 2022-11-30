@@ -34,7 +34,6 @@ body {
 	background-size:100%;*/
 }
 
-
 /* COLUNA ESQUERDA NA VERTICAL - TESTES */
 
 .colunaesquerda {
@@ -53,14 +52,12 @@ body {
     /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
     width: 100%;
     font-weight: bold;
-    font-size: 20px;
-    
+    font-size: 20px;   
 }
 
 img {
     width: 40px;
 }
-
 
 .imglogo {
     align-self: center;
@@ -73,7 +70,6 @@ input[type="checkbox"] {
     input[type="checkbox"]:checked ~ nav {
         transform: translateX(350px);
     }
-
 
 nav {
     position: absolute;
@@ -90,7 +86,7 @@ nav {
     display: none;
 }
 
-a {
+a{
     align-self: end;
     text-decoration: none;
     display: flex;
@@ -101,13 +97,10 @@ a {
     width: 100%;
     margin-left: 13%;
 }
-
 ul li:hover {
     background-color: rgba(32, 248, 255, 0.2);
     width: 100%;
 }
-
-
 label {
     padding: 15px;
     position: absolute;
@@ -117,7 +110,6 @@ label {
     margin-left: 5%;
     display: block;
 }
-
 .logo {
     display: flex;
     width: 25px;
@@ -126,15 +118,12 @@ label {
     margin-left: 4.4%;
     margin-top: -14.3%;
 }
-
-
 .label{
     color: white;
     font-size: 15px;
     font-weight: bold;
     padding-bottom: 32%;
-  
-    
+
 }
 .label0{
     color: white;
@@ -143,9 +132,7 @@ label {
     padding-bottom: 32%;
     float: right;
     margin-left: -20%;
-  
 
-    
 }
 .label1{
     color: white;
@@ -163,9 +150,6 @@ label {
     padding-bottom: 32%;
     float: right;
     margin-left: -20%;
-    
-    
-    
 
 }
 .label3{
@@ -176,9 +160,6 @@ label {
     float: right;
     margin-left: -20%;
 
-    
-
-    
 }
 #div2{
     margin-left: -4px;
@@ -189,18 +170,17 @@ label {
 .youtube2{
     margin-top: 9.2%;
 }
-.youtube3{
-    margin-left: 5px;
-}
 .mpeg1{
     margin-left: 5px;
 }
 .mpeg2{
     margin-top: 5px;  
 }
-.mpeg3{
+#div3{
     margin-left: 5px;
+    margin-top: 5px;
 }
+
 
 
 .labelmpeg0{

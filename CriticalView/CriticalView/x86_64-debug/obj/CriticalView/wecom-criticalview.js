@@ -44,7 +44,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -95,13 +94,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         });
     }
     }
-    
+
     function colEsquerda(){
      var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
      for (let i = 1; i < 6; i++) {
         var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null,i,null,null,"button","allbutton"));
      }
     }
+
     function grid(){
         var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
         grid.setAttribute("id","grid");
@@ -134,8 +134,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                     document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
 
-                    
-
                     if (item.type == "video/flv") {
                         var video = document.createElement("video");
                         video.setAttribute("id", "my_video_" + i);
@@ -152,9 +150,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
-                        
-                     
-
+       
                         var flvPlayer = flvjs.createPlayer({    
                             type: 'flv',
                             url: item.url

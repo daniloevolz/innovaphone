@@ -44,7 +44,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -75,7 +74,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
         }
     }
-    
+
     function constructor(){
         colEsquerda();
         grid();
@@ -135,8 +134,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                     document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
 
-                    
-
                     if (item.type == "video/flv") {
                         var video = document.createElement("video");
                         video.setAttribute("id", "my_video_" + i);
@@ -153,9 +150,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
-                        
-                     
-
+       
                         var flvPlayer = flvjs.createPlayer({    
                             type: 'flv',
                             url: item.url
