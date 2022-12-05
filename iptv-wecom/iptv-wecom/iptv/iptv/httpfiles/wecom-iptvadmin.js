@@ -30,21 +30,6 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var elcloseModal = document.getElementById("closeModal");
-    elcloseModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elCancelModal = document.getElementById("cancelModal");
-    elCancelModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elSalvarCloseModal = document.getElementById("salvarCloseModal");
-    elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
-
-    var elAddVideoModal = document.getElementById("newVideoModal");
-    elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
-
-    var elDelVideoModal = document.getElementById("deleteVideo");
-    elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
-
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
@@ -52,6 +37,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
+            constructor();
         }
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
@@ -71,6 +57,80 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
             getChannels();
         }
     }
+    function constructor(){
+        table();
+        modal();
+
+    var elcloseModal = document.getElementById("closeModal");
+    elcloseModal.addEventListener("click", function () { closeModal() }, false);
+
+    var elCancelModal = document.getElementById("cancelModal");
+    elCancelModal.addEventListener("click", function () { closeModal() }, false);
+
+    var elSalvarCloseModal = document.getElementById("salvarCloseModal");
+    elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
+
+    var elAddVideoModal = document.getElementById("newVideoModal");
+    elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
+
+    var elDelVideoModal = document.getElementById("deleteVideo");
+    elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
+
+    }
+    function table(){
+        var container = that.add(new innovaphone.ui1.Div(null,null,null));
+        container.setAttribute("id","container")
+        var table = container.add(new innovaphone.ui1.Node("table",null,null,"truetable"));
+        table.setAttribute("id","tableChannels")
+        var tr = table.add(new innovaphone.ui1.Node("tr",null,null,null));
+        
+        var name = {a:"SELECIONAR",b:"NOME",c:"PAGINA",d:"TIPO",e:"URL",f:"LOGO"};
+        for (var x in name) {
+          var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],null));
+        }
+        var divbtn = container.add(new innovaphone.ui1.Div(null,null,null));
+        divbtn.setAttribute("id","divbtn");
+        var btnDelete = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("RemoveVideo"),"btn btn-close btn-lg"));
+        btnDelete.setAttribute("id","deleteVideo");
+        var btnAdd = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("AddVideo"),"btn btn-save btn-lg"));
+        btnAdd.setAttribute("id","newVideoModal");
+      }
+  
+      function modal(){
+          var divModal = that.add(new innovaphone.ui1.Div(null,null,"modal"));
+          var headerModal = divModal.add(new innovaphone.ui1.Node("header",null,null,null));
+          var h2Modal = headerModal.add(new innovaphone.ui1.Node("h2",null,texts.text("AddVideo"),null));
+          var spanModal = headerModal.add(new innovaphone.ui1.Node("span",null,"×","fechar-modal"));
+          spanModal.setAttribute("id","closeModal");
+          var corpoModal = divModal.add(new innovaphone.ui1.Div(null,null,"corpo-modal"))
+          var pNome = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licNome"),null))
+          var iptNomeVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"text","input"));
+          iptNomeVideo.setAttribute("id","nomeVideo");
+          var br = corpoModal.add(new innovaphone.ui1.Node("p","padding: 3px;",null,null));
+          var pTipo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licTipo")));
+          var selectType = corpoModal.add(new innovaphone.ui1.Node("select",null,null,null));
+          selectType.setAttribute("id","selectType");   
+          selectType.setAttribute("name","selectType");
+           var value1 = {a:"video/mp4",b:"application/x-mpegURL",c:"youtube",d:"video/flv",e:"audio/mpeg",f:"audio/wav"}
+           for (var x in value1) {
+              var optionType = selectType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
+              optionType.setAttribute("value",value1[x])
+            }
+          var pUrl = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licURL")));
+          var iptUrlVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
+          iptUrlVideo.setAttribute("id","urlVideo");
+          var pUrlLogo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licUrlLogo")));
+          var iptUrlLogo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
+          iptUrlLogo.setAttribute("id","urlImg");
+          var modalFooter = divModal.add(new innovaphone.ui1.Node("footer",null,null,null));
+          var btnCancel = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licCancel"),"btn btn-close btn-lg"));
+          btnCancel.setAttribute("id","cancelModal");
+          var btnSave = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licSave"),"btn btn-save btn-lg"));
+          btnSave.setAttribute("id","salvarCloseModal");
+          var mask = that.add(new innovaphone.ui1.Div(null,null,null));
+          mask.setAttribute("id","mascara");
+          
+      }
     function insertChannel() {
         var nameVideo = document.getElementById("nomeVideo").value;
         var urlVideo = document.getElementById("urlVideo").value;
