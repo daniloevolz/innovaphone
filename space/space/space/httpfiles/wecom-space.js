@@ -64,6 +64,7 @@ Wecom.space = Wecom.space || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+            constructor();
         }
         if (obj.api == "restaurante" && obj.mt == "MessageError") {
             console.log(obj.result);
@@ -204,7 +205,59 @@ Wecom.space = Wecom.space || function (start, args) {
         }
 
     }
+    function constructor(){
+        colEsquerda();
+        colDireita();
+    }
+    function colEsquerda(){
+        var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
+        var navColEsquerda = colEsquerda.add(new innovaphone.ui1.Node("nav",null,null,null));
+        var ulColEsquerda = navColEsquerda.add(new innovaphone.ui1.Node("ul",null,null,null));
+        for (let i = 0; i < 3; i++) {
+            var liColEsquerda = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null));  
+        }
+        var lista = {a: texts.text("licInicio"), b: texts.text("licCardapio")};
+        for (var x in lista) {
+        var a = liColEsquerda.add(new innovaphone.ui1.Node("a",null,lista[x],null));
+      }
+        var id = {a:"novidades",b:"restaurante"}
+        for (var c in id)
+        a.setAttribute("id",id[c])
+    }
+    function colDireita(){
+        //linha 1 beginning
+        var colDireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
+        var linha1 = colDireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
+        var imgLinha1 = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
+        imgLinha1.setAttribute("src","./images/imglogoinn.png");
+        //linha 2 end
 
+        // linha news (PDF) beginning  
+        var linhaNews = colDireita.add(new innovaphone.ui1.Div("display: block;",null,null));
+        linhaNews.setAttribute("id","linhanews");
+        var id = {a:"iframedesktop",b:"iframemobile"}
+        for(var x in id){
+            var iframe = linhaNews.add(new innovaphone.ui1.Node("iframe","position: absolute; height: 100%; width: 100%;"));
+            iframe.setAttribute("id",id[x]);
+            iframe.setAttribute("src","./news/news.pdf#toolbar=0")
+        }
+        // linha news (PDF) end
+
+        //linha cardapio beginning
+        var linhaCardapio = colDireita.add(new innovaphone.ui1.Div("display:none;",null,null));
+        linhaCardapio.setAttribute("id","linhacardapio");
+        var divAll = linhaCardapio.add(new innovaphone.ui1.Div(null,null,null));
+        divAll.setAttribute("id","all");
+        var header = divAll.add(new innovaphone.ui1.Node("header",null,null,"header1"));
+        var h1Cardapio = header.add(new innovaphone.ui1.Node("h1",null,texts.text("licCardapio"),null));
+        var divinfo = divAll.add(new innovaphone.ui1.Div(null,null,"info"));
+        var h3divinfo = divinfo.add(new innovaphone.ui1.Node("h3",null,texts.text("licCardapioUpdate"),null))
+        //linha cardapio end
+
+        //section main beginning
+        // FAZER A SECTION MAIN NA TERÇA FEIRA 6/12
+        //section main end
+    }
     function insertReview() {
         var annonimous = document.getElementById("checkAnonimo");
         if (annonimous.checked) {

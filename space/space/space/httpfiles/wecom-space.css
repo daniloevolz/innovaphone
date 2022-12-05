@@ -178,8 +178,9 @@ div#center{
  */
 
 
-header#header1 {
+.header1 {
     /*background-color: blue;*/
+    padding: 2px;
     text-align: center;
     flex-direction: row;
     justify-content: center;
@@ -204,7 +205,7 @@ table{
     border: 3px solid rgb(55, 170, 161);
 }
 
-div#info {
+.info {
     text-align: center;
 }
 section#main {
@@ -742,12 +743,12 @@ img {vertical-align: middle;}
         width: 40%;
     }
 
-    header#header1 {
+    .header1 {
         /*background-color: blue;*/
         text-align: center;
     }
 
-    div#info {
+   .info {
         /*background-color: aqua;*/
         text-align: center;
     }
@@ -787,6 +788,7 @@ img {vertical-align: middle;}
     table#terca{
         margin-left: -0.8%;
         width: 95%;
+        
     }
     
 
