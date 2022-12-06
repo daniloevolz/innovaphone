@@ -110,7 +110,7 @@ new PbxApi("PbxAdminApi").onconnected(function (conn) {
                 // unlicensed mode
             }
         }
-    }
+    })
 
 });
 

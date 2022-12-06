@@ -16,10 +16,8 @@
     <script src="wecom-space.js" type="text/javascript"></script>
     <script src="wecom-spacetexts.js" type="text/javascript"></script>
 </head>
-<body onload="innovaphone.lib1.Start(function (start) { new Wecom.space(start, { }); })"></body>
-<body id="body">
-    <div class="containervertical"> 
-        <div class="colunaesquerda">
+<body onload="innovaphone.lib1.Start(function (start) { new Wecom.space(start, { }); })">
+        <!-- <div class="colunaesquerda">
             <nav>
                 <ul>
                     <li><a style="font-weight:bold;" id="novidades" href="#">Início</a></li>
@@ -27,6 +25,7 @@
                 </ul>
             </nav>
         </div>
+
         <div class="colunadireita">
             <div class="linha1">
                 <img class="logo-inn" src="./images/imglogoinn.png" />
@@ -43,9 +42,10 @@
             
             <div id="linhacardapio" style="display: none;">
                 <div id="all">
-                    <header id="header1"> <h1>Cardápio</h1></header>
+                    <header class="header1"> <h1>Cardápio</h1></header>
                     <br>
-                    <div id="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
+                    <div class="info"> <h3>Cardápio Atualizado todos os domingos</h3></div>
+                    
                     <section id="main">
                         <div class="break" style="width: 50px;"></div>
                         <div id="seg" class="tabelas">
@@ -178,41 +178,52 @@
                             </table>
 
                         </div>
-
+ </section>
                 </div>
-
-                <!-- MODAL HTML--> 
+           
+                
+                        </div>
                 <footer style="text-align: center; height: auto; width: 100%;">
                     <button id="myBtn">Sugestões</button>
                     <div id="myModal" class="modal">
                         <div class="modal-content" style="text-align: center;">
                             <span class="close">&times;</span>
-                                <h1 id="h1sugest" style="text-align: center; color: rgb(43, 84, 146);"> Sugestões </h1>
-                                <div id="res">
-                                    <span style="font-size: 16px;" id="spanNameUsuario"></span><span style="font-size: 16px;">, como podemos melhorar?</span>
-                                </div>
-                                <div id="comida">
-                                    <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
-                                    <br><label for="radio" id="radio">
-                                        <input type="radio" name="rate" value="1" class="rate">Muito bom!
-                                        <input type="radio" name="rate" value="2" class="rate">Bom!
-                                        <input type="radio" name="rate" value="3" class="rate">Razoável
-                                        <input type="radio" name="rate" value="4" class="rate">Ruim!
-                                        <input type="radio" name="rate" value="5" class="rate">Muito ruim!
-
-                                    </label>
-                                </div>
-                                <div id="sugestoes">
-                                    <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
-                                    <textarea id="textareaSugestao" rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
-                                </div>
-                                <br>
-                                <h2><input type="checkbox" id="checkAnonimo" onclick="Sumir()"> Deseja responder anonimamente? </h2>
-                                <br>
-                                <input type="submit" value="Enviar!" id="buttonEnviarAvaliacao">
+                            <div class="box">
+                                <form action="" method="POST">
+                                    <fieldset>
+                                        <legend><h1 id="h1sugest" style="text-align: center; color: rgb(43, 84, 146);"><b>Sugestões</b></h1></legend>
+                                        <br> 
+                                        <div id="res">
+                                            <span style="font-size: 16px;" id="spanNameUsuario"></span><span style="font-size: 16px;">, como podemos melhorar?</span>
+                                        </div>
+                                        <br>
+                                        <div id="comida">
+                                            <br> <span id="span" style="font-size: 18px;">Como estava a comida?</span> <br>
+                                            <br><label for="radio" id="radio">
+                                                <input type="radio" name="rate" value="1" class="rate">Muito bom!
+                                                <input type="radio" name="rate" value="2" class="rate">Bom!
+                                                <input type="radio" name="rate" value="3" class="rate">Razoável
+                                                <input type="radio" name="rate" value="4" class="rate">Ruim!
+                                                <input type="radio" name="rate" value="5" class="rate">Muito ruim!
+        
+                                            </label>
+                                        </div>
+                                        <div id="sugestoes">
+                                            <span style="font-size: 15px;" id="spansugest">  Deixe aqui suas sugestões! <br></span> <br>
+                                            <textarea id="textareaSugestao" rows="4" cols="50" required placeholder="Digite sua sugestão"></textarea>
+                                     
+                                        </div>
+                                        <br>
+                                        <h2><input type="checkbox" id="checkAnonimo" onclick="Sumir()"> Deseja responder anonimamente? </h2>
+                                        <br>
+                                       <input type="submit" class="submit" value = "Enviar!" id="buttonEnviarAvaliacao">
+                                    </fieldset> 
+                                </form>
                         </div>
                     </div>
+                </div>
            </footer>
-        </div>
-    </div>
+      
+        </div> -->
+</body>
 </html>

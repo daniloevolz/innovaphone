@@ -13,7 +13,7 @@ Wecom.space = Wecom.space || function (start, args) {
         dark: {
             "--bg": "#191919",
             "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--text-standard": "#4a4a49",
         },
         light: {
             "--bg": "white",
@@ -32,28 +32,21 @@ Wecom.space = Wecom.space || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var elRestauranteDiv = document.getElementById("restaurante");
-    elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
-    var elNovidadesDiv = document.getElementById("novidades");
-    elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
-
-    var avaliar = document.getElementById("buttonEnviarAvaliacao");
-    avaliar.addEventListener("click", function () { insertReview() }, false);
-    
-
     function app_connected(domain, user, dn, appdomain) {
         if (app.logindata.info.unlicensed) {
             // unlicensed mode
             console.log("Unlicensed mode");
+            constructor();
         }
         else {
             // licensed mode
             console.log("Licensed mode");
+            constructor();
         }
 
-
-        document.getElementById("spanNameUsuario").innerText = dn;
-        username = dn;
+        // DESCOMENTAR DEPOIS
+        // document.getElementById("spanNameUsuario").innerText = dn;
+        // username = dn;
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });
@@ -64,6 +57,7 @@ Wecom.space = Wecom.space || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+            
         }
         if (obj.api == "restaurante" && obj.mt == "MessageError") {
             console.log(obj.result);
@@ -204,7 +198,63 @@ Wecom.space = Wecom.space || function (start, args) {
         }
 
     }
+    function constructor(){
+        colEsquerda();
+        colDireita();
 
+         var elRestauranteDiv = document.getElementById("restaurante");
+         elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
+         var elNovidadesDiv = document.getElementById("novidades");
+         elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
+    
+        // var avaliar = document.getElementById("buttonEnviarAvaliacao");
+        // avaliar.addEventListener("click", function () { insertReview() }, false);
+    }
+    function colEsquerda(){
+        var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
+        var navColEsquerda = colEsquerda.add(new innovaphone.ui1.Node("nav",null,null,null));
+        var ulColEsquerda = navColEsquerda.add(new innovaphone.ui1.Node("ul",null,null,null));
+        var liColEsquerda1 = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null));  
+        var liColEsquerda2 = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null)); 
+        var a1 = liColEsquerda1.add(new innovaphone.ui1.Node("a","font-weight:bold;",texts.text("licInicio"),null));
+        var a2 = liColEsquerda2.add(new innovaphone.ui1.Node("a",null,texts.text("licCardapio"),null));
+        a1.setAttribute("id","novidades");
+        a2.setAttribute("id","restaurante");
+    }
+    function colDireita(){
+        //linha 1 beginning
+        var colDireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
+        var linha1 = colDireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
+        var imgLinha1 = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
+        imgLinha1.setAttribute("src","./images/imglogoinn.png");
+        //linha 2 end
+
+        // linha news (PDF) beginning  
+        var linhaNews = colDireita.add(new innovaphone.ui1.Div("display: block;",null,null));
+        linhaNews.setAttribute("id","linhanews");
+        var id = {a:"iframedesktop",b:"iframemobile"}
+        for(var x in id){
+            var iframe = linhaNews.add(new innovaphone.ui1.Node("iframe","position: absolute; height: 100%; width: 100%;"));
+            iframe.setAttribute("id",id[x]);
+            iframe.setAttribute("src","./news/news.pdf#toolbar=0")
+        }
+        // linha news (PDF) end
+
+        //linha cardapio beginning
+        var linhaCardapio = colDireita.add(new innovaphone.ui1.Div("display:none;",null,null));
+        linhaCardapio.setAttribute("id","linhacardapio");
+        var divAll = linhaCardapio.add(new innovaphone.ui1.Div(null,null,null));
+        divAll.setAttribute("id","all");
+        var header = divAll.add(new innovaphone.ui1.Node("header",null,null,"header1"));
+        var h1Cardapio = header.add(new innovaphone.ui1.Node("h1",null,texts.text("licCardapio"),null));
+        var divinfo = divAll.add(new innovaphone.ui1.Div(null,null,"info"));
+        var h3divinfo = divinfo.add(new innovaphone.ui1.Node("h3",null,texts.text("licCardapioUpdate"),null))
+        //linha cardapio end
+
+        //section main beginning
+        // FAZER A SECTION MAIN NA TERÇA FEIRA 6/12
+        //section main end
+    }
     function insertReview() {
         var annonimous = document.getElementById("checkAnonimo");
         if (annonimous.checked) {
@@ -234,7 +284,8 @@ Wecom.space = Wecom.space || function (start, args) {
           document.getElementById('linhanews').style.display = 'block';
       }
     }
-    
+    /*  DESCOMENTAR DEPOIS QUE ESTIVER TD PRONTO
+
     // Modal JS Edição Pietrooo
     
     var modal = document.getElementById("myModal");
@@ -272,6 +323,7 @@ Wecom.space = Wecom.space || function (start, args) {
     myBtn3.addEventListener("click",function () {
         res.style.display = "none";
     })
+    */
 } 
 
 

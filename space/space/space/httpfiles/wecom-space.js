@@ -32,28 +32,21 @@ Wecom.space = Wecom.space || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-    var elRestauranteDiv = document.getElementById("restaurante");
-    elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
-    var elNovidadesDiv = document.getElementById("novidades");
-    elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
-
-    var avaliar = document.getElementById("buttonEnviarAvaliacao");
-    avaliar.addEventListener("click", function () { insertReview() }, false);
-    
-
     function app_connected(domain, user, dn, appdomain) {
         if (app.logindata.info.unlicensed) {
             // unlicensed mode
             console.log("Unlicensed mode");
+            constructor();
         }
         else {
             // licensed mode
             console.log("Licensed mode");
+            constructor();
         }
 
-
-        document.getElementById("spanNameUsuario").innerText = dn;
-        username = dn;
+        // DESCOMENTAR DEPOIS
+        // document.getElementById("spanNameUsuario").innerText = dn;
+        // username = dn;
         app.send({ api: "restaurante", mt: "SelectMessage", day: "segunda", exe: "SELECT segunda FROM cardapio_restaurante WHERE dia ='segunda'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "terca", exe: "SELECT terca FROM cardapio_restaurante WHERE dia ='terca'" });
         app.send({ api: "restaurante", mt: "SelectMessage", day: "quarta", exe: "SELECT quarta FROM cardapio_restaurante WHERE dia ='quarta'" });
@@ -64,7 +57,7 @@ Wecom.space = Wecom.space || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            constructor();
+            
         }
         if (obj.api == "restaurante" && obj.mt == "MessageError") {
             console.log(obj.result);
@@ -208,21 +201,25 @@ Wecom.space = Wecom.space || function (start, args) {
     function constructor(){
         colEsquerda();
         colDireita();
+
+         var elRestauranteDiv = document.getElementById("restaurante");
+         elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
+         var elNovidadesDiv = document.getElementById("novidades");
+         elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
+    
+        // var avaliar = document.getElementById("buttonEnviarAvaliacao");
+        // avaliar.addEventListener("click", function () { insertReview() }, false);
     }
     function colEsquerda(){
         var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
         var navColEsquerda = colEsquerda.add(new innovaphone.ui1.Node("nav",null,null,null));
         var ulColEsquerda = navColEsquerda.add(new innovaphone.ui1.Node("ul",null,null,null));
-        for (let i = 0; i < 3; i++) {
-            var liColEsquerda = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null));  
-        }
-        var lista = {a: texts.text("licInicio"), b: texts.text("licCardapio")};
-        for (var x in lista) {
-        var a = liColEsquerda.add(new innovaphone.ui1.Node("a",null,lista[x],null));
-      }
-        var id = {a:"novidades",b:"restaurante"}
-        for (var c in id)
-        a.setAttribute("id",id[c])
+        var liColEsquerda1 = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null));  
+        var liColEsquerda2 = ulColEsquerda.add(new innovaphone.ui1.Node("li",null,null,null)); 
+        var a1 = liColEsquerda1.add(new innovaphone.ui1.Node("a","font-weight:bold;",texts.text("licInicio"),null));
+        var a2 = liColEsquerda2.add(new innovaphone.ui1.Node("a",null,texts.text("licCardapio"),null));
+        a1.setAttribute("id","novidades");
+        a2.setAttribute("id","restaurante");
     }
     function colDireita(){
         //linha 1 beginning
@@ -287,7 +284,8 @@ Wecom.space = Wecom.space || function (start, args) {
           document.getElementById('linhanews').style.display = 'block';
       }
     }
-    
+    /*  DESCOMENTAR DEPOIS QUE ESTIVER TD PRONTO
+
     // Modal JS Edição Pietrooo
     
     var modal = document.getElementById("myModal");
@@ -325,6 +323,7 @@ Wecom.space = Wecom.space || function (start, args) {
     myBtn3.addEventListener("click",function () {
         res.style.display = "none";
     })
+    */
 } 
 
 
