@@ -84,9 +84,9 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         table.setAttribute("id","tableChannels")
         var tr = table.add(new innovaphone.ui1.Node("tr",null,null,null));
         
-        var name = {a:"SELECIONAR",b:"NOME",c:"PAGINA",d:"TIPO",e:"URL",f:"LOGO"};
+        var name = {a:"SELECIONAR",b:"NOME",d:"TIPO",e:"URL",f:"LOGO"};
         for (var x in name) {
-          var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],null));
+          var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],"bordth"));
         }
         var divbtn = container.add(new innovaphone.ui1.Div(null,null,null));
         divbtn.setAttribute("id","divbtn");
@@ -115,7 +115,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
            for (var x in value1) {
               var optionType = selectType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
               optionType.setAttribute("value",value1[x])
-            }
+          }
           var pUrl = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licURL")));
           var iptUrlVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
           iptUrlVideo.setAttribute("id","urlVideo");
