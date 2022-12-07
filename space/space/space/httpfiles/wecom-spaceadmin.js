@@ -45,6 +45,7 @@ Wecom.spaceAdmin = Wecom.spaceAdmin || function (start, args) {
     elRestauranteDiv.addEventListener("click", function () { MudarDiv("restaurante") }, false);
     var elNovidadesDiv = document.getElementById("novidades");
     elNovidadesDiv.addEventListener("click", function () { MudarDiv("novidades") }, false);
+    
 
 
     function app_connected(domain, user, dn, appdomain) {

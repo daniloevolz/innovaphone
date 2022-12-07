@@ -90,7 +90,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
            constructor();
-    
+           var backspace = document.getElementById("resultado");
+           var apagar = document.getElementById("apagar")
+            apagar.addEventListener('click',function(){
+            backspace.value = backspace.value.substring(0,backspace.value.length-1)
+           })
+
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
@@ -109,11 +114,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     function constructor(){
         colEsquerda();
 
-        var elbtn1 = document.getElementById("um");
-         elbtn1.addEventListener("click", function () { typing("um") }, false);
-         var elbtn2 = document.getElementById("dois");
-         elbtn2.addEventListener("click", function () { typing("dois") }, false);
-    
+        var elbtn1 = document.getElementById("1");
+        elbtn1.addEventListener("click", function () { typing("1") }, false);
+        var elbtn2 = document.getElementById("2");
+        elbtn2.addEventListener("click", function () { typing("2") }, false);
+        var elbtn3 = document.getElementById("3");
+        elbtn3.addEventListener("click", function () { typing("3") }, false);
     }
     
     function colEsquerda(){
@@ -129,12 +135,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var imgBackspace = buttonbackspace.add(new innovaphone.ui1.Node("img","width:130%; height:100%; margin-left: -5px;",null,null));
         imgBackspace.setAttribute("src","backspace.png");
         var divTeclado = teclado.add(new innovaphone.ui1.Div(null,null,"flex-teclado"));
-        for(let i = 0; i < 9; i++){
+        for(var i = 0; i < 9; i++){
             var btn = divTeclado.add(new innovaphone.ui1.Node("button",null, i+1,"typebtn"));
-        }
-        var idbtn = {a:"um",b:"dois",c:"tres",d:"quatro",e:"cinco",f:"seis",g:"sete",h:"oito",i:"nove"}
-        for (z in idbtn){
-            btn.setAttribute("id",idbtn)
+            btn.setAttribute("id",i+1)
         }
         var btn2 = divTeclado.add(new innovaphone.ui1.Node("button",null,"*","typebtn"));
         var btn3 = divTeclado.add(new innovaphone.ui1.Node("button",null,"0","typebtn"));
@@ -145,13 +148,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var btnDesligar = ligar.add(new innovaphone.ui1.Node("button","width: 50%; height: 40px; background-color: rgb(248, 23, 23); color: rgb(0, 0, 0); font-weight: bold;","DESLIGAR",null));
         var calls = colesquerda.add(new innovaphone.ui1.Div(null,null,"calls"));
          calls.setAttribute("id","calls");
-    }       
+    }
+    
     function typing(el){
-            if (el == "um") {
+            if(el == "1") {
                 document.getElementById("resultado").innerHTML += '1';
-            } else if (el == "dois") {
-                document.getElementById("resultado").innerHTML += '2';
-                
+            }
+            else if(el == "2") {
+                document.getElementById("resultado").innerHTML += '2'; 
+            }
+            else if(el == "3"){
+                document.getElementById("resultado").innerHTML += '3';
             }
           }
     function addNotification(msg) {
