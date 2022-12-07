@@ -108,6 +108,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function constructor(){
         colEsquerda();
+
+        var elbtn1 = document.getElementById("um");
+         elbtn1.addEventListener("click", function () { typing("um") }, false);
+         var elbtn2 = document.getElementById("dois");
+         elbtn2.addEventListener("click", function () { typing("dois") }, false);
+    
     }
     
     function colEsquerda(){
@@ -124,7 +130,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         imgBackspace.setAttribute("src","backspace.png");
         var divTeclado = teclado.add(new innovaphone.ui1.Div(null,null,"flex-teclado"));
         for(let i = 0; i < 9; i++){
-            let btn = divTeclado.add(new innovaphone.ui1.Node("button",null, i+1,"typebtn"));
+            var btn = divTeclado.add(new innovaphone.ui1.Node("button",null, i+1,"typebtn"));
+        }
+        var idbtn = {a:"um",b:"dois",c:"tres",d:"quatro",e:"cinco",f:"seis",g:"sete",h:"oito",i:"nove"}
+        for (z in idbtn){
+            btn.setAttribute("id",idbtn)
         }
         var btn2 = divTeclado.add(new innovaphone.ui1.Node("button",null,"*","typebtn"));
         var btn3 = divTeclado.add(new innovaphone.ui1.Node("button",null,"0","typebtn"));
@@ -135,8 +145,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var btnDesligar = ligar.add(new innovaphone.ui1.Node("button","width: 50%; height: 40px; background-color: rgb(248, 23, 23); color: rgb(0, 0, 0); font-weight: bold;","DESLIGAR",null));
         var calls = colesquerda.add(new innovaphone.ui1.Div(null,null,"calls"));
          calls.setAttribute("id","calls");
-    }   
-    
+    }       
+    function typing(el){
+            if (el == "um") {
+                document.getElementById("resultado").innerHTML += '1';
+            } else if (el == "dois") {
+                document.getElementById("resultado").innerHTML += '2';
+                
+            }
+          }
     function addNotification(msg) {
         var scroll = new innovaphone.ui1.Node("scroll-container",null,null,"scroll-container")
         scroll.setAttribute("id","scroll-calls")
