@@ -248,12 +248,26 @@ Wecom.space = Wecom.space || function (start, args) {
         var header = divAll.add(new innovaphone.ui1.Node("header",null,null,"header1"));
         var h1Cardapio = header.add(new innovaphone.ui1.Node("h1",null,texts.text("licCardapio"),null));
         var divinfo = divAll.add(new innovaphone.ui1.Div(null,null,"info"));
-        var h3divinfo = divinfo.add(new innovaphone.ui1.Node("h3",null,texts.text("licCardapioUpdate"),null))
+        var h3divinfo = divinfo.add(new innovaphone.ui1.Node("h3",null,texts.text("licCardapioUpdate"),null));
+        var section = divAll.add(new innovaphone.ui1.Node("section",null,null,null));
+        section.setAttribute("id","main");
+        var divbreak1 = section.add(new innovaphone.ui1.Div("width: 50px;",null,"break"));
+        // tabela segunda
+        var divseg = section.add(new innovaphone.ui1.Div(null,null,"tabelas"));
+        divseg.setAttribute("id","seg");
+        var tableseg = divseg.add(new innovaphone.ui1.Node("table",null,null,null));
+        tableseg.cellPadding = '3';
+        tableseg.setAttribute("id","tdComida");
+        var trseg1 = tableseg.add(new innovaphone.ui1.Node("tr",null,null,null));
+        var tdseg1 = trseg1.add(new innovaphone.ui1.Node("td",null,texts.text("licSegunda"),"day"))
+        tdseg1.colSpan = '4';
+        var trseg2 = tableseg.add(new innovaphone.ui1.Node("tr",null,null,null));
+        var tdseg2 = trseg2.add(new innovaphone.ui1.Node("td",null,"Arroz","tdwidth"));
+        tdseg2.setAttribute("id","comidasegunda");
+        var tdseg3 = trseg2.add(new innovaphone.ui1.Node("td",null,"Feijão",null));
+        tdseg3.setAttribute("id","comidasegunda1")
         //linha cardapio end
-
-        //section main beginning
-        // FAZER A SECTION MAIN NA TERÇA FEIRA 6/12
-        //section main end
+     
     }
     function insertReview() {
         var annonimous = document.getElementById("checkAnonimo");

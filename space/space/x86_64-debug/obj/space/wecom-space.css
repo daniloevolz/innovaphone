@@ -193,6 +193,7 @@ div#center{
 }
 .day{
     background-color: rgb(55, 170, 161);
+    text-transform: uppercase;
     text-align: center;
     width: 200px;
     border: 0px solid rgb(55, 170, 161);

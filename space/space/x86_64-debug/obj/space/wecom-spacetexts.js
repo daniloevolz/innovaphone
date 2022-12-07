@@ -5,6 +5,7 @@ Wecom.spaceTexts = {
         licInicio: "Início",
         licCardapio: "Cardápio",
         licCardapioUpdate: "Cardápio Atualizado todos os domingos",
+        licSegunda: "Segunda",
     },
     en: {
     },

@@ -86,7 +86,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
        var imgcheck = labelcheck.add(new innovaphone.ui1.Node("img",null,null,null));
        imgcheck.setAttribute("id","menu-icon");
        imgcheck.setAttribute("src","menu-icon.png");
-       
+
        var naviptv = that.add(new innovaphone.ui1.Node("nav",null,null,null));
        var uliptv = naviptv.add(new innovaphone.ui1.Node("ul",null,null,null));
        uliptv.setAttribute("id","listchanenels");
