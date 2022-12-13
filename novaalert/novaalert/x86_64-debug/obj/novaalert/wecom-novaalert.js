@@ -118,7 +118,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     
     function colEsquerda(){
         var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
-        var teclado = colesquerda.add(new innovaphone.ui1.Div(null,null,"teclado"));
+        var container  = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;",null,null));
+        var iframetest = container.add(new innovaphone.ui1.Node("iframe","position: absolute ;width:100%; height:100%; border: 0px;",null,null));
+        iframetest.setAttribute("src","https://www.youtube.com/embed/gz8tmR43AJE")
+        /* var teclado = colesquerda.add(new innovaphone.ui1.Div(null,null,"teclado"));
         var divBackspace = teclado.add(new innovaphone.ui1.Div(null,null,"backspace"));
         var textarea = divBackspace.add(new innovaphone.ui1.Node("textarea",null,null,"type"))
         textarea.setAttribute("id","resultado");
@@ -136,12 +139,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var btn2 = divTeclado.add(new innovaphone.ui1.Node("button",null,"*","typebtn"));
         var btn3 = divTeclado.add(new innovaphone.ui1.Node("button",null,"0","typebtn"));
         var btn4 = divTeclado.add(new innovaphone.ui1.Node("button",null,"#","typebtn"));
+
         var ligar = teclado.add(new innovaphone.ui1.Div("display:flex",null,"calling"));
         ligar.setAttribute("id","calling");
         var btnLigar = ligar.add(new innovaphone.ui1.Node("button","width: 50%; height: 40px; background-color: rgb(20, 187, 20); color: rgb(0, 0, 0); font-weight: bold;","LIGAR",null));
         var btnDesligar = ligar.add(new innovaphone.ui1.Node("button","width: 50%; height: 40px; background-color: rgb(248, 23, 23); color: rgb(0, 0, 0); font-weight: bold;","DESLIGAR",null));
         var calls = colesquerda.add(new innovaphone.ui1.Div(null,null,"calls"));
          calls.setAttribute("id","calls");
+         */
     }
 
     function addNotification(msg) {

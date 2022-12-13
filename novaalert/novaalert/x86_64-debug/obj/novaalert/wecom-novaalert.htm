@@ -16,59 +16,27 @@
     <script src="videojs-contrib-hls.min.js"></script>
 </head>
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.novaalert(start, { }); })">
-     <!-- <script>
-        function apagar() {
-            var resultado = document.getElementById('resultado').innerHTML;
-            document.getElementById('resultado').innerHTML = resultado.substring(0, resultado.length - 1);
-        }
-        function insert(num) {
-            var numero = document.getElementById('resultado').innerHTML;
-            document.getElementById('resultado').innerHTML = numero + num;
-        }
-    </script>
     <div class="colunaesquerda">
-        <div id="teclado" class="teclado">
-            <div id="backspace" class="backspace">
-                 <input type="text" id="resultado" class="type"> 
-                <textarea id="resultado" class="type"></textarea>
-                <div class="backspace-icon">
-                    <button id="apagar" value="apagar" onclick="apagar()"> <img src="backspace.png" width="130%" height="100%" style="margin-left: -5px;"></button>
-                    <img src="backspace.png" width="30px" height="25px" id="backspace-button" style="margin-top: 4px;"> 
-                </div>
-            </div>
-            <div class="flex-teclado">
-                <button onclick="insert('1')">1</button>
-                <button onclick="insert('2')">2</button>
-                <button onclick="insert('3')">3</button>
-                <button onclick="insert('4')">4</button>
-                <button onclick="insert('5')">5</button>
-                <button onclick="insert('6')">6</button>
-                <button onclick="insert('7')">7</button>
-                <button onclick="insert('8')">8</button>
-                <button onclick="insert('9')">9</button>
-                <button onclick="insert('*')">*</button>
-                <button onclick="insert('0')">0</button>
-                <button onclick="insert('#')">#</button>
-            </div>
+         <div id="containeriframe" style="position: absolute; height: 40%; width: 100%;">
+            <iframe src="https://www.youtube.com/embed/gz8tmR43AJE" style="position: absolute ;width:100%; height:100%; border: 0px;"> 
 
-            <div id="calling" class="calling" style="display: flex ;">
-                <button style="width: 50%; height: 40px; background-color: rgb(20, 187, 20); color: rgb(0, 0, 0); font-weight: bold;">LIGAR</button>
-                <button style="width: 50%; height: 40px; background-color: rgb(248, 23, 23); color: rgb(0, 0, 0); font-weight: bold;">DESLIGAR</button>
-            </div>
+            </iframe>
 
-        </div>
+        </div> 
+
+
+
 
         <div id="calls" class="calls">
             <scroll-container id="scroll-calls" class="scroll-calls">
                 <scroll-page id="page-1" class="scroll-page">CHAMADA 1</scroll-page>
-                <scroll-page id="page-2">CHAMADA 2</scroll-page>
-                <scroll-page id="page-3">CHAMADA 3</scroll-page>
-                <scroll-page id="page-1">CHAMADA 4</scroll-page>
-                <scroll-page id="page-2">CHAMADA 5</scroll-page>
-                <scroll-page id="page-3">CHAMADA 6</scroll-page>
+                <scroll-page id="page-2" class="scroll-page" >CHAMADA 2</scroll-page>
+                <scroll-page id="page-3" class="scroll-page">CHAMADA 3</scroll-page>
+                <scroll-page id="page-1" class="scroll-page">CHAMADA 4</scroll-page>
+                <scroll-page id="page-2" class="scroll-page">CHAMADA 5</scroll-page>
             </scroll-container>
         </div>
-    </div>   -->
+    </div>   
 </body>
 
 </html>
