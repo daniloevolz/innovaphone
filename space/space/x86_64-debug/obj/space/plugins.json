@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.spacemanager",
+            "icon": "wecom-space.png",
+            "lang": "wecom.spacemanagertexts",
+            "domains": false
+        }
+    ]
+}

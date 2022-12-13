@@ -89,13 +89,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-           constructor();
-           var backspace = document.getElementById("resultado");
-           var apagar = document.getElementById("apagar")
-            apagar.addEventListener('click',function(){
-            backspace.value = backspace.value.substring(0,backspace.value.length-1)
-           })
-
+                constructor();
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
@@ -149,18 +143,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var calls = colesquerda.add(new innovaphone.ui1.Div(null,null,"calls"));
          calls.setAttribute("id","calls");
     }
-    
-    function typing(el){
-            if(el == "1") {
-                document.getElementById("resultado").innerHTML += '1';
-            }
-            else if(el == "2") {
-                document.getElementById("resultado").innerHTML += '2'; 
-            }
-            else if(el == "3"){
-                document.getElementById("resultado").innerHTML += '3';
-            }
-          }
+
     function addNotification(msg) {
         var scroll = new innovaphone.ui1.Node("scroll-container",null,null,"scroll-container")
         scroll.setAttribute("id","scroll-calls")
