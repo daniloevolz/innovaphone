@@ -32,6 +32,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+
+    var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+    //var container = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;", null, null));
+    var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
+    videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
+    videoPlayer.setAttribute("id", "videoPlayer");
+    var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+    scroll.setAttribute("id", "scroll-calls")
+    
+
     function app_connected(domain, user, dn, appdomain) { 
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "user", mt: "SelectMessage" });
@@ -66,30 +76,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             addNotification("<<<  " + type + " " + value);
         }
         if (type == "video") {
-            makePopup(texts.text("headerVideoPlayer"), '<html>' +
-                '<head>' +
-                '<link href="video-js.css" rel="stylesheet">' +
-                '<meta charset=utf-8 />' +
-                '</head>' +
-                '<body>' +
-                '<video id=example-video width=960 height=540 class="video-js vjs-default-skin" controls>' +
-                '<source ' +
-                'src="https://mediaserver.wecom.com.br:4443/live/room/index.m3u8" ' +
-                'type="application/x-mpegURL">' +
-                '</video>' +
-                '<script>' +
-                'var player = videojs("example-video"); ' +
-                'player.play(); ' +
-                '</script>' +
-                '</body>' +
-                '</html>')
+            document.getElementById("videoPlayer").setAttribute("src", value);
         }
         
     };
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-                constructor();
+
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
@@ -105,22 +99,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function constructor(){
-        colEsquerda();
-
-        var elbtn1 = document.getElementById("1");
-        elbtn1.addEventListener("click", function () { typing("1") }, false);
-        var elbtn2 = document.getElementById("2");
-        elbtn2.addEventListener("click", function () { typing("2") }, false);
-        var elbtn3 = document.getElementById("3");
-        elbtn3.addEventListener("click", function () { typing("3") }, false);
-    }
-    
     function colEsquerda(){
-        var colesquerda =  that.add(new innovaphone.ui1.Div(null, null,"colunaesquerda"));
-        var container  = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;",null,null));
-        var iframetest = container.add(new innovaphone.ui1.Node("iframe","position: absolute ;width:100%; height:100%; border: 0px;",null,null));
-        iframetest.setAttribute("src","https://www.youtube.com/embed/gz8tmR43AJE")
+        
         /* var teclado = colesquerda.add(new innovaphone.ui1.Div(null,null,"teclado"));
         var divBackspace = teclado.add(new innovaphone.ui1.Div(null,null,"backspace"));
         var textarea = divBackspace.add(new innovaphone.ui1.Node("textarea",null,null,"type"))
@@ -150,10 +130,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     function addNotification(msg) {
-        var scroll = new innovaphone.ui1.Node("scroll-container",null,null,"scroll-container")
-        scroll.setAttribute("id","scroll-calls")
-        var alarm = new innovaphone.ui1.Node("scroll-page", null, msg, "scroll-page");
-        document.getElementById("scroll-calls").appendChild(alarm.container)
+        var alarm = scroll.add(new innovaphone.ui1.Node("scroll-page", null, msg, "scroll-page"));
+        //document.getElementById("scroll-calls").appendChild(msg)
     }
 
     function popButtons(buttons) {
