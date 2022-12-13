@@ -95,9 +95,13 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     function colDireita(){
         var coldireita = that.add(new innovaphone.ui1.Div("display:block",null,"colunadireita"));
         // linha 1
+
+        /*
         var linha1 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha1"));
         var imginn = linha1.add(new innovaphone.ui1.Node("img",null,null,"logo-inn"));
         imginn.setAttribute("src", "logo-inn.png");
+        */
+       
         // linha 2 
         var linha2 = coldireita.add(new innovaphone.ui1.Div("display:flex",null,"linha2"));
         linha2.setAttribute("id","linha2")
