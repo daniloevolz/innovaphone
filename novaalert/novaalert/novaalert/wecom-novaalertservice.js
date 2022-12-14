@@ -122,12 +122,13 @@ new JsonApi("admin").onconnected(function(conn) {
 
 new PbxApi("RCC").onconnected(function (conn) {
 
+    log("danilo req : RCC message:: connected " + JSON.stringify(conn));
     connectionsRCC.push({ ws: conn });
 
     //conn.send(JSON.stringify({ api: "RCC", mt: "Devices", cn: "Danilo Volz" }));
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
-        log("danilo req : RCC message:: received" + JSON.stringify(obj));
+        log("danilo req : RCC message:: received " + JSON.stringify(obj));
 
         if (obj.mt === "DevicesResult") {
             log("danilo req : RCC message:: " + JSON.stringify(obj));

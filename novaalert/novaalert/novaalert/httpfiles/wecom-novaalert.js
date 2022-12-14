@@ -185,18 +185,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         buttons.forEach(function (object) {
             
             var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
-            if (object.button_type == "Alarme") {
-                var img = btn.add(new innovaphone.ui1.Node("img", null, null, "img-icon"));
-                img.setAttribute("src", "alarm.png");
+            if (object.button_type == "alarm") {
+                btn.addHTML("<img src='alarm.png' class='img-icon'>" + object.button_name);
+            } else if (object.button_type == "video") {
+                btn.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+                //var img = new innovaphone.ui1.Node("img", null, null, "img-icon");
+                //img.setAttribute("src", "video.png");
             } else {
-                var img = btn.add(new innovaphone.ui1.Node("img", null, null, "img-icon"));
-                img.setAttribute("src", "phone.png");
+                btn.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
             }
             btn.setAttribute("type", "button");
             btn.setAttribute("nonce", object.button_id);
             btn.setAttribute("name", object.button_type);
             btn.setAttribute("value", object.button_prt);
-            btn.addHTML(object.button_name);
             
             allbtn.add(btn);
         });
