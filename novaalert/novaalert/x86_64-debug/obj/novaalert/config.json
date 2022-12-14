@@ -18,7 +18,7 @@
           {
             "cmd": "column",
             "name": "button_prt",
-            "type": "VARCHAR(128)"
+            "type": "VARCHAR(250)"
           },
           {
             "cmd": "column",

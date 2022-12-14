@@ -58,6 +58,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             makeDivAdmin();
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
+            app.send({ api: "admin", mt: "SelectMessage" });
             makePopup("Atenção", "Botão criado com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {

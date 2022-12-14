@@ -59,10 +59,15 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
             makePopup("Atenção", "Botão criado com sucesso!");
+            window.setInterval(function () {
+                app.send({ api: "admin", mt: "SelectMessage" });
+            }, 30000);
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
-            app.send({ api: "admin", mt: "SelectMessage" });
             makePopup("Atenção", "Botão excluído com sucesso!");
+            window.setInterval(function () {
+                app.send({ api: "admin", mt: "SelectMessage" });
+            }, 30000);
         }
     }
     function makePopup(header, content) {

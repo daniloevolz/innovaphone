@@ -212,7 +212,7 @@ width: 100%;
 
 .popup-closer {
     background-image: url("close.png");
-    top: -30px;
+    top: 0px;
     right: -30px;
     height: 60px;
     width: 60px;

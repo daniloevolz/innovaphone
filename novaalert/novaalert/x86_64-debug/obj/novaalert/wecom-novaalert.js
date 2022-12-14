@@ -34,10 +34,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
 
     var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-    //var container = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;", null, null));
-    var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
-    videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
-    videoPlayer.setAttribute("id", "videoPlayer");
+    var container = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;", null, null));
+    //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
+    //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
+    container.setAttribute("id", "containerPlayer");
     var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
     scroll.setAttribute("id", "scroll-calls")
     
@@ -67,6 +67,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // Dentro do objeto evt esta o target, e o target tem um value:
         var value = evt.target.value;
         var type = evt.target.name;
+        
+        try {
+            var oldPlayer = document.getElementById('video-js');
+            videojs(oldPlayer).dispose();
+            container.clear();
+        } catch {
+            container.clear();
+        }
         if(type == "number") {
             app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
             addNotification("<<<  " + type + " " + value);
@@ -76,7 +84,43 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             addNotification("<<<  " + type + " " + value);
         }
         if (type == "video") {
-            document.getElementById("videoPlayer").setAttribute("src", value);
+            
+            
+            var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
+
+            //document.getElementById("videoPlayer").setAttribute("src", value);
+            var source = document.createElement("source");
+            source.setAttribute("src", value);
+            source.setAttribute("type", "application/x-mpegURL");
+
+            //document.getElementById("container").appendChild(script);
+            //var videoElement = document.createElement("video");
+            videoElement.setAttribute("allow", "autoplay");
+            videoElement.setAttribute("autoplay", "true");
+            videoElement.setAttribute("muted", "muted");
+            videoElement.setAttribute("width", "800%");
+            videoElement.setAttribute("height", "470%");
+            videoElement.setAttribute("controls", "");
+            videoElement.setAttribute("class", "video-js vjs-default-skin");
+            videoElement.setAttribute("id", "video-js");
+
+            //videoElement.setAttribute("src", url);
+            //videoElement.setAttribute("type", type);
+            //document.getElementById("container").appendChild(videoElement);
+            document.getElementById("video-js").appendChild(source);
+            var video = videojs('video-js', {
+                html5: {
+                    vhs: {
+                        overrideNative: !videojs.browser.IS_SAFARI
+                    },
+                    nativeAudioTracks: false,
+                    nativeVideoTracks: false
+                }
+            });
+            //video.src({ type: type, src: url });
+            video.ready(function () {
+                video.src({ type: "application/x-mpegURL", src: value });
+            });
         }
         
     };

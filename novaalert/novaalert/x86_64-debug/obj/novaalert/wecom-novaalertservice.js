@@ -1,4 +1,4 @@
-﻿//cu cagadççççç
+﻿
 var urlalert = Config.urlalert;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var sendCallEvents = Config.sendCallEvents;
@@ -339,15 +339,16 @@ function alarmReceived(value) {
 
 }
 function callRCC(ws, user, mode, num, sip) {
-    if (mode == "UserInitialize") {
+    log("danilo-req callRCC:mode " + String(mode));
+    if (String(mode) == "UserInitialize") {
         var msg = { api: "RCC", mt: "UserInitialize", cn: user, src: sip };
         ws.send(JSON.stringify(msg));
     }
-    else if (mode == "Device") {
+    else if (String(mode) == "Device") {
         var msg = { api: "RCC", mt: "Devices", cn: user, src: sip };
         ws.send(JSON.stringify(msg));
     }
-    else if (mode == "UserCall") {
+    else if (String(mode) == "UserCall") {
         log("danilo-req UserCall:sip " + sip);
         connections.forEach(function (conn) {
             if (conn.sip == sip) {
@@ -358,7 +359,7 @@ function callRCC(ws, user, mode, num, sip) {
             }
         })
     }
-    else if (mode == "UserClear") {
+    else if (String(mode) == "UserClear") {
         calls.forEach(function (call) {
             if (call.sip == sip) {
                 var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
