@@ -34,21 +34,8 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
-
-        if (app.logindata.info.unlicensed) {
-          //sem licen�a
-          var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
-          that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-             app.send({ api: "user", mt: "UserMessage" })
-          });
-
-      } else {
-
-        app.send({ api: "user", mt: "UserMessage" })
-          
-      }
-      
   }
+  
   var bcblink = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaDia(moeda=@moeda,dataCotacao=@dataCotacao)?@dataCotacao=%27";
   var b3link = "";
   var todaslink = "" ;
@@ -142,8 +129,6 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var Divlinha2b3 = linha2b3.add(new innovaphone.ui1.Div("width: auto;height: auto;background: transparent;padding: 0 !important; margin-left:0px;",null,null))
         var iframelinha2b3  = Divlinha2b3.add(new innovaphone.ui1.Node("iframe","width: 100%; height: 100%; margin: 0 !important; padding: 0 !important;",null,null))
         iframelinha2b3.setAttribute("id","tradingview_8c59f")
-       // var b3link = "https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV"
-       // https://s.tradingview.com/bovespa/widgetembed/?frameElementId=tradingview_8c59f&amp;symbol=IBOV&amp;interval=1&amp;hidesidetoolbar=0&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;editablewatchlist=1&amp;details=1&amp;studies=%5B%5D&amp;widgetbarwidth=300&amp;hideideas=1&amp;theme=White&amp;style=3&amp;timezone=exchange&amp;withdateranges=1&amp;studies_overrides=%7B%7D&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=br&amp;utm_source=www.b3.com.br&amp;utm_medium=widget&amp;utm_campaign=chart&amp;utm_term=IBOV
         iframelinha2b3.setAttribute("src",b3link)
         
 
@@ -155,35 +140,8 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         divinside.setAttribute("id","tradingview_f9a16")
         var divinside2 = divTradingView.add(new innovaphone.ui1.Div("z-index: 1000",null,"tradingview-widget-copyright"))
        var TradingViewiframe = divTradingView.add(new innovaphone.ui1.Node("iframe","width:100%;height:100%;",null,null))
-       // var todaslink = "https://s3.tradingview.com/tv.js"
-        // https://s3.tradingview.com/tv.js
         TradingViewiframe.setAttribute("src",todaslink)
-        //TradingViewiframe.setAttribute("src",todaslink);
-        
-        /*
-        var scripttrading = divTradingView.add(new innovaphone.ui1.Node("script",null,null,null))
-        scripttrading.setAttribute("type","text/javascript")
-        scripttrading.setAttribute("src",todaslink)
-    
-         var scripttrading2 = divTradingView.add(new innovaphone.ui1.Node("script",null,null,null))
-        scripttrading2.setAttribute("type","text/javascript")
-        scripttrading2.setAttribute(' {
-            "autosize": true,
-            "symbol": "BITSTAMP:BTCUSD",
-            "interval": "D",
-            "timezone": "America/Sao_Paulo",
-            "theme": "dark",
-            "style": "1",
-            "locale": "br",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "details": true,
-            "container_id": "tradingview_f9a16"
-        }')
-        */
-  
+   
         }
 
     function cotacao() {
@@ -199,7 +157,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         var date = formatDate(today, 'mm-dd-aaaa');
         var result = dolar(date);
         console.log("Result:" + result);
-        while (result = false) {
+        while (result == false) {
             today.setDate(today.getDate() - 1);
             date = formatDate(today, 'mm-dd-aaaa');
             result = dolar(date);
