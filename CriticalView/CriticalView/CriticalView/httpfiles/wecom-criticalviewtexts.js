@@ -10,7 +10,9 @@ Wecom.CriticalViewTexts = {
         licURL: "URL: ",
         licUrlLogo: "URL Logo: ",
         licCancel: "Cancelar",
-        licSave: "Salvar"
+        licSave: "Salvar",
+        licUnLicensed: "Sistema não licenciado",
+        
 
     },
     en: {
