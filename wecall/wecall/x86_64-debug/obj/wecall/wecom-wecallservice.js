@@ -252,6 +252,10 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.url = obj.vl;
                     Config.save();
                 }
+                if (obj.prt == "UrlG") {
+                    Config.urlGetGroups = obj.vl;
+                    Config.save();
+                }
             }
         });
     }
@@ -409,6 +413,21 @@ new PbxApi("RCC").onconnected(function (conn) {
                             var msg = { user: obj.src, callingNumber: obj.peer.h323, status: "out" };
                         } else {
                             var msg = { user: obj.src, callingNumber: obj.peer.e164, status: "out" };
+                        }
+                        httpClient(urlPhoneApiEvents, msg);
+                    }
+                }
+            }
+            if (obj.msg == "x-conn" || obj.msg == "r-conn") {
+                //Chamada Ativa ou Receptiva Atendida//
+                if (String(foundCall) !== "") {
+                    if (sendCallEvents) {
+                        log("danilo-req : RCC message::sendCallEvents=true");
+                        var e164 = obj.peer.e164;
+                        if (e164 == "") {
+                            var msg = { user: obj.src, callingNumber: obj.peer.h323, status: "ans" };
+                        } else {
+                            var msg = { user: obj.src, callingNumber: obj.peer.e164, status: "ans" };
                         }
                         httpClient(urlPhoneApiEvents, msg);
                     }

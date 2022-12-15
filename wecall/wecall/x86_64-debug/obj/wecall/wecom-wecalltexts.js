@@ -19,7 +19,8 @@ Wecom.wecallTexts = {
         labelUrlDash: "URL Dashboard:",
         labelCodCient: "Código de Cliente Wecall:",
         labelUrlSSO: "URL provedor SSO Wecall:",
-        labelUrl:"URL de Autenticação SSO:"
+        labelUrl: "URL de Autenticação SSO:",
+        labelUrlG: "URL provedor de Filas a serem monitoradas:"
 
     },
     en: {

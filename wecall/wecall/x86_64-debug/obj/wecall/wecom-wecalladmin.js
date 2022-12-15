@@ -92,8 +92,12 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:70%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "Url", vl: String(ipturl.getValue()) });
     });
-
-
+    //URL Get Queue Groups Monitoring
+    var labelUrl = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:80%; font-size:15px; text-align:right", texts.text("labelUrlG")));
+    var ipturlG = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:80%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    that.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:80%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "UrlG", vl: String(ipturlG.getValue()) });
+    });
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
@@ -109,6 +113,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             iptUrlSSO.setValue(obj.urlSSO);
             iptCodClient.setValue(obj.CodCli);
             ipturl.setValue(obj.url);
+            ipturlG.setValue(obj.urlG);
 
         }
     }
