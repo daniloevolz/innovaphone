@@ -5,6 +5,7 @@ var sendCallEvents = Config.sendCallEvents;
 
 var connectionsRCC = [];
 var connectionsApp = [];
+var connectionsPbxSignal = [];
 var connections = [];
 var calls = [];
 
@@ -40,6 +41,7 @@ WebServer.onrequest("triggedAlarm", function (req) {
 new JsonApi("user").onconnected(function (conn) {
     log("danilo req: user conn: " + JSON.stringify(conn))
     connectionsApp.push({ ws: conn });
+
     if (conn.app == "wecom-novaalert") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
@@ -50,7 +52,7 @@ new JsonApi("user").onconnected(function (conn) {
                 callNovaAlert(parseInt(obj.prt), conn.sip);
             }
             if (obj.mt == "TriggerCall") {
-                callRCC(connectionsRCC[0].ws,conn.cn,"UserCall", parseInt(obj.prt), conn.sip);
+                callRCC(connectionsRCC[0].ws,conn.cn,"UserCall", obj.prt, conn.sip);
             }
             if (obj.mt == "SelectMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
@@ -69,6 +71,7 @@ new JsonApi("user").onconnected(function (conn) {
     conn.onclose(function () {
         log("danilo req: user conn: disconnected");
         connectionsApp.splice(connectionsApp.indexOf(conn), 1);
+
     });
 });
 new JsonApi("admin").onconnected(function(conn) {
@@ -237,6 +240,66 @@ new PbxApi("RCC").onconnected(function (conn) {
     conn.onclose(function () {
         log("RCC: disconnected");
         connectionsRCC.splice(connectionsRCC.indexOf(conn), 1);
+    });
+});
+
+//PBX APIS
+new PbxApi("PbxSignal").onconnected(function (conn) {
+    log("PbxSignal: connected");
+
+    // for each PBX API connection an own call array is maintained
+
+    connectionsPbxSignal.push({ ws: conn });
+    // register to the PBX in order to acceppt incoming presence calls
+    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" }));
+
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+        log(msg);
+
+        if (obj.mt === "RegisterResult") {
+            log("PBXSignal: registration result " + JSON.stringify(obj));
+        }
+
+        // handle incoming presence_subscribe call setup messages
+        // the callid "obj.call" required later for sending badge notifications
+        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
+
+            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
+            log("danilo req : PBXSignal::connectionsPbxSignal: " + JSON.stringify(connectionsPbxSignal));
+
+            // connect call
+            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "sig": { "type": "conn" } }));
+
+            //Adiciona
+            log("PBXSignal: connections before add " + JSON.stringify(connections));
+            connections.push({ sip: obj.sig.cg.sip, call: obj.call, name: obj.sig.fty[1].name, user: "", url: "" });
+            log("PBXSignal: connections after add " + JSON.stringify(connections));
+
+            callRCC(connectionsRCC[0].ws, obj.sig.fty[1].name, "UserInitialize", "", obj.sig.cg.sip);
+
+            //getURLLogin(obj.sig.cg.sip);
+
+            // send notification with badge count first time the user has connected
+            updateBadge(conn, obj.call, count);
+        }
+
+        // handle incoming call release messages
+        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
+            // remove callid from the array for calls for this connection
+            calls.splice(calls.indexOf(obj.call), 1);
+
+            //Remove
+            log("PBXSignal: connections result " + JSON.stringify(connections));
+            connections = connections.filter(delConnectionsByCall(obj.call));
+            log("PBXSignal: connections result " + JSON.stringify(connections));
+
+        }
+    });
+
+    conn.onclose(function () {
+        log("PbxSignal: disconnected");
+        connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
 

@@ -64,5 +64,10 @@
     "eval": [
       "wecom-novaalertservice.js"
     ]
+  },
+  "apis": {
+    "wecom-novaalert": {
+      "presence": true
+    }
   }
 }

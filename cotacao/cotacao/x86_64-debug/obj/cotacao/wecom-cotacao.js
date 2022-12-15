@@ -172,7 +172,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         try {
             console.log(json_obj);
             const dol = json_obj.value[4].cotacaoCompra;
-            console.log("D�lar Compra: " + dol.toString().substr(0, 4));
+            console.log("Dolar Compra: " + dol.toString().substr(0, 4));
             document.getElementById('item-dolar').innerHTML
                 = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
             document.getElementById('item-data').innerHTML
@@ -181,7 +181,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         } catch {
             try {
                 const dol = json_obj.value[3].cotacaoCompra;
-                console.log("D�lar Compra: " + dol.toString().substr(0, 4));
+                console.log("Dolar Compra: " + dol.toString().substr(0, 4));
                 document.getElementById('item-dolar').innerHTML
                     = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                 document.getElementById('item-data').innerHTML
@@ -201,7 +201,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                     try {
                         console.log("Dolar Compra! 1");
                         const dol = json_obj.value[1].cotacaoCompra;
-                        console.log("D�lar Compra: " + dol.toString().substr(0, 4));
+                        console.log("Dolar Compra: " + dol.toString().substr(0, 4));
                         document.getElementById('item-dolar').innerHTML
                             = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                         document.getElementById('item-data').innerHTML
@@ -211,7 +211,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                         try {
                             console.log("Dolar Compra! 0");
                             const dol = json_obj.value[0].cotacaoCompra;
-                            console.log("D�lar Compra: " + dol.toString().substr(0, 4));
+                            console.log("Dolar Compra: " + dol.toString().substr(0, 4));
                             document.getElementById('item-dolar').innerHTML
                                 = "Dolar Comercial R$: " + dol.toString().substr(0, 4);
                             document.getElementById('item-data').innerHTML

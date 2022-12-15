@@ -40,6 +40,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "admin", mt: "SelectMessage" });
+        //window.setInterval(function () {
+        //    app.send({ api: "admin", mt: "SelectMessage" });
+        //}, 30000);
     }
 
     function app_message(obj) {
@@ -59,15 +62,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
             makePopup("Atenção", "Botão criado com sucesso!");
-            window.setInterval(function () {
-                app.send({ api: "admin", mt: "SelectMessage" });
-            }, 30000);
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
             makePopup("Atenção", "Botão excluído com sucesso!");
-            window.setInterval(function () {
-                app.send({ api: "admin", mt: "SelectMessage" });
-            }, 30000);
         }
     }
     function makePopup(header, content) {
@@ -150,7 +147,38 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
             })
         });
-        var list = new innovaphone.ui1.Div("position: absolute; left:20px; top:50%; right:20px; height:300px", null, "");
+
+        //Título Tabela Botôes
+        var labelTituloTabeaBotoes = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:45%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloBotoes")));
+
+
+        var list = new innovaphone.ui1.Div("position: absolute; left:20px; top:50%; right:50%; height:300px", null, "");
+        var columns = 5;
+        var rows = list_buttons.length;
+        var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
+        }
+        //Tabela    
+        list_buttons.forEach(function (b) {
+            var row = [];
+            row.push(b.id);
+            row.push(b.button_name);
+            row.push(b.button_prt);
+            row.push(b.button_type);
+            row.push(b.button_user);
+            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+            that.add(list);
+        })
+
+
+
+        //Título Tabela Ações
+        var labelTituloTabeaAcoes = that.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:50%; top:45%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloAcoes")));
+
+
+        var list = new innovaphone.ui1.Div("position: absolute; left:50%; top:50%; right:0%; height:300px", null, "");
         var columns = 5;
         var rows = list_buttons.length;
         var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
