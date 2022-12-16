@@ -31,6 +31,42 @@
             "type": "VARCHAR(50) NOT NULL"
           }
         ]
+      },
+      {
+        "cmd": "table",
+        "name": "list_alarm_actions",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "action_name",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_alarm_code",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_prt",
+            "type": "VARCHAR(250)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_user",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_type",
+            "type": "VARCHAR(50) NOT NULL"
+          }
+        ]
       }
     ]
   },

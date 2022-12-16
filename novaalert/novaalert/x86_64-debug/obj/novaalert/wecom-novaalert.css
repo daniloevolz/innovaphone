@@ -99,7 +99,7 @@ width: 100%;
     top:40%;
     overflow-y: auto;
     /* background-color: rgb(12, 12, 12); */
-    background-color: aqua;
+    background-color: #02163F;
   }
 ::-webkit-scrollbar {
     width: 10px;

@@ -119,6 +119,38 @@ new JsonApi("admin").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "InsertActionMessage") {
+                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertActionMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+            if (obj.mt == "SelectActionMessage") {
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageResult" }));
+                Database.exec("SELECT * FROM list_alarm_actions")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectActionMessageSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "DeleteActionMessage") {
+                conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageResult" }));
+                Database.exec("DELETE FROM list_alarm_actions WHERE id=" + obj.id + ";")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                    });
+            }
         });
     }
 });
@@ -281,7 +313,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             //getURLLogin(obj.sig.cg.sip);
 
             // send notification with badge count first time the user has connected
-            updateBadge(conn, obj.call, count);
+            //updateBadge(conn, obj.call, count);
         }
 
         // handle incoming call release messages
