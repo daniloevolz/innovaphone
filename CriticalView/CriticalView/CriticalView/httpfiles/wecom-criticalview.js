@@ -49,18 +49,23 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         app.send({ api: "channel", mt: "SelectChannelMessage" });
 
         if (app.logindata.info.unlicensed) {
-            // unlicensed mode
-            console.log("Vers�o n�o licenciada!")
+            unlicensed()
+        
         }
         else {
             // licensed mode
-            console.log("Vers�o licenciada!")
+
+            constructor()
+            console.log("Versão licenciada!")
+            
+            
+            
         }
     } 
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            constructor();
+            // constructor();
         }
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
@@ -101,7 +106,17 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null,i,null,null,"button","allbutton"));
      }
     }
-
+    function unlicensed(){
+        var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        grid.setAttribute("id","grid");
+        var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
+            divGrid.setAttribute("id","div0")
+        for(let i = 1; i < 4; i++){
+            var divUnlicensed = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-flex; font-size: 20px; font-weight: bold; color: var(--text-standard); justify-content:center; align-items:center",null,null))
+            var unlicensedText = divUnlicensed.add(new innovaphone.ui1.Node("p",null,texts.text("licUnLicensed"),null))
+            unlicensedText.setAttribute("id","unlicensed" + i)
+        } 
+    }
     function grid(){
         var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
         grid.setAttribute("id","grid");
@@ -121,7 +136,6 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             }
 
         } catch {
-
             for (let i = 0; i < 4; i++) {
                 var oldPlayer = document.getElementById('my_video_' + i);
                 videojs(oldPlayer).dispose();

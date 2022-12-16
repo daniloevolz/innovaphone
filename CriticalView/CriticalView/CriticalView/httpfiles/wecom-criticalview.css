@@ -195,7 +195,7 @@ label {
     font-weight: bold;
     padding-bottom: 32%;
     float: right;
-    margin-left: -5%;
+    margin-left: -4%;
   
 }
 .labelmpeg2{
@@ -206,4 +206,16 @@ label {
     float: right;
     margin-left: -5%;
     
+}
+.labelmpeg3{
+    margin-left: -5%;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+}
+#unlicensed2{
+    margin-top:25%;
+}
+#unlicensed3{
+    margin-top:25%;
 }
