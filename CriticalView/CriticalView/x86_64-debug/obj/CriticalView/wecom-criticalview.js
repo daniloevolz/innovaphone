@@ -55,9 +55,9 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         else {
             // licensed mode
 
-            constructor()
+            //constructor()
             console.log("Versão licenciada!")
-            
+
             
             
         }
@@ -75,13 +75,15 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             var channels = JSON.parse(obj.result);
 
             storeObject = channels;
+            pageName();
             onChangePage("1");
 
         }
     }
 
     function constructor(){
-        colEsquerda();
+        //colEsquerda();
+        pageName();
         grid();
 
     var botoes = document.querySelectorAll(".allbutton");
@@ -124,6 +126,39 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
             divGrid.setAttribute("id","div"+i)
         }
+    }
+    function pageName() {
+        var namePage1 = "";
+        var namePage2 = "";
+        var namePage3 = "";
+        var namePage4 = "";
+        var namePage5 = "";
+        storeObject.forEach(function (item, index) {
+            if (String(item.page) == String(1)) {
+                namePage1 += item.name + "\n ";
+            }
+            if (String(item.page) == String(2)) {
+                namePage2 += item.name + "<br>";
+            }
+            if (String(item.page) == String(3)) {
+                namePage3 += item.name + "\n ";
+            }
+            if (String(item.page) == String(4)) {
+                namePage4 += item.name + "\n ";
+            }
+            if (String(item.page) == String(5)) {
+                namePage5 += item.name + "\n ";
+            }
+        })
+        var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage1, null, null, "button", "allbutton"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage2, null, null, "button", "allbutton"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage3, null, null, "button", "allbutton"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage4, null, null, "button", "allbutton"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage5, null, null, "button", "allbutton"));
+        //for (let i = 1; i < 6; i++) {
+        //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
+        //}
     }
 
     function onChangePage(page) {
