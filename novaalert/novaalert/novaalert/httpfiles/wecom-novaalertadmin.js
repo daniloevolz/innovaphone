@@ -19,11 +19,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             "--bg": "#191919",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--div-DelBtn" : "#f2f5f6",
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--div-DelBtn" : "#f2f5f6",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -91,7 +93,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px", styles[0], h[0]);
+        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px; color: black; font-size: 20px; font-weight: bold", styles[0], h[0]);
         popup.header.addText(header);
         popup.content.addText(content);
     }
@@ -202,10 +204,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     }
     function makeTableButtons() {
         //Botões Tabela de Botões
-        that.add(new innovaphone.ui1.Div("position:absolute; left:5%; width:15%; top:35%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:5%; width:15%; top:35%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
             makeDivAddButton();
         });
-        that.add(new innovaphone.ui1.Div("position:absolute; left:25%; width:15%; top:35%; font-size:12px; text-align:center; background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:25%; width:15%; top:35%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
             var selected = listView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];
@@ -242,10 +244,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
     function makeTableActions() {
         //Botões Tabela de Ações
-        that.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:35%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:35%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
             makeDivAddAction();
         });
-        that.add(new innovaphone.ui1.Div("position:absolute; left:75%; width:15%; top:35%; font-size:12px; text-align:center; background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelAction").addEvent("click", function () {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:75%; width:15%; top:35%; font-size:12px; text-align:center; background-color: #B0132B; color:var(--div-DelBtn); ", null, "button-inn")).addTranslation(texts, "btnDelAction").addEvent("click", function () {
             var selected = actionsListView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];

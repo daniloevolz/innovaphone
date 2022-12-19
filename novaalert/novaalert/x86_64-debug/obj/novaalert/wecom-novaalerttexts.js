@@ -35,7 +35,8 @@ Wecom.novaalertTexts = {
         btnDelButton: "Excluir Botões",
         btnDelAction: "Excluir Ações",
         labelTituloBotoes: "Lista de Botões Cadastrados",
-        labelTituloAcoes: "Lista de Ações Cadastradas"
+        labelTituloAcoes: "Lista de Ações Cadastradas",
+        labelHistorico: "Histórico"
     },
     en: {
     },

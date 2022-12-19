@@ -38,9 +38,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
     //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
     container.setAttribute("id", "containerPlayer");
-    var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+    var call = colesquerda.add(new innovaphone.ui1.Div(null, null,"call-container"));
+    var history = call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px",texts.text("labelHistorico"),null))
+    var scroll = call.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
     scroll.setAttribute("id", "scroll-calls")
-    
 
     function app_connected(domain, user, dn, appdomain) { 
         app.send({ api: "user", mt: "UserMessage" });
@@ -216,7 +217,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px", styles[0], h[0]);
+        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px;", styles[0], h[0]);
         popup.header.addText(header);
         popup.content.addHTML(content);
     }

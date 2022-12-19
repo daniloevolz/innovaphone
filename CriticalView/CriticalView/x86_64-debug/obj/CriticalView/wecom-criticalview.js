@@ -55,7 +55,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         else {
             // licensed mode
 
-            //constructor()
+            constructor()
             console.log("Versão licenciada!")
 
             
@@ -85,6 +85,9 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         //colEsquerda();
         pageName();
         grid();
+        
+        
+        
 
     var botoes = document.querySelectorAll(".allbutton");
     for (var i = 0; i < botoes.length; i++) {
@@ -120,7 +123,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         } 
     }
     function grid(){
-        var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        var grid = that.add(new innovaphone.ui1.Div("margin-left: 7%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
         grid.setAttribute("id","grid");
         for (let i = 0; i < 4; i++) {
             var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
@@ -135,27 +138,32 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         var namePage5 = "";
         storeObject.forEach(function (item, index) {
             if (String(item.page) == String(1)) {
-                namePage1 += item.name + "\n ";
+                namePage1 += item.name + "\n " ;
             }
             if (String(item.page) == String(2)) {
-                namePage2 += item.name + "<br>";
+                namePage2 += item.name + "\n " ;
             }
             if (String(item.page) == String(3)) {
-                namePage3 += item.name + "\n ";
+                namePage3 += item.name + "\n " ;
             }
             if (String(item.page) == String(4)) {
-                namePage4 += item.name + "\n ";
+                namePage4 += item.name + "\n " ;
             }
             if (String(item.page) == String(5)) {
-                namePage5 += item.name + "\n ";
+                namePage5 += item.name + "\n " ;
             }
         })
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage1, null, null, "button", "allbutton"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage2, null, null, "button", "allbutton"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage3, null, null, "button", "allbutton"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage4, null, null, "button", "allbutton"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, namePage5, null, null, "button", "allbutton"));
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
+        allBtn.setAttribute("value",1)
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
+        allBtn.setAttribute("value",2)
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
+        allBtn.setAttribute("value",3)
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
+        allBtn.setAttribute("value",4)
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
+        allBtn.setAttribute("value",5)
         //for (let i = 1; i < 6; i++) {
         //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
         //}

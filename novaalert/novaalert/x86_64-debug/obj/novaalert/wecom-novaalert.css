@@ -91,7 +91,7 @@ background-color: brown;
 height: 15%;
 width: 100%;
 }
-.scroll-container {
+.call-container {
     position: absolute;
     display: block;
     width: 100%;
@@ -100,6 +100,19 @@ width: 100%;
     overflow-y: auto;
     /* background-color: rgb(12, 12, 12); */
     background-color: #02163F;
+  }
+  .scroll-container {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 90%;
+    /* margin-top:10%; */
+    overflow-y: auto;
+    /* background-color: rgb(12, 12, 12); */
+    background-color: #02163F;
+  }
+  .arrow{
+    visibility: hidden;
   }
 ::-webkit-scrollbar {
     width: 10px;
@@ -111,12 +124,12 @@ width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 20%;
-    font-size: 15px;
+    height: 15%;
+    font-size: 14px;
     margin: 2px;
     font-weight: bold;
     /* background-color: grey; */
-    background-color: grey;
+    background-color: rgb(175, 172, 172);
 }
 #apagar{
     background-size: cover;
