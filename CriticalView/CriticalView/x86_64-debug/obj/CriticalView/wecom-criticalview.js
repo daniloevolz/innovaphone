@@ -55,7 +55,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         else {
             // licensed mode
 
-            constructor()
+            
             console.log("Versão licenciada!")
 
             
@@ -75,42 +75,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             var channels = JSON.parse(obj.result);
 
             storeObject = channels;
+
             pageName();
+            grid();
             onChangePage("1");
 
         }
     }
 
-    function constructor(){
-        //colEsquerda();
-        pageName();
-        grid();
-        
-        
-        
-
-    var botoes = document.querySelectorAll(".allbutton");
-    for (var i = 0; i < botoes.length; i++) {
-        var botao = botoes[i];
-
-        // O jeito correto e padronizado de incluir eventos no ECMAScript
-        // (Javascript) eh com addEventListener:
-        botao.addEventListener("click", function (event) {
-            const el = event.target || event.srcElement;
-            const value = el.value;
-            //const type = el.type;
-            console.log(value);
-            onChangePage(value);
-        });
-    }
-    }
-
-    function colEsquerda(){
-     var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
-     for (let i = 1; i < 6; i++) {
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null,i,null,null,"button","allbutton"));
-     }
-    }
     function unlicensed(){
         var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
         grid.setAttribute("id","grid");
@@ -131,12 +103,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         }
     }
     function pageName() {
+
         var namePage1 = "";
         var namePage2 = "";
         var namePage3 = "";
         var namePage4 = "";
         var namePage5 = "";
-        storeObject.forEach(function (item, index) {
+
+            storeObject.forEach(function (item, index) {
             if (String(item.page) == String(1)) {
                 namePage1 += item.name + "\n " ;
             }
@@ -167,6 +141,21 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         //for (let i = 1; i < 6; i++) {
         //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
         //}
+
+        var botoes = document.querySelectorAll(".allbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", function (event) {
+                const el = event.target || event.srcElement;
+                const value = el.value;
+                //const type = el.type;
+                console.log("Valor do button" + value);
+                onChangePage(value);
+            });
+        }
     }
 
     function onChangePage(page) {
