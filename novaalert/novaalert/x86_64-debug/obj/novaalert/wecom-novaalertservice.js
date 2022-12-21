@@ -423,15 +423,24 @@ function httpClient(url, call) {
 }
 
 function alarmReceived(value) {
-
-    log("danilo-req alarmReceived:value " + String(value));
-    //var obj = JSON.parse(String(value));
-    connectionsApp.forEach(function (connection) {
-        var ws = connection.ws;
-        log("danilo-req alarmReceived: will send "+JSON.stringify(connection));
-        ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: value }));
+    var bodyDecoded = unescape(value);
+    log("danilo-req alarmReceived:value " + String(bodyDecoded));
+    var obj = JSON.parse(bodyDecoded);
+    log("danilo-req alarmReceived:User " + String(obj.User));
+    connectionsApp.forEach(function (conn) {
+        var ws = conn.ws;
+        log("danilo-req alarmReceived:conn.sip " + String(conn.sip));
+        log("danilo-req alarmReceived:obj.User " + String(obj.User));
+        if (String(conn.ws.sip) == String(obj.User)) {
+            ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
+        }
     });
-
+    //var obj = JSON.parse(String(value));
+    //connectionsApp.forEach(function (connection) {
+    //    var ws = connection.ws;
+    //    log("danilo-req alarmReceived: will send "+JSON.stringify(connection));
+    //    ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: value }));
+    //});
 
 }
 function callRCC(ws, user, mode, num, sip) {

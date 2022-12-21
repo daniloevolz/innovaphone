@@ -73,18 +73,22 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
             app.send({ api: "admin", mt: "SelectMessage" });
+            makeDivAdmin();
             makePopup("Atenção", "Botão criado com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "InsertActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
+            makeDivAdmin();
             makePopup("Atenção", "Ação criada com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
             app.send({ api: "admin", mt: "SelectMessage" });
+            makeDivAdmin();
             makePopup("Atenção", "Botão excluído com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
+            makeDivAdmin();
             makePopup("Atenção", "Ação excluída com sucesso!");
         }
     }
@@ -127,7 +131,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
             else {
                 app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), value: String(iptValue.getValue()), sip: String(iptUser.getValue()), type: String(type) });
-                makeDivAdmin();
+                //makeDivAdmin();
             }
              });
         //Botão Cancelar   
@@ -171,7 +175,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
             else {
                 app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(iptUser.getValue()), type: String(type) });
-                makeDivAdmin();
+                //makeDivAdmin();
             }
         });
         //Botão Cancelar   
