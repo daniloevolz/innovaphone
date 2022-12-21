@@ -37,7 +37,6 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
-            constructor();
 
         }
         
@@ -58,117 +57,50 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             getChannels();
         }
     }
-    function constructor(){
-        that.clear();
-        table();
-        modal();
-
-        var elcloseModal = document.getElementById("closeModal");
-        elcloseModal.addEventListener("click", function () { closeModal() }, false);
-
-        var elCancelModal = document.getElementById("cancelModal");
-        elCancelModal.addEventListener("click", function () { closeModal() }, false);
-
-        var elSalvarCloseModal = document.getElementById("salvarCloseModal");
-         elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
-
-        var elAddVideoModal = document.getElementById("newVideoModal");
-        elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
-
-        var elDelVideoModal = document.getElementById("deleteVideo");
-        elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
-    }
-
-    function table(){
-      var container = that.add(new innovaphone.ui1.Div(null,null,null));
-      var table = container.add(new innovaphone.ui1.Node("table",null,null,"truetable"));
-      table.setAttribute("id","tableChannels")
-      var tr = table.add(new innovaphone.ui1.Node("tr",null,null,null));
-      
-      var name = {a:"SELECIONAR",b:"NOME",c:"PAGINA",d:"TIPO",e:"URL",f:"LOGO"};
-      for (var x in name) {
-        var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],null));
-      }
-      var divbtn = container.add(new innovaphone.ui1.Div(null,null,null));
-      divbtn.setAttribute("id","divbtn");
-      var btnDelete = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("RemoveVideo"),"btn btn-close btn-lg"));
-      btnDelete.setAttribute("id","deleteVideo");
-      var btnAdd = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("AddVideo"),"btn btn-save btn-lg"));
-      btnAdd.setAttribute("id","newVideoModal");
-    }
-
-    function modal(){
-        var divModal = that.add(new innovaphone.ui1.Div(null,null,"modal"));
-        var headerModal = divModal.add(new innovaphone.ui1.Node("header",null,null,null));
-        var h2Modal = headerModal.add(new innovaphone.ui1.Node("h2",null,texts.text("AddVideo"),null));
-        var spanModal = headerModal.add(new innovaphone.ui1.Node("span",null,"×","fechar-modal"));
-        spanModal.setAttribute("id","closeModal");
-        var corpoModal = divModal.add(new innovaphone.ui1.Div(null,null,"corpo-modal"))
-        var pNome = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licNome"),null))
-        var iptNomeVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"text","input"));
-        iptNomeVideo.setAttribute("id","nomeVideo");
-        var br = corpoModal.add(new innovaphone.ui1.Node("p","padding: 3px;",null,null));
-        var pTipo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licTipo")));
-        var selectType = corpoModal.add(new innovaphone.ui1.Node("select",null,null,null));
-        selectType.setAttribute("id","selectType");   
-        selectType.setAttribute("name","selectType");
-
-         var value1 = {a:"video/mp4",b:"application/x-mpegURL",c:"youtube",d:"video/flv",e:"audio/mpeg",f:"audio/wav"}
-         for (var x in value1) {
-            var optionType = selectType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
-            optionType.setAttribute("value",value1[x])
-          }
-        var br = corpoModal.add(new innovaphone.ui1.Node("p","padding: 3px;",null,null));
-        var pPagina = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licPagina")));
-        var selectPage = corpoModal.add(new innovaphone.ui1.Node("select",null,null,null));
-        selectPage.setAttribute("id","selectPage");   
-        selectPage.setAttribute("name","selectPage");
-
-        for (let i = 1; i < 7; i++) {
-            var optionPage = selectPage.add(new innovaphone.ui1.Node("option",null,"Página " + i,null));
-            optionPage.setAttribute("value",i)
-        }
-        var pUrl = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licURL")));
-        var iptUrlVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
-        iptUrlVideo.setAttribute("id","urlVideo");
-        var pUrlLogo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licUrlLogo")));
-        var iptUrlLogo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
-        iptUrlLogo.setAttribute("id","urlImg");
-        var modalFooter = divModal.add(new innovaphone.ui1.Node("footer",null,null,null));
-        var btnCancel = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licCancel"),"btn btn-close btn-lg"));
-        btnCancel.setAttribute("id","cancelModal");
-        var btnSave = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licSave"),"btn btn-save btn-lg"));
-        btnSave.setAttribute("id","salvarCloseModal");
-        var mask = that.add(new innovaphone.ui1.Div(null,null,null));
-        mask.setAttribute("id","mascara");
         
-    }
+    function makeDivAddButton() {
+        that.clear();
+        //Título
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdd")));
 
-    function insertChannel() {
-        var nameVideo = document.getElementById("nomeVideo").value;
-        var urlVideo = document.getElementById("urlVideo").value;
-        var urlLogo = document.getElementById("urlImg").value;
-        var typeVideo = document.getElementById("selectType").value;
-        var pageVideo = document.getElementById("selectPage").value;
-        console.log(nameVideo);
-        if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
-            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo), page: parseInt(pageVideo) });
-        }
-    }
-
-    function deleteChannel() {
-        //var idVideo = document.getElementById("idVideo").value;
-        var checkedValue = null;
-        var inputElements = document.getElementsByClassName('checkChannels');
-        for (var i = 0; inputElements[i]; ++i) {
-            if (inputElements[i].checked) {
-                checkedValue = inputElements[i].value;
-                console.log(checkedValue);
-                app.send({ api: "channel", mt: "DeleteChannelMessage", id: checkedValue });
+        //Usuário
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:10%; font-size:15px; text-align:right", texts.text("labelName")));
+        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelType")));
+        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, null));
+        iptType.setAttribute("id", "selectType");
+        var value1 = {a:"video/mp4",b:"application/x-mpegURL",c:"youtube",d:"video/flv",e:"audio/mpeg",f:"audio/wav"}
+        for (var x in value1) {
+        var optionType = iptType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
+        optionType.setAttribute("value",value1[x])
+      }
+      that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:10%; font-size:15px; text-align:right", texts.text("labelPage")));
+      var iptPage = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, null));
+      iptPage.setAttribute("id","selectPage");
+      for (let i = 1; i < 7; i++) {
+                var optionPage = iptPage.add(new innovaphone.ui1.Node("option",null,"Página " + i,null));
+                optionPage.setAttribute("value",i)
             }
-        }
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:10%; font-size:15px; text-align:right", texts.text("labelURL")));
+        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+        //Botão Salvar
 
-
+        that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+            var type = document.getElementById("selectType").value;
+            if (String(iptName.getValue()) == "" || String(iptType.getValue()) == "" || String(iptPage.getValue()) == "") {
+                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+            }
+            else {
+                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(iptType.getValue()), page: StringparseInt(iptPage.getValue()) });
+                makeDivAdmin();
+            }
+             });
+        //Botão Cancelar   
+        that.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            makeDivAdmin();
+            makeTableButtons();
+            makeTableActions();
+        });
     }
 
     function getChannels() {
@@ -188,28 +120,38 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     }
 
     function insereTd(data) {
-        try {
-            var lis = document.querySelectorAll('#channelLine');
-            for (var i = 0; li = lis[i]; i++) {
-                li.parentNode.removeChild(li);
-            }
-            console.log("Limpou o Td")
-        } catch {
-            console.log("o Td estava limpo!")
-        }
+        that.add(new innovaphone.ui1.Div("position:absolute; left:5%; width:15%; top:35%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
+            makeDivAddButton();
+        });
+            that.add(new innovaphone.ui1.Div("position:absolute; left:25%; width:15%; top:15%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
+            var selected = listView.getSelectedRows();
+            console.log(selected);
+            var selectedrows = [];
 
-            var table = document.getElementById('tableChannels');
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(listView.getRowData(s))
+                console.log(selectedrows[0]);
+                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+            })
+        });
+            var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
+            var list = new innovaphone.ui1.Div("position: absolute; left:20px; top:50%; right:50%; height:300px", null, "");
+            var columns = 5;
+            var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
+            //Cabeçalho
+             for (i = 0; i < columns; i++) {
+            listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
+            }
             data.forEach(function (object) {
-            var tr = document.createElement('tr');
-            tr.setAttribute("class", "tr1");
-            tr.setAttribute('id', 'channelLine');
-            tr.innerHTML = '<td class="tdborder"><input type="checkbox" id="checkChannels" class="checkChannels" value="' + object.id + '"></td>' +
-                '<td class="tdborder2">' + object.name + '</td>' +
-                '<td class="tdborder3">' + object.page + '</td>' +
-                '<td class="tdborder4">' + object.type + '</td>' +
-                '<td class="tdborder5">' + object.url + '</td>' +
-              '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
-             table.appendChild(tr);
+                var row = [];
+                row.push(object.id);
+                row.push(object.name);
+                row.push(object.page);
+                row.push(object.type);
+                row.push(object.url);
+                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                that.add(list);
          });
          
     }

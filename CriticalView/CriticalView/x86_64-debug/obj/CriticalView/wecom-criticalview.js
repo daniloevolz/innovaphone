@@ -48,37 +48,32 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
 
-        if (app.logindata.info.unlicensed) {
-            unlicensed()
-        
-        }
-        else {
-            // licensed mode
-
-            
-            console.log("Versão licenciada!")
-
-            
-            
-        }
     } 
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            // constructor();
+            
         }
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
+
             console.log(obj.mt);
             var channels = JSON.parse(obj.result);
-
             storeObject = channels;
+
+            if (app.logindata.info.unlicensed) {
+
+                unlicensed()
+                onChangePage("1");
+            
+            }else{
 
             pageName();
             grid();
             onChangePage("1");
+        }
 
         }
     }
