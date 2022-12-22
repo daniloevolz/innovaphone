@@ -23,6 +23,7 @@ Wecom.CriticalViewTexts = {
         btnSave: "Salvar",
         btnCancel: "Cancelar",
         iptText: " ",
+        labelTituloChannels: "Lista de Canais",
 
         
 
