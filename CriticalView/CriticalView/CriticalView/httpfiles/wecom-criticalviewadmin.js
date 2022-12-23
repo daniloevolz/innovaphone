@@ -15,11 +15,13 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             "--bg": "#191919",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--div-DelBtn" : "#f2f5f6",
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--div-DelBtn" : "#f2f5f6",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -48,19 +50,19 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
-           list_buttons = JSON.parse(obj.result);
-           console.log(list_buttons)
-           makeTableButtons();
+            console.log(list_buttons)
+            list_buttons = JSON.parse(obj.result);
+            makeTableButtons();
             
 
         }
         if (obj.api == "channel" && obj.mt == "InsertChannelMessageSucess") {
-            app.send({ api: "admin", mt: "SelectChannelMessage" });
+            app.send({ api: "channel", mt: "SelectChannelMessage" });
             makeDivAdmin();
             makePopup("Atenção", "Canal criado com sucesso!");
         }
         if (obj.api == "channel" && obj.mt == "DeleteChannelMessageResultSuccess") {
-            app.send({ api: "admin", mt: "SelectChannelMessage" });
+            app.send({ api: "channel", mt: "SelectChannelMessage" });
             makeDivAdmin();
             makePopup("Atenção", "Canal excluído com sucesso!");
         }
@@ -146,11 +148,11 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
                 console.log(s);
                 selectedrows.push(listView.getRowData(s))
                 console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+                app.send({ api: "admin", mt: "DeleteChannelMessage", id: parseInt(selectedrows[0]) });
             })
         });
         //Título Tabela Canais
-        var labelTituloCanais = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:45%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloChannels")));
+        var labelTituloCanais = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloChannels")));
         var list = new innovaphone.ui1.Div("position: absolute; left:20%; top:35%;  width: 80%; height:300px", null, "");
         var columns = 5;
         var rows = list_buttons.length;
@@ -169,6 +171,13 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             row.push(b.url);
             listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
             that.add(list);
+        })
+    }
+        
+    function delButton(selected) {
+        console.log(selected);
+        selected.forEach(function (s) {
+            app.send({ api: "admin", mt: "DeleteChannelMessage", id: s.id });
         })
     }
 }

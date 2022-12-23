@@ -3,6 +3,7 @@ body {
     background-color: var(--bg);
     color: var(--text-standard);
     font-family: arial;
+ 
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
@@ -11,6 +12,15 @@ body {
 td {
     text-align: start; /* alinhamento horizontal */
     vertical-align: middle; /* alinhamento vertical */
+}
+::-webkit-scrollbar {
+    display: block;
+}
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(19, 33, 71);
 }
 
 div.button {
@@ -35,11 +45,6 @@ div.button {
 
 input[type="checkbox"] {
     display: block;
-}
-
-
-::-webkit-scrollbar {
-    display: none;
 }
 
 a {
