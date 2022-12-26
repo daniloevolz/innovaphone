@@ -335,6 +335,20 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     });
 });
 
+
+//Funções Internas
+function getActionsFromDB() {
+    Database.exec("SELECT * FROM list_alarm_actions")
+        .oncomplete(function (data) {
+            log("result=" + JSON.stringify(data, null, 4));
+
+            conn.send(JSON.stringify({ api: "admin", mt: "SelectActionMessageSuccess", result: JSON.stringify(data, null, 4) }));
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+        });
+}
 function callNovaAlert(alert, sip) {
     log("callNovaAlert::");
     var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(sip), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
@@ -429,7 +443,7 @@ function alarmReceived(value) {
     log("danilo-req alarmReceived:User " + String(obj.User));
     connectionsApp.forEach(function (conn) {
         var ws = conn.ws;
-        log("danilo-req alarmReceived:conn.sip " + String(conn.sip));
+        log("danilo-req alarmReceived:conn.sip " + String(conn.ws.sip));
         log("danilo-req alarmReceived:obj.User " + String(obj.User));
         if (String(conn.ws.sip) == String(obj.User)) {
             ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
@@ -442,6 +456,18 @@ function alarmReceived(value) {
     //    ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: value }));
     //});
 
+}
+
+function updateBadge(ws, call, count) {
+    var msg = {
+        "api": "PbxSignal", "mt": "Signaling", "call": call, "src": "badge",
+        "sig": {
+            "type": "facility",
+            "fty": [{ "type": "presence_notify", "status": "open", "note": "#badge:" + count, "contact": "app:" }]
+        }
+    };
+
+    ws.send(JSON.stringify(msg));
 }
 function callRCC(ws, user, mode, num, sip) {
     log("danilo-req callRCC:mode " + String(mode));

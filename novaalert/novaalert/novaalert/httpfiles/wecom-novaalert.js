@@ -34,7 +34,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
 
     var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-    var container = colesquerda.add(new innovaphone.ui1.Div("position: absolute; height: 40%; width: 100%;", null, null));
+    var container = colesquerda.add(new innovaphone.ui1.Div("display: none; position: absolute; height: 40%; width: 100%;", null, null));
     //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
     //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
     container.setAttribute("id", "containerPlayer");
@@ -79,13 +79,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if(type == "number") {
             app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
             addNotification("<<<  " + type + " " + value);
+            var Player = document.getElementById("containerPlayer")
+            Player.style.display = 'none';
         }
         if (type == "alarm") {
             app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
             addNotification("<<<  " + type + " " + value);
+            var Player  = document.getElementById("containerPlayer")
+            Player.style.display = 'none';
         }
         if (type == "video") {
-            
+            var Player = document.getElementById("containerPlayer")
+            Player.style.display = 'block';
             
             var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
 
@@ -122,6 +127,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             video.ready(function () {
                 video.src({ type: "application/x-mpegURL", src: value });
             });
+
         }
         
     };
@@ -181,18 +187,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function popButtons(buttons) {
         var allbtn = that.add(new innovaphone.ui1.Div(null, null, "allbtn"));
-
         //var allbtn = document.getElementById("allbtn");
         buttons.forEach(function (object) {
             
+
             var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
             if (object.button_type == "alarm") {
                 btn.addHTML("<img src='alarm.png' class='img-icon'>" + object.button_name);
-            } else if (object.button_type == "video") {
+            } 
+            else if (object.button_type == "video") {
                 btn.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
-                //var img = new innovaphone.ui1.Node("img", null, null, "img-icon");
-                //img.setAttribute("src", "video.png");
-            } else {
+
+            }
+            else {
                 btn.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
             }
             btn.setAttribute("type", "button");
