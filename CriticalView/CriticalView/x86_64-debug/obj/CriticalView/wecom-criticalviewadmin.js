@@ -132,6 +132,14 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     
     function makeDivAdmin(){
         that.clear();
+        //logo wecom
+        var wecom = that.add(new innovaphone.ui1.Div("position:fixed; bottom:20px",null,null));
+        // wecom.setAttribute("id","logowecom");
+        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+        wecomA.setAttribute("href","https://wecom.com.br")
+        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+        imgwecom.setAttribute("src","logo.png")
+        // titulo
         var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
     }
     function makeTableButtons() {
@@ -148,7 +156,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
                 console.log(s);
                 selectedrows.push(listView.getRowData(s))
                 console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteChannelMessage", id: selectedrows[0] });
+                app.send({ api: "admin", mt: "DeleteChannelMessage", id: parseInt(selectedrows[0]) });
             })
         });
         //Título Tabela Canais

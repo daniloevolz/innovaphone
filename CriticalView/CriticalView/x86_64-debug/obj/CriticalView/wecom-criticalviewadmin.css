@@ -47,17 +47,17 @@ input[type="checkbox"] {
     display: block;
 }
 
-a {
+/* a {
     align-self: end;
     text-decoration: none;
     display: flex;
     padding: 20.4px 4px;
     color: #a80939;
-    /*COR ORIGINAL DO MENU:*/ /*color: #b60c3f;*/
     font-weight: bold;
     width: 100%;
     margin-left: 13%;
-}
+} */
+
 input#checkChannels{
     width: 100%;
 }
