@@ -213,6 +213,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         var divtest = document.getElementById('div' + i );
                         divtest.setAttribute("class","youtube" + i) 
+                        
 
 
                         var labelVideo = document.createElement("label");

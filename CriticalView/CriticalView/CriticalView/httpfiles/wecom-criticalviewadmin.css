@@ -3,6 +3,7 @@ body {
     background-color: var(--bg);
     color: var(--text-standard);
     font-family: arial;
+ 
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
@@ -11,6 +12,15 @@ body {
 td {
     text-align: start; /* alinhamento horizontal */
     vertical-align: middle; /* alinhamento vertical */
+}
+::-webkit-scrollbar {
+    display: block;
+}
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(19, 33, 71);
 }
 
 div.button {
@@ -37,22 +47,17 @@ input[type="checkbox"] {
     display: block;
 }
 
-
-::-webkit-scrollbar {
-    display: none;
-}
-
-a {
+/* a {
     align-self: end;
     text-decoration: none;
     display: flex;
     padding: 20.4px 4px;
     color: #a80939;
-    /*COR ORIGINAL DO MENU:*/ /*color: #b60c3f;*/
     font-weight: bold;
     width: 100%;
     margin-left: 13%;
-}
+} */
+
 input#checkChannels{
     width: 100%;
 }
@@ -94,58 +99,29 @@ div.button-inn {
     height: 25px;
     align-self: center;
 }
-
-/*Edição danilo*/
-
-/* Edição Pietro */
-.tdborder{
-    border: 1px solid ;
-    text-align: center; 
-}
-.tdborder2{
-    border: 1px solid ;
-    text-align: center;
-}
-.tdborder3{
-    border: 1px solid ;
-    text-align: center;
-}
-.tdborder4{
-    border: 1px solid ;
-    text-align: center;
-}
-.tdborder5{
-    border: 1px solid ;
-    text-align: center;
-}
-.truetable{
-    border: 3px solid ;
-    text-align: center;
-    margin: auto;
-    width: 65%;
-    margin-top: 2%;
+.popup-background {
+    background-color: rgba(100,100,100,0.2);
 }
 
-th{
-    border: 2px solid;
-    text-align: center;
-}
-.btn {
-    display: flex;
-    margin-top: 0.3%;
-}
-#divbtn {
-    text-align: center;
+.popup-header {
+    background-image: url("novaalert.png");
+    color: #fdb901;
 }
 
-td:first-child { width: 0% }
-td:first-child + td {  width: 20%;}   
-td:first-child + td + td {  width: 10%; }
-td:first-child + td + td + td{  width: 25%; }
-td:first-child + td + td + td + td{  width: 40%; }
-td:first-child + td + td + td + td+ td{  width: 5%; }
-
-table{
-    border-collapse: collapse;
+.popup-main {
+    background-color: white;
+    box-shadow: 0 0 10px black;
+    border: 4px solid transparent;
+    text-align:center;
+    vertical-align:central;
 }
-/* Edição Pietro */
+
+.popup-closer {
+    background-image: url("close.png");
+    top: 0px;
+    right: -30px;
+    height: 60px;
+    width: 60px;
+    background-repeat: no-repeat;
+}
+
