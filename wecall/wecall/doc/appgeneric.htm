@@ -209,7 +209,7 @@
         which contains a list objects for the commands, which are to be executed, when the
         App instance is started.
         Each of the objects contain a property "cmd", which identifies the type ofcommand
-        and a property "name"so that the result of the command can be referenced.
+        and a property "name", so that the result of the command can be referenced.
     </p>
 
     <pre><code class="json">{
@@ -467,7 +467,7 @@
     <p>
         With the htm filename, it is selected on which connection from a PBX App object this information
         is announced. The standard format for API descriptions is used. With the property "presence"
-        the App Service idicates that it will receive presence subscription calls for badge counts.
+        the App Service indicates that it will receive presence subscription calls for badge counts.
         Set it to "true" if the app receives the presence subscription within the app service.
         If the presence subscription should not be done to the app service but to a distinct SIP URI, it can be specified as a string.
         The property "hidden" can be used to hide the app from myApps UI.
@@ -579,7 +579,7 @@
 
     <h2><a id="modes">Modes</a></h2>
     <p>
-        Modes are used to define user access rights on the server side. They can be used to define,
+        Modes are used to define user access rights on the server side. They can be used to define
         which SQL statements may be executed and how config items can be accessed by a given user.
     </p>
     <p>
@@ -759,11 +759,11 @@
     <dl>
         <dt>name</dt>
         <dd>
-            The name of the dbfiles instance, as configured in config.json
+            The name of the dbfiles instance, as configured in config.json.
         </dd>
         <dt>folder</dt>
         <dd>
-            The id of the database table row as configured in config.json
+            The id of the database table row as configured in config.json.
         </dd>
     </dl>
 
@@ -805,7 +805,7 @@
     <h3><a id="cliet-POST">HTTP POST to dbfiles</a></h3>
 
     <p>
-        With HTTP POST new files may be added to a dbfiles folder or existine files maybe deleted.
+        With HTTP POST new files may be added to a dbfiles folder or existing files maybe deleted.
         From the App code a relative URL can be used
     </p>
     <pre><code>?dbfiles=&lt;dbfiles-name&gt;&amp;folder=&lt;folder&gt;&amp;name=&lt;name&gt;&amp;del=&lt;del-id&gt;&amp;key=&lt;key&gt;</code></pre><br />
@@ -813,15 +813,15 @@
     <dl>
         <dt>dbfiles-name</dt>
         <dd>
-            Name of the dbfiles instance as configured in config.json
+            Name of the dbfiles instance as configured in config.json.
         </dd>
         <dt>folder</dt>
         <dd>
-            Id of the folder
+            Id of the folder. Should not be 0.
         </dd>
         <dt>name</dt>
         <dd>
-            Display name of the file
+            Display name of the file.
         </dd>
         <dt>del-id</dt>
         <dd>
@@ -830,7 +830,7 @@
         <dt>key</dt>
         <dd>
             The session key. It is used to authenticate the request. In Javascript the session key
-            is calculated as SHA256 hash from the AppWebsocket key with a preceeding "generic-dbfiles:"
+            is calculated as SHA256 hash from the AppWebsocket key with a preceding "generic-dbfiles:"
             seed.
             <pre><code>sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());</code></pre>
         </dd>

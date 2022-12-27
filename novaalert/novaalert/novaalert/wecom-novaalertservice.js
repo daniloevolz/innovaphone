@@ -8,6 +8,8 @@ var connectionsApp = [];
 var connectionsPbxSignal = [];
 var connections = [];
 var calls = [];
+var actions = [];
+var buttons = [];
 
 Config.onchanged(function(){
     urlalert = Config.urlalert;
@@ -194,9 +196,20 @@ new PbxApi("RCC").onconnected(function (conn) {
                 log("danilo-req : RCC message::CallInfo UPDATED foundCall " + JSON.stringify(foundCall));
             }
             if (obj.msg == "x-alert") {
-                //Chamada Receptiva do Ramal ou Grupo????
+                //Chamada Receptiva do Ramal ou Grupo//
                 if (String(foundCall) == "") {
                     insertCall(obj);
+
+                    //Atualiza status Botões Tela NovaAlert All
+                    connectionsApp.forEach(function (conn) {
+                        var ws = conn.ws;
+                        log("danilo-req x-alert: conn.ws.sip " + String(conn.ws.sip));
+                        log("danilo-req x-alert: obj.src " + String(obj.src));
+                        if (String(conn.ws.sip) == String(obj.src)) {
+                            ws.send(JSON.stringify({ api: "user", mt: "CallConnected", src: obj.src }));
+                        }
+                    });
+
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
                         var e164 = obj.peer.e164;
@@ -210,9 +223,20 @@ new PbxApi("RCC").onconnected(function (conn) {
                 }
             }
             if (obj.msg == "x-setup") {
-                //Chamada Ativa do Ramal????
+                //Chamada Ativa do Ramal//
                 if (String(foundCall) == "") {
                     insertCall(obj);
+
+                    //Atualiza status Botões Tela NovaAlert All
+                    connectionsApp.forEach(function (conn) {
+                        var ws = conn.ws;
+                        log("danilo-req x-alert: conn.ws.sip " + String(conn.ws.sip));
+                        log("danilo-req x-alert: obj.src " + String(obj.src));
+                        if (String(conn.ws.sip) == String(obj.src)) {
+                            ws.send(JSON.stringify({ api: "user", mt: "CallConnected", src: obj.src }));
+                        }
+                    });
+
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
                         var e164 = obj.peer.e164;
@@ -227,19 +251,19 @@ new PbxApi("RCC").onconnected(function (conn) {
             }
             if (obj.msg == "r-setup") {
                 //Chamada Ativa do Ramal????
-                if (String(foundCall) == "") {
-                    insertCall(obj);
-                    if (sendCallEvents) {
-                        log("danilo-req : RCC message::sendCallEvents=true");
-                        var e164 = obj.peer.e164;
-                        if (e164 == "") {
-                            var msg = { user: obj.src, callingNumber: obj.peer.h323, queue: obj.no[0].e164, call: obj.call, status: "inc" };
-                        } else {
-                            var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: obj.no[0].e164, call: obj.call, status: "inc" };
-                        }
-                        httpClient(urlPhoneApiEvents, msg);
-                    }
-                }
+                //if (String(foundCall) == "") {
+                //    insertCall(obj);
+                //    if (sendCallEvents) {
+                //        log("danilo-req : RCC message::sendCallEvents=true");
+                //        var e164 = obj.peer.e164;
+                //        if (e164 == "") {
+                //            var msg = { user: obj.src, callingNumber: obj.peer.h323, queue: obj.no[0].e164, call: obj.call, status: "inc" };
+                //        } else {
+                //            var msg = { user: obj.src, callingNumber: obj.peer.e164, queue: obj.no[0].e164, call: obj.call, status: "inc" };
+                //        }
+                //        httpClient(urlPhoneApiEvents, msg);
+                //    }
+                //}
             }
             if (obj.msg == "del") {
                 //Chamada Desconectada
@@ -248,6 +272,17 @@ new PbxApi("RCC").onconnected(function (conn) {
                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + obj.src);
                     calls = calls.filter(deleteCallsBySrc(obj.src));
                     log("danilo req : after deleteCall " + JSON.stringify(calls));
+
+                    //Atualiza status Botões Tela NovaAlert All
+                    connectionsApp.forEach(function (conn) {
+                        var ws = conn.ws;
+                        log("danilo-req deleteCall:del conn.ws.sip " + String(conn.ws.sip));
+                        log("danilo-req deleteCall:del obj.src " + String(obj.src));
+                        if (String(conn.ws.sip) == String(obj.src)) {
+                            ws.send(JSON.stringify({ api: "user", mt: "CallDisconnected", src: obj.src }));
+                        }
+                    });
+
                     if (sendCallEvents) {
                         log("danilo-req : RCC message::sendCallEvents=true");
                         var e164 = obj.peer.e164;
@@ -291,6 +326,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
         if (obj.mt === "RegisterResult") {
             log("PBXSignal: registration result " + JSON.stringify(obj));
+            //initializeButtons();
         }
 
         // handle incoming presence_subscribe call setup messages
@@ -337,18 +373,6 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
 
 //Funções Internas
-function getActionsFromDB() {
-    Database.exec("SELECT * FROM list_alarm_actions")
-        .oncomplete(function (data) {
-            log("result=" + JSON.stringify(data, null, 4));
-
-            conn.send(JSON.stringify({ api: "admin", mt: "SelectActionMessageSuccess", result: JSON.stringify(data, null, 4) }));
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
-        });
-}
 function callNovaAlert(alert, sip) {
     log("callNovaAlert::");
     var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(sip), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
@@ -441,6 +465,7 @@ function alarmReceived(value) {
     log("danilo-req alarmReceived:value " + String(bodyDecoded));
     var obj = JSON.parse(bodyDecoded);
     log("danilo-req alarmReceived:User " + String(obj.User));
+
     connectionsApp.forEach(function (conn) {
         var ws = conn.ws;
         log("danilo-req alarmReceived:conn.sip " + String(conn.ws.sip));
@@ -449,12 +474,90 @@ function alarmReceived(value) {
             ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
         }
     });
+
+    //Get Actions from DB
+    Database.exec("SELECT * FROM list_alarm_actions")
+        .oncomplete(function (data) {
+            log("result=" + JSON.stringify(data, null, 4));
+            var str = "";
+            str = JSON.stringify(data);
+            actions = JSON.parse(String(str));
+            log("danilo-req alarmReceived:actions " + actions);
+            if (actions != null) {
+                log("danilo-req alarmReceived:actions diferent of null " + actions);
+                actions.forEach(function (ac) {
+                    log("danilo-req alarmReceived:ac " + JSON.stringify(ac));
+                    if (ac.action_user == obj.User) {
+                        log("danilo-req alarmReceived:actions action_user " + ac.action_user + " == obj.User " + obj.User);
+                        if (ac.action_alarm_code == obj.AlarmID) {
+                            log("danilo-req alarmReceived:actions action_alarm_code " + ac.action_alarm_code + " == obj.AlarmID " + obj.AlarmID);
+                            
+                            switch (ac.action_type) {
+                                case "video":
+                                    connectionsApp.forEach(function (conn) {
+                                        var ws = conn.ws;
+                                        log("danilo-req alarmReceived:video conn.sip " + String(conn.ws.sip));
+                                        log("danilo-req alarmReceived:video obj.User " + String(obj.User));
+                                        if (String(conn.ws.sip) == String(obj.User)) {
+                                            ws.send(JSON.stringify({ api: "user", mt: "VideoRequest", alarm: ac.action_prt }));
+                                        }
+                                    });
+                                    break;
+                                case "alarm":
+                                    connectionsApp.forEach(function (conn) {
+                                        var ws = conn.ws;
+                                        log("danilo-req alarmReceived:alarm conn.sip " + String(conn.ws.sip));
+                                        log("danilo-req alarmReceived:alarm obj.User " + String(obj.User));
+                                        if (String(conn.ws.sip) == String(obj.User)) {
+                                            //ws.send(JSON.stringify({ api: "user", mt: "AlarmRequested", alarm: obj.AlarmID }));
+                                        }
+                                    });
+                                    break;
+                                case "number":
+                                    connectionsApp.forEach(function (conn) {
+                                        var ws = conn.ws;
+                                        log("danilo-req alarmReceived:number conn.sip " + String(conn.ws.sip));
+                                        log("danilo-req alarmReceived:number obj.User " + String(obj.User));
+                                        if (String(conn.ws.sip) == String(obj.User)) {
+                                            callRCC(connectionsRCC[0].ws, conn.ws.cn, "UserCall", ac.action_prt, conn.ws.sip);
+                                        }
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                })
+            }
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
+        });
     //var obj = JSON.parse(String(value));
     //connectionsApp.forEach(function (connection) {
     //    var ws = connection.ws;
     //    log("danilo-req alarmReceived: will send "+JSON.stringify(connection));
     //    ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: value }));
     //});
+}
+
+function initializeButtons() {
+    Database.exec("SELECT * FROM list_buttons")
+        .oncomplete(function (data) {
+            log("result=" + JSON.stringify(data, null, 4));
+            buttons = data;
+
+            buttons.forEach(function (b) {
+                log("danilo-req : initializeButtons:: button: " + b.button_name);
+                if (b.button_type == "number") {
+                    callRCC(connectionsRCC[0].ws, b.button_prt, "UserInitialize", "", b.button_prt);
+                }
+                
+            })
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("danilo req:initializeButtons MessageError =" + String(errorText));
+        });
 
 }
 
