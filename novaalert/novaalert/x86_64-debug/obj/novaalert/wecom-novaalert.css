@@ -200,6 +200,23 @@ width: 100%;
     text-align: center;
     cursor: pointer;
 }
+.allbuttonBusy {
+        display: inline-flex;
+        height: 10%;
+        border-color: rgb(56, 55, 55);
+        /* background-color: var(--colbutton); */
+        /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+        width: 10%;
+        font-weight: bold;
+        color: white;
+        font-size: 12px;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        background-color: darkred;
+        text-align: center;
+        cursor: pointer;
+    }
 .calls{
     position: absolute;
     height: 58%;

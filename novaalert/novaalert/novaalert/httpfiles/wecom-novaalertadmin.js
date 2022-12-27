@@ -260,7 +260,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 console.log(s);
                 selectedrows.push(actionsListView.getRowData(s))
                 console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+                app.send({ api: "admin", mt: "DeleteActionMessage", id: parseInt(selectedrows[0]) });
             })
         });
 
