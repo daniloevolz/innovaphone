@@ -38,7 +38,6 @@ body {
 }
 
 ul {
-    top: 70px;
     position: absolute;
     list-style: none;
     width: 100%;
@@ -82,7 +81,7 @@ a {
     text-decoration: none;
     display: flex;
     padding: 20.4px 4px;
-    color: #a80939;
+    color: #0b9981;
  /*COR ORIGINAL DO MENU:*/   /*color: #b60c3f;*/
     font-weight: bold;
     width: 100%;
@@ -90,12 +89,17 @@ a {
     
 }
     ul li:hover{
-        background-color: rgba(32, 248, 255, 0.2);
+        color: #0b9981;
+        padding: 2px;
+        font-weight: bold;
         width: 100%;
 
         
     }
-    
+.video-js{
+    height:100%;
+    width:100%;
+}
 
 label {
     padding: 15px;
@@ -103,7 +107,7 @@ label {
     z-index: 10;
 }
 
-.container {
+/* .container {
     display: flex;
     flex-wrap: wrap;
     width: 100vw;
@@ -111,6 +115,22 @@ label {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+} */
+.colunaesquerda {
+    background-image: url(bg_lateral.png);
+    background-size: cover;
+    margin-left: 0%;
+    float: left;
+    position: absolute;
+    left: 0px;
+    width: 20%;
+    height: 100%;
+    top: 0px;
+    font-size: 15px;
+    text-align: left;
+}
+.container{
+    background-image: url(fundoIPTV.png);
 }
 #listchanenels{
     margin-left: 5%;
@@ -119,6 +139,10 @@ label {
 }
 .logo{
     display: flex; width: 25px; height: 25px; position: absolute; margin-left: 4.4%;margin-top: -14.3%;
+}
+.imglogo{
+    width: 120px;
+    height: 50px;
 }
 
 

@@ -141,6 +141,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
     }
     function makeTableButtons() {
+
         //Botões Tabela de Botões
         that.add(new innovaphone.ui1.Div("position:absolute; left:32%; width:15%; top:15%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
             makeDivAddButton();

@@ -8,16 +8,20 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
 
+    var channels = []
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--div-DelBtn" : "#f2f5f6",
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--div-DelBtn" : "#f2f5f6",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -37,167 +41,138 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
-            constructor();
+            makeDivAdmin()
         }
+        
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
+            makePopup("ERRO", "Erro: " + obj.result);
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
-            var channels = JSON.parse(obj.result);
-
-            insereTd(channels);
+            console.log(channels)
+            channels = JSON.parse(obj.result);
+            makeTableButtons();
+            
 
         }
         if (obj.api == "channel" && obj.mt == "InsertChannelMessageSucess") {
-            closeModal();
-            getChannels();
+            app.send({ api: "channel", mt: "SelectChannelMessage" });
+            makeDivAdmin();
+            makePopup("Atenção", "Canal criado com sucesso!");
         }
-        if (obj.api == "channel" && obj.mt == "DeleteChannelMessageResultSuccess") {
-            getChannels();
-        }
-    }
-    function constructor(){
-        table();
-        modal();
-
-    var elcloseModal = document.getElementById("closeModal");
-    elcloseModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elCancelModal = document.getElementById("cancelModal");
-    elCancelModal.addEventListener("click", function () { closeModal() }, false);
-
-    var elSalvarCloseModal = document.getElementById("salvarCloseModal");
-    elSalvarCloseModal.addEventListener("click", function () { insertChannel() }, false);
-
-    var elAddVideoModal = document.getElementById("newVideoModal");
-    elAddVideoModal.addEventListener("click", function () { newVideoModal() }, false);
-
-    var elDelVideoModal = document.getElementById("deleteVideo");
-    elDelVideoModal.addEventListener("click", function () { deleteChannel() }, false);
-
-    }
-    function table(){
-        var container = that.add(new innovaphone.ui1.Div(null,null,null));
-        container.setAttribute("id","container")
-        var table = container.add(new innovaphone.ui1.Node("table",null,null,"truetable"));
-        table.setAttribute("id","tableChannels")
-        var tr = table.add(new innovaphone.ui1.Node("tr",null,null,null));
-        
-        var name = {a:"SELECIONAR",b:"NOME",d:"TIPO",e:"URL",f:"LOGO"};
-        for (var x in name) {
-          var th = tr.add(new innovaphone.ui1.Node("th",null,name[x],"bordth"));
-        }
-        var divbtn = container.add(new innovaphone.ui1.Div(null,null,null));
-        divbtn.setAttribute("id","divbtn");
-        var btnDelete = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("RemoveVideo"),"btn btn-close btn-lg"));
-        btnDelete.setAttribute("id","deleteVideo");
-        var btnAdd = divbtn.add(new innovaphone.ui1.Node("buton",null,texts.text("AddVideo"),"btn btn-save btn-lg"));
-        btnAdd.setAttribute("id","newVideoModal");
-      }
-  
-      function modal(){
-          var divModal = that.add(new innovaphone.ui1.Div(null,null,"modal"));
-          var headerModal = divModal.add(new innovaphone.ui1.Node("header",null,null,null));
-          var h2Modal = headerModal.add(new innovaphone.ui1.Node("h2",null,texts.text("AddVideo"),null));
-          var spanModal = headerModal.add(new innovaphone.ui1.Node("span",null,"×","fechar-modal"));
-          spanModal.setAttribute("id","closeModal");
-          var corpoModal = divModal.add(new innovaphone.ui1.Div(null,null,"corpo-modal"))
-          var pNome = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licNome"),null))
-          var iptNomeVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"text","input"));
-          iptNomeVideo.setAttribute("id","nomeVideo");
-          var br = corpoModal.add(new innovaphone.ui1.Node("p","padding: 3px;",null,null));
-          var pTipo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licTipo")));
-          var selectType = corpoModal.add(new innovaphone.ui1.Node("select",null,null,null));
-          selectType.setAttribute("id","selectType");   
-          selectType.setAttribute("name","selectType");
-           var value1 = {a:"video/mp4",b:"application/x-mpegURL",c:"youtube",d:"video/flv",e:"audio/mpeg",f:"audio/wav"}
-           for (var x in value1) {
-              var optionType = selectType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
-              optionType.setAttribute("value",value1[x])
-          }
-          var pUrl = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licURL")));
-          var iptUrlVideo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
-          iptUrlVideo.setAttribute("id","urlVideo");
-          var pUrlLogo = corpoModal.add(new innovaphone.ui1.Node("p",null,texts.text("licUrlLogo")));
-          var iptUrlLogo = corpoModal.add(new innovaphone.ui1.Input(null,null,null,null,"url","input"));
-          iptUrlLogo.setAttribute("id","urlImg");
-          var modalFooter = divModal.add(new innovaphone.ui1.Node("footer",null,null,null));
-          var btnCancel = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licCancel"),"btn btn-close btn-lg"));
-          btnCancel.setAttribute("id","cancelModal");
-          var btnSave = modalFooter.add(new innovaphone.ui1.Node("button",null,texts.text("licSave"),"btn btn-save btn-lg"));
-          btnSave.setAttribute("id","salvarCloseModal");
-          var mask = that.add(new innovaphone.ui1.Div(null,null,null));
-          mask.setAttribute("id","mascara");
-          
-      }
-    function insertChannel() {
-        var nameVideo = document.getElementById("nomeVideo").value;
-        var urlVideo = document.getElementById("urlVideo").value;
-        var urlLogo = document.getElementById("urlImg").value;
-        var typeVideo = document.getElementById("selectType").value;
-        console.log(nameVideo);
-        if (nameVideo.length > 1 && urlVideo.length > 1 && urlLogo.length > 1) {
-            app.send({ api: "channel", mt: "AddChannelMessage", name: String(nameVideo), url: String(urlVideo), img: String(urlLogo), type: String(typeVideo) });
+        if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
+            that.clear();
+            app.send({ api: "channel", mt: "SelectChannelMessage" });
+            makeDivAdmin();
+            makePopup("Atenção", "Canal excluído com sucesso!");
         }
     }
 
-    function deleteChannel() {
-        //var idVideo = document.getElementById("idVideo").value;
-        var checkedValue = null;
-        var inputElements = document.getElementsByClassName('checkChannels');
-        for (var i = 0; inputElements[i]; ++i) {
-            if (inputElements[i].checked) {
-                checkedValue = inputElements[i].value;
-                console.log(checkedValue);
-                app.send({ api: "channel", mt: "DeleteChannelMessage", id: checkedValue });
-                //break;  Vamos testar sem o break para ver como o codigo se comporta.
+    function makePopup(header, content) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px; color: black; font-size: 20px; font-weight: bold", styles[0], h[0]);
+        popup.header.addText(header);
+        popup.content.addText(content);
+    }
+
+
+    function makeDivAddButton() {
+        that.clear();
+        //Título
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdd")));
+        // Nome 
+
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:10%; font-size:15px; text-align:right", texts.text("labelName")));
+        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "text", null));
+
+        //Tipo
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelType")));
+        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, null));
+        iptType.setAttribute("id", "selectType");
+        var optionType = iptType.add(new innovaphone.ui1.Node("option",null,"application/x-mpegURL",null));
+        optionType.setAttribute("value","application/x-mpegURL")
+        //Página
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:20%; font-size:15px; text-align:right", texts.text("labelLogo")));
+        var iptImg = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center", null, null,null,"url",null));
+        //URL
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelURL")));
+        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, null,null,"url",null));
+        //Botão Salvar
+        that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+            var type = document.getElementById("selectType").value;
+
+            if (String(iptName.getValue()) == "" || String(iptUrl.getValue()) == "" || String(iptImg.getValue()) == "") {
+                makePopup("Atenção", "Complete todos os campos para que o canal possa ser adicionado.");
             }
-        }
-
-        
-    }
-
-    function getChannels() {
-        app.send({ api: "channel", mt: "SelectChannelMessage" });
-    }
-
-    function newVideoModal(e) {
-        const modalNewVideo = document.querySelector('.modal');
-        modalNewVideo.classList.add('visivel');
-
-    }
-
-    function closeModal(e) {
-        console.log('function closemodal.');
-        const modalNewVideo = document.querySelector('.modal');
-        modalNewVideo.classList.remove('visivel');
-    }
-
-    function insereTd(data) {
-        try {
-            var lis = document.querySelectorAll('#channelLine');
-            for (var i = 0; li = lis[i]; i++) {
-                li.parentNode.removeChild(li);
+            else {
+                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), img: String(iptImg.getValue()) });
+                // makeDivAdmin();
             }
-            console.log("Limpou o Td")
-        } catch {
-            console.log("o Td estava limpo!")
-        }
-
-        var table = document.getElementById('tableChannels');
-        data.forEach(function (object) {
-            var tr = document.createElement('tr');
-            tr.setAttribute("class", "tr1");
-            tr.setAttribute('id', 'channelLine');
-            tr.innerHTML = '<td class="tdborder"><input type="checkbox" id="checkChannels" class="checkChannels" value="' + object.id + '"></td>' +
-                '<td class="tdborder2">' + object.name + '</td>' +
-                '<td class="tdborder3">' + object.type + '</td>' +
-                '<td class="tdborder4">' + object.url + '</td>' +
-                '<td class="tdborder5"><img id="imglogo" class="logo" src="' + object.img + '"></td>';
-            table.appendChild(tr);
+             });
+        //Botão Cancelar   
+        that.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            makeDivAdmin();
+            makeTableButtons();
         });
     }
+    
+    function makeDivAdmin(){
+        that.clear();
+        //logo wecom
+        var wecom = that.add(new innovaphone.ui1.Div("position:fixed; bottom:20px",null,null));
+        // wecom.setAttribute("id","logowecom");
+        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+        wecomA.setAttribute("href","https://wecom.com.br")
+        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+        imgwecom.setAttribute("src","logo.png")
+        // titulo
+        var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
+    }
+    function makeTableButtons() {
+
+        //Botões Tabela de Botões
+        that.add(new innovaphone.ui1.Div("position:absolute; left:32%; width:15%; top:15%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
+            makeDivAddButton();
+        });
+        that.add(new innovaphone.ui1.Div("position:absolute; left:52%; width:15%; top:15%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
+            var selected = listView.getSelectedRows();
+            console.log(selected);
+            var selectedrows = [];
+
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(listView.getRowData(s))
+                console.log("TA PRINTANDO " + selectedrows[0]);
+                app.send({ api: "channel", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+            })
+        });
+        //Título Tabela Canais
+        var labelTituloCanais = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloChannels")));
+        var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
+        var columns = 5;
+        var rows = channels.length;
+        var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
+        }
+        //Tabela    
+        channels.forEach(function (b) {
+            var row = [];
+            row.push(b.id);
+            row.push(b.name);
+            row.push(b.url);
+            row.push(b.type);
+            row.push(b.img);
+            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+            that.add(list);
+        })
+    }
+        
 }
 
 Wecom.iptvAdmin.prototype = innovaphone.ui1.nodePrototype;

@@ -12,13 +12,6 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     this.createNode("body");
     var that = this;
 
-    if (start.scheme == "dark") {
-        document.getElementById('menu-icon').setAttribute('src', 'menu-icon-white.png');
-    }
-    if (start.scheme == "light") {
-        document.getElementById('menu-icon').setAttribute('src', 'menu-icon.png');
-    }
-
     var colorSchemes = {
         dark: {
             "--bg": "#191918",
@@ -35,16 +28,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
-    start.onschemechanged.attach(function () {
-        if (start.scheme  == "dark"){
-            document.getElementById('menu-icon').setAttribute('src', 'menu-icon-white.png');
-        }
-        if (start.scheme == "light") {
-            document.getElementById('menu-icon').setAttribute('src', 'menu-icon.png');
-        }
-        
-        schemes.activate(start.scheme)
-    });
+    start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
 
     var texts = new innovaphone.lib1.Languages(Wecom.iptvTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
@@ -63,7 +47,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     function app_message(obj) {
         console.log(obj);
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            constructor();
+            iptv()
         }
         if (obj.api == "channel" && obj.mt =="ChannelMessageError") {
             console.log(obj.result);
@@ -75,22 +59,16 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
 
         }
     }
-    function constructor(){
-        iptv();
-    }
     function iptv(){
-       var iptcheck = that.add(new innovaphone.ui1.Input(null,null,null,null,"checkbox",null));
-       iptcheck.setAttribute("id","checkmenu");
-        var labelcheck = that.add(new innovaphone.ui1.Node("label",null,null,null));
-        labelcheck.htmlFor = 'checkmenu'
-       var imgcheck = labelcheck.add(new innovaphone.ui1.Node("img",null,null,null));
-       imgcheck.setAttribute("id","menu-icon");
-       imgcheck.setAttribute("src","menu-icon.png");
-
-       var naviptv = that.add(new innovaphone.ui1.Node("nav",null,null,null));
-       var uliptv = naviptv.add(new innovaphone.ui1.Node("ul",null,null,null));
-       uliptv.setAttribute("id","listchanenels");
-       var divcontainer = that.add(new innovaphone.ui1.Div(null,null,"container"));
+       var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:20%;float:left; height: 100%",null,"colunaesquerda"));
+       var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 15; top: 85%;",null,null));
+       var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+       wecomA.setAttribute("href","https://wecom.com.br")
+       var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+       imgwecom.setAttribute("src","logo.png")
+       var uliptv = colesquerda.add(new innovaphone.ui1.Node("ul",null,null,null));
+       uliptv.setAttribute("id","listchannels");
+       var divcontainer = that.add(new innovaphone.ui1.Div("position:absolute;width:85%;left:15%; height: 100%",null,"container"));
        divcontainer.setAttribute("id","container")
        var videoiptv = divcontainer.add(new innovaphone.ui1.Node("video",null,null,null))
        videoiptv.setAttribute("id","video-flv")
@@ -255,7 +233,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         }
         channels.forEach(function (item, index) {
             console.log(item.name);
-            var ul = document.getElementById('listchanenels');
+            var ul = document.getElementById('listchannels');
             var newEl = document.createElement('li');
             var newImg = document.createElement('img');
             var newA = document.createElement('a'); //a tag <a> que faltava
