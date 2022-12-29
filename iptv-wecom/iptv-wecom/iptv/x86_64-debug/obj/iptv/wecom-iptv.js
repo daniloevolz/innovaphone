@@ -61,12 +61,14 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     }
     function iptv(){
        var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:20%;float:left; height: 100%",null,"colunaesquerda"));
-       var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 15; top: 85%;",null,null));
+       var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:90%; height: 5%; top: 87%; left: 10%;",null,null));
        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
        wecomA.setAttribute("href","https://wecom.com.br")
+       wecomA.setAttribute("id","wecomA")
        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
        imgwecom.setAttribute("src","logo.png")
-       var uliptv = colesquerda.add(new innovaphone.ui1.Node("ul",null,null,null));
+       var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+       var uliptv = scroll.add(new innovaphone.ui1.Node("ul",null,null,null));
        uliptv.setAttribute("id","listchannels");
        var divcontainer = that.add(new innovaphone.ui1.Div("position:absolute;width:85%;left:15%; height: 100%",null,"container"));
        divcontainer.setAttribute("id","container")
@@ -123,8 +125,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 iframe.src = url +"?autoplay=1&mute=1";
                 iframe.frameBorder = "0";
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.width = "800px";
-                iframe.height = "470px";
+                iframe.width = "100%";
+                iframe.height = "100%";
                 document.getElementById("container").appendChild(iframe);
             }
             if (type == "application/x-mpegURL") {
@@ -140,8 +142,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 videoElement.setAttribute("allow", "autoplay");
                 videoElement.setAttribute("autoplay", "true");
                 videoElement.setAttribute("muted", "muted");
-                videoElement.setAttribute("width", "800%");
-                videoElement.setAttribute("height", "470%");
+                videoElement.setAttribute("width", "100%");
+                videoElement.setAttribute("height", "100%");
                 videoElement.setAttribute("controls","");
                 videoElement.setAttribute("class", "video-js vjs-default-skin");
                 videoElement.setAttribute("id", "video-js");
@@ -226,7 +228,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             //for (var i = 0; li = lis[i]; i++) {
             //    li.parentNode.removeChild(li);
             //}
-            document.getElementById("listchanenels").innerHTML = "";
+            document.getElementById("listchannels").innerHTML = "";
             console.log("Limpou o LI")
         } catch {
             console.log("o LI estava limpo!")
@@ -236,21 +238,20 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             var ul = document.getElementById('listchannels');
             var newEl = document.createElement('li');
             var newImg = document.createElement('img');
-            var newA = document.createElement('a'); //a tag <a> que faltava
-            var newText = document.createTextNode(item.name);
-            //var position = document.getElementsByTagName('ul')[0];
-            //os atributos do <a>
+            var newA = document.createElement('a'); 
+            var newText = document.createTextNode(item.name)
+            
             newImg.setAttribute("class", "logo");
-            newImg.setAttribute("src", item.img);
+            // newImg.setAttribute("src", item.img); 
+            newImg.setAttribute("src","playIPTV.png")
             newA.setAttribute("nonce", item.url);
             newA.setAttribute("type", item.type);
             newA.setAttribute("href", "#");
             newA.setAttribute("id", "playChannel");
-            newA.appendChild(newText); //colocar o texto no <a>
+            newA.appendChild(newText); 
+            newA.appendChild(newImg);
             newEl.appendChild(newA);
-            newEl.appendChild(newImg);//e o <a> dentro do <li>
             ul.appendChild(newEl);
-            //ul.appendChild(newImg);
         });
 
         document.querySelectorAll("a").forEach(function (button) {
