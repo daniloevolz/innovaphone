@@ -33,7 +33,9 @@ Wecom.iptvTexts = {
         btnCancel: "Cancelar",
         iptText: " ",
         labelTituloChannels: "Lista de Canais",
-        labelLogo: "Logo",
+        labelLogoUrl: "Logo Url",
+        labelEscolherLogo: "Escolher Logo",
+        labelLogos: "Logos"
 
     },
     en: {

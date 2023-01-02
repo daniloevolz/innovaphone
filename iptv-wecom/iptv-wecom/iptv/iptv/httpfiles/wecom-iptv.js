@@ -60,7 +60,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         }
     }
     function iptv(){
-       var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:20%;float:left; height: 100%",null,"colunaesquerda"));
+       var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
        var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 5%; top: 90%;display:flex;justify-content:center; align-items:center;",null,null));
        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
        wecomA.setAttribute("href","https://wecom.com.br")
@@ -243,7 +243,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
             
             newImg.setAttribute("class", "logo");
             // newImg.setAttribute("src", item.img); 
-            newImg.setAttribute("src","playIPTV.png")
+            newImg.setAttribute("src",item.img)
             newA.setAttribute("nonce", item.url);
             newA.setAttribute("type", item.type);
             newA.setAttribute("href", "#");
