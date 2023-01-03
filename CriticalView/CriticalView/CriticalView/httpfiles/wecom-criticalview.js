@@ -90,7 +90,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         } 
     }
     function grid(){
-        var grid = that.add(new innovaphone.ui1.Div("margin-left: 7%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        var grid = that.add(new innovaphone.ui1.Div("position:absolute;width:85%;left:15%; height: 100%;align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
         grid.setAttribute("id","grid");
         for (let i = 0; i < 4; i++) {
             var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
