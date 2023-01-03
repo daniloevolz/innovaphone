@@ -168,11 +168,11 @@ div.button-inn {
   
   
   .logos-conteudos a:hover {background-color: rgb(199, 199, 199) ;
-    width: 92%;
+    width: 100%;
   }
   
   .logos-conteudos a:focus {background-color: rgb(165, 162, 162);
-    width: 92%;
+    width: 100%;
   }
   
   .logos:hover .logos-conteudos {display: block; width: 100%;}

@@ -85,35 +85,34 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         //Título
         that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdd")));
         // Nome 
-
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:10%; font-size:15px; text-align:right", texts.text("labelName")));
-        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "text", null));
-
+        that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:12%; font-size:15px; text-align:right", texts.text("labelName")));
+        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:12%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "text", null));
         //Tipo
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelType")));
-        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, null));
+        that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:17%; font-size:15px; text-align:right", texts.text("labelType")));
+        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:17%; font-size:12px; text-align:center", null, null));
         iptType.setAttribute("id", "selectType");
         var optionType = iptType.add(new innovaphone.ui1.Node("option",null,"application/x-mpegURL",null));
         optionType.setAttribute("value","application/x-mpegURL");
         var optionType2 = iptType.add(new innovaphone.ui1.Node("option",null,"youtube",null));
         optionType2.setAttribute("value","youtube");
         //Página
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:20%; font-size:15px; text-align:right", texts.text("labelLogoUrl")));
-        var iptImg = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center", null, null,null,"url",null));
+        // that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:20%; font-size:15px; text-align:right", texts.text("labelLogoUrl")));
+        // var iptImg = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center", null, null,null,"url",null));
         //URL
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelURL")));
-        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, null,null,"url",null));
+        that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:22%; font-size:15px; text-align:right", texts.text("labelURL")));
+        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:22%; font-size:12px; text-align:center", null, null,null,"url",null));
         // Escolher Logo
-       var divLogos = that.add(new innovaphone.ui1.Div("left:52%; top:12%; font-size:15px;font-weight:bold; text-align:center", texts.text("labelEscolherLogo"),"logos"));
+       var divLogos = that.add(new innovaphone.ui1.Div("left:47.5%; top:28%; font-size:15px;font-weight:bold; text-align:center", texts.text("labelEscolherLogo"),"logos"));
         var btnlogo = divLogos.add(new innovaphone.ui1.Node("button","margin-top: 5%;",null,"btnLogos"))
         var img = btnlogo.add(new innovaphone.ui1.Node("img","margin:0px;width:35px",null,null))
         img.setAttribute("src","cameraIPTV.png")
-        btnlogo.add(new innovaphone.ui1.Node("p",null,"▼",null))
+        img.setAttribute("id","imgMain")
+        btnlogo.add(new innovaphone.ui1.Node("p","margin:2px;","▼",null))
         
         var divLogosConteudo = divLogos.add(new innovaphone.ui1.Div(null,null,"logos-conteudos"));
-        var a1 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0;  center; justify-content: center;",null,null));
-        var a2 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0; center; justify-content: center;",null,null));
-        var a3 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0; center; justify-content: center;",null,null));
+        var a1 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0;  center; justify-content: center;padding:0px",null,null));
+        var a2 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0; center; justify-content: center;padding:0px",null,null));
+        var a3 = divLogosConteudo.add(new innovaphone.ui1.Node("a","display: flex;align-items: center;margin-left:0px; border: 0; center; justify-content: center;padding:0px",null,null));
         a1.setAttribute("id","CamIPTV")
         a2.setAttribute("id","PlayIPTV")
         a3.setAttribute("id","GraficoIPTV")
@@ -123,24 +122,36 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         imgCam.setAttribute("src","cameraIPTV.png")
         imgPlay.setAttribute("src","playIPTV.png")
         imgGrafico.setAttribute("src","graficoIPTV.png")
-        
-        //Botão Salvar
-        that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
-            var type = document.getElementById("selectType").value;
 
-            if (String(iptName.getValue()) == "" || String(iptUrl.getValue()) == "" || String(iptImg.getValue()) == "") {
+        var linkImg = "cameraIPTV.png"
+        console.log("Link da Imagem "+ linkImg)
+
+        //Botão Salvar
+        that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:50%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+            var type = document.getElementById("selectType").value;
+        
+            if (String(iptName.getValue()) == "" || String(iptUrl.getValue()) == "") {
+                // || String(iptImg.getValue()) == ""
                 makePopup("Atenção", "Complete todos os campos para que o canal possa ser adicionado.");
             }
             else {
-                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), img: String(iptImg.getValue()) });
+                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), img: String(linkImg) });
                 // makeDivAdmin();
             }
              });
         //Botão Cancelar   
-        that.add(new innovaphone.ui1.Div("position:absolute; left:61%; width:15%; top:30%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:57%; width:15%; top:50%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeDivAdmin();
             makeTableButtons();
         });
+     
+     var Camera = document.getElementById("CamIPTV");
+     Camera.addEventListener("click", function () { MudarDiv("CamIPTV"),linkImg = "cameraIPTV.png"}, false);
+     var Play = document.getElementById("PlayIPTV");
+     Play.addEventListener("click", function () { MudarDiv("PlayIPTV"),linkImg = "playIPTV.png" }, false);
+     var Grafico = document.getElementById("GraficoIPTV");
+     Grafico.addEventListener("click", function () { MudarDiv("GraficoIPTV"),linkImg = "graficoIPTV.png" }, false);
+
     }
     
     function makeDivAdmin(){
@@ -172,7 +183,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
                 console.log("TA PRINTANDO " + selectedrows[0]);
                 app.send({ api: "channel", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
             })
-        });
+        });   
         //Título Tabela Canais
         var labelTituloCanais = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloChannels")));
         var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
@@ -195,7 +206,18 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
             that.add(list);
         })
     }
-        
-}
 
+      function MudarDiv(el) {
+        if (el == "CamIPTV") {
+            document.getElementById("imgMain").setAttribute("src","cameraIPTV.png");
+            
+         } else if (el == "PlayIPTV") {
+            document.getElementById("imgMain").setAttribute("src","playIPTV.png")
+
+        } else if (el == "GraficoIPTV") {
+            document.getElementById("imgMain").setAttribute("src","graficoIPTV.png")
+        }
+        
+    }
+}
 Wecom.iptvAdmin.prototype = innovaphone.ui1.nodePrototype;

@@ -81,10 +81,11 @@ a {
     width: 100%;
     
 }
-a:focus{
+ a:focus{
     color: #0f6e5f;
     font-weight: bold;
-}
+} 
+
     /* ul li:hover{
         color: #0d695b;
         padding: 1px;
