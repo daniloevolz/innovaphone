@@ -3,6 +3,7 @@ body {
     background-color: var(--bg);
     color: var(--text-standard);
     overflow: hidden;
+    background-image: url(bg.png);
 }
 
 .vjs-modal-dialog-content {
@@ -62,168 +63,26 @@ body {
     padding: 2px;
 }
 
-img {
-    width: 40px;
-}
-
-.imglogo {
-    align-self: center;
-}
-
-input[type="checkbox"] {
-    display: none;
-}
-
-    input[type="checkbox"]:checked ~ nav {
-        transform: translateX(350px);
-    }
-
-nav {
-    position: absolute;
-    background-color: var(--nav-bg);
-    width: 300px;
-    height: 100%;
-    left: -370px;
-    transition: all .6s;
-    z-index: 1;
-    overflow-y: scroll;
-}
-
 ::-webkit-scrollbar {
     display: none;
 }
-
+/* 
 a{
     align-self: end;
     text-decoration: none;
     display: flex;
     padding: 20.4px 4px;
     color: #a80939;
-    /*COR ORIGINAL DO MENU:*/ /*color: #b60c3f;*/
     font-weight: bold;
     width: 100%;
     margin-left: 13%;
-}
+} 
+*/
 ul li:hover {
     background-color: rgba(32, 248, 255, 0.2);
     width: 100%;
 }
-label {
-    padding: 15px;
-    position: absolute;
-    z-index: 10;
-}
-#listchanenels {
-    margin-left: 5%;
-    display: block;
-}
-.logo {
-    display: flex;
-    width: 25px;
-    height: 25px;
-    position: absolute;
-    margin-left: 4.4%;
-    margin-top: -14.3%;
-}
-.label{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
 
-}
-.label0{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -20%;
-
-}
-.label1{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -20%;
-   
-}
-.label2{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -20%;
-
-}
-.label3{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -20%;
-
-}
-/* #div2{
-    margin-left: -4px;
-} */
-.youtube1{
-    margin-left: 5px;
-}
-.youtube2{
-    margin-top: 9.2%;
-}
-#div3.youtube3{
-    margin-top: 9.2%;
-    margin-left: 5px;
-}
-.mpeg1{
-    margin-left: 5px;
-}
-.mpeg2{
-    margin-top: 5px;  
-}
-#div3{
-    margin-left: 5px;
-    margin-top: 5px;
-}
-.labelmpeg0{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -5%;
-    
-}
-.labelmpeg1{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -4%;
-  
-}
-.labelmpeg2{
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    padding-bottom: 32%;
-    float: right;
-    margin-left: -5%;
-    
-}
-.labelmpeg3{
-    margin-left: -5%;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-}
 #unlicensed2{
     margin-top:25%;
 }
