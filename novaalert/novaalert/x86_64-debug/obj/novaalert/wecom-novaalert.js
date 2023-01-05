@@ -11,14 +11,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--bg": "url('bg.png')",
+            "--button": "#929292",
+            "--text-standard": "white",
         },
         light: {
-            "--bg": "white",
-            "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--bg": "url('bg.png')",
+            "--button": "#929292",
+            "--text-standard": "white",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -32,9 +32,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
-
+    //Coluna Esquerda
     var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-    var container = colesquerda.add(new innovaphone.ui1.Div("display: none; position: absolute; height: 40%; width: 100%;", null, null));
+    var container = colesquerda.add(new innovaphone.ui1.Div("display: block; position: absolute; height: 40%; width: 100%;", null, null));
+    //Coluna Direita
+    var coldireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
     //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
     //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
     container.setAttribute("id", "containerPlayer");
@@ -46,6 +48,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     function app_connected(domain, user, dn, appdomain) { 
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "user", mt: "SelectMessage" });
+        app.send({ api: "user", mt: "UserPresence" });
  
         if (app.logindata.info.unlicensed) {
             //sem licença
@@ -66,70 +69,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var buttonClicked = function (evt) {
         // Dentro do objeto evt esta o target, e o target tem um value:
-        var value = evt.target.value;
-        var type = evt.target.name;
         
+        var type = evt.currentTarget.attributes['button_type'].value;
+        var prt = evt.currentTarget.attributes['button_prt'].value;
         try {
-            var oldPlayer = document.getElementById('video-js');
-            videojs(oldPlayer).dispose();
-            container.clear();
+            var prt_user = evt.currentTarget.attributes['button_prt_user'].value;
         } catch {
-            container.clear();
-        }
-        if(type == "number") {
-            app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
-            addNotification("<<<  " + type + " " + value);
-            var Player = document.getElementById("containerPlayer")
-            Player.style.display = 'none';
-        }
-        if (type == "alarm") {
-            app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
-            addNotification("<<<  " + type + " " + value);
-            var Player  = document.getElementById("containerPlayer")
-            Player.style.display = 'none';
-        }
-        if (type == "video") {
-            var Player = document.getElementById("containerPlayer")
-            Player.style.display = 'block';
-            
-            var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
-
-            //document.getElementById("videoPlayer").setAttribute("src", value);
-            var source = document.createElement("source");
-            source.setAttribute("src", value);
-            source.setAttribute("type", "application/x-mpegURL");
-
-            //document.getElementById("container").appendChild(script);
-            //var videoElement = document.createElement("video");
-            videoElement.setAttribute("allow", "autoplay");
-            videoElement.setAttribute("autoplay", "true");
-            videoElement.setAttribute("muted", "muted");
-            videoElement.setAttribute("width", "800%");
-            videoElement.setAttribute("height", "470%");
-            videoElement.setAttribute("controls", "");
-            videoElement.setAttribute("class", "video-js vjs-default-skin");
-            videoElement.setAttribute("id", "video-js");
-
-            //videoElement.setAttribute("src", url);
-            //videoElement.setAttribute("type", type);
-            //document.getElementById("container").appendChild(videoElement);
-            document.getElementById("video-js").appendChild(source);
-            var video = videojs('video-js', {
-                html5: {
-                    vhs: {
-                        overrideNative: !videojs.browser.IS_SAFARI
-                    },
-                    nativeAudioTracks: false,
-                    nativeVideoTracks: false
-                }
-            });
-            //video.src({ type: type, src: url });
-            video.ready(function () {
-                video.src({ type: "application/x-mpegURL", src: value });
-            });
-
+            var prt_user = "";
         }
         
+        updateScreen(type, prt, prt_user);
     };
 
     function app_message(obj) {
@@ -143,10 +92,63 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
            
             
         }
+        if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
+            var clicked = document.getElementById(obj.value);
+            document.getElementById(obj.value).style.backgroundColor = "var(--button)";
+            //if (clicked.className == "allbuttonClicked") {
+            //    document.getElementById(obj.value).setAttribute("class", "allbutton");
+            //}
+        }
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
             console.log(obj.alarm);
-            makePopup("Alarme Recebido!!!!", obj.alarm);
+            makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             addNotification(">>>  " + obj.alarm);
+        }
+        if (obj.api == "user" && obj.mt == "VideoRequest") {
+            console.log(obj.alarm);
+            //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
+            updateScreen("video", obj.alarm, "");
+            //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
+            //addNotification(">>>  " + obj.alarm);
+        }
+        if (obj.api == "user" && obj.mt == "PageRequest") {
+            console.log(obj.alarm);
+            //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
+            updateScreen("page", obj.alarm, "");
+            //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
+            //addNotification(">>>  " + obj.alarm);
+        }
+        if (obj.api == "user" && obj.mt == "CallConnected") {
+            console.log(obj.src);
+            document.getElementById(obj.src).style.borderColor = "darkred";
+            //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+            addNotification(">>>  Chamada Conectada " + obj.src);
+        }
+        if (obj.api == "user" && obj.mt == "UserConnected") {
+            console.log(obj.src);
+            try {
+                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+            } catch {
+                console.log("UserConnected not button");
+            }
+            
+        }
+        if (obj.api == "user" && obj.mt == "UserDisconnected") {
+            console.log(obj.src);
+            try {
+                document.getElementById(obj.src).style.backgroundColor = "var(--button)";
+                document.getElementById(obj.src).style.borderColor = "var(--button)";
+            } catch {
+                console.log("UserDisconnected not button");
+            }
+            
+        }
+        if (obj.api == "user" && obj.mt == "CallDisconnected") {
+            console.log(obj.src);
+            document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+            document.getElementById(obj.src).style.borderColor = "darkgreen";
+            //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
+            addNotification(">>>  Chamada Desconectada " + obj.src);
         }
     }
 
@@ -186,33 +188,143 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     function popButtons(buttons) {
-        var allbtn = that.add(new innovaphone.ui1.Div(null, null, "allbtn"));
+        var combobtn = coldireita.add(new innovaphone.ui1.Div(null, null, "combobtn"));
+        var allbtn = coldireita.add(new innovaphone.ui1.Div(null, null, "allbtn"));
+        var pagebtn = coldireita.add(new innovaphone.ui1.Div(null, null, "pagebtn"));
         //var allbtn = document.getElementById("allbtn");
         buttons.forEach(function (object) {
-            
+            //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
+            if (object.button_type == "combo") {
+                var div1 = combobtn.add(new innovaphone.ui1.Div(null, null, "combobutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+                
 
-            var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='combo.png' class='img-icon'>" + object.button_name);
+            
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "COMBO " + object.button_prt, "buttondown"));
+
+                combobtn.add(div1);
+            }
             if (object.button_type == "alarm") {
-                btn.addHTML("<img src='alarm.png' class='img-icon'>" + object.button_name);
-            } 
-            else if (object.button_type == "video") {
-                btn.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
 
-                if(document.getElementById("containerPlayer").style.display == 'block'){
-                    btn.setAttribute("id","btnVideo")
-                }else{
-                    btn.setAttribute("id","NONE")
-                }
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='alarm.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "ALARME " + object.button_prt, "buttondown"));
+
+                allbtn.add(div1);
+                //
+                //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
+                //btn.addHTML("<img src='alarm.png' class='img-icon'>" + object.button_name);
+                //allbtn.add(btn);
+                //btn.setAttribute("type", "button");
+                //btn.setAttribute("name", object.button_type);
+                //btn.setAttribute("value", object.button_prt);
+                //btn.setAttribute("id", object.button_prt);
             }
-            else {
-                btn.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+            else if (object.button_type == "video") {
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "CÂMERA", "buttondown"));
+
+                allbtn.add(div1);
+                //
+                //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "allbutton"));
+                //btn.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+                //allbtn.add(btn);
+                //btn.setAttribute("type", "button");
+                //btn.setAttribute("name", object.button_type);
+                //btn.setAttribute("value", object.button_prt);
+                //btn.setAttribute("id", object.button_prt);
+
             }
-            btn.setAttribute("type", "button");
-            btn.setAttribute("nonce", object.button_id);
-            btn.setAttribute("name", object.button_type);
-            btn.setAttribute("value", object.button_prt);
+            else if (object.button_type == "number") {
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "numberbutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_prt_user", object.button_prt_user);
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
+
+                allbtn.add(div1);
+
+                //
+                //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "numberbutton"));
+                //btn.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+                //btn.setAttribute("nonce", object.button_prt_user);
+                //allbtn.add(btn);
+                //btn.setAttribute("type", "button");
+                //btn.setAttribute("name", object.button_type);
+                //btn.setAttribute("value", object.button_prt);
+                //btn.setAttribute("id", object.button_prt);
+            }
+            else if (object.button_type == "queue") {
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "numberbutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_prt_user", object.button_prt_user);
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='queue.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "GRUPO " + object.button_prt, "buttondown"));
+
+                allbtn.add(div1);
+
+                //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "numberbutton"));
+                //btn.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+                //btn.setAttribute("nonce", object.button_prt_user);
+                //allbtn.add(btn);
+                //btn.setAttribute("type", "button");
+                //btn.setAttribute("name", object.button_type);
+                //btn.setAttribute("value", object.button_prt);
+                //btn.setAttribute("id", object.button_prt);
+            }
+            else if (object.button_type == "page") {
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "PÀGINA", "buttondown"));
+
+                pagebtn.add(div1);
+
+                //var btn = that.add(new innovaphone.ui1.Node("button", null, null, "pagebutton"));
+                //btn.addHTML("<img src='page.png' class='img-icon'>" + object.button_name);
+                //pagebtn.add(btn);
+                //btn.setAttribute("type", "button");
+                //btn.setAttribute("name", object.button_type);
+                //btn.setAttribute("value", object.button_prt);
+                //btn.setAttribute("id", object.button_prt);
+            }
             
-            allbtn.add(btn);
+            
+            
         });
 
         var botoes = document.querySelectorAll(".allbutton");
@@ -222,16 +334,138 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+        var botoes = document.querySelectorAll(".numberbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
+        var botoes = document.querySelectorAll(".pagebutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
+        var botoes = document.querySelectorAll(".combobutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
     }
 
-    function makePopup(header, content) {
+    function makePopup(header, content, width, height) {
         console.log("makePopup");
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px;", styles[0], h[0]);
+        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
         popup.header.addText(header);
         popup.content.addHTML(content);
+    }
+
+    function updateScreen(type, value, nonce) {
+        
+        if (type == "page") {
+            makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
+            addNotification("<<<  " + type);
+        }
+        if (type == "number") {
+            var clicked = document.getElementById(value);
+            if (clicked.style.backgroundColor == "darkred") {
+                app.send({ api: "user", mt: "EndCall", prt: String(nonce) })
+                document.getElementById(value).style.backgroundColor = "darkgreen";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            } else {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(nonce) })
+                addNotification("<<<  " + type + " " + value);
+                document.getElementById(value).style.backgroundColor = "darkred";
+                //document.getElementById(value).setAttribute("class", "allbuttonClicked");
+            }
+            
+        }
+        if (type == "queue") {
+            var clicked = document.getElementById(value);
+            if (clicked.style.backgroundColor == "darkred") {
+                app.send({ api: "user", mt: "EndCall", prt: String(value) })
+                document.getElementById(value).style.backgroundColor = "darkgreen";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            } else {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(value) })
+                addNotification("<<<  " + type + " " + value);
+                document.getElementById(value).style.backgroundColor = "darkred";
+                //document.getElementById(value).setAttribute("class", "allbuttonClicked");
+            }
+
+        }
+        if (type == "alarm") {
+            var clicked = document.getElementById(value);
+            if (clicked.style.backgroundColor == "darkred") {
+                document.getElementById(value).style.backgroundColor = "var(--button)";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            } else {
+                app.send({ api: "user", mt: "TriggerAlert", prt: String(value) })
+                addNotification("<<<  " + type + " " + value);
+                document.getElementById(value).style.backgroundColor = "darkred";
+                //document.getElementById(value).setAttribute("class", "allbuttonClicked");
+            }
+            
+        }
+        if (type == "video") {
+            try {
+                var oldPlayer = document.getElementById('video-js');
+                videojs(oldPlayer).dispose();
+                container.clear();
+            } catch {
+                container.clear();
+            }
+            var clicked = document.getElementById(value);
+            if (clicked.style.backgroundColor == "darkred") {
+                container.clear();
+                document.getElementById(value).style.backgroundColor = "var(--button)";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            } else {
+                var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
+
+                //document.getElementById("videoPlayer").setAttribute("src", value);
+                var source = document.createElement("source");
+                source.setAttribute("src", value);
+                source.setAttribute("type", "application/x-mpegURL");
+                //document.getElementById("container").appendChild(script);
+                //var videoElement = document.createElement("video");
+                videoElement.setAttribute("allow", "autoplay");
+                videoElement.setAttribute("autoplay", "true");
+                videoElement.setAttribute("muted", "muted");
+                videoElement.setAttribute("width", "800%");
+                videoElement.setAttribute("height", "470%");
+                videoElement.setAttribute("controls", "");
+                videoElement.setAttribute("class", "video-js vjs-default-skin");
+                videoElement.setAttribute("id", "video-js");
+                //videoElement.setAttribute("src", url);
+                //videoElement.setAttribute("type", type);
+                //document.getElementById("container").appendChild(videoElement);
+                document.getElementById("video-js").appendChild(source);
+                var video = videojs('video-js', {
+                    html5: {
+                        vhs: {
+                            overrideNative: !videojs.browser.IS_SAFARI
+                        },
+                        nativeAudioTracks: false,
+                        nativeVideoTracks: false
+                    }
+                });
+                //video.src({ type: type, src: url });
+                video.ready(function () {
+                    video.src({ type: "application/x-mpegURL", src: value });
+                });
+                document.getElementById(value).style.backgroundColor = "darkred";
+                //document.getElementById(value).setAttribute("class", "allbuttonClicked");
+            }
+        }
+
     }
 }
 

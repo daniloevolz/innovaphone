@@ -48,20 +48,150 @@ div.button-inn {
     height:100%;
     top:0px;
     font-size:15px;
-    background-color: rgb(23, 23, 24);
+    background-color: whitesmoke;
     
 }
-.allbtn {
+.colunadireita {
+    background-size: cover;
+    position: absolute;
+    left: 16%;
+    width: 84%;
+    height: 100%;
+    top: 0px;
+    font-size: 15px;
+    background-image: url("bg.png");
+}
+.combobtn {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     flex-direction: row;
     position: absolute;
-    left: 16%;
-    width: 84%;
-    height: 100%;
-    background-color: rgb(56, 55, 55);
+    width: 100%;
+    height: 16%;
 }
+.allbtn {
+    top:16%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    flex-direction: row;
+    position: absolute;
+    width: 100%;
+    height: 72%;
+}
+.pagebtn {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-end;
+    flex-direction: row;
+    position: absolute;
+    width: 100%;
+    top: 84%;
+    height: 16%;
+}
+.buttontop {
+    /* top: 5%; */
+    /* position: static; */
+    height: 40%;
+    width: 90%;
+    background-color: rgba(128, 130, 131, 0.48);
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.buttondown {
+    height: 50%;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.combobutton {
+    margin: 5px;
+    display: inline-flex;
+    height: 94%;
+    border-width: 0px;
+    /* background-color: var(--colbutton); */
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    width: 15%;
+    font-weight: bold;
+    color: var(--text-standard); /*white;*/
+    font-size: 12px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button); /*#191919;*/
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+}
+.allbutton {
+    margin: 5px;
+    display: inline-flex;
+    height: 15%;
+    border-color: white;
+    border-width: 0px;
+    /* background-color: var(--colbutton); */
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    width: 15%;
+    font-weight: bold;
+    color: var(--text-standard); /*white;*/
+    font-size: 12px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button); /*#191919;*/
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+}
+
+.numberbutton {
+    margin: 5px;
+    display: inline-flex;
+    height: 15%;
+    border-color: white;
+    border-width: 3px;
+    /* background-color: var(--colbutton); */
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    width: 15%;
+    font-weight: bold;
+    color: var(--text-standard); /*white;*/
+    font-size: 12px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button); /*#191919;*/
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+}
+
+.pagebutton {
+    margin: 5px;
+    display: inline-flex;
+    height: 94%;
+    border-color: var(--button);
+    border-width: 0px;
+    /* background-color: var(--colbutton); */
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    width: 15%;
+    font-weight: bold;
+    color: var(--text-standard); /*white;*/
+    font-size: 12px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button); /*#191919;*/
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+}
+
 /*.btns{
     position: absolute;
     height: 98%;
@@ -110,8 +240,8 @@ width: 100%;
     height: 90%;
     /* margin-top:10%; */
     overflow-y: auto;
-    /* background-color: rgb(12, 12, 12); */
-    background-color: #02163F;
+    background-color: rgb(188, 188, 188); 
+    /*background-color: #02163F;*/
   }
   .arrow{
     visibility: hidden;
@@ -131,7 +261,7 @@ width: 100%;
     margin: 2px;
     font-weight: bold;
     /* background-color: grey; */
-    background-color: rgb(175, 172, 172);
+    background-color: darkred;
 }
 #apagar{
     background-size: cover;
@@ -183,40 +313,6 @@ width: 100%;
     height: 15%;
     width: 100%;
 }
-.allbutton {
-    display: inline-flex;
-    height: 10%;
-    border-color: rgb(56, 55, 55);
-    /* background-color: var(--colbutton); */
-    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
-    width: 10%;
-    font-weight: bold;
-    color: white;
-    font-size: 12px;
-    box-sizing: border-box;
-    align-items: center;
-    justify-content:center;
-    background-color:#191919;
-    text-align: center;
-    cursor: pointer;
-}
-.allbuttonBusy {
-        display: inline-flex;
-        height: 10%;
-        border-color: rgb(56, 55, 55);
-        /* background-color: var(--colbutton); */
-        /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
-        width: 10%;
-        font-weight: bold;
-        color: white;
-        font-size: 12px;
-        box-sizing: border-box;
-        align-items: center;
-        justify-content: center;
-        background-color: darkred;
-        text-align: center;
-        cursor: pointer;
-    }
 .calls{
     position: absolute;
     height: 58%;
@@ -237,11 +333,12 @@ width: 100%;
 }
 
 .popup-main {
-    background-color: white;
+    background-color: var(--bg);
+    color: var(--text-standard);
     box-shadow: 0 0 10px black;
     border: 4px solid transparent;
-    text-align:center;
-    vertical-align:central;
+    text-align: center;
+    vertical-align: central;
 }
 
 .popup-closer {

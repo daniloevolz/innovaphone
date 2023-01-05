@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="novaalert\httpfiles\close.png" />
+    <Image Include="novaalert\httpfiles\page.png" />
     <Image Include="novaalert\httpfiles\video.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalert.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalertadmin.png" />

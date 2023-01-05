@@ -18,6 +18,11 @@
           {
             "cmd": "column",
             "name": "button_prt",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "button_prt_user",
             "type": "VARCHAR(250)"
           },
           {
