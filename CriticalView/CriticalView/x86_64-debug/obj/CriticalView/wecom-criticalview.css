@@ -23,7 +23,21 @@ div.button {
     text-align: center;
     cursor: pointer;
 }
-
+.my_video_0-dimensions.vjs-fluid{
+    padding-top: 0%;
+}
+.my_video_1-dimensions.vjs-fluid{
+    padding-top: 0%;
+}
+.my_video_2-dimensions.vjs-fluid{
+    padding-top: 0%;
+}
+.my_video_3-dimensions.vjs-fluid{
+    padding-top: 0%;
+}
+.my_video_4-dimensions.vjs-fluid{
+    padding-top: 0%;
+}
 * {
     padding: 0px;
     margin: 0px;
