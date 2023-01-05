@@ -93,10 +93,19 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     function grid(){
         var grid = that.add(new innovaphone.ui1.Div("position:absolute;left:15%;width:85%;height: 100%; flex-wrap: wrap; display: flex; justify-content: center;",null,null));
         grid.setAttribute("id","grid");
-        for (let i = 0; i < 4; i++) {
-            var divGrid = grid.add(new innovaphone.ui1.Div("width:43%;",null,null));
-            divGrid.setAttribute("id","div"+i)
-        }
+
+        var div1 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:red;",null,null))
+        div1.setAttribute("id","div0")
+        var div2 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:aqua;",null,null))
+        div2.setAttribute("id","div1")
+        var div3 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:green;",null,null))
+        div3.setAttribute("id","div2")
+        var div4 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:yellow;",null,null))
+        div4.setAttribute("id","div3")
+        // for (let i = 0; i < 4; i++) {
+        //     var divGrid = grid.add(new innovaphone.ui1.Div("width:43%;",null,null));
+        //     divGrid.setAttribute("id","div"+i)
+        // }
     }
     function pageName() {
 

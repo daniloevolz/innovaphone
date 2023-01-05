@@ -103,8 +103,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 videoElement.setAttribute("allow", "autoplay");
                 videoElement.setAttribute("autoplay", "true");
                 videoElement.setAttribute("muted", "muted");
-                //videoElement.setAttribute("width", "800%");
-                //videoElement.setAttribute("height", "470%");
+                videoElement.setAttribute("width", "100%");
+                videoElement.setAttribute("height", "100%");
                 videoElement.setAttribute("controls", "");
                 videoElement.setAttribute("class", "video-flv vjs-default-skin");
                 videoElement.setAttribute("id", "video-flv");
@@ -180,8 +180,8 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
                 videoElement.setAttribute("allow", "autoplay");
                 videoElement.setAttribute("autoplay", "true");
                 videoElement.setAttribute("muted", "muted");
-                videoElement.setAttribute("width", "800%");
-                videoElement.setAttribute("height", "470%");
+                videoElement.setAttribute("width", "100%");
+                videoElement.setAttribute("height", "100%");
                 videoElement.setAttribute("controls","");
                 videoElement.setAttribute("class", "video-js vjs-default-skin");
                 videoElement.setAttribute("id", "video-js");

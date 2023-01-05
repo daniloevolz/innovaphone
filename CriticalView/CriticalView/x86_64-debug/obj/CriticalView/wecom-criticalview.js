@@ -93,10 +93,19 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     function grid(){
         var grid = that.add(new innovaphone.ui1.Div("position:absolute;left:15%;width:85%;height: 100%; flex-wrap: wrap; display: flex; justify-content: center;",null,null));
         grid.setAttribute("id","grid");
-        for (let i = 0; i < 4; i++) {
-            var divGrid = grid.add(new innovaphone.ui1.Div("width:43%;",null,null));
-            divGrid.setAttribute("id","div"+i)
-        }
+
+        var div1 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:red;",null,null))
+        div1.setAttribute("id","div0")
+        var div2 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:aqua;",null,null))
+        div2.setAttribute("id","div1")
+        var div3 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:green;",null,null))
+        div3.setAttribute("id","div2")
+        var div4 = grid.add(new innovaphone.ui1.Div("width:48%;height:48%;background-color:yellow;",null,null))
+        div4.setAttribute("id","div3")
+        // for (let i = 0; i < 4; i++) {
+        //     var divGrid = grid.add(new innovaphone.ui1.Div("width:43%;",null,null));
+        //     divGrid.setAttribute("id","div"+i)
+        // }
     }
     function pageName() {
 
@@ -227,45 +236,59 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                     }
                     if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
-                        var video = document.createElement("video");
-                        video.setAttribute("id", "my_video_" + i);
-                        video.setAttribute("class", "video-js vjs-fluid vjs-default-skin");
-                        video.setAttribute("controls", "");
-                        video.setAttribute("preload", "auto");
-                        video.setAttribute("allow", "autoplay");
-                        video.setAttribute("autoplay", "true");
-                        video.setAttribute("muted", "muted");
                         
-                        var source = document.createElement("source");
+                        var iframe = document.createElement("iframe");
+                        iframe.src = item.url + "?autoplay=1&mute=1";
+                        iframe.frameBorder = "0";
+                        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                        iframe.width = "100%";
+                        iframe.height = "180%";
+                        iframe.setAttribute("id", "my_video_" + i);                
+                        // document.getElementById("div" + i).appendChild(iframe);
+                        
+
+                        // var video = document.createElement("video");
+                        // video.setAttribute("id", "my_video_" + i);
+                        // video.setAttribute("class", "video-js vjs-fluid vjs-default-skin");
+                        // video.setAttribute("controls", "");
+                        // video.setAttribute("preload", "auto");
+                        // video.setAttribute("allow", "autoplay");
+                        // video.setAttribute("autoplay", "true");
+                        // video.setAttribute("muted", "muted");
+                    
+                        
+                         var source = document.createElement("source");
                         source.setAttribute("src", item.url);
                         source.setAttribute("type", item.type);
+                        iframe.appendChild(source)
+                        playerElement.appendChild(iframe)
 
-                        var divtmpeg = document.getElementById('div' + i );
-                        divtmpeg.setAttribute("class","mpeg" + i)
+                        // var divtmpeg = document.getElementById('div' + i );
+                        // divtmpeg.setAttribute("class","mpeg" + i)
                         
-                        /*
-                        var labelVideo2 = document.createElement("label");
-                        labelVideo2.setAttribute("class", "labelmpeg" + i);
-                        var txtNode2 = document.createTextNode(item.name);
-                        playerElement.appendChild(labelVideo2);
-                        labelVideo2.appendChild(txtNode2);
-                        */
+                        // /*
+                        // var labelVideo2 = document.createElement("label");
+                        // labelVideo2.setAttribute("class", "labelmpeg" + i);
+                        // var txtNode2 = document.createTextNode(item.name);
+                        // playerElement.appendChild(labelVideo2);
+                        // labelVideo2.appendChild(txtNode2);
+                        // */
 
-                        video.appendChild(source);
-                        playerElement.appendChild(video);
-                        var video = videojs('my_video_' + i, {
-                            html5: {
+                        // video.appendChild(source);
+                        // playerElement.appendChild(video);
+                         var iframe = videojs('my_video_' + i, {
+                             html5: {
                                 vhs: {
                                     overrideNative: !videojs.browser.IS_SAFARI
                                 },
                                 nativeAudioTracks: false,
                                 nativeVideoTracks: false
-                            }
-                        });
-                        //video.src({ type: type, src: url });
-                        video.ready(function () {
-                            video.src({ type: item.type, src: item.url });
-                        });
+                             }
+                         });
+                         video.src({ type: type, src: url });
+                         video.ready(function () {
+                             video.src({ type: item.type, src: item.url });
+                         });
 
                     }
                     i++;

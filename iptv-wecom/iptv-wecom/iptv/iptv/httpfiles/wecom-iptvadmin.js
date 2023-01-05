@@ -94,7 +94,11 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         var optionType = iptType.add(new innovaphone.ui1.Node("option",null,"application/x-mpegURL",null));
         optionType.setAttribute("value","application/x-mpegURL");
         var optionType2 = iptType.add(new innovaphone.ui1.Node("option",null,"youtube",null));
-        optionType2.setAttribute("value","youtube");
+        optionType2.setAttribute("value","youtube");  
+        var optionType3 = iptType.add(new innovaphone.ui1.Node("option",null,"video/mp4",null));
+        optionType3.setAttribute("value","video/mp4");
+        var optionType4 = iptType.add(new innovaphone.ui1.Node("option",null,"video/flv",null));
+        optionType4.setAttribute("value","video/flv");
         //Página
         // that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:20%; font-size:15px; text-align:right", texts.text("labelLogoUrl")));
         // var iptImg = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center", null, null,null,"url",null));
