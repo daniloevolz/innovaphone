@@ -8,7 +8,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
     
-    var list_buttons = [];  
+    var channels = [];  
 
     var colorSchemes = {
         dark: {
@@ -50,8 +50,8 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
-            console.log(list_buttons)
-            list_buttons = JSON.parse(obj.result);
+            console.log(channels)
+            channels = JSON.parse(obj.result);
             makeTableButtons();
             
 
@@ -61,7 +61,8 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             makeDivAdmin();
             makePopup("Atenção", "Canal criado com sucesso!");
         }
-        if (obj.api == "channel" && obj.mt == "DeleteChannelMessageResultSuccess") {
+        if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
+            that.clear();
             app.send({ api: "channel", mt: "SelectChannelMessage" });
             makeDivAdmin();
             makePopup("Atenção", "Canal excluído com sucesso!");
@@ -92,11 +93,8 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelType")));
         var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, null));
         iptType.setAttribute("id", "selectType");
-        var value1 = {a:"video/mp4",b:"application/x-mpegURL",c:"youtube",d:"video/flv",e:"audio/mpeg",f:"audio/wav"}
-        for (var x in value1) {
-        var optionType = iptType.add(new innovaphone.ui1.Node("option",null,value1[x],null));
-        optionType.setAttribute("value",value1[x])
-         }
+        var optionType = iptType.add(new innovaphone.ui1.Node("option",null,"application/x-mpegURL",null));
+        optionType.setAttribute("value","application/x-mpegURL")
         //Página
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:20%; font-size:15px; text-align:right", texts.text("labelPage")));
         var iptPage = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center", null, null));
@@ -143,6 +141,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
     }
     function makeTableButtons() {
+
         //Botões Tabela de Botões
         that.add(new innovaphone.ui1.Div("position:absolute; left:32%; width:15%; top:15%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
             makeDivAddButton();
@@ -155,22 +154,22 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             selected.forEach(function (s) {
                 console.log(s);
                 selectedrows.push(listView.getRowData(s))
-                console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteChannelMessage", id: parseInt(selectedrows[0]) });
+                console.log("TA PRINTANDO " + selectedrows[0]);
+                app.send({ api: "channel", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
             })
         });
         //Título Tabela Canais
         var labelTituloCanais = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloChannels")));
         var list = new innovaphone.ui1.Div("position: absolute; left:20%; top:35%;  width: 80%; height:300px", null, "");
         var columns = 5;
-        var rows = list_buttons.length;
+        var rows = channels.length;
         var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
         //Cabeçalho
         for (i = 0; i < columns; i++) {
             listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 40, false);
         }
         //Tabela    
-        list_buttons.forEach(function (b) {
+        channels.forEach(function (b) {
             var row = [];
             row.push(b.id);
             row.push(b.name);
@@ -182,12 +181,6 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         })
     }
         
-    function delButton(selected) {
-        console.log(selected);
-        selected.forEach(function (s) {
-            app.send({ api: "admin", mt: "DeleteChannelMessage", id: s.id });
-        })
-    }
 }
 
 Wecom.CriticalViewAdmin.prototype = innovaphone.ui1.nodePrototype;

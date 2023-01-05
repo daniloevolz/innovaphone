@@ -89,11 +89,12 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             unlicensedText.setAttribute("id","unlicensed" + i)
         } 
     }
+
     function grid(){
-        var grid = that.add(new innovaphone.ui1.Div("margin-left: 7%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        var grid = that.add(new innovaphone.ui1.Div("position:absolute;left:15%;width:85%;height: 100%; flex-wrap: wrap; display: flex; justify-content: center;",null,null));
         grid.setAttribute("id","grid");
         for (let i = 0; i < 4; i++) {
-            var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
+            var divGrid = grid.add(new innovaphone.ui1.Div("width:43%;",null,null));
             divGrid.setAttribute("id","div"+i)
         }
     }
@@ -122,17 +123,18 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                 namePage5 += item.name + "\n " ;
             }
         })
-        var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
-        allBtn.setAttribute("value",1)
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
-        allBtn.setAttribute("value",2)
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
-        allBtn.setAttribute("value",3)
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
-        allBtn.setAttribute("value",4)
-        var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
-        allBtn.setAttribute("value",5)
+         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+
+        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
+        // allBtn.setAttribute("value",1)
+        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
+        // allBtn.setAttribute("value",2)
+        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
+        // allBtn.setAttribute("value",3)
+        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
+        // allBtn.setAttribute("value",4)
+        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
+        // allBtn.setAttribute("value",5)
         //for (let i = 1; i < 6; i++) {
         //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
         //}
@@ -215,12 +217,13 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         divtest.setAttribute("class","youtube" + i) 
                         
 
-
+                        /*
                         var labelVideo = document.createElement("label");
                         labelVideo.setAttribute("class", "label" + i);
                         var txtNode = document.createTextNode(item.name);
                         playerElement.appendChild(labelVideo);
                         labelVideo.appendChild(txtNode);
+                        */
 
                     }
                     if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
@@ -237,14 +240,16 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         source.setAttribute("src", item.url);
                         source.setAttribute("type", item.type);
 
-                        var divtest = document.getElementById('div' + i );
-                        divtest.setAttribute("class","mpeg" + i)
-
+                        var divtmpeg = document.getElementById('div' + i );
+                        divtmpeg.setAttribute("class","mpeg" + i)
+                        
+                        /*
                         var labelVideo2 = document.createElement("label");
                         labelVideo2.setAttribute("class", "labelmpeg" + i);
                         var txtNode2 = document.createTextNode(item.name);
                         playerElement.appendChild(labelVideo2);
                         labelVideo2.appendChild(txtNode2);
+                        */
 
                         video.appendChild(source);
                         playerElement.appendChild(video);

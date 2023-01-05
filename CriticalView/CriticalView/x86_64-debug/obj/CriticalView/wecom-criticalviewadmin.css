@@ -46,7 +46,9 @@ div.button {
 input[type="checkbox"] {
     display: block;
 }
-
+.arrow{
+    visibility: hidden;
+}
 /* a {
     align-self: end;
     text-decoration: none;
