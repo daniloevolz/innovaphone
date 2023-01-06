@@ -35,7 +35,12 @@
             "cmd": "column",
             "name": "page",
             "type": "INT"
-          }
+          },
+           {
+            "cmd":"column",
+            "name": "name_page",
+            "type": "VARCHAR(128) UNIQUE NOT NULL" 
+           }
         ]
       }
     ]

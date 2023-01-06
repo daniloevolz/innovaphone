@@ -5,7 +5,8 @@ Wecom.CriticalViewTexts = {
         labelTitle: "Painel Admin CriticalView",
         AddVideo: "Adicionar Vídeo",
         RemoveVideo: "Apagar Vídeo",
-        labelName: "Nome:",
+        labelName: "Nome do Video:",
+        labelNamePage: "Nome da Página:",
         labelPage: "Página:",
         labelURL: "URL",
         labelType: "Tipo:",
@@ -14,9 +15,11 @@ Wecom.CriticalViewTexts = {
         licUnLicensed: "Sistema não licenciado",
         cabecalho0: "ID",
         cabecalho1: "Nome",
-        cabecalho2:"Pagina",
-        cabecalho3: "Tipo",
-        cabecalho4: "URL",
+        cabecalho2: "Nome da Página",
+        cabecalho3:"Pagina",
+        cabecalho4: "Tipo",
+        cabecalho5: "URL",
+        cabecalho6:"Logo",
         btnDelButton: "Apagar Vídeo",
         labelTituloAdd: "Adicionar Video",
         btnAddButton: "Adicionar Vídeo",
@@ -24,6 +27,7 @@ Wecom.CriticalViewTexts = {
         btnCancel: "Cancelar",
         iptText: " ",
         labelTituloChannels: "Lista de Canais",
+        labelEscolherLogo: "Escolher Logo",
 
         
 

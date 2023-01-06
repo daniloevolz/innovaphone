@@ -1,8 +1,9 @@
 ﻿
 body {
-    background-color: var(--bg);
+    /* background-color: var(--bg); */
     color: var(--text-standard);
     font-family: arial;
+    background-image: url(bg.png);
  
 }
 /*Edição danilo*/
@@ -126,4 +127,49 @@ div.button-inn {
     width: 60px;
     background-repeat: no-repeat;
 }
+
+/* Botao Adicionar Logo */
+
+.linkimgs {
+    padding: 15px;
+}
+
+.logos-conteudos {
+    display: none;
+    position: absolute;
+    width: 100%;
+    background-color: rgb(236, 235, 234);
+  }
+  
+  .logos-conteudos a {
+     width: 100%;
+    color: black;
+    text-decoration: none;
+    display: block;
+  }
+  .btnLogos {
+    background-color: #b3c4bd;
+    color: var(--text-standard);
+    padding: 16px;
+    font-size: 16px;
+    display: flex; 
+    align-items: center;
+    width: 100%;
+    
+  }
+  .logos {
+    position: absolute;
+    display: inline-block;
+  }
+  
+  
+  .logos-conteudos a:hover {background-color: rgb(199, 199, 199) ;
+    width: 100%;
+  }
+  
+  .logos-conteudos a:focus {background-color: rgb(165, 162, 162);
+    width: 100%;
+  }
+  
+  .logos:hover .logos-conteudos {display: block; width: 100%;}
 

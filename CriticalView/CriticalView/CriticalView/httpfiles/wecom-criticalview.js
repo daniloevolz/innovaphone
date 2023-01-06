@@ -70,9 +70,13 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             
             }else{
 
-            pageName();
+            
+            // pageName();
+            CriticalView()
             grid();
+            insert(channels)
             onChangePage("1");
+            
         }
 
         }
@@ -89,81 +93,83 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             unlicensedText.setAttribute("id","unlicensed" + i)
         } 
     }
-
+    function CriticalView(){
+        var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
+        var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 5%; top: 90%;display:flex;justify-content:center; align-items:center;",null,null));
+        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+        wecomA.setAttribute("href","https://wecom.com.br")
+        wecomA.setAttribute("id","wecomA")
+        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+        imgwecom.setAttribute("src","logo.png")
+        var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+        var uliptv = scroll.add(new innovaphone.ui1.Node("ul",null,null,null));
+        uliptv.setAttribute("id","listchannels");
+    }
     function grid(){
         var grid = that.add(new innovaphone.ui1.Div("position:absolute;left:15%;width:85%;height: 100%; flex-wrap: wrap; display: flex; justify-content: center;",null,null));
         grid.setAttribute("id","grid");
         // // tirar o border se n for mais necessário!
 
-        // var div1 = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null)) 
-        // div1.setAttribute("id","div0")
-        // var div2 = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null))
-        // div2.setAttribute("id","div1")
-        // var div3 = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null))
-        // div3.setAttribute("id","div2")
-        // var div4 = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null))
-        // div4.setAttribute("id","div3")
          for (let i = 0; i < 4; i++) {
             var divGrid = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null));
              divGrid.setAttribute("id","div"+i) 
          }
     }
-    function pageName() {
+    // function pageName() {
 
-        var namePage1 = "";
-        var namePage2 = "";
-        var namePage3 = "";
-        var namePage4 = "";
-        var namePage5 = "";
+    //     var namePage1 = "";
+    //     var namePage2 = "";
+    //     var namePage3 = "";
+    //     var namePage4 = "";
+    //     var namePage5 = "";
 
-            storeObject.forEach(function (item, index) {
-            if (String(item.page) == String(1)) {
-                namePage1 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(2)) {
-                namePage2 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(3)) {
-                namePage3 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(4)) {
-                namePage4 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(5)) {
-                namePage5 += item.name + "\n " ;
-            }
-        })
-         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+    //         storeObject.forEach(function (item, index) {
+    //         if (String(item.page) == String(1)) {
+    //             namePage1 += item.name + "\n " ;
+    //         }
+    //         if (String(item.page) == String(2)) {
+    //             namePage2 += item.name + "\n " ;
+    //         }
+    //         if (String(item.page) == String(3)) {
+    //             namePage3 += item.name + "\n " ;
+    //         }
+    //         if (String(item.page) == String(4)) {
+    //             namePage4 += item.name + "\n " ;
+    //         }
+    //         if (String(item.page) == String(5)) {
+    //             namePage5 += item.name + "\n " ;
+    //         }
+    //     })
+    
+    //     // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
+    //     // allBtn.setAttribute("value",1)
+    //     // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
+    //     // allBtn.setAttribute("value",2)
+    //     // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
+    //     // allBtn.setAttribute("value",3)
+    //     // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
+    //     // allBtn.setAttribute("value",4)
+    //     // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
+    //     // allBtn.setAttribute("value",5)
+    //     //for (let i = 1; i < 6; i++) {
+    //     //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
+    //     //}
 
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
-        // allBtn.setAttribute("value",1)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
-        // allBtn.setAttribute("value",2)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
-        // allBtn.setAttribute("value",3)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
-        // allBtn.setAttribute("value",4)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
-        // allBtn.setAttribute("value",5)
-        //for (let i = 1; i < 6; i++) {
-        //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
-        //}
+    //     var botoes = document.querySelectorAll(".allbutton");
+    //     for (var i = 0; i < botoes.length; i++) {
+    //         var botao = botoes[i];
 
-        var botoes = document.querySelectorAll(".allbutton");
-        for (var i = 0; i < botoes.length; i++) {
-            var botao = botoes[i];
-
-            // O jeito correto e padronizado de incluir eventos no ECMAScript
-            // (Javascript) eh com addEventListener:
-            botao.addEventListener("click", function (event) {
-                const el = event.target || event.srcElement;
-                const value = el.value;
-                //const type = el.type;
-                console.log("Valor do button" + value);
-                onChangePage(value);
-            });
-        }
-    }
+    //         // O jeito correto e padronizado de incluir eventos no ECMAScript
+    //         // (Javascript) eh com addEventListener:
+    //         botao.addEventListener("click", function (event) {
+    //             const el = event.target || event.srcElement;
+    //             const value = el.value;
+    //             //const type = el.type;
+    //             console.log("Valor do button" + value);
+    //             onChangePage(value);
+    //         });
+    //     }
+    // }
 
     function onChangePage(page) {
         try {
@@ -283,6 +289,48 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             });
         }
     }
-}
 
+    function insert(channels) {
+        try {
+            //var lis = document.querySelectorAll('#listchanenels');
+            //for (var i = 0; li = lis[i]; i++) {
+            //    li.parentNode.removeChild(li);
+            //}
+            document.getElementById("listchannels").innerHTML = "";
+            console.log("Limpou o LI")
+        } catch {
+            console.log("o LI estava limpo!")
+        }
+        channels.forEach(function (item, index) {
+            var ul = document.getElementById('listchannels');
+            var newEl = document.createElement('li');
+            var newImg = document.createElement('img');
+            var newA = document.createElement('a'); 
+            var newText = document.createTextNode(item.name_page)
+            
+            newImg.setAttribute("class", "logo");
+            // newImg.setAttribute("src", item.img); 
+            newImg.setAttribute("src",item.img)
+            newA.setAttribute("nonce", item.url);
+            newA.setAttribute("value",item.page) // apagar dps
+            newA.setAttribute("type", item.type);
+            newA.setAttribute("href", "#");
+            newA.setAttribute("id", "playChannel");
+            newA.appendChild(newText); 
+            newA.appendChild(newImg);
+            newEl.appendChild(newA);
+            ul.appendChild(newEl);
+        });
+
+        document.querySelectorAll("a").forEach(function (button) {
+
+            button.addEventListener("click", function (event) {
+                const el = event.target || event.srcElement;
+                const value = el.value;
+                onChangePage(value);
+            });
+
+        });
+    }
+}
 Wecom.CriticalView.prototype = innovaphone.ui1.nodePrototype;
