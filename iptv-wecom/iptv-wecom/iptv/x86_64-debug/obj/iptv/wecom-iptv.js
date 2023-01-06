@@ -47,7 +47,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     function app_message(obj) {
         console.log(obj);
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            iptv()
+            
         }
         if (obj.api == "channel" && obj.mt =="ChannelMessageError") {
             console.log(obj.result);
@@ -55,10 +55,20 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
             var channels = JSON.parse(obj.result);
-            insereLi(channels);
+
+            if (app.logindata.info.unlicensed){
+                unlicensed()
+             }else{
+                iptv()
+                insereLi(channels);
+             }
 
         }
     }
+    function unlicensed(){
+        that.add(new innovaphone.ui1.Node("h1","font-size: 40px; text-align: center",texts.text("labelUnlicensed"),null))
+    }
+
     function iptv(){
        var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
        var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 5%; top: 90%;display:flex;justify-content:center; align-items:center;",null,null));
@@ -77,7 +87,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
 
     }
     const myInterval = window.setInterval(function () {
-        getChannels();
+        getChannels(); 
     }, 30000);
 
     function getChannels() {

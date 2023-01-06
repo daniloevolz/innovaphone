@@ -1,8 +1,9 @@
 ﻿
 body {
-    background-color: var(--bg);
+    /* background-color: var(--bg); */
     color: var(--text-standard);
     font-family: arial;
+    background-image: url(fundoIPTV.png);
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
@@ -14,6 +15,7 @@ td {
 }
 ::-webkit-scrollbar {
     display: block;
+    
 }
 ::-webkit-scrollbar {
     width: 10px;

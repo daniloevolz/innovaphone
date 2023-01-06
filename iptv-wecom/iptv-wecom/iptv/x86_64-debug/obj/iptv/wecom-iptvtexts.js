@@ -35,7 +35,8 @@ Wecom.iptvTexts = {
         labelTituloChannels: "Lista de Canais",
         labelLogoUrl: "Logo Url",
         labelEscolherLogo: "Escolher Logo",
-        labelLogos: "Logos"
+        labelLogos: "Logos",
+        labelUnlicensed: "Sistema nao Licenciado"
 
     },
     en: {

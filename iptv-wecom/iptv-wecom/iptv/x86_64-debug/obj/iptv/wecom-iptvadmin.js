@@ -13,14 +13,14 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
             "--div-DelBtn" : "#f2f5f6",
         },
         light: {
             "--bg": "white",
-            "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
             "--div-DelBtn" : "#f2f5f6",
         }
     };
