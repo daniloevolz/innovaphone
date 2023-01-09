@@ -47,7 +47,13 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
     function app_message(obj) {
         console.log(obj);
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            
+
+            if (app.logindata.info.unlicensed) {
+                unlicensed()
+           }else{
+            iptv();
+        }
+
         }
         if (obj.api == "channel" && obj.mt =="ChannelMessageError") {
             console.log(obj.result);
@@ -55,18 +61,27 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
             var channels = JSON.parse(obj.result);
+            insereLi(channels);
 
-            if (app.logindata.info.unlicensed){
-                unlicensed()
-             }else{
-                iptv()
-                insereLi(channels);
-             }
 
         }
     }
     function unlicensed(){
-        that.add(new innovaphone.ui1.Node("h1","font-size: 40px; text-align: center",texts.text("labelUnlicensed"),null))
+        var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
+       var wecom = colesquerda.add(new innovaphone.ui1.Div("position:absolute; width:100%; height: 5%; top: 90%;display:flex;justify-content:center; align-items:center;",null,null));
+       var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+       wecomA.setAttribute("href","https://wecom.com.br")
+       wecomA.setAttribute("id","wecomA")
+       var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+       imgwecom.setAttribute("src","logo.png")
+        var divunlicensed = that.add(new innovaphone.ui1.Div("position:absolute;width:85%;left:15%; height: 100%;align-items: center;text-align: center;display: flex;justify-content: center;", null, null));
+        divunlicensed.add(new innovaphone.ui1.Node("h1", "font-size: 40px; text-align: center", texts.text("labelUnlicensed"), null))
+        divunlicensed.setAttribute("id", "container");
+        var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+        var uliptv = scroll.add(new innovaphone.ui1.Node("ul", null, null, null));
+        uliptv.setAttribute("id", "listchannels");
+        var videoiptv = divcontainer.add(new innovaphone.ui1.Node("video", null, null, null))
+        videoiptv.setAttribute("id", "video-flv")
     }
 
     function iptv(){
@@ -86,13 +101,13 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
        videoiptv.setAttribute("id","video-flv")
 
     }
-    const myInterval = window.setInterval(function () {
-        getChannels(); 
-    }, 30000);
+    //const myInterval = window.setInterval(function () {
+    //    getChannels(); 
+    //}, 30000);
 
-    function getChannels() {
-        app.send({ api: "channel", mt: "SelectChannelMessage" });
-    }
+    //function getChannels() {
+    //    app.send({ api: "channel", mt: "SelectChannelMessage" });
+    //}
 
     function onChange(url, type) {
         try {

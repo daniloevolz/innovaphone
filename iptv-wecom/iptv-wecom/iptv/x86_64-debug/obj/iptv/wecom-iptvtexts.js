@@ -20,7 +20,6 @@ Wecom.iptvTexts = {
         labelType: "Tipo:",
         labelCancel: "Cancelar",
         labelSave: "Salvar",
-        licUnLicensed: "Sistema não licenciado",
         cabecalho0: "ID",
         cabecalho1: "Nome",
         cabecalho2:"URL",
@@ -36,7 +35,7 @@ Wecom.iptvTexts = {
         labelLogoUrl: "Logo Url",
         labelEscolherLogo: "Escolher Logo",
         labelLogos: "Logos",
-        labelUnlicensed: "Sistema nao Licenciado"
+        labelUnlicensed: "Sistema não Licenciado"
 
     },
     en: {

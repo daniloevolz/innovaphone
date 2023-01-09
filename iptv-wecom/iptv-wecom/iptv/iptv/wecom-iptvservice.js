@@ -29,15 +29,30 @@ new JsonApi("channel").onconnected(function (conn) {
 
             if (obj.mt == "SelectChannelMessage") {
                 conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult"}));
-                Database.exec("SELECT * FROM channels")
-                    .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4)}));
+                var licenses = conn.lics;
+                log("SelectChannelMessage: licenses " + licenses)
+                if (conn.unlicensed) {
+                    Database.exec("SELECT * FROM channels LIMIT 1")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
 
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText)}));
-                    });
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                        });
+
+                } else {
+                    Database.exec("SELECT * FROM channels")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                        });
+                }
             }
         });
         conn.messageComplete();
@@ -67,15 +82,16 @@ new JsonApi("channel").onconnected(function (conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
                     });
+                
             }
             if (obj.mt == "DeleteMessage") {
                 conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageResult" }));
                 Database.exec("DELETE FROM channels WHERE id=" + obj.id + ";")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "channel", mt: "DeleteMessageSuccess" }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "admin", mt: "ChannelMessageError", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
                     });
             }
         });

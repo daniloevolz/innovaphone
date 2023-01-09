@@ -97,8 +97,10 @@ a {
     height:100%;
     width:100%;
 }
-#wecomA{
+#wecomA {
     height: 5%;
+    display: flex;
+    justify-content: center;
 }
 
 .colunaesquerda {
