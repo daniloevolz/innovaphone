@@ -61,7 +61,7 @@ new JsonApi("channel").onconnected(function (conn) {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AddChannelMessage") {  
-                Database.insert("INSERT INTO channels (name, url, img, type, page, name_page) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.img + "','" + obj.type + "','" + obj.page + "','" + obj.name_page + "')")
+                Database.insert("INSERT INTO channels (name, url, type, page ) VALUES ('" + obj.name + "','" + obj.url + "','" + obj.type + "','" + obj.page + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "channel", mt: "InsertChannelMessageSucess" }));
                     })
@@ -92,6 +92,37 @@ new JsonApi("channel").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "ChannelMessageError", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "AddPageMessage"){
+                Database.insert("INSERT INTO pages (name_page,img,page) VALUES ('" + obj.name_page + "','" + obj.img + "','" + obj.page + "') ")
+                .oncomplete(function () {
+                    conn.send(JSON.stringify({ api: "channel", mt: "InsertPageMessageSucess" }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(error) }));
+                });
+            }
+            if(obj.mt == "SelectPageMessage"){
+                conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
+                Database.exec("SELECT * FROM pages")
+                .oncomplete(function (data) {
+                    log("result=" + JSON.stringify(data, null, 4));
+                    conn.send(JSON.stringify({ api: "channel", mt: "SelectPageMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                });
+            }
+            if(obj.mt == "DeletePageMessage"){
+            conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageResult" }));
+            Database.exec("DELETE FROM pages WHERE id=" + obj.id + ";")
+            .oncomplete(function () {
+                conn.send(JSON.stringify({ api: "admin", mt: "DeletePageMessageSuccess" }));
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                conn.send(JSON.stringify({ api: "admin", mt: "ChannelMessageError", result: String(errorText) }));
+            });
+        }
         });
         conn.messageComplete();
     }

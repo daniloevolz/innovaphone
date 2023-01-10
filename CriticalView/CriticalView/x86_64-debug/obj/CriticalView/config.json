@@ -22,25 +22,41 @@
           },
           {
             "cmd": "column",
+            "name": "type",
+            "type": "VARCHAR(128)"
+          },
+          {
+            "cmd": "column",
+            "name": "page",    
+            "type": "INT"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "pages",
+        "init" :[
+          {
+            "cmd" : "column",
+            "name" : "id",
+            "type" : "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd":"column",
+            "name": "name_page",
+            "type": "VARCHAR(128) UNIQUE NOT NULL" 
+           },
+           {
+            "cmd": "column",
             "name": "img",
             "type": "VARCHAR(128) NOT NULL"
           },
           {
             "cmd": "column",
-            "name": "type",
-            "type": "VARCHAR(128)"
-          },
-
-          {
-            "cmd": "column",
-            "name": "page",
+            "name": "page",    
             "type": "INT"
-          },
-           {
-            "cmd":"column",
-            "name": "name_page",
-            "type": "VARCHAR(128) UNIQUE NOT NULL" 
-           }
+          }
+
         ]
       }
     ]

@@ -9,6 +9,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     var that = this;
     
     var channels = [];  
+    var pages = []
 
     var colorSchemes = {
         dark: {
@@ -53,6 +54,13 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             console.log(channels)
             channels = JSON.parse(obj.result);
             makeTableButtons();
+            
+
+        }
+        if (obj.api == "channel" && obj.mt == "SelectPageMessageResultSuccess") {
+            console.log(obj.mt);
+            console.log(channels)
+            pages = JSON.parse(obj.result);
             makeTablePage();
             
 
@@ -62,12 +70,24 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             makeDivAdmin();
             makePopup("Atenção", "Canal criado com sucesso!");
         }
+        if (obj.api == "channel" && obj.mt == "InsertPageMessageSucess"){
+            app.send({api: "channel", mt: "SelectPageMessage"})
+            makeDivAdmin();
+            makePopup("Atenção", "Página criada com sucesso!")
+        }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
             that.clear();
             app.send({ api: "channel", mt: "SelectChannelMessage" });
             makeDivAdmin();
             makePopup("Atenção", "Canal excluído com sucesso!");
         }
+        if (obj.api == "admin" && obj.mt == "DeletePageMessageSuccess") {
+            that.clear();
+            app.send({ api: "channel", mt: "SelectPageMessage" });
+            makeDivAdmin();
+            makePopup("Atenção", "Página excluída com sucesso!");
+        }
+
     }
 
     function makePopup(header, content) {
@@ -101,7 +121,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         var labelTituloPage = that.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:50%; top:36%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloPage")));
         var list = new innovaphone.ui1.Div("position: absolute; left: 51%; right:2px; top:45%; height:300px", null, "");
         var columns = 4;
-        var rows = channels.length;
+        var rows = pages.length;
         var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
         //Cabeçalho
         for (i = 0; i < columns; i++) {
@@ -170,7 +190,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que o canal possa ser adicionado.");
             }
             else {
-                app.send({ api: "channel", mt: "AddChannelMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) });
+                app.send({ api: "channel", mt: "AddPageMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) });
                 console.log(String(page))
                 // makeDivAdmin();
             }
@@ -272,7 +292,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         channels.forEach(function (b) {
             var row = [];
             row.push(b.id);
-            row.push(b.name_page);
+            row.push(b.name);
             row.push(b.page);
             row.push(b.type);
             row.push(b.url);

@@ -34,8 +34,6 @@ Wecom.CriticalViewTexts = {
         labelEscolherLogo: "Escolher Logo",
         labelTituloPage: "Lista de Páginas"
 
-        
-
     },
     en: {
     },
