@@ -59,19 +59,21 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
 
-            console.log(obj.mt);
+            
             var channels = JSON.parse(obj.result);
+            console.log(channels);
             storeObject = channels;
 
             if (app.logindata.info.unlicensed) {
-
-                unlicensed()
+                
+                CriticalView()
+                unlicensed();
+                insert(channels)
                 onChangePage("1");
             
             }else{
 
-            
-            // pageName();
+
             CriticalView()
             grid();
             insert(channels)
@@ -83,15 +85,15 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     }
 
     function unlicensed(){
-        var grid = that.add(new innovaphone.ui1.Div("margin-left: 6%; align-content: center; display: flex; flex-wrap: wrap; justify-content: center; flex-direction: row; text-align: center;",null,null));
+        var grid = that.add(new innovaphone.ui1.Div("position:absolute;left:15%;width:85%;height: 100%; flex-wrap: wrap; display: flex; justify-content: center;",null,null));
         grid.setAttribute("id","grid");
-        var divGrid = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-block;",null,null));
-            divGrid.setAttribute("id","div0")
-        for(let i = 1; i < 4; i++){
-            var divUnlicensed = grid.add(new innovaphone.ui1.Div("width:37%; display:inline-flex; font-size: 20px; font-weight: bold; color: var(--text-standard); justify-content:center; align-items:center",null,null))
-            var unlicensedText = divUnlicensed.add(new innovaphone.ui1.Node("p",null,texts.text("licUnLicensed"),null))
-            unlicensedText.setAttribute("id","unlicensed" + i)
-        } 
+        // // tirar o border se n for mais necessário!
+        var divGrid0 = grid.add(new innovaphone.ui1.Div("width:49%;height:49%;border: 2px solid; border-color: transparent;",null,null));
+             divGrid0.setAttribute("id","div0") 
+        for (i = 0 ; i < 3 ; i++){
+        var divGrid1 = grid.add(new innovaphone.ui1.Div("width:49%;display:flex;align-items:center; height:49%;border: 2px solid; justify-content:center; font-weight: bold; color:black; font-size:20px; border-color: transparent;",texts.text("licUnLicensed"),null))
+        }
+        
     }
     function CriticalView(){
         var colesquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
@@ -115,69 +117,13 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
              divGrid.setAttribute("id","div"+i) 
          }
     }
-    function pageName() {
-
-        var namePage1 = "";
-        var namePage2 = "";
-        var namePage3 = "";
-        var namePage4 = "";
-        var namePage5 = "";
-
-            storeObject.forEach(function (item, index) {
-            if (String(item.page) == String(1)) {
-                namePage1 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(2)) {
-                namePage2 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(3)) {
-                namePage3 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(4)) {
-                namePage4 += item.name + "\n " ;
-            }
-            if (String(item.page) == String(5)) {
-                namePage5 += item.name + "\n " ;
-            }
-        })
-    
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage1, "allbutton"));
-        // allBtn.setAttribute("value",1)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage2, "allbutton"));
-        // allBtn.setAttribute("value",2)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage3, "allbutton"));
-        // allBtn.setAttribute("value",3)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage4, "allbutton"));
-        // allBtn.setAttribute("value",4)
-        // var allBtn = colEsquerda.add(new innovaphone.ui1.Node("button", null, namePage5, "allbutton"));
-        // allBtn.setAttribute("value",5)
-        //for (let i = 1; i < 6; i++) {
-        //    var allBtn = colEsquerda.add(new innovaphone.ui1.Input(null, i, null, null, "button", "allbutton"));
-        //}
-
-        var botoes = document.querySelectorAll(".allbutton");
-        for (var i = 0; i < botoes.length; i++) {
-            var botao = botoes[i];
-
-            // O jeito correto e padronizado de incluir eventos no ECMAScript
-            // (Javascript) eh com addEventListener:
-            botao.addEventListener("click", function (event) {
-                const el = event.target || event.srcElement;
-                const value = el.value;
-                //const type = el.type;
-                console.log("Valor do button" + value);
-                onChangePage(value);
-            });
-        }
-    }
-
     function onChangePage(page) {
         try {
             for (let i = 0; i < 4; i++) {
                 var oldPlayer = document.getElementById('my_video_' + i);
                 flvjs(oldPlayer).dispose();
                 document.getElementById('div' + i).innerHTML = "";
-              
+
             }
 
         } catch {
@@ -209,8 +155,8 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
 
                         video.appendChild(source);
                         playerElement.appendChild(video);
-       
-                        var flvPlayer = flvjs.createPlayer({    
+
+                        var flvPlayer = flvjs.createPlayer({
                             type: 'flv',
                             url: item.url
                         });
@@ -226,12 +172,12 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                         iframe.width = "100%";
                         iframe.height = "180%";
-                        iframe.setAttribute("id", "my_video_" + i);                
+                        iframe.setAttribute("id", "my_video_" + i);
                         document.getElementById("div" + i).appendChild(iframe);
 
-                        var divtest = document.getElementById('div' + i );
-                        divtest.setAttribute("class","youtube" + i) 
-                        
+                        var divtest = document.getElementById('div' + i);
+                        divtest.setAttribute("class", "youtube" + i)
+
 
                         /*
                         var labelVideo = document.createElement("label");
@@ -242,7 +188,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         */
 
                     }
-                    if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg"  || item.type == "audio/mpeg" || item.type == "audio/wav") {
+                    if (item.type == "application/x-mpegURL" || item.type == "video/mp4" || item.type == "video/ogg" || item.type == "audio/mpeg" || item.type == "audio/wav") {
                         var video = document.createElement("video");
                         video.setAttribute("id", "my_video_" + i);
                         video.setAttribute("class", "video-js vjs-fluid vjs-default-skin");
@@ -251,14 +197,14 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                         video.setAttribute("allow", "autoplay");
                         video.setAttribute("autoplay", "true");
                         video.setAttribute("muted", "muted");
-                        
+
                         var source = document.createElement("source");
                         source.setAttribute("src", item.url);
                         source.setAttribute("type", item.type);
 
-                        var divtmpeg = document.getElementById('div' + i );
-                        divtmpeg.setAttribute("class","mpeg" + i)
-                        
+                        var divtmpeg = document.getElementById('div' + i);
+                        divtmpeg.setAttribute("class", "mpeg" + i)
+
                         /*
                         var labelVideo2 = document.createElement("label");
                         labelVideo2.setAttribute("class", "labelmpeg" + i);
@@ -290,9 +236,10 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         }
     }
 
+
     function insert(channels) {
         try {
-            //var lis = document.querySelectorAll('#listchanenels');
+            //var lis = document.querySelectorAll('#listchannels');
             //for (var i = 0; li = lis[i]; i++) {
             //    li.parentNode.removeChild(li);
             //}
@@ -301,36 +248,104 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         } catch {
             console.log("o LI estava limpo!")
         }
+        var page;
         channels.forEach(function (item, index) {
-            var ul = document.getElementById('listchannels');
-            var newEl = document.createElement('li');
-            var newImg = document.createElement('img');
-            var newA = document.createElement('a'); 
-            var newText = document.createTextNode(item.name_page)
+            if (page != item.page) {
+                page = item.page;
+                var ul = document.getElementById('listchannels');
+                var newEl = document.createElement('li');
+                var newImg = document.createElement('img');
+                var newA = document.createElement('a');
+                var newText = document.createTextNode(item.name_page)
+
+                newImg.setAttribute("class", "logo");
+                newImg.setAttribute("src", item.img)
+                newA.setAttribute("nonce", item.page) // correto é usar nonce ao invés de value nesse caso
+                newA.setAttribute("href", "#");
+                newA.setAttribute("id", "playChannel");
+                newA.appendChild(newText);
+                newA.appendChild(newImg);
+                newEl.appendChild(newA);
+                ul.appendChild(newEl);
+            }
             
-            newImg.setAttribute("class", "logo");
-            // newImg.setAttribute("src", item.img); 
-            newImg.setAttribute("src",item.img)
-            newA.setAttribute("nonce", item.url);
-            newA.setAttribute("value",item.page) // apagar dps
-            newA.setAttribute("type", item.type);
-            newA.setAttribute("href", "#");
-            newA.setAttribute("id", "playChannel");
-            newA.appendChild(newText); 
-            newA.appendChild(newImg);
-            newEl.appendChild(newA);
-            ul.appendChild(newEl);
+
+            var botoes = document.querySelectorAll("#playChannel");
+            for (var i = 0; i < botoes.length; i++) {
+                var botao = botoes[i];
+
+                botao.addEventListener("click", function (event) {
+                    const el = event.target || event.srcElement;
+                    const nonce = el.nonce;
+                    console.log("Valor do button " + nonce);
+                    onChangePage(nonce);
+                });
+
+            }
+
         });
 
-        document.querySelectorAll("a").forEach(function (button) {
+    }
 
-            button.addEventListener("click", function (event) {
-                const el = event.target || event.srcElement;
-                const value = el.value;
+
+    /*
+    function pageName() {
+
+         var namePage1 = "";
+         var namePage2 = "";
+         var namePage3 = "";
+         var namePage4 = "";
+         var namePage5 = "";
+
+           storeObject.forEach(function (item, index) {
+            if (String(item.page) == String(1)) {
+                namePage1 += item.name_page + "\n " ;
+           }
+           if (String(item.page) == String(2)) {
+                namePage2 += item.name_page + "\n " ;
+            }
+            if (String(item.page) == String(3)) {
+                namePage3 += item.name_page + "\n " ;
+            }
+             if (String(item.page) == String(4)) {
+                namePage4 += item.name_page + "\n " ;
+            }
+            if (String(item.page) == String(5)) {
+                namePage5 += item.name_page + "\n ";
+             }
+        })
+     var colEsquerda = that.add(new innovaphone.ui1.Div("position:absolute;width:15%;float:left; height: 100%",null,"colunaesquerda"));
+     var allBtn = colEsquerda.add(new innovaphone.ui1.Node("div", null, namePage1, "allbutton"));
+     allBtn.setAttribute("value",1)
+     var allBtn = colEsquerda.add(new innovaphone.ui1.Node("div", null, namePage2, "allbutton"));
+     allBtn.setAttribute("value",2)
+     var allBtn = colEsquerda.add(new innovaphone.ui1.Node("div", null, namePage3, "allbutton"));
+     allBtn.setAttribute("value",3)
+     var allBtn = colEsquerda.add(new innovaphone.ui1.Node("div", null, namePage4, "allbutton"));
+     allBtn.setAttribute("value",4)
+     var allBtn = colEsquerda.add(new innovaphone.ui1.Node("div", null, namePage5, "allbutton"));
+     allBtn.setAttribute("value",5)
+
+     for (let i = 1; i < 6; i++) {
+        var allBtn = colEsquerda.add(new innovaphone.ui1.Div(null,null,"allbutton"));
+    }
+
+        var botoes = document.querySelectorAll(".allbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", function (event) {
+                 const el = event.target || event.srcElement;
+                 const value = el.value;
+                //const type = el.type;
+                console.log("Valor do button" + value);
                 onChangePage(value);
             });
+         }
+     }
+     */
 
-        });
-    }
 }
 Wecom.CriticalView.prototype = innovaphone.ui1.nodePrototype;

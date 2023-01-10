@@ -67,14 +67,16 @@ body {
 
 .allbutton {
     height: 20%;
-    border-color: rgb(99, 137, 175);
-    background-color: var(--colbutton);
-    color: var(--coltext);
+    /* border-color: rgb(99, 137, 175); */
+    /* background-color: var(--colbutton); */
+    color: #1a7768; 
     /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
     width: 100%;
-    font-weight: bold;
+    /* font-weight: bold; */
     font-size: 12px;   
     padding: 2px;
+    display: flex;
+    align-items: center;
 }
 
 ::-webkit-scrollbar {
@@ -92,12 +94,6 @@ a{
     margin-left: 13%;
 } 
 */
-#unlicensed2{
-    margin-top:25%;
-}
-#unlicensed3{
-    margin-top:25%;
-}
 li{
     width: 80%;
     left: 10%;
@@ -160,6 +156,7 @@ a {
 }
 #wecomA{
     height: 5%;
+    justify-content: center;
 }
 
     /* ul li:hover{

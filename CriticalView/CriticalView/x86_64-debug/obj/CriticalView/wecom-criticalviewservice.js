@@ -26,10 +26,22 @@ new JsonApi("channel").onconnected(function (conn) {
         conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
+            
 
             if (obj.mt == "SelectChannelMessage") {
                 conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
-                Database.exec("SELECT * FROM channels")
+                if (conn.unlicensed) {
+                    Database.exec("SELECT * FROM channels LIMIT 1")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                        });
+            }else{
+                Database.exec("SELECT * FROM channels ORDER BY page")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
@@ -39,6 +51,8 @@ new JsonApi("channel").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
                     });
             }
+            }
+                
         });
         conn.messageComplete();
     }
