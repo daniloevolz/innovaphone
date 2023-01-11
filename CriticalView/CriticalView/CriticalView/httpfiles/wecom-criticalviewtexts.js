@@ -24,6 +24,7 @@ Wecom.CriticalViewTexts = {
         cabecalhoPage3: "Logo",
         btnDelButton: "Apagar Vídeo",
         labelTituloAdd: "Adicionar Video",
+        labelTituloAddPage: "Adicionar Página",
         btnAddButton: "Adicionar Vídeo",
         btnAddPage: "Criar Página",
         btnDelPage: "Deletar Página",

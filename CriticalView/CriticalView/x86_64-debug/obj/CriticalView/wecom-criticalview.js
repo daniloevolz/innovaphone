@@ -47,7 +47,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
-
+        app.send({ api: "channel", mt: "SelectPageMessage" });
     } 
 
     function app_message(obj) {
@@ -57,31 +57,41 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
         }
-        if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
+        if (obj.api == "channel" && obj.mt == "SelectPageMessageResultSuccess") {
 
             
-            var channels = JSON.parse(obj.result);
-            console.log(channels);
-            storeObject = channels;
+            var pages = JSON.parse(obj.result);
+            console.log(pages);
+            // storeObject = pages;
 
             if (app.logindata.info.unlicensed) {
                 
                 CriticalView()
                 unlicensed();
-                insert(channels)
-                onChangePage("1");
+                insert(pages)
+                // onChangePage("1");
             
             }else{
 
 
             CriticalView()
-            grid();
-            insert(channels)
-            onChangePage("1");
+           // grid();
+            insert(pages)
+           //onChangePage("1");
             
         }
 
         }
+        if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
+        var channels= JSON.parse(obj.result);
+        console.log(channels);
+        storeObject = channels;
+        
+        grid();
+        onChangePage("1");
+
+        }
+
     }
 
     function unlicensed(){
@@ -138,7 +148,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
                 if (String(item.page) == String(page)) {
                     document.getElementById('div' + i).innerHTML = "";
                     var playerElement = document.getElementById('div' + i);
-
+                
                     if (item.type == "video/flv") {
                         var video = document.createElement("video");
                         video.setAttribute("id", "my_video_" + i);
@@ -237,7 +247,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
     }
 
 
-    function insert(channels) {
+    function insert(pages) {
         try {
             //var lis = document.querySelectorAll('#listchannels');
             //for (var i = 0; li = lis[i]; i++) {
@@ -249,7 +259,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             console.log("o LI estava limpo!")
         }
         var page;
-        channels.forEach(function (item, index) {
+        pages.forEach(function (item, index) {
             if (page != item.page) {
                 page = item.page;
                 var ul = document.getElementById('listchannels');

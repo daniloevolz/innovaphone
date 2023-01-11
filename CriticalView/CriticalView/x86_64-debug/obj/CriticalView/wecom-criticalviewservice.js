@@ -52,6 +52,32 @@ new JsonApi("channel").onconnected(function (conn) {
                     });
             }
             }
+
+            if (obj.mt == "SelectPageMessage") {
+                conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
+                if (conn.unlicensed) {
+                    Database.exec("SELECT * FROM pages LIMIT 1")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "channel", mt: "SelectPageMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                        });
+            }else{
+                Database.exec("SELECT * FROM pages ORDER BY page")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "channel", mt: "SelectPageMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
+                    });
+            }
+            }
+                
                 
         });
         conn.messageComplete();
