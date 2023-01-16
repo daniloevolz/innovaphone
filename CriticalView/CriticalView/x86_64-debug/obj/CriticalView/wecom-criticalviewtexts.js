@@ -7,7 +7,7 @@ Wecom.CriticalViewTexts = {
         RemoveVideo: "Apagar Vídeo",
         labelName: "Nome do Video:",
         labelNamePage: "Nome da Página:",
-        labelPage: "Página:",
+        labelPage: "Número da Página:",
         labelURL: "URL",
         labelType: "Tipo:",
         labelCancel: "Cancelar",
@@ -33,8 +33,8 @@ Wecom.CriticalViewTexts = {
         iptText: " ",
         labelTituloChannels: "Lista de Canais",
         labelEscolherLogo: "Escolher Logo",
-        labelTituloPage: "Lista de Páginas"
-
+        labelTituloPage: "Lista de Páginas",
+        labeloption: "Escolha uma Página"
     },
     en: {
     },

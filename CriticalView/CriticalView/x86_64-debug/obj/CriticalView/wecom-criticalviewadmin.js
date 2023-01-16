@@ -9,7 +9,8 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
     var that = this;
     
     var channels = [];  
-    var pages = []
+    var pages = [];
+    var namepage = []; // apagar dps
 
     var colorSchemes = {
         dark: {
@@ -39,9 +40,9 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
         app.send({ api: "channel", mt: "SelectPageMessage" });
+        app.send({ api: "channel", mt: "SelectNamePage" });
         
     }
-
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
             makeDivAdmin()
@@ -51,10 +52,17 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
             console.log(obj.result);
             makePopup("ERRO", "Erro: " + obj.result);
         }
+
+        if(obj.api == "channel" && obj.mt == "SelectNamePageResultSucess"){
+            namepage = JSON.parse(obj.result)
+            console.log(namepage)
+        }
+
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
             console.log(obj.mt);
             console.log(channels)
             channels = JSON.parse(obj.result);
+            
             makeTableButtons();
             
 
@@ -189,22 +197,37 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
 
          //Botão Salvar
          that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:60%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
-            var PageControl = [];
             var pagevalue = document.getElementById("iptpage").value;
+        
+            pages.forEach(function(item,index){
+                // if (String(iptNamePage.getValue()) == ""  || String(pagevalue) == "" ) {
+                //     makePopup("Atenção", "Complete todos os campos para que a página possa ser criada.");
+                // }
+                // if(String(pagevalue) == item.page){
+                //     makePopup("Atenção", "Favor escolher outro número de página");
+                // }
+                // else{
+                //     app.send({ api: "channel", mt: "AddPageMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) })
+                // }
+                // if(String(pagevalue) != item.page ){
+                //     app.send({ api: "channel", mt: "AddPageMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) })
+                // }
 
-            if (String(iptNamePage.getValue()) == ""  || String(iptPage.getValue()) == "") {
-                makePopup("Atenção", "Complete todos os campos para que a página possa ser criada.");
-            }
-            if(String(iptPage.getValue()) == PageControl){
-                makePopup("Atenção", "Favor escolher outro numero de página");
-            }
-            else {
-                app.send({ api: "channel", mt: "AddPageMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) });
-                PageControl.push(pagevalue);
-                console.log("Page control " + PageControl)  
-            }
+            })
+                if (String(iptNamePage.getValue()) == ""  || String(pagevalue) == "" ) {
+                    makePopup("Atenção", "Complete todos os campos para que a página possa ser criada.");
+                }
+                else{
+                     app.send({ api: "channel", mt: "AddPageMessage", page: String(iptPage.getValue()), img:String(linkImg), name_page: String(iptNamePage.getValue()) })
+                 }
+            })
+            
+            
+            
+            
+            
 
-             });
+             ;
         //Botão Cancelar   
         that.add(new innovaphone.ui1.Div("position:absolute; left:57%; width:15%; top:60%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeDivAdmin();
@@ -232,8 +255,29 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
 
         // Página 
         that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelPage")));
-        var iptPage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, null,null,"number",null));
+        //var iptPage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, null,null,"number",null));
+            
+            var iptPage = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, null));
+            iptPage.setAttribute("id", "selectPage");
 
+            var optionMain = iptPage.add(new innovaphone.ui1.Node("option",null,texts.text("labeloption"),null))
+            pages.forEach(function (item, index) {
+            var optionPage = iptPage.add(new innovaphone.ui1.Node("option",null,item.name_page,null));
+            optionPage.setAttribute("value",item.page)
+            optionPage.setAttribute("id","optionPage")
+            })
+        //     for(var i = 0; i < namepage.length; i++ ){
+        //     var opt = namepage[i]
+        //     var el = document.createElement("option");
+        //     el.textContent = opt
+        //     el.value = opt
+        //     var select = document.getElementById("selectPage");
+        //     select.appendChild(el)
+        //   //  var optionPage = iptPage.add(new innovaphone.ui1.Node("option",null,null,null));
+            
+        //   //  optionPage.setAttribute("value",item.page); 
+        //   //  optionPage.setAttribute("id","optionPage")
+        // }
         //URL
         that.add(new innovaphone.ui1.Div("position:absolute; left:15%; width:20%; top:32%; font-size:15px; text-align:right", texts.text("labelURL")));
         var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:32%; font-size:12px; text-align:center", null, null,null,"url",null));
@@ -242,11 +286,13 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         //Botão Salvar
         that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:60%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             var type = document.getElementById("selectType").value;
-            if (String(iptName.getValue()) == "" || String(iptUrl.getValue()) == "" || String(type) == "") {
+            var page = document.getElementById("selectPage").value;
+
+            if (String(iptName.getValue()) == "" || String(iptUrl.getValue()) == "" || String(type) == "" || String(page) == "") {
                 makePopup("Atenção", "Complete todos os campos para que o canal possa ser adicionado.");
             }
             else {
-                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), page: String(iptPage.getValue()) });
+                app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), page: String(page) });
 
             }
              });
