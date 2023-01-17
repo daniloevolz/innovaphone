@@ -62,8 +62,11 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
             
             var pages = JSON.parse(obj.result);
             console.log(pages);
-            // storeObject = pages;
 
+            CriticalView();
+            insert(pages);
+            // storeObject = pages;
+            /*
             if (app.logindata.info.unlicensed) {
                 
                 CriticalView()
@@ -80,6 +83,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
            //onChangePage("1");
             
         }
+        */
 
         }
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {

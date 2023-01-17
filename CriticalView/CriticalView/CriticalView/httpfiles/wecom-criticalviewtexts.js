@@ -8,7 +8,7 @@ Wecom.CriticalViewTexts = {
         labelName: "Nome do Video:",
         labelNamePage: "Nome da Página:",
         labelPage: "Número da Página:",
-        labelURL: "URL",
+        labelURL: "URL:",
         labelType: "Tipo:",
         labelCancel: "Cancelar",
         labelSave: "Salvar",

@@ -151,11 +151,11 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
 
         // Nome da pagina
         that.add(new innovaphone.ui1.Div("position:absolute;left:20%; width:15%; top:22%; font-size:15px; text-align:right", texts.text("labelNamePage")));
-        var iptNamePage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:22%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "text", null));
+        var iptNamePage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:22%; font-size:12px; text-align:center;height:3.5%; border-radius: 6px; border-color:  #004c84;", null, texts.text("iptText"), 255, "text", null));
         
         // Página 
-        that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:27%; font-size:15px; text-align:right", texts.text("labelPage")));
-        var iptPage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:27%; font-size:12px; text-align:center", null, null,null,"number",null));
+        that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:28%; font-size:15px; text-align:right", texts.text("labelPage")));
+        var iptPage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:28%; font-size:12px; text-align:center; height:3.5%; border-radius: 6px; border-color:  #004c84;", null, null,null,"number",null));
         iptPage.setAttribute("id","iptpage")
         // Escolher Logo
        var divLogos = that.add(new innovaphone.ui1.Div("left:47.5%; top:37%; font-size:15px;font-weight:bold; text-align:center", texts.text("labelEscolherLogo"),"logos"));
@@ -238,11 +238,11 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         
         // Nome 
         that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:12%; font-size:15px; text-align:right", texts.text("labelName")));
-        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:12%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "text", null));
+        var iptName = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:12%; font-size:12px; text-align:center; height:3%; border-radius: 6px; border-color:  #004c84;", null, texts.text("iptText"), 255, "text", null));
         
         //Tipo
         that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:18%; font-size:15px; text-align:right", texts.text("labelType")));
-        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:18%; font-size:12px; text-align:center", null, null));
+        var iptType = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:18%; font-size:12px; text-align:center; height:3.5%; border-radius: 6px; border-color:  #004c84;", null, null));
         iptType.setAttribute("id", "selectType");
         var optionType = iptType.add(new innovaphone.ui1.Node("option",null,"application/x-mpegURL",null));
         optionType.setAttribute("value","application/x-mpegURL");
@@ -251,7 +251,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelPage")));
         //var iptPage = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, null,null,"number",null));
             
-            var iptPage = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center", null, null));
+            var iptPage = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:25%; font-size:12px; text-align:center; height:3.5%; border-radius: 6px; border-color:  #004c84;", null, null));
             iptPage.setAttribute("id", "selectPage");
 
             var optionMain = iptPage.add(new innovaphone.ui1.Node("option",null,texts.text("labeloption"),null))
@@ -277,7 +277,7 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         // }
         //URL
         that.add(new innovaphone.ui1.Div("position:absolute; left:15%; width:20%; top:32%; font-size:15px; text-align:right", texts.text("labelURL")));
-        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:32%; font-size:12px; text-align:center", null, null,null,"url",null));
+        var iptUrl = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:32%; font-size:12px; text-align:center; height:3%; border-radius: 6px; border-color:  #004c84;", null, null,null,"url",null));
         
 
         //Botão Salvar

@@ -31,7 +31,7 @@ new JsonApi("channel").onconnected(function (conn) {
             if (obj.mt == "SelectChannelMessage") {
                 conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
                 if (conn.unlicensed) {
-                    Database.exec("SELECT * FROM channels LIMIT 1")
+                    Database.exec("SELECT * FROM channels ORDER BY page")
                         .oncomplete(function (data) {
                             log("result=" + JSON.stringify(data, null, 4));
                             conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
@@ -56,7 +56,7 @@ new JsonApi("channel").onconnected(function (conn) {
             if (obj.mt == "SelectPageMessage") {
                 conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
                 if (conn.unlicensed) {
-                    Database.exec("SELECT * FROM pages LIMIT 1")
+                    Database.exec("SELECT * FROM pages ORDER BY page")
                         .oncomplete(function (data) {
                             log("result=" + JSON.stringify(data, null, 4));
                             conn.send(JSON.stringify({ api: "channel", mt: "SelectPageMessageResultSuccess", result: JSON.stringify(data, null, 4) }));
