@@ -127,7 +127,7 @@ Wecom.CriticalView = Wecom.CriticalView || function (start, args) {
              divGrid.setAttribute("id","div"+i) 
          }
     }
-    function onChangePage(page) {
+    function onChangePage(page) {     
         try {
             for (let i = 0; i < 4; i++) {
                 var oldPlayer = document.getElementById('my_video_' + i);

@@ -149,19 +149,6 @@ new JsonApi("channel").onconnected(function (conn) {
                 conn.send(JSON.stringify({ api: "admin", mt: "ChannelMessageError", result: String(errorText) }));
             });
         }
-        if(obj.mt == "SelectNamePage"){
-            conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResult" }));
-                Database.exec("SELECT name_page FROM pages")
-                .oncomplete(function (data) {
-                    log("result=" + JSON.stringify(data, null, 4));
-                    conn.send(JSON.stringify({ api: "channel", mt: "SelectNamePageResultSuccess", result: JSON.stringify(data, null, 4) }));
-
-                })
-                .onerror(function (error, errorText, dbErrorCode) {
-                    conn.send(JSON.stringify({ api: "channel", mt: "ChannelMessageError", result: String(errorText) }));
-                });
-        }
-
         });
         conn.messageComplete();
     }

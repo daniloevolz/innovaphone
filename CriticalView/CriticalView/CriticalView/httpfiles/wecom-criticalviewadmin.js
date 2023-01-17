@@ -40,7 +40,6 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "channel", mt: "SelectChannelMessage" });
         app.send({ api: "channel", mt: "SelectPageMessage" });
-        app.send({ api: "channel", mt: "SelectNamePage" });
         
     }
     function app_message(obj) {
@@ -51,11 +50,6 @@ Wecom.CriticalViewAdmin = Wecom.CriticalViewAdmin || function (start, args) {
         if (obj.api == "channel" && obj.mt == "ChannelMessageError") {
             console.log(obj.result);
             makePopup("ERRO", "Erro: " + obj.result);
-        }
-
-        if(obj.api == "channel" && obj.mt == "SelectNamePageResultSucess"){
-            namepage = JSON.parse(obj.result)
-            console.log(namepage)
         }
 
         if (obj.api == "channel" && obj.mt == "SelectChannelMessageResultSuccess") {
