@@ -317,7 +317,10 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             connections.push({ sip: obj.sig.cg.sip, call: obj.call, name: obj.sig.fty[1].name, user: "", url:"" });
             log("PBXSignal: connections after add " + JSON.stringify(connections));
 
-            callRCC(connectionsRCC[0].ws, obj.sig.fty[1].name, "UserInitialize", "", obj.sig.cg.sip);
+            connectionsRCC.forEach(function (c) {
+                callRCC(c.ws, obj.sig.fty[1].name, "UserInitialize", "", obj.sig.cg.sip);
+            })
+            
 
             getURLLogin(obj.sig.cg.sip);
 
@@ -514,7 +517,10 @@ function badgeRequest2(value) {
     obj.listuser.forEach(function (user) {
         connections.forEach(function (conn) {
             if (conn.sip == user.user) {
-                updateBadge(connectionsPbxSignal[0].ws, conn.call, user.num);
+                connectionsPbxSignal.forEach(function (c) {
+                    updateBadge(c.ws, conn.call, user.num);
+                })
+                
             }
         })
     });
@@ -789,7 +795,12 @@ function updateConnections(sip, prt, value) {
                     break
                 }
                 case "user": {
-                    conn.user = value
+                    
+                    if (conn.user == "") {
+                        conn.user = value
+                    } else{
+                        connections.push({ sip: conn.sip, call: conn.call, name: conn.name, user: value, url: conn.url });
+                    }
                     break
                 }
                 case "url": {
@@ -806,8 +817,11 @@ function initializeQueues(msg) {
     log("danilo-req : initializeQueues:: queues");
     queues = msg.split(",");
     queues.forEach(function (q) {
-        log("danilo-req : initializeQueues:: queue: "+ q);
-        callRCC(connectionsRCC[0].ws, q, "UserInitialize", "", q);
+        log("danilo-req : initializeQueues:: queue: " + q);
+        connectionsRCC.forEach(function (c) {
+            callRCC(c.ws, q, "UserInitialize", "", q);
+        })
+        
     })
 }
 

@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.reportmanager",
+            "icon": "wecom-report.png",
+            "lang": "wecom.reportmanagertexts",
+            "domains": false
+        }
+    ]
+}

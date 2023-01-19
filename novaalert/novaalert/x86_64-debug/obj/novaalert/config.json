@@ -34,6 +34,26 @@
             "cmd": "column",
             "name": "button_type",
             "type": "VARCHAR(50) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_1",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_2",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_3",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_4",
+            "type": "VARCHAR(50)"
           }
         ]
       },

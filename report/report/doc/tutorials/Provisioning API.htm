@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Tutorial: Create an app to provision 3rd-party devices</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script type="text/javascript">
+        function toggleSpoiler(id) {
+            var e = document.getElementById(id);
+            if (e.style.display == "none") e.style.display = "";
+            else e.style.display = "none";
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Tutorial: Create an app to provision 3rd-party devices</h1>
+
+    <p>
+        In this tutorial you will learn how receive the data from the Users and Devices App Services when provisioning a 3rd-party phone. This data must be managed somehow and sent to your phone.
+    </p>
+
+    <h2>Conventions</h2>
+    <p>
+        Your filenames might be different according to your settings. You need to select your app con the Apps tab from the Profile App Object on the PBX. Otherwise the Profile App will not be able to send the data to your app.
+    </p>
+
+    <h2>Testing and expected behaviour</h2>
+    <p>
+        For testing you need to start a phone provisioning on the Profile App.
+    </p>
+
+    <h2>Step by step</h2>
+
+    <h3>Task 1: Publish de app as a provisioning provider</h3>
+    <p>
+        On the session class, you need to publish your app as a provider to provision phones using the AppWebsocketServiceInfo function.
+    </p>
+
+    <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution1');">Code spoiler</button>
+    <div id="solution1" style="display:none">
+        <p>
+            Publish your app as a provisioning provider
+            <pre><code class="language-cpp">void SDKProvisioningSession::AppWebsocketServiceInfo(const char * app, class json_io & msg, word base)
+    {
+    sdkprovisioning->Log("SDKProvisioningSession(%p)::AppWebsocketServiceInfo", this);
+    word apis = msg.add_object(base, "apis");
+    word api = msg.add_object(apis, "com.innovaphone.provisioning");
+    msg.add_string(api, "title", "SDKProvisioning");
+    }
+</code></pre>
+        </p>
+    </div>
+
+    <h3>Task 2: Receive the data from the Profile App</h3>
+    <p>
+        The data will be received inside the AppWebsocketMessage function on the session class with the mt "ProvisioningPhone".
+        <h4>Parameters received with ProvisioningPhone</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>mac</b></td><td>The MAC address from the 3rd-party phone.</td></tr>
+            <tr><td class="param">string <b>code</b></td><td>The provisioning code provided by Devices. With that code Devices knows which config will be provided for that phone depending on the category selected.</td></tr>
+            <tr><td class="param">string <b>hwid</b></td><td>The Hardware ID set by Profile on the User Object on the PBX.</td></tr>
+            <tr><td class="param">string <b>usename</b></td><td>The username of the user for which the phone is being provisioned.</td></tr>
+            <tr><td class="param">string <b>cn</b></td><td>The common name of the user for which the phone is being provisioned.</td></tr>
+            <tr><td class="param">string <b>seed1</b></td><td>The seed to decrypt the password on the app side.</td></tr>
+            <tr><td class="param">string <b>password</b></td><td>The user's password encrypted'. AppWebsocketDecrypt can be used to get the decrypted password.</td></tr>
+            <tr><td class="param">string <b>domain</b></td><td>The PBX domain.</td></tr>
+            <tr><td class="param">string <b>dns</b></td><td>The PBX DNS.</td></tr>
+        </table>
+        <pre><code class="json">{"mt":"ProvisioningPhone","mac":"112233445566","code":"562822784750","hwid":"112233445566","usename":"test_user","cn":"Test User","seed1":"10046478319880090512700","password":"ddfc00","domain":"test.com","dns":"172.16.0.255"}</code></pre>
+    </p>
+
+    <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution2');">Code spoiler</button>
+    <div id="solution2" style="display:none">
+        <p>
+            Add the parsing of the JSON which mt is ProvisioningPhone on AppWebsocketMessage. This is where the data from Profile App will be received.
+            <pre><code class="language-cpp">if (!strcmp(mt, "ProvisioningPhone")) {
+    const char * mac = msg.get_string(base, "mac");
+    const char * code = msg.get_string(base, "code");
+    const char * hwid = msg.get_string(base, "hwid");
+    const char * username = msg.get_string(base, "usename");
+    const char * password = msg.get_string(base, "password");
+    const char * seed1 = msg.get_string(base, "seed1");
+
+    char * pwd = (char*)alloca(strlen(password) / 2 + 1);
+    if (strlen(seed1) > 1) AppWebsocketDecrypt(seed1, password, pwd, strlen(password) / 2 + 1);
+
+    const char * domain = msg.get_string(base, "domain");
+    const char * dns = msg.get_string(base, "dns");
+
+    //Store the data on the DB for later
+
+    free((void*)usrpwd);
+    }
+</code></pre>
+        </p>
+    </div>
+
+    <p>
+        If the Users Admin App is used to provision several phones instead of the Profile App, the workflow is the next one:
+        <ul>
+            <li>ProvisioningPhone received for the first user: <code>{"mt":"ProvisioningPhone","mac":"112233445566",...}</code></li>
+            <li>The app manages the sysclient connection and the phone configuration.</li>
+            <li>When finished ProvisioningPhoneResult must be sent back to the Users App Service: <code>{"mt":"ProvisioningPhoneResult","result":"ok"}</code></li>
+            <li>Then ProvisioningPhone is received for the next user: <code>{"mt":"ProvisioningPhone","mac":"665544332211",...}</code></li>
+        </ul>
+    </p>
+    <p>
+        Users App Service already creates a device on the User PBX Object with a basic configuration. If any other configuration is needed for the provisioning, this must be managed by your app.
+        By default Hardware ID, Name and App are filled with the information provided on Profile or Users Admin App and TLS only and Reverse Proxy flags are selected.
+    </p>
+
+    <!-- Task 3: Get the published services to be able to connect with Devices later -->
+
+    <h3>Task 3: Get the published services to be able to connect with Devices later</h3>
+    <p>
+        To set the Sysclient connection to get the phone configuration from Devices later.
+    </p>
+
+    <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution3');">Code spoiler</button>
+    <div id="solution3" style="display:none">
+        <p>
+            <pre><code class="language-cpp">else if (!strcmp(mt, "PbxInfo")) {
+    if (!strcmp(app, "innovaphone-sdkprovisioning")){  //Here it must be checked the name of the javascript file of your app, where Websocket flag has been selected
+    class JsonApi * jsonApi = sdkprovisioning->CreateJsonApi("PbxAdminApi", this, msg, base);
+    if (jsonApi) jsonApi->JsonApiStart();
+    }
+    word apis = msg.get_array(base, "apis");
+    if (apis != JSON_ID_NONE) {
+    word last = 0;
+    const char * apiName = NULL;
+    while ((apiName = msg.get_string(apis, last)) != NULL) {
+    if (!strcmp(apiName, "Services")) {
+    services = CreateServicesApi(this, this);
+    sdkprovisioning->ReopenSysclient();
+    break;
+    }
+    }
+    }
+    sdkprovisioning->pbxSessions.push_back(this);
+    if (rcv) AppWebsocketMessageComplete();
+    rcv = false;
+    }
+    {
+    }
+</code></pre>
+        </p>
+        <p>
+            Here it can be defined what to do when the websocket connection is restarted.
+            <pre><code class="language-cpp">void SDKProvisioning::ReopenSysclient()
+    {
+    if (stopping) TryStop();
+    else if (!reopenSysclient){
+    class IService * service = NULL;
+    for (auto pbxsession : this->pbxSessions) {
+    if (pbxsession->services) {
+    service = pbxsession->services->GetService("com.innovaphone.devices");
+    if (service) break;
+    }
+    }
+    if (service){
+    reopenSysclient = true;
+    }
+    }
+    }
+</code></pre>
+        </p>
+    </div>
+    <!-- Task 4: Get the phone configuration with the Sysclient connection -->
+
+    <h3>Task 4: Get the phone configuration with the Sysclient connection</h3>
+    <p>
+        After the configuration received from the Profile App has been stored on the DB, the sysclient connection must be set with Devices to be able to receive the phone configuration and its updates. To learn more about this protocol you can check <a href="../../doc/protocol/sysclient.htm">this article</a>.
+    </p>
+
+    <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution4');">Code spoiler</button>
+    <div id="solution4" style="display:none">
+        <p>
+            When <code>DatabaseConnectComplete</code> is called the database can be initialized.
+            <pre><code class="language-cpp">
+    ProvisioningDevices::ProvisioningDevices(class SDKProvisioning * sdkprovisioning, class SDKProvisioningSession * session, const char * mac, const char * code, bool reconnect) :
+    taskWritePassword(this, &ProvisioningDevices::DatabaseWritePasswordComplete, &ProvisioningDevices::DatabaseWritePasswordFailed),
+    taskReadPassword(this, &ProvisioningDevices::DatabaseReadPasswordComplete, &ProvisioningDevices::DatabaseReadPasswordFailed),
+    taskWriteConfigDevice(this, &ProvisioningDevices::DatabaseWriteConfigComplete, &ProvisioningDevices::DatabaseWriteConfigFailed),
+    {
+    //Constructor where all the parameters are initialized
+    this->code = _strdup(code);
+    this->mac = _strdup(mac);
+    this->stopping = false;
+    this->cancel = false;
+    this->success = false;
+    this->sdkprovisioning = sdkprovisioning;
+    this->session = session;
+    this->database = sdkprovisioning->database;
+    this->reconnect = reconnect;
+    this->historyTask = NULL;
+    this->configTask = NULL;
+    this->passwordTask = NULL;
+    this->sysclient = NULL;
+    this->password = NULL;
+    this->stunserver = NULL;
+    this->turnserver = NULL;
+    this->turnusr = NULL;
+    this->turnpwd = NULL;
+    this->coder = NULL;
+    this->tlsProfile = NULL;
+    this->ntp1 = NULL;
+    this->ntp2 = NULL;
+    this->tz = NULL;
+    }
+
+    ProvisioningDevices::~ProvisioningDevices()
+    {
+    if (code) free((void*)code);
+    if (mac) free((void*)mac);
+    if (password) free((void*)password);
+    if (stunserver) free((char*)stunserver);
+    if (turnserver) free((char*)turnserver);
+    if (turnusr) free((char*)turnusr);
+    if (turnpwd) free((char*)turnpwd);
+    if (coder) free((char*)coder);
+    if (tlsProfile) free((char*)tlsProfile);
+    if (ntp1) free((char*)ntp1);
+    if (ntp2) free((char*)ntp2);
+    if (tz) free((char*)tz);
+    code = NULL; mac = NULL; password = NULL; stunserver = NULL; turnserver = NULL; turnusr = NULL; turnpwd = NULL; coder = NULL; tlsProfile = NULL; ntp1 = NULL; ntp2 = NULL; tz = NULL;
+    }
+
+    void ProvisioningDevices::SessionClosed(class SDKProvisioningSession * session)
+    {
+    this->session->pList.remove(this);
+    this->session = NULL;
+    this->session->Close();
+    }
+
+    void ProvisioningDevices::Start()
+    {
+    //This is the first function that must be called after creating a new ProvisioningDevices object
+    if (sdkprovisioning->pbxSessions.size() > 0 && sdkprovisioning->appURL){
+    class IService * service = NULL;
+    for (auto pbxsession : sdkprovisioning->pbxSessions) {
+    if (pbxsession->services) {
+    service = pbxsession->services->GetService("com.innovaphone.devices"); //Here it looks for the Devices App
+    if (service) break;
+    }
+    }
+    if (service){
+    const char * serviceURL = _strdup(service->GetWebsocketUrl());
+    char * devicesURL = (char*)malloc(strlen(serviceURL) + 20);
+    _snprintf(devicesURL, strlen(serviceURL) + 20, "%ssysclients", serviceURL);
+    if (sysclient) sysclient->Close();
+    //The connection between your app and Devices App is created
+    sysclient = ISysclient::Create(sdkprovisioning->iomux, sdkprovisioning->tcpSocketProvider, sdkprovisioning->tlsSocketProvider, this, devicesURL, sdkprovisioning, NULL, reconnect ? NULL : code, mac);
+    free((void*)devicesURL);
+    free((void*)serviceURL);
+    }
+    else {
+    sdkprovisioning->Log("ProvisioningDevices(%p) Devices Service not found!", this);
+    if (session) session->ProvisioningDevicesCompleted(this, false, "Devices Service not found!");
+    }
+    }
+    else {
+    sdkprovisioning->Log("ProvisioningDevices(%p) no PBX sessions!", this);
+    if (session) session->ProvisioningDevicesCompleted(this, false, "No PBX sessions!");
+    }
+    }
+
+    void ProvisioningDevices::Stop()
+    {
+    TryClose();
+    }
+
+    void ProvisioningDevices::SysclientConnected(class ISysclient * sysclient)
+    {
+    //Once the connection is set, if this is the first time that the Devices is provisioned, SendIdentify must be sent
+    if (!reconnect) sysclient->SendIdentify(NULL, reconnect ? NULL : code, mac, "SDKProvisioning", "1", "{ \"type\": \"PHONE\" }");
+    else {
+    //Otherwise the previously stored password on the DB must be retreived
+    passwordTask = new TaskReadPassword(sdkprovisioning->database, mac);
+    passwordTask->Start(&taskReadPassword);
+    }
+    }
+    void ProvisioningDevices::SetProvisioningCode(const char * provisioningCode)
+    {
+    }
+    void ProvisioningDevices::SetManagerSysClientPassword(const char * password)
+    {
+    if (this->password) free((void*)this->password);
+    this->password = _strdup(password);
+    if (stopping) TryClose();
+    else{
+    //Store the password on the DB, this may be needed later when restarting the sysclient connection for every provisioned device when for example the app instance restarts
+    passwordTask = new TaskWritePassword(sdkprovisioning->database, mac, this->password);
+    passwordTask->Start(&taskWritePassword);
+    }
+    }
+    void ProvisioningDevices::SetManagerSysClient2Password(const char * password)
+    {
+    }
+    void ProvisioningDevices::SetPasswords(const char * admin_pwd)
+    {
+    }
+    void ProvisioningDevices::SetConfig(char * buffer)
+    {
+    // This is where the phone configuration will be received. It may be stored on the DB.
+    const char * bufferOrg = _strdup(buffer);
+    class json_io json(buffer);
+    if (json.decode()) {
+    word base = json.get_object(JSON_ID_ROOT, NULL);
+    bool last = json.get_bool(base, "last");
+    word config = json.get_object(base, "config");
+    if (config != JSON_ID_NONE){
+    const char * type = json.get_string(config, "type");
+    if (!last) last = json.get_bool(config, "last");
+    if (!strcmp(type, "PHONE")) this->coder = _strdup(json.get_string(config, "coder"));
+    else if (!strcmp(type, "MEDIA")){
+    if (this->stunserver) free((void*)this->stunserver);
+    if (this->turnserver) free((void*)this->turnserver);
+    if (this->turnusr) free((void*)this->turnusr);
+    if (this->turnpwd) free((void*)this->turnpwd);
+    this->stunserver = _strdup(json.get_string(config, "stunServer"));
+    this->turnserver = _strdup(json.get_string(config, "turnServer"));
+    this->turnusr = _strdup(json.get_string(config, "turnUser"));
+    const char * turnpass = json.get_string(config, "turnPassword");
+    const char * seed = json.get_string(config, "turnSeed");
+    dword len = turnpass ? (strlen(turnpass) / 2 + 1) : 1;
+    this->turnpwd = (char*)malloc(len);
+    if (strlen(seed) > 1) this->sysclient->Decrypt(seed, turnpass, (char*)this->turnpwd, len);
+    }
+    else if (!strcmp(type, "TLS_PROFILE")) this->tlsProfile = _strdup(json.get_string(config, "profile"));
+    else if (!strcmp(type, "NTP")){
+    if (this->tz) free((void*)this->tz);
+    if (this->ntp1) free((void*)this->ntp1);
+    if (this->ntp2) free((void*)this->ntp2);
+    this->tz = _strdup(json.get_string(config, "tz")); //timezone
+    this->ntp1 = _strdup(json.get_string(config, "ntp1"));
+    this->ntp2 = _strdup(json.get_string(config, "ntp2"));
+    }
+    }
+    if (last) {
+    //If the last boolean is true, that means that all the configuration has been already received and it can be store on the DB.
+    class ITask * task = new TaskWriteConfigDevice(sdkprovisioning->database, this->stunserver, this->turnserver, this->turnusr, this->turnpwd, this->coder, this->tlsProfile, this->ntp1, this->ntp2, this->timezone, this->code, this->mac);
+    configList.push_back(task);
+    if (!configTask){
+    task->Start(&taskWriteConfigDevice);
+    configTask = task;
+    }
+    }
+    if (bufferOrg) free((void*)bufferOrg);
+    }
+    else {
+    sdkprovisioning->Log("ProvisioningDevices(%p) JSON config could not be decoded!", this);
+    if (bufferOrg) free((void*)bufferOrg);
+    }
+    }
+    const char * ProvisioningDevices::GetManagerSysClientPassword()
+    {
+    return this->password;
+    }
+    void ProvisioningDevices::SysClientClosed(class ISysclient * sysclient)
+    {
+    delete sysclient;
+    this->sysclient = NULL;
+    if (stopping) TryClose();
+    }
+
+    void ProvisioningDevices::DatabaseWritePasswordComplete(class TaskWritePassword * task)
+    {
+    if (passwordTask == task) passwordTask = NULL;
+    delete task;
+    if (stopping) TryClose();
+    }
+
+    void ProvisioningDevices::DatabaseWritePasswordFailed(class TaskWritePassword * task)
+    {
+    if (passwordTask == task) passwordTask = NULL;
+    delete task;
+    if (stopping) TryClose();
+    }
+
+    void ProvisioningDevices::DatabaseReadPasswordComplete(class TaskReadPassword * task)
+    {
+    if (this->password) free((void*)this->password);
+    this->password = _strdup(task->password);
+    if (passwordTask == task) passwordTask = NULL;
+    delete task;
+    if (stopping) TryClose();
+    else {
+    //When restarting the sysclient connection, once the password has been retreived from the DB, now the SendIdentify can be sent.
+    sysclient->SetAdminPassword(this->password);
+    sysclient->SendIdentify(NULL, reconnect ? NULL : code, mac, "SDKProvisioning", "1", "{ \"type\": \"PHONE\" }");
+    }
+    }
+
+    void ProvisioningDevices::DatabaseReadPasswordFailed(class TaskReadPassword * task)
+    {
+    if (passwordTask == task) passwordTask = NULL;
+    delete task;
+    if (stopping) TryClose();
+    }
+
+    void ProvisioningDevices::DatabaseWriteConfigComplete(class TaskWriteConfigDevice * task)
+    {
+    //Called when the configuration has been stored on the DB. First it checks if there are more store configuration task pending on the list
+    configList.remove(task);
+    if (configTask == task) configTask = NULL;
+    delete task;
+    if (stopping) {
+    while (configList.size() > 0) {
+    class ITask * tsk = configList.front();
+    configList.remove(tsk);
+    delete tsk;
+    }
+    TryClose();
+    }
+    else if (configList.size() > 0) {
+    configTask = configList.front();
+    configTask->Start(&taskWriteConfigDevice);
+    }
+    //Now you can do whatever you need to do with your device. The configurations have been stored on the DB and you can send them to your phone.
+    }
+
+    void ProvisioningDevices::DatabaseWriteConfigFailed(class TaskWriteConfigDevice * task)
+    {
+    configList.remove(task);
+    if (configTask == task) configTask = NULL;
+    delete task;
+    if (stopping) {
+    while (configList.size() > 0) {
+    class ITask * taskk = configList.front();
+    configList.remove(taskk);
+    delete taskk;
+    }
+    TryClose();
+    }
+    else if (configList.size() > 0) {
+    configTask = configList.front();
+    configTask->Start(&taskWriteConfigDevice);
+    }
+    }
+    }
+
+    void ProvisioningDevices::TryClose()
+    {
+    this->stopping = true;
+    if (historyTask) return;
+    else if (configTask) return;
+    else if (passwordTask) return;
+    else if (sysclient) sysclient->Close();
+    else if (configList.size() > 0) return;
+    else if (historyList.size() > 0) return;
+    else {
+    if (session) session->ProvisioningDevicesCompleted(this, true, NULL); //Callback to the session if needed
+    sdkprovisioning->ProvisioningDevicesClosed(this); //Callback to the instance object if needed
+    }
+    }
+
+    void ProvisioningDevices::Close(bool cancel)
+    {
+    this->cancel = cancel;
+    TryClose();
+    }
+</code></pre>
+    </div>
+    <h2>Useful documentation</h2>
+    <ul>
+        <li><a href="../../doc/protocol/sysclient.htm">Sysclient</a></li>
+        <li><a href="../../sdk/common/interface/database.htm">Database</a></li>
+        <li><a href="../../sdk/common/interface/task.htm">Task</a></li>
+        <li><a href="DatabaseTutorial.htm">Database Tutorial</a></li>
+        <li><a href="https://wiki.innovaphone.com/index.php?title=Reference13r1:Concept_App_Service_Yealink">Yealink Provisioning App</a></li>
+        <li><a href="sdkprovisioning.7z">Code Example</a></li>
+    </ul>
+</body>
+</html>

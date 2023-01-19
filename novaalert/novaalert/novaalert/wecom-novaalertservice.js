@@ -40,7 +40,7 @@ WebServer.onrequest("triggedAlarm", function (req) {
     }
 });
 
-
+//APPS API
 new JsonApi("user").onconnected(function (conn) {
     log("danilo req: user conn: " + JSON.stringify(conn))
     connectionsApp.push({ ws: conn });
@@ -49,20 +49,30 @@ new JsonApi("user").onconnected(function (conn) {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "UserMessage") {
+                updateTableBadgeCount(conn.sip, "ResetCount");
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", urlalert: urlalert }));
-
             }
             if (obj.mt == "UserPresence") {
                 connections.forEach(function (c) {
-                    if (c.user != "") {
+                    if (c.user != "" && c.call !="number") {
                         conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
                     }
 
                 })
             }
+            if (obj.mt == "DecrementCount") {
+                updateTableBadgeCount(conn.sip, obj.mt);
+            }
             if (obj.mt == "TriggerAlert") {
                 callNovaAlert(parseInt(obj.prt), conn.sip);
-                conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", value: obj.prt }));
+                conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", src: obj.prt }));
+            }
+            if (obj.mt == "TriggerCombo") {
+                comboManager(parseInt(obj.prt), conn.sip, obj.mt);
+            }
+            if (obj.mt == "StopCombo") {
+                comboManager(parseInt(obj.prt), conn.sip, obj.mt);
+                conn.send(JSON.stringify({ api: "user", mt: "ComboSuccessTrigged", src: obj.prt }));
             }
             if (obj.mt == "TriggerCall") {
                 callRCC(connectionsRCC[0].ws, conn.cn, "UserCall", obj.prt, conn.sip);
@@ -114,6 +124,17 @@ new JsonApi("admin").onconnected(function (conn) {
             }
             if (obj.mt == "InsertMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        initializeButtons();
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+            if (obj.mt == "InsertComboMessage") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) +"')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                         initializeButtons();
@@ -182,6 +203,7 @@ new JsonApi("admin").onconnected(function (conn) {
     }
 });
 
+//PBX APIS
 new PbxApi("RCC").onconnected(function (conn) {
 
     log("danilo req : RCC message:: connected " + JSON.stringify(conn));
@@ -201,15 +223,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         else if (obj.mt === "UserInitializeResult") {
             //Atualiza connections 
             updateConnections(obj.src, "user", obj.user);
-            //Atualiza status Botões Tela NovaAlert All
-            connectionsApp.forEach(function (conn) {
-                var ws = conn.ws;
-                log("danilo-req RCC UserInitializeResult: success for " + String(obj.src) + " alerting user " + String(conn.ws.sip) +" with APP openned!");
-                ws.send(JSON.stringify({ api: "user", mt: "UserConnected", src: obj.src }));
-                //if (String(conn.ws.sip) == String(obj.src)) {
-                //    ws.send(JSON.stringify({ api: "user", mt: "CallConnected", src: obj.src }));
-                //}
-            });
+            
         }
         else if (obj.mt === "CallInfo") {
 
@@ -347,8 +361,6 @@ new PbxApi("RCC").onconnected(function (conn) {
         connectionsRCC.splice(connectionsRCC.indexOf(conn), 1);
     });
 });
-
-//PBX APIS
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected");
 
@@ -389,8 +401,15 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
             //getURLLogin(obj.sig.cg.sip);
 
+
+
             // send notification with badge count first time the user has connected
-            //updateBadge(conn, obj.call, count);
+            var count;
+            try {
+                count = pbxTableUsers.filter(findConnectionsBySip(obj.sig.cg.sip))[0].badge;
+            } finally {
+                updateBadge(conn, obj.call, count);
+            }
         }
 
         // handle incoming call release messages
@@ -419,7 +438,6 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
         connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
-
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
     log("PbxTableUsers: connected");
 
@@ -434,14 +452,17 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         log("PbxTableUsers: msg received " + msg);
 
         if (obj.mt == "ReplicateStartResult") {
-            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext"  }));
+            pbxTableUsers = [];
+            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
+        }
+        if (obj.mt == "ReplicateNextResult" && obj.columns.guid != null) {
+
+            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, badge: 0 });
+            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
 
         }
-        if (obj.mt == "ReplicateNextResult" && obj.columns.guid) {
-
-            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn  });
-
-            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
+        if (obj.mt == "ReplicateAdd") {
+            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn });
 
         }
         if (obj.mt == "ReplicateUpdate") {
@@ -457,7 +478,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
-
 
 
 //Funções Internas
@@ -476,6 +496,7 @@ function insertCall(obj) {
     }
     log("danilo req : insertCall " + JSON.stringify(calls));
 }
+
 function deleteCallsBySrc(src) {
     return function (value) {
         if (value.sip != src) {
@@ -486,7 +507,6 @@ function deleteCallsBySrc(src) {
     }
 }
 
-
 function delConnectionsByCall(call) {
     return function (value) {
         if (value.call != call) {
@@ -496,6 +516,7 @@ function delConnectionsByCall(call) {
         return false;
     }
 }
+
 function findConnectionsByCall(call) {
     return function (value) {
         if (value.call == call) {
@@ -505,6 +526,68 @@ function findConnectionsByCall(call) {
         return false;
     }
 }
+
+function findConnectionsBySip(sip) {
+    return function (value) {
+        if (value.sip == sip) {
+            return true;
+        }
+        //countInvalidEntries++
+        return false;
+    }
+}
+
+function updateTableBadgeCount(sip, mt) {
+    if (mt == "IncrementCount") {
+        pbxTableUsers.forEach(function (user) {
+            if (user.sip == sip) {
+                user.badge = user.badge + 1;
+
+                log("Sending updates via Presence Signalling");
+                connections.forEach(function (conn) {
+                    if (conn.sip == user.sip) {
+                        connectionsPbxSignal.forEach(function (c) {
+                            updateBadge(c.ws, conn.call, user.badge);
+                        })
+                    }
+                })
+            }
+        })
+    }
+    if (mt == "DecrementCount") {
+        pbxTableUsers.forEach(function (user) {
+            if (user.sip == sip) {
+                user.badge = user.badge - 1;
+
+                log("Sending updates via Presence Signalling");
+                connections.forEach(function (conn) {
+                    if (conn.sip == user.sip) {
+                        connectionsPbxSignal.forEach(function (c) {
+                            updateBadge(c.ws, conn.call, user.badge);
+                        })
+                    }
+                })
+            }
+        })
+    }
+    if (mt == "ResetCount") {
+        pbxTableUsers.forEach(function (user) {
+            if (user.sip == sip) {
+                user.badge = 0;
+
+                log("Sending updates via Presence Signalling");
+                connections.forEach(function (conn) {
+                    if (conn.sip == user.sip) {
+                        connectionsPbxSignal.forEach(function (c) {
+                            updateBadge(c.ws, conn.call, user.badge);
+                        })
+                    }
+                })
+            }
+        })
+    }
+}
+
 function updateConnections(sip, prt, value) {
     var found = false;
     connections.forEach(function (conn) {
@@ -536,8 +619,20 @@ function updateConnections(sip, prt, value) {
         }
     })
     if (!found) {
-        connections.push({ sip: sip, call: "", name: value, user: "", url: "" });
+        connections.push({ sip: sip, call: prt, name: value, user: "", url: "" });
         callRCC(connectionsRCC[0].ws, value, "UserInitialize", "", sip);
+        //Atualiza status Botões Tela NovaAlert All
+        if (prt != "number") {
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req RCC UserInitializeResult: success for " + String(sip) + " alerting user " + String(conn.ws.sip) + " with APP openned!");
+                ws.send(JSON.stringify({ api: "user", mt: "UserConnected", src: sip }));
+                //if (String(conn.ws.sip) == String(obj.src)) {
+                //    ws.send(JSON.stringify({ api: "user", mt: "CallConnected", src: obj.src }));
+                //}
+            });
+        }
+        
     }
 }
 
@@ -577,6 +672,7 @@ function alarmReceived(value) {
         log("danilo-req alarmReceived:conn.sip " + String(conn.ws.sip));
         log("danilo-req alarmReceived:obj.User " + String(obj.User));
         if (String(conn.ws.sip) == String(obj.User)) {
+            updateTableBadgeCount(conn.ws.sip, "IncrementCount");
             ws.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
         }
     });
@@ -667,15 +763,16 @@ function initializeButtons() {
                 if (b.button_type == "queue") {
                     //Adiciona
                     log("initializeButtons: connections before add queue button " + JSON.stringify(connections));
-                    updateConnections(b.button_prt, "", b.button_prt_user)
+                    updateConnections(b.button_prt, b.button_type, b.button_prt_user)
                     //connections.push({ sip: b.button_prt, call: "", name: b.button_prt_user, user: "", url: "" });
                     log("initializeButtons: connections after add queue button " + JSON.stringify(connections));
                     
                 }
                 if (b.button_type == "number") {
                     //Adiciona
+                    var name = pbxTableUsers.filter(findConnectionsBySip(b.button_prt))[0].cn;
                     log("initializeButtons: connections before add number button " + JSON.stringify(connections));
-                    updateConnections(b.button_prt, "",b.button_name)
+                    updateConnections(b.button_prt, b.button_type, name)
                     //connections.push({ sip: b.button_prt, call: "", name: b.button_prt_user, user: "", url: "" });
                     log("initializeButtons: connections after add number button " + JSON.stringify(connections));
                 }
@@ -700,6 +797,7 @@ function updateBadge(ws, call, count) {
 
     ws.send(JSON.stringify(msg));
 }
+
 function callRCC(ws, user, mode, num, sip) {
     log("danilo-req callRCC:mode " + String(mode));
     if (String(mode) == "UserInitialize") {
@@ -779,4 +877,113 @@ function callRCC(ws, user, mode, num, sip) {
         })
     }
 }
+
+function comboManager(combo, sip, mt) {
+    var combo_button = [];
+    Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + sip + "' AND id = " + parseInt(combo))
+        .oncomplete(function (data) {
+            log("result comboManager=" + JSON.stringify(data, null, 4));
+            combo_button = data;
+
+            log("result combo_button=" + JSON.stringify(combo_button));
+            var type1 = parseInt(combo_button[0].button_type_1);
+            log("result combo_button=type1 " + type1);
+
+            buttons.forEach(function (button) {
+                log("result forEach button" + JSON.stringify(button));
+                if (parseInt(combo_button[0].button_type_1) == parseInt(button.id)) {
+                    log("result comboManager= Localizado Combo 1 com ID" + button.id);
+                    comboDispatcher(button,mt);
+                }
+                if (parseInt(combo_button[0].button_type_2) == parseInt(button.id)) {
+                    log("result comboManager= Localizado Combo 2 com ID" + button.id);
+                    comboDispatcher(button,mt);
+                }
+                if (parseInt(combo_button[0].button_type_3) == parseInt(button.id)) {
+                    log("result comboManager= Localizado Combo 3 com ID" + button.id);
+                    comboDispatcher(button,mt);
+                }
+                if (parseInt(combo_button[0].button_type_4) == parseInt(button.id)) {
+                    log("result comboManager= Localizado Combo 4 com ID" + button.id);
+                    comboDispatcher(button,mt);
+                }
+            })
+            //conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            //conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
+        });
+    
+    
+
+}
+
+function comboDispatcher(button, mt) {
+    log("danilo-req comboDispatcher:" + String(button));
+    switch (button.button_type) {
+        case "video":
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req comboDispatcher:video conn.sip " + String(conn.ws.sip));
+                log("danilo-req comboDispatcher:video button.button_user " + String(button.button_user));
+                if (String(conn.ws.sip) == String(button.button_user)) {
+                    ws.send(JSON.stringify({ api: "user", mt: "VideoRequest", alarm: button.button_prt }));
+                }
+            });
+            break;
+        case "alarm":
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req comboDispatcher:alarm conn.sip " + String(conn.ws.sip));
+                log("danilo-req comboDispatcher:alarm button.button_user " + String(button.button_user));
+                if (String(conn.ws.sip) == String(button.button_user)) {
+                    callNovaAlert(parseInt(button.button_prt), conn.ws.sip);
+                    ws.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", value: button.button_prt }));
+                }
+            });
+            break;
+        case "number":
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req comboDispatcher:number conn.sip " + String(conn.ws.sip));
+                log("danilo-req comboDispatcher:number button.button_user " + String(button.button_user));
+                if (String(conn.ws.sip) == String(button.button_user)) {
+                    if (mt == "StopCombo") {
+                        callRCC(connectionsRCC[0].ws, conn.ws.cn, "UserClear", button.button_prt_user, conn.ws.sip);
+                    } else {
+                        callRCC(connectionsRCC[0].ws, conn.ws.cn, "UserCall", button.button_prt_user, conn.ws.sip);
+                    }
+                    
+                }
+            });
+            break;
+        case "queue":
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req comboDispatcher:queue conn.sip " + String(conn.ws.sip));
+                log("danilo-req comboDispatcher:queue button.button_user " + String(button.button_user));
+                if (String(conn.ws.sip) == String(button.button_user)) {
+                    if (mt == "StopCombo") {
+                        callRCC(connectionsRCC[0].ws, conn.ws.cn, "UserClear", button.button_prt_user, conn.ws.sip);
+                    } else {
+                        callRCC(connectionsRCC[0].ws, conn.ws.cn, "UserCall", button.button_prt_user, conn.ws.sip);
+                    }
+                    
+                }
+            });
+            break;
+        case "page":
+            connectionsApp.forEach(function (conn) {
+                var ws = conn.ws;
+                log("danilo-req comboDispatcher:page conn.sip " + String(conn.ws.sip));
+                log("danilo-req comboDispatcher:page button.button_user " + String(button.button_user));
+                if (String(conn.ws.sip) == String(button.button_user)) {
+                    ws.send(JSON.stringify({ api: "user", mt: "PageRequest", alarm: button.button_prt }));
+                }
+            });
+            break;
+    }
+}
+
 

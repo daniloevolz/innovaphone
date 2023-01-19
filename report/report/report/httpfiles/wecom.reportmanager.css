@@ -1,0 +1,95 @@
+
+div.wecom-report-panel {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:var(--wecom-report-item-text);
+    font-size:14px;
+}
+
+div.wecom-report-obj {
+    position:relative;
+    margin:10px;
+    padding:5px;
+    background-color:var(--wecom-report-item);
+    color:var(--wecom-report-item-text);
+    font-size:14px;
+}
+
+div.wecom-report-header {
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+div.wecom-report-label {
+    position:relative;
+    margin:5px 10px;
+    color:var(--wecom-report-c2);
+}
+
+div.wecom-report-label2 {
+    position:relative;
+    width:100px;
+    margin:5px 10px;
+    font-size: 15px;
+    text-align: left;
+    color: var(--innovaphone-report-item-text);
+}
+
+div.wecom-report-value {
+    position:relative;
+    margin:5px 0px;
+    /*background-color:var(--wecom-report-input);*/
+    color:var(--wecom-report-input-text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+div.wecom-report-appicon {
+    background-size: cover;
+    position: absolute;
+    height: 50px;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+}
+
+div.wecom-report-button {
+    position:absolute;
+    width:120px;
+    height:25px;
+    background-color:var(--wecom-report-button);
+    color:var(--wecom-report-button-text);
+    text-align:center;
+    cursor:pointer;
+}
+
+input.wecom-report-input {
+    width:100%;
+    box-sizing:border-box;
+    border:none;
+    margin:5px 0px;
+    padding: 5px 10px;
+    background-color:var(--wecom-report-input);
+    color:var(--wecom-report-input-text);
+}
+
+div.wecom-report-choice {
+    box-sizing: border-box;
+    position:relative;
+    width:120px;
+    height:30px;
+    text-align:center;
+    background-color:var(--wecom-report-button-bg);
+    margin:10px;
+    padding: 5px;
+}
+
+div.wecom-report-choice:hover {
+    background-color:var(--wecom-report-highlight-bg);
+}
+

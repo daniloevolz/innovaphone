@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - AppWebsocketClient</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>AppWebsocketClient</h1>
+    <p>
+        This document describes the AppWebsocketClient available in the JavaScript environment for app serivices.
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#AppWebsocketClient">AppWebsocketClient</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#connect">connect</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Object</b></td>
+            <td>
+                <b><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></b><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#onauth">onauth</a><br />
+                <a href="#onopen">onopen</a><br />
+                <a href="#onclose">onclose</a><br />
+                <a href="#onmessage">onmessage</a><br />
+                <a href="#auth">auth</a><br />
+                <a href="#send">send</a><br />
+                <a href="#close">close</a><br />
+                <a href="#setFlowControl">setFlowControl</a><br />
+                <a href="#messageComplete">messageComplete</a><br />
+                <a href="#encrypt">encrypt</a><br />
+                <a href="#decrypt">decrypt</a><br />
+                <a href="#hash">hash</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#Example-Cross-Service-Login">Connecting to another app service using the Services API of the pbx</a><br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="AppWebsocketClient">AppWebsocketClient</a></h2>
+
+    <a name="connect"><div class="fnhead" style="margin-top:5px">connect</div></a>
+    <dd>
+        Creates a AppWebsocketClientConnection object. The actual connection is started asynchronously. So synchronous function calls on that object are handled before the connection is established.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>uri</b></td><td>An absolute conn: or wss: URI.</td></tr>
+            <tr><td class="param">string <b>password</b></td><td>The password for authentication. Set to null or leave emtpy if you use the asynchronous authentication flow using <a href="#onauth">onauth</a> and <a href="#auth">auth</a></td></tr>
+            <tr><td class="param">string <b>app</b></td><td>The name of the app you like to login at.</td></tr>
+            <tr><td class="param">string <b>domain</b></td><td>The domain of the logged-in user. Optional. Set to null or leave empty if you use the asynchronous authentication flow using <a href="#onauth">onauth</a> and <a href="#auth">auth</a></td></tr>
+            <tr><td class="param">string <b>sip</b></td><td>The SIP URI of the logged-in user. Optional. Set to null or leave empty if you use the asynchronous authentication flow using <a href="#onauth">onauth</a> and <a href="#auth">auth</a></td></tr>
+            <tr><td class="param">string <b>guid</b></td><td>The GUID of the logged-in user. Optional. Set to null or leave empty if you use the asynchronous authentication flow using <a href="#onauth">onauth</a> and <a href="#auth">auth</a></td></tr>
+            <tr><td class="param">string <b>dn</b></td><td>The display name of the logged-in user. Optional. Set to null or leave empty if you use the asynchronous authentication flow using <a href="#onauth">onauth</a> and <a href="#auth">auth</a></td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>An object representing the appwebsocket connection.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var appwebsocket = AppWebsocketClient.connect("wss://pbx.example.com/PBX0/APPS/websocket", "password", "appname", "example.com", "john.doe", "guid", "John Doe");</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">var appwebsocket = AppWebsocketClient.connect("wss://pbx.example.com/PBX0/APPS/websocket", null, "appname");
+appwebsocket.onauth(function(conn, app, challenge) { 
+    // get login parameters asynchronously (e.g. using Services API) and then call the auth function
+    conn.auth(...);
+});
+</code></pre>
+    </dd>
+
+    <h2><a name="AppWebsocketClientConnection">AppWebsocketClientConnection</a></h2>
+
+    <a name="onauth"><div class="fnhead" style="margin-top:5px">onauth</div></a>
+    <dd>
+        Sets a callback function that is invoked when the server sent the challenge and is now waiting for the actual login parameters.
+        Optional. Use, if your app doesn't know the password for the server, but uses for example the Services API to get the login parameters from the PBX.
+        If the callback is set the library will pause the authentication process until the login parameters are given using the <a href="#auth">auth</a> function.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a> connection, string app, string challenge)</td><td>A callback that processes the servers challenge.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var appwebsocket = AppWebsocketClient.connect("wss://pbx.example.com/PBX0/APPS/websocket", null, "appname");
+appwebsocket.onauth(function(conn, app, challenge) {
+    // get login parameters asynchronously (e.g. using Services API) and then call the auth function
+    conn.auth(...);
+});
+</code></pre>
+    </dd>
+
+    <a name="onopen"><div class="fnhead" style="margin-top:5px">onopen</div></a>
+    <dd>
+        Sets a callback function that is invoked when the connection is established.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a> connection)</td><td>A callback that will be called when the connection is established.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.onopen(function(conn) {
+    log("connection is up");
+});</code></pre>
+    </dd>
+
+    <a name="onclose"><div class="fnhead" style="margin-top:5px">onclose</div></a>
+    <dd>
+        Sets a callback function that is invoked when the connection is closed.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a> connection)</td><td>A callback that will be called when the connection is closed. After the callback the connection object is gone and can not be used anymore.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.onclose(function(conn) {
+    log("connection closed");
+});</code></pre>
+    </dd>
+
+    <a name="onmessage"><div class="fnhead" style="margin-top:5px">onmessage</div></a>
+    <dd>
+        Sets a callback function that is invoked when a appwebsocket message is received.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a> connection, message)</td><td>A callback that will be called when the connection is closed. The message attribute represents the text received with the message.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.onmessage(function(conn, msg) {
+    var obj = JSON.parse(msg);
+    if (obj.mt == "SomeMessage") {
+        // ...
+    }
+});</code></pre>
+    </dd>
+
+    <a name="auth"><div class="fnhead" style="margin-top:5px">auth</div></a>
+    <dd>
+        Continues the authentication with the given parameters. This function should be only called if the <a href="#onauth">onauth</a> callback has been used for asynchronous authentication.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>domain</b></td><td>The domain of the logged-in user.</td></tr>
+            <tr><td class="param">string <b>sip</b></td><td>The SIP URI of the logged-in user.</td></tr>
+            <tr><td class="param">string <b>guid</b></td><td>The GUID of the logged-in user.</td></tr>
+            <tr><td class="param">string <b>dn</b></td><td>The display name of the logged-in user.</td></tr>
+            <tr><td class="param">string <b>pbxObj</b></td><td>The name of the PBX object representing the remote endpoint.</td></tr>
+            <tr><td class="param">string <b>app</b></td><td>The app name of the remote endpoint.</td></tr>
+            <tr><td class="param">string <b>info</b></td><td>Additional info encoded as a JSON string.</td></tr>
+            <tr><td class="param">string <b>digest</b></td><td>The login digest.</td></tr>
+            <tr><td class="param">string <b>key</b></td><td>The session key to be used.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var appwebsocket = AppWebsocketClient.connect("wss://pbx.example.com/PBX0/APPS/websocket", null, "appname");
+appwebsocket.onauth(function(conn, app, challenge) {
+    // get login parameters asynchronously (e.g. using Services API) and then call the auth function
+    conn.auth(...);
+});
+</code></pre>
+    </dd>
+
+    <a name="send"><div class="fnhead" style="margin-top:5px">send</div></a>
+    <dd>
+        Sends a appwebsocket text message.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>message</b></td><td>The text message to be sent.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.send(JSON.stringify({ mt: "SomeMessage" }));</code></pre>
+    </dd>
+
+    <a name="setFlowControl"><div class="fnhead" style="margin-top:5px">setFlowControl</div></a>
+    <dd>
+        Enables flow control for the connection. That means that after receiving a message with the <a href="#onmessage">onmessage</a> callback, the <a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a>
+        waits for the application to call <a href="messageComplete">messageComplete</a> before receiving more messages.
+        Optional.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">bool <b>enabled</b></td><td>True if flow controll shall be used.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.setFlowControl(true);
+
+appwebsocket.onmessage(function(conn, msg) {
+    var obj = JSON.parse(msg);
+    if (obj.mt == "SomeMessage") {
+        // ...
+    }
+    conn.messageComplete();
+});</code></pre>
+    </dd>
+
+    <a name="messageComplete"><div class="fnhead" style="margin-top:5px">messageComplete</div></a>
+    <dd>
+        Tells the library to receive the next appwebsocket message.
+        See <a href="#setFlowControl">setFlowControl</a> for details.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#AppWebsocketClientConnection">AppWebsocketClientConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.setFlowControl(true);
+
+appwebsocket.onmessage(function(conn, msg) {
+    var obj = JSON.parse(msg);
+    if (obj.mt == "SomeMessage") {
+        // ...
+    }
+    conn.messageComplete();
+});</code></pre>
+    </dd>
+
+    <a name="encrypt"><div class="fnhead" style="margin-top:5px">encrypt</div></a>
+    <dd>
+        Encrypts a string using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>A seed value that shall be unique for each call. The seed is needed by the remote party for decryption.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The string to be encrypted.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The encrypted string.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var seed = "some seed";
+var secret = "some secret text";
+var encryptedText = conn.encrypt(seed, secret);
+appwebsocket.send(JSON.stringify({ mt: "SomeMessage", seed: seed, encryptedText: encryptedText }));</code></pre>
+    </dd>
+
+    <a name="decrypt"><div class="fnhead" style="margin-top:5px">decrypt</div></a>
+    <dd>
+        Decrypts a string using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>The seed needs to be given by the remote party for decryption.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The encrypted string.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The decrypted string.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">appwebsocket.onmessage(function(conn, msg) {
+    var obj = JSON.parse(msg);
+    if (obj.mt == "SomeMessage") {
+        var secret = conn.decrypt(obj.seed, obj.encryptedText);
+    }
+});</code></pre>
+    </dd>
+
+    <a name="hash"><div class="fnhead" style="margin-top:5px">hash</div></a>
+    <dd>
+        Calculates a hash value using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>A seed value that shall be unique for each call.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The string to be hashed.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The calculated hash value.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var seed = "some seed";
+var text = "some secret text";
+var hash = conn.hash(seed, secret);
+conn.send(JSON.stringify({ mt: "SomeMessage", text: text, seed: seed, hash, hash }));</code></pre>
+    </dd>
+
+
+    <h3><a name="Example-Cross-Service-Login">Example: Connecting to another app service using the Services API of the pbx</a></h3>
+    <dd>
+        This examples demonstrates how to connect to another app service. The password for the app service is unknown so we make use of the Services API of the PBX
+        to get the needed credentials. For that the app object needs some special settings in the PBX.
+        <ul>
+            <li>Websocket must be enabled.</li>
+            <li>Services must be checked.</li>
+            <li>The other app must be checked in the Apps tab.</li>
+        </ul>
+        
+    </dd>
+    <h4>Code example</h4>
+    <pre><code class="JS">
+// track websocket connection from the PBX supporting the Services API
+
+var servicesApi = null;
+new PbxApi("Services").onconnected(function(conn) {
+    servicesApi = conn;
+    conn.onclose(function() {
+        servicesApi = null;
+    });
+});
+
+// connect to other app service
+
+function connectToService(uri, app) {
+    var appwebsocket = AppWebsocketClient.connect(uri, null, app);
+
+    // asynchonous authentication using Services API
+    appwebsocket.onauth(function(conn, app, challenge) {
+        if (!servicesApi) {
+            log("no connection to PBX");
+            appwebsocket.close();
+        }
+        else {
+            servicesApi.send(JSON.stringify({api: "Services", mt:"GetServiceLogin", challenge: challenge, app: app}));
+            servicesApi.onmessage(function(message) {
+                var msg = JSON.parse(message);
+                if (msg.mt == "GetServiceLoginResult") {
+                    if (msg.error) {
+                        log("login failed");
+                        appwebsocket.close();
+                    }
+                    else {
+                        // pass received login parameters to library
+                        var key = servicesApi.decrypt(msg.salt, msg.key);
+                        var info = JSON.stringify(msg.info);
+                        appwebsocket.auth(msg.domain, msg.sip, msg.guid, msg.dn, msg.pbxObj, msg.app, info, msg.digest, key);
+                    }
+                }
+            });
+        }
+    });
+
+    appwebsocket.onopen(function(conn) {
+        // connection is up
+    });
+
+    appwebsocket.onmessage(function (conn, msg) {
+        // process incoming messages
+    });
+
+    appwebsocket.onclose(function(conn) {
+        // connection is closed
+    });
+}
+
+</pre></code>
+</body>
+</html>
