@@ -18,3 +18,50 @@ div.button {
     text-align:center;
     cursor:pointer;
 }
+
+.colunaesquerda{
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    background-color: #02163F;
+    color: white;
+    opacity: 0.9;
+}
+
+.colunadireita{
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    /* background-color: purple; */
+    left:15%;
+    background-color: rgb(196, 196, 196);
+}
+li{
+    padding: 10px;
+    list-style-type: none;
+    margin-left: 20px;  
+}
+li:hover{
+    background-color: rgba(241, 241, 241, 0.486);
+    border-radius: 10px;
+    cursor: pointer;
+
+}
+.otherli{
+    margin-left: 10px;
+    
+}
+.config{
+    margin-left: 2px;
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+
+.config:hover{
+    background-color: rgba(241, 241, 241, 0.486);
+    border-radius: 10px;
+    cursor: pointer;
+
+}
