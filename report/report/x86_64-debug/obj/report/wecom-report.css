@@ -35,13 +35,14 @@ div.button {
     /* background-color: purple; */
     left:15%;
     background-color: rgb(196, 196, 196);
+    color: black;
 }
 li{
     padding: 10px;
     list-style-type: none;
     margin-left: 20px;  
 }
-li:hover{
+.liOptions:hover{
     background-color: rgba(241, 241, 241, 0.486);
     border-radius: 10px;
     cursor: pointer;
@@ -58,10 +59,10 @@ a{
     text-decoration: none;
     color: white;
 }
-
+/* 
 .config:hover{
-    background-color: rgba(241, 241, 241, 0.486);
-    border-radius: 10px;
+    background-color: transparent;
+    border-radius: 0px;
     cursor: pointer;
 
-}
+}  */
