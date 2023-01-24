@@ -1,4 +1,92 @@
 {
+    "database":{
+        "init":[
+            {
+            "cmd": "table",
+            "name": "tbl_ramais",
+            "init":[
+                {
+                    "cmd":"column",
+                    "name":"id",
+                    "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+                },
+                {
+                    "cmd":"column",
+                    "name":"sip",
+                    "type":"VARCHAR(120) UNIQUE NOT NULL"
+                },
+                {
+                    "cmd":"column",
+                    "name": "nome",
+                    "type":"VARCHAR(120) NOT NULL"
+
+                },
+                {
+                    "cmd":"column",
+                    "name": "data_criacao",
+                    "type": "date"
+                }
+
+            ]
+            },
+            {
+                "cmd":"table",
+                "name":"tbl_chamadas",
+                "init":[
+                    {
+                        "cmd":"column",
+                        "name":"id",
+                        "type":"BIGSERIAL PRIMARY KEY NOT NULL"
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"call_id",
+                        "type":"int"
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"call_start",
+                        "type": "timestamp"
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"call_answer",
+                        "type": "timestamp"
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"call_end",
+                        "type":"timestamp"
+
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"local_sip",
+                        "type":"timestamp"
+
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"local_e164",
+                        "type":"timestamp"
+
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"remoto_sip",
+                        "type":"timestamp"
+
+                    },
+                    {
+                        "cmd":"column",
+                        "name":"remoto_e164",
+                        "type":"timestamp"
+
+                    }
+                ]
+            }
+        ]
+    },
     "javascript": {
         "eval": [
             "wecom-reportservice.js"

@@ -43,7 +43,7 @@ li{
     margin-left: 20px;  
 }
 .liOptions:hover{
-    background-color: rgba(241, 241, 241, 0.486);
+    background-color: rgba(255, 255, 255, 0.178);
     border-radius: 10px;
     cursor: pointer;
 

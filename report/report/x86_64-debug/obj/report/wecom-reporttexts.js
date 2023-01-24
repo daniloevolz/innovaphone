@@ -12,7 +12,14 @@ Wecom.reportTexts = {
         labelDetalhadoPeríodo : "Detalhado por Período",
         labelDetalhadoRamal : "Detalhado por Ramal",
         labelTotalRamal : "Total por Ramal",
-        labelConfig : "Configurações"
+        labelConfig : "Configurações",
+        labelFiltros: "Filtros",
+        labelDe: "DE:",
+        labelAté: "ATÉ:",
+        labelNumOrigem: "NÚMERO DE ORIGEM:",
+        labelRamal: "RAMAL:",
+        labelCancel: "Cancelar",
+        labelVisualizar: "Visualizar",
 
       
 

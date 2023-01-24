@@ -8,6 +8,8 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
 
+    var list_users = [];
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -32,11 +34,26 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
+
     }
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
         }
+        if (obj.api == "admin" && obj.mt == "TableUsersResult") {
+            console.log(obj.result);
+            list_users = [];
+            list_users = JSON.parse(obj.result);
+            constructor()
+        }
+    }
+    function constructor(){
+        that.clear();
+        var iptUser = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, null));
+        iptUser.setAttribute("id", "selectUser");
+        list_users.forEach(function (user) {
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.sip, null));
+        })
     }
 }
 
