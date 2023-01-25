@@ -20,6 +20,7 @@ Wecom.reportTexts = {
         labelRamal: "RAMAL:",
         labelCancel: "Cancelar",
         labelVisualizar: "Visualizar",
+        labelUsers: "Usuários"
 
       
 

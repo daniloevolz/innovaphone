@@ -22,6 +22,7 @@ new JsonApi("admin").onconnected(function(conn) {
         });
     }
 });
+
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
     log("PbxTableUsers: connected");
 
@@ -32,22 +33,28 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "grps": {}, "devices": {}} }));
     
     conn.onmessage(function (msg) {
+
         var obj = JSON.parse(msg);
+
+
         log("PbxTableUsers: msg received " + msg);
 
         if (obj.mt == "ReplicateStartResult") {
             pbxTableUsers = [];
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
         }
-        if (obj.mt == "ReplicateNextResult" && obj.columns.guid != null) {
-            
+        if (obj.mt == "ReplicateNextResult" && obj.columns) {
+        
             pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, badge: 0 });
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
 
+            log("PBX TABLE USERS " + JSON.stringify(pbxTableUsers))
         }
+        
         if (obj.mt == "ReplicateAdd") {
-            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn });
 
+            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn });
+    
         }
         if (obj.mt == "ReplicateUpdate") {
 

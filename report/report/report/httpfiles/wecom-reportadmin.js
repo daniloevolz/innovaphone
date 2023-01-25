@@ -49,7 +49,8 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
     }
     function constructor(){
         that.clear();
-        var iptUser = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, null));
+        var divUser = that.add(new innovaphone.ui1.Div("position:absolute; left:47%; top: 10%; font-size:30px;",texts.text("labelUsers"),null))
+        var iptUser = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:18%; font-size:12px; text-align:center", null, null));
         iptUser.setAttribute("id", "selectUser");
         list_users.forEach(function (user) {
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.sip, null));
