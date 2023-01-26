@@ -47,8 +47,10 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         
             pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, badge: 0 });
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext" }));
-            log("PBX TABLE USERS " + pbxTableUsers)
+
+            log("PBX TABLE USERS " + JSON.stringify(pbxTableUsers))
         }
+        
         if (obj.mt == "ReplicateAdd") {
 
             pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn });

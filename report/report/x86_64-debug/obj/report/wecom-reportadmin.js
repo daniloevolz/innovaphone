@@ -44,17 +44,38 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
             console.log(obj.result);
             list_users = [];
             list_users = JSON.parse(obj.result);
-            constructor()
+            MakeAdmin()
         }
     }
-    function constructor(){
+    function MakeAdmin(){
         that.clear();
-        var divUser = that.add(new innovaphone.ui1.Div("position:absolute; left:47%; top: 10%; font-size:30px;",texts.text("labelUsers"),null))
-        var iptUser = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:18%; font-size:12px; text-align:center", null, null));
+        
+        var divAdminPainel = that.add(new innovaphone.ui1.Div("width: 100%; text-align:center; top: 5%; position: absolute; font-size: 25px; ",texts.text("labelAdminPanel"),null))
+
+        var btnDivAddUsers = that.add(new innovaphone.ui1.Div("position:absolute; color:white; top: 15%; width: 15%; left: 32%; text-align:center; background-color: #02163F;",null,"button-inn").addTranslation(texts,"btnAdd")).addEvent("click", function(){
+            DivAddUsers()
+        })
+        // var btnDelUsers = that.add(new innovaphone.ui1.Div("position: absolute; color:white; top: 15%; width: 15%; left: 52%; text-align:center; background-color: #B0132B;",null,"button-inn").addTranslation(texts,"btnDel")).addEvent("click", function(){
+
+        // })
+       
+    }
+    function DivAddUsers(){
+        that.clear();
+        var divUser = that.add(new innovaphone.ui1.Div("position:absolute; top:5%; width:100%; text-align:center ; font-size:30px;",texts.text("labelUsers"),null))
+        var iptUser = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:15%; font-size:15px; text-align:center", null, null));
         iptUser.setAttribute("id", "selectUser");
         list_users.forEach(function (user) {
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.sip, null));
-        })
+        })      
+       that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:25%; font-size:15px; background-color: #02163F; text-align:center", null, "button-inn")).addTranslation(texts, "btnAdd").addEvent("click", function () {
+        // app.send({ api: "channel", mt: "AddChannelMessage", name: String(iptName.getValue()), url: String(iptUrl.getValue()), type: String(type), img: String(linkImg) });
+            });
+        //Botão Cancelar   
+        that.add(new innovaphone.ui1.Div("position:absolute; left:52%; width:15%; top:25%; font-size:15px; text-align:center; background-color: #B0132B; ", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            MakeAdmin();
+            makeTableUsers();
+        });
     }
 }
 

@@ -20,7 +20,10 @@ Wecom.reportTexts = {
         labelRamal: "RAMAL:",
         labelCancel: "Cancelar",
         labelVisualizar: "Visualizar",
-        labelUsers: "Usuários"
+        labelUsers: "Usuários",
+        btnAdd: "Adicionar Usuário",
+        btnDel: "Deletar Usuário",
+        labelAdminPanel: "Painel Admin Report"
 
       
 

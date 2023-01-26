@@ -103,8 +103,9 @@ Wecom.report = Wecom.report || function (start, args) {
         var colDireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
         var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 4rem;",texts.text("labelFiltros"),null));
         var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 2rem;",texts.text("labelTotalPeríodo"),null));
-        divFiltrosDetails.setAttribute("id","details")
+        divFiltrosDetails.setAttribute("id","details");
 
+        
         var divDe = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 25.5%; left: 6%; font-weight: bold;",texts.text("labelDe"),null));
         var InputDe = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 9%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;",null,null,null,"date",null));
         var divAte = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 35.5%; left: 6%; font-weight: bold;",texts.text("labelAté"),null));
