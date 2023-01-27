@@ -19,7 +19,9 @@ div.button {
     text-align:center;
     cursor:pointer;
 }
-
+.arrow{
+    visibility: hidden;
+}
 .colunaesquerda{
     position: absolute;
     width: 15%;
@@ -81,3 +83,38 @@ div.button-inn {
     cursor: pointer;
 
 }  */
+::-webkit-scrollbar {
+    display: block;
+    
+}
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(19, 33, 71);
+}
+.popup-background {
+    background-color: rgba(100,100,100,0.2);
+}
+
+.popup-header {
+    background-image: url("novaalert.png");
+    color: #fdb901; /* #02163F */
+}
+
+.popup-main {
+    background-color: white;
+    box-shadow: 0 0 10px black;
+    border: 4px solid transparent;
+    text-align:center;
+    vertical-align:central;
+}
+
+.popup-closer {
+    background-image: url("close.png");
+    top: 0px;
+    right: -30px;
+    height: 60px;
+    width: 60px;
+    background-repeat: no-repeat;
+}

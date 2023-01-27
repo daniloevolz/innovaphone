@@ -1,9 +1,9 @@
-﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/report" -temp "x86_64-debug/obj/" -project "report" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-reportservice.js," -copyRTM 1
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/report" -temp "x86_64-debug/obj/" -project "report" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, ../web1/ui1.popup/*.js, ../web1/ui1.listview/*.js, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-reportservice.js," -copyRTM 1
   Building project ...
       Project output dirctory : x86_64-debug/report
       Temp directory          : x86_64-debug\obj\report
       Runtime binary          : jse/x86_64/generic
-      Build Number            : 13B185
+      Build Number            : 13B203
   
   Removing old files from x86_64-debug\obj\report...
   Creating directories...
@@ -14,6 +14,8 @@
       .\report\..\web1\ui1.lib\*.js => x86_64-debug\obj\report\web1\ui1.lib
       .\report\..\web1\ui1.svg\*.js => x86_64-debug\obj\report\web1\ui1.svg
       .\report\..\web1\fonts\*.ttf => x86_64-debug\obj\report\web1\fonts
+      .\report\..\web1\ui1.popup\*.js => x86_64-debug\obj\report\web1\ui1.popup
+      .\report\..\web1\ui1.listview\*.js => x86_64-debug\obj\report\web1\ui1.listview
       .\report\httpfiles\* => x86_64-debug\obj\report
       .\report\build.txt => x86_64-debug\obj\report
       .\report\label.txt => x86_64-debug\obj\report

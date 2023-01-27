@@ -29,9 +29,9 @@ new JsonApi("users").onconnected(function(conn){
         conn.onmessage(function(msg){
             var obj = JSON.parse(msg);
             if(obj.mt == "AddUsers"){
-                Database.insert("INSERT INTO tbl_ramais (sip,nome,data_criacao) VALUES ('" + obj.sip + "','" + obj.nome + "','" + obj.data_ciacao + "') ")
+                Database.insert("INSERT INTO tbl_ramais (sip, nome, data_criacao) VALUES ('" + obj.sip + "','" + obj.nome + "','" + obj.data_criacao + "') ")
                 .oncomplete(function () {
-                    conn.send(JSON.stringify({ api: "users", mt: "InsertUsersSucess" }));
+                    conn.send(JSON.stringify({ api: "users", mt: "InsertUsersSuccess" }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
                     conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(error) }));
