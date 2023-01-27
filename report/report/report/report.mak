@@ -6,7 +6,9 @@ FILES += \
 	../$(SDK-WEB1)/lib1/*.css \
 	../$(SDK-WEB1)/ui1.lib/*.js \
 	../$(SDK-WEB1)/ui1.svg/*.js \
-	../$(SDK-WEB1)/fonts/*.ttf
+	../$(SDK-WEB1)/fonts/*.ttf \
+	../$(SDK-WEB1)/ui1.popup/*.js \
+	../$(SDK-WEB1)/ui1.listview/*.js 
 	
 # Files for your app
 FILES += \

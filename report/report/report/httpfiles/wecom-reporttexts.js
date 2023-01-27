@@ -24,7 +24,12 @@ Wecom.reportTexts = {
         btnAdd: "Adicionar Usuário",
         btnDel: "Deletar Usuário",
         btnCancel: "Cancelar",
-        labelAdminPanel: "Painel Admin Report"
+        labelAdminPanel: "Painel Admin Report",
+        labelTituloUsers: "Lista de Usuários",
+        cabecalho0: "Id",
+        cabecalho1: "SIP",
+        cabecalho2: "Nome",
+        cabecalho3: "Data de Criação"
 
       
 
