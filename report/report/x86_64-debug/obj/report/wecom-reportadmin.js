@@ -41,13 +41,14 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
+
         }
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
             console.log(obj.result);
             list_users = [];
             list_users = JSON.parse(obj.result);
             MakeAdmin()
-        }
+        }   
         if (obj.api == "users" && obj.mt == "UsersError") {
             console.log(obj.result);
             makePopup("ERRO", "Erro: " + obj.result);
@@ -83,19 +84,19 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
 
     function MakeAdmin(){
         that.clear();
-        
+
         var divAdminPainel = that.add(new innovaphone.ui1.Div("width: 100%; text-align:center; top: 5%; position: absolute; font-size: 25px; ",texts.text("labelAdminPanel"),null))
 
     }
     function DivAddUsers(){
         that.clear();
-        var divUserSip = that.add(new innovaphone.ui1.Div("position:absolute; top:5%; width:100%; text-align:center ; font-size:30px;",texts.text("labelUsers"),null))
+        var divUserSip = that.add(new innovaphone.ui1.Div("position:absolute; top:5%; width:100%; text-align:center ; font-size:30px;",texts.text("labelUsersSip"),null))
         var iptUserSip = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:15%; font-size:15px; text-align:center", null, null));
         iptUserSip.setAttribute("id", "selectUser");
         list_users.forEach(function (user) {
             iptUserSip.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.sip, null));
         })      
-        var divUserName = that.add(new innovaphone.ui1.Div("position:absolute; top:25%; width:100%; text-align:center ; font-size:30px;",texts.text("labelUsers"),null))
+        var divUserName = that.add(new innovaphone.ui1.Div("position:absolute; top:25%; width:100%; text-align:center ; font-size:30px;",texts.text("labelUsersName"),null))
         var iptUserCN = that.add(new innovaphone.ui1.Node("select", "position:absolute; left:35%; width:30%; top:35%; font-size:15px; text-align:center", null, null));
         iptUserCN.setAttribute("id", "selectCN");
         list_users.forEach(function (user) {
@@ -105,14 +106,17 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
         var userSipSelect = document.getElementById("selectUser").value;
         var userCnSelect = document.getElementById("selectCN").value;
 
+        // Construtor 
         const date = Date.now();
         const today = new Date(date);
-        // console.log(today.toDateString())
-        // console.log(today.toLocaleDateString())
-        list_users.forEach(function (user)  {
-             app.send({ api: "users", mt: "AddUsers", sip: String(userSipSelect) , nome: String(userCnSelect),  data_criacao: today.toLocaleDateString()  });
+        var day =  new Date().toISOString().replace('-', '/').split('T')[0].replace('-', '/');
+        var time = today.toLocaleTimeString()
+        
+        // Verificação
+        console.log(" DATA ATUAL " + day)
+        console.log(" HORA ATUAL " + today.toLocaleTimeString())
 
-        })
+             app.send({ api: "users", mt: "AddUsers", sip: String(userSipSelect) , nome: String(userCnSelect),  data_criacao: today , hora_criacao: String(time) });
             });
         //Botão Cancelar   
         that.add(new innovaphone.ui1.Div("position:absolute; left:52%; width:15%; top:45%; font-size:15px; text-align:center; background-color: #B0132B; color:white ", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
@@ -133,13 +137,13 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
                 console.log(s);
                 selectedrows.push(listView.getRowData(s))
                 console.log("TA PRINTANDO " + selectedrows[0]);
-                app.send({ api: "channel", mt: "DeleteUsers", id: parseInt(selectedrows[0]) });
+                app.send({ api: "users", mt: "DeleteUsers", id: parseInt(selectedrows[0]) });
             })
         }); 
          //Título Tabela Users
          var labelTituloUsers = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloUsers")));
-         var list = new innovaphone.ui1.Div("position: absolute; display:flex; justify-content:center; left:0%; top:35%;  width: 100%; height:300px", null, "");
-         var columns = 4;
+         var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
+         var columns = 5;
          var rows = list_ramais.length;
          var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
          //Cabeçalho
@@ -153,6 +157,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
             row.push(b.sip);
             row.push(b.nome);
             row.push(b.data_criacao);
+            row.push(b.hora_criacao)
             listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
             that.add(list);
         })
