@@ -167,7 +167,7 @@ public:
 			                                                                                          If nullptr, the instance passed to the constructor will be used.</td></tr>
         </table>
         <h4>Return value</h4>
-        The task that must be executed to initialize the config table. Simply call Start() of that task, passing a user of your choice to that function.
+        The task that must be executed to initialize the config table. Simply call Start(class UTask * user) of that task, passing a user of your choice to that function. Make sure to provide a user parameter. The function Start() without any parameter should not be used.
 		
 		<h4>Remarks</h4>
 		Note that the created ITask instance returned by CreateInitTask() must be freed after the task has finished or failed. If not, the application will

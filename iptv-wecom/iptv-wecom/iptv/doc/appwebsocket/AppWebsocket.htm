@@ -325,10 +325,52 @@
         </dd>
         <dt>info</dt>
         <dd>
-            An optional JSON Object with additional information. For the digest calculation this must be JSON
+            <p>An optional JSON Object with additional information. For the digest calculation this must be JSON
             encoded without any unnecessary white space and no unnecessary escaping. This is the
             encoding done by the json_io library of the SDK, by the Javascript JSON.stringify function
-            or by a PHP function json_encode($input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            or by a PHP function json_encode($input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).</p>
+
+            <p>Possible properties are:
+                <dl>
+                    <dt>appobj</dt>
+                    <dd>The name of the App object</dd>
+
+                    <dt>appdn</dt>
+                    <dd>The display name of the App object</dd>
+
+                    <dt>appurl</dt>
+                    <dd>The URL of the App object</dd>
+
+                    <dt>pbx</dt>
+                    <dd>The name of the PBX the connection is established from</dd>
+
+                    <dt>cn</dt>
+                    <dd>The long name of the App object</dd>
+
+                    <dt>testmode</dt>
+                    <dd>The property <code>testmode</code> is set to <code>true</code> if the gateway or the IPVA running the PBX is in the <a href="https://wiki.innovaphone.com/index.php?title=Reference12r1:General/License">Test-Mode</a>. This property can be used to detect the active Test-mode of the connecting PBX in the App Service.</dd>
+
+                    <dt>apps</dt>
+                    <dd>Array of other Apps that are configured to be able to access this App (Apps tab of the App object).</dd>
+                </dl>
+            </p>
+
+            <p>Example for an info object:
+                <pre><code class="json">{
+    "appobj": "sampleapp",
+    "appdn": "sampleapp",
+    "appurl": "https://ap.example.com/sampleapp/acme-sampleapp",
+    "pbx": "master",
+    "cn": "sampleapp",
+    "testmode": true,
+    "apps": [
+        {
+            "name": "otherapp",
+            "dn": "otherapp"
+        }
+    ]
+}</code></pre>
+            </p>
         </dd>
     </dl>
 

@@ -12,16 +12,16 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
+            "--bg": "url('bg.png')",
             "--button": "#c6c6c6",
             "--text-standard": "#004c84",
-            "--div-DelBtn" : "#f2f5f6",
+            "--div-DelBtn": "#f2f5f6",
         },
         light: {
-            "--bg": "white",
+            "--bg": "url('bg.png')",
             "--button": "#c6c6c6",
             "--text-standard": "#004c84",
-            "--div-DelBtn" : "#f2f5f6",
+            "--div-DelBtn": "#f2f5f6",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);

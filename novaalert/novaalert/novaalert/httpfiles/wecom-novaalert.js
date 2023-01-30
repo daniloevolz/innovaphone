@@ -9,6 +9,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     this.createNode("body");
     var that = this;
 
+    //var phoneApi = start.consumeApi("com.innovaphone.phone");
+    var calllistApi = start.consumeApi("com.innovaphone.calllist");
+    calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
+    calllistApi.onmessage.attach(calllistonmessage);
+
     var colorSchemes = {
         dark: {
             "--bg": "url('bg.png')",
@@ -31,24 +36,37 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
+    var userUI;
+    app.onclosed = waitConnection;
+    app.onerror = waitConnection;
 
     //Coluna Esquerda
-    var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-    var container = colesquerda.add(new innovaphone.ui1.Div("display: block; position: absolute; height: 40%; width: 100%;", null, null));
+    var colesquerda;
+    var container;
+    var coldireita;
+    var scroll;
+    var popup;
+    //var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+    //var container = colesquerda.add(new innovaphone.ui1.Div("display: flex; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center; background-color: darkgrey;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null));
     //Coluna Direita
-    var coldireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+    //var coldireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
     //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
     //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
-    container.setAttribute("id", "containerPlayer");
-    var call = colesquerda.add(new innovaphone.ui1.Div(null, null,"call-container"));
-    var history = call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px",texts.text("labelHistorico"),null))
-    var scroll = call.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
-    scroll.setAttribute("id", "scroll-calls")
+    //container.setAttribute("id", "containerPlayer");
+    //var call = colesquerda.add(new innovaphone.ui1.Div(null, null, "call-container"));
+    //var history = call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px", texts.text("labelHistorico"), null))
+    //var scroll = call.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+    //scroll.setAttribute("id", "scroll-calls")
 
-    function app_connected(domain, user, dn, appdomain) { 
+
+    //waitConnection();
+
+    function app_connected(domain, user, dn, appdomain) {
+        userUI = user;
         app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "user", mt: "SelectMessage" });
         app.send({ api: "user", mt: "UserPresence" });
+        connected();
  
         if (app.logindata.info.unlicensed) {
             //sem licença
@@ -84,16 +102,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var list_users = [];
     var list_buttons = [];
+    var popupOpen = false;
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-
+            
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
+            //connected(that);
             popButtons(list_buttons);
-           
-            
         }
         if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
             var clicked = document.getElementById(obj.src);
@@ -135,13 +153,34 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
+        if (obj.api == "user" && obj.mt == "CallRinging") {
+            console.log(obj.src);
+            var element = obj.src + "-status";
+            console.log(element);
+            try {
+                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+            } catch {
+                console.log("CallRinging is not button");
+            } finally {
+                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+                addNotification(">>>  Chamada Tocando " + obj.src);
+                if (obj.src == userUI && popupOpen==false) {
+                    makePopup("Chamando", "<button type='button' class='popup-connect'>ATENDER</button><button type='button' class='popup-clear'>RECUSAR</button>", 400, 100);
+                }
+            }
+        }
         if (obj.api == "user" && obj.mt == "CallConnected") {
             console.log(obj.src);
             var element = obj.src+"-status";
             console.log(element);
-            document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
-            //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
-            addNotification(">>>  Chamada Conectada " + obj.src);
+            try {
+                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
+                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+            } catch {
+                console.log("CallConnected is not button");
+            } finally {
+                addNotification(">>>  Chamada Conectada " + obj.src);
+            } 
         }
         if (obj.api == "user" && obj.mt == "UserConnected") {
             console.log(obj.src);
@@ -171,6 +210,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
             //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
             addNotification(">>>  Chamada Desconectada " + obj.src);
+
+            var sipButton = document.getElementById(obj.src);
+            if (sipButton.style.backgroundColor == "darkred") {
+                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            }
+            if (obj.src == userUI && popupOpen==true) {
+                popup.close();
+                popupOpen = false;
+            }
+
         }
     }
 
@@ -238,6 +288,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         return data;
     }
     function popButtons(buttons) {
+
         var combobtn = coldireita.add(new innovaphone.ui1.Div(null, null, "combobtn"));
         var allbtn = coldireita.add(new innovaphone.ui1.Div(null, null, "allbtn"));
         var pagebtn = coldireita.add(new innovaphone.ui1.Div(null, null, "pagebtn"));
@@ -374,12 +425,47 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
-        popup.header.addText(header);
-        popup.content.addHTML(content);
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+        if (popupOpen == false) {
+            var popupcloser = document.querySelectorAll(".popup-closer");
+            for (var i = 0; i < popupcloser.length; i++) {
+                var botao = popupcloser[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    app.send({ api: "user", mt: "DecrementCount" });
+                    popupOpen = false;
+                });
+            }
+            var popupanswer = document.querySelectorAll(".popup-connect");
+            for (var i = 0; i < popupanswer.length; i++) {
+                var botao = popupanswer[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    app.send({ api: "user", mt: "UserConnect" });
+                    _popup.close();
+                    popupOpen = false;
+                });
+            }
+            var popupanswer = document.querySelectorAll(".popup-clear");
+            for (var i = 0; i < popupanswer.length; i++) {
+                var botao = popupanswer[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    app.send({ api: "user", mt: "EndCall" });
+                    _popup.close();
+                    popupOpen = false;
+                });
+            }
+            popup = _popup;
+            popupOpen = true;
+        }
     }
 
-    
     function updateScreen(id, type, prt, prt_user) {
         
         if (type == "page") {
@@ -455,12 +541,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var oldPlayer = document.getElementById('video-js');
                 videojs(oldPlayer).dispose();
                 container.clear();
-            } catch {
+            }
+            catch {
                 container.clear();
             }
             var clicked = document.getElementById(prt);
             if (clicked.style.backgroundColor == "darkred") {
                 container.clear();
+                container.add(new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null);
+
                 document.getElementById(prt).style.backgroundColor = "var(--button)";
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {
@@ -533,15 +622,41 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    var popupcloser = document.querySelectorAll(".popup-closer");
-    for (var i = 0; i < popupcloser.length; i++) {
-        var botao = popupcloser[i];
-        // O jeito correto e padronizado de incluir eventos no ECMAScript
-        // (Javascript) eh com addEventListener:
-        botao.addEventListener("click", function () {
-            app.send({ api: "user", mt: "DecrementCount" });
-        });
+    function waitConnection() {
+        that.clear();
+        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        that.add(bodywait);
     }
+
+    function connected() {
+        that.clear();
+        //Coluna Esquerda
+        var col_esquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var _container = col_esquerda.add(new innovaphone.ui1.Div("display: flex; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center; background-color: darkgrey;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null));
+
+        //Coluna Direita
+        var col_direita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+        //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
+        //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
+        _container.setAttribute("id", "containerPlayer");
+        var _call = col_esquerda.add(new innovaphone.ui1.Div(null, null, "call-container"));
+        var _history = _call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px", texts.text("labelHistorico"), null))
+        var _scroll = _call.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
+        _scroll.setAttribute("id", "scroll-calls")
+        coldireita = col_direita;
+        colesquerda = col_esquerda;
+        container = _container;
+        scroll = _scroll;
+        popButtons(list_buttons);
+    }
+    function calllistonmessage(consumer, obj) {
+        if (obj.msg) {
+            console.log("::calllistApi::onmessage() msg=" + JSON.stringify(obj.msg));
+            app.send({ api: "user", mt: "CallHistoryEvent", obj: JSON.stringify(obj.msg) });
+        }
+    }
+
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
