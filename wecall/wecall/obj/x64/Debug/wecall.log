@@ -3,7 +3,7 @@
       Project output dirctory : x86_64-debug/wecall
       Temp directory          : x86_64-debug\obj\wecall
       Runtime binary          : jse/x86_64/generic
-      Build Number            : 13B446
+      Build Number            : 13B449
   
   Removing old files from x86_64-debug\obj\wecall...
   Creating directories...
@@ -23,24 +23,4 @@
       .\wecall\wecom-wecallservice.js => x86_64-debug\obj\wecall
   
   Compressing files to x86_64-debug\wecall\httpfiles.zip...
-  ZipArchiveHelper : O processo não pode acessar o arquivo 'C:\Users\danil\OneDrive - Wecom S 
-  A\GitHub\innovaphone\wecall\wecall\x86_64-debug\obj\wecall\wecom-wecall.png' porque ele está sendo usado por outro 
-  processo.
-  No 
-  C:\Windows\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Archive\Microsoft.PowerShell.Archive.psm1:632 
-  caractere:30
-  + ... sArchived = ZipArchiveHelper $sourceFilePaths $destinationPath $compr ...
-  +                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      + CategoryInfo          : PermissionDenied: (C:\Users\danil\...ecom-wecall.png:String) [Write-Error], IOException
-      + FullyQualifiedErrorId : CompressArchiveUnauthorizedAccessError,ZipArchiveHelper
-   
-  New-Object : Exceção ao chamar ".ctor" com "1" argumento(s): "O fluxo não era legível."
-  No 
-  C:\Windows\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Archive\Microsoft.PowerShell.Archive.psm1:808 
-  caractere:38
-  + ...     $srcStream = New-Object System.IO.BinaryReader $currentFileStream
-  +                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      + CategoryInfo          : InvalidOperation: (:) [New-Object], MethodInvocationException
-      + FullyQualifiedErrorId : ConstructorInvokedThrowException,Microsoft.PowerShell.Commands.NewObjectCommand
-   
   Comando de build remoto não configurado, ignorando.

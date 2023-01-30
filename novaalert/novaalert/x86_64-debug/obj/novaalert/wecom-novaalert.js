@@ -182,6 +182,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 addNotification(">>>  Chamada Conectada " + obj.src);
             } 
         }
+        }
         if (obj.api == "user" && obj.mt == "UserConnected") {
             console.log(obj.src);
             updateListUsers(obj.src, obj.mt);

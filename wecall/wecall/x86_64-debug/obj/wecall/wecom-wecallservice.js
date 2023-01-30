@@ -238,6 +238,10 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.sendCallEvents = obj.vl;
                     Config.save();
                 }
+                if (obj.prt == "leaveGroupsStartup") {
+                    Config.LeaveAllGroupsOnStatup = obj.vl;
+                    Config.save();
+                }
                 if (obj.prt == "urlDashboard") {
                     Config.urldash = obj.vl;
                     Config.save();
