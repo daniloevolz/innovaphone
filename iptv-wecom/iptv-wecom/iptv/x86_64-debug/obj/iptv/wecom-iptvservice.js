@@ -32,7 +32,7 @@ new JsonApi("channel").onconnected(function (conn) {
                 var licenses = conn.lics;
                 log("SelectChannelMessage: licenses " + licenses)
                 if (conn.unlicensed) {
-                    Database.exec("SELECT * FROM channels LIMIT 1")
+                    Database.exec("SELECT * FROM channels ")
                         .oncomplete(function (data) {
                             log("result=" + JSON.stringify(data, null, 4));
                             conn.send(JSON.stringify({ api: "channel", mt: "SelectChannelMessageResultSuccess", result: JSON.stringify(data, null, 4) }));

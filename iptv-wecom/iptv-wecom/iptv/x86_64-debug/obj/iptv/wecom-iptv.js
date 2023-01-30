@@ -48,11 +48,12 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
         console.log(obj);
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
 
-            if (app.logindata.info.unlicensed) {
-                unlicensed()
-           }else{
+        //     if (app.logindata.info.unlicensed) {
+        //         unlicensed()
+        //    }else{
+        //     iptv();
+        // }
             iptv();
-        }
 
         }
         if (obj.api == "channel" && obj.mt =="ChannelMessageError") {

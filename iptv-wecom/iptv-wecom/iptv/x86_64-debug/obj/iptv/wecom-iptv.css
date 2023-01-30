@@ -1,6 +1,6 @@
 
 body {
-    background-color: var(--bg);
+    background-image: var(--bg);
     color: var(--text-standard);
     overflow: hidden;
 }
@@ -128,7 +128,7 @@ a {
     left: 1%
 }
 .imglogo{
-    width: 130px;
+    /*width: 130px;*/
     height: 30px;
 }
 

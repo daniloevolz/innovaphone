@@ -326,7 +326,7 @@
     this->turnusr = _strdup(json.get_string(config, "turnUser"));
     const char * turnpass = json.get_string(config, "turnPassword");
     const char * seed = json.get_string(config, "turnSeed");
-    dword len = strlen(turnpass) / 2 + 1;
+    dword len = turnpass ? (strlen(turnpass) / 2 + 1) : 1;
     this->turnpwd = (char*)malloc(len);
     if (strlen(seed) > 1) this->sysclient->Decrypt(seed, turnpass, (char*)this->turnpwd, len);
     }

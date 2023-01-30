@@ -20,7 +20,9 @@ Wecom.wecallTexts = {
         labelCodCient: "Código de Cliente Wecall:",
         labelUrlSSO: "URL provedor SSO Wecall:",
         labelUrl: "URL de Autenticação SSO:",
-        labelUrlG: "URL provedor de Filas a serem monitoradas:"
+        labelUrlG: "URL provedor de Filas a serem monitoradas:",
+        labelCodLeaveGroups: "Código do PBX para sair de todos os grupos:",
+        labelChkLeaveGroupsStartup: "Sair de todos os grupos ao entrar?"
 
     },
     en: {

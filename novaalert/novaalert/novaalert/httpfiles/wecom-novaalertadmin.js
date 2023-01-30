@@ -96,6 +96,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     }
 
     function makeButtons() {
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:0%; font-size:15px; text-align:center", null, "button-inn"));
         //Botão Tabela Botões  
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:0%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnButtons").addEvent("click", function () {
             makeTableButtons(container);
@@ -255,7 +256,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         //Valor
         t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelValue")));
-        var iptValue = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+        var iptValue = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, texts.text("iptText"), 500, "url", null));
         //Tipo
         t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelType")));
         var iptType = t.add(new innovaphone.ui1.Node("select", "position:absolute; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, null));
@@ -299,9 +300,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptUrlNovaAlert.setValue(iptUrl);
         t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:30%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "urlalert", vl: String(iptUrlNovaAlert.getValue()) });
+            iptUrl = String(iptUrlNovaAlert.getValue());
         });
         
     }
+
     function makeTableButtons(t) {
         t.clear();
         //Botões Tabela de Botões

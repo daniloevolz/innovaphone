@@ -12,6 +12,8 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
     calllistApi.onmessage.attach(calllistonmessage);
 
+    
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -35,24 +37,30 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center;", null, "bodywaitconnection")
+    bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+    that.add(bodywait);
+
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
-        if (app.logindata.info.unlicensed) {
-            //sem licença
-            var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
-            that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-                app.send({ api: "user", mt: "UserMessage" });
-            });
+        //if (app.logindata.info.unlicensed) {
+        //    //sem licença
+        //    var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
+        //    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
+        //        app.send({ api: "user", mt: "UserMessage" });
+        //    });
 
-        } else {
+        //} else {
 
-            app.send({ api: "user", mt: "UserMessage" });
-        }
+        //    app.send({ api: "user", mt: "UserMessage" });
+        //}
+        app.send({ api: "user", mt: "UserMessage" });
         
     }
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
+            that.clear();
             if (obj.src == "") {
                 var urlPortal = that.add(new innovaphone.ui1.Input("position:absolute; left:35%; width:30%; top:calc(5% - 6px); font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", "btn btn - save btn - lg"));
                 that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "salvarClose").addEvent("click", function () {

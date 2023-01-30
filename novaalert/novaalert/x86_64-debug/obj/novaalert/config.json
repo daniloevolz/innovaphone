@@ -79,7 +79,7 @@
           {
             "cmd": "column",
             "name": "action_prt",
-            "type": "VARCHAR(250)"
+            "type": "text"
           },
           {
             "cmd": "column",
@@ -128,7 +128,16 @@
   },
   "apis": {
     "wecom-novaalert": {
-      "presence": true
+      "presence": true,
+      "com.innovaphone.phoneinfo": {
+        "info": {}
+      },
+      "com.innovaphone.phone": {
+        "info": {}
+      },
+      "com.innovaphone.calllist": {
+        "info": {}
+      }
     }
   }
 }

@@ -11,14 +11,14 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--bg": "url('bg.png')",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
         },
         light: {
-            "--bg": "white",
-            "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--bg": "url('bg.png')",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -99,6 +99,20 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         app.send({ api: "admin", mt: "UpdateConfig", prt: "UrlG", vl: String(ipturlG.getValue()) });
     });
 
+    //Código Sair de Todos os Grupos
+    var labelCodLeaveGroups = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:90%; font-size:15px; text-align:right", texts.text("labelCodLeaveGroups")));
+    var iptCodLeaveGroups = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:90%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
+    that.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "CodLeaveGroups", vl: String(iptCodLeaveGroups.getValue()) });
+    });
+    //Checkbox sair dos grupos ao entrar
+    var labelChkLeaveGroupsStartup = that.add(new innovaphone.ui1.Div("position:absolute; left:70%; width:15%; top:90%; font-size:15px; text-align:right", texts.text("labelChkLeaveGroupsStartup")));
+    var switchLeaveGroupsStartup = that.add(new innovaphone.ui1.Switch("position:absolute; left:90%; top:90%;"));
+    switchLeaveGroupsStartup.addEvent("click", onLeaveGroupsStartupSwitchCLick);
+
+
+    
+
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "AdminMessage" });
     }
@@ -114,6 +128,8 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             iptCodClient.setValue(obj.CodCli);
             ipturl.setValue(obj.url);
             ipturlG.setValue(obj.urlG);
+            iptCodLeaveGroups.setValue(obj.CodLeave);
+            switchLeaveGroupsStartup.setValue(obj.sLS)
 
         }
     }
@@ -122,6 +138,12 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         var state = switchCallEvents.getValue();
             //e.currentTarget.state;
         app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: state });
+    }
+    function onLeaveGroupsStartupSwitchCLick() {
+
+        var state = switchLeaveGroupsStartup.getValue();
+        //e.currentTarget.state;
+        app.send({ api: "admin", mt: "UpdateConfig", prt: "leaveGroupsStartup", vl: state });
     }
     function onCallListSwitchCLick() {
         var state = switchCallList.getValue();

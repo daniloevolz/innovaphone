@@ -71,6 +71,20 @@
       },
       {
         "cmd": "item",
+        "name": "CodLeaveAllGroups",
+        "type": "STRING",
+        "default": "#32#",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "LeaveAllGroupsOnStatup",
+        "type": "BOOL",
+        "default": true,
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "urlGetGroups",
         "type": "STRING",
         "default": "https://wecallsup.3sales.net/api/innovaphone/getgroups",

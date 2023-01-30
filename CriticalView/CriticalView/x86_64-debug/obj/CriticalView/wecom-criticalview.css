@@ -127,8 +127,8 @@ ul {
 .imglogo {
     align-self: center;
 }
-.imglogo{
-    width: 130px;
+.imglogo {
+    /*width: 130px;*/
     height: 30px;
 }
 
