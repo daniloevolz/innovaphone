@@ -20,7 +20,8 @@ Wecom.reportTexts = {
         labelRamal: "RAMAL:",
         labelCancel: "Cancelar",
         labelVisualizar: "Visualizar",
-        labelUsers: "Usuários",
+        labelUsersSip: "Usuários SIP:",
+        labelUsersName: "Usuários Nome:",
         btnAdd: "Adicionar Usuário",
         btnDel: "Deletar Usuário",
         btnCancel: "Cancelar",
@@ -29,7 +30,8 @@ Wecom.reportTexts = {
         cabecalho0: "Id",
         cabecalho1: "SIP",
         cabecalho2: "Nome",
-        cabecalho3: "Data de Criação"
+        cabecalho3: "Data de Criação",
+        cabecalho4: "Hora de Criação"
 
       
 

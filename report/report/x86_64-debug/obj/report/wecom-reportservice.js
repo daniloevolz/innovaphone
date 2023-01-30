@@ -22,49 +22,52 @@ new JsonApi("admin").onconnected(function(conn) {
         });
     }
 });
+    
+new JsonApi("users").onconnected(function (conn) {
 
-new JsonApi("users").onconnected(function(conn){
-    if (conn.app == "wecom-reportadmin"){
-        conn.send(JSON.stringify({api: "users" , mt: "SelectUsersResult"}));
-        conn.onmessage(function(msg){
+    if (conn.app == "wecom-reportadmin") {
+        conn.send(JSON.stringify({ api: "users", mt: "SelectUsersResult" }));
+        conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
-            if(obj.mt == "AddUsers"){
-                Database.insert("INSERT INTO tbl_ramais (sip, nome, data_criacao) VALUES ('" + obj.sip + "','" + obj.nome + "','" + obj.data_criacao + "') ")
-                .oncomplete(function () {
-                    conn.send(JSON.stringify({ api: "users", mt: "InsertUsersSuccess" }));
-                })
-                .onerror(function (error, errorText, dbErrorCode) {
-                    conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(error) }));
-                });
+
+            if (obj.mt == "AddUsers") {
+                Database.insert("INSERT INTO tbl_ramais (sip, nome, data_criacao, hora_criacao) VALUES ('" + obj.sip + "','" + obj.nome + "','" +  obj.data_criacao + "','" + obj.hora_criacao + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "users", mt: "InsertUsersSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(errorText) }));
+                    });
 
             }
-    if (obj.mt == "SelectUsers") {
-        conn.send(JSON.stringify({ api: "users", mt: "SelectUsersResult" }));
-        Database.exec("SELECT * FROM tbl_ramais")
-            .oncomplete(function (data) {
-                log("result=" + JSON.stringify(data, null, 4));
-                conn.send(JSON.stringify({ api: "users", mt: "SelectUsersResultSuccess", result: JSON.stringify(data, null, 4) }));
+            if (obj.mt == "SelectUsers") {
+                conn.send(JSON.stringify({ api: "users", mt: "SelectUsersResult" }));
+                Database.exec("SELECT * FROM tbl_ramais")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "users", mt: "SelectUsersResultSuccess", result: JSON.stringify(data, null, 4) }));
 
-            })
-            .onerror(function (error, errorText, dbErrorCode) {
-                conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(errorText) }));
-            });
-        
-    }
-    if (obj.mt == "DeleteUsers") {
-        conn.send(JSON.stringify({ api: "users", mt: "DeleteUsersResult" }));
-        Database.exec("DELETE FROM tbl_ramais WHERE id=" + obj.id + ";")
-            .oncomplete(function () {
-                conn.send(JSON.stringify({ api: "users", mt: "DeleteUsersSuccess" }));
-            })
-            .onerror(function (error, errorText, dbErrorCode) {
-                conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(errorText) }));
-            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(errorText) }));
+                    });
+            
+            }
+            if (obj.mt == "DeleteUsers") {
+                conn.send(JSON.stringify({ api: "users", mt: "DeleteUsersResult" }));
+                Database.exec("DELETE FROM tbl_ramais WHERE id=" + obj.id + ";")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "users", mt: "DeleteUsersSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "users", mt: "UsersError", result: String(errorText) }));
+                    });
+            }
+        });
+        conn.messageComplete();
     }
 });
-conn.messageComplete();
-}
-});
+
 
 
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
