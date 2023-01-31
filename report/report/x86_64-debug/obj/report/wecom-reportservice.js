@@ -65,7 +65,13 @@ new JsonApi("admin").onconnected(function(conn) {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "TableUsers") {
-                conn.send(JSON.stringify({api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(pbxTableUsers,null,4) }))
+
+                if(pbxTableUsers.length === 0){
+                    log(" Lista Vazia " + pbxTableUsers)
+                }else{
+                    conn.send(JSON.stringify({api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(pbxTableUsers,null,4) }))
+                }
+                
             }
             if (obj.mt == "AddRamal") {
                 log("obj.data_criacao: " + obj.data_criacao);

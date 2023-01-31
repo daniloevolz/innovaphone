@@ -51,11 +51,12 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
     }
 
     function app_message(obj) {
+        
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
             console.log(JSON.parse(obj.result));
             list_users = [];
             list_users = JSON.parse(obj.result);
-            MakeAdmin()
+            // MakeAdmin()
         }   
         if (obj.api == "admin" && obj.mt == "UsersError") {
             console.log(obj.result);
@@ -65,15 +66,19 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
             console.log(obj.result);
             list_ramais = [];
             list_ramais = JSON.parse(obj.result);
-            makeTableUsers()
+            makeTableUsers();
         }          
         if (obj.api == "admin" && obj.mt == "InsertRamalSuccess") {
+            that.clear()
             app.send({ api: "admin", mt: "SelectRamais" });
             makePopup("Atenção", "Ramal adicionado com sucesso!");
+            
         }
         if (obj.api == "admin" && obj.mt == "DeleteRamalSuccess") {
+            that.clear()
             app.send({ api: "admin", mt: "SelectRamais" });
             makePopup("Atenção", "Ramal excluído com sucesso!");
+           
         }
     }
 
@@ -85,12 +90,6 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
         var popup = new innovaphone.ui1.Popup("position:absolute; left:50px; top:50px; width:500px; height:200px; color: black; font-size: 20px; font-weight: bold", styles[0], h[0]);
         popup.header.addText(header);
         popup.content.addText(content);
-    }
-
-    function MakeAdmin(){
-        that.clear();
-        that.add(new innovaphone.ui1.Div("width: 100%; text-align:center; top: 5%; position: absolute; font-size: 25px; ",texts.text("labelAdminPanel"),null))
-        makeTableUsers();
     }
 
     function DivAddUsers(){
@@ -106,25 +105,21 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
 
            var user = list_users.filter(function (user) { return user.cn === userSipSelect });
 
-        // Construtor 
-        //const date = Date.now();
-        //const today = new Date(date);
-        //var day =  new Date().toISOString().replace('-', '/').split('T')[0].replace('-', '/');
-        //var time = today.toLocaleTimeString()
-        var day = new Date().toUTCString();
-        // Verificação
-        console.log(" DATA ATUAL " + day)
-        //console.log(" HORA ATUAL " + today.toLocaleTimeString())
-
-           app.send({ api: "admin", mt: "AddRamal", sip: String(user[0].sip), nome: String(user[0].cn),  data_criacao: String(day)});
+           // Horario Atual
+           var day = new Date().toLocaleString();
+           
+           app.send({ api: "admin", mt: "AddRamal", sip: String(user[0].sip), nome: String(user[0].cn)  ,  data_criacao: String(day)});
             });
         //Botão Cancelar   
         that.add(new innovaphone.ui1.Div("position:absolute; left:52%; width:15%; top:45%; font-size:15px; text-align:center; background-color: #B0132B; color:white ", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            MakeAdmin();
+            that.clear()
             makeTableUsers();
         });
     }
     function makeTableUsers(){
+        
+        that.add(new innovaphone.ui1.Div("width: 100%; text-align:center; top: 5%; position: absolute; font-size: 25px; ",texts.text("labelAdminPanel"),null))
+
         that.add(new innovaphone.ui1.Div("position:absolute; color:white; top: 15%; width: 15%; left: 32%; text-align:center; background-color: #02163F;",null,"button-inn").addTranslation(texts,"btnAdd")).addEvent("click", function(){
             DivAddUsers()
         })
@@ -143,7 +138,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
          //Título Tabela Users
          var labelTituloUsers = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloUsers")));
          var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
-         var columns = 5;
+         var columns = 4;
          var rows = list_ramais.length;
          var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
          //Cabeçalho
