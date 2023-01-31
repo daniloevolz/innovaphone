@@ -131,6 +131,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptType.setAttribute("id", "selectType");
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "alarm", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "number", null));
+        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "externalnumber", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "video", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "page", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "queue", null));

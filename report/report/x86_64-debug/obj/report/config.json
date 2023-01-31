@@ -25,13 +25,7 @@
                     "cmd":"column",
                     "name": "data_criacao",
                     "type": "timestamp"
-                },
-                {
-                    "cmd": "column",
-                    "name": "hora_criacao",
-                    "type": "time"
                 }
-
             ]
             },
             {

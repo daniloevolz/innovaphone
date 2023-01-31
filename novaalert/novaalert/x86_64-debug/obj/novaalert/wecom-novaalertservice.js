@@ -1539,8 +1539,11 @@ function comboDispatcher(button, mt) {
             break;
         case "number":
             var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser.dn);
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (!foundCall) {
+                log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser.sip)];
                     if (temp != null) {
@@ -1606,8 +1609,11 @@ function comboDispatcher(button, mt) {
             break;
         case "queue":
             var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser.dn);
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (!foundCall) {
+                log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser.sip)];
                     if (temp != null) {
