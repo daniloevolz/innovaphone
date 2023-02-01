@@ -139,7 +139,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
          //Título Tabela Users
          var labelTituloUsers = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloUsers")));
          var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
-         var columns = 5;
+         var columns = 5; 
          var rows = list_ramais.length;
          var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
          //Cabeçalho

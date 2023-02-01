@@ -12,11 +12,12 @@
 }
 
 svg.pl {
-    font-size: 35px;
+    font-size: 32px;
 }
 
 .table {
-    font-size: 22px;
+    font-size: 17px;
+    font-weight: bold;
 }
 
 /*:root {
