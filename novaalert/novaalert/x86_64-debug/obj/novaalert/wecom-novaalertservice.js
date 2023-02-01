@@ -1545,7 +1545,7 @@ function comboDispatcher(button, mt) {
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (foundCall.length==0) {
-                log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser[0].sip)];
                     if (temp != null) {
@@ -1572,7 +1572,7 @@ function comboDispatcher(button, mt) {
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (foundCall.length==0) {
-                log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser[0].sip)];
                     if (temp != null) {
@@ -1642,7 +1642,7 @@ function comboDispatcher(button, mt) {
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (foundCall.length==0) {
-                log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser[0].sip)];
                     if (temp != null) {

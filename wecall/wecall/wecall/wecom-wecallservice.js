@@ -23,6 +23,8 @@ var connectionsAdmin = [];
 //var connectionsRCC = [];
 var RCC = [];
 var PbxSignal = [];
+var pbxTable = [];
+var pbxTableUsers = [];
 
 //var connections = [];
 var calls = [];
@@ -130,6 +132,27 @@ WebServer.onrequest("rcc", function (req) {
                 value = newValue;
                 req.sendResponse();
                 rccRequest(value);
+            }
+        });
+    }
+    else {
+        req.cancel();
+    }
+});
+WebServer.onrequest("pbxTable", function (req) {
+    if (req.method == "POST") {
+        var newValue = "";
+        var value = "";
+        req.onrecv(function (req, data) {
+            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+            if (data) {
+                newValue += (new TextDecoder("utf-8").decode(data));
+                req.recv();
+            }
+            else {
+                value = newValue;
+                req.sendResponse();
+                pbxTableRequest(value);
             }
         });
     }
@@ -302,6 +325,53 @@ new JsonApi("dash").onconnected(function (conn) {
 
 
 //PBX APIS
+new PbxApi("PbxTableUsers").onconnected(function (conn) {
+    pbxTable.push(conn);
+    log("PbxTableUsers: connected " + JSON.stringify(conn));
+
+    // for each PBX API connection an own call array is maintained
+
+    //connectionsPbxSignal.push({ ws: conn });
+    // register to the PBX in order to acceppt incoming presence calls
+    conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
+
+    conn.onmessage(function (msg) {
+
+        var obj = JSON.parse(msg);
+
+
+        log("PbxTableUsers: msg received " + msg);
+
+        if (obj.mt == "ReplicateStartResult") {
+            pbxTableUsers = [];
+            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
+        }
+        if (obj.mt == "ReplicateNextResult" && obj.columns) {
+
+            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, badge: 0 });
+            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
+
+            log("PBX TABLE USERS " + JSON.stringify(pbxTableUsers))
+        }
+
+        if (obj.mt == "ReplicateAdd") {
+
+            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, badge: 0 });
+
+        }
+        if (obj.mt == "ReplicateUpdate") {
+
+        }
+
+        // handle incoming presence_subscribe call setup messages
+        // the callid "obj.call" required later for sending badge notifications
+    });
+
+    conn.onclose(function () {
+        log("PbxTableUsers: disconnected");
+        pbxTable.splice(pbxTable.indexOf(conn), 1);
+    });
+});
 
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
@@ -393,7 +463,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 if (rcc.pbx == pbx) {
                     var user = rcc[sip];
                     log("PbxSignal: calling RCC API to End user Monitor " + String(sip) + " on PBX " + pbx);
-                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: sip + "," + obj.src };
+                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: sip + "," + pbx };
                     conn.send(JSON.stringify(msg));
                 }
             })
@@ -460,6 +530,19 @@ new PbxApi("RCC").onconnected(function (conn) {
                 callRCC(conn, obj.user, "UserCall", codLeaveAllGroups, obj.src);
             }
             //updateConnections(obj.src, "user", obj.user, obj.area);
+        } else if (obj.mt === "UserEndResult") {
+            log("RCC: connections before delete result " + JSON.stringify(RCC));
+            var src = obj.src;
+            var myArray = src.split(",");
+            var sip = myArray[0];
+            var pbx = myArray[1];
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == pbx) {
+                    delete rcc[sip];
+                }
+            })
+            log("RCC: connections after delete result " + JSON.stringify(RCC));
+
         }
         else if (obj.mt === "CallInfo") {
             var src = obj.src;
@@ -704,6 +787,28 @@ function rccRequest(value) {
     //    log("danilo-req rccRequest: will callRCC ");
     //    callRCC(connection.ws, obj.user, obj.mode, obj.num, obj.sip);
     //});
+}
+function pbxTableRequest(value) {
+    log("danilo-req pbxTableRequest:value " + String(value));
+    var obj = JSON.parse(String(value));
+    var user = pbxTableUsers.filter(function (user) { return user.sip === obj.sip });
+    if (obj.mode === "Login") {
+        pbxTable.forEach(function (conn) {
+            if (conn.pbx == user[0].pbx) {
+                log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }],"src": user[0].sip+","+conn.pbx } }));
+                //log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "grps": { "name": obj.group, "dyn": "in" }, "src": user[0].sip+","+conn.pbx } }));
+                conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }], "src": user[0].sip + "," + conn.pbx } }));
+            }
+        })
+    }
+    if (obj.mode === "Logout") {
+        pbxTable.forEach(function (conn) {
+            if (conn.pbx == user[0].pbx) {
+                log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "src": user[0].sip + "," + conn.pbx } }));
+                conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "src": user[0].sip + "," + conn.pbx } }));
+            }
+        })
+    }
 }
 /*
 function makecallRequest(value) {

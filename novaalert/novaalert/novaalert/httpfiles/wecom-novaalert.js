@@ -213,18 +213,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
-                
-            } catch {
-                console.log("CallDisconnected not button");
-            } finally {
-                //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
-                addNotification(">>>  Chamada Desconectada " + obj.src);
-
                 var sipButton = document.getElementById(obj.src);
                 if (sipButton.style.backgroundColor == "darkred") {
                     document.getElementById(obj.src).style.backgroundColor = "darkgreen";
                     //document.getElementById(value).setAttribute("class", "allbutton");
                 }
+            } catch {
+                console.log("CallDisconnected not button");
+            } finally {
+                //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
+                addNotification(">>>  Chamada Desconectada " + obj.src);
                 if (obj.src == userUI && popupOpen == true) {
                     popup.close();
                     popupOpen = false;
