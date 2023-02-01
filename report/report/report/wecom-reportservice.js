@@ -58,7 +58,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         initializeMonitor();
         monitorInitialized = true;
     }
-
+    
     //conn.send(JSON.stringify({ "api": "RCC", "mt": "Initialize", "limit": 50, "calls": true }));
 
     //conn.send(JSON.stringify({ api: "RCC", mt: "Devices", cn: "Danilo Volz" }));
