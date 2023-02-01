@@ -314,7 +314,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         queueGrupsOk = true;
     }
 
-    conn.send(JSON.stringify({ "api": "RCC", "mt": "Initialize", "limit": 50, "calls": true }));
+    //conn.send(JSON.stringify({ "api": "RCC", "mt": "Initialize", "limit": 50, "calls": true }));
 
     //conn.send(JSON.stringify({ api: "RCC", mt: "Devices", cn: "Danilo Volz" }));
     conn.onmessage(function (msg) {
@@ -1014,19 +1014,21 @@ function updateTableBadgeCount(sip, mt) {
     if (mt == "DecrementCount") {
         pbxTableUsers.forEach(function (user) {
             if (user.sip == sip) {
-                user.badge = user.badge - 1;
+                if (user.badge > 0) {
+                    user.badge = user.badge - 1;
+                    log("Sending updates via Presence Signalling");
 
-                log("Sending updates via Presence Signalling");
+                    PbxSignal.forEach(function (signal) {
+                        log("danilo-req badge2:PbxSignal " + JSON.stringify(signal));
+                        var call = signal[user.sip];
+                        if (call != null) {
+                            log("danilo-req badge2:call found" + String(call) + ", will call updateBadge");
+                            updateBadge(signal, call, user.badge);
+                        }
 
-                PbxSignal.forEach(function (signal) {
-                    log("danilo-req badge2:PbxSignal " + JSON.stringify(signal));
-                    var call = signal[user.sip];
-                    if (call != null) {
-                        log("danilo-req badge2:call found" + String(call) + ", will call updateBadge");
-                        updateBadge(signal, call, user.badge);
-                    }
-
-                })
+                    })
+                }
+                
                 /*
                 connections.forEach(function (conn) {
                     if (conn.sip == user.sip) {
@@ -1537,29 +1539,56 @@ function comboDispatcher(button, mt) {
                 }
             });
             break;
-        case "number":
+        case "externalnumber":
             var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
-            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser.dn);
+            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser[0].dn);
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
-            if (!foundCall) {
-                log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
+            if (foundCall.length==0) {
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
                 RCC.forEach(function (rcc) {
-                    var temp = rcc[String(foundConnectionUser.sip)];
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
                     if (temp != null) {
                         user = temp;
-                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
-                        callRCC(rcc, user, "UserCall", button.button_prt_user, foundConnectionUser.sip + "," + rcc.pbx);
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserCall", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
                     }
                 })
             } else {
                 RCC.forEach(function (rcc) {
-                    var temp = rcc[String(foundConnectionUser.sip)];
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
                     log("danilo req:comboDispatcher:number call.sip == conn.sip:temp " + temp);
                     if (temp != null) {
                         user = temp;
-                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
-                        callRCC(rcc, user, "UserClear", button.button_prt_user, foundConnectionUser.sip + "," + rcc.pbx);
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserClear", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
+                    }
+                })
+            }
+            break;
+        case "number":
+            var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser[0].dn);
+            var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
+            log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
+            if (foundCall.length==0) {
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
+                RCC.forEach(function (rcc) {
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
+                    if (temp != null) {
+                        user = temp;
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserCall", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
+                    }
+                })
+            } else {
+                RCC.forEach(function (rcc) {
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
+                    log("danilo req:comboDispatcher:number call.sip == conn.sip:temp " + temp);
+                    if (temp != null) {
+                        user = temp;
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserClear", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
                     }
                 })
             }
@@ -1609,27 +1638,27 @@ function comboDispatcher(button, mt) {
             break;
         case "queue":
             var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
-            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser.dn);
+            log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser[0].dn);
             var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
-            if (!foundCall) {
-                log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
+            if (foundCall.length==0) {
+                //log("danilo-req:comboDispatcher:found call for user " + foundCall.sip);
                 RCC.forEach(function (rcc) {
-                    var temp = rcc[String(foundConnectionUser.sip)];
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
                     if (temp != null) {
                         user = temp;
-                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
-                        callRCC(rcc, user, "UserCall", button.button_prt_user, foundConnectionUser.sip + "," + rcc.pbx);
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserCall", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
                     }
                 })
             } else {
                 RCC.forEach(function (rcc) {
-                    var temp = rcc[String(foundConnectionUser.sip)];
+                    var temp = rcc[String(foundConnectionUser[0].sip)];
                     log("danilo req:comboDispatcher:number call.sip == conn.sip:temp " + temp);
                     if (temp != null) {
                         user = temp;
-                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
-                        callRCC(rcc, user, "UserClear", button.button_prt_user, foundConnectionUser.sip + "," + rcc.pbx);
+                        log("danilo-req:comboDispatcher:will call callRCC for user " + user + " Nome " + foundConnectionUser[0].dn);
+                        callRCC(rcc, user, "UserClear", button.button_prt_user, foundConnectionUser[0].sip + "," + rcc.pbx);
                     }
                 })
             }

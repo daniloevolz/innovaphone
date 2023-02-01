@@ -160,6 +160,12 @@ WebServer.onrequest("value", function (req) {
 new JsonApi("user").onconnected(function (conn) {
     connectionsUser.push(conn);
     getURLLogin(conn.sip);
+    if (sendCallEvents) {
+        log("danilo-req : connectionUser:login:sendCallEvents=true");
+        var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
+
+        httpClient(urlPhoneApiEvents, msg);
+    }
     log("danilo req : user connection " + JSON.stringify(conn));
     if (conn.app == "wecom-wecall") {
         var info = JSON.parse(conn.info);
@@ -202,6 +208,12 @@ new JsonApi("user").onconnected(function (conn) {
     conn.onclose(function () {
         log("User: disconnected");
         connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+        if (sendCallEvents) {
+            log("danilo-req : connectionUser:logout:sendCallEvents=true");
+            var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "logout" };
+
+            httpClient(urlPhoneApiEvents, msg);
+        }
     });
 });
 new JsonApi("admin").onconnected(function (conn) {

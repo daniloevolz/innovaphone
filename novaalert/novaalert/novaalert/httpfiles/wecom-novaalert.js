@@ -180,6 +180,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallConnected is not button");
             } finally {
                 addNotification(">>>  Chamada Conectada " + obj.src);
+                if (obj.src == userUI && popupOpen == true) {
+                    popup.close();
+                    popupOpen = false;
+                }
             } 
         }
         if (obj.api == "user" && obj.mt == "UserConnected") {
@@ -207,19 +211,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             var element = obj.src + "-status";
             console.log(element);
-            document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
-            //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
-            addNotification(">>>  Chamada Desconectada " + obj.src);
+            try {
+                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
+                
+            } catch {
+                console.log("CallDisconnected not button");
+            } finally {
+                //makePopup("Chamada Desconectada!!!!", obj.src, 500, 200);
+                addNotification(">>>  Chamada Desconectada " + obj.src);
 
-            var sipButton = document.getElementById(obj.src);
-            if (sipButton.style.backgroundColor == "darkred") {
-                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
-                //document.getElementById(value).setAttribute("class", "allbutton");
+                var sipButton = document.getElementById(obj.src);
+                if (sipButton.style.backgroundColor == "darkred") {
+                    document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+                    //document.getElementById(value).setAttribute("class", "allbutton");
+                }
+                if (obj.src == userUI && popupOpen == true) {
+                    popup.close();
+                    popupOpen = false;
+                }
             }
-            if (obj.src == userUI && popupOpen==true) {
-                popup.close();
-                popupOpen = false;
-            }
+            
+           
 
         }
     }
@@ -523,19 +535,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
         }
         if (type == "externalnumber") {
-            var found = list_users.indexOf(prt);
-            if (found != -1) {
-                var clicked = document.getElementById(id);
-                if (clicked.style.backgroundColor == "darkred") {
-                    app.send({ api: "user", mt: "EndCall", prt: String(prt_user) })
-                    document.getElementById(id).style.backgroundColor = "darkgreen";
-                    //document.getElementById(value).setAttribute("class", "allbutton");
-                } else {
-                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt_user) })
-                    addNotification("<<<  " + type + " " + prt);
-                    document.getElementById(id).style.backgroundColor = "darkred";
-                    //document.getElementById(value).setAttribute("class", "allbuttonClicked");
-                }
+            //var found = list_users.indexOf(prt);
+            var clicked = document.getElementById(id);
+            if (clicked.style.backgroundColor == "darkred") {
+                app.send({ api: "user", mt: "EndCall", prt: String(prt) })
+                document.getElementById(id).style.backgroundColor = "";
+                //document.getElementById(value).setAttribute("class", "allbutton");
+            } else {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(prt) })
+                addNotification("<<<  " + type + " " + prt);
+                document.getElementById(id).style.backgroundColor = "darkred";
+                //document.getElementById(value).setAttribute("class", "allbuttonClicked");
             }
         }
         if (type == "queue") {
@@ -682,6 +692,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         scroll = _scroll;
         popButtons(list_buttons);
     }
+
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {
             console.log("::calllistApi::onmessage() msg=" + JSON.stringify(obj.msg));
