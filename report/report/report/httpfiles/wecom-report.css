@@ -4,13 +4,27 @@
     margin: 0;
     padding: 0;
 }
-
 :root {
     --hue: 223;
     --bg: hsl(var(--hue),10%,90%);
     --fg: hsl(var(--hue),10%,10%);
-    font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320));
+    /*  font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320)); */
 }
+
+svg.pl {
+    font-size: 35px;
+}
+
+.table {
+    font-size: 22px;
+}
+
+/*:root {
+    --hue: 223;
+    --bg: hsl(var(--hue),10%,90%);
+    --fg: hsl(var(--hue),10%,10%);
+    font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320));
+}*/
 
 .bodywaitconnection {
     background-color: var(--bg);

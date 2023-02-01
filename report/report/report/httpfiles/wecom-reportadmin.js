@@ -46,6 +46,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
+        that.clear();
         app.send({ api: "admin", mt: "TableUsers" });
         app.send({ api: "admin", mt: "SelectRamais" });
     }
@@ -108,7 +109,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
            // Horario Atual
            var day = new Date().toLocaleString();
            
-           app.send({ api: "admin", mt: "AddRamal", sip: String(user[0].sip), nome: String(user[0].cn)  ,  data_criacao: String(day)});
+           app.send({ api: "admin", mt: "AddRamal", sip: String(user[0].sip), nome: String(user[0].cn), pbx: String(user[0].pbx)  ,  data_criacao: String(day)});
             });
         //Botão Cancelar   
         that.add(new innovaphone.ui1.Div("position:absolute; left:52%; width:15%; top:45%; font-size:15px; text-align:center; background-color: #B0132B; color:white ", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
@@ -138,7 +139,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
          //Título Tabela Users
          var labelTituloUsers = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:26%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloUsers")));
          var list = new innovaphone.ui1.Div("position: absolute; left:15%; top:35%;  width: 80%; height:300px", null, "");
-         var columns = 4;
+         var columns = 5;
          var rows = list_ramais.length;
          var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
          //Cabeçalho
@@ -151,6 +152,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
             row.push(b.id);
             row.push(b.sip);
             row.push(b.nome);
+            row.push(b.pbx);
             row.push(b.data_criacao);
             listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
             that.add(list);

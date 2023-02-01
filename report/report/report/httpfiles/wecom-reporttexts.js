@@ -30,8 +30,8 @@ Wecom.reportTexts = {
         cabecalho0: "Id",
         cabecalho1: "SIP",
         cabecalho2: "Nome",
-        cabecalho3: "Data de Criação",
-        cabecalho4: "Hora de Criação"
+        cabecalho3: "PBX",
+        cabecalho4: "Data Inicio Monitoramento"
 
       
 
