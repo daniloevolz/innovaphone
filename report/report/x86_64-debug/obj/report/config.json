@@ -24,7 +24,7 @@
                 {
                     "cmd":"column",
                     "name": "data_criacao",
-                    "type": "timestamp"
+                    "type": "text"
                 }
             ]
             },
