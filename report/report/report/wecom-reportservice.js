@@ -67,7 +67,7 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "TableUsers") {
 
                 if(pbxTableUsers.length === 0){
-                    log(" Lista Vazia " + pbxTableUsers)
+                    log("Lista Vazia " + pbxTableUsers)
                 }else{
                     conn.send(JSON.stringify({api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(pbxTableUsers,null,4) }))
                 }
