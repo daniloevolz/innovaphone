@@ -153,6 +153,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
+        if (obj.api == "user" && obj.mt == "PopupRequest") {
+            console.log(obj.alarm);
+            //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
+            updateScreen("", "popup", obj.alarm, "");
+            //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
+            //addNotification(">>>  " + obj.alarm);
+        }
         if (obj.api == "user" && obj.mt == "CallRinging") {
             console.log(obj.src);
             var element = obj.src + "-status";
@@ -164,7 +171,20 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             } finally {
                 //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
                 addNotification(">>>  Chamada Tocando " + obj.src);
-                if (obj.src == userUI && popupOpen==false) {
+            }
+        }
+        if (obj.api == "user" && obj.mt == "IncomingCallRinging") {
+            console.log(obj.src);
+            var element = obj.src + "-status";
+            console.log(element);
+            try {
+                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+            } catch {
+                console.log("CallRinging is not button");
+            } finally {
+                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+                addNotification(">>>  Chamada Tocando " + obj.src);
+                if (obj.src == userUI && popupOpen == false) {
                     makePopup("Chamando", "<button type='button' class='popup-connect'>ATENDER</button><button type='button' class='popup-clear'>RECUSAR</button>", 400, 100);
                 }
             }
@@ -352,7 +372,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             }
             else if (object.button_type == "number") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "numberbutton"));
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
                 div1.setAttribute("id", object.button_prt);
@@ -430,6 +450,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+        var botoes = document.querySelectorAll(".userbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
         var botoes = document.querySelectorAll(".pagebutton");
         for (var i = 0; i < botoes.length; i++) {
             var botao = botoes[i];
@@ -496,25 +523,30 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         
         if (type == "page") {
             var clicked = document.getElementById(prt);
-            if (clicked.style.backgroundColor == "darkred") {
-                var gfg_down = document.getElementsByClassName("colunapage")[0];
-                gfg_down.parentNode.removeChild(gfg_down);
-                document.getElementsByClassName("combobtn")[0].style.width = "";
-                document.getElementsByClassName("allbtn")[0].style.width = "";
-                document.getElementsByClassName("pagebtn")[0].style.width = "";
-                document.getElementById(prt).style.backgroundColor = "";
-                //document.getElementById(value).setAttribute("class", "allbutton");
+            if (clicked == null) {
+                makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
             } else {
-                //document.getElementsByClassName("allbtn")[0].style. = "darkgreen";
-                document.getElementsByClassName("combobtn")[0].style.width = "65%";
-                document.getElementsByClassName("allbtn")[0].style.width = "65%";
-                document.getElementsByClassName("pagebtn")[0].style.width = "65%";
-                var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
-                colunapage.addHTML("<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
-                //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
-                addNotification("<<<  " + type);
-                document.getElementById(prt).style.backgroundColor = "darkred";
+                if (clicked.style.backgroundColor == "darkred") {
+                    var gfg_down = document.getElementsByClassName("colunapage")[0];
+                    gfg_down.parentNode.removeChild(gfg_down);
+                    document.getElementsByClassName("combobtn")[0].style.width = "";
+                    document.getElementsByClassName("allbtn")[0].style.width = "";
+                    document.getElementsByClassName("pagebtn")[0].style.width = "";
+                    document.getElementById(prt).style.backgroundColor = "";
+                    //document.getElementById(value).setAttribute("class", "allbutton");
+                } else {
+                    //document.getElementsByClassName("allbtn")[0].style. = "darkgreen";
+                    document.getElementsByClassName("combobtn")[0].style.width = "65%";
+                    document.getElementsByClassName("allbtn")[0].style.width = "65%";
+                    document.getElementsByClassName("pagebtn")[0].style.width = "65%";
+                    var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
+                    colunapage.addHTML("<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
+                    //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
+                    addNotification("<<<  " + type);
+                    document.getElementById(prt).style.backgroundColor = "darkred";
+                }
             }
+            
         }
         if (type == "number") {
             var found = list_users.indexOf(prt);
@@ -531,6 +563,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     //document.getElementById(value).setAttribute("class", "allbuttonClicked");
                 }
             }
+        }
+        if (type == "popup") {
+            makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
         }
         if (type == "externalnumber") {
             //var found = list_users.indexOf(prt);
@@ -688,7 +723,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         colesquerda = col_esquerda;
         container = _container;
         scroll = _scroll;
-        popButtons(list_buttons);
     }
 
     function calllistonmessage(consumer, obj) {

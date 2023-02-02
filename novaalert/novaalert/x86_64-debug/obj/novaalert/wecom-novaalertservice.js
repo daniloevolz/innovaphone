@@ -303,9 +303,10 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
 
 //ok
 new PbxApi("RCC").onconnected(function (conn) {
-
-    //connectionsRCC.push({ ws: conn });
-    RCC.push(conn);
+    var rccFound = RCC.filter(function (rcc) { return rcc.pbx === conn.pbx });
+    if(rccFound.length == 0) {
+        RCC.push(conn);
+    }
     log("RCC: connected conn " + JSON.stringify(conn));
     log("RCC: connected RCC " + JSON.stringify(RCC));
 
@@ -391,7 +392,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                         //var ws = conn.ws;
                         log("danilo-req x-alert: conn.sip " + String(conn.sip));
                         log("danilo-req x-alert: obj.src " + String(obj.src));
-                        conn.send(JSON.stringify({ api: "user", mt: "CallRinging", src: sip }));
+                        conn.send(JSON.stringify({ api: "user", mt: "IncomingCallRinging", src: sip }));
                         //if (String(conn.ws.sip) == String(obj.src)) {
                         //    ws.send(JSON.stringify({ api: "user", mt: "CallConnected", src: obj.src }));
                         //}
@@ -564,7 +565,11 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
 
     // for each PBX API connection an own call array is maintained
-    PbxSignal.push(conn);
+    var signalFound = PbxSignal.filter(function (pbx) { return pbx.pbx === conn.pbx });
+    if (signalFound.length == 0) {
+        PbxSignal.push(conn);
+    }
+    
     //connectionsPbxSignal.push({ ws: conn });
     log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
 
@@ -1168,14 +1173,7 @@ function alarmReceived(value) {
     } finally {
         log("danilo-req alarmReceived: FIM");
     }
-    if (found == false) {
-        connectionsUser.forEach(function (conn) {
-            //var ws = conn.ws;
-            log("danilo-req alarmReceived:conn.sip not for user " + String(conn.sip));
-            updateTableBadgeCount(conn.sip, "IncrementCount");
-            conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
-        });
-    }
+    
 
     //Get Actions from DB
     Database.exec("SELECT * FROM list_alarm_actions")
@@ -1216,18 +1214,19 @@ function alarmReceived(value) {
                                     });
                                     break;
                                 case "number":
-                                    var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
-                                    var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
-                                    if (!foundCall) {
-                                        RCC.forEach(function (rcc) {
-                                            var temp = rcc[String(foundConnectionUser.sip)];
-                                            if (temp != null) {
-                                                user = temp;
-                                                log("danilo-req alarmReceived:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
-                                                callRCC(rcc, user, "UserCall", ac.action_prt, foundConnectionUser.sip + "," + rcc.pbx);
-                                            }
-                                        })
-                                    }
+                                    var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === obj.User });
+                                    RCC.forEach(function (rcc) {
+                                        var temp = rcc[String(foundConnectionUser.sip)];
+                                        if (temp != null) {
+                                            user = temp;
+                                            log("danilo-req alarmReceived:will call callRCC for user " + user + " Nome " + foundConnectionUser.dn);
+                                            callRCC(rcc, user, "UserCall", ac.action_prt, foundConnectionUser.sip + "," + rcc.pbx);
+                                        }
+                                    })
+                                    //var foundCall = calls.filter(function (call) { return call.num === ac.action_prt });
+                                    //if (!foundCall) {
+                                        
+                                    //}
 
                                     //connectionsUser.forEach(function (conn) {
                                     //    //var ws = conn.ws;
@@ -1241,10 +1240,20 @@ function alarmReceived(value) {
                                 case "page":
                                     connectionsUser.forEach(function (conn) {
                                         //var ws = conn.ws;
-                                        log("danilo-req alarmReceived:video conn.sip " + String(conn.sip));
-                                        log("danilo-req alarmReceived:video obj.User " + String(obj.User));
+                                        log("danilo-req alarmReceived:page conn.sip " + String(conn.sip));
+                                        log("danilo-req alarmReceived:page obj.User " + String(obj.User));
                                         if (String(conn.sip) == String(obj.User)) {
                                             conn.send(JSON.stringify({ api: "user", mt: "PageRequest", alarm: ac.action_prt }));
+                                        }
+                                    });
+                                    break;
+                                case "popup":
+                                    connectionsUser.forEach(function (conn) {
+                                        //var ws = conn.ws;
+                                        log("danilo-req alarmReceived:page conn.sip " + String(conn.sip));
+                                        log("danilo-req alarmReceived:page obj.User " + String(obj.User));
+                                        if (String(conn.sip) == String(obj.User)) {
+                                            conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", alarm: ac.action_prt }));
                                         }
                                     });
                                     break;
@@ -1257,6 +1266,14 @@ function alarmReceived(value) {
         .onerror(function (error, errorText, dbErrorCode) {
             conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
         });
+    if (found == false) {
+        connectionsUser.forEach(function (conn) {
+            //var ws = conn.ws;
+            log("danilo-req alarmReceived:conn.sip not for user " + String(conn.sip));
+            updateTableBadgeCount(conn.sip, "IncrementCount");
+            conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID }));
+        });
+    }
     //var obj = JSON.parse(String(value));
     //connectionsApp.forEach(function (connection) {
     //    var ws = connection.ws;

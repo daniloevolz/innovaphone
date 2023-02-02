@@ -347,6 +347,26 @@ div.button {
     height: 15%;
     border-color: white;
     border-width: 3px;
+    background-color: darkgreen;
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    width: 15%;
+    font-weight: bold;
+    color: var(--text-standard); /*white;*/
+    font-size: 12px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button); /*#191919;*/
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+}
+.userbutton {
+    margin: 5px;
+    display: inline-flex;
+    height: 15%;
+    border-color: white;
+    border-width: 3px;
     /* background-color: var(--colbutton); */
     /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
     width: 15%;
