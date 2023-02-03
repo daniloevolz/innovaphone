@@ -8,6 +8,10 @@ Wecom.report = Wecom.report || function (start, args) {
     this.createNode("body");
     var that = this;
 
+    var list_ramais = [];
+     // Horario Atual
+    var day = new Date().toLocaleString();
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -30,9 +34,21 @@ Wecom.report = Wecom.report || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
+    app.onclosed = waitConnection;
+    app.onerror = waitConnection;
+    var UIuser;
+
+    function waitConnection() {
+        that.clear();
+        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        that.add(bodywait);
+    }
 
     function app_connected(domain, user, dn, appdomain) {
+        UIuser = dn;
         app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "user", mt: "SelectRamais"})
         // document.getElementById('user').innerHTML = dn
         
         
@@ -40,8 +56,15 @@ Wecom.report = Wecom.report || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-        constructor();
-
+            // MakeReportTA()
+        }
+        if (obj.api == "user" && obj.mt == "SelectUsersResultSuccess"){
+            console.log(obj.result)
+            list_ramais = [];
+            list_ramais = JSON.parse(obj.result);
+                 
+            constructor();
+       
         var TotaisPeriodo = document.getElementById("TTP");
         TotaisPeriodo.addEventListener("click",function() {MudarTexto("TTP")})
 
@@ -54,7 +77,7 @@ Wecom.report = Wecom.report || function (start, args) {
         var TotalRamal = document.getElementById("TTR");
         TotalRamal.addEventListener("click",function() {MudarTexto("TTR")})
         
-
+            
         }
     }
     function constructor(){
@@ -69,7 +92,7 @@ Wecom.report = Wecom.report || function (start, args) {
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img","max-height: 33px;",null,null));
         imguser.setAttribute("src","icon-user.png");
-        var username = user.add(new innovaphone.ui1.Node("span","font-size: 1.25rem; color:white; margin: 5px;","Nome do usuário",null));
+        var username = user.add(new innovaphone.ui1.Node("span","font-size: 1.25rem; color:white; margin: 5px;",UIuser,null));
         username.setAttribute("id","user")
         
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
@@ -84,11 +107,11 @@ Wecom.report = Wecom.report || function (start, args) {
             Arelatorios1.setAttribute("id","TTP");
             var Arelatorios2 = lirelatorios2.add(new innovaphone.ui1.Node("a",null,texts.text("labelDetalhadoPeríodo"),null));
             Arelatorios2.setAttribute("id","DTP")
-            var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a",null,texts.text("labelDetalhadoRamal"),null));
+            var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a",null,texts.text("labelDetalhadoAtendente"),null));
             Arelatorios3.setAttribute("id","DTR")
-            var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a",null,texts.text("labelTotalRamal"),null));
+            var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a",null,texts.text("labelTotalAtendente"),null));
             Arelatorios4.setAttribute("id","TTR")
-        
+            
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;",null,null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null,null,"otherli"));
 
@@ -105,15 +128,24 @@ Wecom.report = Wecom.report || function (start, args) {
         var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 2rem;",texts.text("labelTotalPeríodo"),null));
         divFiltrosDetails.setAttribute("id","details");
 
-        
         var divDe = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 25.5%; left: 6%; font-weight: bold;",texts.text("labelDe"),null));
         var InputDe = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 9%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;",null,null,null,"date",null));
         var divAte = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 35.5%; left: 6%; font-weight: bold;",texts.text("labelAté"),null));
         var InputAte = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 10%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;",null,null,null,"date",null));
-        var divNumOrigem = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 45.6%; left: 6%; font-weight: bold;",texts.text("labelNumOrigem"),null));
+        var divNumOrigem = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 45.6%; left: 6%; font-weight: bold;",texts.text("labelTelefone"),null));
         var InputNumOrigem = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 45%; left: 21%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ",null,null,null,"number",null));
-        var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 55.6%; left: 6%; font-weight: bold;",texts.text("labelRamal"),null));
-        var InputRamal = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 55.0%; left: 12%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ",null,null,null,"number",null));
+        var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 55.6%; left: 6%; font-weight: bold;",texts.text("labelAtendente"),null));
+        var SelectRamal = colDireita.add(new innovaphone.ui1.Node("select","position: absolute; top: 55.0%; left: 14%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ",null,null));
+       
+        list_ramais.forEach(function (user) {
+         var opt =  SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null));
+         opt.setAttribute("id","sips");
+
+       })     
+       
+
+       
+
         // logo WeCom colDireita
         var wecom = colDireita.add(new innovaphone.ui1.Div("position:absolute; top:90%; left: 2%;",null,null));
         var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
@@ -123,10 +155,10 @@ Wecom.report = Wecom.report || function (start, args) {
         // buttons
         var btnCancel = colDireita.add(new innovaphone.ui1.Node("button","position: absolute; top: 70%; height: 50px; width: 90px; left: 75%; border-radius: 10px; background-color: transparent; border: 2px solid; border-color: #02163F; font-weight: bold;",texts.text("labelCancel"),null))
         var btnSee = colDireita.add(new innovaphone.ui1.Node("button","position: absolute; top: 70%; height: 50px; width: 90px; left: 87%; border-radius: 10px; background-color: #02163F; color: white; font-weight: bold;",texts.text("labelVisualizar"),null));
+        
 
-       
     }   
-
+    // Mudar nome dos relatório conforme escolhido na coluna esquerda
     function MudarTexto(ex){
         if(ex == "TTP"){
             document.getElementById('details').innerHTML = texts.text("labelTotalPeríodo");
@@ -140,6 +172,30 @@ Wecom.report = Wecom.report || function (start, args) {
         if(ex == "TTR"){
             document.getElementById('details').innerHTML = texts.text("labelTotalRamal");
         }
+    }
+    // Funções de criação do Relatório - Abreviadas pelas iniciais de cada Relatório
+    function MakeReportTA(){
+        that.clear();
+       var divMainTA = that.add(new innovaphone.ui1.Div("width: 85%; background-color: rgb(196, 196, 196); color:black; height: 100%; position: absolute; left:15%;"));
+       var divDateReport = divMainTA.add(new innovaphone.ui1.Div("text-align:left; font-size: 16px ; font-weight:bold",texts.text("labelDateReport") + day,null))                                                             
+       var divAtendente = divMainTA.add(new innovaphone.ui1.Div("position:absolute; top: 10%; width:50%; height: 50px; display:flex; align-items:center; justify-content:center ;border: 1px solid black;",texts.text("labelAtendente2")))
+       var divTempoFalando = divMainTA.add(new innovaphone.ui1.Div("position:absolute; top: 10%; width:50%; height: 50px; display:flex; align-items:center; left: 50%; justify-content:center ;border: 1px solid black;",texts.text("labelTempoFalando")))       
+   // Tabela dos Atendentes  - mais p frente podemos seprar em uma Função conforme o desenvolvimento
+   var list = divMainTA.add(new innovaphone.ui1.Div("position: absolute; left:0%; top:20%;  width: 50%; height:300px", null, "divTable"));
+   var rows = list_ramais.length;
+   var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
+    //Tabela    
+  list_ramais.forEach(function (b) {
+      var row = [];
+      row.push(b.sip);
+      row.push(b.nome);
+      listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+      that.add(list);
+  })
+
+
+   // Tabela do Tempo Falando  - mais p frente podemos seprar em uma Função conforme o desenvolvimento
+        
     }
     
 }

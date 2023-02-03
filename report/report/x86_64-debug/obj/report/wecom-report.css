@@ -156,7 +156,9 @@ div.button {
     color: white;
     opacity: 0.9;
 }
-
+.divTable{
+    overflow: auto;
+}
 .colunadireita{
     width: 85%;
     height: 100%;

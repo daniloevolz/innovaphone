@@ -311,6 +311,19 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "UserMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
+            if (obj.mt == "SelectRamais") {
+                conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResult" }));
+                Database.exec("SELECT * FROM tbl_ramais")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "UsersError", result: String(errorText) }));
+                    });
+
+            }
         });
     }
 });

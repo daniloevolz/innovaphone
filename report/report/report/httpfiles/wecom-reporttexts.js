@@ -10,14 +10,14 @@ Wecom.reportTexts = {
         labelRelatórios : "Relatórios",
         labelTotalPeríodo : "Totais por Período",
         labelDetalhadoPeríodo : "Detalhado por Período",
-        labelDetalhadoRamal : "Detalhado por Ramal",
-        labelTotalRamal : "Total por Ramal",
+        labelDetalhadoAtendente : "Detalhado por Atendente",
+        labelTotalAtendente : "Total por Atendente",
         labelConfig : "Configurações",
         labelFiltros: "Filtros",
         labelDe: "DE:",
         labelAté: "ATÉ:",
-        labelNumOrigem: "NÚMERO DE ORIGEM:",
-        labelRamal: "RAMAL:",
+        labelTelefone: "TELEFONE:",
+        labelAtendente: "ATENDENTE:",
         labelCancel: "Cancelar",
         labelVisualizar: "Visualizar",
         labelUsersSip: "Usuários SIP:",
@@ -31,7 +31,10 @@ Wecom.reportTexts = {
         cabecalho1: "SIP",
         cabecalho2: "Nome",
         cabecalho3: "PBX",
-        cabecalho4: "Data Inicio Monitoramento"
+        cabecalho4: "Data Inicio Monitoramento",
+        labelDateReport: "Data de Relatório: ",
+        labelTempoFalando: "Tempo Falando",
+        labelAtendente2: "Atendente"
 
       
 
