@@ -1,7 +1,14 @@
 ﻿
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
-    pt:{
+    pt: {
+        labelConfig: "Extras",
+        labelAdmin: "Administração",
+        labelCfgDefaults: "Extras",
+        labelCfgNovaalert: "Servidor NA",
+        labelCfgAcctions: "Ações",
+        labelCfgButtons: "Botões",
+        labelNameApp: "Wecom",
         labelTituloAdmin: "Painel admin NovaAlert",
         labelNovaAlert: "Nova Alert",
         labelCheck: "Adicionar URL",

@@ -9,6 +9,7 @@
 var Wecom = Wecom || {};
 Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     this.createNode("body");
+    var appdn = start.title;
     var that = this;
 
     var iptUrl = "";
@@ -38,11 +39,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
-    var container = that.add(new innovaphone.ui1.Div("position:absolute; display:contents; left:0%; width:100%; top:10%; font-size:15px; text-align:center", null, null));
-
-    
+    app.onclosed = waitConnection;
+    app.onerror = waitConnection;
+    var UIuser;
 
     function app_connected(domain, user, dn, appdomain) {
+        UIuser = dn;
+        costructor();
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "admin", mt: "SelectMessage" });
         app.send({ api: "admin", mt: "SelectActionMessage" });
@@ -54,7 +57,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
             iptUrl = obj.urlalert;
-            makeButtons();
         }
         if (obj.api == "admin" && obj.mt == "MessageError") {
             console.log(obj.result);
@@ -75,40 +77,20 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
             app.send({ api: "admin", mt: "SelectMessage" });
-            container.clear();
-            makePopup("Atenção", "Botão criado com sucesso!");
+            makePopup("Sucesso", "Botão criado com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "InsertActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
-            container.clear();
-            makePopup("Atenção", "Ação criada com sucesso!");
+            makePopup("Sucesso", "Ação criada com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
             app.send({ api: "admin", mt: "SelectMessage" });
-            container.clear();
-            makePopup("Atenção", "Botão excluído com sucesso!");
+            makePopup("Sucesso", "Botão excluído com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
-            container.clear();
-            makePopup("Atenção", "Ação excluída com sucesso!");
+            makePopup("Sucesso", "Ação excluída com sucesso!");
         }
-    }
-
-    function makeButtons() {
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:0%; font-size:15px; text-align:center", null, "button-inn"));
-        //Botão Tabela Botões  
-        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:0%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnButtons").addEvent("click", function () {
-            makeTableButtons(container);
-        });
-        //Botão Tabela Ações  
-        that.add(new innovaphone.ui1.Div("position:absolute; left:15%; width:15%; top:0%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnActions").addEvent("click", function () {
-            makeTableActions(container);
-        });
-        //Botão Tabela Admin  
-        that.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:0%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnAdmin").addEvent("click", function () {
-            makeDivAdmin(container);
-        });
     }
 
     function makePopup(header, content) {
@@ -243,7 +225,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
              });
         //Botão Cancelar   
         t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:20%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            makeButtons();
             makeTableButtons(t);
         });
     }
@@ -289,12 +270,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
             else {
                 app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
-                makeButtons();
             }
         });
         //Botão Cancelar   
         t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:35%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            makeButtons();
             makeTableActions(t);
         });
 
@@ -409,6 +388,86 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             actionsListView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
             t.add(list);
         })
+    }
+
+    function costructor() {
+        that.clear();
+        // col direita
+        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+        // col Esquerda
+        var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
+        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
+        imglogo.setAttribute("src", "logo-wecom.png");
+        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.25rem; color:white; margin : 5px;", appdn, null));
+        var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
+        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px;", null, null));
+        imguser.setAttribute("src", "icon-user.png");
+        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.25rem; color:white; margin: 5px;", UIuser, null));
+        username.setAttribute("id", "user")
+
+        var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
+        var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));
+        var br = relatorios.add(new innovaphone.ui1.Node("br", null, null, null));
+
+        var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var Arelatorios1 = lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgButtons"), null));
+        Arelatorios1.setAttribute("id", "CfgButtons");
+        var Arelatorios2 = lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgAcctions"), null));
+        Arelatorios2.setAttribute("id", "CfgAcctions")
+        var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgNovaalert"), null));
+        Arelatorios3.setAttribute("id", "CfgNovaalert")
+        var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgDefaults"), null));
+        Arelatorios4.setAttribute("id", "CfgDefaults")
+
+        var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
+        var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
+
+        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 62%;", null, null));
+        var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center", null, "config"));
+
+        var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
+        imgconfig.setAttribute("src", "logo.png");
+        //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
+        //Aconfig.setAttribute("href", "#");
+
+        var TotaisPeriodo = document.getElementById("CfgButtons");
+        TotaisPeriodo.addEventListener("click", function () { ChangeView("CfgButtons", colDireita) })
+
+        var DetalhadoPeriodo = document.getElementById("CfgAcctions");
+        DetalhadoPeriodo.addEventListener("click", function () { ChangeView("CfgAcctions", colDireita) })
+
+        var DetalhadoRamal = document.getElementById("CfgNovaalert");
+        DetalhadoRamal.addEventListener("click", function () { ChangeView("CfgNovaalert", colDireita) })
+
+        var TotalRamal = document.getElementById("CfgDefaults");
+        TotalRamal.addEventListener("click", function () { ChangeView("CfgDefaults", colDireita) })
+    }
+
+    function ChangeView(ex, colDireita) {
+        
+        if (ex == "CfgButtons") {
+            makeTableButtons(colDireita);
+        }
+        if (ex == "CfgAcctions") {
+            makeTableActions(colDireita);
+        }
+        if (ex == "CfgNovaalert") {
+            makeDivAdmin(colDireita);
+        }
+        if (ex == "CfgDefaults") {
+            
+        }
+    }
+
+    function waitConnection() {
+        that.clear();
+        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        that.add(bodywait);
     }
 }
 
