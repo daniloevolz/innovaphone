@@ -561,3 +561,106 @@ width: 100%;
     width: 60px;
     background-repeat: no-repeat;
 }
+body {
+    background-image: url(bg.png);
+    color: var(--text-standard);
+    margin: 0;
+}
+
+div.button {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.arrow {
+    height:30px;
+    width:50px;
+    /*visibility: hidden;*/
+}
+
+.colunaesquerda {
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    background-color: #02163F;
+    color: white;
+    opacity: 0.9;
+}
+
+.colunadireita {
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    /* background-color: purple; */
+    left: 15%;
+    background-color: rgb(196, 196, 196);
+    color: black;
+}
+
+li {
+    padding: 10px;
+    list-style-type: none;
+    margin-left: 20px;
+}
+
+.liOptions:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.otherli {
+    margin-left: 10px;
+}
+
+.config {
+    margin-left: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+div.button-inn {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+/* 
+.config:hover{
+    background-color: transparent;
+    border-radius: 0px;
+    cursor: pointer;
+
+}  */
+::-webkit-scrollbar {
+    display: block;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(19, 33, 71);
+}
