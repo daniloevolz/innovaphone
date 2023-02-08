@@ -5,22 +5,19 @@ Wecom.reportTexts = {
     },
     de: {
     },
-    pt: {
-        btnPdf: "PDF",
-        btnClear: "Voltar",
+    pt:{
         labelNameApp : "Report App",
         labelRelatórios : "Relatórios",
         labelTotalPeríodo : "Totais por Período",
         labelDetalhadoPeríodo : "Detalhado por Período",
-        labelDetalhadoRamal : "Detalhado por Ramal",
-        labelTotalRamal: "Total por Ramal",
-        labelRDisponibilidade: "Disponibilidade dos Usuários",
+        labelDetalhadoAtendente : "Detalhado por Atendente",
+        labelTotalAtendente : "Total por Atendente",
         labelConfig : "Configurações",
         labelFiltros: "Filtros",
         labelDe: "DE:",
         labelAté: "ATÉ:",
-        labelNumOrigem: "NÚMERO DE ORIGEM:",
-        labelRamal: "RAMAL:",
+        labelTelefone: "TELEFONE:",
+        labelAtendente: "ATENDENTE:",
         labelCancel: "Cancelar",
         labelVisualizar: "Visualizar",
         labelUsersSip: "Usuários SIP:",
@@ -35,10 +32,9 @@ Wecom.reportTexts = {
         cabecalho2: "Nome",
         cabecalho3: "PBX",
         cabecalho4: "Data Inicio Monitoramento",
-        cabecalhoDisponibilidade0: "Nome",
-        cabecalhoDisponibilidade1: "Data",
-        cabecalhoDisponibilidade2: "Status",
-        cabecalhoDisponibilidade3:"Grupo"
+        labelDateReport: "Data de Relatório: ",
+        labelTempoFalando: "Tempo Falando",
+        labelAtendente2: "Atendente"
 
       
 

@@ -1,9 +1,6 @@
 ﻿var pbxTableUsers = []
 var RCC = [];
-var PbxSignal = [];
 var monitorInitialized = false;
-var list_ramais = [];
-getRamaisFromDB();
 
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
     log("PbxTableUsers: connected "+JSON.stringify(conn));
@@ -39,28 +36,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
 
         }
         if (obj.mt == "ReplicateUpdate") {
-            var foundUser = list_ramais.filter(findBySip(obj.columns.h323))[0].sip;
-            var today = new Date();
-            if (foundUser) {
-                log("ReplicateUpdate= user " + obj.columns.h323 + " encontered on list_ramais");
-                if (obj.columns.grps) {
-                    log("ReplicateUpdate= obj.coumns.grps exists");
-                    var grps = obj.columns.grps;
-                    grps.forEach(function (g) {
-                        switch (g.dyn) {
-                            case "out":
-                                var msg = { sip: obj.columns.h323, name: obj.columns.cn,date: today, status: "Indisponível", group: g.name }
-                                log("ReplicateUpdate= will insert it on DB : "+ JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
-                                break;
-                            case "in":
-                                var msg = { sip: obj.columns.h323, name: obj.columns.cn,date: today, status: "Disponível", group: g.name }
-                                log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
-                        }
-                    })
-                }      
-            }
+
         }
 
         // handle incoming presence_subscribe call setup messages
@@ -328,121 +304,6 @@ new PbxApi("RCC").onconnected(function (conn) {
     });
 });
 
-new PbxApi("PbxSignal").onconnected(function (conn) {
-    log("PbxSignal: connected conn " + JSON.stringify(conn));
-
-    // for each PBX API connection an own call array is maintained
-    var signalFound = PbxSignal.filter(function (pbx) { return pbx.pbx === conn.pbx });
-    if (signalFound.length == 0) {
-        PbxSignal.push(conn);
-    }
-
-    //connectionsPbxSignal.push({ ws: conn });
-    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
-
-    // register to the PBX in order to acceppt incoming presence calls
-    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
-
-    conn.onmessage(function (msg) {
-        var obj = JSON.parse(msg);
-        log(msg);
-
-        if (obj.mt === "RegisterResult") {
-            log("PBXSignal: registration result " + JSON.stringify(obj));
-        }
-
-        // handle incoming presence_subscribe call setup messages
-        // the callid "obj.call" required later for sending badge notifications
-        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
-
-            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
-
-            // connect call
-            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
-
-            //Atualiza connections
-            var src = obj.src;
-            var myArray = src.split(",");
-            var pbx = myArray[0];
-            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    signal[obj.sig.cg.sip] = obj.call;
-                }
-            })
-            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
-            var name = "";
-            var myArray = obj.sig.fty;
-            myArray.forEach(function (fty) {
-                if (fty.name) {
-                    name = fty.name;
-                }
-            })
-            //Talvez seja necessario usar essa dinamica, tentando estatico primeiro//
-            //RCC.forEach(function (rcc) {
-            //    if (rcc.pbx == pbx) {
-            //        log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
-            //        var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-            //        rcc.send(JSON.stringify(msg));
-            //    }
-            //})
-
-            //Intert into DB the event
-            var foundUser = list_ramais.filter(findBySip(obj.sig.cg.sip))[0].sip;
-            if (foundUser) {
-                log("PbxSignal= user " + obj.sig.cg.sip + "encontered on list_ramais");
-                var today = new Date();
-                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Login", group: "" }
-                log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
-            }
-        }
-
-        // handle incoming call release messages
-        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-            // remove callid from the array for calls for this connection
-
-            //Remove
-            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-            var src = obj.src;
-            var myArray = src.split(",");
-            var sip = "";
-            var pbx = myArray[0];
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[sip];
-                }
-            })
-            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
-            //Talvez seja necessario usar essa dinamica, tentando estatico primeiro//
-            //RCC.forEach(function (rcc) {
-            //    if (rcc.pbx == pbx) {
-            //        var user = rcc[sip];
-            //        log("PbxSignal: calling RCC API to End user Monitor " + String(sip) + " on PBX " + pbx);
-            //        var msg = { api: "RCC", mt: "UserEnd", user: user, src: sip + "," + obj.src };
-            //        conn.send(JSON.stringify(msg));
-            //    }
-            //})
-            //Intert into DB the event
-            var foundUser = list_ramais.filter(findBySip(obj.sig.cg.sip))[0].sip;
-            if (foundUser) {
-                log("PbxSignal= user " + obj.sig.cg.sip + "encontered on list_ramais");
-                var today = new Date();
-                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date:today, status: "Logout", group: "" }
-                log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
-            }
-       
-        }
-    });
-    conn.onclose(function () {
-        log("PbxSignal: disconnected");
-        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
-    });
-});
-
-
 new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-report") {
         conn.onmessage(function(msg) {
@@ -450,16 +311,18 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "UserMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
-            if (obj.mt == "SelectFromDisponibilidade") {
-                Database.exec("SELECT * FROM tbl_disponibilidade")
+            if (obj.mt == "SelectRamais") {
+                conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResult" }));
+                Database.exec("SELECT * FROM tbl_ramais")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectFromDisponibilidadeSuccess", result: JSON.stringify(data, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResultSuccess", result: JSON.stringify(data, null, 4) }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "UsersError", result: String(errorText) }));
                     });
+
             }
         });
     }
@@ -547,15 +410,6 @@ new JsonApi("admin").onconnected(function(conn) {
     }
 });
 
-function findBySip(sip) {
-    return function (value) {
-        if (value.sip == sip) {
-            return true;
-        }
-        //countInvalidEntries++
-        return false;
-    }
-}
 
 function initializeMonitor() {
     log("initializeMonitor=");
@@ -575,28 +429,6 @@ function initializeMonitor() {
         })
         .onerror(function (error, errorText, dbErrorCode) {
             log("initializeMonitor error=" + String(errorText));
-        });
-}
-function insertTblDisponibilidade(obj) {
-    Database.insert("INSERT INTO tbl_disponibilidade (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
-        .oncomplete(function () {
-            log("insertTblDisponibilidade= Success");
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblDisponibilidade= Erro " + errorText);
-        });
-}
-
-function getRamaisFromDB() {
-    Database.exec("SELECT * FROM tbl_ramais")
-        .oncomplete(function (data) {
-            log("getRamaisFromDB result=" + JSON.stringify(data, null, 4));
-            list_ramais = data;
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("getRamaisFromDB result= Erro " + errorText);
         });
 }
 
