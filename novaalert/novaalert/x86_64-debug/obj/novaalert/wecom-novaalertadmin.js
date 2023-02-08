@@ -393,17 +393,17 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function costructor() {
         that.clear();
         // col direita
-        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireitaadmin"));
         // col Esquerda
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
         var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
         imglogo.setAttribute("src", "logo-wecom.png");
-        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.25rem; color:white; margin : 5px;", appdn, null));
+        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; color:white; margin : 5px;", appdn, null));
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px;", null, null));
         imguser.setAttribute("src", "icon-user.png");
-        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.25rem; color:white; margin: 5px;", UIuser, null));
+        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user")
 
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
@@ -426,7 +426,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
 
-        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 62%;", null, null));
+        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 90%;", null, null));
         var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center", null, "config"));
 
         var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
@@ -434,17 +434,17 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
         //Aconfig.setAttribute("href", "#");
 
-        var TotaisPeriodo = document.getElementById("CfgButtons");
-        TotaisPeriodo.addEventListener("click", function () { ChangeView("CfgButtons", colDireita) })
+        var a = document.getElementById("CfgButtons");
+        a.addEventListener("click", function () { ChangeView("CfgButtons", colDireita) })
 
-        var DetalhadoPeriodo = document.getElementById("CfgAcctions");
-        DetalhadoPeriodo.addEventListener("click", function () { ChangeView("CfgAcctions", colDireita) })
+        var a = document.getElementById("CfgAcctions");
+        a.addEventListener("click", function () { ChangeView("CfgAcctions", colDireita) })
 
-        var DetalhadoRamal = document.getElementById("CfgNovaalert");
-        DetalhadoRamal.addEventListener("click", function () { ChangeView("CfgNovaalert", colDireita) })
+        var a = document.getElementById("CfgNovaalert");
+        a.addEventListener("click", function () { ChangeView("CfgNovaalert", colDireita) })
 
-        var TotalRamal = document.getElementById("CfgDefaults");
-        TotalRamal.addEventListener("click", function () { ChangeView("CfgDefaults", colDireita) })
+        var a = document.getElementById("CfgDefaults");
+        a.addEventListener("click", function () { ChangeView("CfgDefaults", colDireita) })
     }
 
     function ChangeView(ex, colDireita) {

@@ -15,7 +15,6 @@ var leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
 var url = Config.url;
 var urlSSO = Config.urlSSO;
 var urlGetGroups = Config.urlGetGroups;
-var queueGrupsOk = false;
 
 var connectionsUser = [];
 var connectionsAdmin = [];
@@ -25,6 +24,7 @@ var RCC = [];
 var PbxSignal = [];
 var pbxTable = [];
 var pbxTableUsers = [];
+var pbxTableUsersConns = false;
 
 //var connections = [];
 var calls = [];
@@ -178,6 +178,8 @@ WebServer.onrequest("value", function (req) {
     }
 });
 
+getQueueGroups();
+
 //JSON APIS
 
 new JsonApi("user").onconnected(function (conn) {
@@ -246,8 +248,64 @@ new JsonApi("admin").onconnected(function (conn) {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
-                log("danilo-req AdminMessage:");
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ sip: u.columns.h323})
+                })
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users) }));
                 updateConfigUsers();
+            }
+            if (obj.mt == "AddURLDashMessage") {
+                // Horario Atual
+                var day = new Date().toLocaleString();
+                log("AddURLDashMessage:day: " + day);
+                Database.insert("INSERT INTO tbl_dashboards (sip, app_name, url, date_add) VALUES ('" + obj.sip + "','" + obj.app + "','" + obj.url + "','" + day + "')")
+                    .oncomplete(function () {
+                        Database.exec("SELECT * FROM tbl_dashboards")
+                            .oncomplete(function (data) {
+                                log("AddURLDashMessage:result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "AddURLDashMessageSucess", result: JSON.stringify(data, null, 4) }));
+
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+
+
+            }
+            if (obj.mt == "SelectURLDashMessage") {
+                Database.exec("SELECT * FROM tbl_dashboards")
+                    .oncomplete(function (data) {
+                        log("result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectURLDashResultSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "DelURLDashMessage") {
+                Database.exec("DELETE FROM tbl_dashboards WHERE id=" + obj.id + ";")
+                    .oncomplete(function () {
+                        Database.exec("SELECT * FROM tbl_dashboards")
+                            .oncomplete(function (data) {
+                                log("AddURLDashMessage:result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "DelURLDashMessageSucess", result: JSON.stringify(data, null, 4) }));
+
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                            });
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
             }
             if (obj.mt == "AddMessage") {
                 Config.urladmin = obj.url;
@@ -309,32 +367,57 @@ new JsonApi("dash").onconnected(function (conn) {
     if (conn.app == "wecom-wecalldash") {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
-            if (obj.mt == "DashMessage") {
-                var urldash = Config.urldash;
-                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: urldash }));
+            if (obj.mt == "DashURLMessage") {
+                //var urldash = Config.urldash;
+                Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + conn.sip + "' AND app_name ='" + obj.app + "';")
+                    .oncomplete(function (data) {
+                        log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
+                    });
+                
             }
-            if (obj.mt == "AddMessage") {
-                Config.urldash = obj.url;
-                Config.save();
-                var urldash = Config.urldash;
-                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: urldash }));
+            if (obj.mt == "AddURLDashMessage") {
+                //Config.urldash = obj.url;
+                //Config.save();
+                //var urldash = Config.urldash;
+                // Horario Atual
+                var day = new Date().toLocaleString();
+                log("AddURLMessage:day: " + day);
+                Database.insert("INSERT INTO tbl_dashboards (sip, app_name, url, date_add) VALUES ('" + obj.sip + "','" + obj.app + "','" + obj.url + "','" + day + "')")
+                    .oncomplete(function () {
+                        Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + obj.sip + "' AND app_name ='" + obj.app + "';")
+                            .oncomplete(function (data) {
+                                log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
+
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "dash", mt: "Error", result: String(errorText) }));
+                    }); 
             }
         });
     }
 });
-
 
 //PBX APIS
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
     pbxTable.push(conn);
     log("PbxTableUsers: connected " + JSON.stringify(conn));
 
-    // for each PBX API connection an own call array is maintained
-
-    //connectionsPbxSignal.push({ ws: conn });
-    // register to the PBX in order to acceppt incoming presence calls
-    conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
-
+    if (!pbxTableUsersConns) {
+        // register to the PBX in order to acceppt incoming presence calls
+        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
+        pbxTableUsersConns = true;
+    }
+    
     conn.onmessage(function (msg) {
 
         var obj = JSON.parse(msg);
@@ -348,18 +431,23 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         }
         if (obj.mt == "ReplicateNextResult" && obj.columns) {
 
-            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, badge: 0 });
+            //pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, devices: obj.columns.devices, badge: 0 });
+            pbxTableUsers.push(obj)
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
-
-            log("PBX TABLE USERS " + JSON.stringify(pbxTableUsers))
         }
 
         if (obj.mt == "ReplicateAdd") {
 
-            pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, badge: 0 });
-
+            //pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, devices: obj.columns.devices, badge: 0 });
+            pbxTableUsers.push(obj);
         }
         if (obj.mt == "ReplicateUpdate") {
+            pbxTableUsers.forEach(function (user) {
+                if (user.columns.h323 == obj.columns.h323) {
+                    log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
+                    Object.assign(user, obj)
+                }
+            })
 
         }
 
@@ -464,7 +552,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     var user = rcc[sip];
                     log("PbxSignal: calling RCC API to End user Monitor " + String(sip) + " on PBX " + pbx);
                     var msg = { api: "RCC", mt: "UserEnd", user: user, src: sip + "," + pbx };
-                    conn.send(JSON.stringify(msg));
+                    rcc.send(JSON.stringify(msg));
                 }
             })
             //connections = connections.filter(delConnectionsByCall(obj.call));
@@ -486,10 +574,7 @@ new PbxApi("RCC").onconnected(function (conn) {
     log("RCC: connected conn " + JSON.stringify(conn));
     log("RCC: connected RCC " + JSON.stringify(RCC));
     
-    if (!queueGrupsOk) {
-        getQueueGroups();
-        queueGrupsOk = true;
-    }
+    initializeQueues();
 
     conn.send(JSON.stringify({ "api": "RCC", "mt": "Initialize", "limit": 50, "calls":true }));
 
@@ -769,20 +854,52 @@ function rccRequest(value) {
     log("danilo-req rccRequest:value " + String(value));
     var obj = JSON.parse(String(value));
 
-    log("danilo-req rccRequest:user " + obj.user);
-    log("danilo-req rccRequest:sip " + obj.sip);
-    log("danilo-req rccRequest:mode " + obj.mode);
-    log("danilo-req rccRequest:num " + obj.num);
-    var user;
-    RCC.forEach(function (rcc) {
-        var temp = rcc[String(obj.sip)];
-        log("danilo-req rccRequest:temp " + temp);
-        if (temp != null) {
-            user = temp;
-            log("danilo-req rccRequest:wil call callRCC for user " + user);
-            callRCC(rcc, user, obj.mode, obj.num, obj.sip+","+rcc.pbx);
+    if (obj.mode == "Grp_Add") {
+        log("danilo-req rccRequest:Grp_Add before END Queue " + obj.user);
+        queues.push({ Fila: obj.user, Nome: obj.pbx })
+        log("danilo-req rccRequest:Grp_Add after END Queue " + obj.user);
+
+        log("danilo-req rccRequest:Grp_Add wil call RCC for NEW Queue " + obj.user);
+        RCC.forEach(function (rcc) {
+            if (rcc.pbx == obj.pbx) {
+                var msg = { api: "RCC", mt: "UserInitialize", cn: obj.user, src: obj.user + "," + obj.pbx };
+                rcc.send(JSON.stringify(msg));
+            }
+        })
+    }else if (obj.mode == "Grp_Del") {
+        var foundQueue = queues.filter(function (queue) { return queue.Fila === obj.user });
+        if (foundQueue.length > 0) {
+
+            log("danilo-req rccRequest:Grp_Del before END Queue " + obj.user);
+            queues = queues.filter(deleteCallsBySrc(obj.user));
+            log("danilo-req rccRequest:Grp_Del after END Queue " + obj.user);
+
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == obj.pbx) {
+                    var user = rcc[obj.user];
+                    log("PbxSignal: calling RCC API to End Queue Monitor " + String(obj.user) + " on PBX " + rcc.pbx);
+                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: obj.user + "," + rcc.pbx };
+                    rcc.send(JSON.stringify(msg));
+                }
+            })
         }
-    })
+
+    }else {
+        log("danilo-req rccRequest:user " + obj.user);
+        log("danilo-req rccRequest:sip " + obj.sip);
+        log("danilo-req rccRequest:mode " + obj.mode);
+        log("danilo-req rccRequest:num " + obj.num);
+        var user;
+        RCC.forEach(function (rcc) {
+            var temp = rcc[String(obj.sip)];
+            log("danilo-req rccRequest:temp " + temp);
+            if (temp != null) {
+                user = temp;
+                log("danilo-req rccRequest:wil call callRCC for user " + user);
+                callRCC(rcc, user, obj.mode, obj.num, obj.sip + "," + rcc.pbx);
+            }
+        })
+    }
     //connectionsRCC.forEach(function (connection) {
     //    log("danilo-req rccRequest: will callRCC ");
     //    callRCC(connection.ws, obj.user, obj.mode, obj.num, obj.sip);
@@ -791,24 +908,60 @@ function rccRequest(value) {
 function pbxTableRequest(value) {
     log("danilo-req pbxTableRequest:value " + String(value));
     var obj = JSON.parse(String(value));
-    var user = pbxTableUsers.filter(function (user) { return user.sip === obj.sip });
-    if (obj.mode === "Login") {
-        pbxTable.forEach(function (conn) {
-            if (conn.pbx == user[0].pbx) {
-                log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }],"src": user[0].sip+","+conn.pbx } }));
-                //log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "grps": { "name": obj.group, "dyn": "in" }, "src": user[0].sip+","+conn.pbx } }));
-                conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }], "src": user[0].sip + "," + conn.pbx } }));
+    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+    var found = false;
+
+    user[0].columns.grps.forEach(function (grp) {
+        if (grp.name == obj.group) {
+            found = true;
+            if (obj.mode == "Login") {
+                grp["dyn"] = "in";
             }
-        })
-    }
-    if (obj.mode === "Logout") {
-        pbxTable.forEach(function (conn) {
-            if (conn.pbx == user[0].pbx) {
-                log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "src": user[0].sip + "," + conn.pbx } }));
-                conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "src": user[0].sip + "," + conn.pbx } }));
+            if (obj.mode == "Logout") {
+                grp["dyn"] = "out";
             }
-        })
+        }
+
+    })
+    if (!found) {
+        if (obj.mode == "Login") {
+            user[0].columns.grps.push({ name: obj.group, dyn: "in" })
+        }
+        if (obj.mode == "Logout") {
+            user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+        }
     }
+    pbxTable.forEach(function (conn) {
+        if (conn.pbx == user[0].src) {
+            log(JSON.stringify(user[0]));
+            conn.send(JSON.stringify(user[0]));
+        }
+    })
+    pbxTableUsers.forEach(function (u) {
+        if (u.columns.h323 == user[0].columns.h323) {
+            Object.assign(u, user[0])
+        }
+    })
+
+    
+
+    //if (obj.mode === "Login") {
+    //    pbxTable.forEach(function (conn) {
+    //        if (conn.pbx == user[0].src) {
+    //            log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }], "devices": user[0].devices,"src": user[0].sip+","+conn.pbx } }));
+    //            //log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "grps": { "name": obj.group, "dyn": "in" }, "src": user[0].sip+","+conn.pbx } }));
+    //            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "in" }], "devices": user[0].devices,"src": user[0].sip + "," + conn.pbx } }));
+    //        }
+    //    })
+    //}
+    //if (obj.mode === "Logout") {
+    //    pbxTable.forEach(function (conn) {
+    //        if (conn.pbx == user[0].src) {
+    //            log(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "devices": user[0].devices, "src": user[0].sip + "," + conn.pbx } }));
+    //            conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateUpdate", "columns": { "guid": user[0].guid, "cn": user[0].cn, "h323": user[0].sip, "e164": user[0].e164, "node": user[0].node, "grps": [{ "name": obj.group, "dyn": "out" }], "devices": user[0].devices, "src": user[0].sip + "," + conn.pbx } }));
+    //        }
+    //    })
+    //}
 }
 /*
 function makecallRequest(value) {
@@ -1075,7 +1228,8 @@ function getQueueGroups() {
         var obj = JSON.parse(responseData);
         if (obj.status == "success") {
             //Atualiza connections 
-            initializeQueues(obj.msg);
+            queues = JSON.parse(obj.msg)
+            initializeQueues(queues);
 
         } else {
             log("danilo req : getGroupsResponse " + obj.msg);
@@ -1138,13 +1292,13 @@ function updateConnections(sip, prt, value, area) {
     })
 }
 */
-function initializeQueues(msg) {
+function initializeQueues() {
     log("danilo-req : initializeQueues:: queues");
-    queues = JSON.parse(msg)
+    //queues = JSON.parse(msg)
     queues.forEach(function (q) {
         log("danilo-req : initializeQueues:: queue: " + JSON.stringify(q));
         RCC.forEach(function (rcc) {
-            if (rcc.pbx == q.Nome) {
+            if (rcc.pbx == q.Nome && !rcc[q.Fila]) {
                 var msg = { api: "RCC", mt: "UserInitialize", cn: q.Fila, src: q.Fila + "," + q.Nome };
                 rcc.send(JSON.stringify(msg));
             }

@@ -46,23 +46,23 @@
               {
                 "cmd": "column",
                 "name": "sip",
-                "type": "VARCHAR(120) UNIQUE NOT NULL"
+                "type": "VARCHAR(120) NOT NULL"
               },
               {
                 "cmd": "column",
-                "name": "nome",
-                "type": "VARCHAR(120) NOT NULL"
+                "name": "name",
+                "type": "VARCHAR(120)"
 
               },
               {
                 "cmd": "column",
-                "name": "date_login",
-                "type": "timestamp"
+                "name": "date",
+                "type": "text"
               },
               {
                 "cmd": "column",
-                "name": "date_logout",
-                "type": "timestamp"
+                "name": "status",
+                "type": "text"
               },
               {
                 "cmd": "column",

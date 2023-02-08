@@ -18,7 +18,22 @@ div.button {
     text-align:center;
     cursor:pointer;
 }
+div.button-inn {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
 
+/*Início Loader*/
 * {
     border: 0;
     box-sizing: border-box;
@@ -130,3 +145,75 @@ main {
         stroke-dashoffset: 1165;
     }
 }
+/*Fim Loader*/
+/*Início Menu Admin*/
+.arrow {
+    height: 30px;
+    width: 50px;
+    /*visibility: hidden;*/
+}
+
+.colunaesquerda {
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    background-color: #02163F;
+    color: white;
+    opacity: 0.9;
+}
+
+.colunadireita {
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    /* background-color: purple; */
+    left: 15%;
+    background-color: rgb(196, 196, 196,0.5);
+    color: darkblue;
+    font-size:15px;
+}
+
+li {
+    padding: 10px;
+    list-style-type: none;
+    margin-left: 20px;
+    font-size: 13pt;
+}
+
+.liOptions:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.otherli {
+    margin-left: 10px;
+}
+
+.config {
+    margin-left: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+/* 
+.config:hover{
+    background-color: transparent;
+    border-radius: 0px;
+    cursor: pointer;
+
+}  */
+::-webkit-scrollbar {
+    display: block;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(19, 33, 71);
+}
+/*Fim Menu Admin*/

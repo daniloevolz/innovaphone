@@ -220,7 +220,7 @@ div.button {
     height: 100%;
     top: 0px;
     font-size: 15px;
-    background-image: url("bg.png");
+    /*background-image: url("bg.png");*/
 }
 .colunapage {
     position: absolute;
@@ -562,7 +562,7 @@ width: 100%;
     background-repeat: no-repeat;
 }
 body {
-    background-image: url(bg.png);
+    background-image: var(--bg);
     color: var(--text-standard);
     margin: 0;
 }
@@ -597,20 +597,22 @@ div.button {
     opacity: 0.9;
 }
 
-.colunadireita {
+.colunadireitaadmin {
     width: 85%;
     height: 100%;
     position: absolute;
     /* background-color: purple; */
     left: 15%;
-    background-color: rgb(196, 196, 196);
-    color: black;
+    background-color: rgb(196, 196, 196, 0.5);
+    color: darkblue;
+    font-size: 12pt;
 }
 
 li {
     padding: 10px;
     list-style-type: none;
     margin-left: 20px;
+    font-size: 13pt;
 }
 
 .liOptions:hover {
