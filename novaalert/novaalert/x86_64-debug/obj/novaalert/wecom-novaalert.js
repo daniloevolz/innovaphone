@@ -3,6 +3,7 @@
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
 /// <reference path="../../web1/ui1.popup/innovaphone.ui1.popup.js" />
+/// <reference path="../../web1/com.innovaphone.avatar/com.innovaphone.avatar.js" />
 
 var Wecom = Wecom || {};
 Wecom.novaalert = Wecom.novaalert || function (start, args) {
@@ -11,8 +12,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     //var phoneApi = start.consumeApi("com.innovaphone.phone");
     var calllistApi = start.consumeApi("com.innovaphone.calllist");
+    var avatar = start.consumeApi("com.innovaphone.avatar");
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
     calllistApi.onmessage.attach(calllistonmessage);
+
+
+    
 
     var colorSchemes = {
         dark: {
@@ -46,6 +51,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var coldireita;
     var scroll;
     var popup;
+    var teste;
     //var colesquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
     //var container = colesquerda.add(new innovaphone.ui1.Div("display: flex; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center; background-color: darkgrey;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null));
     //Coluna Direita
@@ -67,6 +73,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         app.send({ api: "user", mt: "SelectMessage" });
         app.send({ api: "user", mt: "UserPresence" });
         connected();
+
+        //avatar
+        avatar = new innovaphone.Avatar(start, user, domain);
+        teste = avatar.url(user, 100, dn);
+        console.log("avatar" + JSON.stringify(teste));
+        //avatar.onmessage.attach(testeavatar);
+
  
         if (app.logindata.info.unlicensed) {
             //sem licença
@@ -96,7 +109,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         } catch {
             var prt_user = "";
         }
-        updateScreen(id, type, prt, prt_user);
+        var name = evt.currentTarget.innerText;
+        updateScreen(id,name, type, prt, prt_user);
     };
 
 
@@ -142,21 +156,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "VideoRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen("", "video", obj.alarm, "");
+            updateScreen("", obj.name,"video", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PageRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen("", "page", obj.alarm, "");
+            updateScreen("", obj.name, "page", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PopupRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen("", "popup", obj.alarm, "");
+            updateScreen("", obj.name, "popup", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
@@ -247,6 +261,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     popup.close();
                     popupOpen = false;
                 }
+            }
+            try {
+                if (obj.src == userUI) {
+                    document.getElementById(obj.num).style.backgroundColor = "";
+                }
+                
+            } catch {
+                console.log("CallDisconnected number dialed not button");
             }
             
            
@@ -386,8 +408,23 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                 allbtn.add(div1);
             }
+            else if (object.button_type == "user") {
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
+                div1.setAttribute("button_type", object.button_type);
+                div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_prt_user", object.button_prt_user);
+
+                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+                div2.setAttribute("id", object.button_prt + "-status");
+                div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+
+                var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
+
+                allbtn.add(div1);
+            }
             else if (object.button_type == "externalnumber") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "numberbutton"));
+                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "exnumberbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
                 div1.setAttribute("id", object.button_prt);
@@ -444,6 +481,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             botao.addEventListener("click", buttonClicked);
         }
         var botoes = document.querySelectorAll(".numberbutton");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", buttonClicked);
+        }
+        var botoes = document.querySelectorAll(".exnumberbutton");
         for (var i = 0; i < botoes.length; i++) {
             var botao = botoes[i];
             // O jeito correto e padronizado de incluir eventos no ECMAScript
@@ -519,7 +563,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function updateScreen(id, type, prt, prt_user) {
+    function updateScreen(id,name, type, prt, prt_user) {
         
         if (type == "page") {
             var clicked = document.getElementById(prt);
@@ -533,6 +577,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     document.getElementsByClassName("allbtn")[0].style.width = "";
                     document.getElementsByClassName("pagebtn")[0].style.width = "";
                     document.getElementById(prt).style.backgroundColor = "";
+                    app.send({ api: "user", mt: "TriggerStopPage", prt: String(prt) })
                     //document.getElementById(value).setAttribute("class", "allbutton");
                 } else {
                     //document.getElementsByClassName("allbtn")[0].style. = "darkgreen";
@@ -542,7 +587,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
                     colunapage.addHTML("<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
                     //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
-                    addNotification("<<<  " + type);
+                    addNotification("<<< " + name);
+                    app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
                     document.getElementById(prt).style.backgroundColor = "darkred";
                 }
             }
@@ -558,7 +604,23 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     //document.getElementById(value).setAttribute("class", "allbutton");
                 } else {
                     app.send({ api: "user", mt: "TriggerCall", prt: String(prt_user) })
-                    addNotification("<<<  " + type + " " + prt);
+                    addNotification("<<<  " + name);
+                    document.getElementById(id).style.backgroundColor = "darkred";
+                    //document.getElementById(value).setAttribute("class", "allbuttonClicked");
+                }
+            }
+        }
+        if (type == "user") {
+            var found = list_users.indexOf(prt);
+            if (found != -1) {
+                var clicked = document.getElementById(id);
+                if (clicked.style.backgroundColor == "darkred") {
+                    app.send({ api: "user", mt: "EndCall", prt: String(prt_user) })
+                    document.getElementById(id).style.backgroundColor = "darkgreen";
+                    //document.getElementById(value).setAttribute("class", "allbutton");
+                } else {
+                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt_user) })
+                    addNotification("<<< " + name);
                     document.getElementById(id).style.backgroundColor = "darkred";
                     //document.getElementById(value).setAttribute("class", "allbuttonClicked");
                 }
@@ -566,6 +628,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (type == "popup") {
             makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
+            app.send({ api: "user", mt: "TriggerStartPopup", prt: String(prt) })
         }
         if (type == "externalnumber") {
             //var found = list_users.indexOf(prt);
@@ -576,7 +639,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt) })
-                addNotification("<<<  " + type + " " + prt);
+                addNotification("<<< " + name);
                 document.getElementById(id).style.backgroundColor = "darkred";
                 //document.getElementById(value).setAttribute("class", "allbuttonClicked");
             }
@@ -591,7 +654,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     //document.getElementById(value).setAttribute("class", "allbutton");
                 } else {
                     app.send({ api: "user", mt: "TriggerCall", prt: String(prt_user) })
-                    addNotification("<<<  " + type + " " + prt);
+                    addNotification("<<< " + name);
                     document.getElementById(id).style.backgroundColor = "darkred";
                     //document.getElementById(value).setAttribute("class", "allbuttonClicked");
                 }
@@ -605,7 +668,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {
                 app.send({ api: "user", mt: "TriggerAlert", prt: String(prt) })
-                addNotification("<<<  Alarme " + prt);
+                addNotification("<<< " + name);
                 document.getElementById(prt).style.backgroundColor = "darkred";
                 //document.getElementById(value).setAttribute("class", "allbuttonClicked");
             }
@@ -622,12 +685,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             var clicked = document.getElementById(prt);
             if (clicked.style.backgroundColor == "darkred") {
+                app.send({ api: "user", mt: "TriggerStopVideo", prt: String(prt) })
                 container.clear();
                 container.add(new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null);
 
                 document.getElementById(prt).style.backgroundColor = "var(--button)";
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {
+                app.send({ api: "user", mt: "TriggerStartVideo", prt: String(prt) })
+                addNotification("<<< " + name);
                 var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
 
                 //document.getElementById("videoPlayer").setAttribute("src", value);
@@ -673,7 +739,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {
                 app.send({ api: "user", mt: "TriggerCombo", prt: String(id) })
-                addNotification("<<<  " + type + " " + prt);
+                addNotification("<<< " + name);
                 document.getElementById(id).style.backgroundColor = "darkred";
                 //document.getElementById(value).setAttribute("class", "allbuttonClicked");
             }
@@ -708,7 +774,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         that.clear();
         //Coluna Esquerda
         var col_esquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-        var _container = col_esquerda.add(new innovaphone.ui1.Div("display: flex; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center; background-color: darkgrey;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null));
+        var _container = col_esquerda.add(new innovaphone.ui1.Div("display: flex; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "play.png"), null));
 
         //Coluna Direita
         var col_direita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));

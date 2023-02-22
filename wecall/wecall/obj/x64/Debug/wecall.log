@@ -1,9 +1,9 @@
-﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/wecall" -temp "x86_64-debug/obj/" -project "wecall" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.switch/*.js, ../web1/ui1.popup/*.js, ../web1/ui1.listview/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-wecallservice.js," -copyRTM 1
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/wecall" -temp "x86_64-debug/obj/" -project "wecall" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.switch/*.js, ../web1/ui1.popup/*.js, ../web1/com.innovaphone.avatar/*.js, ../web1/ui1.listview/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-wecallservice.js," -copyRTM 1
   Building project ...
       Project output dirctory : x86_64-debug/wecall
       Temp directory          : x86_64-debug\obj\wecall
       Runtime binary          : jse/x86_64/generic
-      Build Number            : 13B492
+      Build Number            : 13B512
   
   Removing old files from x86_64-debug\obj\wecall...
   Creating directories...
@@ -14,6 +14,7 @@
       .\wecall\..\web1\ui1.lib\*.js => x86_64-debug\obj\wecall\web1\ui1.lib
       .\wecall\..\web1\ui1.switch\*.js => x86_64-debug\obj\wecall\web1\ui1.switch
       .\wecall\..\web1\ui1.popup\*.js => x86_64-debug\obj\wecall\web1\ui1.popup
+      .\wecall\..\web1\com.innovaphone.avatar\*.js => x86_64-debug\obj\wecall\web1\com.innovaphone.avatar
       .\wecall\..\web1\ui1.listview\*.js => x86_64-debug\obj\wecall\web1\ui1.listview
       .\wecall\..\web1\ui1.svg\*.js => x86_64-debug\obj\wecall\web1\ui1.svg
       .\wecall\..\web1\fonts\*.ttf => x86_64-debug\obj\wecall\web1\fonts

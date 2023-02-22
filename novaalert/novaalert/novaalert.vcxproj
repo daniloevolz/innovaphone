@@ -120,7 +120,12 @@
   <ItemGroup>
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
+    <None Include="jspdf.min.js" />
     <None Include="novaalert.mak" />
+    <None Include="novaalert\httpfiles\autotable.min.js" />
+    <None Include="novaalert\httpfiles\jspdf.es.min.js" />
+    <None Include="novaalert\httpfiles\jspdf.min.js" />
+    <None Include="novaalert\httpfiles\jspdf.umd.min.js" />
     <None Include="novaalert\httpfiles\video-js.css" />
     <None Include="novaalert\httpfiles\video.js" />
     <None Include="novaalert\httpfiles\videojs-contrib-hls.js" />

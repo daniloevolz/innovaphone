@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ShowAllFiles>true</ShowAllFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+<<<<<<< HEAD
+    <RemoteTarget>826361826;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+=======
+    <RemoteTarget>1767005878;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+>>>>>>> 8532281d2e6cba489b9ace43a6aad4e85adb02dd
+    <RemoteDebuggerCommandArguments>--app-name=report --app-domain=wecom.com.br --app-password=pwd --webserver-path=report --db-name=report --db-user=report --db-password=report --service-id=report</RemoteDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>

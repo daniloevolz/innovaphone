@@ -11,6 +11,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
     var appdn = start.title;
+    var avatar = start.consumeApi("com.innovaphone.avatar");
 
     var colorSchemes = {
         dark: {
@@ -47,6 +48,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var CodLeaveGroups;
     var LeaveGroupsStartup;
     var UIuser;
+    var UIuserPicture;
     var list_users = [];
     var dashboard_apps = [];
     var _colDireita;
@@ -232,6 +234,10 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     }
 
     function app_connected(domain, user, dn, appdomain) {
+        //avatar
+        avatar = new innovaphone.Avatar(start, user, domain);
+        UIuserPicture = avatar.url(user, 80, dn);
+
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "admin", mt: "SelectURLDashMessage" });
         UIuser = dn;
@@ -293,8 +299,8 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         imglogo.setAttribute("src", "logo-wecom.png");
         var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; color:white; margin : 5px;", appdn, null));
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
-        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px;", null, null));
-        imguser.setAttribute("src", "icon-user.png");
+        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
+        imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user")
 
