@@ -136,7 +136,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "ComboSuccessTrigged") {
             //var clicked = document.getElementById(obj.src);
-            document.getElementById(obj.src).style.backgroundColor = "var(--button)";
+            document.getElementById(obj.src).style.backgroundColor = "";
             //if (clicked.className == "allbuttonClicked") {
             //    document.getElementById(obj.value).setAttribute("class", "allbutton");
             //}
@@ -180,6 +180,23 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+            } catch {
+                console.log("CallRinging is not button");
+            } finally {
+                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+                addNotification(">>>  Chamada Tocando " + obj.src);
+            }
+        }
+        if (obj.api == "user" && obj.mt == "ComboCallStart") {
+            console.log(obj.src);
+            var element = obj.src + "-status";
+            console.log(element);
+            try {
+                var clicked = document.getElementById(obj.num);
+                if (clicked.style.backgroundColor != "darkred") {
+                    document.getElementById(obj.num).style.backgroundColor = "darkred";
+                }
+
             } catch {
                 console.log("CallRinging is not button");
             } finally {
@@ -734,7 +751,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (type == "combo") {
             var clicked = document.getElementById(id);
             if (clicked.style.backgroundColor == "darkred") {
-                app.send({ api: "user", mt: "StopCombo", prt: String(id) })
+                //app.send({ api: "user", mt: "StopCombo", prt: String(id) })
                 document.getElementById(id).style.backgroundColor = "var(--button)";
                 //document.getElementById(value).setAttribute("class", "allbutton");
             } else {

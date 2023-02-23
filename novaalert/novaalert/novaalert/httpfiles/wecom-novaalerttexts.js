@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        labelDeleteSuccess: "Dados excluídos com sucesso!",
+        labelTituloClearDB: "Remova o histórico do BD",
         btnOk: "OK",
         labelFrom: "Início Período:",
         labelTo: "Fim do Período:",

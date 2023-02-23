@@ -6,7 +6,6 @@
 /// <reference path="../../web1/ui1.listview/innovaphone.ui1.listview.js" />
 /// <reference path="../../web1/com.innovaphone.avatar/com.innovaphone.avatar.js" />
 
-
 var Wecom = Wecom || {};
 Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     this.createNode("body");
@@ -101,6 +100,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "SelectFromReportsSuccess") {
             reportView(colDireita, obj.result, obj.src);
+        }
+        if (obj.api == "admin" && obj.mt == "DeleteFromReportsSuccess") {
+            constructor();
+            makePopup("Atenção!", texts.text(labelDeleteSuccess));
         }
         
     }
@@ -310,6 +313,30 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         });
         
     }
+    function makeDivClearDB(t) {
+        t.clear();
+        //Título
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:25px; text-align:center", texts.text("labelTituloClearDB")));
+
+        var divTo = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+        var InputTo = t.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+        var divReport = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelReports"), null));
+        var SelectReport = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectReport");
+        t.add(SelectReport);
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptCalls", null)).setAttribute("id", "RptCalls");
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptAvailability", null)).setAttribute("id", "RptAvailability");
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptActivities", null)).setAttribute("id", "RptActivities");
+        // buttons
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            var to = document.getElementById("dateTo").value;
+            var report = document.getElementById("selectReport").value;
+            app.send({ api: "admin", mt: "DeleteFromReports", src:report,  to: to });
+            waitConnection(t);
+        });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            constructor();
+        });
+    }
 
     function makeTableButtons(t) {
         t.clear();
@@ -471,7 +498,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         a.addEventListener("click", function () { makeDivAdmin(_colDireita) })
 
         var a = document.getElementById("CfgDefaults");
-        a.addEventListener("click", function () { makeDivAdmin(_colDireita) })
+        a.addEventListener("click", function () { makeDivClearDB(_colDireita) })
 
         var a = document.getElementById("RptAvailability");
         a.addEventListener("click", function () { filterReports("RptAvailability", _colDireita) })
@@ -533,7 +560,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             filterReports(src, colDireita)
         });
         //Título Tabela
-        var labelTituloTabela = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)));
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id","titleReport"));
         var list = new innovaphone.ui1.Div("background-color: rgba(128, 130, 131, 0.48); position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id","listReport");
         var columns = Object.keys(result[0]).length;
         var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
@@ -584,145 +611,81 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         function downloadPDF() {
             // Crie um objeto jsPDF
-            const doc = new jsPDF('p', 'pt', 'a4');
-            // adicionar a imagem no cabeçalho
-            doc.addImage("logo-wecom.png", "PNG", 10, 10, 180, 70);
-            // Defina a fonte para 12px
-            doc.setFontSize(12);
+            const doc = new jsPDF('l', 'pt', 'a4');
 
-            // Obtenha a tabela da listview
-            const table = document.getElementById("listReport");
+            // Carregar a imagem usando um objeto Image
+            var img = new Image();
+            img.src = 'logo.png';
 
-            // Obtenha as linhas da tabela
-            const rows = table.querySelectorAll("tr");
+            // Quando a imagem terminar de carregar, adicionar ao PDF
+            img.onload = function () {
+                // Adicionar a imagem ao documento
+                doc.addImage(img, 'PNG', 10, 30, 100, 19);
+                // Defina a fonte para 18px
+                doc.setFontSize(18);
+                const title = document.getElementById("titleReport");
+                // Adicione o texto da tabela
+                doc.text(title.innerHTML, 300, 50);
 
+                // Defina a fonte para 10px
+                doc.setFontSize(10);
 
-            // Obter todas as colunas da primeira linha
-            var colunas = linhas[0].getElementsByTagName('td');
-            // Definir a largura da página
-            var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-            // Definir a largura de cada coluna
-            var colWidth = pageWidth / colunas.length;
+                // Obtenha a tabela da listview
+                const table = document.getElementById("listReport");
 
-
-
-            // Defina o posicionamento inicial para o topo da primeira página
-            let y = 100;
-
-            // Itere sobre as linhas e colunas da tabela e adicione os dados ao PDF
-            for (let i = 0; i < rows.length; i++) {
-                const cells = rows[i].querySelectorAll("td");
-                let x = 10;
-
-                // Verificar se a próxima linha ultrapassa a altura da página
-                if (y + 20 > doc.internal.pageSize.height) {
-                    doc.addPage();
-                    y = 100;
-                }
-
-                for (let j = 0; j < cells.length; j++) {
-                    var cellWidth = cells[j].offsetWidth * 0.264583;
-
-                    // Adicione bordas à célula
-                    //doc.rect(x, y, cells[j].clientWidth, cells[j].clientHeight);
-                    doc.rect(x, y, cellWidth, cells[j].clientHeight);
-
-                    // Adicione o texto da célula
-                    doc.text(cells[j].textContent, x + 2, y + 10);
-
-                    // Atualize a posição X para a próxima célula
-                    //x += cells[j].clientWidth;
-                    x += cellWidth;
-                }
-
-                // Atualize a posição Y para a próxima linha
-                y += cells[0].clientHeight;
-            }
-
-            // Baixar o arquivo PDF
-            doc.output();
-            saveAs(doc.output('blob'), 'Report.pdf');
-        }
-        function downloadPDF3() {
-            // Criar um novo documento PDF
-            var doc = new jsPDF('p', 'pt', 'a4');
-            // Obter a ListView
-            var listView = document.getElementById('listReport');
-            // Obter todas as linhas da ListView
-            var linhas = listView.getElementsByTagName('tr');
-            // Obter todas as colunas da primeira linha
-            var colunas = linhas[0].getElementsByTagName('td');
-            // Definir a largura da página
-            var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-            // Definir a largura de cada coluna
-            var colWidth = pageWidth / colunas.length;
-            // Adicionar as linhas ao documento PDF
-            var currentHeight = 100;
-            for (var i = 0; i < linhas.length; i++) {
-                // Obter as células da linha
-                var celulas = linhas[i].getElementsByTagName('td');
-
-                // Verificar se a próxima linha ultrapassa a altura da página
-                if (currentHeight + 20 > doc.internal.pageSize.height) {
-                    doc.addPage();
-                    currentHeight = 100;
-                }
+                // Obtenha as linhas da tabela
+                const rows = table.querySelectorAll("tr");
 
 
-                // Adicionar as células ao documento PDF
-                for (var j = 0; j < celulas.length; j++) {
-                    // Adicionar bordas à célula
-                    //doc.rect(j * colWidth, currentHeight, j * colWidth, 50);
-                    // Adicionar o texto à célula
-                    doc.setFontSize(12);
-                    doc.text(celulas[j].innerText, j * colWidth, currentHeight, { align: 'center', valign: 'middle' });
-                }
-                currentHeight += 20;
-            }
+                // Obter todas as colunas da primeira linha
+                var colunas = rows[0].getElementsByTagName('td');
+                // Definir a largura da página
+                var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+                // Definir a largura de cada coluna
+                //var colWidth = pageWidth / colunas.length;
+                var cellWidth = (pageWidth - (colunas.length * 2)) / colunas.length;
 
-            // Baixar o arquivo PDF
-            doc.output();
-            saveAs(doc.output('blob'), 'Report.pdf');
-        }
-        
-        function downloadPDF1() {
-            // Definir a altura máxima de cada página
-            var maxPageHeight = 1000;
 
-            // Criar um novo documento PDF
-            var doc = new jsPDF();
+                // Defina o posicionamento inicial para o topo da primeira página
+                let y = 100;
 
-            // Obter a ListView
-            var listView = document.getElementById('listReport');
+                // Itere sobre as linhas e colunas da tabela e adicione os dados ao PDF
+                for (let i = 0; i < rows.length; i++) {
+                    const cells = rows[i].querySelectorAll("td");
+                    let x = 10;
 
-            // Obter todas as linhas da ListView
-            var linhas = listView.getElementsByTagName('tr');
-
-            // Adicionar as linhas ao documento PDF
-            var currentHeight = 10;
-            for (var i = 0; i < linhas.length; i++) {
-                // Obter as células da linha
-                var celulas = linhas[i].getElementsByTagName('td');
-
-                // Adicionar as células ao documento PDF
-                for (var j = 0; j < celulas.length; j++) {
                     // Verificar se a próxima linha ultrapassa a altura da página
-                    if (currentHeight + 50 > maxPageHeight) {
+                    if (y + 20 > doc.internal.pageSize.height) {
                         doc.addPage();
-                        currentHeight = 10;
+                        y = 100;
                     }
-                    var cellWidth = celulas[j].offsetWidth * 0.264583;
-                    doc.text(celulas[j].innerText, j * cellWidth, currentHeight + 10);
-                    currentHeight += 10;
-                }
-            }
 
-            // Baixar o arquivo PDF
-            doc.output();
-            saveAs(doc.output('blob'), 'Report.pdf');
+                    for (let j = 0; j < cells.length; j++) {
+                        //var cellWidth = cells[j].offsetWidth * 0.264583;
+
+                        // Adicione bordas à célula
+                        //doc.rect(x, y, cells[j].clientWidth, cells[j].clientHeight);
+                        doc.rect(x, y, cellWidth, cells[j].clientHeight);
+
+                        // Adicione o texto da célula
+                        doc.text(cells[j].textContent, x + 2, y + 10);
+
+                        // Atualize a posição X para a próxima célula
+                        //x += cells[j].clientWidth;
+                        x += cellWidth;
+                    }
+
+                    // Atualize a posição Y para a próxima linha
+                    y += cells[0].clientHeight;
+                }
+
+                // Baixar o arquivo PDF
+                doc.output();
+                saveAs(doc.output('blob'), 'Report.pdf');
+            };
+            
         }
     }
-
     function downloadPDF2() {
         var maxPageHeight = 500;
         // criar um novo documento PDF
@@ -745,6 +708,85 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         doc.output();
         saveAs(doc.output('blob'), 'Report.pdf');
 
+    }
+
+    function downloadPDF3() {
+        // Criar um novo documento PDF
+        var doc = new jsPDF('p', 'pt', 'a4');
+        // Obter a ListView
+        var listView = document.getElementById('listReport');
+        // Obter todas as linhas da ListView
+        var linhas = listView.getElementsByTagName('tr');
+        // Obter todas as colunas da primeira linha
+        var colunas = linhas[0].getElementsByTagName('td');
+        // Definir a largura da página
+        var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+        // Definir a largura de cada coluna
+        var colWidth = pageWidth / colunas.length;
+        // Adicionar as linhas ao documento PDF
+        var currentHeight = 100;
+        for (var i = 0; i < linhas.length; i++) {
+            // Obter as células da linha
+            var celulas = linhas[i].getElementsByTagName('td');
+
+            // Verificar se a próxima linha ultrapassa a altura da página
+            if (currentHeight + 20 > doc.internal.pageSize.height) {
+                doc.addPage();
+                currentHeight = 100;
+            }
+
+
+            // Adicionar as células ao documento PDF
+            for (var j = 0; j < celulas.length; j++) {
+                // Adicionar bordas à célula
+                //doc.rect(j * colWidth, currentHeight, j * colWidth, 50);
+                // Adicionar o texto à célula
+                doc.setFontSize(12);
+                doc.text(celulas[j].innerText, j * colWidth, currentHeight, { align: 'center', valign: 'middle' });
+            }
+            currentHeight += 20;
+        }
+
+        // Baixar o arquivo PDF
+        doc.output();
+        saveAs(doc.output('blob'), 'Report.pdf');
+    }
+
+    function downloadPDF1() {
+        // Definir a altura máxima de cada página
+        var maxPageHeight = 1000;
+
+        // Criar um novo documento PDF
+        var doc = new jsPDF();
+
+        // Obter a ListView
+        var listView = document.getElementById('listReport');
+
+        // Obter todas as linhas da ListView
+        var linhas = listView.getElementsByTagName('tr');
+
+        // Adicionar as linhas ao documento PDF
+        var currentHeight = 10;
+        for (var i = 0; i < linhas.length; i++) {
+            // Obter as células da linha
+            var celulas = linhas[i].getElementsByTagName('td');
+
+            // Adicionar as células ao documento PDF
+            for (var j = 0; j < celulas.length; j++) {
+                // Verificar se a próxima linha ultrapassa a altura da página
+                if (currentHeight + 50 > maxPageHeight) {
+                    doc.addPage();
+                    currentHeight = 10;
+                }
+                var cellWidth = celulas[j].offsetWidth * 0.264583;
+                doc.text(celulas[j].innerText, j * cellWidth, currentHeight + 10);
+                currentHeight += 10;
+            }
+        }
+
+        // Baixar o arquivo PDF
+        doc.output();
+        saveAs(doc.output('blob'), 'Report.pdf');
     }
 
     function criaPDF() {

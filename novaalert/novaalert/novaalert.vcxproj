@@ -123,7 +123,7 @@
     <None Include="jspdf.min.js" />
     <None Include="novaalert.mak" />
     <None Include="novaalert\httpfiles\autotable.min.js" />
-    <None Include="novaalert\httpfiles\jspdf.es.min.js" />
+    <None Include="novaalert\httpfiles\jspdf.es.js" />
     <None Include="novaalert\httpfiles\jspdf.min.js" />
     <None Include="novaalert\httpfiles\jspdf.umd.min.js" />
     <None Include="novaalert\httpfiles\video-js.css" />
@@ -146,9 +146,23 @@
     <None Include="novaalert\httpfiles\wecom.novaalertmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="novaalert\httpfiles\alarm.png" />
+    <Image Include="novaalert\httpfiles\arrow.png" />
+    <Image Include="novaalert\httpfiles\backspace.png" />
+    <Image Include="novaalert\httpfiles\bg.png" />
+    <Image Include="novaalert\httpfiles\clock.png" />
     <Image Include="novaalert\httpfiles\close.png" />
+    <Image Include="novaalert\httpfiles\combo.png" />
+    <Image Include="novaalert\httpfiles\config-icon.png" />
+    <Image Include="novaalert\httpfiles\icon-user.png" />
+    <Image Include="novaalert\httpfiles\logo-wecom.png" />
+    <Image Include="novaalert\httpfiles\logo.png" />
     <Image Include="novaalert\httpfiles\page.png" />
+    <Image Include="novaalert\httpfiles\page_grey.png" />
+    <Image Include="novaalert\httpfiles\phone.png" />
     <Image Include="novaalert\httpfiles\play.png" />
+    <Image Include="novaalert\httpfiles\player_ico.jpg" />
+    <Image Include="novaalert\httpfiles\queue.png" />
     <Image Include="novaalert\httpfiles\video.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalert.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalertadmin.png" />
