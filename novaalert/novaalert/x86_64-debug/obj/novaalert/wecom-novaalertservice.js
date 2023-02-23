@@ -505,40 +505,70 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             pbxTableUsers.push(obj);
         }
         if (obj.mt == "ReplicateUpdate") {
-            var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.h323 === obj.columns.h323 });
-            log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
-            const grps1 = foundTableUser[0].columns.grps;
-            const grps2 = obj.columns.grps;
+            //var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.h323 === obj.columns.h323 });
+            //log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
+            //const grps1 = foundTableUser[0].columns.grps;
+            //const grps2 = obj.columns.grps;
             log("ReplicateUpdate= user " + obj.columns.h323);
-            for (var i = 0; i < grps1.length; i++) {
-                for (var j = 0; j < grps2.length; j++) {
-                    if (grps1[i].name === grps2[j].name) {
-                        if (grps1[i].dyn === grps2[j].dyn) {
-                        } else {
-                            log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
-                            switch (grps2[j].dyn) {
-                                case "out":
-                                    var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: g.name }
-                                    log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                    insertTblAvailability(msg);
-                                    break;
-                                case "in":
-                                    var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: g.name }
-                                    log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                    insertTblAvailability(msg);
-                                    break;
+            try {
+                //for (var i = 0; i < grps1.length; i++) {
+                //    for (var j = 0; j < grps2.length; j++) {
+                //        if (grps1[i].name === grps2[j].name) {
+                //            if (grps1[i].dyn === grps2[j].dyn) {
+                //            } else {
+                //                log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
+                //                switch (grps2[j].dyn) {
+                //                    case "out":
+                //                        var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: g.name }
+                //                        log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
+                //                        insertTblAvailability(msg);
+                //                        break;
+                //                    case "in":
+                //                        var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: g.name }
+                //                        log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
+                //                        insertTblAvailability(msg);
+                //                        break;
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                pbxTableUsers.forEach(function (user) {
+                    if (user.columns.h323 == obj.columns.h323) {
+                        const grps1 = user.columns.grps;
+                        const grps2 = obj.columns.grps;
+                        for (var i = 0; i < grps1.length; i++) {
+                            for (var j = 0; j < grps2.length; j++) {
+                                if (grps1[i].name === grps2[j].name) {
+                                    if (grps1[i].dyn === grps2[j].dyn) {
+                                    } else {
+                                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
+                                        switch (grps2[j].dyn) {
+                                            case "out":
+                                                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: g.name }
+                                                log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
+                                                insertTblAvailability(msg);
+                                                break;
+                                            case "in":
+                                                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: g.name }
+                                                log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
+                                                insertTblAvailability(msg);
+                                                break;
+                                        }
+                                    }
+                                }
                             }
                         }
+                        log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
+                        obj.badge = user.badge;
+                        Object.assign(user, obj)
                     }
-                }
+                })
+
+            } finally {
+
             }
-            pbxTableUsers.forEach(function (user) {
-                if (user.columns.h323 == obj.columns.h323) {
-                    log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
-                    obj.badge = user.badge;
-                    Object.assign(user, obj)
-                }
-            })
+            
 
         }
     });
@@ -1003,7 +1033,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var today = getDateNow();
             var msg = { sip: sip, name: name, date: today, status: "Login", group: "PBX" }
             log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
-            insertTblDisponibilidade(msg);
+            insertTblAvailability(msg);
             //connections = connections.filter(delConnectionsByCall(obj.call));
             //log("PBXSignal: connections result " + JSON.stringify(connections));
         }
