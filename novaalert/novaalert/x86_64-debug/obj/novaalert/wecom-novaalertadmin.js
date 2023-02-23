@@ -217,7 +217,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         });
 
         //Botão Salvar
-        t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:10%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             var type = document.getElementById("selectType").value;
             var user = document.getElementById("selectUser").value;
             if (String(iptName.getValue()) == "" || String(type) == "") {
@@ -239,7 +239,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
              });
         //Botão Cancelar   
-        t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:20%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeTableButtons(t);
         });
     }
@@ -277,7 +277,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "page", null));
         var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "popup", null));
         //Botão Salvar
-        t.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:35%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             var type = document.getElementById("selectType").value;
             var user = document.getElementById("selectUser").value;
             if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "" || String(type) == "") {
@@ -288,7 +288,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
         });
         //Botão Cancelar   
-        t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:35%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeTableActions(t);
         });
 
@@ -341,10 +341,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function makeTableButtons(t) {
         t.clear();
         //Botões Tabela de Botões
-        t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
             makeDivAddButton(t);
         });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:10%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:10%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
             var selected = listView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];
@@ -392,10 +392,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         t.clear();
         
         //Botões Tabela de Ações
-        t.add(new innovaphone.ui1.Div("position:absolute; left:55%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
             makeDivAddAction(t);
         });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:30%; width:15%; top:10%; font-size:12px; text-align:center; background-color: #B0132B; color:var(--div-DelBtn); ", null, "button-inn")).addTranslation(texts, "btnDelAction").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:10%; font-size:12px; text-align:center; background-color: #B0132B; color:var(--div-DelBtn); ", null, "button-inn")).addTranslation(texts, "btnDelAction").addEvent("click", function () {
             var selected = actionsListView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];
@@ -685,152 +685,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             };
             
         }
-    }
-    function downloadPDF2() {
-        var maxPageHeight = 500;
-        // criar um novo documento PDF
-        var doc = new jsPDF();
-        // obter a ListView
-        var listView = document.getElementById('listReport');
-        //// obter todas as linhas da ListView
-        var linhas = listView.getElementsByTagName('tr');
-        //// adicionar as linhas ao documento PDF
-        for (var i = 0; i < linhas.length; i++) {
-        //    // obter as células da linha
-            var celulas = linhas[i].getElementsByTagName('td');
-            // adicionar as células ao documento PDF
-            for (var j = 0; j < celulas.length; j++) {
-                doc.text(celulas[j].innerText, j * 60, (i + 2) * 10);
-                //doc.cell(10, 10, celulas[j].innerText, j, i);
-            }
-        }
-        //// baixar o arquivo PDF
-        doc.output();
-        saveAs(doc.output('blob'), 'Report.pdf');
-
-    }
-
-    function downloadPDF3() {
-        // Criar um novo documento PDF
-        var doc = new jsPDF('p', 'pt', 'a4');
-        // Obter a ListView
-        var listView = document.getElementById('listReport');
-        // Obter todas as linhas da ListView
-        var linhas = listView.getElementsByTagName('tr');
-        // Obter todas as colunas da primeira linha
-        var colunas = linhas[0].getElementsByTagName('td');
-        // Definir a largura da página
-        var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-        // Definir a largura de cada coluna
-        var colWidth = pageWidth / colunas.length;
-        // Adicionar as linhas ao documento PDF
-        var currentHeight = 100;
-        for (var i = 0; i < linhas.length; i++) {
-            // Obter as células da linha
-            var celulas = linhas[i].getElementsByTagName('td');
-
-            // Verificar se a próxima linha ultrapassa a altura da página
-            if (currentHeight + 20 > doc.internal.pageSize.height) {
-                doc.addPage();
-                currentHeight = 100;
-            }
-
-
-            // Adicionar as células ao documento PDF
-            for (var j = 0; j < celulas.length; j++) {
-                // Adicionar bordas à célula
-                //doc.rect(j * colWidth, currentHeight, j * colWidth, 50);
-                // Adicionar o texto à célula
-                doc.setFontSize(12);
-                doc.text(celulas[j].innerText, j * colWidth, currentHeight, { align: 'center', valign: 'middle' });
-            }
-            currentHeight += 20;
-        }
-
-        // Baixar o arquivo PDF
-        doc.output();
-        saveAs(doc.output('blob'), 'Report.pdf');
-    }
-
-    function downloadPDF1() {
-        // Definir a altura máxima de cada página
-        var maxPageHeight = 1000;
-
-        // Criar um novo documento PDF
-        var doc = new jsPDF();
-
-        // Obter a ListView
-        var listView = document.getElementById('listReport');
-
-        // Obter todas as linhas da ListView
-        var linhas = listView.getElementsByTagName('tr');
-
-        // Adicionar as linhas ao documento PDF
-        var currentHeight = 10;
-        for (var i = 0; i < linhas.length; i++) {
-            // Obter as células da linha
-            var celulas = linhas[i].getElementsByTagName('td');
-
-            // Adicionar as células ao documento PDF
-            for (var j = 0; j < celulas.length; j++) {
-                // Verificar se a próxima linha ultrapassa a altura da página
-                if (currentHeight + 50 > maxPageHeight) {
-                    doc.addPage();
-                    currentHeight = 10;
-                }
-                var cellWidth = celulas[j].offsetWidth * 0.264583;
-                doc.text(celulas[j].innerText, j * cellWidth, currentHeight + 10);
-                currentHeight += 10;
-            }
-        }
-
-        // Baixar o arquivo PDF
-        doc.output();
-        saveAs(doc.output('blob'), 'Report.pdf');
-    }
-
-    function criaPDF() {
-        // criar um novo objeto jsPDF
-        var doc = new jsPDF();
-
-        // definir a largura de cada coluna
-        var colWidth = [30, 50, 70];
-
-        // definir os dados da tabela
-        var rows = [
-            [1, "John Doe", "johndoe@example.com"],
-            [2, "Jane Doe", "janedoe@example.com"],
-            [3, "Bob Smith", "bobsmith@example.com"]
-        ];
-
-        // definir o estilo da tabela
-        var tableStyle = {
-            fillColor: [255, 255, 255],
-            textColor: [0, 0, 0],
-            lineWidth: 0.1,
-            lineColor: [0, 0, 0],
-            fontStyle: "normal",
-            fontSize: 12
-        };
-
-        // adicionar a imagem no cabeçalho
-        var imgURL = "../logo_wecom.png";
-        var imgWidth = 50;
-        var imgHeight = 50;
-        doc.addImage(imgURL, "PNG", 10, 10, imgWidth, imgHeight);
-
-        // desenhar a tabela abaixo da imagem
-        doc.autoTable({
-            head: [["ID", "Name", "Email"]],
-            body: rows,
-            theme: "grid",
-            startY: 70,
-            columnWidth: colWidth,
-            styles: tableStyle
-        });
-
-        // salvar o arquivo PDF
-        doc.save("lista_de_contatos.pdf");
     }
 }
 
