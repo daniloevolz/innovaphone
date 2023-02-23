@@ -36,7 +36,7 @@
           },
           {
             "cmd": "table",
-            "name": "tbl_disponibilidade",
+            "name": "tbl_activities",
             "init": [
               {
                 "cmd": "column",
@@ -52,7 +52,44 @@
                 "cmd": "column",
                 "name": "name",
                 "type": "VARCHAR(120)"
-
+    
+              },
+              {
+                "cmd": "column",
+                "name": "date",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "status",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "details",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "cmd": "table",
+            "name": "tbl_availability",
+            "init": [
+              {
+                "cmd": "column",
+                "name": "id",
+                "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+              },
+              {
+                "cmd": "column",
+                "name": "sip",
+                "type": "VARCHAR(120) NOT NULL"
+              },
+              {
+                "cmd": "column",
+                "name": "name",
+                "type": "VARCHAR(120)"
+    
               },
               {
                 "cmd": "column",
@@ -71,62 +108,58 @@
               }
             ]
           },
-            {
-                "cmd":"table",
-                "name":"tbl_chamadas",
-                "init":[
-                    {
-                        "cmd":"column",
-                        "name":"id",
-                        "type":"BIGSERIAL PRIMARY KEY NOT NULL"
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"call_id",
-                        "type":"int"
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"call_start",
-                        "type": "timestamp"
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"call_answer",
-                        "type": "timestamp"
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"call_end",
-                        "type":"timestamp"
-
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"local_sip",
-                        "type":"timestamp"
-
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"local_e164",
-                        "type":"timestamp"
-
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"remoto_sip",
-                        "type":"timestamp"
-
-                    },
-                    {
-                        "cmd":"column",
-                        "name":"remoto_e164",
-                        "type":"timestamp"
-
-                    }
-                ]
-            }
+          {
+            "cmd": "table",
+            "name": "tbl_calls",
+            "init": [
+              {
+                "cmd": "column",
+                "name": "id",
+                "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+              },
+              {
+                "cmd": "column",
+                "name": "sip",
+                "type": "VARCHAR(120) NOT NULL"
+              },
+              {
+                "cmd": "column",
+                "name": "number",
+                "type": "VARCHAR(120)"
+    
+              },
+              {
+                "cmd": "column",
+                "name": "call_started",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "call_ringing",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "call_connected",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "call_ended",
+                "type": "text"
+              },
+              {
+                "cmd": "column",
+                "name": "status",
+                "type": "INTEGER"
+              },
+              {
+                "cmd": "column",
+                "name": "direction",
+                "type": "VARCHAR(50)"
+              }
+            ]
+          }
         ]
     },
     "javascript": {

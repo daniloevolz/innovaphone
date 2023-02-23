@@ -450,18 +450,7 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "UserMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
-            if (obj.mt == "SelectFromDisponibilidade") {
-                Database.exec("SELECT * FROM tbl_disponibilidade")
-                    .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectFromDisponibilidadeSuccess", result: JSON.stringify(data, null, 4) }));
-
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                    });
-            }
-            if (obj.mt == "SelectRamais") {
+            if (obj.mt == "SelectUser") {
                 conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResult" }));
                 Database.exec("SELECT * FROM tbl_ramais")
                     .oncomplete(function (data) {
@@ -472,6 +461,119 @@ new JsonApi("user").onconnected(function (conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "UsersError", result: String(errorText) }));
                     });
+            }
+            if (obj.mt == "SelectFromReports") {
+                switch (obj.src) {
+                    case "RptCalls":
+                        var query = "SELECT sip, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
+                        var conditions = [];
+                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.number) conditions.push("number ='" + obj.number + "'");
+                        if (obj.from) conditions.push("call_started >'" + obj.from + "'");
+                        if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptActivities":
+                        var query = "SELECT sip, name, date, status, details  FROM tbl_activities";
+                        var conditions = [];
+                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.from) conditions.push("date >'" + obj.from + "'");
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptAvailability":
+                        var query = "SELECT sip, date, status, group_name FROM tbl_availability";
+                        var conditions = [];
+                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.from) conditions.push("date >'" + obj.from + "'");
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                }
+            }
+            if (obj.mt == "DeleteFromReports") {
+                switch (obj.src) {
+                    case "RptCalls":
+                        var query = "DELETE FROM tbl_calls";
+                        var conditions = [];
+                        if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptActivities":
+                        var query = "DELETE FROM tbl_activities";
+                        var conditions = [];
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptAvailability":
+                        var query = "DELETE FROM tbl_availability";
+                        var conditions = [];
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                }
             }
         });
     }
