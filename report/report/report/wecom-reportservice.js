@@ -51,12 +51,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                             case "out":
                                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: g.name }
                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
+                                insertTblAvailability(msg);
                                 break;
                             case "in":
                                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: g.name }
                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
+                                insertTblAvailability(msg);
                         }
                     })
                 }
@@ -378,15 +378,13 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
-            //Talvez seja necessario usar essa dinamica, tentando estatico primeiro//
-            //RCC.forEach(function (rcc) {
-            //    if (rcc.pbx == pbx) {
-            //        log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
-            //        var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-            //        rcc.send(JSON.stringify(msg));
-            //    }
-            //})
-
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == pbx) {
+                    log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
+                    var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
+                    rcc.send(JSON.stringify(msg));
+                }
+            })
             //Intert into DB the event
             var foundUser = list_ramais.filter(findBySip(obj.sig.cg.sip))[0].sip;
             if (foundUser) {
@@ -394,7 +392,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 var today = new Date();
                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Login", group: "" }
                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
+                insertTblAvailability(msg);
             }
         }
 
@@ -431,7 +429,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 var today = new Date();
                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Logout", group: "" }
                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
+                insertTblAvailability(msg);
             }
 
         }
@@ -691,16 +689,6 @@ function initializeMonitor() {
             log("initializeMonitor error=" + String(errorText));
         });
 }
-function insertTblDisponibilidade(obj) {
-    Database.insert("INSERT INTO tbl_disponibilidade (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
-        .oncomplete(function () {
-            log("insertTblDisponibilidade= Success");
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblDisponibilidade= Erro " + errorText);
-        });
-}
 
 function getRamaisFromDB() {
     Database.exec("SELECT * FROM tbl_ramais")
@@ -711,6 +699,61 @@ function getRamaisFromDB() {
         })
         .onerror(function (error, errorText, dbErrorCode) {
             log("getRamaisFromDB result= Erro " + errorText);
+        });
+}
+//Funções que faltavam para inserir as info no BD -->
+
+function getDateNow() {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date();
+    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+    date.setUTCHours(date.getUTCHours() - 3);
+
+    // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+    var dateString = date.toISOString();
+
+    // Substitui o caractere "T" por um espaço
+    dateString = dateString.replace("T", " ");
+
+    // Retorna a string no formato "AAAA-MM-DD HH:mm:ss.sss"
+    return dateString.slice(0, -5);
+}
+
+//reports
+function insertTblActivities(obj) {
+    Database.insert("INSERT INTO tbl_activities (sip, name, date, status, details) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
+        .oncomplete(function () {
+            log("insertTblActivities= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblActivities= Erro " + errorText);
+        });
+}
+function insertTblCalls(obj) {
+    if (!obj.call_ringing) {
+        obj.call_ringing = "";
+    }
+    if (!obj.call_connected) {
+        obj.call_connected = "";
+    }
+    Database.insert("INSERT INTO tbl_calls (sip, number, call_started, call_ringing, call_connected, call_ended, status, direction) VALUES ('" + obj.sip + "','" + obj.num + "','" + obj.call_started + "','" + obj.call_ringing + "','" + obj.call_connected + "','" + obj.call_ended +"'," + obj.state + ",'" + obj.direction + "')")
+        .oncomplete(function () {
+            log("insertTblCalls= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblCalls= Erro " + errorText);
+        });
+}
+function insertTblAvailability(obj) {
+    Database.insert("INSERT INTO tbl_availability (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
+        .oncomplete(function () {
+            log("insertTblAvailability= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblAvailability= Erro " + errorText);
         });
 }
 

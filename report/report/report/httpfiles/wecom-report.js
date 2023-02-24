@@ -11,6 +11,7 @@ Wecom.report = Wecom.report || function (start, args) {
     var avatar = start.consumeApi("com.innovaphone.avatar");
     var that = this;
     var colDireita;
+    
     var list_ramais = []
     
     var colorSchemes = {

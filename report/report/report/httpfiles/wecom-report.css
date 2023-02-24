@@ -117,6 +117,9 @@ body {
 tr {
     font-size:12px;
 }
+.rowuser{
+    font-size: 16px;
+}
 .img-icon{
     height:25px;
     width:25px;
