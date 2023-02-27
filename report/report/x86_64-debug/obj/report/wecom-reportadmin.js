@@ -154,7 +154,7 @@ Wecom.reportAdmin = Wecom.reportAdmin || function (start, args) {
             row.push(b.nome);
             row.push(b.pbx);
             row.push(b.data_criacao);
-            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+            listView.addRow(i, row, "rowuser", "#A0A0A0", "#82CAE2");
             that.add(list);
         })
     }

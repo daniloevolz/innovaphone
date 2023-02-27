@@ -481,8 +481,8 @@ new JsonApi("user").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                    case "RptActivities":
-                        var query = "SELECT sip, name, date, status, details  FROM tbl_activities";
+                    case "RptTotalRamal":
+                        var query = "SELECT sip, name, date, status, details  FROM tbl_availability";
                         var conditions = [];
                         if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
@@ -538,8 +538,8 @@ new JsonApi("user").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                    case "RptActivities":
-                        var query = "DELETE FROM tbl_activities";
+                    case "RptTotalRamal":
+                        var query = "DELETE FROM tbl_availability";
                         var conditions = [];
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
@@ -720,16 +720,6 @@ function getDateNow() {
 }
 
 //reports
-function insertTblActivities(obj) {
-    Database.insert("INSERT INTO tbl_activities (sip, name, date, status, details) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
-        .oncomplete(function () {
-            log("insertTblActivities= Success");
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblActivities= Erro " + errorText);
-        });
-}
 function insertTblCalls(obj) {
     if (!obj.call_ringing) {
         obj.call_ringing = "";

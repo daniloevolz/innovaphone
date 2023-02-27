@@ -481,24 +481,6 @@ new JsonApi("user").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                    case "RptActivities":
-                        var query = "SELECT sip, name, date, status, details  FROM tbl_activities";
-                        var conditions = [];
-                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
-                        if (obj.from) conditions.push("date >'" + obj.from + "'");
-                        if (obj.to) conditions.push("date <'" + obj.to + "'");
-                        if (conditions.length > 0) {
-                            query += " WHERE " + conditions.join(" AND ");
-                        }
-                        Database.exec(query)
-                            .oncomplete(function (data) {
-                                log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
-                            });
-                        break;
                     case "RptAvailability":
                         var query = "SELECT sip, date, status, group_name FROM tbl_availability";
                         var conditions = [];
@@ -526,22 +508,6 @@ new JsonApi("user").onconnected(function (conn) {
                         var query = "DELETE FROM tbl_calls";
                         var conditions = [];
                         if (obj.to) conditions.push("call_started <'" + obj.to + "'");
-                        if (conditions.length > 0) {
-                            query += " WHERE " + conditions.join(" AND ");
-                        }
-                        Database.exec(query)
-                            .oncomplete(function (data) {
-                                log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
-                            });
-                        break;
-                    case "RptActivities":
-                        var query = "DELETE FROM tbl_activities";
-                        var conditions = [];
-                        if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
                             query += " WHERE " + conditions.join(" AND ");
                         }
@@ -720,16 +686,6 @@ function getDateNow() {
 }
 
 //reports
-function insertTblActivities(obj) {
-    Database.insert("INSERT INTO tbl_activities (sip, name, date, status, details) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
-        .oncomplete(function () {
-            log("insertTblActivities= Success");
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblActivities= Erro " + errorText);
-        });
-}
 function insertTblCalls(obj) {
     if (!obj.call_ringing) {
         obj.call_ringing = "";

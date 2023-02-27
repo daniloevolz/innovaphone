@@ -40,6 +40,7 @@ Wecom.report = Wecom.report || function (start, args) {
     app.onmessage = app_message;
     app.onclosed = waitConnection;
     app.onerror = waitConnection;
+    
     var UIuser;
     var colDireita;
     var UIuserPicture;
@@ -68,6 +69,7 @@ Wecom.report = Wecom.report || function (start, args) {
         if(obj.api == "user" && obj.mt == "SelectUsersResultSuccess"){
             list_ramais = [];
             list_ramais = JSON.parse(obj.result); 
+            console.log("Lista Ramais" + list_ramais)
         }
         if (obj.api == "admin" && obj.mt == "DeleteFromReportsSuccess") {
             constructor();
@@ -93,7 +95,7 @@ Wecom.report = Wecom.report || function (start, args) {
         t.add(SelectReport);
         SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptCalls", null)).setAttribute("id", "RptCalls");
         SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptAvailability", null)).setAttribute("id", "RptAvailability");
-        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptActivities", null)).setAttribute("id", "RptActivities");
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptTotalRamal", null)).setAttribute("id", "RptTotalRamal");
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             var to = document.getElementById("dateTo").value;
@@ -130,7 +132,7 @@ Wecom.report = Wecom.report || function (start, args) {
         var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptAvailability"), null).setAttribute("id", "RptAvailability"));
         lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptCalls"), null).setAttribute("id", "RptCalls"));
-        lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptActivities"), null).setAttribute("id", "RptActivities"));
+        lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("RptTotalRamal"), null).setAttribute("id", "RptTotalRamal"));
         lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgDefaults"), null).setAttribute("id", "CfgDefaults"));
        
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
@@ -147,8 +149,8 @@ Wecom.report = Wecom.report || function (start, args) {
         a.addEventListener("click", function () { filterReports("RptAvailability", _colDireita) })
         var a = document.getElementById("RptCalls");
         a.addEventListener("click", function () { filterReports("RptCalls", _colDireita) })
-        var a = document.getElementById("RptActivities");
-        a.addEventListener("click", function () { filterReports("RptActivities", _colDireita) })
+        var a = document.getElementById("RptTotalRamal");
+        a.addEventListener("click", function () { filterReports("RptTotalRamal", _colDireita) })
         var a = document.getElementById("CfgDefaults");
         a.addEventListener("click", function () { makeDivClearDB(_colDireita) })
 
@@ -221,7 +223,7 @@ Wecom.report = Wecom.report || function (start, args) {
                     t.add(list);
                 })
                 break;
-            case "RptActivities":
+            case "RptTotalRamal": 
                 result.forEach(function (b) {
                     var row = [];
                     row.push(b.sip);

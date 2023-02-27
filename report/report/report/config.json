@@ -36,43 +36,6 @@
           },
           {
             "cmd": "table",
-            "name": "tbl_activities",
-            "init": [
-              {
-                "cmd": "column",
-                "name": "id",
-                "type": "BIGSERIAL PRIMARY KEY NOT NULL"
-              },
-              {
-                "cmd": "column",
-                "name": "sip",
-                "type": "VARCHAR(120) NOT NULL"
-              },
-              {
-                "cmd": "column",
-                "name": "name",
-                "type": "VARCHAR(120)"
-    
-              },
-              {
-                "cmd": "column",
-                "name": "date",
-                "type": "text"
-              },
-              {
-                "cmd": "column",
-                "name": "status",
-                "type": "text"
-              },
-              {
-                "cmd": "column",
-                "name": "details",
-                "type": "text"
-              }
-            ]
-          },
-          {
-            "cmd": "table",
             "name": "tbl_availability",
             "init": [
               {
