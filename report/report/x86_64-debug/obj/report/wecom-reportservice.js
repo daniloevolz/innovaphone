@@ -482,23 +482,24 @@ new JsonApi("user").onconnected(function (conn) {
                             });
                         break;
                     case "RptTotalRamal":
-                        var query = "SELECT sip, name, date, status, details  FROM tbl_availability";
-                        var conditions = [];
-                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
-                        if (obj.from) conditions.push("date >'" + obj.from + "'");
-                        if (obj.to) conditions.push("date <'" + obj.to + "'");
-                        if (conditions.length > 0) {
-                            query += " WHERE " + conditions.join(" AND ");
-                        }
-                        Database.exec(query)
-                            .oncomplete(function (data) {
-                                log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
-                            });
-                        break;
+                            var query = "SELECT sip, number, call_started, call_connected, call_ended, to_char((call_ended - call_started), 'YYYY-MM-DD HH24:MI:SS') as call_duration , to_char((call_connected - call_started, 'YYYY-MM-DD HH24:MI:SS') as call_ringing , status , direction FROM tbl_totalramal";
+                            var conditions = [];
+                            if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                            if (obj.number) conditions.push("number ='" + obj.number + "'");
+                            if (obj.from) conditions.push("call_started >'" + obj.from + "'");
+                            if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                            if (conditions.length > 0) {
+                                query += " WHERE " + conditions.join(" AND ");
+                            }
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+                                    conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                                });
+                            break;
                     case "RptAvailability":
                         var query = "SELECT sip, date, status, group_name FROM tbl_availability";
                         var conditions = [];
@@ -526,22 +527,6 @@ new JsonApi("user").onconnected(function (conn) {
                         var query = "DELETE FROM tbl_calls";
                         var conditions = [];
                         if (obj.to) conditions.push("call_started <'" + obj.to + "'");
-                        if (conditions.length > 0) {
-                            query += " WHERE " + conditions.join(" AND ");
-                        }
-                        Database.exec(query)
-                            .oncomplete(function (data) {
-                                log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
-                            });
-                        break;
-                    case "RptTotalRamal":
-                        var query = "DELETE FROM tbl_availability";
-                        var conditions = [];
-                        if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
                             query += " WHERE " + conditions.join(" AND ");
                         }

@@ -227,10 +227,14 @@ Wecom.report = Wecom.report || function (start, args) {
                 result.forEach(function (b) {
                     var row = [];
                     row.push(b.sip);
-                    row.push(b.name);
-                    row.push(b.date);
+                    row.push(b.number);
+                    row.push(b.call_started);
+                    row.push(b.call_ringing);
+                    row.push(b.call_connected);
+                    row.push(b.call_ended);
+                    row.push(b.call_duration);
                     row.push(b.status);
-                    row.push(b.details);
+                    row.push(b.direction);
                     listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
                     t.add(list);
                 })
