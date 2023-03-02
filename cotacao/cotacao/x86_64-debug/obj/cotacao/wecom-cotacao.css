@@ -227,6 +227,47 @@ label {
     margin-top: 1%;
 }
 
+@media only screen and (max-width: 900px) and (orientation: landscape) {
+    .imglogo {
+        max-width: 45%;
+        max-height: 45%;
+    }
+    div#logowecom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .div-libra {
+        width: 300px;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .div-data {
+        width: 300px;
+        margin-top: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .colunaesquerda {
+        background-image: url(bg_lateral500px.png);
+        position: absolute;
+        background-size: cover;
+        height: 100%;
+        width: 17%;
+        margin-left: 0%;
+        display: flex;
+        position: absolute;
+        float: left;
+        font-size: 15px;
+        text-align: left;
+  }
+  li{
+    font-size: 12px;
+  }
+}
 
 @media screen and (max-width: 400px)  {
     body{
@@ -277,8 +318,8 @@ label {
     }
 
     .imglogo {
-        width: 50%;
-        height: 50%;
+        max-width: 50%;
+        max-height: 50%;
     }
 
     div#logowecom {
