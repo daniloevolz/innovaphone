@@ -5109,11 +5109,11 @@
    * @constant
    */
   MediaError.defaultMessages = {
-    1: 'You aborted the media playback',
-    2: 'A network error caused the media download to fail part-way.',
-    3: 'The media playback was aborted due to a corruption problem or because the media used features your browser did not support.',
-    4: 'The media could not be loaded, either because the server or network failed or because the format is not supported.',
-    5: 'The media is encrypted and we do not have the keys to decrypt it.'
+      1: 'Você abortou a reprodução da mídia',
+      2: 'Um erro de rede fez com que o download da mídia falhasse parcialmente.',
+      3: 'A reprodução da mídia foi interrompida devido a um problema de corrupção ou porque a mídia usada não suporta recursos do seu navegador.',
+      4: 'A mídia não pôde ser carregada porque o servidor ou a rede falhou ou porque o formato não é suportado.',
+      5: 'A mídia é criptografada e não temos as chaves para descriptografá-la.'
   };
 
   // Add types as properties on MediaError

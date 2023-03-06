@@ -58,7 +58,7 @@ new JsonApi("user").onconnected(function (conn) {
         //Intert into DB the event
         log("danilo req: insert into DB = user " + conn.sip );
         var today = getDateNow();
-        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "" }
+        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
         log("danilo req: will insert it on DB : " + JSON.stringify(msg));
         insertTblAvailability(msg);
 
@@ -95,35 +95,35 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "TriggerStartPage") {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "page", date: today, status: "start", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "page", date: today, status: "start", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
             }
             if (obj.mt == "TriggerStopPage") {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "page", date: today, status: "stop", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "page", date: today, status: "stop", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
             }
             if (obj.mt == "TriggerStartVideo") {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "video", date: today, status: "start", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "video", date: today, status: "start", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
             }
             if (obj.mt == "TriggerStopVideo") {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "video", date: today, status: "stop", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "video", date: today, status: "stop", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
             }
             if (obj.mt == "TriggerStartPopup") {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "popup", date: today, status: "start", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "popup", date: today, status: "start", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
             }
@@ -133,7 +133,7 @@ new JsonApi("user").onconnected(function (conn) {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
              
-                var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
                 //respond success to the client
@@ -145,7 +145,7 @@ new JsonApi("user").onconnected(function (conn) {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
 
-                var msg = { sip: conn.sip, name: "combo", date: today, status: "start", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "combo", date: today, status: "start", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
                 conn.send(JSON.stringify({ api: "user", mt: "ComboSuccessTrigged", src: obj.prt }));
@@ -156,17 +156,30 @@ new JsonApi("user").onconnected(function (conn) {
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
 
-                var msg = { sip: conn.sip, name: "combo", date: today, status: "stop", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "combo", date: today, status: "stop", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
                 //respond success to the client
                 conn.send(JSON.stringify({ api: "user", mt: "ComboSuccessTrigged", src: obj.prt }));
             }
             if (obj.mt == "TriggerCall") {
+                var num;
+                try {
+                    var user = pbxTableUsers.filter(findBySip(obj.prt));
+                    log("danilo req: TriggerCall user " + JSON.stringify(user));
+                    if (user.length>0) {
+                        log("danilo req: TriggerCall user e164 " + user[0].columns.e164);
+                        num = user[0].columns.e164;
+                    } else {
+                        num = obj.prt;
+                    }
+                } finally {
+                    log("danilo req: TriggerCall num to call " + num);
+                }
                 //intert into DB the event
                 log("danilo req: insert into DB = user " + conn.sip);
 
-                var msg = { sip: conn.sip, name: "call", date: today, status: "start", details: JSON.stringify(obj) }
+                var msg = { sip: conn.sip, name: "call", date: today, status: "start", details: obj.prt }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
 
@@ -185,8 +198,8 @@ new JsonApi("user").onconnected(function (conn) {
                         log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
                         if (temp != null) {
                             user = temp;
-                            log("danilo-req rccRequest:wil call callRCC for user " + user);
-                            callRCC(rcc, user, "UserCall", obj.prt, conn.sip + "," + rcc.pbx);
+                            log("danilo-req rccRequest:wil call callRCC for user " + user+" to num "+num);
+                            callRCC(rcc, user, "UserCall", num, conn.sip + "," + rcc.pbx);
                         }
                     })
                 }
@@ -232,7 +245,7 @@ new JsonApi("user").onconnected(function (conn) {
             }
             if (obj.mt == "SelectMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
-                Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip + "'")
+                Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip + "' OR button_user = 'all'")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
@@ -249,7 +262,7 @@ new JsonApi("user").onconnected(function (conn) {
         //Intert into DB the event
         log("danilo req: insert into DB = user " + conn.sip);
         var today = getDateNow();
-        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Logout", group: "" }
+        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Logout", group: "APP" }
         log("danilo req: will insert it on DB : " + JSON.stringify(msg));
         insertTblAvailability(msg);
 
@@ -266,7 +279,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ sip: u.columns.h323 })
+                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }
@@ -367,7 +380,20 @@ new JsonApi("admin").onconnected(function (conn) {
                         Database.exec(query)
                             .oncomplete(function (data) {
                                 log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+
+                                var jsonData = JSON.stringify(data, null, 4);
+                                var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                var fragments = [];
+                                for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                    fragments.push(jsonData.substr(i, maxFragmentSize));
+                                }
+                                // Enviar cada fragmento separadamente através do websocket
+                                for (var i = 0; i < fragments.length; i++) {
+                                    var isLastFragment = i === fragments.length - 1;
+                                    conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                }
+
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
@@ -385,7 +411,20 @@ new JsonApi("admin").onconnected(function (conn) {
                         Database.exec(query)
                             .oncomplete(function (data) {
                                 log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+
+                                var jsonData = JSON.stringify(data, null, 4);
+                                var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                var fragments = [];
+                                for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                    fragments.push(jsonData.substr(i, maxFragmentSize));
+                                }
+                                // Enviar cada fragmento separadamente através do websocket
+                                for (var i = 0; i < fragments.length; i++) {
+                                    var isLastFragment = i === fragments.length - 1;
+                                    conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                }
+
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
@@ -404,7 +443,20 @@ new JsonApi("admin").onconnected(function (conn) {
                         Database.exec(query)
                             .oncomplete(function (data) {
                                 log("result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+
+                                var jsonData = JSON.stringify(data, null, 4);
+                                var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                var fragments = [];
+                                for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                    fragments.push(jsonData.substr(i, maxFragmentSize));
+                                }
+                                // Enviar cada fragmento separadamente através do websocket
+                                for (var i = 0; i < fragments.length; i++) {
+                                    var isLastFragment = i === fragments.length - 1;
+                                    conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                }
+
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
@@ -994,6 +1046,12 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             } finally {
                 updateBadge(conn, obj.call, count);
             }
+            //Intert into DB the event
+            log("PbxSignal= user " + obj.sig.cg.sip + " login");
+            var today = getDateNow();
+            var msg = { sip: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
+            log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
+            insertTblAvailability(msg);
         }
 
         // handle incoming call release messages
@@ -1031,7 +1089,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             //Intert into DB the event
             log("PbxSignal= user " + sip + " logout");
             var today = getDateNow();
-            var msg = { sip: sip, name: name, date: today, status: "Login", group: "PBX" }
+            var msg = { sip: sip, name: name, date: today, status: "Logout", group: "PBX" }
             log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
             insertTblAvailability(msg);
             //connections = connections.filter(delConnectionsByCall(obj.call));
@@ -1202,7 +1260,7 @@ function alarmReceived(value) {
         //Intert into DB the event
         log("danilo req: insert into DB = user " + obj.User);
         var today = getDateNow();
-        var msg = { sip: obj.User, name: "alarm", date: today, status: "inc", details: JSON.stringify(obj) }
+        var msg = { sip: obj.User, name: "alarm", date: today, status: "inc", details: obj.prt }
         log("danilo req: will insert it on DB : " + JSON.stringify(msg));
         insertTblActivities(msg);
         //update badge Icon
@@ -1569,19 +1627,19 @@ function comboManager(combo, sip, mt) {
                 log("result forEach button" + JSON.stringify(button));
                 if (parseInt(combo_button[0].button_type_1) == parseInt(button.id)) {
                     log("result comboManager= Localizado Combo 1 com ID" + button.id);
-                    comboDispatcher(button,mt);
+                    comboDispatcher(button, sip, mt);
                 }
                 if (parseInt(combo_button[0].button_type_2) == parseInt(button.id)) {
                     log("result comboManager= Localizado Combo 2 com ID" + button.id);
-                    comboDispatcher(button,mt);
+                    comboDispatcher(button, sip, mt);
                 }
                 if (parseInt(combo_button[0].button_type_3) == parseInt(button.id)) {
                     log("result comboManager= Localizado Combo 3 com ID" + button.id);
-                    comboDispatcher(button,mt);
+                    comboDispatcher(button, sip, mt);
                 }
                 if (parseInt(combo_button[0].button_type_4) == parseInt(button.id)) {
                     log("result comboManager= Localizado Combo 4 com ID" + button.id);
-                    comboDispatcher(button,mt);
+                    comboDispatcher(button, sip, mt);
                 }
             })
             //conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
@@ -1595,14 +1653,14 @@ function comboManager(combo, sip, mt) {
 
 }
 
-function comboDispatcher(button, mt) {
-    log("danilo-req comboDispatcher:" + String(button));
+function comboDispatcher(button, sip, mt) {
+    log("danilo-req comboDispatcher:button " + JSON.stringify(button));
     switch (button.button_type) {
         case "video":
             connectionsUser.forEach(function (conn) {
                 log("danilo-req comboDispatcher:video conn.sip " + String(conn.sip));
-                log("danilo-req comboDispatcher:video button.button_user " + String(button.button_user));
-                if (String(conn.sip) == String(button.button_user)) {
+                log("danilo-req comboDispatcher:video sip " + String(sip));
+                if (String(conn.sip) == String(sip)) {
                     conn.send(JSON.stringify({ api: "user", mt: "VideoRequest", name: button.button_name, alarm: button.button_prt }));
                 }
             });
@@ -1610,17 +1668,17 @@ function comboDispatcher(button, mt) {
         case "alarm":
             connectionsUser.forEach(function (conn) {
                 log("danilo-req comboDispatcher:alarm conn.sip " + String(conn.sip));
-                log("danilo-req comboDispatcher:alarm button.button_user " + String(button.button_user));
-                if (String(conn.sip) == String(button.button_user)) {
+                log("danilo-req comboDispatcher:alarm sip " + String(sip));
+                if (String(conn.sip) == String(sip)) {
                     callNovaAlert(parseInt(button.button_prt), conn.sip);
                     conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", value: button.button_prt }));
                 }
             });
             break;
         case "externalnumber":
-            var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
+            var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === sip });
             log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser[0].dn);
-            var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
+            var foundCall = calls.filter(function (call) { return call.sip === sip });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (foundCall.length == 0) {
                 //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
@@ -1632,6 +1690,13 @@ function comboDispatcher(button, mt) {
                         callRCC(rcc, user, "UserCall", button.button_prt, foundConnectionUser[0].sip + "," + rcc.pbx);
                     }
                 })
+                connectionsUser.forEach(function (conn) {
+                    log("danilo-req comboDispatcher:ComboCallStart conn.sip " + String(conn.sip));
+                    log("danilo-req comboDispatcher:ComboCallStart sip " + String(sip));
+                    if (String(conn.sip) == String(sip)) {
+                        conn.send(JSON.stringify({ api: "user", mt: "ComboCallStart", src: conn.sip, num: button.button_prt }));
+                    }
+                });
             } else {
                 RCC.forEach(function (rcc) {
                     var temp = rcc[String(foundConnectionUser[0].sip)];
@@ -1679,9 +1744,9 @@ function comboDispatcher(button, mt) {
             }
             break;
         case "user":
-            var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === button.button_user });
+            var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === sip });
             log("danilo-req:comboDispatcher:found ConnectionUser for user Name " + foundConnectionUser[0].dn);
-            var foundCall = calls.filter(function (call) { return call.sip === button.button_user });
+            var foundCall = calls.filter(function (call) { return call.sip === sip });
             log("danilo-req:comboDispatcher:found call " + JSON.stringify(foundCall));
             if (foundCall.length == 0) {
                 //log("danilo-req:comboDispatcher:found call for user " + foundCall[0].sip);
@@ -1695,8 +1760,8 @@ function comboDispatcher(button, mt) {
                 })
                 connectionsUser.forEach(function (conn) {
                     log("danilo-req comboDispatcher:ComboCallStart conn.sip " + String(conn.sip));
-                    log("danilo-req comboDispatcher:ComboCallStart button.button_user " + String(button.button_user));
-                    if (String(conn.sip) == String(button.button_user)) {
+                    log("danilo-req comboDispatcher:ComboCallStart sip " + String(sip));
+                    if (String(conn.sip) == String(sip)) {
                         conn.send(JSON.stringify({ api: "user", mt: "ComboCallStart", src: conn.sip, num: button.button_prt }));
                     }
                 });
@@ -1749,8 +1814,8 @@ function comboDispatcher(button, mt) {
         case "page":
             connectionsUser.forEach(function (conn) {
                 log("danilo-req comboDispatcher:page conn.sip " + String(conn.sip));
-                log("danilo-req comboDispatcher:page button.button_user " + String(button.button_user));
-                if (String(conn.sip) == String(button.button_user)) {
+                log("danilo-req comboDispatcher:page sip " + String(sip));
+                if (String(conn.sip) == String(sip)) {
                     conn.send(JSON.stringify({ api: "user", mt: "PageRequest", name: button.button_name, alarm: button.button_prt }));
                 }
             });
