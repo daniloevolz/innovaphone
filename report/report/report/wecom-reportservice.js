@@ -51,12 +51,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                             case "out":
                                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: g.name }
                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
+                                insertTblAvailability(msg);
                                 break;
                             case "in":
                                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: g.name }
                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                                insertTblDisponibilidade(msg);
+                                insertTblAvailability(msg);
                         }
                     })
                 }
@@ -378,15 +378,13 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
-            //Talvez seja necessario usar essa dinamica, tentando estatico primeiro//
-            //RCC.forEach(function (rcc) {
-            //    if (rcc.pbx == pbx) {
-            //        log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
-            //        var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-            //        rcc.send(JSON.stringify(msg));
-            //    }
-            //})
-
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == pbx) {
+                    log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
+                    var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
+                    rcc.send(JSON.stringify(msg));
+                }
+            })
             //Intert into DB the event
             var foundUser = list_ramais.filter(findBySip(obj.sig.cg.sip))[0].sip;
             if (foundUser) {
@@ -394,7 +392,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 var today = new Date();
                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Login", group: "" }
                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
+                insertTblAvailability(msg);
             }
         }
 
@@ -431,7 +429,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 var today = new Date();
                 var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Logout", group: "" }
                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
-                insertTblDisponibilidade(msg);
+                insertTblAvailability(msg);
             }
 
         }
@@ -450,18 +448,7 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "UserMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
-            if (obj.mt == "SelectFromDisponibilidade") {
-                Database.exec("SELECT * FROM tbl_disponibilidade")
-                    .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectFromDisponibilidadeSuccess", result: JSON.stringify(data, null, 4) }));
-
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                    });
-            }
-            if (obj.mt == "SelectRamais") {
+            if (obj.mt == "SelectUser") {
                 conn.send(JSON.stringify({ api: "user", mt: "SelectUsersResult" }));
                 Database.exec("SELECT * FROM tbl_ramais")
                     .oncomplete(function (data) {
@@ -472,6 +459,104 @@ new JsonApi("user").onconnected(function (conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "UsersError", result: String(errorText) }));
                     });
+            }
+            if (obj.mt == "SelectFromReports") {
+                switch (obj.src) {
+                    case "RptCalls":
+                        var query = "SELECT sip, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
+                        var conditions = [];
+                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.number) conditions.push("number ='" + obj.number + "'");
+                        if (obj.from) conditions.push("call_started >'" + obj.from + "'");
+                        if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptTotalRamal":
+                            var query = "SELECT sip, number, call_started, call_connected, call_ended, to_char((call_ended - call_started), 'YYYY-MM-DD HH24:MI:SS') as call_duration , to_char((call_connected - call_started, 'YYYY-MM-DD HH24:MI:SS') as call_ringing , status , direction FROM tbl_totalramal";
+                            var conditions = [];
+                            if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                            if (obj.number) conditions.push("number ='" + obj.number + "'");
+                            if (obj.from) conditions.push("call_started >'" + obj.from + "'");
+                            if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                            if (conditions.length > 0) {
+                                query += " WHERE " + conditions.join(" AND ");
+                            }
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+                                    conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                                });
+                            break;
+                    case "RptAvailability":
+                        var query = "SELECT sip, date, status, group_name FROM tbl_availability";
+                        var conditions = [];
+                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.from) conditions.push("date >'" + obj.from + "'");
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                }
+            }
+            if (obj.mt == "DeleteFromReports") {
+                switch (obj.src) {
+                    case "RptCalls":
+                        var query = "DELETE FROM tbl_calls";
+                        var conditions = [];
+                        if (obj.to) conditions.push("call_started <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptAvailability":
+                        var query = "DELETE FROM tbl_availability";
+                        var conditions = [];
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                }
             }
         });
     }
@@ -589,16 +674,6 @@ function initializeMonitor() {
             log("initializeMonitor error=" + String(errorText));
         });
 }
-function insertTblDisponibilidade(obj) {
-    Database.insert("INSERT INTO tbl_disponibilidade (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
-        .oncomplete(function () {
-            log("insertTblDisponibilidade= Success");
-
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblDisponibilidade= Erro " + errorText);
-        });
-}
 
 function getRamaisFromDB() {
     Database.exec("SELECT * FROM tbl_ramais")
@@ -609,6 +684,51 @@ function getRamaisFromDB() {
         })
         .onerror(function (error, errorText, dbErrorCode) {
             log("getRamaisFromDB result= Erro " + errorText);
+        });
+}
+//Funções que faltavam para inserir as info no BD -->
+
+function getDateNow() {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date();
+    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+    date.setUTCHours(date.getUTCHours() - 3);
+
+    // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+    var dateString = date.toISOString();
+
+    // Substitui o caractere "T" por um espaço
+    dateString = dateString.replace("T", " ");
+
+    // Retorna a string no formato "AAAA-MM-DD HH:mm:ss.sss"
+    return dateString.slice(0, -5);
+}
+
+//reports
+function insertTblCalls(obj) {
+    if (!obj.call_ringing) {
+        obj.call_ringing = "";
+    }
+    if (!obj.call_connected) {
+        obj.call_connected = "";
+    }
+    Database.insert("INSERT INTO tbl_calls (sip, number, call_started, call_ringing, call_connected, call_ended, status, direction) VALUES ('" + obj.sip + "','" + obj.num + "','" + obj.call_started + "','" + obj.call_ringing + "','" + obj.call_connected + "','" + obj.call_ended +"'," + obj.state + ",'" + obj.direction + "')")
+        .oncomplete(function () {
+            log("insertTblCalls= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblCalls= Erro " + errorText);
+        });
+}
+function insertTblAvailability(obj) {
+    Database.insert("INSERT INTO tbl_availability (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
+        .oncomplete(function () {
+            log("insertTblAvailability= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblAvailability= Erro " + errorText);
         });
 }
 

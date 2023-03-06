@@ -2,26 +2,30 @@
 /// <reference path="../../web1/lib1/innovaphone.lib1.js" />
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
+/// <reference path="../../web1/ui1.listview/innovaphone.ui1.listview.js" />
 
 var Wecom = Wecom || {};
 Wecom.report = Wecom.report || function (start, args) {
     this.createNode("body");
+    var appdn = start.title;
+    var avatar = start.consumeApi("com.innovaphone.avatar");
     var that = this;
-
-    var list_ramais = [];
-     // Horario Atual
-    var day = new Date().toLocaleString();
-
+    var colDireita;
+    
+    var list_ramais = []
+    
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--bg": "url('bg.png')",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
+            "--div-DelBtn" : "#f2f5f6",
         },
         light: {
-            "--bg": "white",
-            "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--bg": "url('bg.png')",
+            "--button": "#c6c6c6",
+            "--text-standard": "#004c84",
+            "--div-DelBtn" : "#f2f5f6",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -36,168 +40,295 @@ Wecom.report = Wecom.report || function (start, args) {
     app.onmessage = app_message;
     app.onclosed = waitConnection;
     app.onerror = waitConnection;
+    
     var UIuser;
-
-    function waitConnection() {
-        that.clear();
-        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
-        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
-        that.add(bodywait);
-    }
+    var colDireita;
+    var UIuserPicture;
 
     function app_connected(domain, user, dn, appdomain) {
         UIuser = dn;
+        //avatar
+        avatar = new innovaphone.Avatar(start, user, domain);
+        UIuserPicture = avatar.url(user, 100, dn);
+        constructor();
+
         app.send({ api: "user", mt: "UserMessage" });
-        app.send({ api: "user", mt: "SelectRamais"})
+        app.send({ api: "user", mt: "SelectUser"})
+        
         // document.getElementById('user').innerHTML = dn
-        
-        
+
+
     }
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            MakeReportTA()
         }
-        if (obj.api == "user" && obj.mt == "SelectUsersResultSuccess"){
-            console.log(obj.result)
+        if (obj.api == "user" && obj.mt == "SelectFromReportsSuccess") {
+            reportView(colDireita, obj.result, obj.src);
+        }
+        if(obj.api == "user" && obj.mt == "SelectUsersResultSuccess"){
             list_ramais = [];
-            list_ramais = JSON.parse(obj.result);
-            /*
+            list_ramais = JSON.parse(obj.result); 
+            console.log("Lista Ramais" + list_ramais)
+        }
+        if (obj.api == "admin" && obj.mt == "DeleteFromReportsSuccess") {
             constructor();
-       
-        var TotaisPeriodo = document.getElementById("TTP");
-        TotaisPeriodo.addEventListener("click",function() {MudarTexto("TTP")})
-
-        var DetalhadoPeriodo = document.getElementById("DTP");
-        DetalhadoPeriodo.addEventListener("click",function() {MudarTexto("DTP")})
-
-        var DetalhadoRamal = document.getElementById("DTR");
-        DetalhadoRamal.addEventListener("click",function() {MudarTexto("DTR")})
-
-        var TotalRamal = document.getElementById("TTR");
-        TotalRamal.addEventListener("click",function() {MudarTexto("TTR")})
-        */
-            
+            makePopup("Atenção!", texts.text(labelDeleteSuccess));
         }
     }
-    function constructor(){
+    function waitConnection(t) {
+        t.clear();
+        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        t.add(bodywait);
+    }
     
-        that.clear();
-        // col Esquerda
-        var colEsquerda = that.add(new innovaphone.ui1.Div(null,null,"colunaesquerda"));
-        var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;",null,null));
-        var imglogo = divreport.add(new innovaphone.ui1.Node("img","max-height: 33px; opacity: 0.8;",null,null));
-        imglogo.setAttribute("src","logo-wecom.png");
-        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.25rem; color:white; margin : 5px;",texts.text("labelNameApp"),null));
-        var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
-        var imguser = user.add(new innovaphone.ui1.Node("img","max-height: 33px;",null,null));
-        imguser.setAttribute("src","icon-user.png");
-        var username = user.add(new innovaphone.ui1.Node("span","font-size: 1.25rem; color:white; margin: 5px;",UIuser,null));
-        username.setAttribute("id","user")
-        
-        var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
-        var prelatorios = relatorios.add(new innovaphone.ui1.Node("p","text-align: center; font-size: 20px;",texts.text("labelRelatórios") ,null));
-        var br = relatorios.add(new innovaphone.ui1.Node("br",null,null,null));
+    function makeDivClearDB(t) {
+        t.clear();
+        //Título
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:25px; text-align:center", texts.text("labelTituloClearDB")));
 
-            var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li","opacity: 0.9",null,"liOptions"))
-            var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li","opacity: 0.9",null,"liOptions"))
-            var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li","opacity: 0.9",null,"liOptions"))
-            var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li","opacity: 0.9",null,"liOptions"))
-            var Arelatorios1 = lirelatorios1.add(new innovaphone.ui1.Node("a",null,texts.text("labelTotalPeríodo"),null));
-            Arelatorios1.setAttribute("id","TTP");
-            var Arelatorios2 = lirelatorios2.add(new innovaphone.ui1.Node("a",null,texts.text("labelDetalhadoPeríodo"),null));
-            Arelatorios2.setAttribute("id","DTP")
-            var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a",null,texts.text("labelDetalhadoAtendente"),null));
-            Arelatorios3.setAttribute("id","DTR")
-            var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a",null,texts.text("labelTotalAtendente"),null));
-            Arelatorios4.setAttribute("id","TTR")
-            
-        var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;",null,null));
-        var divother2 = divother.add(new innovaphone.ui1.Div(null,null,"otherli"));
-
-        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 62%;",null,null));
-        var liconfig = config.add(new innovaphone.ui1.Node("li","display:flex; aligns-items: center",null,"config"));
-        
-        var imgconfig = liconfig.add(new innovaphone.ui1.Node("img","max-height: 30px; opacity: 0.9; margin: 5px; ",null,null));
-        imgconfig.setAttribute("src","config-icon.png");
-        var Aconfig = liconfig.add(new innovaphone.ui1.Node("a","display: flex; align-items: center; justify-content: center;",texts.text("labelConfig"),null));
-        Aconfig.setAttribute("href","#");
-        // col direita
-        var colDireita = that.add(new innovaphone.ui1.Div(null,null,"colunadireita"));
-        var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 4rem;",texts.text("labelFiltros"),null));
-        var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 2rem;",texts.text("labelTotalPeríodo"),null));
-        divFiltrosDetails.setAttribute("id","details");
-
-        var divDe = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 25.5%; left: 6%; font-weight: bold;",texts.text("labelDe"),null));
-        var InputDe = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 9%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;",null,null,null,"date",null));
-        var divAte = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 35.5%; left: 6%; font-weight: bold;",texts.text("labelAté"),null));
-        var InputAte = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 10%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;",null,null,null,"date",null));
-        var divNumOrigem = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 45.6%; left: 6%; font-weight: bold;",texts.text("labelTelefone"),null));
-        var InputNumOrigem = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 45%; left: 21%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ",null,null,null,"number",null));
-        var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; top: 55.6%; left: 6%; font-weight: bold;",texts.text("labelAtendente"),null));
-        var SelectRamal = colDireita.add(new innovaphone.ui1.Node("select","position: absolute; top: 55.0%; left: 14%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ",null,null));
-       
-        list_ramais.forEach(function (user) {
-         var opt =  SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null));
-         opt.setAttribute("id","sips");
-
-       })     
-       
-
-       
-
-        // logo WeCom colDireita
-        var wecom = colDireita.add(new innovaphone.ui1.Div("position:absolute; top:90%; left: 2%;",null,null));
-        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
-        wecomA.setAttribute("href","https://wecom.com.br")
-        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-        imgwecom.setAttribute("src","logo.png");
+        var divTo = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+        var InputTo = t.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+        var divReport = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelReports"), null));
+        var SelectReport = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectReport");
+        t.add(SelectReport);
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptCalls", null)).setAttribute("id", "RptCalls");
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptAvailability", null)).setAttribute("id", "RptAvailability");
+        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "RptTotalRamal", null)).setAttribute("id", "RptTotalRamal");
         // buttons
-        var btnCancel = colDireita.add(new innovaphone.ui1.Node("button","position: absolute; top: 70%; height: 50px; width: 90px; left: 75%; border-radius: 10px; background-color: transparent; border: 2px solid; border-color: #02163F; font-weight: bold;",texts.text("labelCancel"),null))
-        var btnSee = colDireita.add(new innovaphone.ui1.Node("button","position: absolute; top: 70%; height: 50px; width: 90px; left: 87%; border-radius: 10px; background-color: #02163F; color: white; font-weight: bold;",texts.text("labelVisualizar"),null));
-        
-
-    }   
-    // Mudar nome dos relatório conforme escolhido na coluna esquerda
-    function MudarTexto(ex){
-        if(ex == "TTP"){
-            document.getElementById('details').innerHTML = texts.text("labelTotalPeríodo");
-        }
-        if(ex == "DTP"){
-            document.getElementById('details').innerHTML = texts.text("labelDetalhadoPeríodo"); 
-        }
-        if(ex == "DTR"){
-            document.getElementById('details').innerHTML = texts.text("labelDetalhadoRamal");
-        }
-        if(ex == "TTR"){
-            document.getElementById('details').innerHTML = texts.text("labelTotalRamal");
-        }
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            var to = document.getElementById("dateTo").value;
+            var report = document.getElementById("selectReport").value;
+            app.send({ api: "user", mt: "DeleteFromReports", src:report,  to: to });
+            waitConnection(t);
+        });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            constructor();
+        });
     }
-    // Funções de criação do Relatório - Abreviadas pelas iniciais de cada Relatório
-    function MakeReportTA(){
+    function constructor() {
         that.clear();
-       var divMainTA = that.add(new innovaphone.ui1.Div("width: 85%; background-color: rgb(196, 196, 196); color:black; height: 100%; position: absolute; left:15%;"));
-       var divDateReport = divMainTA.add(new innovaphone.ui1.Div("text-align:left; font-size: 16px ; font-weight:bold",texts.text("labelDateReport") + day,null))                                                             
-       var divAtendente = divMainTA.add(new innovaphone.ui1.Div("position:absolute; top: 10%; width:50%; height: 50px; display:flex; align-items:center; justify-content:center ;border: 1px solid black;",texts.text("labelAtendente2")))
-       var divTempoFalando = divMainTA.add(new innovaphone.ui1.Div("position:absolute; top: 10%; width:50%; height: 50px; display:flex; align-items:center; left: 50%; justify-content:center ;border: 1px solid black;",texts.text("labelTempoFalando")))       
-   // Tabela dos Atendentes  - mais p frente podemos seprar em uma Função conforme o desenvolvimento
-   var list = divMainTA.add(new innovaphone.ui1.Div("position: absolute; left:0%; top:20%;  width: 50%; height:300px", null, "divTable"));
-   var rows = list_ramais.length;
-   var listView = new innovaphone.ui1.ListView(list, 30, "headercl", "arrow", false);
-    //Tabela    
-  list_ramais.forEach(function (b) {
-      var row = [];
-      row.push(b.sip);
-      row.push(b.nome);
-      listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-      that.add(list);
-  })
+        // col direita
+        var _colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireitaadmin"));
+        // col Esquerda
+        var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
+        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
+        imglogo.setAttribute("src", "logo-wecom.png");
+        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; color:white; margin : 5px;", appdn, null));
+        var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
+        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
+        imguser.setAttribute("src", UIuserPicture);
+        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, null));
+        username.setAttribute("id", "user")
+
+        var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 26%; height: 40%;"));
+        relatorios.add(new innovaphone.ui1.Node("p", "text-align: left; font-size: 20px;", texts.text("labelReports"), null));
+        relatorios.add(new innovaphone.ui1.Node("br", null, null, null));
+        var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptAvailability"), null).setAttribute("id", "RptAvailability"));
+        lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptCalls"), null).setAttribute("id", "RptCalls"));
+        lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("RptTotalRamal"), null).setAttribute("id", "RptTotalRamal"));
+        lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgDefaults"), null).setAttribute("id", "CfgDefaults"));
+       
+        var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
+        var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
+
+        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 90%;", null, null));
+        var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center", null, "config"));
+
+        var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
+        imgconfig.setAttribute("src", "logo.png");
+        //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
+        //Aconfig.setAttribute("href", "#");
+        var a = document.getElementById("RptAvailability");
+        a.addEventListener("click", function () { filterReports("RptAvailability", _colDireita) })
+        var a = document.getElementById("RptCalls");
+        a.addEventListener("click", function () { filterReports("RptCalls", _colDireita) })
+        var a = document.getElementById("RptTotalRamal");
+        a.addEventListener("click", function () { filterReports("RptTotalRamal", _colDireita) })
+        var a = document.getElementById("CfgDefaults");
+        a.addEventListener("click", function () { makeDivClearDB(_colDireita) })
+
+        colDireita = _colDireita;
+    }
+    function filterReports(rpt,colDireita) {
+        colDireita.clear();
+        var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+        var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+        var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+        var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id","dateFrom"));
+        var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+        var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+        var divNumber = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelPhone"), null));
+        var InputNumber = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 45%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ", null, null, null, "number", null).setAttribute("id", "number"));
+        var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+        var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id","selectUser");
+        colDireita.add(SelectRamal);
+        SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+        list_ramais.forEach(function (user) {
+            SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+        })
+        // buttons
+        colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            var sip = document.getElementById("selectUser").value;
+            var from = document.getElementById("dateFrom").value;
+            var to = document.getElementById("dateTo").value;
+            var number = document.getElementById("number").value;
+
+            app.send({ api: "user", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, src: rpt });
+            waitConnection(colDireita);
+        });
+        colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            constructor();
+        });
+    }
+    function reportView(t, result, src) {
+        t.clear();
+        var result = JSON.parse(result);
+        //Botões Tabela
+        t.add(new innovaphone.ui1.Div("position:absolute; left:15%; width:15%; top:0%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnPdf").addEvent("click", function () {
+            downloadPDF();
+        });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:0%; font-size:12px; text-align:center; color:var(--div-DelBtn); background-color: #B0132B", null, "button-inn")).addTranslation(texts, "btnReturn").addEvent("click", function () {
+            filterReports(src, colDireita)
+        });
+        //Título Tabela
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id","titleReport"));
+        var list = new innovaphone.ui1.Div("background-color: rgba(128, 130, 131, 0.48); position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id","listReport");
+        var columns = Object.keys(result[0]).length;
+        var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            listView.addColumn(null, "text", texts.text("cabecalho"+src+ + i), i, 10, false);
+        }
+        //Tabela 
+        switch (src) {
+            case "RptCalls":
+                result.forEach(function (b) {
+                    var row = [];
+                    row.push(b.sip);
+                    row.push(b.number);
+                    row.push(b.call_started);
+                    row.push(b.call_ringing);
+                    row.push(b.call_connected);
+                    row.push(b.call_ended);
+                    row.push(b.status);
+                    row.push(b.direction);
+                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                    t.add(list);
+                })
+                break;
+            case "RptTotalRamal": 
+                result.forEach(function (b) {
+                    var row = [];
+                    row.push(b.sip);
+                    row.push(b.number);
+                    row.push(b.call_started);
+                    row.push(b.call_ringing);
+                    row.push(b.call_connected);
+                    row.push(b.call_ended);
+                    row.push(b.call_duration);
+                    row.push(b.status);
+                    row.push(b.direction);
+                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                    t.add(list);
+                })
+                break;
+            case "RptAvailability":
+                result.forEach(function (b) {
+                    var row = [];
+                    row.push(b.sip);
+                    row.push(b.date);
+                    row.push(b.status);
+                    row.push(b.group_name);
+                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                    t.add(list);
+                })
+                break;
+        }
+    }
+    function downloadPDF() {
+        // Crie um objeto jsPDF
+        const doc = new jsPDF('l', 'pt', 'a4');
+
+        // Carregar a imagem usando um objeto Image
+        var img = new Image();
+        img.src = 'logo.png';
+
+        // Quando a imagem terminar de carregar, adicionar ao PDF
+        img.onload = function () {
+            // Adicionar a imagem ao documento
+            doc.addImage(img, 'PNG', 10, 30, 100, 19);
+            // Defina a fonte para 18px
+            doc.setFontSize(18);
+            const title = document.getElementById("titleReport");
+            // Adicione o texto da tabela
+            doc.text(title.innerHTML, 300, 50);
+
+            // Defina a fonte para 10px
+            doc.setFontSize(10);
+
+            // Obtenha a tabela da listview
+            const table = document.getElementById("listReport");
+
+            // Obtenha as linhas da tabela
+            const rows = table.querySelectorAll("tr");
 
 
-   // Tabela do Tempo Falando  - mais p frente podemos seprar em uma Função conforme o desenvolvimento
+            // Obter todas as colunas da primeira linha
+            var colunas = rows[0].getElementsByTagName('td');
+            // Definir a largura da página
+            var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+            // Definir a largura de cada coluna
+            //var colWidth = pageWidth / colunas.length;
+            var cellWidth = (pageWidth - (colunas.length * 2)) / colunas.length;
+
+
+            // Defina o posicionamento inicial para o topo da primeira página
+            let y = 100;
+
+            // Itere sobre as linhas e colunas da tabela e adicione os dados ao PDF
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].querySelectorAll("td");
+                let x = 10;
+
+                // Verificar se a próxima linha ultrapassa a altura da página
+                if (y + 20 > doc.internal.pageSize.height) {
+                    doc.addPage();
+                    y = 100;
+                }
+
+                for (let j = 0; j < cells.length; j++) {
+                    //var cellWidth = cells[j].offsetWidth * 0.264583;
+
+                    // Adicione bordas à célula
+                    //doc.rect(x, y, cells[j].clientWidth, cells[j].clientHeight);
+                    doc.rect(x, y, cellWidth, cells[j].clientHeight);
+
+                    // Adicione o texto da célula
+                    doc.text(cells[j].textContent, x + 2, y + 10);
+
+                    // Atualize a posição X para a próxima célula
+                    //x += cells[j].clientWidth;
+                    x += cellWidth;
+                }
+
+                // Atualize a posição Y para a próxima linha
+                y += cells[0].clientHeight;
+            }
+
+            // Baixar o arquivo PDF
+            doc.output();
+            saveAs(doc.output('blob'), 'Report.pdf');
+        };
         
     }
-    
 }
+
 
 Wecom.report.prototype = innovaphone.ui1.nodePrototype;
