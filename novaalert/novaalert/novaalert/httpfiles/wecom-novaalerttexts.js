@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        labelEvent: "Evento:",
+        labelGoogleKey: "Google Key API:",
         labelDeleteSuccess: "Dados excluídos com sucesso!",
         labelTituloClearDB: "Remova o histórico do BD",
         btnOk: "OK",

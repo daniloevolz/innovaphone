@@ -243,6 +243,13 @@
         "type": "BOOL",
         "default": false,
         "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "googleApiKey",
+        "type": "STRING",
+        "default": "AIzaSyBIKQzdxql08fuOcVodlLsKeNo6qmK7McY",
+        "password": false
       }
     ]
 

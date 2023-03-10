@@ -155,6 +155,7 @@
     <Image Include="novaalert\httpfiles\combo.png" />
     <Image Include="novaalert\httpfiles\config-icon.png" />
     <Image Include="novaalert\httpfiles\icon-user.png" />
+    <Image Include="novaalert\httpfiles\left-arrow.png" />
     <Image Include="novaalert\httpfiles\logo-wecom.png" />
     <Image Include="novaalert\httpfiles\logo.png" />
     <Image Include="novaalert\httpfiles\page.png" />
@@ -163,6 +164,7 @@
     <Image Include="novaalert\httpfiles\play.png" />
     <Image Include="novaalert\httpfiles\player_ico.jpg" />
     <Image Include="novaalert\httpfiles\queue.png" />
+    <Image Include="novaalert\httpfiles\right-arrow.png" />
     <Image Include="novaalert\httpfiles\video.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalert.png" />
     <Image Include="novaalert\httpfiles\wecom-novaalertadmin.png" />
