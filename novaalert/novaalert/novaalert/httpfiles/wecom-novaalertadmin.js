@@ -110,7 +110,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 // Todos os fragmentos foram recebidos
                 var jsonData = receivedFragments.join("");
                 // Faça o que quiser com os dados aqui
-                reportView(colDireita, jsonData, obj.src);
+                reportView(colDireita, jsonData, obj.src)
+                    .then(function (message) {
+                        console.log(message);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                //reportView(colDireita, jsonData, obj.src);
                 // Limpe o array de fragmentos recebidos
                 receivedFragments = [];
             }
@@ -845,210 +852,232 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     }
 
     //report pages
-    function reportView(t, result, src) {
-        t.clear();
-        var result = JSON.parse(result);
-        //Botões Tabela
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnPdf").addEvent("click", function () {
-            downloadPDF();
-        });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnReturn").addEvent("click", function () {
-            filterReports(src, colDireita)
-        });
-        //Título Tabela
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id","titleReport"));
-        var list = new innovaphone.ui1.Div("background-color: rgba(128, 130, 131, 0.48); position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id","listReport");
-        var columns = Object.keys(result[0]).length;
-        var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-        //Cabeçalho
-        for (i = 0; i < columns; i++) {
-            listView.addColumn(null, "text", texts.text("cabecalho"+src+ + i), i, 10, false);
-        }
-        //Tabela 
-        switch (src) {
-            case "RptCalls":
-                result.forEach(function (b) {
-                    var row = [];
-                    row.push(b.sip);
-                    row.push(b.number);
-                    row.push(b.call_started);
-                    row.push(b.call_ringing);
-                    row.push(b.call_connected);
-                    row.push(b.call_ended);
-                    // Substituir valores de b.status por texto correspondente
-                    switch (b.status) {
-                        case 6:
-                            row.push("Desc. Realizada");
-                            break;
-                        case 7:
-                            row.push("Desc. Recebida");
-                            break;
-                        case 134:
-                            row.push("Desc. Realizada");
-                            break;
-                        case 135:
-                            row.push("Desc. Recebida");
-                            break;
-                        default:
+    function reportView(t, response, src) {
+        return new Promise(function (resolve, reject) {
+            try {
+                //t.clear();
+                var result = JSON.parse(response);
+                ////Botões Tabela
+                //t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnPdf").addEvent("click", function () {
+                //    downloadPDF();
+                //});
+                //t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnReturn").addEvent("click", function () {
+                //    filterReports(src, colDireita)
+                //});
+                ////Título Tabela
+                //t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id", "titleReport"));
+                var list = new innovaphone.ui1.Div("background-color: rgba(128, 130, 131, 0.48); position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id", "listReport");
+                var columns = Object.keys(result[0]).length;
+                var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+                //Cabeçalho
+                for (i = 0; i < columns; i++) {
+                    listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                }
+                //Tabela 
+                switch (src) {
+                    case "RptCalls":
+                        result.forEach(function (b) {
+                            var row = [];
+                            row.push(b.sip);
+                            row.push(b.number);
+                            row.push(b.call_started);
+                            row.push(b.call_ringing);
+                            row.push(b.call_connected);
+                            row.push(b.call_ended);
+                            // Substituir valores de b.status por texto correspondente
+                            switch (b.status) {
+                                case 6:
+                                    row.push("Desc. Realizada");
+                                    break;
+                                case 7:
+                                    row.push("Desc. Recebida");
+                                    break;
+                                case 134:
+                                    row.push("Desc. Realizada");
+                                    break;
+                                case 135:
+                                    row.push("Desc. Recebida");
+                                    break;
+                                default:
+                                    row.push(b.status);
+                            }
+                            //row.push(b.status);
+                            // Substituir valores de b.direction por texto correspondente
+                            switch (b.direction) {
+                                case "inc":
+                                    row.push("Entrada");
+                                    break;
+                                case "out":
+                                    row.push("Saída");
+                                    break;
+                                default:
+                                    row.push(b.direction);
+                            }
+                            //row.push(b.direction);
+                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                            //t.add(list);
+                        })
+                        break;
+                    case "RptActivities":
+                        result.forEach(function (b) {
+                            var row = [];
+                            row.push(b.sip);
+                            // Substituir valores de b.name por texto correspondente
+                            switch (b.name) {
+                                case "video":
+                                    row.push("Vídeo");
+                                    break;
+                                case "page":
+                                    row.push("Página");
+                                    break;
+                                case "alarm":
+                                    row.push("Alarme");
+                                    break;
+                                case "call":
+                                    row.push("Ligação");
+                                    break;
+                                case "combo":
+                                    row.push("Combo");
+                                    break;
+                                case "popup":
+                                    row.push("PopUp");
+                                    break;
+                                default:
+                                    row.push(b.name);
+                            }
+                            //row.push(b.name);
+                            row.push(b.date);
+                            // Substituir valores de b.status por texto correspondente
+                            switch (b.status) {
+                                case "start":
+                                    row.push("Ínício");
+                                    break;
+                                case "stop":
+                                    row.push("Fim");
+                                    break;
+                                case "inc":
+                                    row.push("Entrada");
+                                    break;
+                                case "out":
+                                    row.push("Saída");
+                                    break;
+                                default:
+                                    row.push(b.status);
+                            }
+                            //row.push(b.status);
+                            row.push(b.details);
+                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                            //t.add(list);
+                        })
+                        break;
+                    case "RptAvailability":
+                        result.forEach(function (b) {
+                            var row = [];
+                            row.push(b.sip);
+                            row.push(b.date);
                             row.push(b.status);
-                    }
-                    //row.push(b.status);
-                    // Substituir valores de b.direction por texto correspondente
-                    switch (b.direction) {
-                        case "inc":
-                            row.push("Entrada");
-                            break;
-                        case "out":
-                            row.push("Saída");
-                            break;
-                        default:
-                            row.push(b.direction);
-                    }
-                    //row.push(b.direction);
-                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                    t.add(list);
-                })
-                break;
-            case "RptActivities":
-                result.forEach(function (b) {
-                    var row = [];
-                    row.push(b.sip);
-                    // Substituir valores de b.name por texto correspondente
-                    switch (b.name) {
-                        case "video":
-                            row.push("Vídeo");
-                            break;
-                        case "page":
-                            row.push("Página");
-                            break;
-                        case "alarm":
-                            row.push("Alarme");
-                            break;
-                        case "call":
-                            row.push("Ligação");
-                            break;
-                        case "combo":
-                            row.push("Combo");
-                            break;
-                        case "popup":
-                            row.push("PopUp");
-                            break;
-                        default:
-                            row.push(b.name);
-                    }
-                    //row.push(b.name);
-                    row.push(b.date);
-                    // Substituir valores de b.status por texto correspondente
-                    switch (b.status) {
-                        case "start":
-                            row.push("Ínício");
-                            break;
-                        case "stop":
-                            row.push("Fim");
-                            break;
-                        case "inc":
-                            row.push("Entrada");
-                            break;
-                        case "out":
-                            row.push("Saída");
-                            break;
-                        default:
-                            row.push(b.status);
-                    }
-                    //row.push(b.status);
-                    row.push(b.details);
-                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                    t.add(list);
-                })
-                break;
-            case "RptAvailability":
-                result.forEach(function (b) {
-                    var row = [];
-                    row.push(b.sip);
-                    row.push(b.date);
-                    row.push(b.status);
-                    row.push(b.group_name);
-                    listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                    t.add(list);
-                })
-                break;
-        }
-        function downloadPDF() {
-            // Crie um objeto jsPDF
-            const doc = new jsPDF('l', 'pt', 'a4');
+                            row.push(b.group_name);
+                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                            //t.add(list);
+                        })
+                        break;
+                }
+                function downloadPDF() {
+                    // Crie um objeto jsPDF
+                    const doc = new jsPDF('l', 'pt', 'a4');
 
-            // Carregar a imagem usando um objeto Image
-            var img = new Image();
-            img.src = 'logo.png';
+                    // Carregar a imagem usando um objeto Image
+                    var img = new Image();
+                    img.src = 'logo.png';
 
-            // Quando a imagem terminar de carregar, adicionar ao PDF
-            img.onload = function () {
-                // Adicionar a imagem ao documento
-                doc.addImage(img, 'PNG', 10, 30, 100, 19);
-                // Defina a fonte para 18px
-                doc.setFontSize(18);
-                const title = document.getElementById("titleReport");
-                // Adicione o texto da tabela
-                doc.text(title.innerHTML, 300, 50);
+                    // Quando a imagem terminar de carregar, adicionar ao PDF
+                    img.onload = function () {
+                        // Adicionar a imagem ao documento
+                        doc.addImage(img, 'PNG', 10, 30, 100, 19);
+                        // Defina a fonte para 18px
+                        doc.setFontSize(18);
+                        const title = document.getElementById("titleReport");
+                        // Adicione o texto da tabela
+                        doc.text(title.innerHTML, 300, 50);
 
-                // Defina a fonte para 10px
-                doc.setFontSize(10);
+                        // Defina a fonte para 10px
+                        doc.setFontSize(10);
 
-                // Obtenha a tabela da listview
-                const table = document.getElementById("listReport");
+                        // Obtenha a tabela da listview
+                        const table = document.getElementById("listReport");
 
-                // Obtenha as linhas da tabela
-                const rows = table.querySelectorAll("tr");
+                        // Obtenha as linhas da tabela
+                        const rows = table.querySelectorAll("tr");
 
 
-                // Obter todas as colunas da primeira linha
-                var colunas = rows[0].getElementsByTagName('td');
-                // Definir a largura da página
-                var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-                // Definir a largura de cada coluna
-                //var colWidth = pageWidth / colunas.length;
-                var cellWidth = (pageWidth - (colunas.length * 2)) / colunas.length;
+                        // Obter todas as colunas da primeira linha
+                        var colunas = rows[0].getElementsByTagName('td');
+                        // Definir a largura da página
+                        var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+                        // Definir a largura de cada coluna
+                        //var colWidth = pageWidth / colunas.length;
+                        var cellWidth = (pageWidth - (colunas.length * 2)) / colunas.length;
 
 
-                // Defina o posicionamento inicial para o topo da primeira página
-                let y = 100;
+                        // Defina o posicionamento inicial para o topo da primeira página
+                        let y = 100;
 
-                // Itere sobre as linhas e colunas da tabela e adicione os dados ao PDF
-                for (let i = 0; i < rows.length; i++) {
-                    const cells = rows[i].querySelectorAll("td");
-                    let x = 10;
+                        // Itere sobre as linhas e colunas da tabela e adicione os dados ao PDF
+                        for (let i = 0; i < rows.length; i++) {
+                            const cells = rows[i].querySelectorAll("td");
+                            let x = 10;
 
-                    // Verificar se a próxima linha ultrapassa a altura da página
-                    if (y + 20 > doc.internal.pageSize.height) {
-                        doc.addPage();
-                        y = 100;
-                    }
+                            // Verificar se a próxima linha ultrapassa a altura da página
+                            if (y + 20 > doc.internal.pageSize.height) {
+                                doc.addPage();
+                                y = 100;
+                            }
 
-                    for (let j = 0; j < cells.length; j++) {
-                        //var cellWidth = cells[j].offsetWidth * 0.264583;
+                            for (let j = 0; j < cells.length; j++) {
+                                //var cellWidth = cells[j].offsetWidth * 0.264583;
 
-                        // Adicione bordas à célula
-                        //doc.rect(x, y, cells[j].clientWidth, cells[j].clientHeight);
-                        doc.rect(x, y, cellWidth, cells[j].clientHeight);
+                                // Adicione bordas à célula
+                                //doc.rect(x, y, cells[j].clientWidth, cells[j].clientHeight);
+                                doc.rect(x, y, cellWidth, cells[j].clientHeight);
 
-                        // Adicione o texto da célula
-                        doc.text(cells[j].textContent, x + 2, y + 10);
+                                // Adicione o texto da célula
+                                doc.text(cells[j].textContent, x + 2, y + 10);
 
-                        // Atualize a posição X para a próxima célula
-                        //x += cells[j].clientWidth;
-                        x += cellWidth;
-                    }
+                                // Atualize a posição X para a próxima célula
+                                //x += cells[j].clientWidth;
+                                x += cellWidth;
+                            }
 
-                    // Atualize a posição Y para a próxima linha
-                    y += cells[0].clientHeight;
+                            // Atualize a posição Y para a próxima linha
+                            y += cells[0].clientHeight;
+                        }
+
+                        // Baixar o arquivo PDF
+                        doc.output();
+                        saveAs(doc.output('blob'), 'Report.pdf');
+                    };
+
                 }
 
-                // Baixar o arquivo PDF
-                doc.output();
-                saveAs(doc.output('blob'), 'Report.pdf');
-            };
-            
-        }
+
+                t.clear();
+                //Botões Tabela
+                t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnPdf").addEvent("click", function () {
+                    downloadPDF();
+                });
+                t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnReturn").addEvent("click", function () {
+                    filterReports(src, colDireita)
+                });
+                //Título Tabela
+                t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id", "titleReport"));
+                t.add(list);
+
+                resolve('Report added successfully.');
+            } catch (error) {
+                reject('Error adding report: ' + error.message);
+            }
+
+        });
     }
 }
 

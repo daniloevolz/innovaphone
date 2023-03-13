@@ -448,30 +448,65 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             const grps1 = foundTableUser[0].columns.grps;
             const grps2 = obj.columns.grps;
             log("ReplicateUpdate= user " + obj.columns.h323);
-            for (var i = 0; i < grps1.length; i++) {
-                for (var j = 0; j < grps2.length; j++) {
-                    if (grps1[i].name === grps2[j].name) {
-                        if (grps1[i].dyn === grps2[j].dyn) {
-                        } else {
-                            log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
-                            switch (grps2[j].dyn) {
-                                case "out":
-                                    if (sendCallEvents) {
-                                        var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
-                                        httpClient(urlPhoneApiEvents, msg);
+
+            try {
+                for (var i = 0; i < grps1.length; i++) {
+                    try {
+                        for (var j = 0; j < grps2.length; j++) {
+                            if (grps1[i].name === grps2[j].name) {
+                                if (grps1[i].dyn === grps2[j].dyn) {
+                                } else {
+                                    log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps2[j].name +"!!!");
+                                    switch (grps2[j].dyn) {
+                                        case "out":
+                                            if (sendCallEvents) {
+                                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
+                                                httpClient(urlPhoneApiEvents, msg);
+                                            }
+                                            break;
+                                        case "in":
+                                            if (sendCallEvents) {
+                                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
+                                                httpClient(urlPhoneApiEvents, msg);
+                                            }
+                                            break;
                                     }
-                                    break;
-                                case "in":
-                                    if (sendCallEvents) {
-                                        var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
-                                        httpClient(urlPhoneApiEvents, msg);
-                                    }
-                                    break;
+                                }
                             }
                         }
+
+                    }
+                    catch (e) {
+                        log("ReplicateUpdate= user " + obj.columns.h323 + " received from pbx has no grups at this moment and group presence changed to out for all!!!");
+                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed to OUT for group " + grps1[j].name);
+                        var msg = { User: obj.columns.h323, Grupo: grps1[j].name, Callinnumber: "", Status: "grp_logout" };
+                        httpClient(urlPhoneApiEvents, msg);
+                    }
+                    
+                }
+
+            }
+            catch (e) {
+                log("ReplicateUpdate= user " + obj.columns.h323 + " stored on app has no grups at this moment and group presence received from pbx!!!");
+                for (var j = 0; j < grps2.length; j++) {
+                    log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps1[j].name);
+                    switch (grps2[j].dyn) {
+                        case "out":
+                            if (sendCallEvents) {
+                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
+                                httpClient(urlPhoneApiEvents, msg);
+                            }
+                            break;
+                        case "in":
+                            if (sendCallEvents) {
+                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
+                                httpClient(urlPhoneApiEvents, msg);
+                            }
+                            break;
                     }
                 }
             }
+            
             
 
             //log("ReplicateUpdate= user " + obj.columns.h323);
@@ -595,7 +630,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             PbxSignal.forEach(function (signal) {
                 if (signal.pbx == pbx) {
                     sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[chave];
+                    delete signal[sip];
                     
                 }
             })
@@ -1166,37 +1201,117 @@ function pbxTableRequest(value) {
     var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
     var found = false;
 
-    user[0].columns.grps.forEach(function (grp) {
-        if (grp.name == obj.group) {
-            found = true;
+    if (user[0].columns.grps) {
+        log("danilo-req pbxTableRequest:Objeto contem colunms.grps" + JSON.stringify(user[0].columns));
+        user[0].columns.grps.forEach(function (grp) {
+            if (grp.name == obj.group) {
+                found = true;
+                log("danilo-req pbxTableRequest: Group founded changing presence")
+                if (obj.mode == "Login") {
+                    grp["dyn"] = "in";
+                }
+                if (obj.mode == "Logout") {
+                    grp["dyn"] = "out";
+                }
+            }
+
+        })
+        if (!found) {
+            log("danilo-req pbxTableRequest: Group not founded including it");
             if (obj.mode == "Login") {
-                grp["dyn"] = "in";
+                user[0].columns.grps.push({ name: obj.group, dyn: "in" })
             }
             if (obj.mode == "Logout") {
-                grp["dyn"] = "out";
+                user[0].columns.grps.push({ name: obj.group, dyn: "out" })
             }
         }
+        pbxTable.forEach(function (conn) {
+            if (conn.pbx == user[0].src) {
+                user[0].mt="ReplicateUpdate";
+                log(JSON.stringify(user[0]));
+                conn.send(JSON.stringify(user[0]));
+            }
+        })
+        pbxTableUsers.forEach(function (u) {
+            if (u.columns.h323 == user[0].columns.h323) {
+                user[0].mt = "ReplicateNextResult";
+                Object.assign(u, user[0])
+            }
+        })
 
-    })
-    if (!found) {
+    } else {
+        log("danilo-req pbxTableRequest:Objeto nno contem colunms.grps" + JSON.stringify(user[0].columns));
         if (obj.mode == "Login") {
+            //user[0].columns.grps = [];
+            //user[0].columns.grps.push({ name: obj.group, dyn: "in" })
+            const grps = [
+                //{
+                //    "name": obj.group,
+                //    "dyn": "in"
+                //}
+            ];
+            user[0].columns.grps = grps;
             user[0].columns.grps.push({ name: obj.group, dyn: "in" })
         }
         if (obj.mode == "Logout") {
+            //user[0].columns.grps = [];
+            //user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+            const grps = [
+                //{
+                //    "name": obj.group,
+                //    "dyn": "out"
+                //}
+            ];
+            user[0].columns.grps = grps;
             user[0].columns.grps.push({ name: obj.group, dyn: "out" })
         }
+        pbxTable.forEach(function (conn) {
+            if (conn.pbx == user[0].src) {
+                user[0].mt = "ReplicateUpdate";
+                log("danilo-req pbxTableRequest:Objeto a ser enviado no pbxTable "+JSON.stringify(user[0]));
+                conn.send(JSON.stringify(user[0]));
+            }
+        })
+        pbxTableUsers.forEach(function (u) {
+            if (u.columns.h323 == user[0].columns.h323) {
+                user[0].mt = "ReplicateNextResult";
+                Object.assign(u, user[0])
+                log("danilo-req pbxTableRequest:Objeto atualizado no pbxTableUsers " + JSON.stringify(u));
+            }
+        })
+
     }
-    pbxTable.forEach(function (conn) {
-        if (conn.pbx == user[0].src) {
-            log(JSON.stringify(user[0]));
-            conn.send(JSON.stringify(user[0]));
-        }
-    })
-    pbxTableUsers.forEach(function (u) {
-        if (u.columns.h323 == user[0].columns.h323) {
-            Object.assign(u, user[0])
-        }
-    })
+    //user[0].columns.grps.forEach(function (grp) {
+    //    if (grp.name == obj.group) {
+    //        found = true;
+    //        if (obj.mode == "Login") {
+    //            grp["dyn"] = "in";
+    //        }
+    //        if (obj.mode == "Logout") {
+    //            grp["dyn"] = "out";
+    //        }
+    //    }
+
+    //})
+    //if (!found) {
+    //    if (obj.mode == "Login") {
+    //        user[0].columns.grps.push({ name: obj.group, dyn: "in" })
+    //    }
+    //    if (obj.mode == "Logout") {
+    //        user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+    //    }
+    //}
+    //pbxTable.forEach(function (conn) {
+    //    if (conn.pbx == user[0].src) {
+    //        log(JSON.stringify(user[0]));
+    //        conn.send(JSON.stringify(user[0]));
+    //    }
+    //})
+    //pbxTableUsers.forEach(function (u) {
+    //    if (u.columns.h323 == user[0].columns.h323) {
+    //        Object.assign(u, user[0])
+    //    }
+    //})
 
     
 
