@@ -409,7 +409,7 @@ background-color: darkred;
     display: none;
     position: absolute;
     width: 50px;
-    padding:50px;
+    /*padding:50px;*/
     z-index:999;
     left: 65%;
     height: 100%;

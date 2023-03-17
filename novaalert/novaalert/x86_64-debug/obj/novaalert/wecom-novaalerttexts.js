@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
+        labelDevice: "Dispositivo:",
         labelEvent: "Evento:",
         labelGoogleKey: "Google Key API:",
         labelDeleteSuccess: "Dados excluídos com sucesso!",

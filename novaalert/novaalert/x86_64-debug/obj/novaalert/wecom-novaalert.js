@@ -82,7 +82,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         //avatar.onmessage.attach(testeavatar);
         if (app.logindata.info.unlicensed) {
             //sem licença
-            app.send({ api: "user", mt: "UserMessage" })
+            //app.send({ api: "user", mt: "UserMessage" })
             //var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
             //that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
             //    app.send({ api: "user", mt: "UserMessage" })
@@ -92,7 +92,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         else {
   
-            app.send({ api: "user", mt: "UserMessage" })
+            //app.send({ api: "user", mt: "UserMessage" })
 
         }
     }
@@ -389,6 +389,38 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             
            
 
+        }
+        if (obj.api == "user" && obj.mt == "DevicesList") {
+
+            console.log("makePopupDevice");
+            var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+            var h = [20];
+            var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:400px; height:200px;", styles[0], h[0]);
+            _popup.header.addText(texts.text("labelDeviceTitle"));
+
+            var devices = obj.devices;
+            var iptDeviceTitle =new innovaphone.ui1.Div("position:absolute; left:0%; width:25%; top:40%; font-size:15px; text-align:right", texts.text("labelDevice"));
+            var iptDevice = new innovaphone.ui1.Node("select", "position:absolute; left:30%; width:30%; top:40%; font-size:12px; text-align:rigth", null, null);
+            iptDevice.setAttribute("id", "selectDevice");
+            devices.forEach(function (dev) {
+                iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+            })
+            //Botão Salvar
+            var btnSelectDevice = new innovaphone.ui1.Div("position:absolute; left:40%; width:20%; top:70%; font-size:15px; text-align:center", null, "button-inn").addTranslation(texts, "btnSave").addEvent("click", function () {
+                var hw = document.getElementById("selectDevice");
+                var selectedOption = hw.options[hw.selectedIndex];
+                var hw = selectedOption.id;
+                if (String(hw) == "") {
+                    window.alert("Atenção!! Complete todos os campos.");
+                } else {
+                    app.send({ api: "user", mt: "DeviceSelected", hw: String(hw), src: obj.src});
+                    _popup.close()
+                }
+            });
+
+            _popup.content.add(iptDeviceTitle);
+            _popup.content.add(iptDevice);
+            _popup.content.add(btnSelectDevice);
         }
     }
 
@@ -917,6 +949,42 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         isDragging = false;
                     });
 
+                    // Adiciona um ouvinte de eventos para touchstart
+                    pageDivider.addEventListener("touchstart", function (event) {
+                        // Lida com o evento touchstart aqui
+                        isDragging = true;
+                        //startX = event.pageX;
+                        //startX = event.changedTouches[0].clientX
+                        startX = event.touches[0].pageX;
+                        btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
+                    });
+
+                    // Adiciona um ouvinte de eventos para touchmove
+                    pageDivider.addEventListener("touchmove", function (event) {
+                        // Lida com o evento touchmove aqui
+                        if (!isDragging) {
+                            return;
+                        }
+                        var offset = event.touches[0].pageX - startX;
+                        var newBtnWidth = btnWidth + offset;
+
+                        // Verifique se a nova largura está dentro dos limites permitidos
+                        if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
+                            comboBtn.style.width = newBtnWidth - 5 + 'px';
+                            allBtn.style.width = newBtnWidth - 5 + 'px';
+                            pageBtn.style.width = newBtnWidth - 5 + 'px';
+
+                            pageDivider.style.left = newBtnWidth - 5 + 'px';
+                            pageColumn.style.left = newBtnWidth + 5 + 'px';
+                        }
+                        
+                    });
+
+                    // Adiciona um ouvinte de eventos para touchend
+                    pageDivider.addEventListener("touchend", function (event) {
+                        // Lida com o evento touchend aqui
+                        isDragging = false;
+                    });
 
                     found = 1;
                 }
@@ -1136,6 +1204,47 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         document.addEventListener('mouseup', function () {
             isDragging = false;
         });
+
+
+        // Obtém a referência ao elemento que você deseja observar eventos de toque
+        //var elemento = document.getElementById("meu-elemento");
+
+        // Adiciona um ouvinte de eventos para touchstart
+        divider.addEventListener("touchstart", function (event) {
+            // Lida com o evento touchstart aqui
+            isDragging = true;
+            //startX = event.pageX;
+            //startX = event.changedTouches[0].clientX
+            startX = event.touches[0].pageX;
+            startWidth = parseInt(getComputedStyle(leftColumn).width, 10);
+        });
+
+        // Adiciona um ouvinte de eventos para touchmove
+        divider.addEventListener("touchmove", function (event) {
+            // Lida com o evento touchmove aqui
+            if (!isDragging) {
+                return;
+            }
+
+            var offset = event.touches[0].pageX - startX;
+            var newWidth = startWidth + offset;
+
+            // Verifique se a nova largura está dentro dos limites permitidos
+            if (newWidth > 0 && newWidth < window.innerWidth * 0.8) {
+                leftColumn.style.width = newWidth + 'px';
+                var rightWidth = window.innerWidth - newWidth;
+                rightColumn.style.width = rightWidth - 5 + 'px';
+                rightColumn.style.left = newWidth + 5 + 'px';
+                divider.style.left = newWidth + 'px';
+            }
+        });
+
+        // Adiciona um ouvinte de eventos para touchend
+        divider.addEventListener("touchend", function (event) {
+            // Lida com o evento touchend aqui
+            isDragging = false;
+        });
+
     }
 
     function calllistonmessage(consumer, obj) {
@@ -1148,3 +1257,4 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
+

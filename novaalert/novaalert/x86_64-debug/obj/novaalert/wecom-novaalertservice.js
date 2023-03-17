@@ -72,7 +72,22 @@ new JsonApi("user").onconnected(function (conn) {
 
             if (obj.mt == "UserMessage") {
                 updateTableBadgeCount(conn.sip, "ResetCount");
-                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", urlalert: urlalert }));
+                var user = pbxTableUsers.filter(findBySip(conn.sip));
+                conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323+","+user[0].src }));
+            }
+            if (obj.mt == "DeviceSelected") {
+                var src = obj.src;
+                log("SPLIT1:");
+                var myArray = src.split(",");
+                var sip = myArray[0];
+                var pbx = myArray[1];
+                RCC.forEach(function (rcc) {
+                    if (rcc.pbx == pbx) {
+                        log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + pbx);
+                        var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: obj.hw, src: obj.src };
+                        rcc.send(JSON.stringify(msg));
+                    }
+                })
             }
             if (obj.mt == "UserPresence") {
                 RCC.forEach(function (c) {
@@ -682,7 +697,18 @@ new PbxApi("RCC").onconnected(function (conn) {
         log("danilo req : RCC message:: received" + JSON.stringify(obj));
 
         if (obj.mt === "DevicesResult") {
-            log("danilo req : RCC message:: " + JSON.stringify(obj));
+            log("danilo req : RCC message:DevicesResult: " + JSON.stringify(obj.devices));
+            //var src = obj.src;
+            //log("SPLIT2:");
+            //var myArray = src.split(",");
+            //var sip = myArray[0];
+            //var pbx = myArray[1];
+            //connectionsUser.forEach(function (usr) {
+            //    if (String(usr.sip) == String(sip)) {
+            //        usr.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: obj.devices, src: src}));
+            //    }
+
+            //})
             //var hw = obj.devices.filter(function (device) { return device.text === "Softphone" })[0];
             //conn.send(JSON.stringify({ api: "RCC", mt: "UserInitialize", cn: "danilo", hw: hw }));
         }
@@ -690,6 +716,7 @@ new PbxApi("RCC").onconnected(function (conn) {
             log("danilo req UserInitializeResult: RCC message:: received" + JSON.stringify(obj));
             //Atualiza connections
             var src = obj.src;
+            log("SPLIT3:");
             var myArray = src.split(",");
             var sip = myArray[0];
             var pbx = myArray[1];
@@ -710,6 +737,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         }
         else if (obj.mt === "CallInfo") {
             var src = obj.src;
+            log("SPLIT4:");
             var myArray = src.split(",");
             var sip = myArray[0];
             var pbx = myArray[1];
@@ -725,6 +753,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 log("danilo-req : RCC message::CallInfo NOT foundCall ");
                 if (obj.state == 1 || obj.state == 129) {
                     var e164 = obj.peer.e164;
+                    log("SPLIT5:");
                     var myArray = obj.src.split(",");
                     var src = myArray[0];
 
@@ -1043,6 +1072,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
             //Atualiza connections
             var src = obj.src;
+            log("SPLIT6:");
             var myArray = src.split(",");
             var pbx = myArray[0];
             log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
@@ -1059,13 +1089,14 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
-            RCC.forEach(function (rcc) {
-                if (rcc.pbx == pbx) {
-                    log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
-                    var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-                    rcc.send(JSON.stringify(msg));
-                }
-            })
+            //RCC.forEach(function (rcc) {
+            //    if (rcc.pbx == pbx) {
+            //        log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
+            //        var msg = { api: "RCC", mt: "Devices", cn: name, src: obj.sig.cg.sip + "," + obj.src };
+            //        //var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
+            //        rcc.send(JSON.stringify(msg));
+            //    }
+            //})
 
             // send notification with badge count first time the user has connected
             try {
@@ -1090,6 +1121,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             //log("PBXSignal: connections result " + JSON.stringify(connections));
             log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
             var src = obj.src;
+            log("SPLIT7:");
             var myArray = src.split(",");
             var sip = "";
             var pbx = myArray[0];
@@ -1287,7 +1319,9 @@ function alarmReceived(value) {
             if (obj.Location) {
                 try {
                     location = obj.Location;
+                    log("SPLIT8:");
                     var myArray = location.split(":");
+                    log("SPLIT9:");
                     var location = myArray[1].split(",");
                     var x = location[0];
                     var y = location[1];
@@ -1316,7 +1350,9 @@ function alarmReceived(value) {
             if (obj.Location1) {
                 try {
                     location = obj.Location1;
+                    log("SPLIT11:");
                     var myArray = location.split(":");
+                    log("SPLIT12:");
                     var location = myArray[1].split(",");
                     var x = location[0];
                     var y = location[1];
@@ -1459,7 +1495,9 @@ function alarmReceived(value) {
             if (obj.Location) {
                 try {
                     var location = obj.Location;
+                    log("SPLIT13:");
                     var myArray = location.split(":");
+                    log("SPLIT14:");
                     var location = myArray[1].split(",");
                     var x = location[0];
                     var y = location[1];
@@ -1487,7 +1525,9 @@ function alarmReceived(value) {
             if (obj.Location1) {
                 try {
                     var location = obj.Location;
+                    log("SPLIT15:");
                     var myArray = location.split(":");
+                    log("SPLIT16:");
                     var location = myArray[1].split(",");
                     var x = location[0];
                     var y = location[1];
@@ -1587,6 +1627,7 @@ function updateBadge(ws, call, count) {
     };
 
     ws.send(JSON.stringify(msg));
+    return;
 }
 
 function callRCC(ws, user, mode, num, sip) {
@@ -1628,6 +1669,7 @@ function callRCC(ws, user, mode, num, sip) {
         //})
     }
     else if (String(mode) == "UserClear") {
+        log("SPLIT17:");
         var myArray = sip.split(",");
         var sip = myArray[0];
         var pbx = myArray[1];
@@ -1654,6 +1696,7 @@ function callRCC(ws, user, mode, num, sip) {
         //})
     }
     else if (mode == "UserHold") {
+        log("SPLIT18:");
         var myArray = sip.split(",");
         var sip = myArray[0];
         var pbx = myArray[1];
@@ -1674,6 +1717,7 @@ function callRCC(ws, user, mode, num, sip) {
         //})
     }
     else if (mode == "UserRetrieve") {
+        log("SPLIT19:");
         var myArray = sip.split(",");
         var sip = myArray[0];
         var pbx = myArray[1];
@@ -1694,6 +1738,7 @@ function callRCC(ws, user, mode, num, sip) {
         //})
     }
     else if (mode == "UserRedirect") {
+        log("SPLIT20:");
         var myArray = sip.split(",");
         var sip = myArray[0];
         var pbx = myArray[1];
@@ -1714,6 +1759,7 @@ function callRCC(ws, user, mode, num, sip) {
         //})
     }
     else if (mode == "UserConnect") {
+        log("SPLIT21:");
         var myArray = sip.split(",");
         var sip = myArray[0];
         var pbx = myArray[1];
