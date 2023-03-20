@@ -74,6 +74,7 @@ new JsonApi("user").onconnected(function (conn) {
                 updateTableBadgeCount(conn.sip, "ResetCount");
                 var user = pbxTableUsers.filter(findBySip(conn.sip));
                 let numDevices = user[0].columns.devices.length;
+                log("Os devices são:" + numDevices)
                 if (numDevices > 1) {
                     conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
                 } else {
