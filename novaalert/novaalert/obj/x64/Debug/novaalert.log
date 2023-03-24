@@ -3,7 +3,11 @@
       Project output dirctory : x86_64-debug/novaalert
       Temp directory          : x86_64-debug\obj\novaalert
       Runtime binary          : jse/x86_64/generic
+<<<<<<< HEAD
       Build Number            : 13B1071
+=======
+      Build Number            : 13B1068
+>>>>>>> e4d30ad3aa241eccd723385ce591363d4ee6d794
   
   Removing old files from x86_64-debug\obj\novaalert...
   Creating directories...

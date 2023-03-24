@@ -64,8 +64,6 @@ new JsonApi("user").onconnected(function (conn) {
         log("danilo req: will insert it on DB : " + JSON.stringify(msg));
         insertTblAvailability(msg);
 
-
-
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             var today = getDateNow();
@@ -73,25 +71,29 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "UserMessage") {
                 updateTableBadgeCount(conn.sip, "ResetCount");
                 var user = pbxTableUsers.filter(findBySip(conn.sip));
-               // let numDevices = user[0].columns.devices.length;
-                // log("Os devices são:" + numDevices)
-                // if (numDevices > 1) {
-                //     conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
-                // } else {
-                //     var src = obj.src;
-                //     log("SPLIT1:");
-                //     var myArray = src.split(",");
-                //     var sip = myArray[0];
-                //     var pbx = myArray[1];
-                    RCC.forEach(function (rcc) {
-                        if (rcc.pbx == pbx) {
-                            log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + pbx);
-                            var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: obj.hw, src: obj.src };
+                var numDevices = user[0].columns.devices.length;
+                log("Os devices sao:" + numDevices);
+
+                RCC.forEach(function (rcc) {
+                    var temp = rcc[String(conn.sip)];
+                    log("danilo req:UserMessage call.sip == conn.sip:temp " + temp);
+                    if (temp == null) {
+                        if (numDevices > 1) {
+                            conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                        }
+                        if (numDevices == 1) {
+                            log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + rcc.pbx);
+                            var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: user[0].columns.devices[0].hw, src: conn.sip + "," + rcc.pbx };
                             rcc.send(JSON.stringify(msg));
                         }
-                    })
-                //}
-                
+
+                    } else {
+                        connectionsUser.forEach(function (c) {
+                            c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
+
+                        })
+                    }
+                })  
             }
             if (obj.mt == "DeviceSelected") {
                 var src = obj.src;
