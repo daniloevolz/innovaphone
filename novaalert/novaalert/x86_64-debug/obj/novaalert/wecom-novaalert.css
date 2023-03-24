@@ -11,21 +11,24 @@
     width:100%; 
     top:5%; 
     font-size:25px; 
-    text-align:center
+    text-align:center;
+    
 }
-.labeltypeAdd{
-     position:absolute;
-     left:0%; 
-     width:15%; 
-     top:10%; 
-     font-size:15px; 
-     text-align:right
+.labeltypeAdd {
+    position: absolute;
+    left: 0%;
+    /* width: 15%; */
+    top: 11%;
+    left: 30%;
+    border-bottom: 2px solid #02163F;
+    font-size: 18px;
+    text-align: right;
 }
 .selectTypeAdd {
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 10%;
+    top: 12%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -43,19 +46,22 @@
     text-align:right; 
     display:contents;
 }
-.labelUserString{
-      position:absolute;
-      left:0%;
-      width:15%; 
-      top:15%; 
-      font-size:15px; 
-      text-align:right
+.labelUserString {
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 19%;
+    /* font-weight: bold; */
+    font-size: 19px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
 }
+
 .iptUserString{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 18%;
+    top: 19%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -70,13 +76,14 @@
     display: block;
     transition: 0.2s;
     font-size: 20px;
-    color: #02163F;
+    /* color: #02163F; */
 
 }
 .divAdd{
     position: absolute;
-    top: 23%;
-    width: 35%;
+    top: 24%;
+    left:28%;
+    width: 38%;
     padding: 10px;
 }
 .iptNameString{
@@ -123,7 +130,7 @@
     display: block;
     transition: 0.2s;
     font-size: 20px;
-    color: #02163F;
+    /* color: #02163F; */
 }
 .iptValueString{
     width: 100%;
@@ -163,8 +170,9 @@
   }
 .divAdd2{
     position: absolute;
-    top: 27%;
-    width: 35%;
+    top: 34%;
+    left:28%;
+    width: 38%;
     padding: 10px;
     
 }
