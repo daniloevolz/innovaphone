@@ -186,18 +186,20 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             })
             //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
-            
-            var iptName = t.add(new innovaphone.ui1.Input(null, null, null, 255, "url","iptNameString"));
-            t.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"),"labelBtnString"));
-            t.add(new innovaphone.ui1.Node("span",null,null,"focus-bg"))
+            var divAdd = t.add(new innovaphone.ui1.Div(null,null,"divAdd"))
+            var iptName = divAdd.add(new innovaphone.ui1.Input(null, null, null, 255, "url","iptNameString"));
+            divAdd.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"),"labelBtnString"));
+             iptName.setAttribute("placeholder"," ");
+            // divAdd.add(new innovaphone.ui1.Node("span",null,null,"focus-bg"))
             //Nome Usuário
             //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
             //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
             //Parâmetro
-            t.add(new innovaphone.ui1.Div(null, texts.text("labelValue"),"labelValueString"));
-            var iptValue = t.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url","iptValueString"));
-
+            var divAdd2 = t.add(new innovaphone.ui1.Div(null,null,"divAdd2"))
+            var iptValue = divAdd2.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url","iptValueString"));
+            divAdd2.add(new innovaphone.ui1.Div(null, texts.text("labelValue"),"labelValueString"));
+            iptValue.setAttribute("placeholder"," ");
             //Botão Salvar
             t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
                 var type = document.getElementById("selectType");

@@ -66,75 +66,107 @@
 }
 .labelBtnString{
     position: absolute;
-    top: 20px;
-    left: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    transform-origin: 0 0;
-    transform: translate3d(0,0,0);
-    transition: all .2s ease;
-    pointer-events: none;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 20px;
     color: #02163F;
 
 }
-.focus-bg{
+.divAdd{
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #02163F;
-    z-index: -1;
-    transform: scaleX(0);
-    transform-origin: left;
+    top: 23%;
+    width: 35%;
+    padding: 10px;
 }
 .iptNameString{
-    /* position:absolute; 
-    width:30%; 
-    top:20%; 
-    font-size:12px; 
-    text-align:center */
-    -webkit-appearance: none;
-    appearance: none;
-    width: 50%;
-    border: 0;
-    font-family: inherit;
-    padding: 16px 12px 0 12px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: 400;
-    background: rgba(grey);
-    box-shadow: inset 0 -1px 0 rgba(grey);
-    color: #02163F;
-    transition: all .15s ease;
-}
-.iptNameString:focus {
-    background: #02163F;
-    outline: none;
-    box-shadow: inset 0 -2px 0;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #02163F;
+  outline: 0;
+  font-size: 20px;
+  color: black;
+  padding: 8px 0;
+  background: transparent;
+  transition: border-color 0.2s;
 
 }
-.iptNameString:focus + .labelBtnString, .iptNameString:focus + .focus-bg {
-    /* estilos aqui */
-    transform: translate3d(0,-12px,0) scale(.75);
-    transform: scaleX(1);
-    transition: all .1s ease;
+.iptNameString ::placeholder {
+    display: none;
+    color: transparent;
   }
+.iptNameString:placeholder-shown ~ .labelBtnString {
+    font-size: 20px;
+    cursor: text;
+    top: 20px;
+}
+.iptNameString:focus ~.labelBtnString {
+      position: absolute;
+      top: 0;
+      display: block;
+      transition: 0.2s;
+      font-size: 20px;
+      color: #02163F;
+      font-weight:bold;    
+    }
+.iptNameString:focus {
+        padding-bottom: 6px;  
+        font-size: 20px;
+        border-width: 3px;
+        border-image: linear-gradient(to right, #02163F,#0a45bd);
+        border-image-slice: 1;
+}
+
 .labelValueString{
-    position:absolute;
-    left:0%;
-    width:15%;
-    top:25%; 
-    font-size:15px; 
-    text-align:right"
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 20px;
+    color: #02163F;
 }
 .iptValueString{
-    position:absolute;
-    /* left:16%; */
-    width:30%; 
-    top:25%;
-    font-size:12px; 
-    text-align:center"
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 20px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+  .iptValueString ::placeholder {
+      display: none;
+      color: transparent;
+    }
+  .iptValueString:placeholder-shown ~ .labelValueString {
+      font-size: 20px;
+      cursor: text;
+      top: 20px;
+  }
+  .iptValueString:focus ~.labelValueString {
+        position: absolute;
+        top: 0;
+        display: block;
+        transition: 0.2s;
+        font-size: 20px;
+        color: #02163F;
+        font-weight:bold;    
+      }
+  .iptValueString:focus {
+          padding-bottom: 6px;  
+          font-size: 20px;
+          border-width: 3px;
+          border-image: linear-gradient(to right, #02163F,#0a45bd);
+          border-image-slice: 1;
+  }
+.divAdd2{
+    position: absolute;
+    top: 27%;
+    width: 35%;
+    padding: 10px;
+    
 }
 .labelUserNumber{
     position:absolute;
