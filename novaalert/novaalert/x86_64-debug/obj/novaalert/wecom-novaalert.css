@@ -5,6 +5,9 @@
     padding: 0;
 }
 /*ADMIN NOVA ALERT*/
+select{
+    overflow-y:auto;
+ }
 .tituloAdd{
     position:absolute;
     left:0px;
@@ -18,10 +21,10 @@
     position: absolute;
     left: 0%;
     /* width: 15%; */
-    top: 11%;
-    left: 30%;
+    top: 12%;
+    left: 29%;
     border-bottom: 2px solid #02163F;
-    font-size: 18px;
+    font-size: 15px;
     text-align: right;
 }
 .selectTypeAdd {
@@ -52,7 +55,7 @@
     /* width: 15%; */
     top: 19%;
     /* font-weight: bold; */
-    font-size: 19px;
+    font-size: 15px;
     text-align: right;
     border-bottom: 2px solid #02163F;
 }
@@ -75,7 +78,7 @@
     top: 0;
     display: block;
     transition: 0.2s;
-    font-size: 20px;
+    font-size: 15px;
     /* color: #02163F; */
 
 }
@@ -91,7 +94,7 @@
   border: 0;
   border-bottom: 2px solid #02163F;
   outline: 0;
-  font-size: 20px;
+  font-size: 15px;
   color: black;
   padding: 8px 0;
   background: transparent;
@@ -103,7 +106,7 @@
     color: transparent;
   }
 .iptNameString:placeholder-shown ~ .labelBtnString {
-    font-size: 20px;
+    font-size: 15px;
     cursor: text;
     top: 20px;
 }
@@ -112,13 +115,13 @@
       top: 0;
       display: block;
       transition: 0.2s;
-      font-size: 20px;
+      font-size: 15px;
       color: #02163F;
       font-weight:bold;    
     }
 .iptNameString:focus {
         padding-bottom: 6px;  
-        font-size: 20px;
+        font-size: 15px;
         border-width: 3px;
         border-image: linear-gradient(to right, #02163F,#0a45bd);
         border-image-slice: 1;
@@ -129,7 +132,7 @@
     top: 0;
     display: block;
     transition: 0.2s;
-    font-size: 20px;
+    font-size: 15px;
     /* color: #02163F; */
 }
 .iptValueString{
@@ -137,7 +140,7 @@
     border: 0;
     border-bottom: 2px solid #02163F;
     outline: 0;
-    font-size: 20px;
+    font-size: 15px;
     color: black;
     padding: 8px 0;
     background: transparent;
@@ -148,7 +151,7 @@
       color: transparent;
     }
   .iptValueString:placeholder-shown ~ .labelValueString {
-      font-size: 20px;
+      font-size: 15px;
       cursor: text;
       top: 20px;
   }
@@ -157,13 +160,13 @@
         top: 0;
         display: block;
         transition: 0.2s;
-        font-size: 20px;
+        font-size: 15px;
         color: #02163F;
         font-weight:bold;    
       }
   .iptValueString:focus {
           padding-bottom: 6px;  
-          font-size: 20px;
+          font-size: 15px;
           border-width: 3px;
           border-image: linear-gradient(to right, #02163F,#0a45bd);
           border-image-slice: 1;
@@ -176,129 +179,697 @@
     padding: 10px;
     
 }
+/*INPUT NUMBER*/
+.divAdd3{
+    position: absolute;
+    top: 24%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.divAdd4{
+    position: absolute;
+    top: 34%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+    
+}
 .labelUserNumber{
-    position:absolute;
-     left:0%; 
-     width:15%; 
-     top:15%; 
-     font-size:15px; 
-     text-align:right
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 19%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
 }
 .selectUserNumber{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:15%;
-    font-size:12px; 
-    text-align:center
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 19%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
 }
 .labelBtnNumber{
-    position:absolute; 
-    left:0%; 
-    width:15%; 
-    top:20%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 20px;
+    /* color: #02163F; */
 }
 .iptNameNumber{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:20%; 
-    font-size:12px; 
-    text-align:center
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+.iptNameNumber ::placeholder{
+    display: none;
+    color: transparent;
+}
+.iptNameNumber:placeholder-shown ~ .labelBtnNumber{
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptNameNumber:focus ~.labelBtnNumber {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    color: #02163F;
+    font-weight:bold;    
+  }
+.iptNameNumber:focus {
+    padding-bottom: 6px;  
+    font-size: 15px;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #02163F,#0a45bd);
+    border-image-slice: 1;
 }
 .labelValueNumber{
-    position:absolute; 
-    left:0%; 
-    width:15%; 
-    top:25%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    /* color: #02163F; */
 }
 .iptValueNumber{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:25%; 
-    font-size:12px; 
-    text-align:center"
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+.iptValueNumber ::placeholder {     
+    display: none;
+    color: transparent;
+}
+.iptValueNumber:placeholder-shown ~ .labelValueNumber { 
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptValueNumber:focus ~.labelValueNumber {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    color: #02163F;
+    font-weight:bold;    
+  }
+  .iptValueNumber:focus {
+    padding-bottom: 6px;  
+    font-size: 15px;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #02163F,#0a45bd);
+    border-image-slice: 1;
+}
+/*INPUT USERS*/
+.divAdd5{
+    position: absolute;
+    top: 24%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.divAdd6{
+    position: absolute;
+    top: 34%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+    
 }
 .labelUserUsers{
-    position:absolute; 
-    left:0%; 
-    width:15%;
-    top:15%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 19%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
 }
 .iptUserUsers{
-    position:absolute; 
-    left:16%;
-    width:30%; 
-    top:15%; 
-    font-size:12px; 
-    text-align:center
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 19%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
 }
 .labelBtnUsers{
-    position:absolute; 
-    left:0%;
-    width:15%; 
-    top:20%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    /* color: #02163F; */
 }
 .iptNameUsers{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:20%; 
-    font-size:12px; 
-    text-align:center
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
 }
+.iptNameUsers ::placeholder{
+    display: none;
+    color: transparent;
+}
+.iptNameUsers:placeholder-shown ~ .labelBtnUsers{
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptNameUsers:focus ~.labelBtnUsers {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    color: #02163F;
+    font-weight:bold;    
+  }
+  .iptNameUsers:focus {
+    padding-bottom: 6px;  
+    font-size: 15px;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #02163F,#0a45bd);
+    border-image-slice: 1;
+}
+
 .labelValueUsers{
-    position:absolute; 
-    left:0%; 
-    width:15%; 
-    top:25%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 37%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
 }
-.selectValueUsers{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:25%; 
-    font-size:12px; 
-    text-align:center
+.selectValueUsers {
+    top: 37%;
+    position: absolute;
+    /* left: 16%; */
+    width: 28%;
+    left: 37%;
+    top: 37%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+/*INPUT COMBO*/
+.divAdd7{
+    position: absolute;
+    top: 24%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.divAdd8{
+    position: absolute;
+    top: 34%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+    
 }
 .labelUserCombo{
-    position:absolute; 
-    left:0%; 
-    width:15%; 
-    top:15%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 19%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
 }
 .iptUserCombo{
-    position:absolute; 
-    left:16%; 
-    width:30%; 
-    top:15%; 
-    font-size:12px; 
-    text-align:center
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 19%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
 }
 .labelButtonCombo{
-    position:absolute; 
-    left:0%; 
-    width:15%; 
-    top:20%; 
-    font-size:15px; 
-    text-align:right
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    /* color: #02163F; */
 }
 .iptNameCombo{
-    position:absolute; left:16%; width:30%; top:20%; font-size:12px; text-align:center
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
 }
+.iptNameCombo ::placeholder{
+    display: none;
+    color: transparent;
+}
+.iptNameCombo:placeholder-shown ~ .labelButtonCombo{
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptNameCombo:focus ~.labelButtonCombo {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    color: #02163F;
+    font-weight:bold;    
+}
+.iptNameCombo:focus {
+    padding-bottom: 6px;  
+    font-size: 15px;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #02163F,#0a45bd);
+    border-image-slice: 1;
+}
+.labelValueCombo{
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 20px;
+    /* color: #02163F; */
+}
+.iptValueCombo{
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+.iptValueCombo ::placeholder {
+    display: none;
+    color: transparent;
+}
+.iptValueCombo:placeholder-shown ~ .labelValueCombo { 
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptValueCombo:focus ~.labelValueCombo {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 15px;
+    color: #02163F;
+    font-weight:bold;    
+  }
+.iptValueCombo:focus {
+    padding-bottom: 6px;  
+    font-size: 15px;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #02163F,#0a45bd);
+    border-image-slice: 1;
+}
+.combo1Div{
+    position:absolute; left:0%; width:15%; top:46%; font-size:15px; left: 23%;
+}
+.combo1{
+    position: absolute;
+    left: 39%;
+    width: 25%;
+    top: 46%;
+    font-size: 12px;
+    text-align: center;
+    height: 20px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+.combo2Div{
+    position:absolute; left:0%; width:15%; top:51%; font-size:15px; left: 23%;
+}
+.combo2{
+    position: absolute;
+    left: 39%;
+    width: 25%;
+    top: 51%;
+    font-size: 12px;
+    text-align: center;
+    height: 20px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+.combo3Div{
+    position:absolute; left:0%; width:15%; top:56%; font-size:15px; left: 23%;
+}
+.combo3{
+    position: absolute;
+    left: 39%;
+    width: 25%;
+    top: 56%;
+    font-size: 12px;
+    text-align: center;
+    height: 20px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+.combo4Div{
+    position:absolute; left:0%; width:15%; top:61%; font-size:15px; left: 23%;
+}
+.combo4{
+    position: absolute;
+    left: 39%;
+    width: 25%;
+    top: 61%;
+    font-size: 12px;
+    text-align: center;
+    height: 20px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+/* CSS DA TABELA DE AÇÕES  */
+.btnAddAction{
+    position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center;
+}
+.labelUser{
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 19%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
+}
+.selectUserAction{
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 19%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px; 
+}
+.divAddAction{
+    position: absolute;
+    top: 24%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.labelNameAction {
+    position: absolute;
+    /* left: 29%; */
+    /* width: 15%; */
+    top: 3%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    /* border-bottom: 2px solid #02163F; */
+}
+.iptNameAction{
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+  
+}
+.iptNameAction ::placeholder {
+      display: none;
+      color: transparent;
+}
+.iptNameAction:placeholder-shown ~ .labelNameAction {
+      font-size: 15px;
+      cursor: text;
+      top: 20px;
+}
+.iptNameAction:focus ~.labelNameAction {
+
+        position: absolute;
+        top: 0;
+        display: block;
+        transition: 0.2s;
+        font-size: 15px;
+        color: #02163F;
+        font-weight:bold;    
+}
+.iptNameAction:focus {
+          padding-bottom: 6px;  
+          font-size: 15px;
+          border-width: 3px;
+          border-image: linear-gradient(to right, #02163F,#0a45bd);
+          border-image-slice: 1;
+}
+.labelNameAlarm {
+    position: absolute;
+    /* left: 29%; */
+    /* width: 15%; */
+    top: 3%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    /* border-bottom: 2px solid #02163F; */
+}
+.iptAlarmAction{
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+  
+}
+.iptAlarmAction ::placeholder {
+      display: none;
+      color: transparent;
+}
+.iptAlarmAction:placeholder-shown ~ .labelNameAlarm {
+      font-size: 15px;
+      cursor: text;
+      top: 20px;
+}
+.iptAlarmAction:focus ~.labelNameAlarm {
+        position: absolute;
+        top: 0;
+        display: block;
+        transition: 0.2s;
+        font-size: 15px;
+        color: #02163F;
+        font-weight:bold;    
+}
+.iptAlarmAction:focus {
+          padding-bottom: 6px;  
+          font-size: 15px;
+          border-width: 3px;
+          border-image: linear-gradient(to right, #02163F,#0a45bd);
+          border-image-slice: 1;
+}
+.divAddAction2{
+    position: absolute;
+    top: 35%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.divAddAction3{
+    position: absolute;
+    top: 45%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.labelTypeAction{
+    position: absolute;
+    /* left: 29%; */
+    /* width: 15%; */
+    top: 55%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+     border-bottom: 2px solid #02163F;
+}
+.selectTypeAction {
+    top: 37%;
+    position: absolute;
+    left: 17%;
+    width: 80%;
+    /* left: 37%; */
+    top: 55%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+.divAddAction4 {
+    position: absolute;
+    top: 55%;
+    left: 28%;
+    width: 38%;
+    padding: 10px;
+}
+.labelValueAction {
+    position: absolute;
+    /* left: 29%; */
+    /* width: 15%; */
+    top: 3%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    /* border-bottom: 2px solid #02163F; */
+}
+.iptValueAction{
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+.iptValueAction ::placeholder {
+    display: none;
+    color: transparent;
+}
+.iptValueAction:placeholder-shown ~ .labelValueAction {
+    font-size: 15px;
+    cursor: text;
+    top: 20px;
+}
+.iptValueAction:focus ~.labelValueAction {
+      position: absolute;
+      top: 0;
+      display: block;
+      transition: 0.2s;
+      font-size: 15px;
+      color: #02163F;
+      font-weight:bold;    
+}
+.iptValueAction:focus {
+        padding-bottom: 6px;  
+        font-size: 15px;
+        border-width: 3px;
+        border-image: linear-gradient(to right, #02163F,#0a45bd);
+        border-image-slice: 1;
+}
+/*FIM TABELA DE AÇÕES */
+
+/*SERVIDOR NA*/
+.labelUrlNovaAlert{
+    position:absolute; left:6%; width:20%; top:35%; font-size:15px; text-align:right"
+}
+.iptUrlNovaAlert{
+position: absolute;
+left: 30%;
+width: 50%;
+top: 33%;
+font-size: 12px;
+text-align: center;
+background-color: rgb(98 95 95 / 19%);
+    border: 1px solid #02163F;
+height: 40px;
+display: flex;
+align-items: center;
+color: black;
+font-weight: bold;  
+border-radius: 12px;
+}
+.labelGoogleKey{
+    position:absolute; left:6%; width:20%; top:47%; font-size:15px; text-align:right"
+}
+.iptGoogleKey{
+    position:absolute; left:30%; width:50%; top:45%; font-size:12px; text-align:center;
+    height: 40px;
+    background-color: rgb(98 95 95 / 19%);
+    border: 1px solid #02163F;
+    align-items: center;
+  color: black;
+    font-weight: bold;  
+    border-radius: 12px;
+}
+
+
+
+
+/*FIM SERVIDOR NA*/
+
+
+
 
 /*ADMIN NOVA ALERT END */
 
@@ -1072,20 +1643,6 @@ div.button-inn-del {
 ::-webkit-scrollbar-thumb {
     background: rgb(19, 33, 71);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* Mobile Model */
 @media only screen and (max-width: 900px) and (orientation: landscape) {
