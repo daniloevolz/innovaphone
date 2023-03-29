@@ -3,8 +3,6 @@ var pbxTableUsers = [];
 var pbxTable = [];
 var connectionsUser = [];
 
-var SmtpClient;
-SmtpClient.config(cfg.from, cfg.fromName, cfg.host, cfg.server, cfg.username, cfg.password);
 
 WebServer.onrequest("value", function (req) {
     if (req.method == "GET") {
@@ -44,9 +42,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                     var obj = JSON.parse(String(value));
                     var schedule_valid = false;
                     Database.exec("SELECT * FROM tbl_availability WHERE sip ='" + obj.sip + "';")
-                        .oncomplete(function (data) {
-                            log("SelectAvailabilityMessage:result=" + JSON.stringify(data, null, 4));
-                            var objAvail = data;
+                        .oncomplete(function (dataAvail) {
+                            log("SelectAvailabilityMessage:result=" + JSON.stringify(dataAvail, null, 4));
+                            var objAvail = dataAvail;
                             objAvail.forEach(function (a) {
                                 if (obj.start >= a.time_start && obj.end <= a.time_end) {
                                     schedule_valid = true;
@@ -100,6 +98,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                         log("danilo req: erro send badge: " + e);
                                                     }
                                                     try {
+                                                        var today = getDateNow();
+                                                        var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
+                                                        //Email Cliente
                                                         var dataClient = "<!DOCTYPE html>"
                                                             + "<html>"
                                                             + "<head></head>"
@@ -111,12 +112,13 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "<i>DWC Wecom</i>"
                                                             + "</body>"
                                                             + "</html>";
-                                                        sendEmail("Evento Agendado", obj.email, dataClient);
+
+                                                        //Email Usuario
                                                         var dataUser = "<!DOCTYPE html>"
                                                             + "<html>"
                                                             + "<head></head>"
                                                             + "<body>"
-                                                            + "<b>Um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</b><br/><br/>"
+                                                            + "<b>Olá "+ name +", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</b><br/><br/>"
                                                             + "<b>Nome: " + obj.title + "</b><br/>"
                                                             + "<b>E-mail: " + obj.email + "</b><br/>"
                                                             + "<b>Quando: " + obj.start + "</b><br/>"
@@ -125,7 +127,67 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "<i>DWC Wecom</i>"
                                                             + "</body>"
                                                             + "</html>";
-                                                        sendEmail("Evento Agendado", cfg[0].email_contato, dataUser);
+
+
+                                                        //Anexo
+                                                        var attachment = "BEGIN: VCALENDAR"
+                                                            +"METHOD: REQUEST"
+                                                            + "PRODID: DWC Wecom"
+                                                            + "VERSION: 2.0"
+                                                            + "BEGIN: VTIMEZONE"
+                                                            + "TZID: E.South America Standard Time"
+                                                            + "BEGIN: STANDARD"
+                                                            + "DTSTART: 16010101T000000"
+                                                            + "TZOFFSETFROM: -0300"
+                                                            + "TZOFFSETTO: -0300"
+                                                            + "END: STANDARD"
+                                                            + "BEGIN: DAYLIGHT"
+                                                            + "DTSTART: 16010101T000000"
+                                                            + "TZOFFSETFROM: -0300"
+                                                            + "TZOFFSETTO: -0300"
+                                                            + "END: DAYLIGHT"
+                                                            + "END: VTIMEZONE"
+                                                            + "BEGIN: VEVENT"
+                                                            + "ORGANIZER; CN = " + name +": mailto: "+cfg[0].email_contato+""
+                                                            + "ATTENDEE; ROLE = REQ - PARTICIPANT; PARTSTAT = NEEDS - ACTION; RSVP = TRUE; CN = " + obj.title + ": mailto: " + obj.email + ""
+
+                                                            + "DESCRIPTION; LANGUAGE = pt - BR: \n______________________________________________"
+                                                            + "__________________________________\nReunião do DWC Wecom\nClique para"
+                                                            + "ingressar na reunião <" + cfg[0].url_conference + ">\n____________________________"
+                                                            + "____________________________________________________\nAviso Legal.Esta me"
+                                                            + "nsagem pode conter informações confidenciais e / ou privilegiadas.Se voc"
+                                                            + "ê não for o destinatário ou a pessoa autorizada a receber esta mensagem"
+                                                            + "não deve usar\, copiar ou divulgar as informações nela contidas ou tom"
+                                                            + "ar qualquer ação baseada nessas informações.Se você recebeu essa com"
+                                                            + "unicação por engano\, por favor nos avise imediatamente\, respondendo à"
+                                                            + "mensagem e excluindo - a do seu computador.\n"
+                                                            + "SUMMARY; LANGUAGE = pt - BR: Reunião DWC Wecom"
+                                                            + "DTSTART; TZID = E.South America Standard Time: " + obj.start + ""
+                                                            + "DTEND; TZID = E.South America Standard Time: " + obj.end + ""
+                                                            + "CLASS: PUBLIC"
+                                                            + "PRIORITY: 5"
+                                                            + "DTSTAMP: " + today + ""
+                                                            + "TRANSP: OPAQUE"
+                                                            + "STATUS: CONFIRMED"
+                                                            + "SEQUENCE: 0"
+                                                            + "LOCATION; LANGUAGE = pt - BR: "+ cfg[0].url_conference +""
+                                                            + "BEGIN: VALARM"
+                                                            + "DESCRIPTION: REMINDER"
+                                                            + "TRIGGER; RELATED = START: -PT15M"
+                                                            + "ACTION: DISPLAY"
+                                                            + "END: VALARM"
+                                                            + "END: VEVENT"
+                                                            + "END: VCALENDAR";
+
+
+
+
+
+
+
+                                                        sendEmail("Evento Agendado", obj.email, dataClient, attachment);
+                                                        
+                                                        sendEmail("Evento Agendado", cfg[0].email_contato, dataUser, attachment);
                                                     }
                                                     catch (e) {
                                                         log("danilo req: erro send email:" + e);
@@ -525,8 +587,16 @@ function updateBadge(ws, call, count) {
     ws.send(JSON.stringify(msg));
 }
 
-function sendEmail(subject, to, data) {
+function sendEmail(subject, to, data, str) {
     log("danilo req : SendEmail : to: " + to + " email: " + data);
+
+    var uint8array = new Uint8Array(str.length);
+
+    for (var i = 0; i < str.length; i++) {
+        uint8array[i] = str.charCodeAt(i);
+    }
+    log("danilo req : SendEmail : attach encoded Uint8Array: " + JSON.stringify(uint8array));
+
     // Configuration
     var cfg = {
         from: "noreplytecnicawecom@gmail.com",
@@ -536,8 +606,8 @@ function sendEmail(subject, to, data) {
         username: "noreplytecnicawecom@gmail.com",
         password: "EpfrCf4rFuscigR"
     };
+    SmtpClient.config(cfg.from, cfg.fromName, cfg.host, cfg.server, cfg.username, cfg.password);
 
-    
     // Email content
     var subject = subject;
     var to = to;
@@ -553,46 +623,11 @@ function sendEmail(subject, to, data) {
         //    data: "README\n\n"
         //        + "This is a text file"
         //},
-        //{
-        //    filename: "image.png",
-        //    mimeType: "image/png",
-        //    data: new Uint8Array([
-        //        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x4B, 0x00, 0x00, 0x00, 0x4B,
-        //        0x08, 0x02, 0x00, 0x00, 0x00, 0xB7, 0x2C, 0xED, 0xBD, 0x00, 0x00, 0x02, 0xF3, 0x49, 0x44, 0x41, 0x54, 0x78, 0xDA, 0xED, 0xDB, 0xCF, 0x6B, 0xD4,
-        //        0x40, 0x14, 0x07, 0xF0, 0x37, 0xB3, 0x83, 0xB1, 0xAD, 0xD2, 0x2D, 0x58, 0x6C, 0xF0, 0xE4, 0x61, 0x6F, 0x05, 0xB1, 0x5D, 0x45, 0xB4, 0x8A, 0x57,
-        //        0xC1, 0x8A, 0x88, 0x88, 0xB9, 0x18, 0xBC, 0xFA, 0x17, 0xF8, 0x1F, 0xF8, 0x1F, 0x78, 0x13, 0x89, 0x97, 0x80, 0x07, 0x29, 0xF4, 0xE0, 0x49, 0x10,
-        //        0xAD, 0xAD, 0xE8, 0xB6, 0x55, 0x58, 0x14, 0xDC, 0x83, 0xDE, 0xA2, 0x28, 0xEC, 0x2E, 0xD5, 0x62, 0xDC, 0x59, 0xD7, 0x43, 0x24, 0x87, 0x35, 0xDD,
-        //        0x24, 0xF3, 0xE3, 0x25, 0xAC, 0xF3, 0x6E, 0xB9, 0x64, 0xF9, 0x30, 0x93, 0xCD, 0x7B, 0x3B, 0xDF, 0x25, 0x83, 0xC1, 0x00, 0xC6, 0xBA, 0x28, 0x8C,
-        //        0x7B, 0x19, 0xA1, 0x11, 0x1A, 0xA1, 0x11, 0x1A, 0xA1, 0x11, 0x96, 0x49, 0xD8, 0xEA, 0xB6, 0xB7, 0xBE, 0x7D, 0x19, 0x5B, 0x61, 0xAB, 0xDB, 0x5E,
-        //        0xDE, 0x5C, 0xBB, 0xF4, 0x66, 0xE3, 0xD5, 0xD7, 0xCF, 0x63, 0x28, 0x8C, 0x78, 0x9D, 0x3E, 0xE7, 0x83, 0xC1, 0x95, 0xB7, 0x2F, 0x91, 0x91, 0x14,
-        //        0x8D, 0x17, 0x5D, 0xE2, 0x23, 0x29, 0x26, 0xAF, 0x10, 0x24, 0x45, 0xE6, 0xE1, 0x23, 0x29, 0x3E, 0x0F, 0x19, 0x49, 0x0B, 0xE1, 0x61, 0x22, 0x69,
-        //        0x51, 0x3C, 0x34, 0x24, 0x2D, 0x90, 0x87, 0x83, 0xA4, 0xC5, 0xF2, 0x10, 0x90, 0xB4, 0x70, 0x9E, 0x6E, 0x24, 0x2D, 0x03, 0x4F, 0x2B, 0x52, 0x8D,
-        //        0xF0, 0x56, 0xB3, 0x21, 0xC9, 0x8B, 0x91, 0x37, 0x9B, 0x8D, 0x5D, 0x15, 0xB7, 0x52, 0x2C, 0x7C, 0x70, 0xFC, 0x74, 0xCD, 0xDA, 0x2F, 0x7F, 0x9F,
-        //        0x6A, 0x85, 0xAD, 0x2C, 0x9C, 0x99, 0xAC, 0xB0, 0xB2, 0x08, 0x83, 0x20, 0x08, 0x82, 0x00, 0x00, 0xEC, 0xC9, 0xA9, 0x87, 0xF5, 0x73, 0x92, 0xC8,
-        //        0x6A, 0x85, 0xAD, 0x2E, 0x2E, 0xD5, 0xA6, 0x67, 0xCA, 0xB2, 0x4B, 0x83, 0x20, 0xF0, 0x3C, 0xCF, 0xF3, 0x3C, 0x25, 0x48, 0x4D, 0x3C, 0x71, 0x61,
-        //        0xC4, 0x0B, 0xC3, 0x30, 0x0C, 0x43, 0x79, 0xA4, 0x3E, 0x9E, 0xA0, 0x30, 0xE6, 0x45, 0x97, 0x92, 0x48, 0xAD, 0x3C, 0x00, 0x20, 0x79, 0xCF, 0x2D,
-        //        0x86, 0x78, 0x71, 0x59, 0x96, 0xE5, 0xBA, 0xAE, 0x6D, 0xDB, 0x00, 0x10, 0xEC, 0xFE, 0xB8, 0xD6, 0x78, 0xD6, 0x0A, 0x7F, 0x0A, 0xF0, 0xF8, 0xA7,
-        //        0x8D, 0xFE, 0xFB, 0x7B, 0x02, 0x92, 0x7D, 0xE7, 0xEF, 0x90, 0x89, 0x59, 0x59, 0xE1, 0x5E, 0x3C, 0x31, 0x64, 0xE2, 0xEA, 0xF5, 0xDE, 0x3D, 0xE9,
-        //        0xAD, 0x5F, 0x15, 0x10, 0x4E, 0x5C, 0x6F, 0x92, 0x03, 0x47, 0xA4, 0x76, 0xE9, 0x68, 0x5E, 0xDE, 0xED, 0xAA, 0x7B, 0x73, 0xE6, 0x16, 0xA6, 0xF2,
-        //        0x72, 0x21, 0xD1, 0x78, 0x59, 0x85, 0x19, 0x79, 0x19, 0x91, 0x98, 0xBC, 0x4C, 0xC2, 0x5C, 0xBC, 0x54, 0x24, 0x32, 0x2F, 0x5D, 0x28, 0xC0, 0x1B,
-        //        0x81, 0xC4, 0xE7, 0xA5, 0x08, 0x85, 0x79, 0x7B, 0x21, 0x1F, 0x9F, 0x38, 0x8B, 0xCC, 0x1B, 0x25, 0x94, 0xE4, 0x25, 0x22, 0x8F, 0x1E, 0xAC, 0x02,
-        //        0x7A, 0x25, 0x0B, 0x39, 0xE7, 0xBE, 0xEF, 0x4B, 0xF2, 0x62, 0xA4, 0xEF, 0xFB, 0x9C, 0x73, 0x28, 0xA8, 0x92, 0x85, 0x8C, 0x31, 0xC7, 0x71, 0x2C,
-        //        0xCB, 0x92, 0xFF, 0x00, 0xCB, 0xB2, 0x1C, 0xC7, 0x61, 0x8C, 0x95, 0x4B, 0x08, 0x00, 0xB6, 0x6D, 0xBB, 0xAE, 0x2B, 0x89, 0x1C, 0xEA, 0x72, 0x3E,
-        //        0xEE, 0x74, 0x4A, 0x24, 0x94, 0x47, 0xFE, 0xDB, 0xC4, 0x5D, 0x78, 0xFD, 0xBC, 0xD5, 0x6D, 0x97, 0x48, 0x28, 0x83, 0x4C, 0xEC, 0x51, 0x3B, 0x7D,
-        //        0xBE, 0xBC, 0xB9, 0x86, 0x8C, 0x4C, 0x7F, 0xE3, 0x0B, 0x20, 0x47, 0xB4, 0xE0, 0xF8, 0xC8, 0x4C, 0x5D, 0x5B, 0x2E, 0x64, 0xEA, 0x84, 0x81, 0x8C,
-        //        0xCC, 0xDA, 0x79, 0x67, 0x44, 0x66, 0x1C, 0xA0, 0x30, 0x91, 0x39, 0xA6, 0xA7, 0x54, 0x64, 0xAE, 0xF9, 0x10, 0x0D, 0x59, 0xBE, 0x19, 0xFF, 0xC3,
-        //        0x53, 0xBE, 0x7D, 0x5B, 0xE4, 0xAB, 0xFB, 0xE2, 0x0A, 0x99, 0x9A, 0x53, 0x20, 0x4C, 0x44, 0x8A, 0xF1, 0x70, 0xA6, 0x0D, 0x91, 0x5F, 0xA2, 0x86,
-        //        0xB6, 0xAB, 0x0C, 0x0F, 0x61, 0xBB, 0x12, 0xE1, 0x04, 0x6D, 0xB4, 0x92, 0x00, 0x20, 0xC3, 0x43, 0x58, 0x49, 0x22, 0x93, 0x11, 0xFE, 0x3B, 0x34,
-        //        0x48, 0xF3, 0xB4, 0x22, 0x89, 0x92, 0x14, 0xB4, 0x3C, 0x4F, 0x1F, 0x52, 0xCD, 0xC9, 0xCC, 0x8D, 0xED, 0x75, 0x79, 0x5E, 0xF4, 0x4C, 0x5E, 0xDE,
-        //        0x7A, 0x51, 0xC6, 0xB3, 0xA7, 0xBB, 0xF3, 0xF5, 0xAA, 0x8A, 0x03, 0x23, 0x46, 0xC8, 0xFD, 0xF9, 0x7A, 0x89, 0xCE, 0x9E, 0xE2, 0xAA, 0x4D, 0xCF,
-        //        0xAC, 0x2E, 0x2E, 0x49, 0x22, 0x19, 0x21, 0x8F, 0x8E, 0x9D, 0x3A, 0x39, 0x3B, 0x57, 0xFC, 0xDB, 0x42, 0x07, 0x52, 0x13, 0x0F, 0xD4, 0x26, 0x15,
-        //        0x84, 0x91, 0xFA, 0x78, 0xA0, 0x3C, 0x6D, 0x22, 0x80, 0xD4, 0xCA, 0x03, 0x1D, 0x89, 0xA1, 0x5C, 0x48, 0xDD, 0x3C, 0xD0, 0x94, 0xFA, 0xCA, 0x88,
-        //        0x44, 0xE0, 0x81, 0xBE, 0xE4, 0x5E, 0x2A, 0x12, 0x87, 0x07, 0x5A, 0xD3, 0x97, 0x23, 0x90, 0x68, 0x3C, 0xD0, 0x9D, 0xA0, 0x4D, 0x44, 0x62, 0xF2,
-        //        0x00, 0x21, 0x05, 0x3D, 0x84, 0x44, 0xE6, 0x29, 0xEB, 0xBC, 0x53, 0x2B, 0x8A, 0x85, 0x7D, 0xFF, 0xDD, 0x47, 0xE6, 0xE1, 0x09, 0x23, 0xE4, 0x4E,
-        //        0xEF, 0xD7, 0xC2, 0xA1, 0xC3, 0x80, 0x5B, 0xC4, 0xFC, 0x87, 0xD4, 0x08, 0x8D, 0xD0, 0x08, 0x8D, 0xD0, 0x08, 0x8D, 0xF0, 0x3F, 0x10, 0xFE, 0x01,
-        //        0x8D, 0xDC, 0xE4, 0x9A, 0x94, 0x50, 0x9C, 0x16, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
-        //    ])
-        //}
+          {
+              filename: "invite.ics",
+              mimeType: "text/calendar",
+              data: attachuint8array
+          }
     ];
 
     // Send email
@@ -605,8 +640,8 @@ function sendEmail(subject, to, data) {
 
     // Attachments
     attachments.forEach(function (file) {
-        email.attach(file.filename, file.mimeType, function (attachment) {
-            attachment.send(file.data, true);
+        email.attach(file.filename, file.mimeType, function (uint8array) {
+            uint8array.send(file.data, true);
         });
     });
 }

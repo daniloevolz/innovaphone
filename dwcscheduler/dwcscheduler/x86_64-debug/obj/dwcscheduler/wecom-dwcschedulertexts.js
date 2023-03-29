@@ -7,7 +7,7 @@ Wecom.dwcschedulerTexts = {
         labelEventHistory: "Você recebeu novas solicitações de agendamento enquanto esteve fora, verifique seus agendamentos.",
         labelEventCount: "Novos Agendamentos: ",
         labelEvent: "Você tem um novo agendamento realizado pelo site DWC.",
-        labelEventRequest: "Solicotante: ",
+        labelEventRequest: "Solicitante: ",
         labelEventEmail: "Email: ",
         labelEventWhen: "Quando: ",
         btnOk: "Ok",

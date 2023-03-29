@@ -66,6 +66,7 @@ new JsonApi("user").onconnected(function (conn) {
 
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
+            var info = JSON.parse(conn.info);
             var today = getDateNow();
 
             if (obj.mt == "UserMessage") {
@@ -97,18 +98,65 @@ new JsonApi("user").onconnected(function (conn) {
                 })  
             }
             if (obj.mt == "DeviceSelected") {
-                var src = obj.src;
-                log("SPLIT1:");
-                var myArray = src.split(",");
-                var sip = myArray[0];
-                var pbx = myArray[1];
+                var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                var hw = user[0].columns.devices.filter(function (device) { return device.hw === obj.hw })[0];
                 RCC.forEach(function (rcc) {
-                    if (rcc.pbx == pbx) {
-                        log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + pbx);
-                        var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: obj.hw, src: obj.src };
+                    if (rcc.pbx == info.pbx) {
+                        log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                        var msg = { api: "RCC", mt: "UserInitialize", hw: hw, cn: conn.dn, src: conn.sip + "," + info.pbx };
                         rcc.send(JSON.stringify(msg));
+
+                        connectionsUser.forEach(function (c) {
+                            if (c.sip == conn.sip) {
+                                c.hw = hw;
+                            }
+                        })
+                        log("DeviceSeclected: connectionsUser updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
                     }
                 })
+            }
+            if (obj.mt == "InitializeMessage") {
+                try {
+                    updateTableBadgeCount(conn.sip, "ResetCount");
+                    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                    var numDevices = user[0].columns.devices.length;
+                    log("danilo req : devices sao: " + numDevices);
+                    RCC.forEach(function (rcc) {
+                        if (rcc.pbx == info.pbx) {
+                            var temp = rcc[String(conn.sip)];
+                            if (temp == null) {
+                                log("danilo req : User Connection conn.sip: "+conn.sip+" rcc temp user " + temp);
+                                if (numDevices > 1) {
+                                    conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                                }
+                                if (numDevices == 1) {
+                                    if (rcc.pbx == info.pbx) {
+                                        log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                                        var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
+                                        rcc.send(JSON.stringify(msg));
+                                        connectionsUser.forEach(function (c) {
+                                            if (c.sip == conn.sip) {
+                                                c.hw = user[0].columns.devices[0];
+                                            }
+                                        })
+                                        log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+                                    }
+                                    getURLLogin(conn.sip);
+                                }
+                            }
+                            else {
+                                conn.send(JSON.stringify({ api: "user", mt: "UserInitializeResultSuccess"}));
+                                connectionsUser.forEach(function (c) {
+                                    c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
+
+                                })
+                            }
+                        }
+                    })
+
+                } catch (e) {
+                    log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
+                }
             }
             if (obj.mt == "UserPresence") {
                 RCC.forEach(function (c) {
@@ -304,14 +352,34 @@ new JsonApi("user").onconnected(function (conn) {
     }
     conn.onclose(function () {
         log("User: disconnected");
+
         //Intert into DB the event
         log("danilo req: insert into DB = user " + conn.sip);
         var today = getDateNow();
+        var info = JSON.parse(conn.info);
         var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Logout", group: "APP" }
         log("danilo req: will insert it on DB : " + JSON.stringify(msg));
         insertTblAvailability(msg);
 
+        //Remove from RCC monitor
+        RCC.forEach(function (rcc) {
+            if (rcc.pbx == info.pbx) {
+                var user = rcc[conn.sip];
+                log("PbxSignal: calling RCC API to End user Monitor " + String(conn.sip) + " on PBX " + info.pbx);
+                var msg = { api: "RCC", mt: "UserEnd", user: user, src: conn.sip + "," + info.pbx };
+                rcc.send(JSON.stringify(msg));
+            }
+        })
+
+        //Notify user about this logout
+        connectionsUser.forEach(function (c) {
+            c.send(JSON.stringify({ api: "user", mt: "UserDisconnected", src: conn.sip }));
+
+        })
+
+        //Remove cennection from array
         connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+        log("danilo req : connectionsUsers after delete conn of user " + conn.sip + " : " + JSON.stringify(connectionsUser));
 
     });
 });
@@ -747,14 +815,28 @@ new PbxApi("RCC").onconnected(function (conn) {
                 }
             })
             connectionsUser.forEach(function (c) {
-                c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: sip }));
-
+                //c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: sip }));
+                if (c.sip == sip) {
+                    c.send(JSON.stringify({ api: "user", mt: "UserInitializeResultSuccess", src: sip }));
+                }
             })
             
 
             //updateConnections(obj.src, "user", obj.user, obj.area);
-        } else if (obj.mt === "UserEndResult") {
-            
+        }
+        else if (obj.mt === "UserEndResult") {
+            log("danilo req UserEndResult: RCC message:: received" + JSON.stringify(obj));
+            log("RCC: connections before delete result " + JSON.stringify(RCC));
+            var src = obj.src;
+            var myArray = src.split(",");
+            var sip = myArray[0];
+            var pbx = myArray[1];
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == pbx) {
+                    delete rcc[sip];
+                }
+            })
+            log("RCC: connections after delete result " + JSON.stringify(RCC));
         }
         else if (obj.mt === "CallInfo") {
             var src = obj.src;
@@ -1135,11 +1217,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-            // remove callid from the array for calls for this connection
-            calls.splice(calls.indexOf(obj.call), 1);
-
             //Remove
-            //log("PBXSignal: connections result " + JSON.stringify(connections));
             log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
             var src = obj.src;
             log("SPLIT7:");
@@ -1154,33 +1232,18 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             })
             log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
 
-            RCC.forEach(function (rcc) {
-                if (rcc.pbx == pbx) {
-                    var user = rcc[sip];
-                    log("PbxSignal: calling RCC API to End user Monitor " + String(sip) + " on PBX " + pbx);
-                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: sip + "," + obj.src };
-                    conn.send(JSON.stringify(msg));
-                }
-            })
-            connectionsUser.forEach(function (c) {
-                c.send(JSON.stringify({ api: "user", mt: "UserDisconnected", src: sip }));
-
-            })
             //Intert into DB the event
             log("PbxSignal= user " + sip + " logout");
             var today = getDateNow();
             var msg = { sip: sip, name: name, date: today, status: "Logout", group: "PBX" }
             log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
             insertTblAvailability(msg);
-            //connections = connections.filter(delConnectionsByCall(obj.call));
-            //log("PBXSignal: connections result " + JSON.stringify(connections));
         }
     });
 
     conn.onclose(function () {
         log("PbxSignal: disconnected");
         PbxSignal.splice(PbxSignal.indexOf(conn), 1);
-        //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
 
@@ -1419,7 +1482,7 @@ function alarmReceived(value) {
                 //Get Actions from DB
                 Database.exec("SELECT * FROM list_alarm_actions")
                     .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
+                        log("danilo req : select from list_alarm_actions result legth=" + data.length);
                         var str = "";
                         str = JSON.stringify(data);
                         actions = JSON.parse(String(str));

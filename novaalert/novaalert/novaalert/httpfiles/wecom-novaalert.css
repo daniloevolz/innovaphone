@@ -21,7 +21,7 @@ select{
     position: absolute;
     left: 0%;
     /* width: 15%; */
-    top: 12%;
+    top: 19%;
     left: 29%;
     border-bottom: 2px solid #02163F;
     font-size: 15px;
@@ -31,7 +31,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 12%;
+    top: 19%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -53,7 +53,7 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 19%;
+    top: 26%;
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
@@ -64,7 +64,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 19%;
+    top: 26%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -84,7 +84,7 @@ select{
 }
 .divAdd{
     position: absolute;
-    top: 24%;
+    top: 31%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -173,7 +173,7 @@ select{
   }
 .divAdd2{
     position: absolute;
-    top: 34%;
+    top: 39%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -182,14 +182,14 @@ select{
 /*INPUT NUMBER*/
 .divAdd3{
     position: absolute;
-    top: 24%;
+    top: 31%;
     left:28%;
     width: 38%;
     padding: 10px;
 }
 .divAdd4{
     position: absolute;
-    top: 34%;
+    top: 39%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -199,7 +199,7 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 19%;
+    top: 26%;
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
@@ -209,7 +209,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 19%;
+    top: 26%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -309,14 +309,14 @@ select{
 /*INPUT USERS*/
 .divAdd5{
     position: absolute;
-    top: 24%;
+    top: 31%;
     left:28%;
     width: 38%;
     padding: 10px;
 }
 .divAdd6{
     position: absolute;
-    top: 34%;
+    top: 41%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -326,7 +326,7 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 19%;
+    top: 26%;
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
@@ -336,7 +336,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 19%;
+    top: 26%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -394,19 +394,18 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 37%;
+    top: 42%;
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
     border-bottom: 2px solid #02163F;
 }
 .selectValueUsers {
-    top: 37%;
+    top: 42%;
     position: absolute;
     /* left: 16%; */
     width: 28%;
     left: 37%;
-    top: 37%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -418,14 +417,14 @@ select{
 /*INPUT COMBO*/
 .divAdd7{
     position: absolute;
-    top: 24%;
+    top: 31%;
     left:28%;
     width: 38%;
     padding: 10px;
 }
 .divAdd8{
     position: absolute;
-    top: 34%;
+    top: 39%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -435,7 +434,7 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 19%;
+    top: 26%;
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
@@ -445,7 +444,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 19%;
+    top: 26%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -543,13 +542,13 @@ select{
     border-image-slice: 1;
 }
 .combo1Div{
-    position:absolute; left:0%; width:15%; top:46%; font-size:15px; left: 23%;
+    position:absolute; left:0%; width:15%; top:53%; font-size:15px; left: 23%;
 }
 .combo1{
     position: absolute;
     left: 39%;
     width: 25%;
-    top: 46%;
+    top: 53%;
     font-size: 12px;
     text-align: center;
     height: 20px;
@@ -559,13 +558,13 @@ select{
     border-radius: 10px;
 }
 .combo2Div{
-    position:absolute; left:0%; width:15%; top:51%; font-size:15px; left: 23%;
+    position:absolute; left:0%; width:15%; top:58%; font-size:15px; left: 23%;
 }
 .combo2{
     position: absolute;
     left: 39%;
     width: 25%;
-    top: 51%;
+    top: 58%;
     font-size: 12px;
     text-align: center;
     height: 20px;
@@ -575,13 +574,13 @@ select{
     border-radius: 10px;
 }
 .combo3Div{
-    position:absolute; left:0%; width:15%; top:56%; font-size:15px; left: 23%;
+    position:absolute; left:0%; width:15%; top:63%; font-size:15px; left: 23%;
 }
 .combo3{
     position: absolute;
     left: 39%;
     width: 25%;
-    top: 56%;
+    top: 63%;
     font-size: 12px;
     text-align: center;
     height: 20px;
@@ -591,13 +590,13 @@ select{
     border-radius: 10px;
 }
 .combo4Div{
-    position:absolute; left:0%; width:15%; top:61%; font-size:15px; left: 23%;
+    position:absolute; left:0%; width:15%; top:68%; font-size:15px; left: 23%;
 }
 .combo4{
     position: absolute;
     left: 39%;
     width: 25%;
-    top: 61%;
+    top: 68%;
     font-size: 12px;
     text-align: center;
     height: 20px;

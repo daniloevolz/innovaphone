@@ -44,6 +44,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var userUI;
     app.onclosed = waitConnection;
     app.onerror = waitConnection;
+    waitConnection();
 
     //Coluna Esquerda
     var colesquerda;
@@ -70,31 +71,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
-        app.send({ api: "user", mt: "UserMessage" });
-        app.send({ api: "user", mt: "SelectMessage" });
-        app.send({ api: "user", mt: "UserPresence" });
-        connected();
+        if (app.logindata.info.unlicensed) {
+            //sem licença
+            app.send({ api: "user", mt: "InitializeMessage" }); //Inicializa o ramal
+        }
+        else {
+            //licenciado
+            app.send({ api: "user", mt: "InitializeMessage" }); //Inicializa o ramal
+
+        }
 
         //avatar
         avatar = new innovaphone.Avatar(start, user, domain);
         teste = avatar.url(user, 100, dn);
         console.log("avatar" + JSON.stringify(teste));
-        //avatar.onmessage.attach(testeavatar);
-        if (app.logindata.info.unlicensed) {
-            //sem licença
-            //app.send({ api: "user", mt: "UserMessage" })
-            //var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
-            //that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-            //    app.send({ api: "user", mt: "UserMessage" })
-            //    app.send({ api: "user", mt: "SelectMessage" });
-            //});
-  
-        }
-        else {
-  
-            //app.send({ api: "user", mt: "UserMessage" })
-
-        }
+        
     }
 
     var buttonClicked = function (evt) {
@@ -135,10 +126,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_buttons = [];
     var popupOpen = false;
     function app_message(obj) {
-        if (obj.api == "user" && obj.mt == "UserMessageResult") {
-            
+        if (obj.api == "user" && obj.mt == "UserInitializeResultSuccess") {
+            app.send({ api: "user", mt: "SelectMessage" }); //Requisita os botões
+            app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
+            connected();
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             //connected(that);
@@ -399,8 +392,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             _popup.header.addText(texts.text("labelDeviceTitle"));
 
             var devices = obj.devices;
-            var iptDeviceTitle =new innovaphone.ui1.Div("position:absolute; left:0%; width:25%; top:40%; font-size:15px; text-align:right", texts.text("labelDevice"));
-            var iptDevice = new innovaphone.ui1.Node("select", "position:absolute; left:30%; width:30%; top:40%; font-size:12px; text-align:rigth", null, null);
+            var iptDeviceTitle = new innovaphone.ui1.Div("position:absolute; left:0%; width:50%; top:40%; font-size:15px; text-align:right", texts.text("labelDevice"));
+            var iptDevice = new innovaphone.ui1.Node("select", "position:absolute; left:50%; width:30%; top:40%; font-size:12px; text-align:rigth", null, null);
             iptDevice.setAttribute("id", "selectDevice");
             devices.forEach(function (dev) {
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -413,7 +406,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 if (String(hw) == "") {
                     window.alert("Atenção!! Complete todos os campos.");
                 } else {
-                    app.send({ api: "user", mt: "DeviceSelected", hw: String(hw), src: obj.src});
+                    app.send({ api: "user", mt: "DeviceSelected", hw: String(hw), src: obj.src });
                     _popup.close()
                 }
             });
