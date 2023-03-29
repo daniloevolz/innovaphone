@@ -85,6 +85,7 @@ new JsonApi("user").onconnected(function (conn) {
                             log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + rcc.pbx);
                             var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: user[0].columns.devices[0].hw, src: conn.sip + "," + rcc.pbx };
                             rcc.send(JSON.stringify(msg));
+
                         }
 
                     } else {

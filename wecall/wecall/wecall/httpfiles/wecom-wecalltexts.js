@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.wecallTexts = {
     pt: {
+        labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
+        labelDevice: "Dispositivo:",
         labelAdmin: "Administração",
         labelMonitorTitulo: "Configure onde obter a lista de Grupos, e o comportamento do aplicativo",
         labelCfgLogin: "Login Integrado",

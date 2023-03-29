@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - JavaScript Runtime</title>
+    <link rel="stylesheet" href="../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../web1/doc/vs.css">
+    <script src="../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1><a>JavaScript Runtime</a></h1>
+
+    <p>
+        The JavaScript Runtime allows to write apps for the innovaphone App Platform using JavaScript only.
+    </p>
+    <p>
+        It comes as a generic app binary provided by innovaphone that is part of the SDK. All the app specific files
+        are put into a "httpfiles.zip" archive.
+        To run the app on the App Platform, the ZIP archive is installed together with the generic app binary.
+    </p>
+
+    <dl>
+        <dt><a href="#overview">Overview</a></dt>
+        <dd><a href="#overview-frameworks">Included frameworks</a></dd>
+        <dd><a href="#overview-httpfiles">httpfiles.zip</a></dd>
+        <dd><a href="#overview-development">Development using the JavaScript Runtime</a></dd>
+
+        <dt><a href="#config">config.json</a></dt>
+        <dd><a href="#config-database">database</a></dd>
+        <dd><a href="#config-config">config</a></dd>
+        <dd><a href="#config-dbfiles">dbfiles</a></dd>
+        <dd><a href="#config-apis">apis</a></dd>
+        <dd><a href="#config-serviceApis">serviceApis</a></dd>
+        <dd><a href="#config-javascript">javascript</a></dd>
+
+        <dt><a href="#plugins">plugins.json</a></dt>
+        <dd></dd>
+
+        <dt><a href="#modes">Modes</a></dt>
+        <dd></dd>
+
+        <dt><a href="#client">Client-side framework</a></dt>
+        <dd>
+            <a href="#client-appwebsocket">AppWebsocket messages</a>
+            <dl>
+                <dd><a href="#client-SqlInsert">SqlInsert</a></dd>
+                <dd><a href="#client-SqlExec">SqlExec</a></dd>
+                <dd><a href="#client-SqlMonitor">SqlMonitor</a></dd>
+                <dd><a href="#client-DbFilesList">DbFilesList</a></dd>
+            </dl>
+        </dd>
+        <dd>
+            <a href="#client-http">HTTP operations</a>
+            <dl>
+                <dd><a href="#client-POST">HTTP POST to dbfiles</a></dd>
+                <dd><a href="#client-GET">HTTP GET to dbfiles</a></dd>
+            </dl>
+        </dd>
+
+        <dt><a href="#service">Service-side framework</a></dt>
+        <dd><a href="#service-initialization">Initialization</a></dd>
+        <dd><a href="#service-library">Library</a></dd>
+    </dl>
+
+    <h2><a id="overview">Overview</a></h2>
+
+    <h3><a id="overview-frameworks">Included frameworks</a></h3>
+    <p>
+        The runtime provides two frameworks.
+        <ul>
+            <li>
+                Client-side framework
+                <ul>
+                    <li>Provides typical workflows that can be used from the browser using AppWebsocket messages.</li>
+                    <li>For example those workflows include database access, file storage and configuration.</li>
+                    <li>Can be used out-of-the box without writing any serivce-side code.</li>
+                </ul>
+            </li>
+            <li>
+                Service-side JavaScript interpreter and library
+                <ul>
+                    <li>Can be used to write individual service-side logic in JavaScript.</li>
+                    <li>The runtime provides libraries that can be used from the JavaScript code.</li>
+                </ul>
+            </li>
+        </ul>
+        Both frameworks can be used independently. You can use the both or just one of them, depending on what you need for your app.
+    </p>
+
+    <h3><a id="overview-httpfiles">httpfiles.zip</a></h3>
+    <p>
+        The ZIP file contains your own app code along with manifests, needed to configure the runtime.
+        <ul>
+            <li>
+                config.json
+                <ul>
+                    <li>The app manifest.</li>
+                    <li>Definition of database tables, dbfiles instances, provided APIs etc.</li>
+                    <li>Enumeration of JS files that shall be interpreted on the service-side.</li>
+                </ul>
+            </li>
+            <li>
+                plugins.json
+                <ul>
+                    <li>If a PBX Manager plugin is provided for the app as well, it has to be configured here.</li>
+                    <li>This is required if the App Services provides cloud services for multiple domains.</li>
+                </ul>
+            </li>
+            <li>
+                build.txt
+                <ul>
+                    <li>Contains the build number of the app.</li>
+                    <li>This build number is be displayed in the AP manager.</li>
+                    <li>Also this build number is used for the CheckBuild mechanism of the web application.</li>
+                </ul>
+            </li>
+            <li>
+                label.txt
+                <ul>
+                    <li>Contains the label of the build, e.g. "dvl", "beta1", "final", "sr1", "sr2", ...</li>
+                    <li>The label is be displayed in the AP manager.</li>
+                    <li>If not specified, the label of the used JavaScript Runtime is displayed.</li>
+                </ul>
+            </li>
+            <li>
+                PBX Manager plugin
+                <ul>
+                    <li>Web files (JS, HTML, CSS, PNG, etc).</li>
+                    <li>The runtime hosts the files, so they can be downloaded by the browser if the user opens the plugin in the PBX manager.</li>
+                    <li>No difference to innovaphone C++ apps.</li>
+                </ul>
+            </li>
+            <li>
+                Client-side app
+                <ul>
+                    <li>Web files (JS, HTML, CSS, PNG, etc).</li>
+                    <li>The runtime hosts the files, so they can be downloaded by the browser if the user opens the app.</li>
+                    <li>No difference to innovaphone C++ apps.</li>
+                </ul>
+            </li>
+            <li>
+                Service-side scripts
+                <ul>
+                    <li>JS files.</li>
+                    <li>The runtime interprets the code when the app instance is started.</li>
+                </ul>
+            </li>
+        </ul>
+    </p>
+
+    <h3><a id="overview-development">Development using the JavaScript Runtime</a></h3>
+    There are two alternative options for developing apps using the JavaScript Runtime.
+    <h4>Using the Visual Studio plugin (recommended)</h4>
+    Installation
+    <ul>
+        <li>Download the innovaphone SDK Installer from <a href="https://store.innovaphone.com/release/download.htm">https://store.innovaphone.com/release/download.htm .</a></li>
+        <li>Install the SDK.</li>
+    </ul>
+    App creation
+    <ul>
+        <li>Open Visual Studio</li>
+        <li>Create a new innovaphone app and select the template "innovaphone JS App".</li>
+        <li>The build output contains the binary containing the JavaScript Runtime and your own code packed in a httpfiles.zip.</li>
+    </ul>
+    Deployment to your test setup
+    <ul>
+        <li>Make sure the developer mode is enabled in the settings of the AP manager.</li>
+        <li>Press the play button in Visual studio to start debugging. The plugin will automatically configure the app object on the PBX and do the app upload.</li>
+        <li>Give your test user access rights to your app.</li>
+    </ul>
+    <h4>Manual</h4>
+    Installation
+    <ul>
+        <li>Download the JavaScript Runtime from <a href="https://store.innovaphone.com/release/download.htm">https://store.innovaphone.com/release/download.htm .</a></li>
+    </ul>
+    App creation
+    <ul>
+        <li>Put together the httpfiles.zip with your own code according to this documentation.</li>
+        <li>Rename the generic app binary containing the JavaScript Runtime to a unique name like &lt;Your Company&gt;-&lt;App Name&gt; and copy it to the same folder as your httpfiles.zip.</li>
+    </ul>
+    Deployment to your test setup
+    <ul>
+        <li>
+            Make sure the developer mode is enabled in the settings of the AP manager.
+        </li>
+        <li>
+            Upload the binary together with your httpfiles.zip.
+        </li>
+        <li>
+            When the app is uploaded the new app service is available. For this configure an instance with
+            all the parameters like webserver path, database name, passwords etc.
+        </li>
+        <li>
+            On the PBX configure an app object with an URL pointing to the start .htm file of your app.
+        </li>
+        <li>
+            Give your test user access rights to your app.
+        </li>
+    </ul>
+
+    <h2><a id="config">config.json</a></h2>
+    <p>
+        The config.json contains objects for each area which can be configured.
+    </p>
+    <p>
+        If some initialization has to be done in an area, the object contains an array name "init",
+        which contains a list objects for the commands, which are to be executed, when the
+        App instance is started.
+        Each of the objects contain a property "cmd", which identifies the type ofcommand
+        and a property "name", so that the result of the command can be referenced.
+    </p>
+
+    <pre><code class="json">{
+    "database": {
+        "init": [
+            ...
+        ]
+    },
+    "config": {
+        "init": [
+            ...
+        ]
+    },
+    "dbfiles": {
+        "init": [
+            ...
+        ]
+    },
+    "apis": {
+        ...
+    },
+    "serviceApis": {
+        ...
+    },
+    "javascript": {
+        "eval": [
+            ...
+        ]
+    }
+}</code></pre><br />
+
+
+
+    <h3><a id="config-database">database</a></h3>
+
+    <p>
+        The init array of database may contain the following items:
+    </p>
+    <dl>
+        <dt>table</dt>
+        <dd>
+            Defines a database table. The property "name" is used as a name for the table.
+            It also contains another array "init", with a list of command, for example to
+            add columns to the table
+        </dd>
+        <dd>
+            The init object column has the following content:
+            <pre><code class="json">{
+    "cmd": "column",
+    "name": string,
+    "type": string
+}</code></pre><br />
+            <dl>
+                <dt>name</dt>
+                <dd>
+                    The name of the database column
+                </dd>
+                <dt>type</dt>
+                <dd>
+                    The SQL type definition of the column (Example: "BIGSERIAL PRIMARY KEY NOT NULL")
+                </dd>
+            </dl>
+        </dd>
+        <dt>statement</dt>
+        <dd>
+            The statement object has the following content:
+            <pre><code class="json">{
+    "cmd": "statement",
+    "name": string,
+    "mode": string,
+    "query": string,
+    "args": object,
+    "monitor": string (optionally),
+    "return": string (optionally)
+}</code></pre><br />
+            <dl>
+                <dt>name</dt>
+                <dd>
+                    Used to invoke this statement with an AppWebsocket message. The name
+                    together with the mode must be unique.
+                </dd>
+                <dt>mode</dt>
+                <dd>
+                    The mode in which this statement is executed. Several statements with the
+                    same name can be configured for different modes. Depending on the current mode
+                    the statement with matching name and mode is used.
+                    If node mode is configured, it is the default which is used if no mode matches
+                    directly.
+                </dd>
+                <dt>query</dt>
+                <dd>
+                    Defines the SQL statement, with placeholders for the arguments
+                    (%s for strings, %u for unsigned integers, %i for signed integers,
+                    %llu for unsigned 64 bit integers,
+                    %lli for signed 64bit integers and %b for boolean values).
+                </dd>
+                <dt>args</dt>
+                <dd>
+                    Contains a property for each argument
+                    in the order of the appearance of the respective placeholder in the query.
+                    The name of these properties are used as name for the properties holding the
+                    value of the argument in the AppWebsocket message to invoke the statement
+                </dd>
+                <dd>
+                    If the name of an args property start with '@', it identifies a variable.
+                    There are some predefined variables: @domain - domain of logged in user,
+                    @sip - sip URI of logged in user, @dn - display name of logged in user.
+                    Other variables may be defined dynamically by the return value of an
+                    SQL INSERT statement.
+                </dd>
+                <dd>
+                    The value of the property is an object, which contains a string property type
+                    defining the type of the argument. For the type the values "string", "int",
+                    "unsigned", "long", "ulong64", "bool" are available.
+                </dd>
+                <dt>monitor</dt>
+                <dd>
+                    An optional identifier which can be used to monitor this statement. The
+                    AppWebsocket message "SqlMonitor" can be used to monitor a statement
+                    with this property set
+                </dd>
+                <dt>return</dt>
+                <dd>
+                    Identifies a variable into which the return value of an INSERT statement
+                    may be stored
+                </dd>
+            </dl>
+        </dd>
+    </dl>
+
+    <h3><a id="config-config">config</a></h3>
+    <p>
+        The config array is used to define config items that can be used from the different config libraries:
+        <ul>
+            <li><a href="../web1/config/config.htm">in the web application</a> </li>
+            <li><a href="./javascript/Config.htm">in a JavaScript app serivce</a></li>
+        </ul>
+        The configuration of access rights is done using modes.
+        The init array of config may contain the following items:
+    </p>
+    <dl>
+        <dt>item</dt>
+        <dd>
+            Defines a config item.
+        </dd>
+        <dd>
+            The init object column has the following content:
+            <pre><code class="json">{
+    "cmd": "item",
+    "name": string,
+    "type": string,
+    "default": value,
+    "password": bool,
+    "min": value,
+    "max": value,
+    "options": array[string]
+}</code></pre><br />
+            <dl>
+                <dt>name</dt>
+                <dd>
+                    The name of the config item.
+                </dd>
+                <dt>type</dt>
+                <dd>
+                    "CHOICE", "BOOL", "INT", "DWORD", "LONG64", "ULONG64", or "STRING"
+                </dd>
+                <dt>default</dt>
+                <dd>
+                    The default value.
+                </dd>
+                <dt>password (type "STRING" only)</dt>
+                <dd>
+                    Tells if the config item represents a password.
+                </dd>
+                <dt>min (types "INT", "DWORD", "LONG64", "ULONG64" only)</dt>
+                <dd>
+                    The minimum value of the config item.
+                </dd>
+                <dt>max (types "INT", "DWORD", "LONG64", "ULONG64" only)</dt>
+                <dd>
+                    The maximum value of the config item.
+                </dd>
+                <dt>options (type "CHOICE" only)</dt>
+                <dd>
+                    An array of strings with the possible values of the choice.
+                </dd>
+            </dl>
+        </dd>
+        <dt>mode</dt>
+        <dd>
+            Defines in which modes the defined config items should be accessible. If not defined, no appwebsocket connections will have access to the config items.
+            <pre><code class="json">{
+    "cmd": "mode",
+    "name": string,
+    "read": bool,
+    "write": bool
+}</code></pre><br />
+            <dl>
+                <dt>name</dt>
+                <dd>
+                    The name of the mode. E.g. "owner.admin" or "owner".
+                </dd>
+                <dt>read</dt>
+                <dd>
+                    true, if read access should be granted.
+                </dd>
+                <dt>write</dt>
+                <dd>
+                    true, if write access should be granted.
+                </dd>
+            </dl>
+        </dd>
+    </dl>
+
+    <h3><a id="config-dbfiles">dbfiles</a></h3>
+
+    <p>
+        The init array of dbfiles contains the following objects:
+    </p>
+    <dl>
+        <dt>start</dt>
+        <dd>
+            Starts the dbfiles instance. The object has the following content:
+            <pre><code class="json">{
+    "cmd": "start",
+    "name": string,
+    "folder": string
+}</code></pre><br />
+            <dl>
+                <dt>name</dt>
+                <dd>
+                    The name of the dbfiles instance
+                </dd>
+                <dt>folder</dt>
+                <dd>
+                    An SQL type, which references another database row, which is used as
+                    a folder for the files. Example: "BIGINT REFERENCES reports(id) ON DELETE CASCADE"
+                </dd>
+            </dl>
+        </dd>
+    </dl>
+
+    <h3><a id="config-apis">apis</a></h3>
+    <p>
+        The apis object contains an object property for each API the App publishes. These
+        properties have the following structure:
+    </p>
+    <pre><code class="json">"&lt;htm filename of the app&gt;": {
+    "&lt;name of the API&gt;": {
+        "info": object,
+    }
+    "presence": bool,
+    "hidden": bool
+}</code></pre><br />
+    <p>
+        With the htm filename, it is selected on which connection from a PBX App object this information
+        is announced. The standard format for API descriptions is used. With the property "presence"
+        the App Service indicates that it will receive presence subscription calls for badge counts.
+        Set it to "true" if the app receives the presence subscription within the app service.
+        If the presence subscription should not be done to the app service but to a distinct SIP URI, it can be specified as a string.
+        The property "hidden" can be used to hide the app from myApps UI.
+    </p>
+    <p>
+        The following example shows two API definitions for both Apps provided by an App Service. The first definition is for the App "manufacturer-appname", which should provide a <a href="../../web1/com.innovaphone.phoneinfo/com.innovaphone.phoneinfo.htm">com.innovaphone.phoneinfo</a> API. Additionally, the App "manufacturer-appname" should be hidden from the client UI and should be able to handle presence subscriptions. The second App "manufacturer-appname-admin" will publish an own API "com.manufacturer.someapi" which can provide any custom functionality to other apps:
+        <pre><code class="json">"apis": {
+    "manufacturer-appname": {
+        "com.innovaphone.phoneinfo": {
+            "info": {}
+        },
+        "presence": true,
+        "hidden": true
+    },
+    "manufacturer-appname-admin": {
+        "com.manufacturer.someapi": {
+            "info": {}
+        },
+    }
+}</code></pre><br />
+    </p>
+
+    <h3><a id="config-serviceApis">serviceApis</a></h3>
+    <p>
+        The serviceApis object contains an object property for each API the App Service publishes. These
+        properties have the following structure:
+    </p>
+    <pre><code class="json">"&lt;htm filename of the app&gt;": {
+    "&lt;name of the API&gt;": {
+        "&lt;title of the API&gt;": string
+    }
+}
+
+</code></pre><br />
+    <p>
+        With the htm filename, it is selected on which connection from a PBX App object this information
+        is announced. The standard format for API descriptions is used.
+    </p>
+    <p>
+        Example of an API definition:
+        <pre><code class="json">"serviceApis": {
+    "acme-provisioning-service": {
+        "com.innovaphone.provisioning": {
+            "title": "ACME"
+        }
+    }
+}
+
+</code></pre><br />
+    </p>
+
+    <h3><a id="config-javascript">javascript</a></h3>
+    <p>
+        The javascript object specifies the javascript files that shall be executed in the JavaScript Environment on the service-side, when the app instance is started. The structure is like follows:
+    </p>
+    <pre><code class="json">"javascript": {
+    "eval": [ string ]
+}</code></pre><br />
+    <p>
+        Example:
+        <pre><code class="json">"javascript": {
+    "eval": [ 
+        "service1.js",
+        "service2.js",
+        "service3.js"
+    ]
+}</code></pre><br />
+    </p>
+
+    <h2><a id="plugins">plugins.json</a></h2>
+    <p>
+        The plugins.json contains an array of objects "plugins", with the configuration information for
+        each plugin.
+    </p>
+    <pre><code class="json">{
+    "plugins": [
+        {
+            "js": String,
+            "icon": String,
+            "lang": String,
+            "domains":  Bool
+        }
+    ]
+}</code></pre><br />
+
+    <dl>
+        <dt>js</dt>
+        <dd>
+            The Javascript file containing the Plugin Javascript code. An extension of ".js", will
+            be added automatically to the name configured here.
+        </dd>
+        <dt>icon</dt>
+        <dd>
+            The filename of the .png file, for the App Icon. This filename must be given, including
+            the .png filename extension.
+        </dd>
+        <dt>lang</dt>
+        <dd>
+            The JavaScript language file, which contains an object for all the localized texts.
+            An extension of ".js", will be added automatically to the name configured here.
+        </dd>
+        <dt>domains</dt>
+        <dd>
+            If set to true, this App Service can be used by multiple domains. The domains must
+            be registered at the AP Manager. If the domain is registered and an AP object is
+            configured in the PBX, the plugin is displayed in the PBX Manager.
+        </dd>
+    </dl>
+
+    <h2><a id="modes">Modes</a></h2>
+    <p>
+        Modes are used to define user access rights on the server side. They can be used to define
+        which SQL statements may be executed and how config items can be accessed by a given user.
+    </p>
+    <p>
+        There is one mode, which is set automatically by the App Service, if the connected user
+        is from the App Instance domain and is authenticated using the App Instance password: "owner".
+        Using this mode different database operations can be defined for users of the domain
+        providing this service and other users.
+    </p>
+    <p>
+        More modes maybe defined by the local PBX administrator, by adding these with '~' to the
+        name of the App Object. This way for example a local administrator can assign different users
+        different Apps providing different services.
+    </p>
+    <p>
+        The modes are concatenated using '.' as separator. For example in case of a user logging
+        in from the domain owning the service, with an app object name ending on "~admin" a mode of "owner.admin"
+        will result.
+    </p>
+
+    <h2><a id="client">Client-side framework</a></h2>
+    <h3><a id="client-appwebsocket">AppWebsocket messages</a></h3>
+    <p>
+        The following AppWebsocket messages can be used by the app to communicate with the app service.
+    </p>
+
+    <h4><a id="client-SqlInsert">SqlInsert</a></h4>
+    <p>
+        Execute a prepared statement as Insert request, which means a return value may be used:
+        <pre><code class="json">{
+    "mt": "SqlInsert",
+    "src": string (see AppWebsocket protocol)
+    "statement": string,
+    "args": {
+        "&lt;arg-name1&gt;":&lt;arg-value1&gt;
+        "&lt;arg-name2&gt;":&lt;arg-value2&gt;
+        ...
+    }
+}</code></pre><br />
+    </p>
+    <dl>
+        <dt>statement</dt>
+        <dd>
+            Name of the prepared statement
+        </dd>
+        <dt>args</dt>
+        <dd>
+            The arguments with names as defined in the statement.
+        </dd>
+    </dl>
+
+    <p>
+        As a response a "SqlInsertResult" message is sent, which contains a property "id" if
+        the request was successful. The table should contain a row named "id" as primary key
+        for this to work.
+    </p>
+
+    <h4><a id="client-SqlExec">SqlExec</a></h4>
+    <p>
+        Execute a prepared statement as Insert request, which means a return value may be used:
+        <pre><code class="json">{
+    "mt": "SqlExec",
+    "src": string (see AppWebsocket protocol)
+    "statement": string,
+    "args": {
+        "&lt;arg-name1&gt;":&lt;arg-value1&gt;
+        "&lt;arg-name2&gt;":&lt;arg-value2&gt;
+        ...
+    }
+}</code></pre><br />
+    </p>
+    <dl>
+        <dt>statement</dt>
+        <dd>
+            Name of the prepared statement
+        </dd>
+        <dt>args</dt>
+        <dd>
+            The arguments with names as defined in the statement.
+        </dd>
+    </dl>
+
+    <p>
+        As response a SqlRow message for each returned row is sent:
+        <pre><code class="json">{
+    "mt": "SqlRow",
+    "src": string (see AppWebsocket protocol)
+    "statement": string,
+    "&lt;row-name1&gt;":&lt;value1&gt;
+    "&lt;row-name2&gt;":&lt;value2&gt;
+    ...
+}</code></pre><br />
+    </p>
+
+    <dl>
+        <dt>statement</dt>
+        <dd>
+            The prepared statement name
+        </dd>
+        <dt>&lt;row-name&gt;</dt>
+        <dd>
+            Property for each returned row value. For this to work row names should not use
+            "mt", "statement" nor "src".
+        </dd>
+    </dl>
+
+    <p>
+        As final message for the command "SqlExecResult" is sent.
+    </p>
+
+    <h3><a id="client-SqlMonitor">SqlMonitor</a></h3>
+
+    <p>
+        The "SqlMonitor" message is used to start monitoring of SQL commands which are marked
+        as "monitor". Whenever such an SQL command is invoked by any user, a message is sent
+        to the monitoring App containing the values of the SQL command.
+    </p>
+    <pre><code class="json">{
+    "mt": "SqlMonitor",
+    "src": string (see AppWebsocket protocol)
+    "name": string
+}</code></pre><br />
+    <dl>
+        <dt>src</dt>
+        <dd>
+            Needed in this case to associate the notifications to the monitor.
+        </dd>
+        <dt>name</dt>
+        <dd>
+            Identifies the SQL statements ("monitor property")
+        </dd>
+    </dl>
+    <p>
+        When the monitored SQL statements are executed a notification is sent
+    </p>
+
+    <pre><code class="json">{
+    "mt": "SqlUpdate",
+    "src": string (see AppWebsocket protocol)
+    "statement": string,
+    "id": ulong64,
+    "obj": object
+}</code></pre><br />
+
+    <dl>
+        <dt>src</dt>
+        <dd>
+            Identifies the monitor
+        </dd>
+        <dt>statement</dt>
+        <dd>
+            The executed SQL statement
+        </dd>
+        <dt>id</dt>
+        <dd>
+            The returned id in case of an SqlInsert request
+        </dd>
+        <dt>obj</dt>
+        <dd>
+            An object with a property for each value
+        </dd>
+    </dl>
+
+    <h4><a id="client-DbFilesList">DbFilesList</a></h4>
+
+    <p>
+        Read the list of files stored in the addressed dbfiles instance in the identified folder.
+        A folder may be any row in another database table as configured in config.json.
+    </p>
+
+    <pre><code class="json">{
+    "mt": "DbFilesList",
+    "src": string (see AppWebsocket protocol)
+    "name": string,
+    "folder": ulong64
+}</code></pre><br />
+
+    <dl>
+        <dt>name</dt>
+        <dd>
+            The name of the dbfiles instance, as configured in config.json.
+        </dd>
+        <dt>folder</dt>
+        <dd>
+            The id of the database table row as configured in config.json.
+        </dd>
+    </dl>
+
+    <p>
+        A single DbFilesListResult message is sent as response, which contains the list of files.
+    </p>
+
+    <pre><code class="json">{
+    "mt": "DbFilesListResult",
+    "src": string (see AppWebsocket protocol)
+    "files": [
+        {
+            id: ulong64,
+            url: string,
+            name: string
+        }
+    ]
+}</code></pre><br />
+    <dl>
+        <dt>id</dt>
+        <dd>
+            The database table id of the file. This is used to delete a file.
+        </dd>
+        <dt>url</dt>
+        <dd>
+            relative URL which can be used for HTTP GET to retrieve the file.
+        </dd>
+        <dt>name</dt>
+        <dd>
+            Display name of the file. This is not necessarily unique.
+        </dd>
+    </dl>
+
+    <h3><a id="client-http">HTTP operations</a></h3>
+    <p>
+        For some operations, as file upload or download, HTTP operations are implemented
+    </p>
+
+    <h3><a id="cliet-POST">HTTP POST to dbfiles</a></h3>
+
+    <p>
+        With HTTP POST new files may be added to a dbfiles folder or existing files maybe deleted.
+        From the App code a relative URL can be used
+    </p>
+    <pre><code>?dbfiles=&lt;dbfiles-name&gt;&amp;folder=&lt;folder&gt;&amp;name=&lt;name&gt;&amp;del=&lt;del-id&gt;&amp;key=&lt;key&gt;</code></pre><br />
+
+    <dl>
+        <dt>dbfiles-name</dt>
+        <dd>
+            Name of the dbfiles instance as configured in config.json.
+        </dd>
+        <dt>folder</dt>
+        <dd>
+            Id of the folder. Should not be 0.
+        </dd>
+        <dt>name</dt>
+        <dd>
+            Display name of the file.
+        </dd>
+        <dt>del-id</dt>
+        <dd>
+            Id of file, which shall be deleted.
+        </dd>
+        <dt>key</dt>
+        <dd>
+            The session key. It is used to authenticate the request. In Javascript the session key
+            is calculated as SHA256 hash from the AppWebsocket key with a preceding "generic-dbfiles:"
+            seed.
+            <pre><code>sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());</code></pre>
+        </dd>
+    </dl>
+
+    <h3><a id="client-GET">HTTP GET to dbfiles</a></h3>
+
+    <p>
+        The relative URL in the DbFilesList results can be directly used to retrieve the files.
+    </p>
+
+    <h2><a id="service">Service-side framework</a></h2>
+
+    <h3><a id="service-initialization">Initialization</a></h3>
+    <p>
+        In the <a href="#config-javascript">javascript</a> object of the config.json you can specify which JS files from your ZIP shall be executed in the app service.
+    </p>
+    <p>
+        When your app service starts the following happens:
+        <ul>
+            <li>The httpfiles.zip is read and the files are extracted.</li>
+            <li>The database connection is established.</li>
+            <li>All initializations from the config.json are done.</li>
+            <li>Then the JS files of your service are executed in the specified order.</li>
+            <li>The app instance starts to accept HTTP requests and Websocket connections.</li>
+        </ul>
+        Note: The JS files declared as service files and the manifests (config.json, plugins.json) are not accessible using HTTP.
+    </p>
+
+    <h3><a id="service-library">Library</a></h3>
+    <p>
+        The library for service-side scripts is described in separate articles in the SDK <a href="reference.htm#JS_library_service">Reference</a>.
+    </p>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - calllist api</title>
+    <link rel="stylesheet" href="../lib1/innovaphone.lib1.css" type="text/css" />
+    <link rel="stylesheet" href="../doc/innovaphone.doc.css" type="text/css" />
+    <script src="../doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>com.innovaphone.calllist</h1>
+    <p>
+        This API is used for communication with call-list apps.
+    </p>
+
+    <a name="consumeApi"><h2>consumeApi</h2></a>
+
+    <p>
+        The client consumeApi function is used to access the Api:
+    </p>
+
+    <pre><code class="json">var calllistApi = start.consumeApi("com.innovaphone.calllist");
+calllistApi.onmessage.attach(onmessage); // onmessage is called for responses from the API
+</code></pre><br />
+
+    <h2>Messages</h2></a>
+    <a href="#Subscribe" style="text-decoration:none;">Subscribe</a><br />
+    <a href="#Update" style="text-decoration:none;">Update</a><br />
+    <a href="#Clear" style="text-decoration:none;">Clear</a><br />
+    <a href="#GetCallFlow" style="text-decoration:none;">GetCallFlow</a><br />
+    <a href="#GetCallFlowResult" style="text-decoration:none;">GetCallFlowResult</a><br />
+
+    <a name="Subscribe"><h3>Subscribe</h3></a>
+    <p>
+        Used to declare that it is interested in call list entries. The Call List App will provide the requested amount of available call list entries. The App wil also provide new entries at runtime.
+    <p />
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>count </b></td><td>Number of currently available entries that are to be returned immediately.</td></tr>
+    </table>
+    <pre><code class="javascript">calllistApi.send({ "mt": "Subscribe", "count": 20 });</code></pre><br />
+
+    <a name="Update"><h3>Update</h3></a>
+    <p>
+        The result message for the Subscribe request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>entries </b></td><td>Array of call list entries.</td></tr>
+    </table>
+
+    <h4>Details:</h4>
+    <ul>
+        <li><b>dir</b>: "i" (inbound call) or "o" (outbound call)</li>
+        <li><b>time</b>: UTC timestamp</li>
+        <li><b>cause</b>: the decimal disconnect reason of the call (see Reference:ISDN_Cause_Codes)</li>
+        <li><b>call</b>: "int" (internal call) or "ext" (external call)</li>
+        <li><b>status</b>: "co" (connected), "al" (alert), "er" (error) or "bu" (busy)</li>
+    </ul>
+
+
+    <pre><code class="javascript">
+{
+    "mt": "Update",
+    "entries": [
+    {
+    "cdr": 21173,
+    "sip": "tac",
+    "id": "c06ab5ee-cc1c-5c01-8a68-009033420759",
+    "dir": "o",
+    "node": "root",
+    "phys": "",
+    "cause": 0,
+    "time": 1545391345000,
+    "alert-duration": 12,
+    "call-duration": 0,
+    "conn-duration": 0,
+    "billing-duration": 0,
+    "call": "int",
+    "remote": {
+    "number": "40",
+    "sip": "rh",
+    "dn": "Ralf Hütter"
+    },
+    "status": "al"
+    },
+    {
+    "cdr": 20713,
+    "sip": "tac",
+    "id": "2d61b691-9c1b-5c01-ed7a-009033420759",
+    "dir": "i",
+    "node": "root",
+    "phys": "berlin",
+    "cause": 0,
+    "time": 1545313426000,
+    "alert-duration": 7,
+    "call-duration": 2814,
+    "conn-duration": 2814,
+    "billing-duration": 0,
+    "call": "int",
+    "remote": {
+    "number": "683",
+    "sip": "fs",
+    "dn": "Florian Schneider"
+    },
+    "status": "co"
+    },
+    ]
+}
+</code></pre><br />
+
+
+    <a name="Clear"><h3>Clear</h3></a>
+    <p>The  Call List App sends this message to subscriber when ever the call list (database) have been cleared.<p />
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>count </b></td><td>Number of currently available entries that are to be returned immediately.</td></tr>
+    </table>
+    <pre><code class="javascript">calllistApi.send({ "mt": "Clear" });</code></pre><br />
+
+    <a name="GetCallFlow"><h3>GetCallFlow</h3></a>
+    <p>Used to get the complete callflow of a call.<p />
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>id </b></td><td>The cdr of the call entry.</td></tr>
+    </table>
+    <pre><code class="javascript">calllistApi.send({ "mt": "GetCallFlow", "id": 12 });</code></pre><br />
+
+    <a name="GetCallFlowResult"><h3>GetCallFlowResult</h3></a>
+    <p>Response message to GetCallFlow containing the callflow information of an entry.<p />
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>id</b></td><td>The cdr of the call entry.</td></tr>
+        <tr><td class="param">string <b>flow</b></td><td>The callflow of the call entry.</td></tr>
+    </table>
+    <pre><code class="javascript">{"mt":"GetCallFlowResult","id":12,"flow":[
+        {"caller":"ep2","ep1_number":"302","ep1_sip":"waiting2","ep1_dn":"Waiting2","ep2_number":"201","ep2_sip":"endeavour","ep2_dn":"Endeavour","status":"al"},
+        {"ep1_number":"200","ep1_sip":"atlantis","status":"co","type":"cf","entry":"true"}
+ ],"src":"src0"}</code></pre><br />
+
+</body>
+</html>

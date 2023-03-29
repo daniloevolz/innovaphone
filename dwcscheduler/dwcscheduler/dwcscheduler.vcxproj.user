@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ShowAllFiles>true</ShowAllFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteTarget>-1892905235;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggerCommandArguments>--app-name=dwcscheduler --app-domain=wecom.com.br --app-password=pwd --webserver-path=dwcscheduler --db-name=dwcscheduler --db-user=dwcscheduler --db-password=dwcscheduler --service-id=dwcscheduler</RemoteDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>
