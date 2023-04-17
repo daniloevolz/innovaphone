@@ -6,6 +6,7 @@
 /// <reference path="../../web1/ui1.listview/innovaphone.ui1.listview.js" />
 /// <reference path="../../web1/com.innovaphone.avatar/com.innovaphone.avatar.js" />
 
+
 var Wecom = Wecom || {};
 Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     this.createNode("body");
@@ -48,6 +49,22 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var avatar;
     var UIuserPicture;
     var receivedFragments = [];
+
+    var list_types = [
+        { typeName: "Alarme", id: "alarm" },
+        { typeName: "Usuário", id: "user" },
+        { typeName: "Número", id: "externalnumber" },
+        { typeName: "Vídeo", id: "video" },
+        { typeName: "Página Iframe", id: "page" },
+        { typeName: "Combo x4", id: "combo" }
+    ];
+    var list_act_types = [
+        { typeName: "Alarme", id: "alarm" },
+        { typeName: "Número", id: "number" },
+        { typeName: "Vídeo", id: "video" },
+        { typeName: "Página Iframe", id: "page" },
+        { typeName: "PopUp Iframe", id: "popup" }
+    ];
 
     function app_connected(domain, user, dn, appdomain) {
         UIuser = dn;
@@ -92,9 +109,17 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             app.send({ api: "admin", mt: "SelectMessage" });
             makePopup("Sucesso", "Botão criado com sucesso!");
         }
+        if (obj.api == "admin" && obj.mt == "UpdateMessageSuccess") {
+            app.send({ api: "admin", mt: "SelectMessage" });
+            makePopup("Sucesso", "Botão atualizado com sucesso!");
+        }
         if (obj.api == "admin" && obj.mt == "InsertActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
             makePopup("Sucesso", "Ação criada com sucesso!");
+        }
+        if (obj.api == "admin" && obj.mt == "UpdateActionMessageSuccess") {
+            app.send({ api: "admin", mt: "SelectActionMessage" });
+            makePopup("Sucesso", "Ação atualizada com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
             app.send({ api: "admin", mt: "SelectMessage" });
@@ -175,31 +200,32 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
             
         });
+
         function addStringParamters(t) {
             //Usuário
             t.clear();
-            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"),"labelUserString"));
-            var iptUser = t.add(new innovaphone.ui1.Node("select",null, null, "iptUserString"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserString"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserString"));
             iptUser.setAttribute("id", "selectUser");
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
             list_users.forEach(function (user) {
                 iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             })
             //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
-            var divAdd = t.add(new innovaphone.ui1.Div(null,null,"divAdd"))
-            var iptName = divAdd.add(new innovaphone.ui1.Input(null, null, null, 255, "url","iptNameString"));
-            divAdd.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"),"labelBtnString"));
-             iptName.setAttribute("placeholder"," ");
+            var divAdd = t.add(new innovaphone.ui1.Div(null, null, "divAdd"))
+            var iptName = divAdd.add(new innovaphone.ui1.Input(null, null, null, 255, "url", "iptNameString"));
+            divAdd.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnString"));
+            iptName.setAttribute("placeholder", " ");
             // divAdd.add(new innovaphone.ui1.Node("span",null,null,"focus-bg"))
             //Nome Usuário
             //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
             //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
             //Parâmetro
-            var divAdd2 = t.add(new innovaphone.ui1.Div(null,null,"divAdd2"))
-            var iptValue = divAdd2.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url","iptValueString"));
-            divAdd2.add(new innovaphone.ui1.Div(null, texts.text("labelValue"),"labelValueString"));
-            iptValue.setAttribute("placeholder"," ");
+            var divAdd2 = t.add(new innovaphone.ui1.Div(null, null, "divAdd2"))
+            var iptValue = divAdd2.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url", "iptValueString"));
+            divAdd2.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueString"));
+            iptValue.setAttribute("placeholder", " ");
             //Botão Salvar
             t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
                 var type = document.getElementById("selectType");
@@ -223,8 +249,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         function addNumberParamters(t) {
             //Usuário
             t.clear();
-            t.add(new innovaphone.ui1.Div(null , texts.text("labelUser"),"labelUserNumber"));
-            var iptUser = t.add(new innovaphone.ui1.Node("select", null , null,"selectUserNumber"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserNumber"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserNumber"));
             iptUser.setAttribute("id", "selectUser");
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
             list_users.forEach(function (user) {
@@ -232,19 +258,19 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             })
             //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
             //Nome Botão
-            var divAdd3 = t.add(new innovaphone.ui1.Div(null,null,"divAdd3"))
-            var iptName = divAdd3.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url","iptNameNumber"));
-            divAdd3.add(new innovaphone.ui1.Div(null , texts.text("labelButtonName"),"labelBtnNumber"));
-            iptName.setAttribute("placeholder"," ");
+            var divAdd3 = t.add(new innovaphone.ui1.Div(null, null, "divAdd3"))
+            var iptName = divAdd3.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url", "iptNameNumber"));
+            divAdd3.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnNumber"));
+            iptName.setAttribute("placeholder", " ");
             //Nome Usuário
             //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
             //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
             //Parâmetro
-            var divAdd4 = t.add(new innovaphone.ui1.Div(null,null,"divAdd4"))
-            var iptValue = divAdd4.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url","iptValueNumber"));
-            divAdd4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"),"labelValueNumber"));
-            iptValue.setAttribute("placeholder"," ");
+            var divAdd4 = t.add(new innovaphone.ui1.Div(null, null, "divAdd4"))
+            var iptValue = divAdd4.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url", "iptValueNumber"));
+            divAdd4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueNumber"));
+            iptValue.setAttribute("placeholder", " ");
             //Botão Salvar
             t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
                 var type = document.getElementById("selectType");
@@ -270,8 +296,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         function addUserParamters(t) {
             //Usuário
             t.clear();
-            t.add(new innovaphone.ui1.Div(null , texts.text("labelUser"),"labelUserUsers"));
-            var iptUser = t.add(new innovaphone.ui1.Node("select", null , null, "iptUserUsers"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserUsers"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserUsers"));
             iptUser.setAttribute("id", "selectUser");
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
             list_users.forEach(function (user) {
@@ -279,19 +305,19 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             })
             //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
             //Nome Botão
-            var divAdd5 = t.add(new innovaphone.ui1.Div(null,null,"divAdd5"))
-            var iptName = divAdd5.add(new innovaphone.ui1.Input(null , null, texts.text("iptText"), 255, "url", "iptNameUsers"));
-            divAdd5.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"),"labelBtnUsers"));
-            iptName.setAttribute("placeholder"," ");
+            var divAdd5 = t.add(new innovaphone.ui1.Div(null, null, "divAdd5"))
+            var iptName = divAdd5.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url", "iptNameUsers"));
+            divAdd5.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnUsers"));
+            iptName.setAttribute("placeholder", " ");
             //Nome Usuário
             //var labelUserName = t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
             //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
             //Parâmetro
-            t.add(new innovaphone.ui1.Div(null , texts.text("labelValue"),"labelValueUsers"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueUsers"));
             //var iptValue = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, texts.text("iptText"), 500, "url", null));
 
-            var iptValue = t.add(new innovaphone.ui1.Node("select", null , null,"selectValueUsers"));
+            var iptValue = t.add(new innovaphone.ui1.Node("select", null, null, "selectValueUsers"));
             iptValue.setAttribute("id", "selectValue");
             list_users.forEach(function (user) {
                 iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
@@ -323,8 +349,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         function addComboParamters(t) {
             //Usuário
             t.clear();
-            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"),"labelUserCombo"));
-            var iptUser = t.add(new innovaphone.ui1.Node("select", null , null,"iptUserCombo"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserCombo"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserCombo"));
             iptUser.setAttribute("id", "selectUser");
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", "none"));
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
@@ -333,34 +359,34 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             })
             //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
             //Nome Botão
-            var divAdd7 = t.add(new innovaphone.ui1.Div(null,null,"divAdd7"))
-            var iptName = divAdd7.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url","iptNameCombo"));
-            divAdd7.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"),"labelButtonCombo"));
-            iptName.setAttribute("placeholder"," ");
+            var divAdd7 = t.add(new innovaphone.ui1.Div(null, null, "divAdd7"))
+            var iptName = divAdd7.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url", "iptNameCombo"));
+            divAdd7.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelButtonCombo"));
+            iptName.setAttribute("placeholder", " ");
             //Nome Usuário
             //var labelUserName = t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
             //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
-            
+
             //PAREI DAQUI P BAIXO - APAGAR ISSO DEPOIS
 
             //Parâmetro
-            var divAdd8 = t.add(new innovaphone.ui1.Div(null,null,"divAdd8"));
-            var iptValue = divAdd8.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url","iptValueCombo"));
-            divAdd8.add(new innovaphone.ui1.Div(null, texts.text("labelValue"),"labelValueCombo"));
-            iptValue.setAttribute("placeholder"," ");
+            var divAdd8 = t.add(new innovaphone.ui1.Div(null, null, "divAdd8"));
+            var iptValue = divAdd8.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url", "iptValueCombo"));
+            divAdd8.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueCombo"));
+            iptValue.setAttribute("placeholder", " ");
 
             //Tipo
-            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho6"),"combo1Div"));
-            var iptType1 = t.add(new innovaphone.ui1.Node("select", null, null,"combo1"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho6"), "combo1Div"));
+            var iptType1 = t.add(new innovaphone.ui1.Node("select", null, null, "combo1"));
             iptType1.setAttribute("id", "selectType1");
-            
+
             //Tipo
-            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho7"),"combo2Div"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho7"), "combo2Div"));
             var iptType2 = t.add(new innovaphone.ui1.Node("select", null, null, "combo2"));
             iptType2.setAttribute("id", "selectType2");
-            
+
             //Tipo
-            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho8"),"combo3Div"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho8"), "combo3Div"));
             var iptType3 = t.add(new innovaphone.ui1.Node("select", null, null, "combo3"));
             iptType3.setAttribute("id", "selectType3");
             iptType3.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
@@ -371,7 +397,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             })
 
             //Tipo
-            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho9"),"combo4Div"));
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho9"), "combo4Div"));
             var iptType4 = t.add(new innovaphone.ui1.Node("select", null, null, "combo4"));
             iptType4.setAttribute("id", "selectType4");
             iptType4.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
@@ -452,9 +478,434 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 })
             });
 
-            
 
-            
+
+
+        }
+        
+    }
+    
+
+    function makeDivUpdateButton(t1, button) {
+        t1.clear();
+        //Título
+        t1.add(new innovaphone.ui1.Div(null, texts.text("labelTituloEdit"), "tituloAdd"));
+        //Tipo
+        t1.add(new innovaphone.ui1.Div(null, texts.text("labelType"), "labeltypeAdd"));
+        var iptType = t1.add(new innovaphone.ui1.Node("select", null, null, "selectTypeAdd"));
+        iptType.setAttribute("id", "selectType");
+        list_types.forEach(function (type) {
+            iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", type.typeName, null).setAttribute("id", type.id));
+        });
+        var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
+
+        if (button) {
+            var type = list_types.filter(function (type) { return type.id === button.button_type })[0].typeName;
+            var select = document.getElementById('selectType');
+            //select.value = button[2];
+            select.value = type;
+            switch (button.button_type) {
+                case "externalnumber":
+                    addNumberParamters(comboarea);
+                    break;
+                case "combo":
+                    addComboParamters(comboarea);
+                    break;
+                case "user":
+                    addUserParamters(comboarea);
+                    break;
+                default:
+                    addStringParamters(comboarea);
+                    break;
+            }
+        }
+        document.getElementById("selectType").addEventListener("change", function (e) {
+            console.log(e.target.value);
+            if (e.target.value == "Usuário") {
+                addUserParamters(comboarea);
+            }
+            else if (e.target.value == "Número") {
+                addNumberParamters(comboarea);
+            }
+            else if (e.target.value == "Combo x4") {
+                addComboParamters(comboarea);
+            }
+            else {
+                addStringParamters(comboarea);
+            }
+
+        });
+        function addStringParamters(t) {
+            //Usuário
+            t.clear();
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserString"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserString"));
+            iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
+            list_users.forEach(function (user) {
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            })
+            //Atualiza valores
+            if (button && button.button_user != "all") {
+                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var select = document.getElementById('selectUser');
+                select.value = cn;
+            } else if (button && button.button_user == "all") {
+                var select = document.getElementById('selectUser');
+                select.value = "TODOS";
+            }
+            //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+            var divAdd = t.add(new innovaphone.ui1.Div(null, null, "divAdd"))
+            var iptName = divAdd.add(new innovaphone.ui1.Input(null, button.button_name, null, 255, "text", "iptNameString"));
+            divAdd.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnString"));
+            //iptName.setAttribute("placeholder", " ");
+            // divAdd.add(new innovaphone.ui1.Node("span",null,null,"focus-bg"))
+            //Nome Usuário
+            //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
+            //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+
+            //Parâmetro
+            var divAdd2 = t.add(new innovaphone.ui1.Div(null, null, "divAdd2"))
+            var iptValue = divAdd2.add(new innovaphone.ui1.Input(null, button.button_prt, null, 500, "text", "iptValueString"));
+            divAdd2.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueString"));
+            //Botão Salvar
+            t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+                var type = document.getElementById("selectType");
+                var selectedOption = type.options[type.selectedIndex];
+                var type = selectedOption.id;
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var user = selectedOption.id;
+                if (String(iptName.getValue()) == "" || String(type) == "") {
+                    makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                } else {
+                    app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
+                    waitConnection(t1);
+                }
+            });
+            //Botão Cancelar   
+            t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+                makeTableButtons(t1);
+            });
+        }
+        function addNumberParamters(t) {
+            //Usuário
+            t.clear();
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserNumber"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserNumber"));
+            iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
+            list_users.forEach(function (user) {
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            })
+            //Atualiza valores
+            if (buttonbutton.button_user != "all") {
+                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var select = document.getElementById('selectUser');
+                select.value = cn;
+            } else if (button && button.button_user == "all") {
+                var select = document.getElementById('selectUser');
+                select.value = "TODOS";
+            }
+            //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+            //Nome Botão
+            var divAdd3 = t.add(new innovaphone.ui1.Div(null, null, "divAdd3"))
+            var iptName = divAdd3.add(new innovaphone.ui1.Input(null, button.button_name, null, 255, "text", "iptNameNumber"));
+            divAdd3.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnNumber"));
+            //Nome Usuário
+            //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
+            //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+
+            //Parâmetro
+            var divAdd4 = t.add(new innovaphone.ui1.Div(null, null, "divAdd4"))
+            var iptValue = divAdd4.add(new innovaphone.ui1.Input(null, button.button_prt, null, 500, "text", "iptValueNumber"));
+            divAdd4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueNumber"));
+            //Botão Salvar
+            t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+                var type = document.getElementById("selectType");
+                var selectedOption = type.options[type.selectedIndex];
+                var type = selectedOption.id;
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var user = selectedOption.id;
+                if (String(iptName.getValue()) == "" || String(type) == "") {
+                    makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                }
+                if (type == "externalnumber") {
+                    app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
+                    waitConnection(t1);
+                }
+            });
+            //Botão Cancelar   
+            t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+                makeTableButtons(t1);
+            });
+
+        }
+        function addUserParamters(t) {
+            //Usuário
+            t.clear();
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserUsers"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserUsers"));
+            iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
+            list_users.forEach(function (user) {
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            })
+            //Atualiza valores
+            if (button && button.button_user != "all") {
+                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var select = document.getElementById('selectUser');
+                select.value = cn;
+            } else if (button && button.button_user == "all") {
+                var select = document.getElementById('selectUser');
+                select.value = "TODOS";
+            }
+            //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+            //Nome Botão
+            var divAdd5 = t.add(new innovaphone.ui1.Div(null, null, "divAdd5"))
+            var iptName = divAdd5.add(new innovaphone.ui1.Input(null, button.button_name, null, 255, "text", "iptNameUsers"));
+            divAdd5.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnUsers"));
+            //Nome Usuário
+            //var labelUserName = t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
+            //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+
+            //Parâmetro
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueUsers"));
+            //var iptValue = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, texts.text("iptText"), 500, "url", null));
+
+            var iptValue = t.add(new innovaphone.ui1.Node("select", null, null, "selectValueUsers"));
+            iptValue.setAttribute("id", "selectValue");
+            list_users.forEach(function (user) {
+                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            });
+            if (button.button_type=="user") {
+                var cn = list_users.filter(function (user) { return user.sip === button.button_prt })[0].cn;
+                var select = document.getElementById('selectValue');
+                select.value = cn;
+            }
+            //Botão Salvar
+            t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+                var type = document.getElementById("selectType");
+                var selectedOption = type.options[type.selectedIndex];
+                var type = selectedOption.id;
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var user = selectedOption.id;
+                if (String(iptName.getValue()) == "" || String(type) == "") {
+                    makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                }
+                if (type == "user") {
+                    var value = document.getElementById("selectValue");
+                    var selectedOption = value.options[value.selectedIndex];
+                    var value = selectedOption.id;
+                    app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type) });
+                    waitConnection(t1);
+                }
+            });
+            //Botão Cancelar   
+            t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+                makeTableButtons(t1);
+            });
+        }
+        function addComboParamters(t) {
+            //Usuário
+            t.clear();
+            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserCombo"));
+            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserCombo"));
+            iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", "none"));
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
+            list_users.forEach(function (user) {
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            })
+            //Atualiza valores
+            if (button && button.button_user != "all") {
+                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var select = document.getElementById('selectUser');
+                select.value = cn;
+            } else if (button && button.button_user == "all") {
+                var select = document.getElementById('selectUser');
+                select.value = "TODOS";
+            }
+            //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+            //Nome Botão
+            var divAdd7 = t.add(new innovaphone.ui1.Div(null, null, "divAdd7"))
+            var iptName = divAdd7.add(new innovaphone.ui1.Input(null, button.button_name, null, 255, "text", "iptNameCombo"));
+            divAdd7.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelButtonCombo"));
+
+            //Nome Usuário
+            //var labelUserName = t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
+            //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+
+            //PAREI DAQUI P BAIXO - APAGAR ISSO DEPOIS
+
+            //Parâmetro
+            var divAdd8 = t.add(new innovaphone.ui1.Div(null, null, "divAdd8"));
+            var iptValue = divAdd8.add(new innovaphone.ui1.Input(null, button.button_prt, null, 500, "text", "iptValueCombo"));
+            divAdd8.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueCombo"));
+
+
+            //// Tipo Botão 1 ////
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho6"), "combo1Div"));
+            var iptType1 = t.add(new innovaphone.ui1.Node("select", null, null, "combo1"));
+            iptType1.setAttribute("id", "selectType1");
+
+            list_buttons.forEach(function (btn) {
+                if (btn.button_type != "combo" && btn.button_user == button.button_user || btn.button_user == "all") {
+                    iptType1.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", btn.button_name, null).setAttribute("id", btn.id));
+                }
+            })
+
+            if (button.button_type == "combo" && button.button_type_1 != "") {
+                try {
+                    var button_name = list_buttons.filter(function (btn) { return btn.id === parseInt(button.button_type_1) })[0].button_name;
+                    var select = document.getElementById('selectType1');
+                    select.value = button_name;
+                } catch (e) {
+                    console.warn("Botão 1 Referenciado no Combo já não existe mais! Erro: " + e)
+                }
+                
+            }
+
+            //// Tipo Botão 2 ////
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho7"), "combo2Div"));
+            var iptType2 = t.add(new innovaphone.ui1.Node("select", null, null, "combo2"));
+            iptType2.setAttribute("id", "selectType2");
+
+            list_buttons.forEach(function (btn) {
+                if (btn.button_type != "combo" && btn.button_user == button.button_user || btn.button_user == "all") {
+                    iptType2.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", btn.button_name, null).setAttribute("id", btn.id));
+                }
+            })
+
+            if (button.button_type == "combo" && button.button_type_2 != "") {
+                try {
+                    var button_name = list_buttons.filter(function (btn) { return btn.id === parseInt(button.button_type_2) })[0].button_name;
+                    var select = document.getElementById('selectType2');
+                    select.value = button_name;
+
+                } catch (e) {
+                    console.warn("Botão 2 Referenciado no Combo já não existe mais! Erro: " + e)
+                }
+            }
+
+            //// Tipo Botão 3 ////
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho8"), "combo3Div"));
+            var iptType3 = t.add(new innovaphone.ui1.Node("select", null, null, "combo3"));
+            iptType3.setAttribute("id", "selectType3");
+
+            iptType3.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
+            list_buttons.forEach(function (btn) {
+                if (btn.button_type != "combo" && btn.button_user == button.button_user || btn.button_user == "all") {
+                    iptType3.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", btn.button_name, null).setAttribute("id", btn.id));
+                }
+            })
+
+            if (button.button_type == "combo" && button.button_type_3 != "") {
+                try {
+                    var button_name = list_buttons.filter(function (btn) { return btn.id === parseInt(button.button_type_3) })[0].button_name;
+                    var select = document.getElementById('selectType3');
+                    select.value = button_name;
+
+                } catch (e) {
+                    console.warn("Botão 3 Referenciado no Combo já não existe mais! Erro: " + e)
+                }
+            }
+
+            //// Tipo Botão 4 ////
+            t.add(new innovaphone.ui1.Div(null, texts.text("cabecalho9"), "combo4Div"));
+            var iptType4 = t.add(new innovaphone.ui1.Node("select", null, null, "combo4"));
+            iptType4.setAttribute("id", "selectType4");
+            iptType4.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
+            list_buttons.forEach(function (btn) {
+                if (btn.button_type != "combo" && btn.button_user == button.button_user || btn.button_user == "all") {
+                    iptType4.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", btn.button_name, null).setAttribute("id", btn.id));
+                }
+            })
+            if (button.button_type == "combo" && button.button_type_4 != "") {
+                try {
+                    var button_name = list_buttons.filter(function (btn) { return btn.id === parseInt(button.button_type_4) })[0].button_name;
+                    var select = document.getElementById('selectType4');
+                    select.value = button_name;
+
+                } catch (e) {
+                    console.warn("Botão 4 Referenciado no Combo já não existe mais! Erro: "+e)
+                }
+            }
+
+            //// Botão Salvar ////
+            t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+                var type = document.getElementById("selectType");
+                var selectedOption = type.options[type.selectedIndex];
+                var type = selectedOption.id;
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var user = selectedOption.id;
+                if (String(iptName.getValue()) == "" || String(type) == "") {
+                    makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                }
+                else if (type == "combo") {
+                    var type1 = document.getElementById("selectType1");
+                    var selectedOption = type1.options[type1.selectedIndex];
+                    var type1 = selectedOption.id;
+
+                    var type2 = document.getElementById("selectType2");
+                    var selectedOption = type2.options[type2.selectedIndex];
+                    var type2 = selectedOption.id;
+
+                    var type3 = document.getElementById("selectType3");
+                    var selectedOption = type3.options[type3.selectedIndex];
+                    var type3 = selectedOption.id;
+
+                    var type4 = document.getElementById("selectType4");
+                    var selectedOption = type4.options[type4.selectedIndex];
+                    var type4 = selectedOption.id;
+                    app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4) });
+                    waitConnection(t1);
+                }
+            });
+
+            //// Botão Cancelar ////
+            t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+                makeTableButtons(t1);
+            });
+
+
+            document.getElementById("selectUser").addEventListener("change", function (e) {
+                console.log(e.target.value);
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var user = selectedOption.id;
+                iptType1.clear();
+                list_buttons.forEach(function (button) {
+                    if (button.button_type != "combo" && button.button_user == user || button.button_user == "all") {
+                        iptType1.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                    }
+                })
+
+                iptType2.clear();
+                iptType2.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
+                list_buttons.forEach(function (button) {
+                    if (button.button_type != "combo" && button.button_user == user || button.button_user == "all") {
+                        iptType2.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                    }
+                })
+                iptType3.clear();
+                iptType3.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
+                list_buttons.forEach(function (button) {
+                    if (button.button_type != "combo" && button.button_user == user || button.button_user == "all") {
+                        iptType3.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                    }
+                })
+                iptType4.clear();
+                iptType4.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null));
+                list_buttons.forEach(function (button) {
+                    if (button.button_type != "combo" && button.button_user == user || button.button_user == "all") {
+                        iptType4.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                    }
+                })
+            });
         }
     }
 
@@ -489,11 +940,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         divAddAction3.add(new innovaphone.ui1.Div(null, texts.text("labelType"),"labelTypeAction"));
         var iptType = divAddAction3.add(new innovaphone.ui1.Node("select", null , null, "selectTypeAction"));
         iptType.setAttribute("id", "selectType");
-        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Alarme", null).setAttribute("id","alarm"));
-        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Número", null).setAttribute("id", "number"));
-        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Vídeo", null).setAttribute("id", "video"));
-        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Página Iframe", null).setAttribute("id", "page"));
-        var opt = iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "PopUp Iframe", null).setAttribute("id", "popup"));
+
+        list_act_types.forEach(function (act) {
+            iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", act.typeName, null).setAttribute("id", act.id));
+        })
 
         //Valor
         var divAddAction4 =  t.add(new innovaphone.ui1.Div(null,null,"divAddAction4"));
@@ -514,6 +964,79 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
             else {
                 app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
+                makeTableActions(t);
+            }
+        });
+        //Botão Cancelar   
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; color:var(--div-DelBtn); font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+            makeTableActions(t);
+        });
+
+    }
+
+    function makeDivUpdateAction(t, action) {
+        t.clear();
+        //Título
+        t.add(new innovaphone.ui1.Div(null, texts.text("btnAddAction"), "btnAddAction"));
+
+        //Usuário
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUser"));
+        var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserAction"));
+        iptUser.setAttribute("id", "selectUser");
+        list_users.forEach(function (user) {
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+        })
+        if (action) {
+            var cn = list_users.filter(function (user) { return user.sip === action[5] })[0].cn;
+            var select = document.getElementById('selectUser');
+            select.value = cn;
+        }
+        //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+
+        //Nome
+        var divAddAction = t.add(new innovaphone.ui1.Div(null, null, "divAddAction"))
+        var iptName = divAddAction.add(new innovaphone.ui1.Input(null, action[1], null, 255, "text", "iptNameAction"));
+        divAddAction.add(new innovaphone.ui1.Div(null, texts.text("labelName"), "labelNameAction"));
+
+        //Código Alarme
+        var divAddAction2 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction2"));
+        var iptAlarmCode = divAddAction2.add(new innovaphone.ui1.Input(null, action[2], null, 255, "text", "iptAlarmAction"));
+        divAddAction2.add(new innovaphone.ui1.Div(null, texts.text("labelAlarmCode"), "labelNameAlarm"));
+
+        //Tipo
+        var divAddAction3 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction3"));
+        divAddAction3.add(new innovaphone.ui1.Div(null, texts.text("labelType"), "labelTypeAction"));
+        var iptType = divAddAction3.add(new innovaphone.ui1.Node("select", null, null, "selectTypeAction"));
+        iptType.setAttribute("id", "selectType");
+
+        list_act_types.forEach(function (act) {
+            iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", act.typeName, null).setAttribute("id", act.id));
+        })
+
+        if (action) {
+            //var type = list_act_types.filter(function (type) { return type.id === action[4] })[0].typeName;
+            var select = document.getElementById('selectType');
+            select.value = action[4];
+        }
+        
+        //Valor
+        var divAddAction4 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction4"));
+        var iptValue = divAddAction4.add(new innovaphone.ui1.Input(null, action[3], null, 500, "text", "iptValueAction"));
+        divAddAction4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueAction"));
+
+        //Botão Salvar
+        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+            var type = document.getElementById("selectType");
+            var selectedOption = type.options[type.selectedIndex];
+            var type = selectedOption.id;
+            var user = document.getElementById("selectUser");
+            var selecteduser = user.options[user.selectedIndex];
+            var user = selecteduser.id;
+            if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "" || String(type) == "") {
+                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+            }
+            else {
+                app.send({ api: "admin", mt: "UpdateActionMessage", id: parseInt(action[0]), name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
                 makeTableActions(t);
             }
         });
@@ -586,18 +1109,25 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
             selected.forEach(function (s) {
                 console.log(s);
-                selectedrows.push(listView.getRowData(s))
-                console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(selectedrows[0]) });
+                selectedrows.push(listView.getRowData(s)[0])
+                
             })
+            app.send({ api: "admin", mt: "DeleteMessage", id: selectedrows });
+        });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnEditButton").addEvent("click", function () {
+            var selected = listView.getSelectedRows();
+            console.log(selected[0]);
+            var button = list_buttons.filter(function (btn) { return btn.id === parseInt(listView.getRowData(selected[0])[0]) })[0];
+            makeDivUpdateButton(t, button)
+
         });
         //Título Tabela Botôes
         var labelTituloTabeaBotoes = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloBotoes")));
 
-        var scroll_container = new innovaphone.ui1.Node("scroll-container", "background-color: rgba(128, 130, 131, 0.48); position: absolute; left:1%; top:25%; right:1%; width: 98%; height:-webkit-fill-available;", null, "scroll-container-table");
+        var scroll_container = new innovaphone.ui1.Node("scroll-container", "position: absolute; left:1%; top:25%; right:1%; width: 98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
         var list = new innovaphone.ui1.Div("position: absolute; left:2px; right:2px; height:fit-content", null, "");
-        var columns = 10;
+        var columns = 4;
         var rows = list_buttons.length;
         var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         //Cabeçalho
@@ -609,44 +1139,67 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var row = [];
             row.push(b.id);
             row.push(b.button_name);
-            row.push(b.button_prt);
-            row.push(b.button_prt_user);
-            row.push(b.button_type);
+            //row.push(b.button_prt);
+            //row.push(b.button_prt_user);
+            // Substituir valores de b.name por texto correspondente
+            switch (b.button_type) {
+                case "video":
+                    row.push("Vídeo");
+                    break;
+                case "page":
+                    row.push("Página Iframe");
+                    break;
+                case "alarm":
+                    row.push("Alarme");
+                    break;
+                case "externalnumber":
+                    row.push("Número");
+                    break;
+                case "combo":
+                    row.push("Combo x4");
+                    break;
+                case "user":
+                    row.push("Usuário");
+                    break;
+                default:
+                    row.push(b.button_type);
+            }
+            //row.push(b.button_type);
             row.push(b.button_user);
-            try {
-                var b1 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_1) })[0].button_name;
-            } catch {
-                var b1;
-            } finally {
-                row.push(b1);
-            }
-            //row.push(b.button_type_1);
-            try {
-                var b2 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_2) })[0].button_name;
-            } catch {
-                var b2;
-            } finally {
-                //row.push(b.button_type_2);
-                row.push(b2);
-            }
-            try {
-                var b3 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_3) })[0].button_name;
-            } catch {
-                var b3;
-            } finally {
-                row.push(b3);
-            }
-            try {
-                var b4 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_4) })[0].button_name;
-            } catch {
-                var b4;
-            } finally {
-                row.push(b4);
-            }
-      
+            //try {
+            //    var b1 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_1) })[0].button_name;
+            //} catch {
+            //    var b1;
+            //} finally {
+            //    row.push(b1);
+            //}
+            ////row.push(b.button_type_1);
+            //try {
+            //    var b2 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_2) })[0].button_name;
+            //} catch {
+            //    var b2;
+            //} finally {
+            //    //row.push(b.button_type_2);
+            //    row.push(b2);
+            //}
+            //try {
+            //    var b3 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_3) })[0].button_name;
+            //} catch {
+            //    var b3;
+            //} finally {
+            //    row.push(b3);
+            //}
+            //try {
+            //    var b4 = list_buttons.filter(function (btn) { return btn.id === parseInt(b.button_type_4) })[0].button_name;
+            //} catch {
+            //    var b4;
+            //} finally {
+            //    row.push(b4);
+            //}
             listView.addRow(i, row, "rowbutton", "#A0A0A0", "#82CAE2");
-            scroll_container.add(list);
         })
+        
+        scroll_container.add(list);
         t.add(scroll_container);
     }
 
@@ -664,12 +1217,16 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
             selected.forEach(function (s) {
                 console.log(s);
-                selectedrows.push(actionsListView.getRowData(s))
-                console.log(selectedrows[0]);
-                app.send({ api: "admin", mt: "DeleteActionMessage", id: parseInt(selectedrows[0]) });
+                selectedrows.push(actionsListView.getRowData(s)[0])
             })
+            app.send({ api: "admin", mt: "DeleteActionMessage", id: selectedrows });
         });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnEditButton").addEvent("click", function () {
+            var selected = actionsListView.getSelectedRows();
+            console.log(selected[0]);
+            makeDivUpdateAction(t, actionsListView.getRowData(selected[0]))
 
+        });
 
 
         //Título Tabela Ações
@@ -692,11 +1249,30 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             row.push(b.action_name);
             row.push(b.action_alarm_code);
             row.push(b.action_prt);
-            row.push(b.action_type);
+            // Substituir valores de b.name por texto correspondente
+            switch (b.action_type) {
+                case "video":
+                    row.push("Vídeo");
+                    break;
+                case "page":
+                    row.push("Página Iframe");
+                    break;
+                case "alarm":
+                    row.push("Alarme");
+                    break;
+                case "number":
+                    row.push("Número");
+                    break;
+                case "popup":
+                    row.push("PopUp Iframe");
+                    break;
+                default:
+                    row.push(b.action_type);
+            }
             row.push(b.action_user);
             actionsListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
-            scroll_container.add(list);
         })
+        scroll_container.add(list);
         t.add(scroll_container);
     }
 
@@ -825,6 +1401,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var divEvent = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelEvent"), null));
                 var iptEvent = colDireita.add(new innovaphone.ui1.Node("select", "position:absolute; left:20%; width:20%; top:45.6%; text-align:center; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold;", null, null));
                 iptEvent.setAttribute("id", "selectEvent");
+                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
                 var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Alarme", null).setAttribute("id", "alarm"));
                 var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Ligação", null).setAttribute("id", "call"));
                 var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Vídeo", null).setAttribute("id", "video"));
@@ -877,8 +1454,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function reportView(t, response, src) {
         return new Promise(function (resolve, reject) {
             try {
-                //t.clear();
-                var result = JSON.parse(response);
+                t.clear();
+                
                 ////Botões Tabela
                 //t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:5%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnPdf").addEvent("click", function () {
                 //    downloadPDF();
@@ -888,122 +1465,151 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //});
                 ////Título Tabela
                 //t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id", "titleReport"));
-                var list = new innovaphone.ui1.Div("background-color: rgba(128, 130, 131, 0.48); position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id", "listReport");
-                var columns = Object.keys(result[0]).length;
+                var list = new innovaphone.ui1.Div("position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id", "listReport");
+                //var columns = Object.keys(result[0]).length;
                 var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
                 //Cabeçalho
-                for (i = 0; i < columns; i++) {
-                    listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
-                }
-                //Tabela 
                 switch (src) {
                     case "RptCalls":
-                        result.forEach(function (b) {
-                            var row = [];
-                            row.push(b.sip);
-                            row.push(b.number);
-                            row.push(b.call_started);
-                            row.push(b.call_ringing);
-                            row.push(b.call_connected);
-                            row.push(b.call_ended);
-                            // Substituir valores de b.status por texto correspondente
-                            switch (b.status) {
-                                case 6:
-                                    row.push("Desc. Realizada");
-                                    break;
-                                case 7:
-                                    row.push("Desc. Recebida");
-                                    break;
-                                case 134:
-                                    row.push("Desc. Realizada");
-                                    break;
-                                case 135:
-                                    row.push("Desc. Recebida");
-                                    break;
-                                default:
-                                    row.push(b.status);
-                            }
-                            //row.push(b.status);
-                            // Substituir valores de b.direction por texto correspondente
-                            switch (b.direction) {
-                                case "inc":
-                                    row.push("Entrada");
-                                    break;
-                                case "out":
-                                    row.push("Saída");
-                                    break;
-                                default:
-                                    row.push(b.direction);
-                            }
-                            //row.push(b.direction);
-                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                            //t.add(list);
-                        })
+                        for (i = 0; i < 6; i++) {
+                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                        }
                         break;
                     case "RptActivities":
-                        result.forEach(function (b) {
-                            var row = [];
-                            row.push(b.sip);
-                            // Substituir valores de b.name por texto correspondente
-                            switch (b.name) {
-                                case "video":
-                                    row.push("Vídeo");
-                                    break;
-                                case "page":
-                                    row.push("Página");
-                                    break;
-                                case "alarm":
-                                    row.push("Alarme");
-                                    break;
-                                case "call":
-                                    row.push("Ligação");
-                                    break;
-                                case "combo":
-                                    row.push("Combo");
-                                    break;
-                                case "popup":
-                                    row.push("PopUp");
-                                    break;
-                                default:
-                                    row.push(b.name);
-                            }
-                            //row.push(b.name);
-                            row.push(b.date);
-                            // Substituir valores de b.status por texto correspondente
-                            switch (b.status) {
-                                case "start":
-                                    row.push("Ínício");
-                                    break;
-                                case "stop":
-                                    row.push("Fim");
-                                    break;
-                                case "inc":
-                                    row.push("Entrada");
-                                    break;
-                                case "out":
-                                    row.push("Saída");
-                                    break;
-                                default:
-                                    row.push(b.status);
-                            }
-                            //row.push(b.status);
-                            row.push(b.details);
-                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                            //t.add(list);
-                        })
+                        for (i = 0; i < 5; i++) {
+                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                        }
                         break;
                     case "RptAvailability":
-                        result.forEach(function (b) {
-                            var row = [];
-                            row.push(b.sip);
-                            row.push(b.date);
-                            row.push(b.status);
-                            row.push(b.group_name);
-                            listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
-                            //t.add(list);
-                        })
+                        for (i = 0; i < 4; i++) {
+                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                        }
                         break;
+                    default:
+                        for (i = 0; i < 1; i++) {
+                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                        }
+                        break;
+
                 }
+                
+                //Tabela 
+                try {
+                    var result = JSON.parse(response);
+                    switch (src) {
+                        case "RptCalls":
+                            result.forEach(function (b) {
+                                var row = [];
+                                row.push(b.sip);
+                                row.push(b.number);
+                                row.push(b.call_started);
+                                row.push(b.call_ringing);
+                                row.push(b.call_connected);
+                                row.push(b.call_ended);
+                                // Substituir valores de b.status por texto correspondente
+                                switch (b.status) {
+                                    case 6:
+                                        row.push("Desc. Realizada");
+                                        break;
+                                    case 7:
+                                        row.push("Desc. Recebida");
+                                        break;
+                                    case 134:
+                                        row.push("Desc. Realizada");
+                                        break;
+                                    case 135:
+                                        row.push("Desc. Recebida");
+                                        break;
+                                    default:
+                                        row.push(b.status);
+                                }
+                                //row.push(b.status);
+                                // Substituir valores de b.direction por texto correspondente
+                                switch (b.direction) {
+                                    case "inc":
+                                        row.push("Entrada");
+                                        break;
+                                    case "out":
+                                        row.push("Saída");
+                                        break;
+                                    default:
+                                        row.push(b.direction);
+                                }
+                                //row.push(b.direction);
+                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                //t.add(list);
+                            })
+                            break;
+                        case "RptActivities":
+                            result.forEach(function (b) {
+                                var row = [];
+                                row.push(b.sip);
+                                // Substituir valores de b.name por texto correspondente
+                                switch (b.name) {
+                                    case "video":
+                                        row.push("Vídeo");
+                                        break;
+                                    case "page":
+                                        row.push("Página");
+                                        break;
+                                    case "alarm":
+                                        row.push("Alarme");
+                                        break;
+                                    case "call":
+                                        row.push("Ligação");
+                                        break;
+                                    case "combo":
+                                        row.push("Combo");
+                                        break;
+                                    case "popup":
+                                        row.push("PopUp");
+                                        break;
+                                    default:
+                                        row.push(b.name);
+                                }
+                                //row.push(b.name);
+                                row.push(b.date);
+                                // Substituir valores de b.status por texto correspondente
+                                switch (b.status) {
+                                    case "start":
+                                        row.push("Ínício");
+                                        break;
+                                    case "stop":
+                                        row.push("Fim");
+                                        break;
+                                    case "inc":
+                                        row.push("Entrada");
+                                        break;
+                                    case "out":
+                                        row.push("Saída");
+                                        break;
+                                    default:
+                                        row.push(b.status);
+                                }
+                                //row.push(b.status);
+                                row.push(b.details);
+                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                //t.add(list);
+                            })
+                            break;
+                        case "RptAvailability":
+                            result.forEach(function (b) {
+                                var row = [];
+                                row.push(b.sip);
+                                row.push(b.date);
+                                row.push(b.status);
+                                row.push(b.group_name);
+                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                //t.add(list);
+                            })
+                            break;
+                    }
+
+                } catch (e){
+                    console.log("Erro ao receber report: "+e)
+                }
+                
+
                 function downloadPDF() {
                     // Crie um objeto jsPDF
                     const doc = new jsPDF('l', 'pt', 'a4');

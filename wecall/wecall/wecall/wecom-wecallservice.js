@@ -1,4 +1,4 @@
-// the variables
+﻿// the variables
 var baseUrl = WebServer.url;
 log("danilo req url: " + baseUrl);
 var count = 0;
@@ -476,8 +476,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     conn.onmessage(function (msg) {
 
         var obj = JSON.parse(msg);
-
-
         log("PbxTableUsers: msg received " + msg);
 
         if (obj.mt == "ReplicateStartResult") {
@@ -485,87 +483,97 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
         }
         if (obj.mt == "ReplicateNextResult" && obj.columns) {
-
             pbxTableUsers.push(obj)
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
         }
 
         if (obj.mt == "ReplicateAdd") {
-
-            //pbxTableUsers.push({ guid: obj.columns.guid, sip: obj.columns.h323, cn: obj.columns.cn, pbx: obj.src, e164: obj.columns.e164, node: obj.columns.node, devices: obj.columns.devices, badge: 0 });
             pbxTableUsers.push(obj);
         }
         if (obj.mt == "ReplicateUpdate") {
             var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.h323 === obj.columns.h323 });
             log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
-            const grps1 = foundTableUser[0].columns.grps;
-            const grps2 = obj.columns.grps;
+            var grps1 = foundTableUser[0].columns.grps;
+            var grps2 = obj.columns.grps;
             log("ReplicateUpdate= user " + obj.columns.h323);
-
-            try {
+            if (grps1) {
+                //Obj local do usuario ja possui algum Grupo
                 for (var i = 0; i < grps1.length; i++) {
                     try {
-                        for (var j = 0; j < grps2.length; j++) {
-                            if (grps1[i].name === grps2[j].name) {
-                                if (grps1[i].dyn === grps2[j].dyn) {
-                                } else {
-                                    log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps2[j].name +"!!!");
-                                    switch (grps2[j].dyn) {
-                                        case "out":
-                                            if (sendCallEvents) {
-                                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
-                                                httpClient(urlPhoneApiEvents, msg);
-                                            }
-                                            break;
-                                        case "in":
-                                            if (sendCallEvents) {
-                                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
-                                                httpClient(urlPhoneApiEvents, msg);
-                                            }
-                                            break;
+                        if (grps2) {
+                            //Obj vindo do PBX possui algum Grupo
+                            for (var j = 0; j < grps2.length; j++) {
+                                if (grps1[i].name === grps2[j].name) {
+                                    if (grps1[i].dyn === grps2[j].dyn) {
+                                    } else {
+                                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps2[j].name + "!!!");
+                                        switch (grps2[j].dyn) {
+                                            case "out":
+                                                if (sendCallEvents) {
+                                                    var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
+                                                    httpClient(urlPhoneApiEvents, msg);
+                                                }
+                                                break;
+                                            case "in":
+                                                if (sendCallEvents) {
+                                                    var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
+                                                    httpClient(urlPhoneApiEvents, msg);
+                                                }
+                                                break;
+                                        }
                                     }
                                 }
                             }
+                        } else {
+                            //Obj vindo do PBX NaO possui Grupo
+                            log("ReplicateUpdate= user " + obj.columns.h323 + " received from pbx has no grups at this moment and group presence changed to out for all!!!");
+                            log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed to OUT for group " + grps1[j].name);
+                            var msg = { User: obj.columns.h323, Grupo: grps1[j].name, Callinnumber: "", Status: "grp_logout" };
+                            httpClient(urlPhoneApiEvents, msg);
                         }
-
                     }
                     catch (e) {
-                        log("ReplicateUpdate= user " + obj.columns.h323 + " received from pbx has no grups at this moment and group presence changed to out for all!!!");
-                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed to OUT for group " + grps1[j].name);
-                        var msg = { User: obj.columns.h323, Grupo: grps1[j].name, Callinnumber: "", Status: "grp_logout" };
-                        httpClient(urlPhoneApiEvents, msg);
+                        log("ReplicateUpdate Try2= user " + obj.columns.h323 + " ERRO: " + e);
                     }
-                    
-                }
 
-            }
-            catch (e) {
-                log("ReplicateUpdate= user " + obj.columns.h323 + " stored on app has no grups at this moment and group presence received from pbx!!!");
-                for (var j = 0; j < grps2.length; j++) {
-                    log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps1[j].name);
-                    switch (grps2[j].dyn) {
-                        case "out":
-                            if (sendCallEvents) {
-                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                            break;
-                        case "in":
-                            if (sendCallEvents) {
-                                var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                            break;
-                    }
                 }
             }
-
+            else {
+                //Obj local do usuario NaO possui Grupo
+                log("ReplicateUpdate= user " + obj.columns.h323 + " stored on app has no grups at this moment and new presence received from pbx!!!");
+                if (grps2) {
+                    for (var j = 0; j < grps2.length; j++) {
+                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed from PBX for group " + grps1[j].name);
+                        switch (grps2[j].dyn) {
+                            case "out":
+                                if (sendCallEvents) {
+                                    var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
+                                    httpClient(urlPhoneApiEvents, msg);
+                                }
+                                break;
+                            case "in":
+                                if (sendCallEvents) {
+                                    var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
+                                    httpClient(urlPhoneApiEvents, msg);
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            
+            var found;
             pbxTableUsers.forEach(function (user) {
                 if (user.columns.h323 == obj.columns.h323) {
                     log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
                     Object.assign(user, obj)
+                    found = true;
                 }
             })
+            if (found == false) {
+                log("ReplicateUpdate: Adding the object user " + obj.columns.h323+" because it not exists here before");
+                pbxTableUsers.push(obj);
+            }
 
         }
     });
@@ -651,11 +659,12 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     });
 });
 new PbxApi("RCC").onconnected(function (conn) {
-
-    //connectionsRCC.push({ ws: conn });
-    RCC.push(conn);
     log("RCC: connected conn " + JSON.stringify(conn));
-    log("RCC: connected RCC " + JSON.stringify(RCC));
+    var rccFound = RCC.filter(function (rcc) { return rcc.pbx === conn.pbx });
+    if (rccFound.length == 0) {
+        RCC.push(conn);
+        log("RCC: connected RCC " + JSON.stringify(RCC));
+    }
     
     initializeQueues();
 
@@ -774,7 +783,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                             break;
                     }
                 }
-            } else {
+            }
+            else {
                 log("danilo-req : RCC message::CallInfo foundCall " + JSON.stringify(foundCall));
                 calls.forEach(function (call) {
                     if (call.sip == sip) {
@@ -927,10 +937,12 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     break;
                                 
                             }
-                            call.state = obj.state;
+                            //Condicao de fuga dos states malucos que surgem eventualmente em Park ou Hold
+                            if (obj.state == 4 || obj.state == 5 || obj.state == 6 || obj.state == 7 || obj.state == 132 || obj.state == 133 || obj.state == 134 || obj.state == 135) {
+                                call.state = obj.state;
+                            }
                         }
                         
-
                     }
                 })
                 var foundCall = calls.filter(function (call) { return call.sip === sip });

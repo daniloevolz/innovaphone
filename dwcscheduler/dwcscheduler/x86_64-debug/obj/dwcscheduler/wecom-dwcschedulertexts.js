@@ -2,6 +2,13 @@
 var Wecom = Wecom || {};
 Wecom.dwcschedulerTexts = {
     pt: {
+        labelfrom: "Conta de Email: ",
+        labelfromName: "Nome da Conta: ",
+        labelserver: "Servidor SMTP: ",
+        labelusername: "Usuário do Email: ",
+        labelpassword: "Senha: ",
+        btnNext: "Futuros",
+        btnAll:"Todos",
         btnDel: "Excluir",
         labelEventTitle: "Novo agendamento!",
         labelEventHistory: "Você recebeu novas solicitações de agendamento enquanto esteve fora, verifique seus agendamentos.",
@@ -17,7 +24,11 @@ Wecom.dwcschedulerTexts = {
         labelTxtInvite: "Texto do e-mail de convite:",
         labelTituloAvail: "Disponibilidades Cadastradas",
         labelTituloSchedules: "Agendamentos Realizados",
-        labelCfgGeral: "Padrões",
+        labelCfgGeral: "Email",
+        labelCfgGoogle: "Google API",
+        lblsendLocation: "Enviar Localização do Cliente?",
+        labelgoogleApiKey: "Chave API Google:",
+        labelTituloGoogle: "Configure o envio da Localização dos Clientes",
         labelCfgSchedules: "Agendamentos",
         labelCfgAvailability: "Disponibilidades",
         cabecalhoAvailabilities0: "ID",
@@ -34,7 +45,8 @@ Wecom.dwcschedulerTexts = {
         btnCancel: "Cancelar",
         btnOk: "Salvar",
         labelAdmin: "Administração",
-        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site."
+        labelTituloSmtp:"Configure o servidor de emails",
+        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site"
     },
     en: {
     },

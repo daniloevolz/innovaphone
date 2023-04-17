@@ -223,7 +223,7 @@ select{
     top: 0;
     display: block;
     transition: 0.2s;
-    font-size: 20px;
+    font-size: 15px;
     /* color: #02163F; */
 }
 .iptNameNumber{
@@ -502,7 +502,7 @@ select{
     top: 0;
     display: block;
     transition: 0.2s;
-    font-size: 20px;
+    font-size: 15px;
     /* color: #02163F; */
 }
 .iptValueCombo{
@@ -1364,7 +1364,7 @@ width: 100%;
     height: fit-content;
     /* margin-top:10%; */
     overflow-y: auto;
-    background-color: rgb(188, 188, 188);
+    /*background-color: rgb(188, 188, 188);*/
     /*background-color: #02163F;*/
 }
   .arrow{
@@ -1461,18 +1461,24 @@ width: 100%;
 /* Quebra da linha na tabela dos buttons*/
 tr.rowaction > td:nth-child(4) {
     /* background: aqua; */
-    width: 150px;
+    width: 16.666666666666668%;
     word-break: break-word;
 }
 
-/* Quebra de linha na tabela de a��es */
+/* Quebra de linha na tabela de ações */
+
+tr.rowcl > td:nth-child(5) {
+    /* background: aqua; */
+    /*width: 20%;*/
+    word-break: break-word;
+}
+/* Quebra de linha na tabela de atividades */
 
 tr.rowbutton > td:nth-child(3) {
     /* background: aqua; */
-    width: 150px;
+    /*width: 10%;*/
     word-break: break-word;
 }
-
 
 
 .popup-background {
@@ -1733,3 +1739,36 @@ div.button-inn-del {
     }
 }
 /*End Mobile model */
+
+/*Inicío Tabelas*/
+table {
+    border-collapse: collapse; /* CSS2 */
+    background: #80808096;
+    color: #B0132B;
+}
+
+    table td {
+        border: 1px solid #02163F;
+        width: -webkit-fill-available;
+        padding: 10px;
+        height: 50px
+    }
+
+    table tr {
+        border: 1px solid #02163F;
+        height: 50px;
+        color: white;
+    }
+
+    table th {
+        border: 1px solid #02163F;
+        background: #F0FFF0;
+        height: 50px;
+        color: white;
+    }
+
+.headercl {
+    font-size: 12px;
+    background-color: #02163F;
+}
+/*End Tabelas*/

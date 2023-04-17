@@ -20,7 +20,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             "--text-standard": "#f2f5f6",
         },
         light: {
-            "--bg": "white",
+            "--bg": "url(bg.png)",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
         }
@@ -43,6 +43,12 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     var list_configs = [];
     var UIuserPicture;
     var UIuser;
+    var dwcCaller;
+    var dwcLocation;
+
+    var phoneApi;
+    var searchApi;
+    
 
     function app_connected(domain, user, dn, appdomain) {
         //avatar
@@ -51,6 +57,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         UIuser = dn;
         constructor();
         app.send({ api: "user", mt: "UserMessage" });
+        searchApi = start.provideApi("com.innovaphone.search");
+        searchApi.onmessage.attach(onSearchApiMessage);
+        // start consume Phone API when AppWebsocket is connected
+        phoneApi = start.consumeApi("com.innovaphone.phone");
+        if (phoneApi) {
+            phoneApi.onupdate.attach(onPhoneApiUpdate);
+        }
     }
 
     function app_message(obj) {
@@ -113,6 +126,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             _popup.content.add(iptEventTitle);
             _popup.content.add(iptEventCount);
             _popup.content.add(btnAckEvent);
+        }
+        if (obj.api == "user" && obj.mt == "DWCCallRequest") {
+            dwcCaller = obj.caller;
+            dwcLocation = obj.location;
         }
     }
     function constructor() {
@@ -188,12 +205,12 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivSchedules(t) {
         t.clear();
-
+        var today = getDateNow();
         //Botões Tabela de Agendamentos
         //t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
         //    makeDivAddAction(t);
         //});
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:3%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
             var selected = ListView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];
@@ -201,12 +218,72 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             selected.forEach(function (s) {
                 console.log(s);
                 selectedrows.push(ListView.getRowData(s))
-                console.log(selectedrows[0]);
-                app.send({ api: "user", mt: "DelSchedulesMessage", id: parseInt(selectedrows[0]) });
+            })
+            selectedrows.forEach(function (row) {
+                console.log(row);
+                app.send({ api: "user", mt: "DelSchedulesMessage", id: parseInt(row) });
             })
         });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:18%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnNext").addEvent("click", function () {
+            next();
+        });
+        t.add(new innovaphone.ui1.Div("position:absolute; left:33%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAll").addEvent("click", function () {
+            scroll_container.clear();
+            list.clear();
+            var rows = list_schedules.length;
+            ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+            //Cabeçalho
+            for (i = 0; i < columns; i++) {
+                ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
+            }
+            //Tabela    
+            list_schedules.forEach(function (b) {
+                var row = [];
+                row.push(b.id);
+                row.push(b.name);
+                row.push(b.email);
+                var arrayDate = b.time_start.split("T");
+                var day = arrayDate[0];
+                var time = arrayDate[1];
+                row.push(day + " " + time);
+                var arrayDate = b.time_end.split("T");
+                var day = arrayDate[0];
+                var time = arrayDate[1];
+                row.push(day + " " + time);
+                ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
+            })
+            scroll_container.add(list);
+        });
 
-
+        function next() {
+            scroll_container.clear();
+            list.clear();
+            var rows = list_schedules.length;
+            ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+            //Cabeçalho
+            for (i = 0; i < columns; i++) {
+                ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
+            }
+            //Tabela    
+            list_schedules.forEach(function (b) {
+                if (today < b.time_start) {
+                    var row = [];
+                    row.push(b.id);
+                    row.push(b.name);
+                    row.push(b.email);
+                    var arrayDate = b.time_start.split("T");
+                    var day = arrayDate[0];
+                    var time = arrayDate[1];
+                    row.push(day + " " + time);
+                    var arrayDate = b.time_end.split("T");
+                    var day = arrayDate[0];
+                    var time = arrayDate[1];
+                    row.push(day + " " + time);
+                    ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
+                }
+            })
+            scroll_container.add(list);
+        }
 
         //Título Tabela
         var labelTituloTabeaAcoes = t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloSchedules")));
@@ -215,34 +292,18 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
         var list = new innovaphone.ui1.Div(null, null, "");
         var columns = 5;
-        var rows = list_schedules.length;
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-        //Cabeçalho
-        for (i = 0; i < columns; i++) {
-            ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
-        }
-        //Tabela    
-        list_schedules.forEach(function (b) {
-            var row = [];
-            row.push(b.id);
-            row.push(b.name);
-            row.push(b.email);
-            row.push(b.time_start);
-            row.push(b.time_end);
-            ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
-            
-        })
-        scroll_container.add(list);
         t.add(scroll_container);
+        next();
     }
     function makeDivAvailabilities(t) {
         t.clear();
 
         //Botões Tabela de Disponibilidades
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAdd").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:3%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAdd").addEvent("click", function () {
             makeDivAddAvail(t);
         });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:18%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
             var selected = ListView.getSelectedRows();
             console.log(selected);
             var selectedrows = [];
@@ -250,8 +311,11 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             selected.forEach(function (s) {
                 console.log(s);
                 selectedrows.push(ListView.getRowData(s))
-                console.log(selectedrows[0]);
-                app.send({ api: "user", mt: "DelAvailabilitiesMessage", id: parseInt(selectedrows[0]) });
+                
+            })
+            selectedrows.forEach(function (row) {
+                console.log(row);
+                app.send({ api: "user", mt: "DelAvailabilityMessage", id: parseInt(row) });
             })
         });
 
@@ -268,14 +332,20 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         //Cabeçalho
         for (i = 0; i < columns; i++) {
-            ListView.addColumn(null, "text", texts.text("cabecalhoAvailabilities" + i), i, 10, false);
+            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoAvailabilities" + i), i, 10, false);
         }
         //Tabela    
         list_availabilities.forEach(function (a) {
             var row = [];
             row.push(a.id);
-            row.push(a.time_start);
-            row.push(a.time_end);
+            var arrayDate = a.time_start.split("T");
+            var day = arrayDate[0];
+            var time = arrayDate[1];
+            row.push(day + " " + time);
+            var arrayDate = a.time_end.split("T");
+            var day = arrayDate[0];
+            var time = arrayDate[1];
+            row.push(day + " " + time);
             ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
         })
         scroll_container.add(list);
@@ -304,7 +374,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             constructor();
         });
     }
-
     function waitConnection(t) {
         t.clear();
         var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
@@ -326,15 +395,15 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         var emailContato = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelEmailContato"), null));
-        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, null, null, "email", null).setAttribute("id", "InputEmailContato"));
+        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, null, null, "email", null).setAttribute("id", "InputEmailContato"));
 
         var divURLConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelURLContato"), null));
-        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, null, null, "url", null).setAttribute("id", "InputURLConference"));
+        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, null, null, "url", null).setAttribute("id", "InputURLConference"));
 
         var divTextInvite = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelTxtInvite"), null));
-        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute;  top: 45%; left: 20%; height: 200px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
+        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute; padding:5px; top: 45%; left: 20%; height: 200px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
         // buttons
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             var email_contato = document.getElementById("InputEmailContato").value;
             var url_conference = document.getElementById("InputURLConference").value;
             var text_invite = document.getElementById("InputTxtInvite").value;
@@ -343,6 +412,84 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             waitConnection(t);
         });
 
+    }
+    function getDateNow() {
+        // Cria uma nova data com a data e hora atuais em UTC
+        var date = new Date();
+        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        date.setUTCHours(date.getUTCHours() - 3);
+
+        // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+        var dateString = date.toISOString();
+
+        // Substitui o caractere "T" por um espaço
+        //dateString = dateString.replace("T", " ");
+
+        // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+        return dateString.slice(0, -5);
+    }
+    function getDateNow2() {
+        // Cria uma nova data com a data e hora atuais em UTC
+        var date = new Date();
+        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        date.setUTCHours(date.getUTCHours() - 3);
+
+        // Formata a data em uma string no formato "AAAAMMDDTHHmmss"
+        var year = date.getUTCFullYear();
+        var month = padZero(date.getUTCMonth() + 1);
+        var day = padZero(date.getUTCDate());
+        var hours = padZero(date.getUTCHours());
+        var minutes = padZero(date.getUTCMinutes());
+        var seconds = padZero(date.getUTCSeconds());
+        var dateString = year + month + day + "T" + hours + minutes + seconds;
+
+        // Retorna a string no formato "AAAAMMDDTHHmmss"
+        return dateString;
+    }
+    function convertDateTimeLocalToCustomFormat(datetimeLocal) {
+        var d = new Date(datetimeLocal);
+        var year = d.getFullYear();
+        var month = padZero(d.getMonth() + 1);
+        var day = padZero(d.getDate());
+        var hours = padZero(d.getHours());
+        var minutes = padZero(d.getMinutes());
+        var seconds = padZero(d.getSeconds());
+        return year + month + day + "T" + hours + minutes + seconds;
+    }
+    function padZero(num) {
+        return (num < 10 ? "0" : "") + num;
+    }
+    // callback function called upon events in the phone app
+    function onPhoneApiUpdate(arg0) {
+        const provider = arg0.defaultApiProvider;
+        const calls = arg0.model[provider].model.calls;
+        calls.forEach(function (call) {
+            if (call.sip == "extern-web") {
+                if (!dwcLocation) {
+                    phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div>" });
+                }
+                phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div><div style='top:40px; width: 100%; height: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'><iframe src='"+dwcLocation+"' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe></div>" });
+            } else {
+                phoneApi.send({ mt: "CallInfo", id: call.id, html: ""});
+            }
+            //if (call.state == "Alerting" || call.state == "Ringback" || call.state == "Connected") {
+            //    }
+        });
+    }
+    function onSearchApiMessage(consumer, obj) {
+        console.log("onSearchApiMessage:obj " + JSON.stringify(obj));
+        switch (obj.msg.mt) {
+            case "Search":
+                if (obj.msg.search == "Extern Web") {
+                    obj.msg = "";
+                    obj.msg = { mt: "SearchInfo", type: "contact", dn: dwcCaller, avatar: "danilo.volz", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3", link: "users?id=danilo.volz@wecom.com.br", contact: { givenname: "Danilo", sn: "Volz", company: "", sip: ["danilo.volz@wecom.com.br"] }, pbx: "inn-lab-ipva", node: "root", template: "Config Admin" };
+                    searchApi.send(obj);
+                    obj.msg = "";
+                    obj.msg = { mt: "SearchResult" };
+                    searchApi.send(obj);
+                }
+                break;
+        }
     }
 }
 

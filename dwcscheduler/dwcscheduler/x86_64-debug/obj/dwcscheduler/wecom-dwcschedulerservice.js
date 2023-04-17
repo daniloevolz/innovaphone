@@ -3,6 +3,27 @@ var pbxTableUsers = [];
 var pbxTable = [];
 var connectionsUser = [];
 
+//smtp
+var from = Config.from;
+var fromName = Config.fromName;
+var server = Config.server;
+var pbx = Config.pbx;
+var username = Config.username;
+var password = Config.password;
+var google_api_key = Config.googleApiKey;
+var sendLocation = Config.sendLocation;
+
+Config.onchanged(function () {
+    from = Config.from;
+    fromName = Config.fromName;
+    pbx = Config.pbx;
+    server = Config.server;
+    username = Config.username;
+    password = Config.password;
+    google_api_key = Config.googleApiKey;
+    sendLocation = Config.sendLocation;
+})
+
 
 WebServer.onrequest("value", function (req) {
     if (req.method == "GET") {
@@ -22,6 +43,71 @@ WebServer.onrequest("value", function (req) {
             // value does not exist, send 404 Not Found
             req.cancel();
         }
+    }
+});
+WebServer.onrequest("get-agenda", function (req) {
+    if (req.method == "GET") {
+        var uri = req.relativeUri;
+        log(uri);
+        var array_uri = uri.split("=");
+        var sip = array_uri[1];
+        var msg;
+        Database.exec("SELECT * FROM tbl_availability WHERE sip ='" + sip + "';")
+            .oncomplete(function (dataavailability) {
+                log("get-agenda:tbl_availability result=" + JSON.stringify(dataavailability, null, 4));
+
+                Database.exec("SELECT * FROM tbl_schedules WHERE sip ='" + sip + "';")
+                    .oncomplete(function (dataschedules) {
+                        log("get-agenda:tbl_schedules result=" + JSON.stringify(dataschedules, null, 4));
+                        msg = { status: 200, dataavailability: JSON.stringify(dataavailability), dataschedules: JSON.stringify(dataschedules) };
+                        req.responseContentType("application/json")
+                            .sendResponse()
+                            .onsend(function (req) {
+                                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        // value does not exist, send 404 Not Found
+                        req.cancel();
+                    });
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                // value does not exist, send 404 Not Found
+                req.cancel();
+            });
+        
+    }
+});
+WebServer.onrequest("put-caller", function (req) {
+    if (req.method == "GET") {
+        var uri = req.relativeUri;
+        log(uri);
+        var params = getQueryStringParams(uri); // Obter um objeto com os parâmetros
+
+        var sip = params['id']; // Obter o valor do parâmetro 'id'
+        var caller = params['caller']; // Obter o valor do parâmetro 'caller'
+        var x = params['x']; // Obter o valor do parâmetro 'id'
+        var y = params['y']; // Obter o valor do parâmetro 'caller'
+        var msg;
+
+
+        connectionsUser.forEach(function (c) {
+            if (c.sip == sip) {
+                log("put-caller:user connected notified caller=" + caller);
+                if (sendLocation) {
+                    c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+                } else {
+                    c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "" }));
+                }
+            }
+        })
+        
+        msg = { status: 200 };
+        req.responseContentType("application/json")
+            .sendResponse()
+            .onsend(function (req) {
+                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+            });
     }
 });
 WebServer.onrequest("salvar-evento", function (req) {
@@ -52,7 +138,7 @@ WebServer.onrequest("salvar-evento", function (req) {
                                         .oncomplete(function () {
                                             Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
                                                 .oncomplete(function (data) {
-                                                    msg = { status: 200, msg: "Evento agendado, Acesse seu e-mail e encontre o convite!" };
+                                                    msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!" };
                                                     req.responseContentType("application/json")
                                                         .sendResponse()
                                                         .onsend(function (req) {
@@ -70,7 +156,7 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                         log("danilo req: erro send UserEventMessage: " + e);
                                                     }
                                                     try {
-                                                        var count = 1;
+                                                        var count = 0;
                                                         PbxSignal.forEach(function (signal) {
                                                             log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
                                                             var call = signal[obj.sip];
@@ -80,8 +166,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                                     pbxTableUsers.forEach(function (user) {
 
                                                                         if (user.columns.h323 == obj.sip) {
-                                                                            log("danilo-req salvar-evento: Updating the object for user " + user.columns.h323)
+                                                                            var old_badge = user.badge;
                                                                             user.badge += 1;
+                                                                            log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
                                                                             count = user.badge;
                                                                         }
                                                                     })
@@ -98,17 +185,21 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                         log("danilo req: erro send badge: " + e);
                                                     }
                                                     try {
-                                                        var today = getDateNow();
+                                                        var today = convertDateTimeLocalToCustomFormat(getDateNow());
+                                                        var arrayToday = obj.start.split("T");
+                                                        var day = arrayToday[0];
+                                                        var time = arrayToday[1];
                                                         var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
                                                         //Email Cliente
                                                         var dataClient = "<!DOCTYPE html>"
                                                             + "<html>"
                                                             + "<head></head>"
                                                             + "<body>"
-                                                            + "<b>" + cfg[0].text_invite + "</b><br/>"
-                                                            + "<a>URL do Evento: " + cfg[0].url_conference + "</a><br/>"
-                                                            + "<b>Quando: " + obj.start + "</b><br/><br/>"
-                                                            + "Best regards<br/>"
+                                                            + "<h3>" + cfg[0].text_invite + "</h3><br/>"
+                                                            + "<b>URL do Evento:</b> " + cfg[0].url_conference +"<br/>"
+                                                            + "<b>Quando:</b> " + day + "<br/>"
+                                                            + "<b>Horário:</b> " + time + "<br/><br/>"
+                                                            + "Atenciosamente<br/>"
                                                             + "<i>DWC Wecom</i>"
                                                             + "</body>"
                                                             + "</html>";
@@ -118,72 +209,63 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "<html>"
                                                             + "<head></head>"
                                                             + "<body>"
-                                                            + "<b>Olá "+ name +", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</b><br/><br/>"
+                                                            + "<h3>Olá "+ name +", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
                                                             + "<b>Nome: " + obj.title + "</b><br/>"
-                                                            + "<b>E-mail: " + obj.email + "</b><br/>"
-                                                            + "<b>Quando: " + obj.start + "</b><br/>"
-                                                            + "<a>URL Conferência: " + cfg[0].url_conference + "</a><br/><br/>"
-                                                            + "Best regards<br/>"
+                                                            + "<b>E-mail:</b> " + obj.email + "<br/>"
+                                                            + "<b>Quando:</b> " + day + "<br/>"
+                                                            + "<b>Horário:</b> " + time + "<br/><br/>"
+                                                            + "<b>URL Conferência:</b> "+ cfg[0].url_conference +"<br/><br/>"
+                                                            + "Atenciosamente<br/>"
                                                             + "<i>DWC Wecom</i>"
                                                             + "</body>"
                                                             + "</html>";
 
 
                                                         //Anexo
-                                                        var attachment = "BEGIN: VCALENDAR"
-                                                            +"METHOD: REQUEST"
-                                                            + "PRODID: DWC Wecom"
-                                                            + "VERSION: 2.0"
-                                                            + "BEGIN: VTIMEZONE"
-                                                            + "TZID: E.South America Standard Time"
-                                                            + "BEGIN: STANDARD"
-                                                            + "DTSTART: 16010101T000000"
-                                                            + "TZOFFSETFROM: -0300"
-                                                            + "TZOFFSETTO: -0300"
-                                                            + "END: STANDARD"
-                                                            + "BEGIN: DAYLIGHT"
-                                                            + "DTSTART: 16010101T000000"
-                                                            + "TZOFFSETFROM: -0300"
-                                                            + "TZOFFSETTO: -0300"
-                                                            + "END: DAYLIGHT"
-                                                            + "END: VTIMEZONE"
-                                                            + "BEGIN: VEVENT"
-                                                            + "ORGANIZER; CN = " + name +": mailto: "+cfg[0].email_contato+""
-                                                            + "ATTENDEE; ROLE = REQ - PARTICIPANT; PARTSTAT = NEEDS - ACTION; RSVP = TRUE; CN = " + obj.title + ": mailto: " + obj.email + ""
-
-                                                            + "DESCRIPTION; LANGUAGE = pt - BR: \n______________________________________________"
-                                                            + "__________________________________\nReunião do DWC Wecom\nClique para"
-                                                            + "ingressar na reunião <" + cfg[0].url_conference + ">\n____________________________"
-                                                            + "____________________________________________________\nAviso Legal.Esta me"
-                                                            + "nsagem pode conter informações confidenciais e / ou privilegiadas.Se voc"
-                                                            + "ê não for o destinatário ou a pessoa autorizada a receber esta mensagem"
-                                                            + "não deve usar\, copiar ou divulgar as informações nela contidas ou tom"
-                                                            + "ar qualquer ação baseada nessas informações.Se você recebeu essa com"
-                                                            + "unicação por engano\, por favor nos avise imediatamente\, respondendo à"
-                                                            + "mensagem e excluindo - a do seu computador.\n"
-                                                            + "SUMMARY; LANGUAGE = pt - BR: Reunião DWC Wecom"
-                                                            + "DTSTART; TZID = E.South America Standard Time: " + obj.start + ""
-                                                            + "DTEND; TZID = E.South America Standard Time: " + obj.end + ""
-                                                            + "CLASS: PUBLIC"
-                                                            + "PRIORITY: 5"
-                                                            + "DTSTAMP: " + today + ""
-                                                            + "TRANSP: OPAQUE"
-                                                            + "STATUS: CONFIRMED"
-                                                            + "SEQUENCE: 0"
-                                                            + "LOCATION; LANGUAGE = pt - BR: "+ cfg[0].url_conference +""
-                                                            + "BEGIN: VALARM"
-                                                            + "DESCRIPTION: REMINDER"
-                                                            + "TRIGGER; RELATED = START: -PT15M"
-                                                            + "ACTION: DISPLAY"
-                                                            + "END: VALARM"
-                                                            + "END: VEVENT"
-                                                            + "END: VCALENDAR";
-
-
-
-
-
-
+                                                        var attachment = "BEGIN:VCALENDAR\n"
+                                                            + "PRODID:-//DWC Wecom//EN\n"
+                                                            + "VERSION:2.0\n"
+                                                            + "CALSCALE:GREGORIAN\n"
+                                                            + "METHOD:REQUEST\n"
+                                                            + "BEGIN:VTIMEZONE\n"
+                                                            + "TZID:America/Sao_Paulo\n"
+                                                            + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                            + "BEGIN:STANDARD\n"
+                                                            + "TZOFFSETFROM:-0300\n"
+                                                            + "TZOFFSETTO:-0300\n"
+                                                            + "TZNAME:-03\n"
+                                                            + "DTSTART:19700101T000000\n"
+                                                            + "END:STANDARD\n"
+                                                            + "END:VTIMEZONE\n"
+                                                            + "BEGIN:VEVENT\n"
+                                                            + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.start) + "\n"
+                                                            + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.end) + "\n"
+                                                            + "DTSTAMP:" + today + "Z\n"
+                                                            + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                            + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                            + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
+                                                            + "X-GOOGLE-CONFERENCE:" + cfg[0].url_conference + "\n"
+                                                            + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
+                                                            + "CREATED:" + today + "Z\n"
+                                                            + "DESCRIPTION:" + cfg[0].url_conference + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                            + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + cfg[0].url_conference + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                            + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
+                                                            + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
+                                                            + "LAST-MODIFIED:" + today + "Z\n"
+                                                            + "LOCATION:\n"
+                                                            + "SEQUENCE:0\n"
+                                                            + "STATUS:CONFIRMED\n"
+                                                            + "SUMMARY:Reunião DWC Wecom\n"
+                                                            + "TRANSP:OPAQUE\n"
+                                                            + "BEGIN:VALARM\n"
+                                                            + "DESCRIPTION:REMINDER\n"
+                                                            + "TRIGGER;RELATED=START:-PT15M\n"
+                                                            + "ACTION:DISPLAY\n"
+                                                            + "END:VALARM\n"
+                                                            + "END:VEVENT\n"
+                                                            + "END:VCALENDAR";
 
                                                         sendEmail("Evento Agendado", obj.email, dataClient, attachment);
                                                         
@@ -251,6 +333,16 @@ WebServer.onrequest("salvar-evento", function (req) {
         req.cancel();
     }
 });
+
+function getQueryStringParams(queryString) {
+    var params = {};
+    var pairs = queryString.slice(1).split('&');
+    for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        params[pair[0]] = pair[1];
+    }
+    return params;
+}
 
 new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-dwcscheduler") {
@@ -429,7 +521,43 @@ new JsonApi("admin").onconnected(function(conn) {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src }));
+
+                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src, from: from, fromName: fromName, server: server, username: username, password: password, googleApiKey: google_api_key, sendLocation: sendLocation }));
+            }
+            if (obj.mt == "UpdateConfigMessage") {
+                try {
+                    Config.from = obj.from;
+                    Config.fromName = obj.fromName;
+                    Config.server = obj.server;
+                    Config.username = obj.username;
+                    Config.password = obj.password;
+                    var info = JSON.parse(conn.info);
+                    Config.pbx = info.pbx + "." + conn.domain;
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro"}));
+                    log("ERRO UpdateConfigMessage:" + e);
+
+
+                }
+                
+            }
+            if (obj.mt == "UpdateConfigGoogleMessage") {
+                try {
+                    Config.sendLocation = obj.sendLocation;
+                    Config.googleApiKey = obj.googleApiKey;
+                    
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigGoogleMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigGoogleMessage:" + e);
+
+
+                }
             }
         });
     }
@@ -554,9 +682,9 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             try {
                 pbxTableUsers.forEach(function (user) {
                     if (user.columns.h323 == obj.columns.h323) {
-                            log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
-                            obj.badge = user.badge;
-                            Object.assign(user, obj)
+                        obj.badge = user.badge;
+                        log("ReplicateUpdate: Updating the object for user " + obj.columns.h323 + " and current Badge is " + user.badge);
+                        Object.assign(user, obj);
                     }
                 })
 
@@ -599,12 +727,12 @@ function sendEmail(subject, to, data, str) {
 
     // Configuration
     var cfg = {
-        from: "noreplytecnicawecom@gmail.com",
-        fromName: "noreplytecnicawecom",
-        host: "localhost",
-        server: "smtp.gmail.com",
-        username: "noreplytecnicawecom@gmail.com",
-        password: "EpfrCf4rFuscigR"
+        from: from,
+        fromName: fromName,
+        host: pbx,
+        server: server,
+        username: username,
+        password: password
     };
     SmtpClient.config(cfg.from, cfg.fromName, cfg.host, cfg.server, cfg.username, cfg.password);
 
@@ -626,7 +754,7 @@ function sendEmail(subject, to, data, str) {
           {
               filename: "invite.ics",
               mimeType: "text/calendar",
-              data: attachuint8array
+              data: uint8array
           }
     ];
 
@@ -676,8 +804,40 @@ function getDateNow() {
     var dateString = date.toISOString();
 
     // Substitui o caractere "T" por um espaço
-    dateString = dateString.replace("T", " ");
+    //dateString = dateString.replace("T", " ");
 
-    // Retorna a string no formato "AAAA-MM-DD HH:mm:ss.sss"
+    // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
     return dateString.slice(0, -5);
+}
+function getDateNow2() {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date();
+    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+    date.setUTCHours(date.getUTCHours() - 3);
+
+    // Formata a data em uma string no formato "AAAAMMDDTHHmmss"
+    var year = date.getUTCFullYear();
+    var month = padZero(date.getUTCMonth() + 1);
+    var day = padZero(date.getUTCDate());
+    var hours = padZero(date.getUTCHours());
+    var minutes = padZero(date.getUTCMinutes());
+    var seconds = padZero(date.getUTCSeconds());
+    var dateString = year + month + day + "T" + hours + minutes + seconds;
+
+    // Retorna a string no formato "AAAAMMDDTHHmmss"
+    return dateString;
+}
+function convertDateTimeLocalToCustomFormat(datetimeLocal) {
+    var d = new Date(datetimeLocal);
+    var year = d.getFullYear();
+    var month = padZero(d.getMonth() + 1);
+    var day = padZero(d.getDate());
+    var hours = padZero(d.getHours());
+    var minutes = padZero(d.getMinutes());
+    var seconds = padZero(d.getSeconds());
+    return year + month + day + "T" + hours + minutes + seconds;
+}
+
+function padZero(num) {
+    return (num < 10 ? "0" : "") + num;
 }

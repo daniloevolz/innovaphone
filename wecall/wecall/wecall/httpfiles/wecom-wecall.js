@@ -67,6 +67,31 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
         //}
         //app.send({ api: "user", mt: "UserMessage" });
         app.send({ api: "user", mt: "InitializeMessage" });
+
+        var phoneinfoApi = start.provideApi("com.innovaphone.phoneinfo");
+        phoneinfoApi.onmessage.attach(function (sender, obj) {
+            switch (obj.msg.mt) {
+                case "CallAdded":
+                    start.show();
+                    //console.warn(obj.msg.mt);
+                    console.log(obj.msg);
+                    break;
+                case "CallUpdated":
+                    console.warn(obj.msg.mt);
+                    console.log(obj.msg);
+                    // show app if call is in connected state
+                    if (obj.msg.state === "Connected") start.show();
+                    break;
+                case "CallRemoved":
+                    start.show();
+                    //console.warn(obj.msg.mt);
+                    console.log(obj.msg);
+
+                    // show home screen after the call is ended
+                    //start.home();
+                    break;
+            }
+        });
         
     }
 

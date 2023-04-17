@@ -105,7 +105,79 @@
   },
   "apis": {
     "wecom-dwcscheduler": {
+      "com.innovaphone.search": {
+        "info": {}
+      },
+      "com.innovaphone.phone": {
+        "info": {}
+      },
       "presence": true
+    },
+    "wecom-dwcschedulerservice": {
+      "com.innovaphone.search": {
+        "info": {}
+      }
+    }
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "from",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "fromName",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "server",
+        "type": "STRING",
+        "default": false,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "pbx",
+        "type": "STRING",
+        "default": false,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "username",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "password",
+        "type": "STRING",
+        "default": "",
+        "password": true
+      },
+      {
+        "cmd": "item",
+        "name": "googleApiKey",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendLocation",
+        "type": "BOOL",
+        "default": true,
+        "password": false
+      }
+    ]
+
     }
   }
-}

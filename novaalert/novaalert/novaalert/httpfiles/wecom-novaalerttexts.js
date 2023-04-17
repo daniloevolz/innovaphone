@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        labelTituloEdit: "Edite o botão selecionado",
+        btnEditButton: "Editar",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
         labelDevice: "Dispositivo:",
         labelEvent: "Evento:",
@@ -55,10 +57,10 @@ Wecom.novaalertTexts = {
         cabecalho1: "Nome",
         cabecalho2: "Parâmetro",
         cabecalho3: "Número",
-        cabecalho4: "Tipo",
-        cabecalho5: "Usuário",
+        cabecalho2: "Tipo",
+        cabecalho3: "Usuário",
         cabecalho6: "1º Botão Combo",
-        cabecalho7: "2º Botão Combo",
+        cabecalho7: "2º Botão Combo", 
         cabecalho8: "3º Botão Combo",
         cabecalho9: "4º Botão Combo",
         cabecalhoAction0: "ID",
