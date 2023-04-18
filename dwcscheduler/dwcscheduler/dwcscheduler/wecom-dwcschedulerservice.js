@@ -242,9 +242,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.end) + "\n"
                                                             + "DTSTAMP:" + today + "Z\n"
                                                             + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE"
                                                             + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                            + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE"
                                                             + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
                                                             + "X-GOOGLE-CONFERENCE:" + cfg[0].url_conference + "\n"
                                                             + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
@@ -257,7 +257,7 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "LOCATION:\n"
                                                             + "SEQUENCE:0\n"
                                                             + "STATUS:CONFIRMED\n"
-                                                            + "SUMMARY:Reunião DWC Wecom\n"
+                                                            + "SUMMARY:" + cfg[0].title_conference + "\n" 
                                                             + "TRANSP:OPAQUE\n"
                                                             + "BEGIN:VALARM\n"
                                                             + "DESCRIPTION:REMINDER\n"
@@ -267,9 +267,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "END:VEVENT\n"
                                                             + "END:VCALENDAR";
 
-                                                        sendEmail("Evento Agendado", obj.email, dataClient, attachment);
+                                                        sendEmail(cfg[0].email_title, obj.email, dataClient, attachment);
                                                         
-                                                        sendEmail("Evento Agendado", cfg[0].email_contato, dataUser, attachment);
+                                                        sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment);
                                                     }
                                                     catch (e) {
                                                         log("danilo req: erro send email:" + e);
