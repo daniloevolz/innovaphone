@@ -95,7 +95,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             var iptEventEmail = new innovaphone.ui1.Div("position:absolute; left:1%; width:99%; top:45%; font-size:15px; text-align:left", texts.text("labelEventEmail")+obj.email);
             var iptEventWhen = new innovaphone.ui1.Div("position:absolute; left:1%; width:99%; top:55%; font-size:15px; text-align:left", texts.text("labelEventWhen")+obj.time_start);
 
-            //Botão Salvar
+            //Botï¿½o Salvar
             var btnAckEvent = new innovaphone.ui1.Div("position:absolute; left:40%; width:20%; top:70%; font-size:15px; text-align:center", null, "button-inn").addTranslation(texts, "btnOk").addEvent("click", function () {
                 app.send({ api: "user", mt: "UserAckEventMessage"});
                 _popup.close();
@@ -117,7 +117,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
             var iptEventTitle = new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:20%; font-size:15px; text-align:center", texts.text("labelEventHistory"));
             var iptEventCount = new innovaphone.ui1.Div("position:absolute; left:1%; width:99%; top:50%; font-size:15px; text-align:left", texts.text("labelEventCount") + obj.count);
-            //Botão Salvar
+            //Botï¿½o Salvar
             var btnAckEvent = new innovaphone.ui1.Div("position:absolute; left:40%; width:20%; top:70%; font-size:15px; text-align:center", null, "button-inn").addTranslation(texts, "btnOk").addEvent("click", function () {
                 app.send({ api: "user", mt: "UserAckEventMessage" });
                 _popup.close();
@@ -136,7 +136,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         that.clear();
         // col direita
         var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
-        //Título
+        //Tï¿½tulo
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         // col Esquerda
@@ -206,7 +206,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     function makeDivSchedules(t) {
         t.clear();
         var today = getDateNow();
-        //Botões Tabela de Agendamentos
+        //Botï¿½es Tabela de Agendamentos
         //t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
         //    makeDivAddAction(t);
         //});
@@ -232,7 +232,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             list.clear();
             var rows = list_schedules.length;
             ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-            //Cabeçalho
+            //Cabeï¿½alho
             for (i = 0; i < columns; i++) {
                 ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
             }
@@ -260,7 +260,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             list.clear();
             var rows = list_schedules.length;
             ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-            //Cabeçalho
+            //Cabeï¿½alho
             for (i = 0; i < columns; i++) {
                 ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
             }
@@ -285,7 +285,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             scroll_container.add(list);
         }
 
-        //Título Tabela
+        //Tï¿½tulo Tabela
         var labelTituloTabeaAcoes = t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloSchedules")));
 
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
@@ -299,7 +299,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     function makeDivAvailabilities(t) {
         t.clear();
 
-        //Botões Tabela de Disponibilidades
+        //Botï¿½es Tabela de Disponibilidades
         t.add(new innovaphone.ui1.Div("position:absolute; left:3%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAdd").addEvent("click", function () {
             makeDivAddAvail(t);
         });
@@ -321,7 +321,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
 
 
-        //Título Tabela
+        //Tï¿½tulo Tabela
         t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloAvail")));
 
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
@@ -330,7 +330,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var columns = 3;
         var rows = list_availabilities.length;
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-        //Cabeçalho
+        //Cabeï¿½alho
         for (i = 0; i < columns; i++) {
             ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoAvailabilities" + i), i, 10, false);
         }
@@ -382,33 +382,48 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivGeral(t){
         t.clear();
-        //Título
+        //Tï¿½tulo
         try {
             var email_contato = list_configs[0].email_contato;
             var text_invite = list_configs[0].text_invite;
             var url_conference = list_configs[0].url_conference;
+            var email_title = list_configs[0].email_title;
+            var title_conference = list_configs[0].title_conference
         } catch (e) {
             var email_contato = null;
             var text_invite = null;
             var url_conference = null;
+            var email_title = null;
+            var title_conference = null;
         }
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
-        var emailContato = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelEmailContato"), null));
-        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, null, null, "email", null).setAttribute("id", "InputEmailContato"));
+        var emailContato = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 20%; left: 6%; font-weight: bold;", texts.text("labelEmailContato"), null));
+        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 20%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, null, null, "email", null).setAttribute("id", "InputEmailContato"));
+
+        var divTitleEmail = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 30%; left: 6%; font-weight: bold;", texts.text("labelTitleEmail"), null));
+        var InputTitleEmail = t.add(new innovaphone.ui1.Input("position: absolute;  top: 30%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_title, null, null, "url", null).setAttribute("id", "InputTitleEmail"));
 
         var divURLConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelURLContato"), null));
-        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, null, null, "url", null).setAttribute("id", "InputURLConference"));
+        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, null, null, "url", null).setAttribute("id", "InputURLConference"));
 
-        var divTextInvite = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelTxtInvite"), null));
-        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute; padding:5px; top: 45%; left: 20%; height: 200px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
+        var divTitleConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 40%; left: 6%; font-weight: bold;", texts.text("labelTitleConference"), null));
+        var InputTitleConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 40%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", title_conference, null, null, "url", null).setAttribute("id", "InputTitleConference"));
+
+        var divTextInvite = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelTxtInvite"), null));
+        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute; padding:5px; top: 45%; left: 21%; height: 150px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            
             var email_contato = document.getElementById("InputEmailContato").value;
             var url_conference = document.getElementById("InputURLConference").value;
             var text_invite = document.getElementById("InputTxtInvite").value;
+            var email_title = document.getElementById("InputTitleEmail").value;
+            var title_conference = document.getElementById("InputTitleConference").value;
+             
+            
 
-            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite });
+            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite, email_title: email_title, title_conference: title_conference });
             waitConnection(t);
         });
 
@@ -416,13 +431,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     function getDateNow() {
         // Cria uma nova data com a data e hora atuais em UTC
         var date = new Date();
-        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        // Adiciona o deslocamento de GMT-3 ï¿½s horas da data atual em UTC
         date.setUTCHours(date.getUTCHours() - 3);
 
         // Formata a data e hora em uma string ISO 8601 com o caractere "T"
         var dateString = date.toISOString();
 
-        // Substitui o caractere "T" por um espaço
+        // Substitui o caractere "T" por um espaï¿½o
         //dateString = dateString.replace("T", " ");
 
         // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
@@ -431,7 +446,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     function getDateNow2() {
         // Cria uma nova data com a data e hora atuais em UTC
         var date = new Date();
-        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        // Adiciona o deslocamento de GMT-3 ï¿½s horas da data atual em UTC
         date.setUTCHours(date.getUTCHours() - 3);
 
         // Formata a data em uma string no formato "AAAAMMDDTHHmmss"

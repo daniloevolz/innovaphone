@@ -406,7 +406,7 @@ new JsonApi("user").onconnected(function(conn) {
                 }
                 
                 try {
-                    Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, url_conference, email_contato) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.url_conference + "','" + obj.email + "')")
+                    Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, url_conference, email_contato, email_title, title_conference) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.url_conference + "','" + obj.email + "','" + obj.email_title + "','" + obj.title_conference +"')")
                         .oncomplete(function () {
                             log("UpdateConfigMessage:result=");
                             conn.send(JSON.stringify({ api: "user", mt: "UpdateConfigMessageSuccess" }));
