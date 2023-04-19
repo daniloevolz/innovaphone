@@ -423,7 +423,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
              
             
 
-            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite });
+            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite, email_title: email_title, title_conference: title_conference });
             waitConnection(t);
         });
 

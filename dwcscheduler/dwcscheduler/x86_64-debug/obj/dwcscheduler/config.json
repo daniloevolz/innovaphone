@@ -93,6 +93,17 @@
             "cmd": "column",
             "name": "email_contato",
             "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "email_title",
+            "type": "text"
+            
+          },
+          {
+            "cmd": "column",
+            "name": "title_conference",
+            "type": "text"
           }
         ]
       }
