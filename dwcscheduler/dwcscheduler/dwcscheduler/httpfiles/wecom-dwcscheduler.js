@@ -71,7 +71,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             console.log(obj.result);
             list_configs = JSON.parse(obj.result);
             makeDivGeral(_colDireita);
-            console.log("AAAAAAAAAAAAAAAAAAWWWWWWWWWWWWWWWWWWWWWWWWAAAAAA");
         }
         if (obj.api == "user" && obj.mt == "SelectAvailabilityMessageSuccess") {
             console.log(obj.result);
