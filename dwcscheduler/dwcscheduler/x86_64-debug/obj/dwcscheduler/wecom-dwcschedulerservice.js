@@ -214,8 +214,9 @@ WebServer.onrequest("salvar-evento", function (req) {
                                                             + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
                                                             + "</td>"
                                                             + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                            + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
+                                                            + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + cfg[0].url_conference + " ' " + ">" +"<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
                                                             + "</span>"
+                                                            + "</a>"
                                                             + "</td>"
                                                             + "</tr>"
                                                             + "<tr style='height: 25px;'></tr>"

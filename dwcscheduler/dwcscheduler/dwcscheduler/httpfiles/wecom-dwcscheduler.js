@@ -405,7 +405,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var InputTitleEmail = t.add(new innovaphone.ui1.Input("position: absolute;  top: 30%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_title,"Insira aqui o titulo do e-mail", null, "url", null).setAttribute("id", "InputTitleEmail"));
 
         var divURLConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelURLContato"), null));
-        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", "Insira aqui a URL do evento", null, null, "url", null).setAttribute("id", "InputURLConference"));
+        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, "Insira aqui a URL do evento", null, "url", null).setAttribute("id", "InputURLConference"));
 
         var divTitleConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 40%; left: 6%; font-weight: bold;", texts.text("labelTitleConference"), null));
         var InputTitleConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 40%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", title_conference,"Insira aqui o título do evento", null, "url", null).setAttribute("id", "InputTitleConference"));
