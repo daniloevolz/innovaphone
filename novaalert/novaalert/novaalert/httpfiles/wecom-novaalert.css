@@ -1182,7 +1182,7 @@ background-color: darkred;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    background-color: var(--button); /*#191919;*/
+    background-color: #101e3f; /*#191919;*/
     text-align: center;
     cursor: pointer;
     flex-direction: column;
@@ -1299,7 +1299,7 @@ background-color: darkred;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    background-color: var(--button); /*#191919;*/
+    background-color: #171f1b; /*#191919;*/
     text-align: center;
     cursor: pointer;
     flex-direction: column;

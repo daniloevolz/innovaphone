@@ -48,6 +48,9 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     var password = null;
     var googleApiKey = null;
     var sendLocation = false;
+    var licenseToken = null;
+    var licenseFile = null;
+    var licenseInstallDate = null;
 
     function app_connected(domain, user, dn, appdomain) {
         //avatar
@@ -61,14 +64,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
             try {
-                from = obj.from;
-                fromName = obj.fromName;
-                server = obj.server;
-                username = obj.username;
-                password = obj.password;
-                googleApiKey = obj.googleApiKey;
-                sendLocation = obj.sendLocation;
-
+                licenseToken = obj.licenseToken;
 
             } catch (e) {
                 console.log("ERRO AdminMessageResult:"+e)
@@ -87,6 +83,17 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             makeDivGoogle(_colDireita);
             window.alert("Configurações Atualizadas com suecesso!");
 
+        }
+        if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
+            try {
+                licenseToken = obj.licenseToken;
+                licenseFile = obj.licenseFile;
+                licenseInstallDate = obj.licenseInstallDate;
+
+            } catch (e) {
+                console.log("ERRO LicenseMessageResult:" + e)
+            }
+            makeDivLicense(_colDireita);
         }
     }
     function constructor() {
@@ -114,12 +121,14 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
 
         var Arelatorios1 = lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgGeral"), null));
         Arelatorios1.setAttribute("id", "CfgGeral");
         var Arelatorios2 = lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgGoogle"), null));
         Arelatorios2.setAttribute("id", "CfgGoogle");
-
+        var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgLicense"), null));
+        Arelatorios3.setAttribute("id", "CfgLicense");
 
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
@@ -137,6 +146,9 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         var a = document.getElementById("CfgGoogle");
         a.addEventListener("click", function () { ChangeView("CfgGoogle", colDireita) })
 
+        var a = document.getElementById("CfgLicense");
+        a.addEventListener("click", function () { ChangeView("CfgLicense", colDireita) })
+
         _colDireita = colDireita;
     }
     function ChangeView(ex, colDireita) {
@@ -146,6 +158,10 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         }
         if (ex == "CfgGoogle") {
             makeDivGoogle(colDireita);
+        }
+        if (ex == "CfgLicense") {
+            app.send({ api: "admin", mt: "ConfigLicense"});
+            waitConnection(colDireita);
         }
     }
     function waitConnection(t) {
@@ -213,6 +229,32 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
 
             app.send({ api: "admin", mt: "UpdateConfigGoogleMessage", googleApiKey: googleApiKey, sendLocation: sendLocation });
+            waitConnection(t);
+        });
+
+    }
+    function makeDivLicense(t) {
+        t.clear();
+        //Título
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloLicense")));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, null));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"), null));
+        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, null).setAttribute("id", "InputLicenseFile"));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", licenseInstallDate, null));
+
+       
+
+        // buttons
+        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            licenseFile = document.getElementById("InputLicenseLile").value;
+
+
+            app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
             waitConnection(t);
         });
 

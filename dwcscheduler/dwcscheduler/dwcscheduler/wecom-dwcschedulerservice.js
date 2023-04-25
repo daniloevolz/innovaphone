@@ -3,7 +3,14 @@ var pbxTableUsers = [];
 var pbxTable = [];
 var connectionsUser = [];
 
-//smtp
+//Config variables
+var licenseAppToken = Config.licenseAppToken;
+if (licenseAppToken == "") {
+    var rand = Random.bytes(16);
+    Config.licenseAppToken = String(rand);
+    Config.save();
+}
+
 var from = Config.from;
 var fromName = Config.fromName;
 var server = Config.server;
@@ -12,6 +19,8 @@ var username = Config.username;
 var password = Config.password;
 var google_api_key = Config.googleApiKey;
 var sendLocation = Config.sendLocation;
+var licenseAppFile = Config.licenseAppFile;
+var licenseInstallDate = Config.licenseInstallDate;
 
 Config.onchanged(function () {
     from = Config.from;
@@ -22,6 +31,8 @@ Config.onchanged(function () {
     password = Config.password;
     google_api_key = Config.googleApiKey;
     sendLocation = Config.sendLocation;
+    licenseAppFile = Config.licenseAppFile;
+    licenseInstallDate = Config.licenseInstallDate;
 })
 
 
@@ -577,6 +588,32 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 }
             }
+            if (obj.mt == "ConfigLicense") {
+                var licenseAppToken = Config.licenseAppToken;
+                licenseInstallDate = Config.licenseInstallDate;
+                licenseAppFile = Config.licenseAppFile;
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseInstallDate: licenseInstallDate }));
+            }
+            if (obj.mt == "UpdateConfigLicenseMessage") {
+                try {
+                    // create 256-Bit encryption key from passphrase by hashing it using SHA256
+                    var key = Crypto.hash("SHA256").update(obj.licenseAppToken).final();
+                    log("UpdateConfigLicenseMessage: License key: " + key);
+                    // decrypt
+                    var plaintext = Crypto.cipher("AES", "CTR", key, false).iv(parseInt(obj.licenseToken)).crypt(obj.licenseFile);
+                    log("UpdateConfigLicenseMessage: License decrypted: " + plaintext);
+                    Config.licenseAppFile = obj.licenseFile;
+                    Config.licenseInstallDate = getDateNow();
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigLicenseMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigLicenseMessage:" + e);
+
+
+                }
+            }
         });
     }
 });
@@ -859,3 +896,5 @@ function convertDateTimeLocalToCustomFormat(datetimeLocal) {
 function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
+
+

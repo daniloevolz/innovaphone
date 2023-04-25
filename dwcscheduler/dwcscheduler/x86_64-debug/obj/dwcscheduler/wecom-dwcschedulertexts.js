@@ -22,7 +22,7 @@ Wecom.dwcschedulerTexts = {
         labelEmailContato: "Email de Contato:",
         labelURLContato: "Url da sala de Reunião:",
         labelTitleConference: "Titulo da Reunião",
-        labelTitleEmail: "Titulo do Email",
+        labelTitleEmail: "Titulo do e-mail",
         labelTxtInvite: "Texto do e-mail de convite:",
         labelTituloAvail: "Disponibilidades Cadastradas",
         labelTituloSchedules: "Agendamentos Realizados",

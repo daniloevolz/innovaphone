@@ -399,19 +399,20 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         var emailContato = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 20%; left: 6%; font-weight: bold;", texts.text("labelEmailContato"), null));
-        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 20%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, null, null, "email", null).setAttribute("id", "InputEmailContato"));
+        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 20%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, "Insira aqui o e-mail de contato", null, "email", null).setAttribute("id", "InputEmailContato"));
 
         var divTitleEmail = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 30%; left: 6%; font-weight: bold;", texts.text("labelTitleEmail"), null));
-        var InputTitleEmail = t.add(new innovaphone.ui1.Input("position: absolute;  top: 30%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_title,"Reunião com "+ UIuser, null, "url", null).setAttribute("id", "InputTitleEmail"));
+        var InputTitleEmail = t.add(new innovaphone.ui1.Input("position: absolute;  top: 30%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_title,"Insira aqui o titulo do e-mail", null, "url", null).setAttribute("id", "InputTitleEmail"));
 
         var divURLConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelURLContato"), null));
-        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, null, null, "url", null).setAttribute("id", "InputURLConference"));
+        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", "Insira aqui a URL do evento", null, null, "url", null).setAttribute("id", "InputURLConference"));
 
         var divTitleConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 40%; left: 6%; font-weight: bold;", texts.text("labelTitleConference"), null));
-        var InputTitleConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 40%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", title_conference, null, null, "url", null).setAttribute("id", "InputTitleConference"));
+        var InputTitleConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 40%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", title_conference,"Insira aqui o título do evento", null, "url", null).setAttribute("id", "InputTitleConference"));
 
         var divTextInvite = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelTxtInvite"), null));
         var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute; padding:5px; top: 45%; left: 21%; height: 150px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
+        InputTextInvite.setAttribute("placeholder", "Insira aqui o texto do e-mail de convite")
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             
