@@ -2,10 +2,15 @@
 var Wecom = Wecom || {};
 Wecom.dwcschedulerTexts = {
     pt: {
-        labelfrom: "Conta de Email: ",
-        labelfromName: "Nome da Conta: ",
-        labelserver: "Servidor SMTP: ",
-        labelusername: "Usuário do Email: ",
+        labelCfgLicense: "Licenciamento",
+        labelTituloLicense: "Licenciamento do sistema",
+        lblLicenseToken: "Token do Sistema:",
+        labelLicenseFile: "Chave de Licença:",
+        labelLicenseInstallDate: "Data de instalação da licença:",
+        labelfrom: "Conta de Email:",
+        labelfromName: "Nome da Conta:",
+        labelserver: "Servidor SMTP:",
+        labelusername: "Usuário do Email:",
         labelpassword: "Senha: ",
         btnNext: "Futuros",
         btnAll:"Todos",

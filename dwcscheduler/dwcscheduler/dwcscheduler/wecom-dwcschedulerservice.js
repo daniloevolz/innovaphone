@@ -5,8 +5,8 @@ var connectionsUser = [];
 
 //Config variables
 var licenseAppToken = Config.licenseAppToken;
-if (licenseAppToken == "") {
-    var rand = Random.bytes(16);
+if (licenseAppToken != "") {
+    var rand = Random.bytes(32);
     Config.licenseAppToken = String(rand);
     Config.save();
 }

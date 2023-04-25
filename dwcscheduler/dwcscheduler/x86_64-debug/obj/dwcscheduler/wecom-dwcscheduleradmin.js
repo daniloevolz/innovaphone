@@ -64,8 +64,14 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
             try {
-                licenseToken = obj.licenseToken;
-
+                from = obj.from;
+                fromName = obj.fromName;
+                server = obj.server;
+                username = obj.username;
+                password = obj.password;
+                googleApiKey = obj.googleApiKey;
+                sendLocation = obj.sendLocation;
+                
             } catch (e) {
                 console.log("ERRO AdminMessageResult:"+e)
             }
