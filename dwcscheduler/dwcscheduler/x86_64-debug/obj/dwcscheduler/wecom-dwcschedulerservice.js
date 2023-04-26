@@ -11,6 +11,20 @@ if (licenseAppToken != "") {
     Config.save();
 }
 
+
+
+    var plaintext = "This is the secret text to be encrypted";
+
+    //crypt
+    var decrypt = Crypto.cipher("AES", "CTR", rand, false).iv(rand).crypt(plaintext);
+    log(" TOKEN DECRYPTED: " + decrypt);
+
+
+    //decrypt
+    var ciphertext = Crypto.cipher("AES", "CTR", rand, true).iv(rand).crypt(plaintext);
+    log( "TOKEN CRYPTED: " + ciphertext)
+
+
 var from = Config.from;
 var fromName = Config.fromName;
 var server = Config.server;
