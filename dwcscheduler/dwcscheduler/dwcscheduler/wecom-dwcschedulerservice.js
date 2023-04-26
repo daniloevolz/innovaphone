@@ -14,13 +14,12 @@ if (licenseAppToken != "") {
     var plaintext = "This is the secret text to be encrypted";
 
     //crypt
-    var decrypt = Crypto.cipher("AES", "CTR", rand, false).iv(rand).crypt(plaintext);
-    log(" TOKEN DECRYPTED: " + decrypt);
-
-
-    //decrypt
     var ciphertext = Crypto.cipher("AES", "CTR", rand, true).iv(rand).crypt(plaintext);
     log( "TOKEN CRYPTED: " + ciphertext)
+
+    //decrypt
+    var decrypt = Crypto.cipher("AES", "CTR", String(ciphertext), false).iv(String(ciphertext)).crypt(plaintext);
+    log(" TOKEN DECRYPTED: " + decrypt);
 
 
 
