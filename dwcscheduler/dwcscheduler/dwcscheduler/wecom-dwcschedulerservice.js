@@ -15,7 +15,7 @@ if (licenseAppToken != "") {
 
     //crypt
     var ciphertext = Crypto.cipher("AES", "CTR", rand, true).iv(rand).crypt(plaintext);
-    log( "TOKEN CRYPTED: " + ciphertext)
+    log( "TEXT CRYPTED: " + ciphertext)
 
     //decrypt
     var decrypt = Crypto.cipher("AES", "CTR", String(ciphertext), false).iv(String(ciphertext)).crypt(plaintext);
