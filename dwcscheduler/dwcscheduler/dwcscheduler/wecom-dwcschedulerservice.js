@@ -597,7 +597,7 @@ new JsonApi("admin").onconnected(function(conn) {
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
-                    var lic = decrypt(obj.licenseToken, obj.licenseToken, obj.licenseFile)
+                    var lic = decrypt(obj.licenseToken,obj.licenseFile)
                     log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
                     Config.licenseAppFile = obj.licenseFile;
                     Config.licenseInstallDate = getDateNow();
@@ -755,14 +755,21 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     });
 });
 
-function decrypt(key, iv, hash) {
+function decrypt(key,hash) {
     //var iv = iv.substring(0, 16);
-    log("iv: " + iv)
+
     log("key: " + key)
     log("hash: " + hash)
-    var plaintext = Crypto.cipher("AES", "CBC", key, false).iv().crypt(hash);
-    log("plain: " + plaintext)
-    return JSON.parse(plaintext);
+
+     var decrypted= Crypto.hmac("SHA256", key).update(hash).final();
+    //  var crypted = Crypto.hmac("SHA256", null, key).crypt(plaintext);
+
+    // log("PlainText: " + cipher);
+
+    log("Decrypted: " + decrypted);
+
+    return JSON.parse(decrypted);
+    
 }
 
 function updateBadge(ws, call, count) {
