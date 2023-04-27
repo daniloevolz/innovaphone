@@ -5,25 +5,11 @@ var connectionsUser = [];
 
 //Config variables
 var licenseAppToken = Config.licenseAppToken;
-if (licenseAppToken != "") {
-    var rand = Random.bytes(32);
+if (licenseAppToken == "") {
+    var rand = Random.bytes(16);
     Config.licenseAppToken = String(rand);
     Config.save();
 }
-
-
-
-    var plaintext = "This is the secret text to be encrypted";
-
-    //crypt
-    var decrypt = Crypto.cipher("AES", "CTR", rand, false).iv(rand).crypt(plaintext);
-    log(" TOKEN DECRYPTED: " + decrypt);
-
-
-    //decrypt
-    var ciphertext = Crypto.cipher("AES", "CTR", rand, true).iv(rand).crypt(plaintext);
-    log( "TOKEN CRYPTED: " + ciphertext)
-
 
 var from = Config.from;
 var fromName = Config.fromName;
@@ -611,12 +597,8 @@ new JsonApi("admin").onconnected(function(conn) {
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
-                    // create 256-Bit encryption key from passphrase by hashing it using SHA256
-                    var key = Crypto.hash("SHA256").update(obj.licenseAppToken).final();
-                    log("UpdateConfigLicenseMessage: License key: " + key);
-                    // decrypt
-                    var plaintext = Crypto.cipher("AES", "CTR", key, false).iv(parseInt(obj.licenseToken)).crypt(obj.licenseFile);
-                    log("UpdateConfigLicenseMessage: License decrypted: " + plaintext);
+                    var lic = decrypt(obj.licenseToken, obj.licenseToken, obj.licenseFile)
+                    log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
                     Config.licenseAppFile = obj.licenseFile;
                     Config.licenseInstallDate = getDateNow();
                     Config.save();
@@ -772,6 +754,16 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.splice(pbxTable.indexOf(conn), 1);
     });
 });
+
+function decrypt(key, iv, hash) {
+    //var iv = iv.substring(0, 16);
+    log("iv: " + iv)
+    log("key: " + key)
+    log("hash: " + hash)
+    var plaintext = Crypto.cipher("AES", "CBC", key, false).iv().crypt(hash);
+    log("plain: " + plaintext)
+    return JSON.parse(plaintext);
+}
 
 function updateBadge(ws, call, count) {
     var msg = {

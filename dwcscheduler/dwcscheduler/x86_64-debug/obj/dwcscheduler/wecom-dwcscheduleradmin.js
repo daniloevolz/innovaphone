@@ -257,11 +257,14 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            licenseFile = document.getElementById("InputLicenseLile").value;
-
-
-            app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
-            waitConnection(t);
+            licenseFile = document.getElementById("InputLicenseFile").value;
+            if (licenseFile.length > 0) {
+                app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
+                waitConnection(t);
+            } else {
+                window.alert("A chave de licença precisa ser informada!");
+            }
+            
         });
 
     }
