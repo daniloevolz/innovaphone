@@ -11,3 +11,18 @@ C:\Users\danil\source\repos\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\We
 C:\Users\danil\source\repos\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\Newtonsoft.Json.dll
 C:\Users\danil\source\repos\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\Newtonsoft.Json.xml
 C:\Users\danil\source\repos\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.csproj.CopyComplete
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\WecomLicenseCreator.exe.config
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\WecomLicenseCreator.exe
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\WecomLicenseCreator.pdb
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\BouncyCastle.Crypto.dll
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\Newtonsoft.Json.dll
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\BouncyCastle.Crypto.xml
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\bin\Debug\Newtonsoft.Json.xml
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.csproj.AssemblyReference.cache
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.Form1.resources
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.Properties.Resources.resources
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.csproj.GenerateResource.cache
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.csproj.CoreCompileInputs.cache
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.csproj.CopyComplete
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.exe
+C:\Users\danil\OneDrive - Wecom S A\GitHub\innovaphone\WecomLicenseCreator\WecomLicenseCreator\obj\Debug\WecomLicenseCreator.pdb

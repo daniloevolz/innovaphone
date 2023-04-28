@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Parameters;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
@@ -31,61 +33,72 @@ namespace WecomLicenseCreator
             string objeto = textBoxObj.Text.Trim(); // Obtém o valor de USER do input e remove os espaços em branco
             //string hash = CreateSHA256Hash(token); //Cria hash do token
 
-            string ciphertext = Encrypt(objeto, token, token);
+            //string ciphertext = EncryptRC4(objeto, token);
+            string ciphertext = EncryptSHA256(objeto, token);
             //string ciphertext = EncryptAES(token, token, objeto);
             textBoxResult.Text = ciphertext; // Exibe o hash criptografado na tela
+
+            string decrypt = DecryptRC4(ciphertext, token);
+            textBox1.Text = decrypt;
+
         }
-        public static string Encrypt(string text, string key, string iv)
+        public static string EncryptSHA256(string text, string key)
         {
-            if (iv.Length > 16)
-            {
-                iv = iv.Substring(0, 16);
-            }
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            byte[] textBytes = Encoding.UTF8.GetBytes(text);
+            byte[] messageBytes = Encoding.UTF8.GetBytes(text);
 
-            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            using (HMACSHA256 hmac = new HMACSHA256(keyBytes))
             {
-                aes.Key = keyBytes;
-                aes.IV = null;
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
-
-                ICryptoTransform encryptor = aes.CreateEncryptor();
-
-                byte[] encryptedBytes = encryptor.TransformFinalBlock(textBytes, 0, textBytes.Length);
-
-                return Convert.ToBase64String(encryptedBytes);
+                return Convert.ToBase64String(hmac.ComputeHash(messageBytes));
             }
         }
-        public static string EncryptAES(string key, string iv, string plaintext)
+        public static string EncryptRC4(string text, string key)
         {
-            
-            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
-            {
-                if (iv.Length > 16)
-                {
-                    iv = iv.Substring(0, 16);
-                }
-                byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.IV = ivBytes;
-                aes.Mode = CipherMode.CTS;
+            byte[] input = Encoding.UTF8.GetBytes(text);
+            byte[] output = new byte[input.Length];
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
 
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+            // Configurando o RC4 com a chave de 32 bits
+            var rc4 = new RC4Engine();
+            var keyParam = new KeyParameter(keyBytes);
+            rc4.Init(true, keyParam);
 
-                byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
-                byte[] encryptedBytes = encryptor.TransformFinalBlock(plaintextBytes, 0, plaintextBytes.Length);
+            // Criptografando os dados de entrada
+            rc4.ProcessBytes(input, 0, input.Length, output, 0);
 
-                return Convert.ToBase64String(encryptedBytes);
-            }
+            return Convert.ToBase64String(output);
+        }
+        public static string DecryptRC4(string text, string key)
+        {
+            byte[] input = Convert.FromBase64String(text);
+            byte[] output = new byte[input.Length];
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+
+            // Configurando o RC4 com a chave de 32 bits
+            var rc4 = new RC4Engine();
+            var keyParam = new KeyParameter(keyBytes);
+            rc4.Init(false, keyParam);
+
+            // Descriptografando os dados de entrada
+            rc4.ProcessBytes(input, 0, input.Length, output, 0);
+
+            return Encoding.UTF8.GetString(output);
         }
         private void btnLimpar_Click(object sender, EventArgs e)
         {
             textBoxToken.Text = null;
             textBoxObj.Text = null;
             textBoxResult.Text = null; // Exibe o hash criptografado na tela
+        }
+
+        private void textBoxToken_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

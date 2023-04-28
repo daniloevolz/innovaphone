@@ -37,6 +37,7 @@ namespace WecomLicenseCreator
             this.textBoxObj = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnLimpar = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnCriptografar
@@ -61,7 +62,7 @@ namespace WecomLicenseCreator
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 326);
+            this.label2.Location = new System.Drawing.Point(31, 280);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(65, 17);
             this.label2.TabIndex = 2;
@@ -69,7 +70,7 @@ namespace WecomLicenseCreator
             // 
             // textBoxResult
             // 
-            this.textBoxResult.Location = new System.Drawing.Point(34, 347);
+            this.textBoxResult.Location = new System.Drawing.Point(34, 313);
             this.textBoxResult.Name = "textBoxResult";
             this.textBoxResult.Size = new System.Drawing.Size(621, 22);
             this.textBoxResult.TabIndex = 3;
@@ -80,6 +81,7 @@ namespace WecomLicenseCreator
             this.textBoxToken.Name = "textBoxToken";
             this.textBoxToken.Size = new System.Drawing.Size(621, 22);
             this.textBoxToken.TabIndex = 4;
+            this.textBoxToken.TextChanged += new System.EventHandler(this.textBoxToken_TextChanged);
             // 
             // textBoxObj
             // 
@@ -108,11 +110,20 @@ namespace WecomLicenseCreator
             this.btnLimpar.UseVisualStyleBackColor = true;
             this.btnLimpar.Click += new System.EventHandler(this.btnLimpar_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(37, 391);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(513, 22);
+            this.textBox1.TabIndex = 8;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnLimpar);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBoxObj);
@@ -139,6 +150,7 @@ namespace WecomLicenseCreator
         private System.Windows.Forms.TextBox textBoxObj;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnLimpar;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
