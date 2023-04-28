@@ -67,6 +67,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
 
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "NoLicense") {
+            console.log(obj.result);
+            makeDivNoLicense(obj.result);
+        }
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
             console.log(obj.result);
             list_configs = JSON.parse(obj.result);
@@ -202,6 +206,12 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             app.send({ api: "user", mt: "SelectAvailabilityMessage"});
             waitConnection(colDireita);
         }
+    }
+    function makeDivNoLicense(msg) {
+        that.clear();
+        //Titulo 
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
+
     }
     function makeDivSchedules(t) {
         t.clear();

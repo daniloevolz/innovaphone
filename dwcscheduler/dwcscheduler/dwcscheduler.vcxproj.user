@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteTarget>2142707483;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
-    <RemoteDebuggerCommandArguments>--app-name=dwcscheduler --app-domain= --app-password=pwd --webserver-path=dwcscheduler --db-name=dwcscheduler --db-user=dwcscheduler --db-password=dwcscheduler --service-id=dwcscheduler</RemoteDebuggerCommandArguments>
+    <RemoteTarget>-68184123;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggerCommandArguments>--app-name=dwcscheduler --app-domain=wecom.com.br --app-password=pwd --webserver-path=dwcscheduler --db-name=dwcscheduler --db-user=dwcscheduler --db-password=dwcscheduler --service-id=dwcscheduler</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
