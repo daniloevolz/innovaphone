@@ -34,13 +34,56 @@ namespace WecomLicenseCreator
             //string hash = CreateSHA256Hash(token); //Cria hash do token
 
             //string ciphertext = EncryptRC4(objeto, token);
-            string ciphertext = EncryptSHA256(objeto, token);
-            //string ciphertext = EncryptAES(token, token, objeto);
+            //string ciphertext = EncryptSHA256(objeto, token);
+            string ciphertext = EncryptAES(objeto, token, token);
+            //string ciphertext = ComputeSHA256(objeto);
             textBoxResult.Text = ciphertext; // Exibe o hash criptografado na tela
 
-            string decrypt = DecryptRC4(ciphertext, token);
-            textBox1.Text = decrypt;
+            //string decrypt = DecryptRC4(ciphertext, token);
+            //textBox1.Text = decrypt;
 
+        }
+        public static string ComputeSHA256(string input)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] crypt = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+                return Convert.ToBase64String(crypt);
+            }
+        }
+        public static string EncryptAES(string text, string key, string iv)
+        {
+            byte[] keyBytes;
+            //byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            //byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
+
+            //string input = "3f66eb506a592602d69ec9274c6b1956";
+
+            byte[] inputBytes = Encoding.UTF8.GetBytes(key);
+
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(inputBytes);
+                byte[] truncatedBytes = new byte[16];
+                Buffer.BlockCopy(hashBytes, 0, truncatedBytes, 0, 16);
+                // truncatedBytes agora contém os 16 bytes do hash truncado
+                keyBytes = truncatedBytes;
+            }
+
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+            {
+                aes.Key = keyBytes;
+                aes.IV = keyBytes;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                ICryptoTransform encryptor = aes.CreateEncryptor();
+
+                byte[] encryptedBytes = encryptor.TransformFinalBlock(textBytes, 0, textBytes.Length);
+
+                return Convert.ToBase64String(encryptedBytes);
+            }
         }
         public static string EncryptSHA256(string text, string key)
         {

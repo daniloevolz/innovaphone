@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.wecomlicensemanagermanager",
+            "icon": "wecom-wecomlicensemanager.png",
+            "lang": "wecom.wecomlicensemanagermanagertexts",
+            "domains": false
+        }
+    ]
+}

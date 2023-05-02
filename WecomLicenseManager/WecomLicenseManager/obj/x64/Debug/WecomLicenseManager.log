@@ -1,0 +1,25 @@
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/WecomLicenseManager" -temp "x86_64-debug/obj/" -project "WecomLicenseManager" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-wecomlicensemanagerservice.js," -copyRTM 1
+  Building project ...
+      Project output dirctory : x86_64-debug/WecomLicenseManager
+      Temp directory          : x86_64-debug\obj\WecomLicenseManager
+      Runtime binary          : jse/x86_64/generic
+      Build Number            : 13B126
+  
+  Removing old files from x86_64-debug\obj\WecomLicenseManager...
+  Creating directories...
+  Checking for new items to add...
+      .\WecomLicenseManager\..\web1\appwebsocket\innovaphone.appwebsocket.Connection.js => x86_64-debug\obj\WecomLicenseManager\web1\appwebsocket
+      .\WecomLicenseManager\..\web1\lib1\*.js => x86_64-debug\obj\WecomLicenseManager\web1\lib1
+      .\WecomLicenseManager\..\web1\lib1\*.css => x86_64-debug\obj\WecomLicenseManager\web1\lib1
+      .\WecomLicenseManager\..\web1\ui1.lib\*.js => x86_64-debug\obj\WecomLicenseManager\web1\ui1.lib
+      .\WecomLicenseManager\..\web1\ui1.svg\*.js => x86_64-debug\obj\WecomLicenseManager\web1\ui1.svg
+      .\WecomLicenseManager\..\web1\fonts\*.ttf => x86_64-debug\obj\WecomLicenseManager\web1\fonts
+      .\WecomLicenseManager\httpfiles\* => x86_64-debug\obj\WecomLicenseManager
+      .\WecomLicenseManager\build.txt => x86_64-debug\obj\WecomLicenseManager
+      .\WecomLicenseManager\label.txt => x86_64-debug\obj\WecomLicenseManager
+      .\WecomLicenseManager\config.json => x86_64-debug\obj\WecomLicenseManager
+      .\WecomLicenseManager\plugins.json => x86_64-debug\obj\WecomLicenseManager
+      .\WecomLicenseManager\wecom-wecomlicensemanagerservice.js => x86_64-debug\obj\WecomLicenseManager
+  
+  Compressing files to x86_64-debug\WecomLicenseManager\httpfiles.zip...
+  Comando de build remoto não configurado, ignorando.
