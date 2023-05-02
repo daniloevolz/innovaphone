@@ -38,7 +38,7 @@ Config.onchanged(function () {
 })
 
 log("danilo req: License "+JSON.stringify(license));
-if (license.System==true) {
+if (license != null && license.System==true) {
     log("danilo req: License for System found, Webservers will be available");
     WebServer.onrequest("value", function (req) {
         if (req.method == "GET") {
@@ -370,10 +370,9 @@ if (license.System==true) {
 }
 
 function getLicense() {
-    var lic = {
-        System: true,
-        Users: 1
-    }
+    var key = Config.licenseAppToken;
+    var hash = Config.licenseAppFile;
+    var lic = decrypt(key,hash);
     return lic;
 }
 
@@ -389,13 +388,18 @@ function getQueryStringParams(queryString) {
 
 new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-dwcscheduler") {
+        log("license: " + JSON.stringify(license));
         log("connectionsUser: license.Users " + license.Users);
         log("connectionsUser: connectionsUser.length " + connectionsUser.length);
-        if (parseInt(connectionsUser.length) < parseInt(license.Users)) {
-            connectionsUser.push(conn);
-        }
+        // if (connectionsUser.length < license.Users) {
+               connectionsUser.push(conn);
+               log("Usuario Conectado:  " + connectionsUser.length);
+        // }
+        
         conn.onmessage(function (msg) {
-            if (parseInt(connectionsUser.length) < parseInt(license.Users)) {
+
+            if (license != null && connectionsUser.length <= license.Users) {
+                
                 var obj = JSON.parse(msg);
                 if (obj.mt == "UserMessage") {
                     try {
@@ -612,7 +616,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 var licenseAppToken = Config.licenseAppToken;
                 licenseInstallDate = Config.licenseInstallDate;
                 licenseAppFile = Config.licenseAppFile;
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: license, licenseInstallDate: licenseInstallDate }));
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: JSON.stringify(license), licenseInstallDate: licenseInstallDate }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
@@ -780,16 +784,17 @@ function decrypt(key,hash) {
     log("key: " + key)
     log("hash: " + hash)
 
-     var decrypted= Crypto.hmac("SHA256", key).update(hash).final();
-    //  var crypted = Crypto.hmac("SHA256", null, key).crypt(plaintext);
-
-    // log("PlainText: " + cipher);
-
+    
+    // encryption using AES-128 in CTR mode
+    var ciphertext = Crypto.cipher("AES", "CTR", key, true).iv(key).crypt(hash);
+    log("Crypted: " + ciphertext);
+    // decryption using AES-128 in CTR mode
+    var decrypted = Crypto.cipher("AES", "CTR", key, false).iv(key).crypt(hash);
     log("Decrypted: " + decrypted);
+    // now decrypted contains the plain text again
 
     return JSON.parse(decrypted);
-    
-}
+ }
 
 function updateBadge(ws, call, count) {
     var msg = {

@@ -82,7 +82,7 @@
                 The top level element of a JSON string can be either a primitive or a constructed data type.
             </li>
             <li>
-                When a JSON document is created using this library, you need to add properties to the json_io instance in a certain order. Imagine the JSON document as a tree structure, where each level represents an object or an array. If you want to add properties to an object, you need to first add the object to the current level of the tree, and then add the properties to the object before moving to the next level. You cannot add another property to the same level as the object before adding all the properties to the object.  
+                When a JSON document is created using this library, you need to add elements to the json_io instance in the order as they appear in the JSON document. 
             </li>
             <li>
                 Strings are encoded using quotes.
