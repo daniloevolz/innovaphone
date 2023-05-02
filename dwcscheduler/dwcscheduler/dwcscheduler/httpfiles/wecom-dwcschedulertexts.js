@@ -7,6 +7,7 @@ Wecom.dwcschedulerTexts = {
         lblLicenseToken: "Token do Sistema:",
         labelLicenseFile: "Chave de Licença:",
         labelLicenseInstallDate: "Data de instalação da licença:",
+        labelLicenseActive: "Licença Ativa",
         labelfrom: "Conta de Email:",
         labelfromName: "Nome da Conta:",
         labelserver: "Servidor SMTP:",

@@ -616,7 +616,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 var licenseAppToken = Config.licenseAppToken;
                 licenseInstallDate = Config.licenseInstallDate;
                 licenseAppFile = Config.licenseAppFile;
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: JSON.stringify(license), licenseInstallDate: licenseInstallDate }));
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(license), licenseInstallDate: licenseInstallDate }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
