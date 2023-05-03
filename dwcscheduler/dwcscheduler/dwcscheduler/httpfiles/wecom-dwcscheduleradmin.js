@@ -52,6 +52,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     var licenseFile = null;
     var licenseActive = null;
     var licenseInstallDate = null;
+    var licenseUsed = 0;
 
     function app_connected(domain, user, dn, appdomain) {
         //avatar
@@ -91,12 +92,19 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             window.alert("Configurações Atualizadas com suecesso!");
 
         }
+        if (obj.api == "admin" && obj.mt == "UpdateConfigLicenseMessageSuccess") {
+            app.send({ api: "admin", mt: "ConfigLicense" });
+            waitConnection(colDireita);
+            window.alert("Configurações Atualizadas com suecesso!");
+
+        }
         if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
             try {
                 licenseToken = obj.licenseToken;
                 licenseFile = obj.licenseFile;
                 licenseActive = obj.licenseActive;
                 licenseInstallDate = obj.licenseInstallDate;
+                licenseUsed = obj.licenseUsed;
 
             } catch (e) {
                 console.log("ERRO LicenseMessageResult:" + e)
@@ -258,7 +266,9 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), null));
         t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", licenseInstallDate, null));
 
-       
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), null));
+
 
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {

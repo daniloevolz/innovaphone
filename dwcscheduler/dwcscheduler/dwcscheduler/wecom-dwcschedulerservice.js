@@ -616,7 +616,9 @@ new JsonApi("admin").onconnected(function(conn) {
                 var licenseAppToken = Config.licenseAppToken;
                 licenseInstallDate = Config.licenseInstallDate;
                 licenseAppFile = Config.licenseAppFile;
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(license), licenseInstallDate: licenseInstallDate }));
+                var licUsed = connectionsUser.length;
+                var lic = decrypt(licenseAppToken, licenseAppFile)
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult",licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {

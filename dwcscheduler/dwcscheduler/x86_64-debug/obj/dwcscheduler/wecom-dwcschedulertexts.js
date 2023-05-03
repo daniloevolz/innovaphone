@@ -2,6 +2,7 @@
 var Wecom = Wecom || {};
 Wecom.dwcschedulerTexts = {
     pt: {
+        labelLicenseUsed:"Licenças em uso:",
         labelCfgLicense: "Licenciamento",
         labelTituloLicense: "Licenciamento do sistema",
         lblLicenseToken: "Token do Sistema:",
