@@ -366,6 +366,22 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         src.obj = obj;
         src.send(message);
     }
+    this.sendSrcMore = function (message, result, obj) {
+        var src = new instance.Src(function (m) {
+            if (m.more) {
+                if (m.more !== true) {
+                    message.more = m.more;
+                    src.send(message);
+                }
+            }
+            else {
+                src.close();
+            }
+            result(m, src.obj);
+        });
+        src.obj = obj;
+        src.send(message);
+    }
     this.close = function (error) {
         close(error);
     }

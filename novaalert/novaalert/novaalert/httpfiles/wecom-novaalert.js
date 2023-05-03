@@ -136,6 +136,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "NoLicense") {
+            console.log(obj.result);
+            makeDivNoLicense(obj.result);
+        }
         if (obj.api == "user" && obj.mt == "UserInitializeResultSuccess") {
             app.send({ api: "user", mt: "SelectMessage" }); //Requisita os botões
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
@@ -543,6 +547,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             data = "0" + data;
         }
         return data;
+    }
+    function makeDivNoLicense(msg) {
+        that.clear();
+        //Titulo 
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
+
     }
     function popButtons(buttons) {
 

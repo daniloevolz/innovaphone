@@ -476,7 +476,8 @@
     "api": "PbxAdminApi",
     "mt": "GetObject",
     "guid": string,
-    "cn": string
+    "cn": string,
+	"h323": string
 }</code></pre>
 
     <p>
@@ -489,7 +490,11 @@
         </dd>
         <dt>cn</dt>
         <dd>
-            If no guid is present, the cn can be used to identify the object.
+            If no guid is present, the cn (Long Name) can be used to identify the object
+        </dd>
+        <dt>h323</dt>
+        <dd>
+            If no guid and no cn is present, the h323-id (Name) can be used to identify the object
         </dd>
     </dl>
 

@@ -66,6 +66,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         { typeName: "PopUp Iframe", id: "popup" }
     ];
 
+    //license
+    var licenseToken = null;
+    var licenseFile = null;
+    var licenseActive = null;
+    var licenseInstallDate = null;
+    var licenseUsed = 0;
+
     function app_connected(domain, user, dn, appdomain) {
         UIuser = dn;
         //avatar
@@ -152,6 +159,28 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             constructor();
             makePopup("Atenção!", "Dados excluídos com sucesso!");
         }
+        if (obj.api == "admin" && obj.mt == "UpdateConfigLicenseMessageSuccess") {
+            app.send({ api: "admin", mt: "ConfigLicense" });
+            waitConnection(colDireita);
+            window.alert("Configurações Atualizadas com suecesso!");
+
+        }
+        if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
+            try {
+                licenseToken = obj.licenseToken;
+                licenseFile = obj.licenseFile;
+                licenseActive = obj.licenseActive;
+                licenseInstallDate = obj.licenseInstallDate;
+                licenseUsed = obj.licenseUsed;
+
+            } catch (e) {
+                console.log("ERRO LicenseMessageResult:" + e)
+            }
+            makeDivLicense(colDireita);
+        }
+        if (obj.api == "admin" && obj.mt == "UpdateConfigMessageErro") {
+            window.alert("Erro ao atualizar as configurações, verifique os logs do serviço.");
+        }
         
     }
 
@@ -165,6 +194,40 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         popup.content.addText(content);
     }
 
+    function makeDivLicense(t) {
+        t.clear();
+        //Título
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloLicense")));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, null));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"), null));
+        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, null).setAttribute("id", "InputLicenseFile"));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", licenseActive, null));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", licenseInstallDate, null));
+
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), null));
+
+
+        // buttons
+        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+            licenseFile = document.getElementById("InputLicenseFile").value;
+            if (licenseFile.length > 0) {
+                app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
+                waitConnection(t);
+            } else {
+                window.alert("A chave de licença precisa ser informada!");
+            }
+            
+        });
+
+    }
     function makeDivAddButton(t1) {
         t1.clear();
         //Título
@@ -1292,20 +1355,22 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, "username"));
         username.setAttribute("id", "user")
 
-        var menuarea = colEsquerda.add(new innovaphone.ui1.Node("scroll-container", "position: absolute; top: 24%; height: 76%; width:100%; overflow-y: auto;", null,"menuarea"));
+        var menuarea = colEsquerda.add(new innovaphone.ui1.Node("scroll-container", "position: absolute; top: 20%; height: 76%; width:100%; overflow-y: auto;", null,"menuarea"));
 
         var configs = menuarea.add(new innovaphone.ui1.Div("position: absolute; top: 5%; height: 40%; width:100%"));
         configs.add(new innovaphone.ui1.Node("p", "text-align: left; font-size: 17px;", texts.text("labelAdmin"), null));
         configs.add(new innovaphone.ui1.Node("br", null, null, null));
 
-        var lirelatorios1 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios2 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios3 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios4 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios1 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios2 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios3 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios4 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios5 = configs.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgButtons"), null).setAttribute("id", "CfgButtons"));
         lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgAcctions"), null).setAttribute("id", "CfgAcctions"));
         lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgNovaalert"), null).setAttribute("id", "CfgNovaalert"));
         lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgDefaults"), null).setAttribute("id", "CfgDefaults"));
+        lirelatorios5.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgLicense"), null).setAttribute("id", "CfgLicense"));
 
         var relatorios = menuarea.add(new innovaphone.ui1.Div("position: absolute; top: 50%; height: 40%; width:100%"));
         relatorios.add(new innovaphone.ui1.Node("p", "text-align: left; font-size: 17px;", texts.text("labelReports"), null));
@@ -1327,6 +1392,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         imgconfig.setAttribute("src", "logo.png");
         //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
         //Aconfig.setAttribute("href", "#");
+
+        var a = document.getElementById("CfgLicense");
+        a.addEventListener("click", function(){
+            app.send({ api: "admin", mt: "ConfigLicense"});
+            waitConnection(_colDireita);
+        })
 
         var a = document.getElementById("CfgButtons");
         a.addEventListener("click", function () {

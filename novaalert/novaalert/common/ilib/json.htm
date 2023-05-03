@@ -82,6 +82,9 @@
                 The top level element of a JSON string can be either a primitive or a constructed data type.
             </li>
             <li>
+                When a JSON document is created using this library, you need to add elements to the json_io instance in the order as they appear in the JSON document. 
+            </li>
+            <li>
                 Strings are encoded using quotes.
                 <br /><pre><code class="JS">"some text"</code></pre>
                 All other primitive data style are encoded without quotes.
@@ -874,7 +877,8 @@ json.add_unsigned(base, "age", 30, t);
         "programming", 
         "tv series", 
         "cooking"
-    ] 
+    ],
+    "email": "john.doe@aol.com"
 }</code></pre>
     </p>
 
@@ -890,6 +894,8 @@ word interests = json.add_array(base, "interests");
 json.add_string(interests, "programming");
 json.add_string(interests, "tv series");
 json.add_string(interests, "cooking");
+json.add_string(base, "email", "john.doe@aol.com");
+json.add_string(interests, "fishing"); // this will have no effect, cause "interests" handle is not valid any more
 
 json.encode();
 </code></pre>

@@ -1,8 +1,19 @@
-﻿
+﻿var license = getLicense();
+log("var license =" + license)
+//Config variables
+var licenseAppToken = Config.licenseAppToken;
+if (licenseAppToken != "") {
+    var rand = Random.bytes(16);
+    Config.licenseAppToken = String(rand);
+    Config.save();
+}
+
 var urlalert = Config.urlalert;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var sendCallEvents = Config.sendCallEvents;
 var google_api_key = Config.googleApiKey;
+var licenseAppFile = Config.licenseAppFile;
+var licenseInstallDate = Config.licenseInstallDate;
 
 //var connectionsRCC = [];
 var connectionsApp = [];
@@ -26,8 +37,12 @@ Config.onchanged(function () {
     sendCallEvents = Config.sendCallEvents;
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
     google_api_key = Config.googleApiKey;
+    licenseAppFile = Config.licenseAppFile;
+    licenseInstallDate = Config.licenseInstallDate;
 })
 
+log("pietro req: License "+JSON.stringify(license));
+if (license != null && license.System==true) {
 WebServer.onrequest("triggedAlarm", function (req) {
     if (req.method == "POST") {
         var newValue = "";
@@ -49,25 +64,44 @@ WebServer.onrequest("triggedAlarm", function (req) {
         req.cancel();
     }
 });
+}
+
+function getLicense() {
+    var key = Config.licenseAppToken;
+    var hash = Config.licenseAppFile;
+    var lic = decrypt(key,hash);
+    return lic;
+}
 
 //APPS API
 new JsonApi("user").onconnected(function (conn) {
-    log("danilo req: user conn: " + JSON.stringify(conn))
-    connectionsUser.push(conn);
+    // log("danilo req: user conn: " + JSON.stringify(conn))
+    // connectionsUser.push(conn);
 
     if (conn.app == "wecom-novaalert") {
 
-        //Intert into DB the event
-        log("danilo req: insert into DB = user " + conn.sip );
-        var today = getDateNow();
-        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
-        log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-        insertTblAvailability(msg);
+        log("license: " + JSON.stringify(license));
+        // log("connectionsUser: license.Users " + license.Users);
+        log("connectionsUser: connectionsUser.length " + connectionsUser.length);
+        
+               connectionsUser.push(conn);
+               log("Usuario Conectado:  " + connectionsUser.length);
+     
+
+
 
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             var info = JSON.parse(conn.info);
             var today = getDateNow();
+
+            if (license != null && connectionsUser.length <= license.Users) {
+                        //Intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip );
+                    var today = getDateNow();
+                    var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblAvailability(msg);
 
             if (obj.mt == "UserMessage") {
                 updateTableBadgeCount(conn.sip, "ResetCount");
@@ -347,8 +381,15 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
                     });
             }
-        });
-    }
+        }
+        else{
+            log("danilo req: No license Available")
+            conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));  
+        }
+    
+        })
+
+
     conn.onclose(function () {
         log("User: disconnected");
 
@@ -381,7 +422,9 @@ new JsonApi("user").onconnected(function (conn) {
         log("danilo req : connectionsUsers after delete conn of user " + conn.sip + " : " + JSON.stringify(connectionsUser));
 
     });
+}
 });
+
 new JsonApi("admin").onconnected(function (conn) {
     if (conn.app == "wecom-novaalertadmin") {
         conn.onmessage(function (msg) {
@@ -405,6 +448,34 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.save();
                 }
             }
+            // license 
+            if (obj.mt == "ConfigLicense") {
+                var licenseAppToken = Config.licenseAppToken;
+                licenseInstallDate = Config.licenseInstallDate;
+                licenseAppFile = Config.licenseAppFile;
+                var licUsed = connectionsUser.length;
+                var lic = decrypt(licenseAppToken, licenseAppFile)
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult",licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate }));
+            }
+            if (obj.mt == "UpdateConfigLicenseMessage") {
+                try {
+                    var lic = decrypt(obj.licenseToken,obj.licenseFile)
+                    log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
+                    Config.licenseAppFile = obj.licenseFile;
+                    Config.licenseInstallDate = getDateNow();
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigLicenseMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigLicenseMessage:" + e);
+
+
+                }
+            }
+
+
+
             if (obj.mt == "InsertMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
                     .oncomplete(function () {
@@ -1999,6 +2070,24 @@ function comboManager(combo, sip, mt) {
     }
 
 }
+
+function decrypt(key,hash) {
+    //var iv = iv.substring(0, 16);
+
+    log("key: " + key)
+    log("hash: " + hash)
+
+    
+    // encryption using AES-128 in CTR mode
+    var ciphertext = Crypto.cipher("AES", "CTR", key, true).iv(key).crypt(hash);
+    log("Crypted: " + ciphertext);
+    // decryption using AES-128 in CTR mode
+    var decrypted = Crypto.cipher("AES", "CTR", key, false).iv(key).crypt(hash);
+    log("Decrypted: " + decrypted);
+    // now decrypted contains the plain text again
+
+    return JSON.parse(decrypted);
+ }
 
 function getDateNow() {
     // Cria uma nova data com a data e hora atuais em UTC

@@ -225,6 +225,27 @@
     "init": [
       {
         "cmd": "item",
+        "name": "licenseAppFile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseInstallDate",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseAppToken",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "urlalert",
         "type": "STRING",
         "default": "",
