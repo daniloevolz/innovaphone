@@ -2,6 +2,13 @@
 var Wecom = Wecom || {};
 Wecom.wecallTexts = {
     pt: {
+        labelLicenseUsed: "Licenças em uso:",
+        labelCfgLicense: "Licenciamento",
+        labelTituloLicense: "Licenciamento do sistema",
+        lblLicenseToken: "Token do Sistema:",
+        labelLicenseFile: "Chave de Licença:",
+        labelLicenseInstallDate: "Data de instalação da licença:",
+        labelLicenseActive: "Licença Ativa",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
         labelDevice: "Dispositivo:",
         labelAdmin: "Administração",

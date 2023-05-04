@@ -180,6 +180,11 @@
             "cmd": "column",
             "name": "button_type_4",
             "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_device",
+            "type": "VARCHAR(50)"
           }
         ]
       },

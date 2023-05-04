@@ -45,6 +45,27 @@
     "init": [
       {
         "cmd": "item",
+        "name": "licenseAppFile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseInstallDate",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseAppToken",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "url",
         "type": "STRING",
         "default": "https://wecall.3sales.net/home/desktop/startup/",
@@ -82,7 +103,7 @@
         "cmd": "item",
         "name": "sendCallEvents",
         "type": "BOOL",
-        "default": false,
+        "default": true,
         "password": false
       },
       {

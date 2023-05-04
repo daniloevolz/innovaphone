@@ -31,7 +31,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 19%;
+    top: 18%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -209,7 +209,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 26%;
+    top: 25%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -305,6 +305,28 @@ select{
     border-width: 3px;
     border-image: linear-gradient(to right, #02163F,#0a45bd);
     border-image-slice: 1;
+}
+.labelDeviceNumber {
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 53%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
+}
+.iptDeviceNumber {
+    position: absolute;
+    width: 30%;
+    top: 52%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
 }
 /*INPUT USERS*/
 .divAdd5{

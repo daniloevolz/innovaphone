@@ -8,7 +8,7 @@ var Wecom = Wecom || {};
 Wecom.wecall = Wecom.wecall || function (start, args) {
     this.createNode("body");
     var that = this;
-    //var phoneApi = start.consumeApi("com.innovaphone.phone");
+    var phoneApi = start.consumeApi("com.innovaphone.phone");
     var calllistApi = start.consumeApi("com.innovaphone.calllist");
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
     calllistApi.onmessage.attach(calllistonmessage);
@@ -49,6 +49,12 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
         //const myInterval = window.setInterval(function () {
         //    moedas();
         //}, 60000);
+    }
+    function makeDivNoLicense(msg) {
+        that.clear();
+        //Titulo 
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
+
     }
     
 
@@ -96,6 +102,10 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     }
 
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "NoLicense") {
+            console.log(obj.result);
+            makeDivNoLicense(obj.result);
+        }
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
             that.clear();
             if (obj.src == "") {
@@ -143,14 +153,19 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
             _popup.content.add(iptDevice);
             _popup.content.add(btnSelectDevice);
         }
-        //if (obj.api == "user" && obj.mt == "MakeCall") {
-        //    console.warn("::MakeCall::");
-        //    phoneApi.send({ mt: "StartCall", num: String(obj.num) });
-        //}
-        //if (obj.api == "user" && obj.mt == "DisconnectCall") {
-        //    console.warn("::DisconnectCall::");
-        //    phoneApi.send({ mt: "DisconnectCall" });
-        //}
+        if (obj.api == "user" && obj.mt == "MakeCall") {
+            console.warn("::MakeCall::");
+            phoneApi.send({ mt: "StartCall", txt: String(obj.num) });
+        }
+        if (obj.api == "user" && obj.mt == "DisconnectCall") {
+            console.warn("::DisconnectCall::");
+            phoneApi.send({ mt: "DisconnectCall" });
+        }
+        if (obj.api == "user" && obj.mt == "ConnectCall") {
+            console.warn("::ConnectCall::");
+            phoneApi.send({ mt: "ConnectCall" });
+        }
+
     }
     //phoneApi.onupdate.attach(function (sender, type) {
     //    Object.keys(sender.model).forEach(function (key) {

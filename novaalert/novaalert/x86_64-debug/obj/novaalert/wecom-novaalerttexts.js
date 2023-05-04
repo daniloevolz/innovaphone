@@ -2,6 +2,13 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        labelLicenseUsed: "Licenças em uso:",
+        labelCfgLicense: "Licenciamento",
+        labelTituloLicense: "Licenciamento do sistema",
+        lblLicenseToken: "Token do Sistema:",
+        labelLicenseFile: "Chave de Licença:",
+        labelLicenseInstallDate: "Data de instalação da licença:",
+        labelLicenseActive: "Licença Ativa",
         labelTituloEdit: "Edite o botão selecionado",
         btnEditButton: "Editar",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
@@ -94,7 +101,8 @@ Wecom.novaalertTexts = {
         btnActions: "Ações",
         labelTituloBotoes: "Lista de Botões Cadastrados",
         labelTituloAcoes: "Lista de Ações Cadastradas",
-        labelHistorico: "Histórico"
+        labelHistorico: "Histórico",
+        device: "Dispositivo:"
     },
     en: {
     },

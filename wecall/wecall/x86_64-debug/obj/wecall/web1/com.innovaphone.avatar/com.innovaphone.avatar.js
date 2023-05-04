@@ -1,4 +1,4 @@
-/// <reference path="../../web1/lib1/innovaphone.lib1.js" />
+/// <reference path="~/web1/lib1/innovaphone.lib1.js" />
 
 var innovaphone = innovaphone || {};
 

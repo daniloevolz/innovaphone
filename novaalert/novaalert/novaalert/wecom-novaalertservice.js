@@ -1,13 +1,11 @@
-﻿
-var license = getLicense();
-
-//Config variables
+﻿//Config variables
 var licenseAppToken = Config.licenseAppToken;
-if (licenseAppToken != "") {
+if (licenseAppToken == "") {
     var rand = Random.bytes(16);
     Config.licenseAppToken = String(rand);
     Config.save();
 }
+var license = getLicense();
 
 var urlalert = Config.urlalert;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
@@ -70,7 +68,10 @@ WebServer.onrequest("triggedAlarm", function (req) {
 function getLicense() {
     var key = Config.licenseAppToken;
     var hash = Config.licenseAppFile;
-    var lic = decrypt(key,hash);
+    var lic;
+    if (key != "" && hash != "") {
+        lic = decrypt(key, hash);
+    }
     return lic;
 }
 
@@ -80,20 +81,20 @@ new JsonApi("user").onconnected(function (conn) {
     // connectionsUser.push(conn);
 
     if (conn.app == "wecom-novaalert") {
-
+        license = getLicense();
         log("license: " + JSON.stringify(license));
         // log("connectionsUser: license.Users " + license.Users);
         log("connectionsUser: connectionsUser.length " + connectionsUser.length);
         
-               connectionsUser.push(conn);
-               log("Usuario Conectado:  " + connectionsUser.length);
+        connectionsUser.push(conn);
+        log("Usuario Conectado:  " + connectionsUser.length);
      
-                //Intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip );
-                var today = getDateNow();
-                var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblAvailability(msg);
+        //Intert into DB the event
+        log("danilo req: insert into DB = user " + conn.sip );
+        var today = getDateNow();
+        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
+        log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+        insertTblAvailability(msg);
 
 
         conn.onmessage(function (msg) {
@@ -103,289 +104,293 @@ new JsonApi("user").onconnected(function (conn) {
 
             if (license != null && connectionsUser.length <= license.Users) {
                     
-            if (obj.mt == "UserMessage") {
-                updateTableBadgeCount(conn.sip, "ResetCount");
-                var user = pbxTableUsers.filter(findBySip(conn.sip));
-                var numDevices = user[0].columns.devices.length;
-                log("Os devices sao:" + numDevices);
-
-                RCC.forEach(function (rcc) {
-                    var temp = rcc[String(conn.sip)];
-                    log("danilo req:UserMessage call.sip == conn.sip:temp " + temp);
-                    if (temp == null) {
-                        if (numDevices > 1) {
-                            conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
-                        }
-                        if (numDevices == 1) {
-                            log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + rcc.pbx);
-                            var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: user[0].columns.devices[0].hw, src: conn.sip + "," + rcc.pbx };
-                            rcc.send(JSON.stringify(msg));
-
-                        }
-
-                    } else {
-                        connectionsUser.forEach(function (c) {
-                            c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
-
-                        })
-                    }
-                })  
-            }
-            if (obj.mt == "DeviceSelected") {
-                var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
-                var hw = user[0].columns.devices.filter(function (device) { return device.hw === obj.hw })[0];
-                RCC.forEach(function (rcc) {
-                    if (rcc.pbx == info.pbx) {
-                        log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
-                        var msg = { api: "RCC", mt: "UserInitialize", hw: hw, cn: conn.dn, src: conn.sip + "," + info.pbx };
-                        rcc.send(JSON.stringify(msg));
-
-                        connectionsUser.forEach(function (c) {
-                            if (c.sip == conn.sip) {
-                                c.hw = hw;
-                            }
-                        })
-                        log("DeviceSeclected: connectionsUser updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
-                    }
-                })
-            }
-            if (obj.mt == "InitializeMessage") {
-                try {
+                if (obj.mt == "UserMessage") {
                     updateTableBadgeCount(conn.sip, "ResetCount");
-                    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                    var user = pbxTableUsers.filter(findBySip(conn.sip));
                     var numDevices = user[0].columns.devices.length;
-                    log("danilo req : devices sao: " + numDevices);
-                    RCC.forEach(function (rcc) {
-                        if (rcc.pbx == info.pbx) {
-                            var temp = rcc[String(conn.sip)];
-                            if (temp == null) {
-                                log("danilo req : User Connection conn.sip: "+conn.sip+" rcc temp user " + temp);
-                                if (numDevices > 1) {
-                                    conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
-                                }
-                                if (numDevices == 1) {
-                                    if (rcc.pbx == info.pbx) {
-                                        log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
-                                        var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
-                                        rcc.send(JSON.stringify(msg));
-                                        connectionsUser.forEach(function (c) {
-                                            if (c.sip == conn.sip) {
-                                                c.hw = user[0].columns.devices[0];
-                                            }
-                                        })
-                                        log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
-                                    }
-                                    getURLLogin(conn.sip);
-                                }
-                            }
-                            else {
-                                conn.send(JSON.stringify({ api: "user", mt: "UserInitializeResultSuccess"}));
-                                connectionsUser.forEach(function (c) {
-                                    c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
+                    log("Os devices sao:" + numDevices);
 
-                                })
-                            }
-                        }
-                    })
-
-                } catch (e) {
-                    log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
-                }
-            }
-            if (obj.mt == "UserPresence") {
-                RCC.forEach(function (c) {
-                    for (var i in c) {
-                        
-                        if (c.hasOwnProperty(i)) {
-                            conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: i }));
-                            //resultado += nomeDoObj + "." + i + " = " + obj[i] + "\n";
-                        }
-                    }
-                })
-                //connections.forEach(function (c) {
-                //    if (c.user != "" && c.call !="number") {
-                //        conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
-                //    }
-
-                //})
-            }
-            if (obj.mt == "DecrementCount") {
-                updateTableBadgeCount(conn.sip, obj.mt);
-            }
-            if (obj.mt == "TriggerStartPage") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "page", date: today, status: "start", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerStopPage") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "page", date: today, status: "stop", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerStartVideo") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "video", date: today, status: "start", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerStopVideo") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "video", date: today, status: "stop", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerStopAlarm") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerStartPopup") {
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-                var msg = { sip: conn.sip, name: "popup", date: today, status: "start", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "TriggerAlert") {
-                //trigger the Novalink server
-                callNovaAlert(parseInt(obj.prt), conn.sip);
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-             
-                var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-                //respond success to the client
-                conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt }));
-            }
-            if (obj.mt == "TriggerCombo") {
-                //trigger the combo function
-                comboManager(parseInt(obj.prt), conn.sip, obj.mt);
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-
-                var msg = { sip: conn.sip, name: "combo", date: today, status: "start", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-            }
-            if (obj.mt == "StopCombo") {
-                //trigger the combo function
-                comboManager(parseInt(obj.prt), conn.sip, obj.mt);
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-
-                var msg = { sip: conn.sip, name: "combo", date: today, status: "stop", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-                //respond success to the client
-                conn.send(JSON.stringify({ api: "user", mt: "ComboSuccessTrigged", src: obj.prt }));
-            }
-            if (obj.mt == "TriggerCall") {
-                var num;
-                try {
-                    var user = pbxTableUsers.filter(findBySip(obj.prt));
-                    log("danilo req: TriggerCall user " + JSON.stringify(user));
-                    if (user.length>0) {
-                        log("danilo req: TriggerCall user e164 " + user[0].columns.e164);
-                        num = user[0].columns.e164;
-                    } else {
-                        num = obj.prt;
-                    }
-                } finally {
-                    log("danilo req: TriggerCall num to call " + num);
-                }
-                //intert into DB the event
-                log("danilo req: insert into DB = user " + conn.sip);
-
-                var msg = { sip: conn.sip, name: "call", date: today, status: "start", details: obj.prt }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-
-                //treat the event
-                var foundCall = false;
-                calls.forEach(function (call) {
-                    log("danilo req:TriggerCall call.sip == " + call.sip);
-                    if (call.sip == conn.sip) {
-                        foundCall = true;
-                        //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
-                    }
-                })
-                if (!foundCall) {
                     RCC.forEach(function (rcc) {
                         var temp = rcc[String(conn.sip)];
-                        log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
-                        if (temp != null) {
-                            user = temp;
-                            log("danilo-req rccRequest:wil call callRCC for user " + user+" to num "+num);
-                            callRCC(rcc, user, "UserCall", num, conn.sip + "," + rcc.pbx);
+                        log("danilo req:UserMessage call.sip == conn.sip:temp " + temp);
+                        if (temp == null) {
+                            if (numDevices > 1) {
+                                conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                            }
+                            if (numDevices == 1) {
+                                log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + rcc.pbx);
+                                var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: user[0].columns.devices[0].hw, src: conn.sip + "," + rcc.pbx };
+                                rcc.send(JSON.stringify(msg));
+
+                            }
+
+                        } else {
+                            connectionsUser.forEach(function (c) {
+                                c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
+
+                            })
+                        }
+                    })  
+                }
+                if (obj.mt == "DeviceSelected") {
+                    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                    var hw = user[0].columns.devices.filter(function (device) { return device.hw === obj.hw })[0];
+                    RCC.forEach(function (rcc) {
+                        if (rcc.pbx == info.pbx) {
+                            log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                            var msg = { api: "RCC", mt: "UserInitialize", hw: hw, cn: conn.dn, src: conn.sip + "," + info.pbx };
+                            rcc.send(JSON.stringify(msg));
+
+                            connectionsUser.forEach(function (c) {
+                                if (c.sip == conn.sip) {
+                                    c.hw = hw;
+                                }
+                            })
+                            log("DeviceSeclected: connectionsUser updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
                         }
                     })
                 }
-                //callRCC(connectionsRCC[0].ws, conn.cn, "UserCall", obj.prt, conn.sip);
-            }
-            if (obj.mt == "UserConnect") {
-                log("danilo req:UserConnect");
-                calls.forEach(function (call) {
-                    log("danilo req:UserConnect call.sip == " + call.sip);
-                    if (call.sip == conn.sip) {
-                        log("danilo req:UserConnect call.sip == conn.sip");
+                if (obj.mt == "InitializeMessage") {
+                    try {
+                        updateTableBadgeCount(conn.sip, "ResetCount");
+                        var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                        var numDevices = user[0].columns.devices.length;
+                        log("danilo req : devices sao: " + numDevices);
                         RCC.forEach(function (rcc) {
-                            var temp = rcc[String(conn.sip)];
-                            log("danilo req:UserConnect call.sip == conn.sip:temp " + temp);
-                            if (temp != null) {
-                                user = temp;
-                                //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
-                                log("danilo-req:UserConnect:will call callRCC for user " + user);
-                                callRCC(rcc, user, "UserConnect", obj.prt, conn.sip + "," + rcc.pbx);
+                            if (rcc.pbx == info.pbx) {
+                                var temp = rcc[String(conn.sip)];
+                                if (temp == null) {
+                                    log("danilo req : User Connection conn.sip: "+conn.sip+" rcc temp user " + temp);
+                                    if (numDevices > 1) {
+                                        conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                                    }
+                                    if (numDevices == 1) {
+                                        if (rcc.pbx == info.pbx) {
+                                            log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                                            var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
+                                            rcc.send(JSON.stringify(msg));
+                                            connectionsUser.forEach(function (c) {
+                                                if (c.sip == conn.sip) {
+                                                    c.hw = user[0].columns.devices[0];
+                                                }
+                                            })
+                                            log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+                                        }
+                                        getURLLogin(conn.sip);
+                                    }
+                                }
+                                else {
+                                    conn.send(JSON.stringify({ api: "user", mt: "UserInitializeResultSuccess"}));
+                                    connectionsUser.forEach(function (c) {
+                                        c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
+
+                                    })
+                                }
                             }
                         })
+
+                    } catch (e) {
+                        log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
                     }
-                })
-            }
-            if (obj.mt == "EndCall") {
-                log("danilo req:EndCall");
-                calls.forEach(function (call) {
-                    log("danilo req:EndCall call.sip == "+ call.sip);
-                    if (call.sip == conn.sip) {
-                        log("danilo req:EndCall call.sip == conn.sip");
+                }
+                if (obj.mt == "UserPresence") {
+                    RCC.forEach(function (c) {
+                        for (var i in c) {
+                        
+                            if (c.hasOwnProperty(i)) {
+                                conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: i }));
+                                //resultado += nomeDoObj + "." + i + " = " + obj[i] + "\n";
+                            }
+                        }
+                    })
+                    //connections.forEach(function (c) {
+                    //    if (c.user != "" && c.call !="number") {
+                    //        conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
+                    //    }
+
+                    //})
+                }
+                if (obj.mt == "DecrementCount") {
+                    updateTableBadgeCount(conn.sip, obj.mt);
+                }
+                if (obj.mt == "TriggerStartPage") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "page", date: today, status: "start", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerStopPage") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "page", date: today, status: "stop", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerStartVideo") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "video", date: today, status: "start", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerStopVideo") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "video", date: today, status: "stop", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerStopAlarm") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerStartPopup") {
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+                    var msg = { sip: conn.sip, name: "popup", date: today, status: "start", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "TriggerAlert") {
+                    //trigger the Novalink server
+                    callNovaAlert(parseInt(obj.prt), conn.sip);
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+             
+                    var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                    //respond success to the client
+                    conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt }));
+                }
+                if (obj.mt == "TriggerCombo") {
+                    //trigger the combo function
+                    comboManager(parseInt(obj.prt), conn.sip, obj.mt);
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+
+                    var msg = { sip: conn.sip, name: "combo", date: today, status: "start", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                if (obj.mt == "StopCombo") {
+                    //trigger the combo function
+                    comboManager(parseInt(obj.prt), conn.sip, obj.mt);
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+
+                    var msg = { sip: conn.sip, name: "combo", date: today, status: "stop", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                    //respond success to the client
+                    conn.send(JSON.stringify({ api: "user", mt: "ComboSuccessTrigged", src: obj.prt }));
+                }
+                if (obj.mt == "TriggerCall") {
+                    var num;
+                    try {
+                        var userButtons = buttons.filter(findBySip(obj.prt));
+                        userButtons.forEach(function (user_b) {
+                            if(user_b.button_prt==)
+                        })
+                        var user = pbxTableUsers.filter(findBySip(obj.prt));
+                        log("danilo req: TriggerCall user " + JSON.stringify(user));
+                        if (user.length>0) {
+                            log("danilo req: TriggerCall user e164 " + user[0].columns.e164);
+                            num = user[0].columns.e164;
+                        } else {
+                            num = obj.prt;
+                        }
+                    } finally {
+                        log("danilo req: TriggerCall num to call " + num);
+                    }
+                    //intert into DB the event
+                    log("danilo req: insert into DB = user " + conn.sip);
+
+                    var msg = { sip: conn.sip, name: "call", date: today, status: "start", details: obj.prt }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+
+                    //treat the event
+                    var foundCall = false;
+                    calls.forEach(function (call) {
+                        log("danilo req:TriggerCall call.sip == " + call.sip);
+                        if (call.sip == conn.sip) {
+                            foundCall = true;
+                            //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
+                        }
+                    })
+                    if (!foundCall) {
                         RCC.forEach(function (rcc) {
                             var temp = rcc[String(conn.sip)];
                             log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
                             if (temp != null) {
                                 user = temp;
-                                //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
-                                log("danilo-req:TriggerCall:will call callRCC for user " + user);
-                                callRCC(rcc, user, "UserClear", obj.prt, conn.sip + "," + rcc.pbx);
+                                log("danilo-req rccRequest:wil call callRCC for user " + user+" to num "+num);
+                                callRCC(rcc, user, "UserCall", num, conn.sip + "," + rcc.pbx);
                             }
                         })
                     }
-                })
-            }
-            if (obj.mt == "SelectMessage") {
-                conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
-                Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip + "' OR button_user = 'all'")
-                    .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
-
+                    //callRCC(connectionsRCC[0].ws, conn.cn, "UserCall", obj.prt, conn.sip);
+                }
+                if (obj.mt == "UserConnect") {
+                    log("danilo req:UserConnect");
+                    calls.forEach(function (call) {
+                        log("danilo req:UserConnect call.sip == " + call.sip);
+                        if (call.sip == conn.sip) {
+                            log("danilo req:UserConnect call.sip == conn.sip");
+                            RCC.forEach(function (rcc) {
+                                var temp = rcc[String(conn.sip)];
+                                log("danilo req:UserConnect call.sip == conn.sip:temp " + temp);
+                                if (temp != null) {
+                                    user = temp;
+                                    //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
+                                    log("danilo-req:UserConnect:will call callRCC for user " + user);
+                                    callRCC(rcc, user, "UserConnect", obj.prt, conn.sip + "," + rcc.pbx);
+                                }
+                            })
+                        }
                     })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
-                    });
+                }
+                if (obj.mt == "EndCall") {
+                    log("danilo req:EndCall");
+                    calls.forEach(function (call) {
+                        log("danilo req:EndCall call.sip == "+ call.sip);
+                        if (call.sip == conn.sip) {
+                            log("danilo req:EndCall call.sip == conn.sip");
+                            RCC.forEach(function (rcc) {
+                                var temp = rcc[String(conn.sip)];
+                                log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
+                                if (temp != null) {
+                                    user = temp;
+                                    //callRCC(connectionsRCC[0].ws, conn.cn, "UserClear", obj.prt, conn.sip);
+                                    log("danilo-req:TriggerCall:will call callRCC for user " + user);
+                                    callRCC(rcc, user, "UserClear", obj.prt, conn.sip + "," + rcc.pbx);
+                                }
+                            })
+                        }
+                    })
+                }
+                if (obj.mt == "SelectMessage") {
+                    conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
+                    Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip + "' OR button_user = 'all'")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
+                        });
+                }
             }
-        }
-        else{
-            log("danilo req: No license Available")
-            conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));  
-        }
+            else{
+                log("danilo req: No license Available")
+                conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));  
+            }
     
         })
 
@@ -434,7 +439,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn })
+                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }
@@ -455,7 +460,15 @@ new JsonApi("admin").onconnected(function (conn) {
                 licenseAppFile = Config.licenseAppFile;
                 var licUsed = connectionsUser.length;
                 var lic = decrypt(licenseAppToken, licenseAppFile)
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult",licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate }));
+                conn.send(JSON.stringify({
+                    api: "admin",
+                    mt: "LicenseMessageResult",
+                    licenseUsed: licUsed,
+                    licenseToken: licenseAppToken,
+                    licenseFile: licenseAppFile,
+                    licenseActive: JSON.stringify(lic),
+                    licenseInstallDate: licenseInstallDate
+                }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
@@ -474,10 +487,19 @@ new JsonApi("admin").onconnected(function (conn) {
                 }
             }
 
-
-
             if (obj.mt == "InsertMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+
+            if (obj.mt == "InsertNumberMessage") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -2073,11 +2095,8 @@ function comboManager(combo, sip, mt) {
 
 function decrypt(key,hash) {
     //var iv = iv.substring(0, 16);
-
     log("key: " + key)
     log("hash: " + hash)
-
-    
     // encryption using AES-128 in CTR mode
     var ciphertext = Crypto.cipher("AES", "CTR", key, true).iv(key).crypt(hash);
     log("Crypted: " + ciphertext);

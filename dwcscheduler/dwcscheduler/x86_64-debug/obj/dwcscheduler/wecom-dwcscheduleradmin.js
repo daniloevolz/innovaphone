@@ -48,6 +48,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     var password = null;
     var googleApiKey = null;
     var sendLocation = false;
+    //license
     var licenseToken = null;
     var licenseFile = null;
     var licenseActive = null;

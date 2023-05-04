@@ -1,4 +1,12 @@
 ﻿// the variables
+var licenseAppToken = Config.licenseAppToken;
+if (licenseAppToken == "") {
+    var rand = Random.bytes(16);
+    Config.licenseAppToken = String(rand);
+    Config.save();
+}
+var license = getLicense();
+
 var baseUrl = WebServer.url;
 log("danilo req url: " + baseUrl);
 var count = 0;
@@ -16,6 +24,7 @@ var urlGetGroups = Config.urlGetGroups;
 
 var connectionsUser = [];
 var connectionsAdmin = [];
+var connectionsDash = [];
 var RCC = [];
 var PbxSignal = [];
 var pbxTable = [];
@@ -39,7 +48,8 @@ Config.onchanged(function () {
     urlGetGroups = Config.urlGetGroups;
     codLeaveAllGroups = Config.CodLeaveAllGroups;
     leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
-
+    licenseAppFile = Config.licenseAppFile;
+    licenseInstallDate = Config.licenseInstallDate;
     updateConfigUsers();
 });
 
@@ -47,112 +57,6 @@ Config.onchanged(function () {
 WebServer.onurlchanged(function (newUrl) {
     baseUrl = newUrl;
     log("danilo req urlchaged: " + baseUrl);
-});
-
-WebServer.onrequest("makecall", function (req) {
-    if (req.method == "POST") {
-        var newValue = "";
-        var value = "";
-        req.onrecv(function (req, data) {
-            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-                makecallRequest(value);
-            }
-        });
-    }
-    else {
-        req.cancel();
-    }
-});
-WebServer.onrequest("disconnectcall", function (req) {
-    if (req.method == "POST") {
-        var newValue = "";
-        var value = "";
-        req.onrecv(function (req, data) {
-            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-                disconnectRequest(value);
-            }
-        });
-    }
-    else {
-        req.cancel();
-    }
-});
-WebServer.onrequest("badge", function (req) {
-    if (req.method == "POST") {
-        var newValue = "";
-        var value = "";
-        req.onrecv(function (req, data) {
-            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-                badgeRequest2(value);
-            }
-        });
-    }
-    else {
-        req.cancel();
-    }
-});
-WebServer.onrequest("rcc", function (req) {
-    if (req.method == "POST") {
-        var newValue = "";
-        var value = "";
-        req.onrecv(function (req, data) {
-            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-                rccRequest(value);
-            }
-        });
-    }
-    else {
-        req.cancel();
-    }
-});
-WebServer.onrequest("pbxTable", function (req) {
-    if (req.method == "POST") {
-        var newValue = "";
-        var value = "";
-        req.onrecv(function (req, data) {
-            //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
-            if (data) {
-                newValue += (new TextDecoder("utf-8").decode(data));
-                req.recv();
-            }
-            else {
-                value = newValue;
-                req.sendResponse();
-                pbxTableRequest(value);
-            }
-        });
-    }
-    else {
-        req.cancel();
-    }
 });
 WebServer.onrequest("value", function (req) {
     if (req.method == "GET") {
@@ -172,7 +76,116 @@ WebServer.onrequest("value", function (req) {
     }
 });
 
-getQueueGroups();
+log("pietro req: License " + JSON.stringify(license));
+if (license != null && license.System == true) {
+    WebServer.onrequest("makecall", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    makecallRequest(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+    WebServer.onrequest("disconnectcall", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    disconnectRequest(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+    WebServer.onrequest("badge", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    badgeRequest2(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+    WebServer.onrequest("rcc", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    rccRequest(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+    WebServer.onrequest("pbxTable", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    pbxTableRequest(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+
+    getQueueGroups();
+}
 
 //JSON APIS
 new JsonApi("user").onconnected(function (conn) {
@@ -186,89 +199,122 @@ new JsonApi("user").onconnected(function (conn) {
     }
     log("danilo req : User Connection " + JSON.stringify(conn));
     if (conn.app == "wecom-wecall") {
-        
+        license = getLicense();
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             var info = JSON.parse(conn.info);
             log("danilo-req : wecom-wecall");
-            //if (obj.mt == "PhoneApiEvent") {
-            //    log("danilo-req : PhoneApiEvent");
-            //    if (sendCallEvents) {
-            //        log("danilo-req : PhoneApiEvent=true");
-            //        httpClient(urlPhoneApiEvents, obj.obj);
-            //    }
-            //}
-            if (obj.mt == "CallHistoryEvent") {
-                log("danilo-req : CallHistoryEvent");
-                if (sendCallHistory) {
-                    log("danilo-req : CallHistoryEvent=true");
-                    httpClient(urlCallHistory, obj.obj);
-                }
-            }
-            if (obj.mt == "DeviceSelected") {
-                var src = obj.src;
-                log("SPLIT1:");
-                var myArray = src.split(",");
-                var sip = myArray[0];
-                var pbx = myArray[1];
-                var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
-                var hw = user[0].columns.devices.filter(function (device) { return device.hw === obj.hw })[0];
-                RCC.forEach(function (rcc) {
-                    if (rcc.pbx == info.pbx) {
-                        log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
-                        var msg = { api: "RCC", mt: "UserInitialize", hw: hw, cn: conn.dn, src: conn.sip+","+info.pbx };
-                        rcc.send(JSON.stringify(msg));
-
-                        connectionsUser.forEach(function (c) {
-                            if (c.sip == conn.sip) {
-                                c.hw = hw;
-                            }
-                        })
-                        log("DeviceSeclected: connectionsUser updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+            if (license != null && connectionsUser.length <= license.Users) {
+                //if (obj.mt == "PhoneApiEvent") {
+                //    log("danilo-req : PhoneApiEvent");
+                //    if (sendCallEvents) {
+                //        log("danilo-req : PhoneApiEvent=true");
+                //        httpClient(urlPhoneApiEvents, obj.obj);
+                //    }
+                //}
+                if (obj.mt == "CallHistoryEvent") {
+                    log("danilo-req : CallHistoryEvent");
+                    if (sendCallHistory) {
+                        log("danilo-req : CallHistoryEvent=true");
+                        httpClient(urlCallHistory, obj.obj);
                     }
-                })
-                getURLLogin(conn.sip);
-            }
-            if (obj.mt == "InitializeMessage") {
-                try {
+                }
+                if (obj.mt == "DeviceSelected") {
+                    var src = obj.src;
+                    log("SPLIT1:");
+                    var myArray = src.split(",");
+                    var sip = myArray[0];
+                    var pbx = myArray[1];
                     var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
-                    var numDevices = user[0].columns.devices.length;
-                    log("danilo req : devices sao: " + numDevices);
+                    var hw = user[0].columns.devices.filter(function (device) { return device.hw === obj.hw })[0];
                     RCC.forEach(function (rcc) {
                         if (rcc.pbx == info.pbx) {
-                            var temp = rcc[String(conn.sip)];
-                            log("danilo req : User Connection conn.sip:temp " + temp);
-                            if (temp == null) {
-                                if (numDevices > 1) {
-                                    conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                            log("DeviceSeclected: calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                            var msg = { api: "RCC", mt: "UserInitialize", hw: hw, cn: conn.dn, src: conn.sip + "," + info.pbx };
+                            rcc.send(JSON.stringify(msg));
+
+                            connectionsUser.forEach(function (c) {
+                                if (c.sip == conn.sip) {
+                                    c.hw = hw;
                                 }
-                                if (numDevices == 1) {
-                                    if (rcc.pbx == info.pbx) {
-                                        log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
-                                        var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
-                                        rcc.send(JSON.stringify(msg));
-                                        connectionsUser.forEach(function (c) {
-                                            if (c.sip == conn.sip) {
-                                                c.hw = user[0].columns.devices[0];
-                                            }
-                                        })
-                                        log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
-                                    }
-                                    getURLLogin(conn.sip);
-                                }
-                            }
+                            })
+                            log("DeviceSeclected: connectionsUser updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
                         }
                     })
-
-                } catch (e) {
-                    log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
+                    getURLLogin(conn.sip);
                 }
-            }
-            if (obj.mt == "AddMessage") {
-                Config.url = obj.url;
-                Config.save();
-                var url = Config.url;
-                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                if (obj.mt == "InitializeMessage2") {
+                    try {
+                        var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                        var numDevices = user[0].columns.devices.length;
+                        log("danilo req : devices sao: " + numDevices);
+                        RCC.forEach(function (rcc) {
+                            if (rcc.pbx == info.pbx) {
+                                var temp = rcc[String(conn.sip)];
+                                log("danilo req : User Connection conn.sip:temp " + temp);
+                                if (temp == null) {
+                                    if (numDevices > 1) {
+                                        conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
+                                    }
+                                    if (numDevices == 1) {
+                                        if (rcc.pbx == info.pbx) {
+                                            log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                                            var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
+                                            rcc.send(JSON.stringify(msg));
+                                            connectionsUser.forEach(function (c) {
+                                                if (c.sip == conn.sip) {
+                                                    c.hw = user[0].columns.devices[0];
+                                                }
+                                            })
+                                            log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+                                        }
+                                        getURLLogin(conn.sip);
+                                    }
+                                }
+                            }
+                        })
+
+                    } catch (e) {
+                        log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
+                    }
+                }
+                if (obj.mt == "InitializeMessage") {
+                    try {
+                        //var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
+                        //var numDevices = user[0].columns.devices.length;
+                        log("danilo req : devices sao: " + numDevices);
+                        RCC.forEach(function (rcc) {
+                            if (rcc.pbx == info.pbx) {
+                                var temp = rcc[String(conn.sip)];
+                                log("danilo req : User Connection conn.sip:temp " + temp);
+                                if (temp == null && rcc.pbx == info.pbx) {
+                                    log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
+                                    var msg = { api: "RCC", mt: "UserInitialize", cn: String(conn.dn), src: conn.sip + "," + info.pbx };
+                                    rcc.send(JSON.stringify(msg));
+                                    //connectionsUser.forEach(function (c) {
+                                    //    if (c.sip == conn.sip) {
+                                    //        c.hw = user[0].columns.devices[0];
+                                    //    }
+                                    //})
+                                    //log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+                                }
+                                getURLLogin(conn.sip);
+                            }
+                        })
+
+                    } catch (e) {
+                        log("danilo req : User Connection Erro RCC has null, please try again in a few moments " + e);
+                    }
+                }
+                if (obj.mt == "AddMessage") {
+                    Config.url = obj.url;
+                    Config.save();
+                    var url = Config.url;
+                    conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                }
+            } else {
+                log("danilo req: No license Available")
+                conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
             }
         });
     }
@@ -409,6 +455,44 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.save();
                 }
             }
+            // license 
+            if (obj.mt == "ConfigLicense") {
+                var licenseAppToken = Config.licenseAppToken;
+                licenseInstallDate = Config.licenseInstallDate;
+                licenseAppFile = Config.licenseAppFile;
+                var licUsed = connectionsUser.length;
+                var licDashUsed = connectionsDash.length;
+                var used = "Users:" + licUsed + " Dashboards:" + licDashUsed;
+                var lic = decrypt(licenseAppToken, licenseAppFile)
+                conn.send(JSON.stringify({
+                    api: "admin",
+                    mt: "LicenseMessageResult",
+                    licenseUsed: used,
+                    licenseToken: licenseAppToken,
+                    licenseFile: licenseAppFile,
+                    licenseActive: JSON.stringify(lic),
+                    licenseInstallDate: licenseInstallDate
+                }));
+            }
+            if (obj.mt == "UpdateConfigLicenseMessage") {
+                try {
+                    var lic = decrypt(obj.licenseToken, obj.licenseFile)
+                    log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
+                    Config.licenseAppFile = obj.licenseFile;
+                    Config.licenseInstallDate = getDateNow();
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigLicenseMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigLicenseMessage:" + e);
+
+
+                }
+            }
+            if (obj.mt =="UpdateConfigMessageErro") {
+                window.alert("ERRO: Verifique os logs do serviço!");
+            }
         });
     }
     conn.onclose(function () {
@@ -417,45 +501,59 @@ new JsonApi("admin").onconnected(function (conn) {
     });
 });
 new JsonApi("dash").onconnected(function (conn) {
+    connectionsDash.push(conn);
     if (conn.app == "wecom-wecalldash") {
+        license = getLicense();
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
-            if (obj.mt == "DashURLMessage") {
-                //var urldash = Config.urldash;
-                Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + conn.sip + "' AND app_name ='" + obj.app + "';")
-                    .oncomplete(function (data) {
-                        log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
+            if (license != null && connectionsDash.length <= license.Dashboards) {
+                if (obj.mt == "DashURLMessage") {
+                    //var urldash = Config.urldash;
+                    Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + conn.sip + "' AND app_name ='" + obj.app + "';")
+                        .oncomplete(function (data) {
+                            log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
+                            conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
 
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
-                    });
-                
-            }
-            if (obj.mt == "AddURLDashMessage") {
-                //Config.urldash = obj.url;
-                //Config.save();
-                //var urldash = Config.urldash;
-                // Horario Atual
-                var day = new Date().toLocaleString();
-                log("AddURLMessage:day: " + day);
-                Database.insert("INSERT INTO tbl_dashboards (sip, app_name, url, date_add) VALUES ('" + obj.sip + "','" + obj.app + "','" + obj.url + "','" + day + "')")
-                    .oncomplete(function () {
-                        Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + obj.sip + "' AND app_name ='" + obj.app + "';")
-                            .oncomplete(function (data) {
-                                log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
-                                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
+                        });
 
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
-                            });
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "dash", mt: "Error", result: String(errorText) }));
-                    }); 
+                }
+                if (obj.mt == "AddURLDashMessage") {
+                    //Config.urldash = obj.url;
+                    //Config.save();
+                    //var urldash = Config.urldash;
+                    // Horario Atual
+                    var day = new Date().toLocaleString();
+                    log("AddURLMessage:day: " + day);
+                    Database.insert("INSERT INTO tbl_dashboards (sip, app_name, url, date_add) VALUES ('" + obj.sip + "','" + obj.app + "','" + obj.url + "','" + day + "')")
+                        .oncomplete(function () {
+                            Database.exec("SELECT url FROM tbl_dashboards WHERE sip ='" + obj.sip + "' AND app_name ='" + obj.app + "';")
+                                .oncomplete(function (data) {
+                                    log("DashURLMessage:result=" + JSON.stringify(data, null, 4));
+                                    conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: JSON.stringify(data, null, 4) }));
+
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "dash", mt: "DashMessageResult", src: "" }));
+                                });
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "dash", mt: "Error", result: String(errorText) }));
+                        });
+                }
+            } else {
+                log("danilo req: No license Available")
+                conn.send(JSON.stringify({ api: "dash", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
+
             }
+            });
+        conn.onclose(function () {
+            log("connectionsDash: disconnected");
+            connectionsDash = connectionsDash.filter(deleteCallsBySrc(conn.sip));
+            log("connectionsDash: after delete conn " + JSON.stringify(connectionsDash));
+            
         });
     }
 });
@@ -786,12 +884,14 @@ new PbxApi("RCC").onconnected(function (conn) {
             }
             else {
                 log("danilo-req : RCC message::CallInfo foundCall " + JSON.stringify(foundCall));
+                var cause;
+                if (obj.cause) cause = obj.cause;
                 calls.forEach(function (call) {
                     if (call.sip == sip) {
-                        if (call.callid < obj.call) {
+                        if (call.callid < obj.call && cause !=26) {
                             call.callid = obj.call;
                         }
-                        if (call.state < obj.state) {
+                        if (call.state < obj.state && cause != 26) {
                             switch (obj.state) {
                                 case 5:
                                     //Ativa (Connected)
@@ -957,6 +1057,47 @@ new PbxApi("RCC").onconnected(function (conn) {
 });
 
 //Internal Functions
+function getDateNow() {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date();
+    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+    date.setUTCHours(date.getUTCHours() - 3);
+
+    // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+    var dateString = date.toISOString();
+
+    // Substitui o caractere "T" por um espaço
+    dateString = dateString.replace("T", " ");
+
+    // Retorna a string no formato "AAAA-MM-DD HH:mm:ss.sss"
+    return dateString.slice(0, -5);
+}
+
+function getLicense() {
+    var key = Config.licenseAppToken;
+    var hash = Config.licenseAppFile;
+    var lic;
+    if (key != "" && hash != "") {
+        lic = decrypt(key, hash);
+    }
+    return lic;
+}
+
+function decrypt(key, hash) {
+    //var iv = iv.substring(0, 16);
+    log("key: " + key)
+    log("hash: " + hash)
+    // encryption using AES-128 in CTR mode
+    var ciphertext = Crypto.cipher("AES", "CTR", key, true).iv(key).crypt(hash);
+    log("Crypted: " + ciphertext);
+    // decryption using AES-128 in CTR mode
+    var decrypted = Crypto.cipher("AES", "CTR", key, false).iv(key).crypt(hash);
+    log("Decrypted: " + decrypted);
+    // now decrypted contains the plain text again
+
+    return JSON.parse(decrypted);
+}
+
 function updateConfigUsers() {
     log("danilo-req updateConfigUsers:");
     connectionsAdmin.forEach(function (connection) {
@@ -1066,9 +1207,11 @@ function callRCC(ws, user, mode, num, src) {
     }
     else if (mode == "UserCall") {
         log("danilo-req UserCall:sip " + sip);
-        var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, src: src };
-        log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
-        ws.send(JSON.stringify(msg));
+        //var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, src: src };
+        //log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
+        //ws.send(JSON.stringify(msg));
+        var msg = { api: "user", mt: "MakeCall", num: num, src: sip };
+        userC[0].send(JSON.stringify(msg));
     }
     else if (mode == "UserClear") {
         calls.forEach(function (call) {
@@ -1078,10 +1221,13 @@ function callRCC(ws, user, mode, num, src) {
             log("danilo-req UserClear:call.sip " + JSON.stringify(call.sip));
             if (call.sip == sip) {
 
-                var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
-                log("danilo req callRCC: UserClear sent rcc msg " + JSON.stringify(msg));
-                ws.send(JSON.stringify(msg));
+                //var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
+                //log("danilo req callRCC: UserClear sent rcc msg " + JSON.stringify(msg));
+                //ws.send(JSON.stringify(msg));
+                var msg = { api: "user", mt: "DisconnectCall", src: sip };
+                userC[0].send(JSON.stringify(msg));
             }
+            
 
         })
     }
@@ -1097,7 +1243,8 @@ function callRCC(ws, user, mode, num, src) {
     else if (mode == "UserRetrieve") {
         calls.forEach(function (call) {
             if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserRetrieve", hw: userC[0].hw, call: call.callid, src: call.sip };
+                //var msg = { api: "RCC", mt: "UserRetrieve", hw: userC[0].hw, call: call.callid, src: call.sip };
+                var msg = { api: "RCC", mt: "UserRetrieve", call: call.callid, src: call.sip };
                 ws.send(JSON.stringify(msg));
             }
 
@@ -1119,8 +1266,10 @@ function callRCC(ws, user, mode, num, src) {
             log("danilo-req UserConnect:call.callid " + JSON.stringify(call.callid));
             log("danilo-req UserConnect:call.sip " + JSON.stringify(call.sip));
             if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserConnect", call: call.callid, src: call.sip };
-                ws.send(JSON.stringify(msg));
+                //var msg = { api: "user", mt: "UserConnect", call: call.callid, src: call.sip };
+                //ws.send(JSON.stringify(msg));
+                var msg = { api: "user", mt: "ConnectCall", call: call.callid, src: call.sip };
+                userC[0].send(JSON.stringify(msg));
             }
 
         })
