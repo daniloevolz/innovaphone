@@ -336,6 +336,8 @@ new JsonApi("user").onconnected(function (conn) {
                                 RCC.forEach(function (rcc) {
                                     var temp = rcc[String(conn.sip)];
                                     log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
+                                    log("USER DEVICE " + user_b.device);
+                                    
                                     if (temp != null) {
                                         user = temp;
                                         log("danilo-req UserCall:sip " + conn.sip);
