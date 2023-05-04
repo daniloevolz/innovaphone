@@ -176,12 +176,6 @@ main {
 }
 /*Fim Loader*/
 /*Início Menu Admin*/
-.arrow {
-    height: 30px;
-    width: 50px;
-    /*visibility: hidden;*/
-}
-
 .colunaesquerda {
     position: absolute;
     width: 15%;
@@ -246,3 +240,39 @@ a {
     background: rgb(19, 33, 71);
 }
 /*Fim Menu Admin*/
+/*Inicío Tabelas*/
+.arrow{
+    width:15px;
+    height:15px;
+}
+table {
+    border-collapse: collapse; /* CSS2 */
+    background: #80808096;
+    color: #B0132B;
+}
+
+    table td {
+        border: 1px solid #02163F;
+        width: -webkit-fill-available;
+        padding: 10px;
+        height: 50px
+    }
+
+    table tr {
+        border: 1px solid #02163F;
+        height: 50px;
+        color: white;
+    }
+
+    table th {
+        border: 1px solid #02163F;
+        background: #F0FFF0;
+        height: 50px;
+        color: white;
+    }
+
+.headercl {
+    font-size: 12px;
+    background-color: #02163F;
+}
+/*End Tabelas*/

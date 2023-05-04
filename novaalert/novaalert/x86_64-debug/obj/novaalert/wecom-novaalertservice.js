@@ -292,6 +292,7 @@ new JsonApi("user").onconnected(function (conn) {
                 if (obj.mt == "TriggerCall") {
                     var num;
                     try {
+                        
                         var user = pbxTableUsers.filter(findBySip(obj.prt));
                         log("danilo req: TriggerCall user " + JSON.stringify(user));
                         if (user.length>0) {
@@ -320,13 +321,29 @@ new JsonApi("user").onconnected(function (conn) {
                         }
                     })
                     if (!foundCall) {
-                        RCC.forEach(function (rcc) {
-                            var temp = rcc[String(conn.sip)];
-                            log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
-                            if (temp != null) {
-                                user = temp;
-                                log("danilo-req rccRequest:wil call callRCC for user " + user+" to num "+num);
-                                callRCC(rcc, user, "UserCall", num, conn.sip + "," + rcc.pbx);
+                        //RCC.forEach(function (rcc) {
+                        //    var temp = rcc[String(conn.sip)];
+                        //    log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
+                        //    if (temp != null) {
+                        //        user = temp;
+                        //        log("danilo-req rccRequest:wil call callRCC for user " + user+" to num "+num);
+                        //        callRCC(rcc, user, "UserCall", num, conn.sip + "," + rcc.pbx);
+                        //    }
+                        //})
+                        var userButtons = buttons.filter(findBySip(conn.sip));
+                        userButtons.forEach(function (user_b) {
+                            if (user_b.button_prt == obj.prt) {
+                                RCC.forEach(function (rcc) {
+                                    var temp = rcc[String(conn.sip)];
+                                    log("danilo req:TriggerCall call.sip == conn.sip:temp " + temp);
+                                    if (temp != null) {
+                                        user = temp;
+                                        log("danilo-req UserCall:sip " + conn.sip);
+                                        var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, hw: user_b.device, src: conn.sip + "," + rcc.pbx };
+                                        log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
+                                        ws.send(JSON.stringify(msg));
+                                    }
+                                })
                             }
                         })
                     }

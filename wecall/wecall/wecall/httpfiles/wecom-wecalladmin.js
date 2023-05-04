@@ -260,7 +260,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
 
 
         // buttons
-        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             licenseFile = document.getElementById("InputLicenseFile").value;
             if (licenseFile.length > 0) {
                 app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });

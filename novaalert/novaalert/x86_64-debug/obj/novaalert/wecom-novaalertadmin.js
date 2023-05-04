@@ -737,7 +737,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             })
             //Atualiza valores
-            if (buttonbutton.button_user != "all") {
+            if (button.button_user != "all") {
                 var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
                 var select = document.getElementById('selectUser');
                 select.value = cn;

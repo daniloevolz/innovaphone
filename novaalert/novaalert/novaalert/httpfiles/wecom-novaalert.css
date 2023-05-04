@@ -1390,7 +1390,9 @@ width: 100%;
     /*background-color: #02163F;*/
 }
   .arrow{
-    visibility: hidden;
+      width:15px;
+      height:15px;
+    /*visibility: hidden;*/
   }
 ::-webkit-scrollbar {
     width: 10px;
@@ -1763,6 +1765,7 @@ div.button-inn-del {
 /*End Mobile model */
 
 /*Inicío Tabelas*/
+
 table {
     border-collapse: collapse; /* CSS2 */
     background: #80808096;
