@@ -175,6 +175,7 @@ if (license != null && license.System==true) {
                                                             PbxSignal.forEach(function (signal) {
                                                                 log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
                                                                 var call = signal[obj.sip];
+                                                                log("pietro-log: call = " + call)
                                                                 if (call != null) {
                                                                     log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
                                                                     try {
