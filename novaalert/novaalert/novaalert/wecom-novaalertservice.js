@@ -229,7 +229,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //})
                     //Notify user about users logged
                     connectionsUser.forEach(function (c) {
-                        con.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
+                        conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
 
                     })
                 }
@@ -364,7 +364,7 @@ new JsonApi("user").onconnected(function (conn) {
                                         //user = temp;
                                         log("danilo req:TriggerCall:sip " + conn.sip);
                                         // var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, hw: user_b.button_device, src: conn.sip + "," + rcc.pbx };
-                                        var msg = { api: "RCC", mt: "UserInitialize", cn: conn.cn, hw: user_b.button_device, src: conn.sip + "," + rcc.pbx + "," + user_b.button_device + "," + num};
+                                        var msg = { api: "RCC", mt: "UserInitialize", cn: conn.cn, hw: user_b.button_device,src: conn.sip + "," + rcc.pbx + "," + user_b.button_device + "," + num};
                                         log("danilo req:TriggerCall: UserInitialize sent rcc msg " + JSON.stringify(msg));
                                         rcc.send(JSON.stringify(msg));
                                     }
@@ -953,6 +953,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         var today = getDateNow();
         //Log de Dev
         log("danilo req : RCC message:: received" + JSON.stringify(obj));
+        
 
         if (obj.mt === "DevicesResult") {
             log("danilo req : RCC message:DevicesResult: " + JSON.stringify(obj.devices));
@@ -974,10 +975,16 @@ new PbxApi("RCC").onconnected(function (conn) {
                 }
             })
             //Start a call
-            var msg = { api: "RCC", mt: "UserCall", user: obj.user, e164: num, src: obj.src };
+            var msg = { api: "RCC", mt: "UserCall", user: obj.user, e164: num, hw:device, device:device};
+            //, src: obj.src    - pietro colocar isso logo acima ,apos o device
             log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
             conn.send(JSON.stringify(msg));
+            
 
+        }
+        else if(obj.mt === "UserCallResult"){
+            log("pietro req UserCallResult: RCC message:: received" + JSON.stringify(obj));
+            log("device" , String(device))
         }
         else if (obj.mt === "UserEndResult") {
             log("danilo req UserEndResult: RCC message:: received" + JSON.stringify(obj));
@@ -1181,7 +1188,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
                                     calls = calls.filter(deleteCallsBySrc(sip));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
-
+FUs
                                     //Remove from RCC monitor
                                     RCC.forEach(function (rcc) {
                                         if (rcc.pbx == pbx) {
@@ -1861,6 +1868,7 @@ function callRCC(ws, user, mode, num, sip) {
         log("danilo-req UserCall:sip " + sip);
         var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, src: sip };
         log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
+        
         ws.send(JSON.stringify(msg));
 
         //log("danilo-req UserCall:sip " + sip);
@@ -1874,6 +1882,7 @@ function callRCC(ws, user, mode, num, sip) {
         //    }
         //})
     }
+
     else if (String(mode) == "UserClear") {
         log("SPLIT17:");
         var myArray = sip.split(",");
