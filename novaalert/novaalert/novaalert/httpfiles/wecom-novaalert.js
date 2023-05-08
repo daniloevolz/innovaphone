@@ -142,14 +142,34 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "UserInitializeResultSuccess") {
             app.send({ api: "user", mt: "SelectMessage" }); //Requisita os botões
-            app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             connected();
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
-            //connected(that);
-            popButtons(list_buttons);
+            popButtons(list_buttons); //Cria os botões na tela
+            app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
+        }
+        if (obj.api == "user" && obj.mt == "UserConnected") {
+            console.log(obj.src);
+            updateListUsers(obj.src, obj.mt);
+            try {
+                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+            } catch {
+                console.log("UserConnected not button");
+            }
+
+        }
+        if (obj.api == "user" && obj.mt == "UserDisconnected") {
+            console.log(obj.src);
+            updateListUsers(obj.src, obj.mt);
+            try {
+                document.getElementById(obj.src).style.backgroundColor = "var(--button)";
+                document.getElementById(obj.src).style.borderColor = "var(--button)";
+            } catch {
+                console.log("UserDisconnected not button");
+            }
+
         }
         if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
             try {
@@ -363,27 +383,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 popup.close();
                 popupOpen = false;
             }
-        }
-        if (obj.api == "user" && obj.mt == "UserConnected") {
-            console.log(obj.src);
-            updateListUsers(obj.src, obj.mt);
-            try {
-                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
-            } catch {
-                console.log("UserConnected not button");
-            }
-            
-        }
-        if (obj.api == "user" && obj.mt == "UserDisconnected") {
-            console.log(obj.src);
-            updateListUsers(obj.src, obj.mt);
-            try {
-                document.getElementById(obj.src).style.backgroundColor = "var(--button)";
-                document.getElementById(obj.src).style.borderColor = "var(--button)";
-            } catch {
-                console.log("UserDisconnected not button");
-            }
-            
         }
         if (obj.api == "user" && obj.mt == "CallDisconnected") {
             console.log(obj.src);

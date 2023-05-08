@@ -40,6 +40,7 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     app.onclosed = wait;
     app.onerror = wait;
     wait();
+    var session;
 
     function wait() {
         that.clear();
@@ -102,6 +103,10 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     }
 
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "UserSessionResult") {
+            console.info("::Session "+obj.session+"::");
+            session = obj.session;
+        }
         if (obj.api == "user" && obj.mt == "NoLicense") {
             console.log(obj.result);
             makeDivNoLicense(obj.result);

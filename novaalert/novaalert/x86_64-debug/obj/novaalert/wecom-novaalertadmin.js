@@ -554,6 +554,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserNumber"));
             var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserNumber"));
             iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+
             list_users.forEach(function (user) {
                 iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             })
@@ -577,6 +579,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             t.add(new innovaphone.ui1.Div(null, texts.text("device"), "labelDeviceNumber"));
             var iptDevice = t.add(new innovaphone.ui1.Node("select", null, null, "iptDeviceNumber"));
             iptDevice.setAttribute("id", "selectDevice");
+            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+
 
             document.getElementById("selectUser").addEventListener("change", function (e) {
                 console.log(e.target.value);
@@ -588,7 +592,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     if (user.sip == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
-                            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.hw, null).setAttribute("id", dev.hw));
+                            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
                         })
                     }
                 })

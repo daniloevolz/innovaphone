@@ -189,6 +189,8 @@ if (license != null && license.System == true) {
 
 //JSON APIS
 new JsonApi("user").onconnected(function (conn) {
+    conn["session"] = Random.bytes(16);
+    conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: conn["session"] }));
     connectionsUser.push(conn);
     
     if (sendCallEvents) {
