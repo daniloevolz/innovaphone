@@ -310,53 +310,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makeTableButtons(t1);
             });
         }
-        function addNumberParamters(t) {
-            //Usuário
-            t.clear();
-            t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserNumber"));
-            var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserNumber"));
-            iptUser.setAttribute("id", "selectUser");
-            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
-            list_users.forEach(function (user) {
-                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
-            })
-            //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:15%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
-            //Nome Botão
-            var divAdd3 = t.add(new innovaphone.ui1.Div(null, null, "divAdd3"))
-            var iptName = divAdd3.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 255, "url", "iptNameNumber"));
-            divAdd3.add(new innovaphone.ui1.Div(null, texts.text("labelButtonName"), "labelBtnNumber"));
-            iptName.setAttribute("placeholder", " ");
-            //Nome Usuário
-            //t.add(new innovaphone.ui1.Div("position:absolute; display:block; left:0%; width:15%; top:30%; font-size:15px; text-align:right", texts.text("labelUserName")));
-            //var iptUserName = t.add(new innovaphone.ui1.Input("position:absolute; display:block; left:16%; width:30%; top:30%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
-
-            //Parâmetro
-            var divAdd4 = t.add(new innovaphone.ui1.Div(null, null, "divAdd4"))
-            var iptValue = divAdd4.add(new innovaphone.ui1.Input(null, null, texts.text("iptText"), 500, "url", "iptValueNumber"));
-            divAdd4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueNumber"));
-            iptValue.setAttribute("placeholder", " ");
-            //Botão Salvar
-            t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
-                var type = document.getElementById("selectType");
-                var selectedOption = type.options[type.selectedIndex];
-                var type = selectedOption.id;
-                var user = document.getElementById("selectUser");
-                var selectedOption = user.options[user.selectedIndex];
-                var user = selectedOption.id;
-                if (String(iptName.getValue()) == "" || String(type) == "") {
-                    makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
-                }
-                if (type == "externalnumber") {
-                    app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
-                    waitConnection(t1);
-                }
-            });
-            //Botão Cancelar   
-            t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-                makeTableButtons(t1);
-            });
-
-        }
         function addUserParamters(t) {
             //Usuário
             t.clear();
@@ -386,6 +339,30 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             list_users.forEach(function (user) {
                 iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             });
+
+            //Device
+            t.add(new innovaphone.ui1.Div(null, texts.text("device"), "labelDeviceNumber"));
+            var iptDevice = t.add(new innovaphone.ui1.Node("select", "width:28%;margin-left:2%;", null, "iptDeviceNumber"));
+            iptDevice.setAttribute("id", "selectDevice");
+            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+
+
+            document.getElementById("selectUser").addEventListener("change", function (e) {
+                console.log(e.target.value);
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var sip = selectedOption.id;
+                iptDevice.clear();
+                list_users.forEach(function (user) {
+                    if (user.sip == sip) {
+                        var devices = user.devices;
+                        devices.forEach(function (dev) {
+                            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+                        })
+                    }
+                })
+            });
+
             //Botão Salvar
             t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
                 var type = document.getElementById("selectType");
@@ -394,6 +371,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var user = document.getElementById("selectUser");
                 var selectedOption = user.options[user.selectedIndex];
                 var user = selectedOption.id;
+                var device = document.getElementById("selectDevice");
+                var selectedOption = device.options[device.selectedIndex];
+                var device = selectedOption.id;
+
                 if (String(iptName.getValue()) == "" || String(type) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
@@ -401,7 +382,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var value = document.getElementById("selectValue");
                     var selectedOption = value.options[value.selectedIndex];
                     var value = selectedOption.id;
-                    app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type) });
+                    app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type), device:device });
                     waitConnection(t1);
                 }
             });
@@ -610,10 +591,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var device = document.getElementById("selectDevice");
                 var selectedOption = device.options[device.selectedIndex];
                 var device = selectedOption.id;
-                if (String(iptName.getValue()) == "" || String(type) == "") {
+                if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
-                if (type == "externalnumber") {
+                else if (type == "externalnumber") {
                     app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), device: device });
                     waitConnection(t1);
                 }
@@ -762,6 +743,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var divAdd4 = t.add(new innovaphone.ui1.Div(null, null, "divAdd4"))
             var iptValue = divAdd4.add(new innovaphone.ui1.Input(null, button.button_prt, null, 500, "text", "iptValueNumber"));
             divAdd4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueNumber"));
+            iptValue.setAttribute("id","iptValuePrt")
             //Botão Salvar
             t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
                 var type = document.getElementById("selectType");
@@ -770,7 +752,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var user = document.getElementById("selectUser");
                 var selectedOption = user.options[user.selectedIndex];
                 var user = selectedOption.id;
-                if (String(iptName.getValue()) == "" || String(type) == "") {
+                var prt = document.getElementById("iptValuePrt");
+                if (String(iptName.getValue()) == "" || String(prt) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
                 if (type == "externalnumber") {
@@ -816,6 +799,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             t.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueUsers"));
             //var iptValue = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:25%; font-size:12px; text-align:center", null, texts.text("iptText"), 500, "url", null));
 
+
+
             var iptValue = t.add(new innovaphone.ui1.Node("select", null, null, "selectValueUsers"));
             iptValue.setAttribute("id", "selectValue");
             list_users.forEach(function (user) {
@@ -834,7 +819,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var user = document.getElementById("selectUser");
                 var selectedOption = user.options[user.selectedIndex];
                 var user = selectedOption.id;
-                if (String(iptName.getValue()) == "" || String(type) == "") {
+                if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
                 if (type == "user") {
