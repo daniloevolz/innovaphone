@@ -316,6 +316,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUserUsers"));
             var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserUsers"));
             iptUser.setAttribute("id", "selectUser");
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
             list_users.forEach(function (user) {
                 iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
             })

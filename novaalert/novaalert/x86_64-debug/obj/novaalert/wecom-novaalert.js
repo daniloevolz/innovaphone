@@ -105,6 +105,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         
         var type = evt.currentTarget.attributes['button_type'].value;
         var prt = evt.currentTarget.attributes['button_prt'].value;
+        var btn_id = evt.currentTarget.attributes['button_id'].value;
         var id = evt.currentTarget.attributes['id'].value;
 
         try {
@@ -113,11 +114,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var prt_user = "";
         }
         var name = evt.currentTarget.innerText;
-        updateScreen(id, name.split("\n")[0], type, prt, prt_user);
+        updateScreen(id, name.split("\n")[0], type, prt, prt_user, btn_id);
     };
-    function findByPrt(prt) {
+    function findById(id) {
         return function (value) {
-            if (value.prt == prt) {
+            if (String(value.id) == String(id)) {
                 return true;
             }
             //countInvalidEntries++
@@ -154,7 +155,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             updateListUsers(obj.src, obj.mt);
             try {
-                document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[button_prt="' + obj.src + '"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "darkgreen";
+                }
+                //document.getElementById(obj.src).style.backgroundColor = "darkgreen";
             } catch {
                 console.log("UserConnected not button");
             }
@@ -164,8 +175,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             updateListUsers(obj.src, obj.mt);
             try {
-                document.getElementById(obj.src).style.backgroundColor = "var(--button)";
-                document.getElementById(obj.src).style.borderColor = "var(--button)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[button_prt="' + obj.src + '"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "var(--button)";
+                    elemento.style.borderColor = "var(--button)";
+                }
+                //document.getElementById(obj.src).style.backgroundColor = "var(--button)";
+                //document.getElementById(obj.src).style.borderColor = "var(--button)";
             } catch {
                 console.log("UserDisconnected not button");
             }
@@ -173,9 +195,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
             try {
-                button_clicked = button_clicked.filter(deleteById(obj.alarm));
-                var clicked = document.getElementById(obj.alarm);
-                document.getElementById(obj.alarm).style.backgroundColor = "var(--button)";
+                button_clicked = button_clicked.filter(deleteById(obj.btn_id));
+                var clicked = document.getElementById(obj.btn_id);
+                document.getElementById(obj.btn_id).style.backgroundColor = "var(--button)";
             } catch {
                 console.log("danilo req: Alarme acionado não estava ativo no botão.");
                 
@@ -216,12 +238,26 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var button_found;
                 list_buttons.forEach(function (l) {
                     if (l.button_prt == obj.alarm) {
-                        button_found = l;
+                        button_found.push(l);
                     }
                 })
                 //var clicked = document.getElementById(obj.alarm);
-                document.getElementById(obj.alarm).style.backgroundColor = "darkred";
-                button_clicked.push({ id: String(obj.alarm), type: "alarm", name: button_found.button_name, prt: obj.alarm });
+                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
+
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "darkred";
+                    button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
+                }
+
+
+                
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.Sip +"</p>", 500, 200);
@@ -241,21 +277,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "VideoRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.alarm, obj.name,"video", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name,"video", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PageRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.alarm, obj.name, "page", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name, "page", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PopupRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.alarm, obj.name, "popup", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name, "popup", obj.alarm, "");
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
@@ -264,7 +300,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var element = obj.src + "-status";
             console.log(element);
             try {
-                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                }
+                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 addNotification('inc', "Tocando " + obj.src)
                     .then(function (message) {
                         console.log(message);
@@ -276,7 +322,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallRinging is not button");
             }
             try {
-                document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                }
+                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 addNotification('inc', "Tocando " + obj.num)
                     .then(function (message) {
                         console.log(message);
@@ -293,19 +349,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var element = obj.src + "-status";
             console.log(element);
             try {
-                var clicked = button_clicked.filter(findByPrt(obj.num));
+                var clicked = button_clicked.filter(findById(obj.btn_id));
                 if (clicked.length == 0) {
                     var button_found;
                     list_buttons.forEach(function (l) {
-                        if (l.button_prt == obj.num) {
+                        if (l.id == obj.btn_id) {
                             button_found = l;
                         }
                     })
                     //var button = list_buttons.filter(findByPrt(obj.num));
-                    var clicked = document.getElementById(obj.num);
+                    var clicked = document.getElementById(obj.btn_id);
                     if (clicked.style.backgroundColor != "darkred") {
-                        document.getElementById(obj.num).style.backgroundColor = "darkred";
-                        button_clicked.push({ id: button_found.button_prt, type: button_found.button_type, name: button_found.button_name, prt: obj.num });
+                        document.getElementById(obj.btn_id).style.backgroundColor = "darkred";
+                        button_clicked.push({ id: button_found.id, type: button_found.button_type, name: button_found.button_name, prt: obj.num });
                         console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
                     }
                 }
@@ -323,7 +379,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var element = obj.src + "-status";
             console.log(element);
             try {
-                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                }
+                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 addNotification('inc', "Tocando " + obj.src)
                     .then(function (message) {
                         console.log(message);
@@ -335,7 +401,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallRinging is not button");
             }
             try {
-                document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                }
+                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 addNotification('inc', "Tocando " + obj.num)
                     .then(function (message) {
                         console.log(message);
@@ -348,7 +424,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             
             if (obj.src == userUI && popupOpen == false) {
-                makePopup("Chamando", "<button type='button' class='popup-connect'>ATENDER</button><button type='button' class='popup-clear'>RECUSAR</button>", 400, 100);
+                makePopupCall("Chamando", "<button type='button' class='popup-connect'>ATENDER</button><button type='button' class='popup-clear'>RECUSAR</button>", 400, 100, obj.btn_id);
             }
         }
         if (obj.api == "user" && obj.mt == "CallConnected") {
@@ -356,7 +432,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var element = obj.src+"-status";
             console.log(element);
             try {
-                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
+                }
+                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 addNotification('inc', "Conectado " + obj.src)
                     .then(function (message) {
                         console.log(message);
@@ -368,7 +454,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallConnected is not button");
             }
             try {
-                document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
+                }
+                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 addNotification('inc', "Conectado " + obj.num)
                     .then(function (message) {
                         console.log(message);
@@ -389,12 +485,22 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var element = obj.src + "-status";
             console.log(element);
             try {
-                document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
-                var sipButton = document.getElementById(obj.src);
-                if (sipButton.style.backgroundColor == "darkred") {
-                    document.getElementById(obj.src).style.backgroundColor = "darkgreen";
-                    //document.getElementById(value).setAttribute("class", "allbutton");
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "";
                 }
+                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
+                //var sipButton = document.getElementById(obj.src);
+                //if (sipButton.style.backgroundColor == "darkred") {
+                //    document.getElementById(obj.src).style.backgroundColor = "darkgreen";
+                //    //document.getElementById(value).setAttribute("class", "allbutton");
+                //}
                 addNotification('inc', "Desconectado " + obj.src)
                     .then(function (message) {
                         console.log(message);
@@ -406,12 +512,22 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallDisconnected not button");
             }
             try {
-                document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "";
-                var sipButton = document.getElementById(obj.num);
-                if (sipButton.style.backgroundColor == "darkred") {
-                    document.getElementById(obj.num).style.backgroundColor = "darkgreen";
-                    //document.getElementById(value).setAttribute("class", "allbutton");
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    elemento.style.backgroundColor = "";
                 }
+                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "";
+                //var sipButton = document.getElementById(obj.btn_);
+                //if (sipButton.style.backgroundColor == "darkred") {
+                //    document.getElementById(obj.).style.backgroundColor = "darkgreen";
+                //    //document.getElementById(value).setAttribute("class", "allbutton");
+                //}
                 addNotification('inc', "Desconectado " + obj.num)
                     .then(function (message) {
                         console.log(message);
@@ -423,10 +539,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("CallDisconnected not button");
             }
             try {
-                if (obj.src == userUI) {
-                    document.getElementById(obj.num).style.backgroundColor = "";
+                var user_conn = list_users.filter(function (user) { return user == obj.src });
+                if (obj.src == userUI && user_conn.length > 0) {
+                    document.getElementById(obj.btn_id).style.backgroundColor = "darkgreen";
+                } else {
+                    document.getElementById(obj.btn_id).style.backgroundColor = "";
                 }
-                
             } catch (e){
                 console.log("CallDisconnected number dialed not button");
             }
@@ -434,6 +552,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 popup.close();
                 popupOpen = false;
             }
+            button_clicked = button_clicked.filter(deleteById(obj.btn_id));
+            console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
         }
         if (obj.api == "user" && obj.mt == "DevicesList") {
 
@@ -567,6 +687,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = combobtn.add(new innovaphone.ui1.Div(null, null, "combobutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
+                div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
                 
 
@@ -582,7 +703,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
 
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -597,7 +719,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
 
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -613,7 +736,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
                 div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -628,7 +752,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
                 div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -643,7 +768,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "exnumberbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
                 div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -654,27 +780,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                 allbtn.add(div1);
             }
-
-            else if (object.button_type == "queue") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "numberbutton"));
-                div1.setAttribute("button_type", object.button_type);
-                div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
-                div1.setAttribute("button_prt_user", object.button_prt_user);
-
-                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-                div2.setAttribute("id", object.button_prt + "-status");
-                div2.addHTML("<img src='queue.png' class='img-icon'>" + object.button_name);
-
-                var div3 = div1.add(new innovaphone.ui1.Div(null, "GRUPO " + object.button_prt, "buttondown"));
-
-                allbtn.add(div1);
-            }
             else if (object.button_type == "page") {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("id", object.button_prt);
+                div1.setAttribute("button_id", object.id);
+                div1.setAttribute("id", object.id);
 
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
@@ -779,15 +890,60 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             popupOpen = true;
         }
     }
+    function makePopupCall(header, content, width, height) {
+        console.log("makePopupCall");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
 
-    function updateScreen(id, name, type, prt, prt_user) {
-        var clicked = button_clicked.filter(findByPrt(prt));
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+        if (popupOpen == false) {
+            //var popupcloser = document.querySelectorAll(".popup-closer");
+            //for (var i = 0; i < popupcloser.length; i++) {
+            //    var botao = popupcloser[i];
+            //    // O jeito correto e padronizado de incluir eventos no ECMAScript
+            //    // (Javascript) eh com addEventListener:
+            //    botao.addEventListener("click", function () {
+            //        app.send({ api: "user", mt: "DecrementCount" });
+            //        popupOpen = false;
+            //    });
+            //}
+            var popupanswer = document.querySelectorAll(".popup-connect");
+            for (var i = 0; i < popupanswer.length; i++) {
+                var botao = popupanswer[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    app.send({ api: "user", mt: "UserConnect", btn_id: btn_id });
+                    _popup.close();
+                    popupOpen = false;
+                });
+            }
+            var popupanswer = document.querySelectorAll(".popup-clear");
+            for (var i = 0; i < popupanswer.length; i++) {
+                var botao = popupanswer[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    app.send({ api: "user", mt: "EndCall", btn_id:btn_id });
+                    _popup.close();
+                    popupOpen = false;
+                });
+            }
+            popup = _popup;
+            popupOpen = true;
+        }
+    }
+
+    function updateScreen(id, name, type, prt, prt_user,btn_id) {
+        var clicked = button_clicked.filter(findById(id));
         if (clicked.length > 0) {
             //DESATIVAR
             if (type == "page") {
                 button_clicked.forEach(function (b) {
-                    if (b.type == "page") {
-                        document.getElementById(b.prt).style.backgroundColor = "";
+                    if (b.type == "page" && b.prt==prt) {
+                        document.getElementById(b.id).style.backgroundColor = "";
                         try {
                             document.getElementsByClassName("pagebtn")[0].style.width = "";
                             var gfg_down = document.getElementsByClassName("colunapage")[0];
@@ -807,18 +963,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "user") {
                 var found = list_users.indexOf(prt);
                 if (found != -1) {
-                    app.send({ api: "user", mt: "EndCall", prt: String(prt) })
+                    app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id)})
                     document.getElementById(id).style.backgroundColor = "darkgreen";
                 }
             }
             if (type == "externalnumber") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt) })
+                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
                 document.getElementById(id).style.backgroundColor = "";
             }
             if (type == "alarm") {
                 app.send({ api: "user", mt: "DecrementCount" });
-                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt) })
-                document.getElementById(prt).style.backgroundColor = "var(--button)";
+                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt), btn_id: String(id) })
+                document.getElementById(id).style.backgroundColor = "var(--button)";
             }
             if (type == "video") {
                 try {
@@ -829,14 +985,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 catch {
                     container.clear();
                 }
-                app.send({ api: "user", mt: "TriggerStopVideo", prt: String(prt) })
+                app.send({ api: "user", mt: "TriggerStopVideo", prt: String(prt), btn_id: String(id) })
                 container.clear();
                 container.add(new innovaphone.ui1.Node("img", "width:20%; height:20%; max-width: 100px;", null, null).setAttribute("src", "play.png"), null);
 
-                document.getElementById(prt).style.backgroundColor = "var(--button)";
+                document.getElementById(id).style.backgroundColor = "var(--button)";
             }
             if (type == "combo") {
-                document.getElementById(id).style.backgroundColor = "var(--button)";
+                document.getElementById(id).style.backgroundColor = "";
             }
             //var btn = { id: id, type: type, name: name, prt: prt };
             //button_clicked.splice(button_clicked.indexOf(btn), 1);
@@ -852,8 +1008,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         try {
                             //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
                             //button_clicked.splice(button_clicked.indexOf(btn), 1);
-                            button_clicked = button_clicked.filter(deleteById(b.prt));
-                            document.getElementById(b.prt).style.backgroundColor = "";
+                            button_clicked = button_clicked.filter(deleteById(b.id));
+                            document.getElementById(b.id).style.backgroundColor = "";
                             var gfg_down = document.getElementsByClassName("colunapage")[0];
                             gfg_down.parentNode.removeChild(gfg_down);
                             document.getElementsByClassName("pageDivider")[0].style.display = "none";
@@ -868,7 +1024,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 })
 
 
-                var is_button = document.getElementById(prt);
+                var is_button = document.getElementById(id);
                 if (is_button == null) {
                     makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
                 } else {
@@ -890,7 +1046,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                             console.log(error);
                         });
                     app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
-                    document.getElementById(prt).style.backgroundColor = "darkred";
+                    document.getElementById(id).style.backgroundColor = "darkred";
 
                     //ARRASTAR E SOLTAR DIMENSÂO COLUNAS
                     // Obtenha as referências às DIVs que serão redimensionadas
@@ -1003,7 +1159,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "user") {
                 found = list_users.indexOf(prt);
                 if (found != -1) {
-                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt) })
+                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                     //addNotification("out", name);
                     addNotification('out', name)
                         .then(function (message) {
@@ -1020,7 +1176,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 app.send({ api: "user", mt: "TriggerStartPopup", prt: String(prt) })
             }
             if (type == "externalnumber") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt) })
+                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
                 addNotification('out', name)
                     .then(function (message) {
@@ -1033,8 +1189,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 found = 1;
             }
             if (type == "alarm") {
-                app.send({ api: "user", mt: "TriggerAlert", prt: String(prt) })
-                document.getElementById(prt).style.backgroundColor = "darkred";
+                app.send({ api: "user", mt: "TriggerAlert", prt: String(prt), btn_id: String(id)})
+                document.getElementById(id).style.backgroundColor = "darkred";
                 found = 1;
             }
             if (type == "video") {
@@ -1043,8 +1199,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         try {
                             //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
                             //button_clicked.splice(button_clicked.indexOf(btn), 1);
-                            button_clicked = button_clicked.filter(deleteById(b.prt));
-                            document.getElementById(b.prt).style.backgroundColor = "";
+                            button_clicked = button_clicked.filter(deleteById(b.id));
+                            document.getElementById(b.id).style.backgroundColor = "";
 
                         } catch {
                             console.log("danilo req: Area de video já estava fechada, vamos abrir um novo video");
@@ -1101,13 +1257,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 video.ready(function () {
                     video.src({ type: "application/x-mpegURL", src: prt });
                 });
-                document.getElementById(prt).style.backgroundColor = "darkred";
+                document.getElementById(id).style.backgroundColor = "darkred";
                 found = 1;
                         //document.getElementById(value).setAttribute("class", "allbuttonClicked");
                         
             }
             if (type == "combo") {
-                app.send({ api: "user", mt: "TriggerCombo", prt: String(id) })
+                app.send({ api: "user", mt: "TriggerCombo", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
                 addNotification('out', name)
                     .then(function (message) {
