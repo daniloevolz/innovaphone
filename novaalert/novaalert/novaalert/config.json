@@ -209,6 +209,11 @@
           },
           {
             "cmd": "column",
+            "name": "action_start_type",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
             "name": "action_prt",
             "type": "text"
           },
