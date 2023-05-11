@@ -189,7 +189,7 @@ select{
 }
 .divAdd4{
     position: absolute;
-    top: 39%;
+    top: 40%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -315,6 +315,29 @@ select{
     font-size: 15px;
     text-align: right;
     border-bottom: 2px solid #02163F;
+}
+.labelDeviceNumberAction{
+    position: absolute;
+    /* left: 29%; */
+    /* width: 15%; */
+    top: 53%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
+}
+.iptDeviceNumberAction{
+    position: absolute;
+    top: 52%;
+    width: 75%;
+    left: 22%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
 }
 .iptDeviceNumber {
     position: absolute;
@@ -758,14 +781,36 @@ select{
 }
 .divAddAction2{
     position: absolute;
+    top: 43%;
+    left:28%;
+    width: 38%;
+    padding: 10px;
+}
+.divAddAction5{
+    position: absolute;
     top: 35%;
     left:28%;
     width: 38%;
     padding: 10px;
 }
+.selectAlarmOrCall {
+    top: 37%;
+    position: absolute;
+    left: 27%;
+    width: 70%;
+    /* left: 37%; */
+    top: 55%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
 .divAddAction3{
     position: absolute;
-    top: 45%;
+    top: 53%;
     left:28%;
     width: 38%;
     padding: 10px;
@@ -797,11 +842,19 @@ select{
 }
 .divAddAction4 {
     position: absolute;
-    top: 55%;
+    top: 61%;
     left: 28%;
     width: 38%;
     padding: 10px;
 }
+.divAddAction6 {
+    position: absolute;
+    top: 70%;
+    left: 28%;
+    width: 38%;
+    padding: 10px;
+    /* display: none; */
+} 
 .labelValueAction {
     position: absolute;
     /* left: 29%; */
