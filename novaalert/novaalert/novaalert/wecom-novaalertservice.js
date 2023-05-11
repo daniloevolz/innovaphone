@@ -532,7 +532,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateMessage") {
-                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + "' WHERE id=" + obj.id)
+                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + + "', button_device='" + String(obj.device) +"' WHERE id=" + obj.id)
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateMessageSuccess" }));
                     })
@@ -587,7 +587,7 @@ new JsonApi("admin").onconnected(function (conn) {
             }
             if (obj.mt == "InsertActionMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
-                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type)+ "','" + String(obj.device) +"')")
                 .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertActionMessageSuccess" }));
                     })
@@ -597,7 +597,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateActionMessage") {
-                Database.exec("UPDATE list_alarm_actions SET action_name='" + String(obj.name) + "', action_alarm_code='" + String(obj.alarm) + "', action_prt='" + String(obj.value) + "', action_user='" + String(obj.sip) + "', action_type='" + String(obj.type) + "' WHERE id=" + obj.id)
+                Database.exec("UPDATE list_alarm_actions SET action_name='" + String(obj.name) + "', action_alarm_code='" + String(obj.alarm) + "', action_prt='" + String(obj.value) + "', action_user='" + String(obj.sip) + "', action_type='" + String(obj.type)+ "', action_device='" + String(obj.device) + "' WHERE id=" + obj.id)
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateActionMessageSuccess" }));
                     })

@@ -1055,6 +1055,16 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         divAddAction.add(new innovaphone.ui1.Div(null, texts.text("labelName"),"labelNameAction"));
         iptName.setAttribute("placeholder"," ");
         
+        //SELECT LIGAÇÃO OU ALARME
+        var divAddAction5 = t.add(new innovaphone.ui1.Div(null,null,"divAddAction5"))
+        divAddAction5.add(new innovaphone.ui1.Div("text-align:center; border-bottom: 2px solid #02163F;",texts.text("labelAlarmeOrCall"),null));
+        var selectAlarmOrNumber = divAddAction5.add(new innovaphone.ui1.Node("select",null,texts.text("Escolher..."),"selectAlarmOrCall"));
+        var opt1 = selectAlarmOrNumber.add(new innovaphone.ui1.Node("option",null,texts.text("labelAlarm"),null));
+        var opt2 = selectAlarmOrNumber.add(new innovaphone.ui1.Node("option",null,texts.text("labelExternalNumber"),null));
+        selectAlarmOrNumber.setAttribute("id","selectStartType");
+
+
+
         //Código Alarme
         var divAddAction2 = t.add(new innovaphone.ui1.Div(null,null,"divAddAction2"));
         var iptAlarmCode = divAddAction2.add(new innovaphone.ui1.Input(null, null, null, 255, "url","iptAlarmAction"));
@@ -1085,11 +1095,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var user = document.getElementById("selectUser");
             var selecteduser = user.options[user.selectedIndex];
             var user = selecteduser.id;
+            var start = document.getElementById("selectStartType");
+            var StartOpt = start.options[start.selectedIndex].text;
             if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "" || String(type) == "") {
-                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt) , value: String(iptValue.getValue()), sip: String(user), type: String(type) });
                 makeTableActions(t);
             }
         });
@@ -1097,6 +1109,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; color:var(--div-DelBtn); font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeTableActions(t);
         });
+
 
     }
 
@@ -1361,7 +1374,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
         var list = new innovaphone.ui1.Div(null, null, "");
-        var columns = 6;
+        var columns = 7;
         var rows = list_actions.length;
         var actionsListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         //Cabeçalho
@@ -1374,6 +1387,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             row.push(b.id);
             row.push(b.action_name);
             row.push(b.action_alarm_code);
+            row.push(b.action_start_type);
             row.push(b.action_prt);
             // Substituir valores de b.name por texto correspondente
             switch (b.action_type) {
