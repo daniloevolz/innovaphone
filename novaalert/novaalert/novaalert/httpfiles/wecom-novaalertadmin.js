@@ -1116,6 +1116,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var select = document.getElementById('selectUser');
             select.value = cn;
         }
+       
         //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
         //Nome
@@ -1124,14 +1125,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         divAddAction.add(new innovaphone.ui1.Div(null, texts.text("labelName"), "labelNameAction"));
 
         //Código Alarme
-        var divAddAction2 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction2"));
+        var divAddAction2 = t.add(new innovaphone.ui1.Div(null, null, "divAddActionUpdate2"));
         var iptAlarmCode = divAddAction2.add(new innovaphone.ui1.Input(null, action[2], null, 255, "text", "iptAlarmAction"));
         divAddAction2.add(new innovaphone.ui1.Div(null, texts.text("labelAlarmCode"), "labelNameAlarm"));
 
         //Tipo
         var divAddAction3 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction3"));
         divAddAction3.add(new innovaphone.ui1.Div(null, texts.text("labelType"), "labelTypeAction"));
-        var iptType = divAddAction3.add(new innovaphone.ui1.Node("select", null, null, "selectTypeAction"));
+        var iptType = divAddAction3.add(new innovaphone.ui1.Node("select", null, null, "selectTypeActionUpdate"));
         iptType.setAttribute("id", "selectType");
 
         list_act_types.forEach(function (act) {
@@ -1144,11 +1145,63 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             select.value = action[4];
         }
         
+        //Tipo Gatilho
+       
+        //var divAddAction5 = t.add(new innovaphone.ui1.Div(null,null,"divAddAction5")) desnecessário
+        t.add(new innovaphone.ui1.Div(" border-bottom: 2px solid #02163F;",texts.text("labelAlarmeOrCall"),"labelStartTypeUpdate"));
+        var selectAlarmOrNumber = t.add(new innovaphone.ui1.Node("select", null, "Escolher...", "selectStartTypeUpdate").setAttribute("id", "selectStartType"));
+        selectAlarmOrNumber.add(new innovaphone.ui1.Node("option",null,texts.text("labelAlarm"),null).setAttribute("id","alarm"));
+        selectAlarmOrNumber.add(new innovaphone.ui1.Node("option",null,texts.text("labelDestinationNumber"),null).setAttribute("id","out-number"));
+        selectAlarmOrNumber.add(new innovaphone.ui1.Node("option",null,texts.text("labelOriginNumber"),null).setAttribute("id","inc-number"));
+        
         //Valor
         var divAddAction4 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction4"));
         var iptValue = divAddAction4.add(new innovaphone.ui1.Input(null, action[3], null, 500, "text", "iptValueAction"));
         divAddAction4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueAction"));
+        iptValue.setAttribute("placeholder"," ");
+        var divDevice = t.add(new innovaphone.ui1.Div(null, null, "divAddAction5"));
 
+        document.getElementById("selectType").addEventListener("change", function (e) {
+            console.log(e.target.value);
+            if (e.target.value == "Número") {
+                //Device
+                divDevice.add(new innovaphone.ui1.Div(null, texts.text("device"), "labelDeviceNumberAction"));
+                var iptDevice = divDevice.add(new innovaphone.ui1.Node("select", null, null, "iptDeviceNumberAction").setAttribute("id", "selectDevice"));
+                //iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+
+                var user = document.getElementById("selectUser");
+                var selectedOption = user.options[user.selectedIndex];
+                var sip = selectedOption.id;
+                iptDevice.clear();
+                iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+                list_users.forEach(function (user) {
+                    if (user.sip == sip) {
+                        var devices = user.devices;
+                        devices.forEach(function (dev) {
+                            iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+                        })
+                    }
+                })
+
+                document.getElementById("selectUser").addEventListener("change", function (e) {
+                    console.log(e.target.value);
+                    var user = document.getElementById("selectUser");
+                    var selectedOption = user.options[user.selectedIndex];
+                    var sip = selectedOption.id;
+                    iptDevice.clear();
+                    list_users.forEach(function (user) {
+                        if (user.sip == sip) {
+                            var devices = user.devices;
+                            devices.forEach(function (dev) {
+                                iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+                            })
+                        }
+                    })
+                });
+            } else  {
+                divDevice.clear();
+            }
+        });
         //Botão Salvar
         t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
             var type = document.getElementById("selectType");
@@ -1157,11 +1210,22 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var user = document.getElementById("selectUser");
             var selecteduser = user.options[user.selectedIndex];
             var user = selecteduser.id;
+            var start = document.getElementById("selectStartType");
+            var StartOpt = start.options[start.selectedIndex].getAttribute("id");
+            //var start = document.getElementById("selectType");
+            var device;
+
+            if (type == "number") {
+                device = document.getElementById("selectDevice");
+                var selectedOption = device.options[device.selectedIndex];
+                var device = selectedOption.id;
+            }
+       
             if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "" || String(type) == "") {
-                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+                makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "UpdateActionMessage", id: parseInt(action[0]), name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
+                app.send({ api: "admin", mt: "UpdateActionMessage", id: parseInt(action[0]), name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start:String(StartOpt), value: String(iptValue.getValue()), sip: String(user), type: String(type), device:device });
                 makeTableActions(t);
             }
         });

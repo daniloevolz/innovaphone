@@ -611,7 +611,11 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateActionMessage") {
+<<<<<<< Updated upstream
                 Database.exec("UPDATE list_alarm_actions SET action_name='" + String(obj.name) + "', action_alarm_code='" + String(obj.alarm) + "', action_prt='" + String(obj.value) + "', action_user='" + String(obj.sip) + "', action_type='" + String(obj.type) + "' WHERE id=" + obj.id)
+=======
+                Database.exec("UPDATE list_alarm_actions SET action_name='" + String(obj.name) + "', action_alarm_code='" + String(obj.alarm) + "',action_start_type='" + String(obj.start) + "', action_prt='" + String(obj.value) + "', action_user='" + String(obj.sip) + "', action_type='" + String(obj.type)+ "', action_device='" + String(obj.device) + "' WHERE id=" + obj.id)
+>>>>>>> Stashed changes
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateActionMessageSuccess" }));
                     })
