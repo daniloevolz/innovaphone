@@ -339,48 +339,6 @@ select{
     border: 1px solid #02163F;
     border-radius: 10px;
 }
-.divAddActionUpdate2{
-    position: absolute;
-    top: 50%;
-    left: 4%;
-    width: 77%;
-    padding: 10px;
-}
-.labelStartTypeUpdate{
-    position: absolute;
-    left: 5%;
-    width: 50%;
-    top: 45%;
-    font-size: 15px;
-    text-align: left;
-    border-bottom: 2px solid rgb(2, 22, 63);
-}
-.selectStartTypeUpdate {
-    position: absolute;
-    width: 30%;
-    left: 50%;
-    top: 45%;
-    font-size: 12px;
-    text-align: center;
-    height: 30px;
-    background-color: rgb(2, 22, 63);
-    color: white;
-    border: 1px solid rgb(2, 22, 63);
-    border-radius: 10px;
-}
-.selectTypeActionUpdate {
-    position: absolute;
-    width: 30%;
-    left: 50%;
-    top: 35%;
-    font-size: 12px;
-    text-align: center;
-    height: 30px;
-    background-color: rgb(2, 22, 63);
-    color: white;
-    border: 1px solid rgb(2, 22, 63);
-    border-radius: 10px;
-}
 .iptDeviceNumber {
     position: absolute;
     width: 30%;
@@ -866,6 +824,19 @@ select{
     left: 17%;
     width: 30%;
     left: 50%;
+    top: 55%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+.selectValueAction {
+    position: absolute;
+    left: 60.0%;
+    width: 38.5%;
     top: 55%;
     font-size: 12px;
     text-align: center;

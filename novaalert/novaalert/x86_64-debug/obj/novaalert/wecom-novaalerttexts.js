@@ -2,6 +2,8 @@
 var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        promptSelectAction: "Selecione uma ação!",
+        promptSelectButton: "Selecione um botão!",
         labelLicenseUsed: "Licenças em uso:",
         labelCfgLicense: "Licenciamento",
         labelTituloLicense: "Licenciamento do sistema",
@@ -9,7 +11,7 @@ Wecom.novaalertTexts = {
         labelLicenseFile: "Chave de Licença:",
         labelLicenseInstallDate: "Data de instalação da licença:",
         labelLicenseActive: "Licença Ativa",
-        labelTituloEdit: "Edite o botão selecionado",
+        labelTituloEdit: "Edição",
         btnEditButton: "Editar",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
         labelDevice: "Dispositivo:",
@@ -77,10 +79,10 @@ Wecom.novaalertTexts = {
         cabecalho9: "4º Botão Combo",
         cabecalhoAction0: "ID",
         cabecalhoAction1: "Nome",
-        cabecalhoAction2: "Parâmetro:",
-        cabecalhoAction3: "Gatilho",
+        cabecalhoAction2: "Parâmetro de Gatilho",
+        cabecalhoAction3: "Tipo de Gatilho",
         cabecalhoAction4: "Valor",
-        cabecalhoAction5: "Tipo",
+        cabecalhoAction5: "Tipo de Ação",
         cabecalhoAction6: "Usuário",
         cabecalhoRptAvailability0: "Nome",
         cabecalhoRptAvailability1: "Data",
