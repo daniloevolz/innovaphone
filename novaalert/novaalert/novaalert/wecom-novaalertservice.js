@@ -532,7 +532,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateMessage") {
-                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + + "', button_device='" + String(obj.device) +"' WHERE id=" + obj.id)
+                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + "', button_device='" + String(obj.device) +"' WHERE id=" + obj.id)
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateMessageSuccess" }));
                     })

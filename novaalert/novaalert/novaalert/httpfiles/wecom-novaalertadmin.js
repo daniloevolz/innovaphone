@@ -919,14 +919,16 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var device = document.getElementById("selectDevice");
                 var selectedOption = device.options[device.selectedIndex];
                 var device = selectedOption.id;
-                if (String(iptName.getValue()) == "" || String(iptValue.getValue()) == "") {
+
+                var value = document.getElementById("selectValue");
+                var selectedOption = value.options[value.selectedIndex];
+                var value = selectedOption.id;
+
+                if (String(iptName.getValue()) == "" || String(value) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
-                else if (type == "user") {
-                    var value = document.getElementById("selectValue");
-                    var selectedOption = value.options[value.selectedIndex];
-                    var value = selectedOption.id;
-                    app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type), device:device });
+                else {
+                    app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type), device: device });
                     waitConnection(t1);
                 }
             });
@@ -1223,15 +1225,21 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var user = document.getElementById("selectUser");
                     var selectedOption = user.options[user.selectedIndex];
                     var sip = selectedOption.id;
-                    iptDevice.clear();
-                    list_users.forEach(function (user) {
-                        if (user.sip == sip) {
-                            var devices = user.devices;
-                            devices.forEach(function (dev) {
-                                iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
-                            })
-                        }
-                    })
+
+                    var start = document.getElementById("selectType");
+                    var start = start.options[start.selectedIndex].getAttribute("id");
+
+                    if (start == "number") {
+                        iptDevice.clear();
+                        list_users.forEach(function (user) {
+                            if (user.sip == sip) {
+                                var devices = user.devices;
+                                devices.forEach(function (dev) {
+                                    iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+                                })
+                            }
+                        })
+                    }
                 });
             }
             else if (e.target.value == "Botão") {
@@ -1255,12 +1263,18 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var user = document.getElementById("selectUser");
                     var selectedOption = user.options[user.selectedIndex];
                     var sip = selectedOption.id;
-                    divAddAction4.clear();
-                    list_buttons.forEach(function (button) {
-                        if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
-                            iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
-                        }
-                    })
+
+                    var start = document.getElementById("selectType");
+                    var start = start.options[start.selectedIndex].getAttribute("id");
+
+                    if (start == "button") {
+                        divAddAction4.clear();
+                        list_buttons.forEach(function (button) {
+                            if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
+                                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                            }
+                        })
+                    }
                 });
             } else  {
                 divDevice.clear();
@@ -1508,12 +1522,18 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var user = document.getElementById("selectUser");
                     var selectedOption = user.options[user.selectedIndex];
                     var sip = selectedOption.id;
-                    iptValue.clear();
-                    list_buttons.forEach(function (button) {
-                        if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
-                            iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
-                        }
-                    })
+
+                    var start = document.getElementById("selectType");
+                    var start = start.options[start.selectedIndex].getAttribute("id");
+
+                    if (start == "button") {
+                        iptValue.clear();
+                        list_buttons.forEach(function (button) {
+                            if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
+                                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
+                            }
+                        })
+                    }
                 });
                     
             }
@@ -1547,15 +1567,20 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var user = document.getElementById("selectUser");
                     var selectedOption = user.options[user.selectedIndex];
                     var sip = selectedOption.id;
-                    iptDevice.clear();
-                    list_users.forEach(function (user) {
-                        if (user.sip == sip) {
-                            var devices = user.devices;
-                            devices.forEach(function (dev) {
-                                iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
-                            })
-                        }
-                    })
+                    var start = document.getElementById("selectType");
+                    var start = start.options[start.selectedIndex].getAttribute("id");
+
+                    if (start == "number") {
+                        iptDevice.clear();
+                        list_users.forEach(function (user) {
+                            if (user.sip == sip) {
+                                var devices = user.devices;
+                                devices.forEach(function (dev) {
+                                    iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
+                                })
+                            }
+                        })
+                    }
                 });
             }
             else {
