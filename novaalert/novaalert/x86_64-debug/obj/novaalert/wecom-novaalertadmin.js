@@ -1268,7 +1268,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var start = start.options[start.selectedIndex].getAttribute("id");
 
                     if (start == "button") {
-                        divAddAction4.clear();
+                        //divAddAction4.clear();
+                        iptValue.clear();
                         list_buttons.forEach(function (button) {
                             if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
                                 iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
