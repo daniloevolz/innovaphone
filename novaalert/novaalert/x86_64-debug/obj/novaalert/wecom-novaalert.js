@@ -11,6 +11,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var that = this;
 
     //var phoneApi = start.consumeApi("com.innovaphone.phone");
+    var phoneApi = start.consumeApi("com.innovaphone.phone");
     var calllistApi = start.consumeApi("com.innovaphone.calllist");
     var avatar = start.consumeApi("com.innovaphone.avatar");
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
@@ -105,16 +106,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         
         var type = evt.currentTarget.attributes['button_type'].value;
         var prt = evt.currentTarget.attributes['button_prt'].value;
-        var btn_id = evt.currentTarget.attributes['button_id'].value;
+        //var btn_id = evt.currentTarget.attributes['button_id'].value;
         var id = evt.currentTarget.attributes['id'].value;
 
-        try {
-            var prt_user = evt.currentTarget.attributes['button_prt_user'].value;
-        } catch {
-            var prt_user = "";
-        }
+        //try {
+        //    var prt_user = evt.currentTarget.attributes['button_prt_user'].value;
+        //} catch {
+        //    var prt_user = "";
+        //}
         var name = evt.currentTarget.innerText;
-        updateScreen(id, name.split("\n")[0], type, prt, prt_user, btn_id);
+        updateScreen(id, name.split("\n")[0], type, prt);
     };
     function findById(id) {
         return function (value) {
@@ -277,23 +278,29 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "VideoRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name,"video", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name,"video", obj.alarm);
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PageRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name, "page", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name, "page", obj.alarm);
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
         }
         if (obj.api == "user" && obj.mt == "PopupRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name, "popup", obj.alarm, "");
+            updateScreen(obj.btn_id, obj.name, "popup", obj.alarm);
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
+        }
+        if (obj.api == "user" && obj.mt == "ButtonRequest") {
+            console.log(obj.button);
+            var btn = JSON.parse(obj.button);
+            updateScreen(btn.id, btn.button_name, btn.button_type, btn.button_prt);
+ 
         }
         if (obj.api == "user" && obj.mt == "CallRinging") {
             console.log(obj.src);
@@ -687,7 +694,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = combobtn.add(new innovaphone.ui1.Div(null, null, "combobutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
                 
 
@@ -703,7 +710,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
 
 
@@ -719,7 +726,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
 
 
@@ -736,9 +743,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
-                div1.setAttribute("button_prt_user", object.button_prt_user);
+                //div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
                 div2.setAttribute("id", object.button_prt + "-status");
@@ -752,9 +759,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
-                div1.setAttribute("button_prt_user", object.button_prt_user);
+                //div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
                 div2.setAttribute("id", object.button_prt + "-status");
@@ -768,9 +775,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "exnumberbutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
-                div1.setAttribute("button_prt_user", object.button_prt_user);
+                //div1.setAttribute("button_prt_user", object.button_prt_user);
 
                 var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
                 div2.setAttribute("id", object.button_prt + "-status");
@@ -784,7 +791,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
                 div1.setAttribute("button_type", object.button_type);
                 div1.setAttribute("button_prt", object.button_prt);
-                div1.setAttribute("button_id", object.id);
+                //div1.setAttribute("button_id", object.id);
                 div1.setAttribute("id", object.id);
 
 
@@ -899,23 +906,24 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         _popup.header.addText(header);
         _popup.content.addHTML(content);
         if (popupOpen == false) {
-            //var popupcloser = document.querySelectorAll(".popup-closer");
-            //for (var i = 0; i < popupcloser.length; i++) {
-            //    var botao = popupcloser[i];
-            //    // O jeito correto e padronizado de incluir eventos no ECMAScript
-            //    // (Javascript) eh com addEventListener:
-            //    botao.addEventListener("click", function () {
-            //        app.send({ api: "user", mt: "DecrementCount" });
-            //        popupOpen = false;
-            //    });
-            //}
+            var popupcloser = document.querySelectorAll(".popup-closer");
+            for (var i = 0; i < popupcloser.length; i++) {
+                var botao = popupcloser[i];
+                // O jeito correto e padronizado de incluir eventos no ECMAScript
+                // (Javascript) eh com addEventListener:
+                botao.addEventListener("click", function () {
+                    popupOpen = false;
+                });
+            }
             var popupanswer = document.querySelectorAll(".popup-connect");
             for (var i = 0; i < popupanswer.length; i++) {
                 var botao = popupanswer[i];
                 // O jeito correto e padronizado de incluir eventos no ECMAScript
                 // (Javascript) eh com addEventListener:
                 botao.addEventListener("click", function () {
-                    app.send({ api: "user", mt: "UserConnect", btn_id: btn_id });
+                    //app.send({ api: "user", mt: "UserConnect", btn_id: btn_id });
+                    console.warn("::ConnectCall::");
+                    phoneApi.send({ mt: "ConnectCall" });
                     _popup.close();
                     popupOpen = false;
                 });
@@ -926,7 +934,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 // O jeito correto e padronizado de incluir eventos no ECMAScript
                 // (Javascript) eh com addEventListener:
                 botao.addEventListener("click", function () {
-                    app.send({ api: "user", mt: "EndCall", btn_id:btn_id });
+                    //app.send({ api: "user", mt: "EndCall", btn_id: btn_id });
+                    console.warn("::DisconnectCall::");
+                    phoneApi.send({ mt: "DisconnectCall" });
                     _popup.close();
                     popupOpen = false;
                 });
@@ -936,7 +946,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function updateScreen(id, name, type, prt, prt_user,btn_id) {
+    function updateScreen(id, name, type, prt) {
         var clicked = button_clicked.filter(findById(id));
         if (clicked.length > 0) {
             //DESATIVAR

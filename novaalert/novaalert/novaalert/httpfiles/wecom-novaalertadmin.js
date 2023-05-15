@@ -1403,7 +1403,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var user = document.getElementById("selectUser");
                 var selectedOption = user.options[user.selectedIndex];
                 var sip = selectedOption.id;
-                divAddAction4.clear();
+                iptValue.clear();
                 list_buttons.forEach(function (button) {
                     if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
                         iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
@@ -1508,7 +1508,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var user = document.getElementById("selectUser");
                     var selectedOption = user.options[user.selectedIndex];
                     var sip = selectedOption.id;
-                    divAddAction4.clear();
+                    iptValue.clear();
                     list_buttons.forEach(function (button) {
                         if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
                             iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
