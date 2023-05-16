@@ -76,7 +76,8 @@
 
     </style>
     <script>
-
+        var start ;
+        var end;
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             var id = $.urlParam('id');
@@ -187,62 +188,8 @@
                     } else {
                         document.getElementById("MyModal").style.display = 'block';
                         
-                        document.getElementById("iptName").innerHTML = '';
+                        document.getElementById("iptName").value = '';
                         document.getElementById("iptEmail").value = '';
-
-
-                        document.getElementById("btnSendName").addEventListener("click",function(){
-                            var name = document.getElementById("iptName").value;
-                            var email = document.getElementById("iptEmail").value;
-                            console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
-                            
-
-                        // document.getElementById("MyModal").style.display = 'none';
-
-                        if (name && email) {
-                            
-                            var eventData;
-                            eventData = {
-                                sip: id,
-                                title: name,
-                                start: start,
-                                end: end,
-                                email: email
-                            };
-                            fetch('/dwcscheduler/salvar-evento', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(eventData)
-                            }).then(function (response) {
-                                // Processa a resposta do servidor
-                                if (response.status == 200) {
-
-                                    response.text().then(function (text) {
-                                        var obj = JSON.parse(String(text));
-                                        switch (obj.status) {
-                                            case 200:
-                                                window.alert("\n" + obj.msg);
-                                                $('#calendar').fullCalendar('renderEvent', eventData, true);
-                                                break;
-                                            default:
-                                                window.alert(obj.msg);
-                                                break;
-                                        }
-                                    });
-                                } else {
-                                    response.text().then(function (text) {
-                                        window.alert("Algo saiu errado:\n" + text);
-                                    });
-                                }
-
-                            });
-
-                            //var mailto = "mailto:" + email + "?subject=" + encodeURIComponent("Agendamento de evento") + "&body=" + encodeURIComponent("Ol�,\n\nSeu evento foi agendado para " + moment(start).format("DD/MM/YYYY [�s] HH:mm") + " e ter� dura��o de " + duration + " minutos.\n\nAtenciosamente,\nAgenda Online");
-                            //window.open(mailto);
-                        }
-                    }) 
                         $('#calendar').fullCalendar('unselect');
                     }
                 },
@@ -252,7 +199,15 @@
                 eventRender: function (event, element) {}
             });
 
+            document.getElementById("btnSendName").addEventListener("click",function(){
+                            var name = document.getElementById("iptName").value;
+                            var email = document.getElementById("iptEmail").value;
+                            console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
+                            sendAgenda(id,name, email,start,end);
+        })
+
         });
+        
         // Função para obter o valor de um parâmetro de URL
         $.urlParam = function (name) {
             var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -260,6 +215,57 @@
                 return null;
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+        //evt listener aaqui 
+        
+
+        function sendAgenda(id,name, email,start,end){
+            document.getElementById("MyModal").style.display = 'none';
+            console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
+            "end " + end + "\n" + "email " + email)
+                            if (name && email) {
+                                
+                                var eventData;
+                                eventData = {
+                                    sip: id,
+                                    title: name,
+                                    start: start,
+                                    end: end,
+                                    email: email
+                                };
+                                fetch('/dwcscheduler/salvar-evento', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(eventData)
+                                }).then(function (response) {
+                                    // Processa a resposta do servidor
+                                    if (response.status == 200) {
+
+                                        response.text().then(function (text) {
+                                            var obj = JSON.parse(String(text));
+                                            switch (obj.status) {
+                                                case 200:
+                                                    window.alert("\n" + obj.msg);
+                                                    $('#calendar').fullCalendar('renderEvent', eventData, true);
+                                                    break;
+                                                default:
+                                                    window.alert(obj.msg);
+                                                    break;
+                                            }
+                                        });
+                                    } else {
+                                        response.text().then(function (text) {
+                                            window.alert("Algo saiu errado:\n" + text);
+                                        });
+                                    }
+
+                                });
+
+                                //var mailto = "mailto:" + email + "?subject=" + encodeURIComponent("Agendamento de evento") + "&body=" + encodeURIComponent("Ol�,\n\nSeu evento foi agendado para " + moment(start).format("DD/MM/YYYY [�s] HH:mm") + " e ter� dura��o de " + duration + " minutos.\n\nAtenciosamente,\nAgenda Online");
+                                //window.open(mailto);
+                            }
         }
         function closeModal(event){
         if(event.target.id === "spanX"){
