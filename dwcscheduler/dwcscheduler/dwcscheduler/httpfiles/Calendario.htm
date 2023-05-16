@@ -186,6 +186,7 @@
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
                     } else {
+                        console.log("START " + start + "\n" + "END " + end)
                         document.getElementById("MyModal").style.display = 'block';
                         
                         document.getElementById("iptName").value = '';
