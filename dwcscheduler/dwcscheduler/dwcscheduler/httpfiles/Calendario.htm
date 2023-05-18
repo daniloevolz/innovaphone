@@ -20,9 +20,8 @@
             padding: 0;
             font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
             font-size: 14px;
-            background-color: #7c7171c7;
+            background-color: white;
         }
-
         #calendar {
             max-width: 900px;
             margin: 0 auto;
@@ -34,7 +33,7 @@
             position: fixed;
             left: 15%;
             top: 1%;
-            z-index: 3;
+            z-index: 1000;
             width: 70%;
             height: 100%;
             border-radius: 20px;
@@ -74,10 +73,72 @@
                 border-radius: 25px;
             }
 
+            /*FULL CALENDAR OPÇÕES */
+
+            .fc .fc-toolbar>*>* {
+                 float: none; 
+                margin-left: 0.75em;
+            }
+            .fc-button-group {
+                 float: none; 
+            }
+            /* .fc-state-default {
+    border: 1px solid;
+    background-color: grey;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    color: #333;
+
+} */
+
+.fc-state-disabled {
+    cursor: default;
+    background-image: none;
+    /* opacity: .65; */
+    box-shadow: none;
+}
+.fc-state-disabled {
+    cursor: default;
+    background-image: none;
+    opacity: inherit;
+    box-shadow: none;
+}
+/* .fc-state-active, .fc-state-disabled, .fc-state-down, .fc-state-hover {
+    color: #333;
+    background-color: grey;
+} */
+.fc-month-button ,.fc-button, .fc-state-default ,.fc-corner-left{
+    background-color: none;
+}
+.fc-head{
+    background-color: #02163f;
+    color: white;
+}
+hr.fc-divider {
+    display: none;
+}
+/* .fc-day-grid {
+    display: none;
+} */
+.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {
+    padding-bottom: 0em; 
+}
+.fc-axis .fc-widget-content{
+    display: none;
+}
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable > div{
+    visibility: hidden;
+}
+.fc-agenda-view .fc-day-grid .fc-row {
+    min-height: 0em;
+}
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable 
+> div > div.fc-bg > table > tbody > tr > td.fc-axis.fc-widget-content{
+    display: none;
+}
     </style>
     <script>
-        var start ;
-        var end;
+        var selectstart ;
+        var selectend;
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             var id = $.urlParam('id');
@@ -105,9 +166,12 @@
                         var last_end = "2000-12-30T23:00";
                         var dataavailability = JSON.parse(obj.dataavailability);
                         var dataschedules = JSON.parse(obj.dataschedules);
-
+                        console.log("Data Availability: " + JSON.stringify(dataavailability));
+                        console.log(" Data Availability Start: " + JSON.stringify(dataavailability.time_start))
+                        console.log(" Data Availability End: " + JSON.stringify(dataavailability.time_end))
                         //Disponibilidades cadastradas
                         for (var i = 0; i < dataavailability.length-1; i++) {
+
                             var start = moment(dataavailability[i].time_end).toDate();
                             var end = moment(dataavailability[i + 1].time_start).toDate();
 
@@ -117,32 +181,34 @@
                             if (last_end < dataavailability[i + 1].time_end) {
                                 last_end = dataavailability[i + 1].time_end;
                             }
-                            var eventData = {
-                                title: "Indisponível",
-                                start: start,
-                                end: end,
-                                editable: false,
-                                backgroundColor: '#941f1f'
-                            };
-                            $('#calendar').fullCalendar('renderEvent', eventData, true);
+                            // var eventData = {
+                            //     title: "Indisponível",
+                            //     start: start,
+                            //     end: end,
+                            //     editable: false,
+                            //     backgroundColor: '#941f1f'
+                            // };
+                            
                         }
-                        var eventData = {
-                            title: "Indisponível",
-                            start: "2000-01-01T01:00",
-                            end: first_start,
-                            editable: false,
-                            backgroundColor: '#941f1f'
-                        };
-                        $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        var eventData = {
-                            title: "Indisponível",
-                            start: last_end,
-                            end: "2999-01-01T01:00",
-                            editable: false,
-                            backgroundColor: '#941f1f'
-                        };
-                        $('#calendar').fullCalendar('renderEvent', eventData, true);
-
+                        
+                        // var eventData = {
+                        //     title: "Indisponível",
+                        //     start: "2000-01-01T01:00",
+                        //     end: first_start,
+                        //     editable: false,
+                        //     backgroundColor: '#941f1f',
+                        // };
+                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        
+                        // var eventData = {
+                        //     title: "Indisponível",
+                        //     start: last_end,
+                        //     end: "2999-01-01T01:00",
+                        //     editable: false,
+                        //     backgroundColor: '#941f1f'
+                        // };
+                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        
                         //Eventos já existentes
                         for (var i = 0; i < dataschedules.length; i++) {
                             var eventData = {
@@ -150,41 +216,71 @@
                                 start: dataschedules[i].time_start,
                                 end: dataschedules[i].time_end,
                                 editable: false,
-                                backgroundColor: '#02163F'
+                                backgroundColor: '#02163F',
+
                             };
                             $('#calendar').fullCalendar('renderEvent', eventData, true);
+                            console.log("DataSchedules " + JSON.stringify(dataschedules))
+
                         }
+                        
                     });
                 } else {
                     response.text().then(function (text) {
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
-
+                
             });
 
             $('#calendar').fullCalendar({
+                
                 header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
+                    left: 'today',
+                    center: 'title , month,agendaWeek,agendaDay',
+                    right: 'prev,next'
                 },
-                defaultView: 'agendaWeek',
-                slotDuration: '00:30:00',
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro'
+  ],
+                defaultView: 'month',
+                slotDuration: '00:30:00',  // mexer dps 
                 minTime: '00:00:00',
                 maxTime: '24:00:00',
                 selectable: true,
 
                 selectHelper: true,
                 select: function (start, end, jsEvent, view) {
-                    // If user clicks on a day in month view, switch to day view and let them select a time
+                    selectstart = start
+                    selectend = end
+                    // If user cli  cks on a day in month view, switch to day view and let them select a time
                     if (view.name === 'month') {
+                        console.log("View: " + "Month");
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
                         //$('#calendar').fullCalendar('select', start, end, jsEvent);
                     } else if (view.name === 'agendaWeek') {
+                        console.log("View: " + "Week");
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
+                        // document.querySelector('.fc-day-grid').setAttribute("style","display:none")
                     } else {
                         console.log("START " + start + "\n" + "END " + end)
                         document.getElementById("MyModal").style.display = 'block';
@@ -204,7 +300,8 @@
                             var name = document.getElementById("iptName").value;
                             var email = document.getElementById("iptEmail").value;
                             console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
-                            sendAgenda(id,name, email,start,end);
+                            sendAgenda(id,name, email,selectstart,selectend); 
+                            // console.log("APOS EVENT LISTENER \n" + "start:" + start + "\n" + "end:" + end);
         })
 
         });
