@@ -8,7 +8,7 @@
     <title>DWC Agenda Online</title>
     <!--<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>-->
 
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
+    <link href='fullcalendar.min.css' rel='stylesheet' />
     <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.print.min.css' rel='stylesheet' media='print' />
     <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/pt-br.js'></script>
@@ -72,73 +72,14 @@
                 font-weight: bold;
                 border-radius: 25px;
             }
-
-            /*FULL CALENDAR OPÇÕES */
-
-            .fc .fc-toolbar>*>* {
-                 float: none; 
-                margin-left: 0.75em;
-            }
-            .fc-button-group {
-                 float: none; 
-            }
-            /* .fc-state-default {
-    border: 1px solid;
-    background-color: grey;
-    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-    color: #333;
-
-} */
-
-.fc-state-disabled {
-    cursor: default;
-    background-image: none;
-    /* opacity: .65; */
-    box-shadow: none;
-}
-.fc-state-disabled {
-    cursor: default;
-    background-image: none;
-    opacity: inherit;
-    box-shadow: none;
-}
-/* .fc-state-active, .fc-state-disabled, .fc-state-down, .fc-state-hover {
-    color: #333;
-    background-color: grey;
-} */
-.fc-month-button ,.fc-button, .fc-state-default ,.fc-corner-left{
-    background-color: none;
-}
-.fc-head{
-    background-color: #02163f;
-    color: white;
-}
-hr.fc-divider {
-    display: none;
-}
-/* .fc-day-grid {
-    display: none;
-} */
-.fc-agenda-view .fc-day-grid .fc-row .fc-content-skeleton {
-    padding-bottom: 0em; 
-}
-.fc-axis .fc-widget-content{
-    display: none;
-}
-#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable > div{
-    visibility: hidden;
-}
-.fc-agenda-view .fc-day-grid .fc-row {
-    min-height: 0em;
-}
-#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable 
-> div > div.fc-bg > table > tbody > tr > td.fc-axis.fc-widget-content{
-    display: none;
-}
     </style>
     <script>
         var selectstart ;
         var selectend;
+        var dataTime_start;
+        var dataTime_end;
+        var dataavailability;
+        
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             var id = $.urlParam('id');
@@ -164,32 +105,43 @@ hr.fc-divider {
                         console.log("get-agenda result=" + JSON.stringify(obj))
                         var first_start = "2999-01-01T01:00";
                         var last_end = "2000-12-30T23:00";
-                        var dataavailability = JSON.parse(obj.dataavailability);
+                        dataavailability = JSON.parse(obj.dataavailability);
                         var dataschedules = JSON.parse(obj.dataschedules);
+                        // var dataTime_start;
+                        // var dataTime_end;
+
+                        if(dataavailability[0])  dataTime_start = dataavailability[0].time_start 
+                        
+                        if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
+                        
                         console.log("Data Availability: " + JSON.stringify(dataavailability));
-                        console.log(" Data Availability Start: " + JSON.stringify(dataavailability.time_start))
-                        console.log(" Data Availability End: " + JSON.stringify(dataavailability.time_end))
-                        //Disponibilidades cadastradas
-                        for (var i = 0; i < dataavailability.length-1; i++) {
+                        console.log("Time Start \n" + dataTime_start)
+                        console.log("Time End \n" + dataTime_end)
+                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                        console.log("UpdateAvailability Result Success")
+                        // UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                        
+                        // //Disponibilidades cadastradas
+                        // for (var i = 0; i < dataavailability.length-1; i++) {
 
-                            var start = moment(dataavailability[i].time_end).toDate();
-                            var end = moment(dataavailability[i + 1].time_start).toDate();
+                        //     var start = moment(dataavailability[i].time_end).toDate();
+                        //     var end = moment(dataavailability[i + 1].time_start).toDate();
 
-                            if (first_start > dataavailability[i].time_start) {
-                                first_start = dataavailability[i].time_start;
-                            }
-                            if (last_end < dataavailability[i + 1].time_end) {
-                                last_end = dataavailability[i + 1].time_end;
-                            }
-                            // var eventData = {
-                            //     title: "Indisponível",
-                            //     start: start,
-                            //     end: end,
-                            //     editable: false,
-                            //     backgroundColor: '#941f1f'
-                            // };
+                        //     if (first_start > dataavailability[i].time_start) {
+                        //         first_start = dataavailability[i].time_start;
+                        //     }
+                        //     if (last_end < dataavailability[i + 1].time_end) {
+                        //         last_end = dataavailability[i + 1].time_end;
+                        //     }
+                        //     // var eventData = {
+                        //     //     title: "Indisponível",
+                        //     //     start: start,
+                        //     //     end: end,
+                        //     //     editable: false,
+                        //     //     backgroundColor: '#941f1f'
+                        //     // };
                             
-                        }
+                        // }
                         
                         // var eventData = {
                         //     title: "Indisponível",
@@ -225,13 +177,25 @@ hr.fc-divider {
                         }
                         
                     });
-                } else {
+                } 
+                // fim da resposta STATUS 200
+                else {
                     response.text().then(function (text) {
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
                 
-            });
+                         // atualizar disponibilidade
+            var monthButtons = document.querySelectorAll('.fc-month-button');
+            console.log(monthButtons)
+            monthButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                    console.log("Onclick Success, View: Month, Availability Updated")
+
+  });
+});
+            }); // final .then (response)
 
             $('#calendar').fullCalendar({
                 
@@ -261,7 +225,7 @@ hr.fc-divider {
                 'Dezembro'
   ],
                 defaultView: 'month',
-                slotDuration: '00:30:00',  // mexer dps 
+                slotDuration: '01:00:00',  // mexer dps 
                 minTime: '00:00:00',
                 maxTime: '24:00:00',
                 selectable: true,
@@ -295,13 +259,13 @@ hr.fc-divider {
                 events: [],
                 eventRender: function (event, element) {}
             });
-
+            // Enviar os dados 
             document.getElementById("btnSendName").addEventListener("click",function(){
                             var name = document.getElementById("iptName").value;
                             var email = document.getElementById("iptEmail").value;
                             console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
                             sendAgenda(id,name, email,selectstart,selectend); 
-                            // console.log("APOS EVENT LISTENER \n" + "start:" + start + "\n" + "end:" + end);
+                           
         })
 
         });
@@ -314,8 +278,28 @@ hr.fc-divider {
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-        //evt listener aaqui 
-        
+        //funções internas 
+        function UpdateAvailability(datastart,dataend,availability){
+                            var tds = document.querySelectorAll('.fc-day');
+                                if (availability.length === 0) {
+                                    tds.forEach(function(td) {
+                                        td.classList.add('unavailable');
+                                    });
+                                    } else {
+                                        var datastart = moment(availability[0].time_start).format('YYYY-MM-DD');
+                                        var dataend = moment(availability[0].time_end).format('YYYY-MM-DD');
+
+                                        tds.forEach(function(td) {
+                                            var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+
+                                            if (dataDate >= datastart && dataDate <= dataend) {
+                                                td.classList.add('available');
+                                            } else {
+                                                td.classList.add('unavailable');
+                                            }
+                                    });
+                                    }   
+                                }
 
         function sendAgenda(id,name, email,start,end){
             document.getElementById("MyModal").style.display = 'none';
@@ -365,6 +349,7 @@ hr.fc-divider {
                                 //window.open(mailto);
                             }
         }
+        
         function closeModal(event){
         if(event.target.id === "spanX"){
             // limpar as divs
