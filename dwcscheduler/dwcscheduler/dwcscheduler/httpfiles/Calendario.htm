@@ -117,64 +117,25 @@
                         console.log("Data Availability: " + JSON.stringify(dataavailability));
                         console.log("Time Start \n" + dataTime_start)
                         console.log("Time End \n" + dataTime_end)
-                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-                        console.log("UpdateAvailability Result Success")
-                        // UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
                         
-                        // //Disponibilidades cadastradas
-                        // for (var i = 0; i < dataavailability.length-1; i++) {
-
-                        //     var start = moment(dataavailability[i].time_end).toDate();
-                        //     var end = moment(dataavailability[i + 1].time_start).toDate();
-
-                        //     if (first_start > dataavailability[i].time_start) {
-                        //         first_start = dataavailability[i].time_start;
-                        //     }
-                        //     if (last_end < dataavailability[i + 1].time_end) {
-                        //         last_end = dataavailability[i + 1].time_end;
-                        //     }
-                        //     // var eventData = {
-                        //     //     title: "Indisponível",
-                        //     //     start: start,
-                        //     //     end: end,
-                        //     //     editable: false,
-                        //     //     backgroundColor: '#941f1f'
-                        //     // };
-                            
-                        // }
-                        
-                        // var eventData = {
-                        //     title: "Indisponível",
-                        //     start: "2000-01-01T01:00",
-                        //     end: first_start,
-                        //     editable: false,
-                        //     backgroundColor: '#941f1f',
-                        // };
-                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        
-                        // var eventData = {
-                        //     title: "Indisponível",
-                        //     start: last_end,
-                        //     end: "2999-01-01T01:00",
-                        //     editable: false,
-                        //     backgroundColor: '#941f1f'
-                        // };
-                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        
-                        //Eventos já existentes
+                            //Eventos já existentes
                         for (var i = 0; i < dataschedules.length; i++) {
-                            var eventData = {
-                                title: "Indisponível",
-                                start: dataschedules[i].time_start,
-                                end: dataschedules[i].time_end,
-                                editable: false,
-                                backgroundColor: '#02163F',
+                                var eventData = {
+                                    title: "Indisponível",
+                                    start: dataschedules[i].time_start,
+                                    end: dataschedules[i].time_end,
+                                    editable: false,
+                                    backgroundColor: '#02163F',
 
-                            };
-                            $('#calendar').fullCalendar('renderEvent', eventData, true);
-                            console.log("DataSchedules " + JSON.stringify(dataschedules))
+                                };
+                                $('#calendar').fullCalendar('renderEvent', eventData, true);
+                                console.log("DataSchedules " + JSON.stringify(dataschedules))
 
                         }
+                        
+                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                
+
                         
                     });
                 } 
@@ -184,16 +145,33 @@
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
-                
-                         // atualizar disponibilidade
+                // atualizar disponibilidade 
+
+                         // evt listener para o button month
             var monthButtons = document.querySelectorAll('.fc-month-button');
+            
+            // var eventContainer = document.querySelectorAll('.fc-event-container');
+            
             monthButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
                     UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
                     console.log("Onclick Success, View: Month, Availability Updated")
-
+                    
+                        
   });
 });
+            // evt listener para o button prev,next
+            var prevButton = document.querySelector('.fc-prev-button');
+            var nextButton = document.querySelector('.fc-next-button');
+
+            prevButton.addEventListener('click', function() {
+                UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
+            });
+            
+            nextButton.addEventListener('click', function() {
+                UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
+            });
+
             }); // final .then (response)
 
             $('#calendar').fullCalendar({
@@ -277,7 +255,15 @@
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-        //funções internas 
+        //funções internas
+        function hideEventContainer() {
+            var container = document.querySelectorAll('.fc-event-container, .fc-more-cell');
+                container.forEach(function(td) {
+                    td.classList.add("hide-container");
+                });
+            console.log("HideEventContainer Result Success");
+        }
+
         function UpdateAvailability(datastart,dataend,availability){
                             var tds = document.querySelectorAll('.fc-day');
                                 if (availability.length === 0) {
@@ -297,7 +283,10 @@
                                                 td.classList.add('unavailable');
                                             }
                                     });
-                                    }   
+                                    }
+                                console.log("UpdateAvailability Result Success");
+                                // setTimeout(hideEventContainer, 500);
+                                hideEventContainer()
                                 }
 
         function sendAgenda(id,name, email,start,end){
