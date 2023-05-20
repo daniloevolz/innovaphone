@@ -1056,7 +1056,11 @@ new PbxApi("RCC").onconnected(function (conn) {
             log("danilo req : RCC message:CallUpdate: " + JSON.stringify(obj));
             var num;
             var device;
-            var sip = obj.local.h323;
+            try{
+                sip = obj.local.h323;
+            }catch(e){
+                sip = obj.local.e164;
+            }
             var timeNow = getDateNow();
 
             var foundCall = calls.filter(function (call) { return call.sip === sip && call.callid == obj.call });
@@ -1116,7 +1120,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     }
                 case "x-alert":
                     //Ativa (Alert)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 4;
@@ -1143,7 +1146,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     break;
                 case "r-alert":
                     //Receptiva (Alert)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 132;
@@ -1170,7 +1172,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     break;
                 case "x-conn":
                     //Ativa (Connected)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 5;
@@ -1196,7 +1197,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     break;
                 case "r-conn":
                     //Receptiva (Connected)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 133;
@@ -1222,7 +1222,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     break;
                 case "x-rel":
                     //Ativa (Disconnect Sent)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 6;
@@ -1242,7 +1241,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                             }
                             //Remove
                             log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                            calls = calls.filter(deleteCallsBySrc(obj.call));
+                            calls = calls.filter(function(call){return obj.call != call.callid});
                             log("danilo req : after deleteCall " + JSON.stringify(calls));
 
                         }
@@ -1250,7 +1249,6 @@ new PbxApi("RCC").onconnected(function (conn) {
                     break;
                 case "r-rel":
                     //Ativa (Disconnect Received)
-                    var sip = obj.local.h323;
                     calls.forEach(function (call) {
                         if (call.sip === sip && call.callid == obj.call) {
                             call.state = 135;
@@ -1270,7 +1268,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                             }
                             //Remove
                             log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                            calls = calls.filter(deleteCallsBySrc(obj.call));
+                            calls = calls.filter(function(call){return obj.call != call.callid});
                             log("danilo req : after deleteCall " + JSON.stringify(calls));
                         }
                     })
@@ -1456,7 +1454,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(src));
+                                    calls = calls.filter(function(call){return src != call.src});
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
 
                                     //Remove from RCC monitor
@@ -1488,7 +1486,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(src));
+                                    calls = calls.filter(function(call){return obj.src != call.src});
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     //Remove from RCC monitor
                                     RCC.forEach(function (rcc) {
@@ -1519,7 +1517,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(src));
+                                    calls = calls.filter(function(call){return src != call.src});
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     //Remove from RCC monitor
                                     RCC.forEach(function (rcc) {
@@ -1551,7 +1549,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(src));
+                                    calls = calls.filter(function(call){return src != call.src});
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     //Remove from RCC monitor
                                     RCC.forEach(function (rcc) {
