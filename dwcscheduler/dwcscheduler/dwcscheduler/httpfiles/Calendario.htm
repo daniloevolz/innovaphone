@@ -8,7 +8,7 @@
     <title>DWC Agenda Online</title>
     <!--<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>-->
 
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
+    <link href='fullcalendar.min.css' rel='stylesheet' />
     <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.print.min.css' rel='stylesheet' media='print' />
     <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/pt-br.js'></script>
@@ -20,16 +20,66 @@
             padding: 0;
             font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
             font-size: 14px;
-            background-color: #7c7171c7;
+            background-color: white;
         }
-
         #calendar {
             max-width: 900px;
             margin: 0 auto;
         }
+        /* MODAL SEU NOME */
+        .mainModalName {
+            display: none;
+            background-color: white;
+            position: fixed;
+            left: 15%;
+            top: 1%;
+            z-index: 1000;
+            width: 70%;
+            height: 100%;
+            border-radius: 20px;
+            box-shadow: 0.5em 0.5em 1em 0.5em rgba(0,0,0,0.5);
+}
+            .divSpan{
+                width: 100%;
+                /* background-color: yellow; */
+            }
+            .spanX{
+                float: right;
+                padding-right: 25px;
+                margin-top: 10px;
+                cursor: pointer;
+                font-size: 15px;
+            }
+            .data-person{
+                text-align: center;
+                /* display: flex; */
+                font-family: 'Arial';
+            }
+            .identify{
+                font-size: 12px;
+            }
+            .iptName{
+                height: 25px;
+                width: 65%;
+                border: 2px solid #02163f;
+            }
+            .btnSendName{
+                height: 30px;
+                width: 30%;
+                background-color: #02163f;
+                border: 0;
+                color: white;
+                font-weight: bold;
+                border-radius: 25px;
+            }
     </style>
     <script>
-
+        var selectstart ;
+        var selectend;
+        var dataTime_start;
+        var dataTime_end;
+        var dataavailability;
+        
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             var id = $.urlParam('id');
@@ -55,46 +105,62 @@
                         console.log("get-agenda result=" + JSON.stringify(obj))
                         var first_start = "2999-01-01T01:00";
                         var last_end = "2000-12-30T23:00";
-                        var dataavailability = JSON.parse(obj.dataavailability);
+                        dataavailability = JSON.parse(obj.dataavailability);
                         var dataschedules = JSON.parse(obj.dataschedules);
+                        // var dataTime_start;
+                        // var dataTime_end;
 
-                        //Disponibilidades cadastradas
-                        for (var i = 0; i < dataavailability.length-1; i++) {
-                            var start = moment(dataavailability[i].time_end).toDate();
-                            var end = moment(dataavailability[i + 1].time_start).toDate();
+                        if(dataavailability[0])  dataTime_start = dataavailability[0].time_start 
+                        
+                        if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
+                        
+                        console.log("Data Availability: " + JSON.stringify(dataavailability));
+                        console.log("Time Start \n" + dataTime_start)
+                        console.log("Time End \n" + dataTime_end)
+                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                        console.log("UpdateAvailability Result Success")
+                        // UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                        
+                        // //Disponibilidades cadastradas
+                        // for (var i = 0; i < dataavailability.length-1; i++) {
 
-                            if (first_start > dataavailability[i].time_start) {
-                                first_start = dataavailability[i].time_start;
-                            }
-                            if (last_end < dataavailability[i + 1].time_end) {
-                                last_end = dataavailability[i + 1].time_end;
-                            }
-                            var eventData = {
-                                title: "Indisponível",
-                                start: start,
-                                end: end,
-                                editable: false,
-                                backgroundColor: '#941f1f'
-                            };
-                            $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        }
-                        var eventData = {
-                            title: "Indisponível",
-                            start: "2000-01-01T01:00",
-                            end: first_start,
-                            editable: false,
-                            backgroundColor: '#941f1f'
-                        };
-                        $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        var eventData = {
-                            title: "Indisponível",
-                            start: last_end,
-                            end: "2999-01-01T01:00",
-                            editable: false,
-                            backgroundColor: '#941f1f'
-                        };
-                        $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        //     var start = moment(dataavailability[i].time_end).toDate();
+                        //     var end = moment(dataavailability[i + 1].time_start).toDate();
 
+                        //     if (first_start > dataavailability[i].time_start) {
+                        //         first_start = dataavailability[i].time_start;
+                        //     }
+                        //     if (last_end < dataavailability[i + 1].time_end) {
+                        //         last_end = dataavailability[i + 1].time_end;
+                        //     }
+                        //     // var eventData = {
+                        //     //     title: "Indisponível",
+                        //     //     start: start,
+                        //     //     end: end,
+                        //     //     editable: false,
+                        //     //     backgroundColor: '#941f1f'
+                        //     // };
+                            
+                        // }
+                        
+                        // var eventData = {
+                        //     title: "Indisponível",
+                        //     start: "2000-01-01T01:00",
+                        //     end: first_start,
+                        //     editable: false,
+                        //     backgroundColor: '#941f1f',
+                        // };
+                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        
+                        // var eventData = {
+                        //     title: "Indisponível",
+                        //     start: last_end,
+                        //     end: "2999-01-01T01:00",
+                        //     editable: false,
+                        //     backgroundColor: '#941f1f'
+                        // };
+                        // $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        
                         //Eventos já existentes
                         for (var i = 0; i < dataschedules.length; i++) {
                             var eventData = {
@@ -102,86 +168,88 @@
                                 start: dataschedules[i].time_start,
                                 end: dataschedules[i].time_end,
                                 editable: false,
-                                backgroundColor: '#02163F'
+                                backgroundColor: '#02163F',
+
                             };
                             $('#calendar').fullCalendar('renderEvent', eventData, true);
+                            console.log("DataSchedules " + JSON.stringify(dataschedules))
+
                         }
+                        
                     });
-                } else {
+                } 
+                // fim da resposta STATUS 200
+                else {
                     response.text().then(function (text) {
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
+                
+                         // atualizar disponibilidade
+            var monthButtons = document.querySelectorAll('.fc-month-button');
+            monthButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+                    console.log("Onclick Success, View: Month, Availability Updated")
 
-            });
+  });
+});
+            }); // final .then (response)
 
             $('#calendar').fullCalendar({
+                
                 header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
+                    left: 'today',
+                    center: 'title , month,agendaWeek,agendaDay',
+                    right: 'prev,next'
                 },
-                defaultView: 'agendaWeek',
-                slotDuration: '00:30:00',
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro'
+  ],
+                defaultView: 'month',
+                slotDuration: '01:00:00',  // mexer dps 
                 minTime: '00:00:00',
                 maxTime: '24:00:00',
                 selectable: true,
 
                 selectHelper: true,
                 select: function (start, end, jsEvent, view) {
-                    // If user clicks on a day in month view, switch to day view and let them select a time
+                    selectstart = start
+                    selectend = end
+                    // If user cli  cks on a day in month view, switch to day view and let them select a time
                     if (view.name === 'month') {
+                        console.log("View: " + "Month");
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
                         //$('#calendar').fullCalendar('select', start, end, jsEvent);
                     } else if (view.name === 'agendaWeek') {
+                        console.log("View: " + "Week");
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
+                        // document.querySelector('.fc-day-grid').setAttribute("style","display:none")
                     } else {
-                        var name = prompt('Digite o seu nome:');
-                        var email = prompt('Digite o seu e-mail:');
-                        if (name && email) {
-                            var eventData;
-                            eventData = {
-                                sip: id,
-                                title: name,
-                                start: start,
-                                end: end,
-                                email: email
-                            };
-                            fetch('/dwcscheduler/salvar-evento', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(eventData)
-                            }).then(function (response) {
-                                // Processa a resposta do servidor
-                                if (response.status == 200) {
-
-                                    response.text().then(function (text) {
-                                        var obj = JSON.parse(String(text));
-                                        switch (obj.status) {
-                                            case 200:
-                                                window.alert("\n" + obj.msg);
-                                                $('#calendar').fullCalendar('renderEvent', eventData, true);
-                                                break;
-                                            default:
-                                                window.alert(obj.msg);
-                                                break;
-                                        }
-                                    });
-                                } else {
-                                    response.text().then(function (text) {
-                                        window.alert("Algo saiu errado:\n" + text);
-                                    });
-                                }
-
-                            });
-
-                            //var mailto = "mailto:" + email + "?subject=" + encodeURIComponent("Agendamento de evento") + "&body=" + encodeURIComponent("Ol�,\n\nSeu evento foi agendado para " + moment(start).format("DD/MM/YYYY [�s] HH:mm") + " e ter� dura��o de " + duration + " minutos.\n\nAtenciosamente,\nAgenda Online");
-                            //window.open(mailto);
-                        }
+                        console.log("START " + start + "\n" + "END " + end)
+                        document.getElementById("MyModal").style.display = 'block';
+                        
+                        document.getElementById("iptName").value = '';
+                        document.getElementById("iptEmail").value = '';
                         $('#calendar').fullCalendar('unselect');
                     }
                 },
@@ -190,8 +258,17 @@
                 events: [],
                 eventRender: function (event, element) {}
             });
+            // Enviar os dados 
+            document.getElementById("btnSendName").addEventListener("click",function(){
+                            var name = document.getElementById("iptName").value;
+                            var email = document.getElementById("iptEmail").value;
+                            console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
+                            sendAgenda(id,name, email,selectstart,selectend); 
+                           
+        })
 
         });
+        
         // Função para obter o valor de um parâmetro de URL
         $.urlParam = function (name) {
             var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -200,10 +277,140 @@
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
+        //funções internas 
+        function UpdateAvailability(datastart,dataend,availability){
+                            var tds = document.querySelectorAll('.fc-day');
+                                if (availability.length === 0) {
+                                    tds.forEach(function(td) {
+                                        td.classList.add('unavailable');
+                                    });
+                                    } else {
+                                        var datastart = moment(availability[0].time_start).format('YYYY-MM-DD');
+                                        var dataend = moment(availability[0].time_end).format('YYYY-MM-DD');
+
+                                        tds.forEach(function(td) {
+                                            var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+
+                                            if (dataDate >= datastart && dataDate <= dataend) {
+                                                td.classList.add('available');
+                                            } else {
+                                                td.classList.add('unavailable');
+                                            }
+                                    });
+                                    }   
+                                }
+
+        function sendAgenda(id,name, email,start,end){
+            document.getElementById("MyModal").style.display = 'none';
+            console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
+            "end " + end + "\n" + "email " + email)
+                            if (name && email) {
+                                
+                                var eventData;
+                                eventData = {
+                                    sip: id,
+                                    title: name,
+                                    start: start,
+                                    end: end,
+                                    email: email
+                                };
+                                fetch('/dwcscheduler/salvar-evento', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(eventData)
+                                }).then(function (response) {
+                                    // Processa a resposta do servidor
+                                    if (response.status == 200) {
+
+                                        response.text().then(function (text) {
+                                            var obj = JSON.parse(String(text));
+                                            switch (obj.status) {
+                                                case 200:
+                                                    window.alert("\n" + obj.msg);
+                                                    $('#calendar').fullCalendar('renderEvent', eventData, true);
+                                                    break;
+                                                default:
+                                                    window.alert(obj.msg);
+                                                    break;
+                                            }
+                                        });
+                                    } else {
+                                        response.text().then(function (text) {
+                                            window.alert("Algo saiu errado:\n" + text);
+                                        });
+                                    }
+
+                                });
+
+                                //var mailto = "mailto:" + email + "?subject=" + encodeURIComponent("Agendamento de evento") + "&body=" + encodeURIComponent("Ol�,\n\nSeu evento foi agendado para " + moment(start).format("DD/MM/YYYY [�s] HH:mm") + " e ter� dura��o de " + duration + " minutos.\n\nAtenciosamente,\nAgenda Online");
+                                //window.open(mailto);
+                            }
+        }
+        
+        function closeModal(event){
+        if(event.target.id === "spanX"){
+            // limpar as divs
+            document.getElementById("iptName").innerHTML = '';
+            document.getElementById("iptEmail").innerHTML = '';
+            console.log("DIVS LIMPAS")
+            // sumir o modal 
+            document.getElementById("MyModal").style.display = 'none';
+            // setTimeout(function() {
+            //     location.reload();
+            // }, 200);
+            
+        }
+    }
+    document.addEventListener('click', closeModal);
     </script>
 </head>
 <body>
+    <!--Calendário-->
     <div id='calendar'></div>
+
+         <!--MODAL DIGITE SEU NOME-->
+         <div class="mainModalName" id="MyModal">
+            <div class="divSpan">
+            <span class="spanX" id="spanX">✕</span>
+        </div>
+            <br>
+            </br>
+            <div class="data-person">
+                <h2 style="    margin-block-end: 0;">Digite seu nome e e-mail</h2>
+                <p class="identify">Se identifique para continuar o agendamento</p>
+                <p></p>
+                <p>Nome:</p>
+                <input type="text" class="iptName" placeholder="Seu nome" id="iptName">
+                <br>
+                <p>E-mail:</p>
+                <input type="text" class="iptName" placeholder="Seu E-mail" id="iptEmail">
+                </br>
+                <br>
+               </br>
+                <button class="btnSendName" id="btnSendName" >Enviar</button>
+            </div>
+        </div>
+
+         <!--MODAL DIGITE SEU EMAIL
+         <div class="mainModalName" id="MyModal2">
+            <div class="divSpan">
+            <span class="spanX" id="spanX">✕</span>
+        </div>
+            <br>
+            </br>
+            <div class="data-person">
+                <h2 style="    margin-block-end: 0;">Digite seu e-mail</h2>
+                <p class="identify">Digite seu e-mail para continuar o agendamento</p>
+                <p></p>
+                <input type="text" class="iptName" placeholder="Seu E-mail" id="iptEmail">
+                <br>
+                </br>
+                <button class="btnSendName" id="btnSendName">Enviar</button>
+            </div>
+        </div>
+    -->
 </body>
 </html>
 
