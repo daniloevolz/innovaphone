@@ -98,11 +98,7 @@ new JsonApi("user").onconnected(function (conn) {
         license = getLicense();
         log("license: " + JSON.stringify(license));
         // log("connectionsUser: license.Users " + license.Users);
-        log("connectionsUser: connectionsUser.length " + connectionsUser.length);
-        
-        connectionsUser.push(conn);
-        log("Usuario Conectado:  " + connectionsUser.length);
-     
+
         //Intert into DB the event of new login
         log("danilo req: insert into DB = user " + conn.sip );
         var today = getDateNow();
@@ -116,19 +112,43 @@ new JsonApi("user").onconnected(function (conn) {
             var today = getDateNow();
 
             if (license != null && connectionsUser.length <= license.Users) {
-                    
+                if (obj.mt == "UserSession") {
+
+                    var session = Random.bytes(16);
+                    conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
+
+                }
                 if (obj.mt == "InitializeMessage") {
+                    log("connectionsUser: connectionsUser.length " + connectionsUser.length);
+                    if (connectionsUser.length > 0) {
+                        var foundConn = connectionsUser.filter(function (c) { return c.session == obj.session });
+                        if (!foundConn) {
+                            log("connectionsUser: not found conn");
+                            conn["session"] = obj.session;
+                            connectionsUser.push(conn);
+                        }
+                    } else {
+                        log("connectionsUser: connectionsUser.length == 0");
+                        conn["session"] = obj.session;
+                        connectionsUser.push(conn);
+                        log("connectionsUser: connectionsUser.push =" + JSON.stringify(connectionsUser));
+                    }
+                    //var connectionUser = connectionsUser.filter(function (c) { c.session == obj.session })[0];
+                    //log("danilo req: InitializeMessage connectionUser= " + JSON.stringify(connectionUser));
+                    //if (JSON.stringify(connectionUser) =="undefined") {
+                    //    conn["session"] = obj.session;
+                    //    log("danilo req: InitializeMessage connectionUser==undefined " + JSON.stringify(connectionUser));
+                    //    connectionsUser.push(conn);
+                    //    log("danilo req: InitializeMessage connectionUser==undefined connectionsUser=" + JSON.stringify(connectionsUser));
+                    //}
+
                     //Reset badge count
                     updateTableBadgeCount(conn.sip, "ResetCount");
 
                     //Callback user about success login
+                    log("danilo req: InitializeMessage Callback user about success login " + conn.sip);
                     conn.send(JSON.stringify({ api: "user", mt: "UserInitializeResultSuccess", src: conn.sip }));
 
-                    //Notify users about this new login
-                    connectionsUser.forEach(function (c) {
-                        c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: conn.sip }));
-
-                    })
                 }
                 if (obj.mt == "DeviceSelected") {
                     var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
@@ -220,18 +240,42 @@ new JsonApi("user").onconnected(function (conn) {
                     }
                 }
                 if (obj.mt == "UserPresence") {
-                    //RCC.forEach(function (c) {
-                    //    for (var i in c) {
-                    //        if (c.hasOwnProperty(i)) {
-                    //            conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: i }));
+                    //Notify user about users logged
+                    log("danilo req: UserPresence Notify user about users logged");
+                    PbxSignal.forEach(function (c) {
+                        for (var i in c) {
+                              var valorAtual = c[i];
+                            if (c.hasOwnProperty(i) && isNegativeNumber(valorAtual)) {
+                                  log("danilo req: UserPresence Notify user " + conn.sip + " about users logged " + i);
+                                conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: i }));
+                            }
+                        }
+                    })
+                    
+                    //PbxSignal.forEach(function (sig) {
+                    //    var chaves = Object.keys(sig);
+                    //    log("danilo req: UserPresence chaves " + chaves);
+                    //    for (var i = 0; i < chaves.length; i++) {
+                    //        var chave = chaves[i];
+                    //        var valorAtual = sig[chave];
+                    //        if (isNegativeNumber(valorAtual)) {
+                    //            log("danilo req: UserPresence Notify user " + conn.sip + " about users logged " + chave);
+                    //            conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: chave }));
                     //        }
                     //    }
                     //})
-                    //Notify user about users logged
-                    connectionsUser.forEach(function (c) {
-                        conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
+                    
 
-                    })
+                    function isNegativeNumber(value) {
+                        return typeof value === 'number' && value < 0;
+                    }
+
+                    //connectionsUser.forEach(function (c) {
+                    //    if (conn.sip != c.sip) {
+                    //        log("danilo req: UserPresence Notify user " + conn.sip + " about users logged " + c.sip);
+                    //        conn.send(JSON.stringify({ api: "user", mt: "UserConnected", src: c.sip }));
+                    //    }
+                    //})
                 }
                 if (obj.mt == "DecrementCount") {
                     updateTableBadgeCount(conn.sip, obj.mt);
@@ -439,14 +483,8 @@ new JsonApi("user").onconnected(function (conn) {
             //    }
             //})
 
-            //Notify user about this logout
-            connectionsUser.forEach(function (c) {
-                c.send(JSON.stringify({ api: "user", mt: "UserDisconnected", src: conn.sip }));
-
-            })
-
             //Remove cennection from array
-            connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+            connectionsUser = connectionsUser.filter(function (c) { return c.session != conn.session });
             log("danilo req : connectionsUsers after delete conn of user " + conn.sip + " : " + JSON.stringify(connectionsUser));
 
         });
@@ -817,7 +855,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         var obj = JSON.parse(msg);
         var today = getDateNow();
 
-        log("PbxTableUsers: msg received " + msg);
+        //log("PbxTableUsers: msg received " + msg);
 
         if (obj.mt == "ReplicateStartResult") {
             pbxTableUsers = [];
@@ -1024,7 +1062,7 @@ new PbxApi("RCC").onconnected(function (conn) {
             var foundCall = calls.filter(function (call) { return call.sip === sip && call.callid == obj.call });
 
             switch (obj.msg) {
-                case "x-call-proc":
+                case "r-setup":
                     //Ativa (Alert)
                     var e164 = obj.remote.e164;
                     if (String(foundCall) == "") {
@@ -1053,7 +1091,7 @@ new PbxApi("RCC").onconnected(function (conn) {
 
 
                     break;
-                case "r-call-proc":
+                case "x-setup":
                     //Receptiva (Alert)
                     var e164 = obj.remote.e164;
                     if (String(foundCall) == "") {
@@ -1575,10 +1613,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
         if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
 
             log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
-
-            // connect call
-            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
-
+            
             //Atualiza connections
             var src = obj.src;
             log("SPLIT6:");
@@ -1587,38 +1622,46 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
             PbxSignal.forEach(function (signal) {
                 if (signal.pbx == pbx) {
-                    signal[obj.sig.cg.sip] = obj.call;
-                }
-            })
-            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
-            var name = "";
-            var myArray = obj.sig.fty;
-            myArray.forEach(function (fty) {
-                if (fty.name) {
-                    name = fty.name;
-                }
-            })
-            //RCC.forEach(function (rcc) {
-            //    if (rcc.pbx == pbx) {
-            //        log("PbxSignal: calling RCC API for new userclient " + String(name) + " on PBX " + pbx);
-            //        var msg = { api: "RCC", mt: "Devices", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-            //        //var msg = { api: "RCC", mt: "UserInitialize", cn: name, src: obj.sig.cg.sip + "," + obj.src };
-            //        rcc.send(JSON.stringify(msg));
-            //    }
-            //})
+                    if (!signal[obj.sig.cg.sip]) {
+                        signal[obj.sig.cg.sip] = obj.call;
 
-            // send notification with badge count first time the user has connected
-            try {
-                count = pbxTableUsers.filter(findBySip(obj.sig.cg.sip))[0].badge;
-            } finally {
-                updateBadge(conn, obj.call, count);
-            }
-            //Intert into DB the event
-            log("PbxSignal= user " + obj.sig.cg.sip + " login");
-            var today = getDateNow();
-            var msg = { sip: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
-            log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
-            insertTblAvailability(msg);
+                        // connect call
+                        conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
+
+                        //get name of the user from the signal
+                        log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
+                        var name = "";
+                        var myArray = obj.sig.fty;
+                        myArray.forEach(function (fty) {
+                            if (fty.name) {
+                                name = fty.name;
+                            }
+                        })
+                        // send notification with badge count first time the user has connected
+                        try {
+                            count = pbxTableUsers.filter(findBySip(obj.sig.cg.sip))[0].badge;
+                        } finally {
+                            updateBadge(conn, obj.call, count);
+                        }
+
+                        //Notify users about this new login
+                        log("danilo req: !signal[obj.sig.cg.sip] Notify users about this new login");
+                        log("danilo req: !signal[obj.sig.cg.sip] Notify users about this new login connectionsUser=" + JSON.stringify(connectionsUser));
+                        connectionsUser.forEach(function (c) {
+                            log("danilo req: PbxSignal Signaling Notify users " + c.sip + " about this new login " + obj.sig.cg.sip);
+                            c.send(JSON.stringify({ api: "user", mt: "UserConnected", src: obj.sig.cg.sip }));
+
+                        })
+
+                        //Intert into DB the event
+                        log("PbxSignal= user " + obj.sig.cg.sip + " login");
+                        var today = getDateNow();
+                        var msg = { sip: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
+                        log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
+                        insertTblAvailability(msg);
+                    }
+                }
+            }) 
         }
 
         // handle incoming call release messages
@@ -1633,17 +1676,33 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             PbxSignal.forEach(function (signal) {
                 if (signal.pbx == pbx) {
                     sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[sip];
+                    if (String(sip) !="undefined") {
+                        delete signal[sip];
+
+                        log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
+
+                        //get name of the user from the signal
+                        var userTable = pbxTableUsers.filter(findBySip(sip));
+                        log("PBXSignal: userTable " + JSON.stringify(userTable));
+                        //Notify user about this logout
+                        log("danilo req: PbxSignal Signaling rel notify connectionsUser " + JSON.stringify(connectionsUser));
+                        connectionsUser.forEach(function (c) {
+                            log("danilo req: PbxSignal Signaling Notify users " + c.sip + " about this new logout " + sip);
+                            c.send(JSON.stringify({ api: "user", mt: "UserDisconnected", src: sip }));
+
+                        })
+
+                        //Intert into DB the event
+                        log("PbxSignal= user " + sip + " logout");
+                        var today = getDateNow();
+                        var msg = { sip: sip, name: userTable[0].columns.cn, date: today, status: "Logout", group: "PBX" }
+                        log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
+                        insertTblAvailability(msg);
+                    }
+                    
                 }
             })
-            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
-
-            //Intert into DB the event
-            log("PbxSignal= user " + sip + " logout");
-            var today = getDateNow();
-            var msg = { sip: sip, name: name, date: today, status: "Logout", group: "PBX" }
-            log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
-            insertTblAvailability(msg);
+            
         }
     });
 
@@ -1977,9 +2036,9 @@ function triggerAction(user, prt, type) {
                 var str = "";
                 str = JSON.stringify(data);
                 actions = JSON.parse(String(str));
-                log("danilo-req triggerAction:actions " + actions);
+                
                 if (actions != null) {
-                    log("danilo-req triggerAction:actions diferent of null " + actions);
+                    log("danilo-req triggerAction:actions diferent of null " + JSON.stringify(actions));
                     actions.forEach(function (ac) {
                         log("danilo-req triggerAction:ac " + JSON.stringify(ac));
                         if (ac.action_user == user) {
@@ -2021,7 +2080,7 @@ function triggerAction(user, prt, type) {
                                         RCC.forEach(function (rcc) {
                                             if (rcc.pbx == info.pbx) {
                                                 log("danilo req:comboDispatcher:sip " + foundConnectionUser[0].sip);
-                                                var msg = { api: "RCC", mt: "UserInitialize", cn: foundConnectionUser[0].dn, hw: ac.action_device, src: foundConnectionUser[0].sip + "," + rcc.pbx + "," + ac.action_device +"," + ac.action_prt };
+                                                var msg = { api: "RCC", mt: "UserInitialize", cn: foundConnectionUser[0].dn, hw: ac.action_device, src: foundConnectionUser[0].sip + "," + rcc.pbx + "," + ac.action_device + "," + ac.action_prt };
                                                 log("danilo req:comboDispatcher: UserInitialize sent rcc msg " + JSON.stringify(msg));
                                                 rcc.send(JSON.stringify(msg));
                                             }
@@ -2063,6 +2122,9 @@ function triggerAction(user, prt, type) {
                             }
                         }
                     })
+                }
+                else {
+                    log("danilo-req triggerAction:actions is null " + JSON.stringify(actions));
                 }
             })
             .onerror(function (error, errorText, dbErrorCode) {

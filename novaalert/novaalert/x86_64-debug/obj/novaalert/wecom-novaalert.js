@@ -55,17 +55,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_users = [];
     var list_buttons = [];
     var popupOpen = false;
+    var session;
 
 
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
         if (app.logindata.info.unlicensed) {
             //sem licença
-            app.send({ api: "user", mt: "InitializeMessage" }); //Inicializa o ramal
+            app.send({ api: "user", mt: "UserSession" }); //Inicializa o ramal
         }
         else {
             //licenciado
-            app.send({ api: "user", mt: "InitializeMessage" }); //Inicializa o ramal
+            app.send({ api: "user", mt: "UserSession" }); //Inicializa o ramal
 
         }
 
@@ -138,6 +139,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "UserSessionResult") {
+            console.log(obj.session);
+            session = obj.session;
+            app.send({ api: "user", mt: "InitializeMessage", session: session }); //Inicializa o ramal
+        }
         if (obj.api == "user" && obj.mt == "NoLicense") {
             console.log(obj.result);
             makeDivNoLicense(obj.result);

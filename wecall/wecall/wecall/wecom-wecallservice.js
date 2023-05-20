@@ -300,9 +300,10 @@ new JsonApi("user").onconnected(function (conn) {
                                     //})
                                     //log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
                                 }
-                                getURLLogin(conn.sip);
                             }
                         })
+                        log("danilo req : calling getURLLogin: " + conn.sip);
+                        getURLLogin(conn.sip);
 
                     } catch (e) {
                         log("danilo req : User Connection Erro RCC has null, please try again in a few moments " + e);
