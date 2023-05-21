@@ -60,13 +60,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
+        var browserName = navigator.appCodeName;
+        console.log("Navegador:", browserName);
+        
+        var screenWidth = window.screen.width;
+        var screenHeight = window.screen.height;
+        console.log("Resolução da tela:", screenWidth, "x", screenHeight);
+                
+
         if (app.logindata.info.unlicensed) {
             //sem licença
-            app.send({ api: "user", mt: "UserSession" }); //Inicializa o ramal
+            app.send({ api: "user", mt: "UserSession", info: browserName }); //Inicializa o ramal
         }
         else {
             //licenciado
-            app.send({ api: "user", mt: "UserSession" }); //Inicializa o ramal
+            app.send({ api: "user", mt: "UserSession", info: browserName }); //Inicializa o ramal
 
         }
 
@@ -324,13 +332,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                addNotification('inc', "Tocando " + obj.src)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Tocando " + obj.src)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallRinging is not button");
             }
@@ -346,13 +354,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                addNotification('inc', "Tocando " + obj.num)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Tocando " + obj.num)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallRinging is not button");
             } 
@@ -403,13 +411,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                addNotification('inc', "Tocando " + obj.src)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Tocando " + obj.src)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallRinging is not button");
             }
@@ -425,13 +433,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                addNotification('inc', "Tocando " + obj.num)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Tocando " + obj.num)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallRinging is not button");
             }
@@ -456,13 +464,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
-                addNotification('inc', "Conectado " + obj.src)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Conectado " + obj.src)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallConnected is not button");
             }
@@ -478,13 +486,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
-                addNotification('inc', "Conectado " + obj.num)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Conectado " + obj.num)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallConnected is not button");
             }
@@ -514,13 +522,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 //    document.getElementById(obj.src).style.backgroundColor = "darkgreen";
                 //    //document.getElementById(value).setAttribute("class", "allbutton");
                 //}
-                addNotification('inc', "Desconectado " + obj.src)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Desconectado " + obj.src)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallDisconnected not button");
             }
@@ -541,13 +549,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 //    document.getElementById(obj.).style.backgroundColor = "darkgreen";
                 //    //document.getElementById(value).setAttribute("class", "allbutton");
                 //}
-                addNotification('inc', "Desconectado " + obj.num)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                // addNotification('inc', "Desconectado " + obj.num)
+                //     .then(function (message) {
+                //         console.log(message);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
             } catch (e){
                 console.log("CallDisconnected not button");
             }

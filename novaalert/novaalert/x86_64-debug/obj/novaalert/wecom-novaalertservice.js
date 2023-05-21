@@ -99,12 +99,7 @@ new JsonApi("user").onconnected(function (conn) {
         log("license: " + JSON.stringify(license));
         // log("connectionsUser: license.Users " + license.Users);
 
-        //Intert into DB the event of new login
-        log("danilo req: insert into DB = user " + conn.sip );
-        var today = getDateNow();
-        var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP" }
-        log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-        insertTblAvailability(msg);
+        
         
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
@@ -116,6 +111,13 @@ new JsonApi("user").onconnected(function (conn) {
 
                     var session = Random.bytes(16);
                     conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
+
+                    //Intert into DB the event of new login
+                    log("danilo req: insert into DB = user " + conn.sip );
+                    var today = getDateNow();
+                    var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP " + obj.info }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblAvailability(msg);
 
                 }
                 if (obj.mt == "InitializeMessage") {
@@ -1052,18 +1054,20 @@ new PbxApi("RCC").onconnected(function (conn) {
         else if (obj.mt === "CallAdd") {
             log("danilo req : RCC message:CallAdd: " + JSON.stringify(obj));
         }
+        /*
         else if (obj.mt === "CallUpdate") {
             log("danilo req : RCC message:CallUpdate: " + JSON.stringify(obj));
             var num;
             var device;
+            var sip;
             try{
-                sip = obj.local.h323;
+                if(obj.local.h323 != "" && obj.local.h323 != "undefined") sip = obj.local.h323;
             }catch(e){
-                sip = obj.local.e164;
+                if(obj.local.e164 != "" && obj.local.e164 != "undefined") sip = obj.local.e164;
             }
             var timeNow = getDateNow();
 
-            var foundCall = calls.filter(function (call) { return call.sip === sip && call.callid == obj.call });
+            var foundCall = calls.filter(function (call) { return call.callid == obj.call });
 
             switch (obj.msg) {
                 case "r-setup":
@@ -1121,7 +1125,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "x-alert":
                     //Ativa (Alert)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 4;
                             call.call_ringing = timeNow;
                             var e164 = obj.remote.e164;
@@ -1147,7 +1151,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "r-alert":
                     //Receptiva (Alert)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 132;
                             call.call_ringing = timeNow;
                             var e164 = obj.remote.e164;
@@ -1173,7 +1177,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "x-conn":
                     //Ativa (Connected)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 5;
                             call.call_connected = timeNow;
                             //Atualiza status Botões Tela NovaAlert All
@@ -1198,7 +1202,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "r-conn":
                     //Receptiva (Connected)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 133;
                             call.call_connected = timeNow;
                             //Atualiza status Botões Tela NovaAlert All
@@ -1223,7 +1227,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "x-rel":
                     //Ativa (Disconnect Sent)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 6;
                             call.call_ended = timeNow;
                             insertTblCalls(call);
@@ -1250,7 +1254,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 case "r-rel":
                     //Ativa (Disconnect Received)
                     calls.forEach(function (call) {
-                        if (call.sip === sip && call.callid == obj.call) {
+                        if (call.callid == obj.call) {
                             call.state = 135;
                             call.call_ended = timeNow;
                             insertTblCalls(call);
@@ -1272,6 +1276,83 @@ new PbxApi("RCC").onconnected(function (conn) {
                             log("danilo req : after deleteCall " + JSON.stringify(calls));
                         }
                     })
+                    break;
+            }
+        }
+        */
+        else if (obj.mt === "CallUpdate") {
+            log("danilo req : RCC message:CallUpdate: " + JSON.stringify(obj));
+        
+            var num;
+            var device;
+            var sip;
+        
+            try {
+                if (obj.local.h323 !== undefined && obj.local.h323 !== "") {
+                    sip = obj.local.h323;
+                    log("danilo req : RCC message:CallUpdate: 1");
+                } else if (obj.local.e164 !== undefined && obj.local.e164 !== "") {
+                    sip = obj.local.e164;
+                    log("danilo req : RCC message:CallUpdate: 2");
+                } else {
+                    // Se nenhum dos parâmetros estiver definido, ignore o evento
+                    log("danilo req : RCC message:CallUpdate: 3");
+                    return;
+                }
+            } catch (e) {
+                if (obj.local.e164 !== undefined && obj.local.e164 !== "") {
+                    sip = obj.local.e164;
+                    log("danilo req : RCC message:CallUpdate: 4");
+                } else {
+                    // Se o parâmetro local.e164 não estiver definido, ignore o evento
+                    log("danilo req : RCC message:CallUpdate: 5");
+                    return;
+                }
+            }
+        
+            var timeNow = getDateNow();
+            var foundCall = calls.filter(function (call) {
+                return call.callid === obj.call;
+            });
+        
+            switch (obj.msg) {
+                case "r-setup":
+                    num = obj.remote.e164 !== "" ? obj.remote.e164 : obj.remote.h323;
+                    log("danilo req : RCC message:CallUpdate: r-setup 2 foundcall "+JSON.stringify(foundCall));
+                    if (foundCall.length==0) {
+                        log("danilo req : RCC message:CallUpdate: r-setup 2 not found call num"+num);
+                        addCall(sip, obj.call, num, 1, "out", timeNow, device);
+                        sendRingingEvents(sip, num, "CallRinging");
+                        triggerAction(sip, num, "out-number");
+                    }
+                    break;
+                case "x-setup":
+                    num = obj.remote.e164 !== "" ? obj.remote.e164 : obj.remote.h323;
+                    log("danilo req : RCC message:CallUpdate: x-setup 2 foundcall "+JSON.stringify(foundCall));
+                    if (foundCall.length==0) {
+                        log("danilo req : RCC message:CallUpdate: x-setup 2 not found call num "+num);
+                        addCall(sip, obj.call, num, 129, "inc", timeNow, device);
+                        sendRingingEvents(sip, num, "IncomingCallRinging");
+                        triggerAction(sip, num, "inc-number");
+                    }
+                    break;
+                case "x-alert":
+                    handleAlert(obj.call, 4, timeNow, obj.remote.e164, obj.remote.h323, sip, sendCallEvents);
+                    break;
+                case "r-alert":
+                    handleAlert(obj.call, 132, timeNow, obj.remote.e164, obj.remote.h323, sip, sendCallEvents);
+                    break;
+                case "x-conn":
+                    handleConnected(obj.call, 5, timeNow, sip, sendCallEvents, obj.remote.e164, obj.remote.h323);
+                    break;
+                case "r-conn":
+                    handleConnected(obj.call, 133, timeNow, sip, sendCallEvents, obj.remote.e164, obj.remote.h323);
+                    break;
+                case "x-rel":
+                    handleDisconnect(obj.call, 6, timeNow, sip, sendCallEvents);
+                    break;
+                case "r-rel":
+                    handleDisconnect(obj.call, 135, timeNow, sip, sendCallEvents);
                     break;
             }
         }
@@ -1711,21 +1792,82 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 });
 
 //Funções Internas
+function addCall(sip, callid, num, state, direction, call_started, device) {
+    var call = {
+        sip: String(sip),
+        src: callid,
+        callid: callid,
+        num: num,
+        state: state,
+        direction: direction,
+        call_started: call_started,
+        device: device
+    };
+    calls.push(call);
+    log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
+}
+
+function sendRingingEvents(sip, num, mt) {
+    connectionsUser.forEach(function (conn) {
+        conn.send(JSON.stringify({ api: "user", mt: mt, src: sip, num: num }));
+    });
+}
+
+function handleAlert(callid, state, timeNow, e164, h323, sip, sendCallEvents) {
+    calls.forEach(function (call) {
+        if (call.callid == callid) {
+            call.state = state;
+            call.call_ringing = timeNow;
+            var num = e164 !== "" ? e164 : h323;
+            sendRingingEvents(sip, call.num, "CallRinging");
+            if (sendCallEvents) {
+                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "out" };
+                httpClient(urlPhoneApiEvents, msg);
+            }
+        }
+    })
+}
+
+function handleConnected(callid, state, timeNow, sip, sendCallEvents, e164, h323) {
+    calls.forEach(function (call) {
+        if (call.callid == callid) {
+            call.state = state;
+            call.call_connected = timeNow;
+            sendRingingEvents(sip, call.num, "CallConnected");
+            if (sendCallEvents) {
+                var num = e164 !== "" ? e164 : h323;
+                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "ans" };
+                httpClient(urlPhoneApiEvents, msg);
+            }
+        }
+    })
+}
+
+function handleDisconnect(callid, state, timeNow, sip, sendCallEvents) {
+    calls.forEach(function (call) {
+        if (call.callid == callid) {
+            call.state = state;
+            call.call_ended = timeNow;
+            insertTblCalls(call);
+            sendRingingEvents(sip, call.num, "CallDisconnected");
+            if (sendCallEvents) {
+                var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "del" };
+                httpClient(urlPhoneApiEvents, msg);
+            }
+            calls = calls.filter(function (call) {
+                return call.callid !== callid;
+            });
+            log("danilo req : after deleteCall " + JSON.stringify(calls));
+        }
+    })
+}        
+
 function callNovaAlert(alert, sip) {
     log("callNovaAlert::");
     var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(sip), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
     httpClient(urlalert, msg);
 }
 
-function deleteCallsBySrc(src) {
-    return function (value) {
-        if (value.src != src) {
-            return true;
-        }
-        //countInvalidEntries++
-        return false;
-    }
-}
 
 function findBySip(sip) {
     return function (value) {
@@ -2035,7 +2177,7 @@ function triggerAction(user, prt, type) {
                 str = JSON.stringify(data);
                 actions = JSON.parse(String(str));
                 
-                if (actions != null) {
+                if (actions.length > 0) {
                     log("danilo-req triggerAction:actions diferent of null " + JSON.stringify(actions));
                     actions.forEach(function (ac) {
                         log("danilo-req triggerAction:ac " + JSON.stringify(ac));
