@@ -118,7 +118,7 @@
                         console.log("Time Start \n" + dataTime_start)
                         console.log("Time End \n" + dataTime_end)
                         
-                                                //Eventos já existentes
+                            //Eventos já existentes
                         for (var i = 0; i < dataschedules.length; i++) {
                                 var eventData = {
                                     title: "Indisponível",
@@ -132,9 +132,8 @@
                                 console.log("DataSchedules " + JSON.stringify(dataschedules))
 
                         }
+                        
                         UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-                
-
                         
                     });
                 } 
@@ -144,12 +143,11 @@
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
-                // atualizar disponibilidade 
+
+                // // atualizar disponibilidade 
 
                          // evt listener para o button month
             var monthButtons = document.querySelectorAll('.fc-month-button');
-            
-            // var eventContainer = document.querySelectorAll('.fc-event-container');
             
             monthButtons.forEach(function(button) {
                 button.addEventListener('click', function() {
@@ -170,6 +168,7 @@
             nextButton.addEventListener('click', function() {
                 UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
             });
+
 
             }); // final .then (response)
 
@@ -212,15 +211,45 @@
                     selectend = end
                     // If user cli  cks on a day in month view, switch to day view and let them select a time
                     if (view.name === 'month') {
-                        console.log("View: " + "Month");
-                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                        $('#calendar').fullCalendar('gotoDate', start);
-                        //$('#calendar').fullCalendar('select', start, end, jsEvent);
-                    } else if (view.name === 'agendaWeek') {
+                        console.log("View: Month");
+                        //.dataset.date;
+                        var clickedElement = jsEvent.target
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+
+                        dataavailability.forEach(function(dates){
+                        
+                            var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                            var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+
+                        if (clickedDate >= datastart && clickedDate <= dataend ) {
+                         console.log("Elemento clicado está disponível");
+                         $('#calendar').fullCalendar('changeView', 'agendaDay');
+                         $('#calendar').fullCalendar('gotoDate', start);
+                         } else {
+                         console.log("Elemento clicado não está disponível");
+                         }
+
+                        })
+                        
+                        // var clickedElement = jsEvent.target;
+                        // var computedStyle = window.getComputedStyle(clickedElement);
+                        // var backgroundColor = computedStyle.backgroundColor;
+
+                        // if (backgroundColor === 'rgb(188, 232, 241)' || backgroundColor === '#bce8f1') {
+                        // console.log("View: Month");
+                        // console.log("Elemento clicado está disponível");
+                        // $('#calendar').fullCalendar('changeView', 'agendaDay');
+                        // $('#calendar').fullCalendar('gotoDate', start);
+                        // } else {
+                        // console.log("View: Month");
+                        // console.log("Elemento clicado não está disponível");
+                        // }
+                    }else if (view.name === 'agendaWeek') {
                         console.log("View: " + "Week");
                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                         $('#calendar').fullCalendar('gotoDate', start);
-                        // document.querySelector('.fc-day-grid').setAttribute("style","display:none")
                     } else {
                         console.log("START " + start + "\n" + "END " + end)
                         document.getElementById("MyModal").style.display = 'block';
@@ -235,6 +264,17 @@
                 events: [],
                 eventRender: function (event, element) {}
             });
+            /*
+            var unavailableTD =   document.querySelectorAll('.unavailable')
+                    console.log("Unavailable Elements" + unavailableTD);
+                    unavailableTD.forEach(function(tds){
+                        tds.addEventListener("click",function(event){
+                            console.log("Click Funcionando!!!!!!!!!")
+                            event.stopPropagation();
+                        })
+                    })
+                    */
+
             // Enviar os dados 
             document.getElementById("btnSendName").addEventListener("click",function(){
                             var name = document.getElementById("iptName").value;
@@ -254,7 +294,9 @@
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-        //funções internas
+        
+        //funções internas 
+      
         function hideEventContainer() {
             var container = document.querySelectorAll('.fc-event-container, .fc-more-cell');
                 container.forEach(function(td) {
@@ -262,30 +304,34 @@
                 });
             console.log("HideEventContainer Result Success");
         }
-
+        
         function UpdateAvailability(datastart,dataend,availability){
-                            var tds = document.querySelectorAll('.fc-day');
+                            var tds = document.querySelectorAll('.fc-day','.fc-highlight');
                                 if (availability.length === 0) {
                                     tds.forEach(function(td) {
-                                        td.classList.add('unavailable');
+                                        td.classList.add('unavailable');  
                                     });
                                     } else {
-                                        var datastart = moment(availability[0].time_start).format('YYYY-MM-DD');
-                                        var dataend = moment(availability[0].time_end).format('YYYY-MM-DD');
+                                        availability.forEach(function(dates){
+                                            var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                                            var dataend = moment(dates.time_end).format('YYYY-MM-DD');
 
-                                        tds.forEach(function(td) {
-                                            var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                                            tds.forEach(function(td) {
+                                                var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
 
-                                            if (dataDate >= datastart && dataDate <= dataend) {
-                                                td.classList.add('available');
-                                            } else {
-                                                td.classList.add('unavailable');
-                                            }
-                                    });
+                                                if (dataDate >= datastart && dataDate <= dataend) {
+                                                    td.classList.add('available');
+                                                } else {
+                                                    td.classList.add('unavailable');
+                                                // td.setAttribute("id","unavailable")
+                                                }
+                                            });
+                                        })
+                                    
                                     }
                                 console.log("UpdateAvailability Result Success");
-                                // setTimeout(hideEventContainer, 500);
                                 hideEventContainer()
+
                                 }
 
         function sendAgenda(id,name, email,start,end){
@@ -336,7 +382,7 @@
                                 //window.open(mailto);
                             }
         }
-        
+
         function closeModal(event){
         if(event.target.id === "spanX"){
             // limpar as divs
@@ -351,7 +397,7 @@
             
         }
     }
-    document.addEventListener('click', closeModal);
+        document.addEventListener('click', closeModal);
     </script>
 </head>
 <body>
