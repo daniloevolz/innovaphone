@@ -214,6 +214,20 @@ background-color: #f4a083
 .available{
 background-color: rgb(188, 232, 241)
 }
+.subtitle-divs{
+display: inline-flex;
+align-items: center;
+}
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-scroller.fc-time-grid-container{
+    height: auto !important;
+    overflow: hidden;
+}
+/* .calendar-subtitle{
+    max-width: 900px;S
+    display: inline-block;
+} */
+
+
 /* .fc-unthemed td.fc-today {
 background: no-repeat;
 } */
@@ -541,9 +555,11 @@ a.fc-more:hover {
 }
 
 .fc-unthemed .fc-content,.fc-unthemed .fc-divider,.fc-unthemed .fc-list-heading td,.fc-unthemed .fc-list-view,.fc-unthemed .fc-popover,.fc-unthemed .fc-row,.fc-unthemed tbody,.fc-unthemed td,.fc-unthemed th,.fc-unthemed thead {
-    border-color: #ddd;
+    border-color: black;
 }
-
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable{
+    display: none;
+}
 .fc-unthemed .fc-popover {
     background-color: #fff;
     border-width: 1px;
