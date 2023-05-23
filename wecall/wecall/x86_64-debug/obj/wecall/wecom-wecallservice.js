@@ -189,16 +189,6 @@ if (license != null && license.System == true) {
 
 //JSON APIS
 new JsonApi("user").onconnected(function (conn) {
-    conn["session"] = Random.bytes(16);
-    conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: conn["session"] }));
-    connectionsUser.push(conn);
-    
-    if (sendCallEvents) {
-        log("danilo-req : connectionUser:login:sendCallEvents=true");
-        var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
-
-        httpClient(urlPhoneApiEvents, msg);
-    }
     log("danilo req : User Connection " + JSON.stringify(conn));
     if (conn.app == "wecom-wecall") {
         license = getLicense();
@@ -207,13 +197,15 @@ new JsonApi("user").onconnected(function (conn) {
             var info = JSON.parse(conn.info);
             log("danilo-req : wecom-wecall");
             if (license != null && connectionsUser.length <= license.Users) {
-                //if (obj.mt == "PhoneApiEvent") {
-                //    log("danilo-req : PhoneApiEvent");
-                //    if (sendCallEvents) {
-                //        log("danilo-req : PhoneApiEvent=true");
-                //        httpClient(urlPhoneApiEvents, obj.obj);
-                //    }
-                //}
+                if (obj.mt == "UserSession") {
+                    var foundConn = connectionsUser.filter(function (c) { return c.sip == conn.sip });
+                    if(foundConn.length>0){
+                        conn.send(JSON.stringify({ api: "user", mt: "UserSessionResultDuplicated", result: "Login duplicado! Identifiamos uma sessão já aberta no seguinte local: " + foundConn[0].sessionInfo }));
+                    }else{
+                        var session = Random.bytes(16);
+                        conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
+                    }
+                    }
                 if (obj.mt == "CallHistoryEvent") {
                     log("danilo-req : CallHistoryEvent");
                     if (sendCallHistory) {
@@ -245,46 +237,24 @@ new JsonApi("user").onconnected(function (conn) {
                     })
                     getURLLogin(conn.sip);
                 }
-                if (obj.mt == "InitializeMessage2") {
-                    try {
-                        var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
-                        var numDevices = user[0].columns.devices.length;
-                        log("danilo req : devices sao: " + numDevices);
-                        RCC.forEach(function (rcc) {
-                            if (rcc.pbx == info.pbx) {
-                                var temp = rcc[String(conn.sip)];
-                                log("danilo req : User Connection conn.sip:temp " + temp);
-                                if (temp == null) {
-                                    if (numDevices > 1) {
-                                        conn.send(JSON.stringify({ api: "user", mt: "DevicesList", devices: user[0].columns.devices, src: user[0].columns.h323 + "," + user[0].src }));
-                                    }
-                                    if (numDevices == 1) {
-                                        if (rcc.pbx == info.pbx) {
-                                            log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
-                                            var msg = { api: "RCC", mt: "UserInitialize", hw: user[0].columns.devices[0], cn: String(conn.dn), src: conn.sip + "," + info.pbx };
-                                            rcc.send(JSON.stringify(msg));
-                                            connectionsUser.forEach(function (c) {
-                                                if (c.sip == conn.sip) {
-                                                    c.hw = user[0].columns.devices[0];
-                                                }
-                                            })
-                                            log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
-                                        }
-                                        getURLLogin(conn.sip);
-                                    }
-                                }
-                            }
-                        })
-
-                    } catch (e) {
-                        log("danilo req : User Connection Erro pbxTableUsers has null, please try again in a few moments " + e);
-                    }
-                }
                 if (obj.mt == "InitializeMessage") {
                     try {
-                        //var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === conn.sip });
-                        //var numDevices = user[0].columns.devices.length;
-                        log("danilo req : devices sao: " + numDevices);
+                        if (connectionsUser.length > 0) {
+                            var foundConn = connectionsUser.filter(function (c) { return c.session == obj.session });
+                            if (foundConn.length==0) {
+                                log("connectionsUser: not found conn");
+                                conn["session"] = obj.session;
+                                conn["sessionInfo"] = obj.info;
+                                connectionsUser.push(conn);
+                            }
+                        } else {
+                            log("connectionsUser: connectionsUser.length == 0");
+                            conn["session"] = obj.session;
+                            conn["sessionInfo"] = obj.info;
+                            connectionsUser.push(conn);
+                            log("connectionsUser: connectionsUser.push =" + JSON.stringify(connectionsUser));
+                        }
+
                         RCC.forEach(function (rcc) {
                             if (rcc.pbx == info.pbx) {
                                 var temp = rcc[String(conn.sip)];
@@ -293,16 +263,21 @@ new JsonApi("user").onconnected(function (conn) {
                                     log("danilo req : User Connection calling RCC API for new userclient " + String(conn.dn) + " on PBX " + info.pbx);
                                     var msg = { api: "RCC", mt: "UserInitialize", cn: String(conn.dn), src: conn.sip + "," + info.pbx };
                                     rcc.send(JSON.stringify(msg));
-                                    //connectionsUser.forEach(function (c) {
-                                    //    if (c.sip == conn.sip) {
-                                    //        c.hw = user[0].columns.devices[0];
-                                    //    }
-                                    //})
-                                    //log("danilo req : User Connection updated including the new hardware for userclient " + String(conn.dn) + " on connectionsUser " + JSON.stringify(connectionsUser));
+
+                                    if (sendCallEvents) {
+                                        log("danilo-req : connectionUser:login:sendCallEvents=true");
+                                        var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
+                                
+                                        httpClient(urlPhoneApiEvents, msg);
+                                    }
+
+                                }else{
+                                    log("danilo req : User Connection conn.sip:temp already exists " + temp);
                                 }
-                                getURLLogin(conn.sip);
                             }
                         })
+                        log("danilo req : calling getURLLogin: " + conn.sip);
+                        getURLLogin(conn.sip, obj.session);
 
                     } catch (e) {
                         log("danilo req : User Connection Erro RCC has null, please try again in a few moments " + e);
@@ -323,22 +298,29 @@ new JsonApi("user").onconnected(function (conn) {
     conn.onclose(function () {
         log("connectionsUser: disconnected");
         var info = JSON.parse(conn.info);
-        RCC.forEach(function (rcc) {
-            if (rcc.pbx == info.pbx) {
-                var user = rcc[conn.sip];
-                log("connectionsUser: calling RCC API to End user Monitor " + String(conn.sip) + " on PBX " + info.pbx);
-                var msg = { api: "RCC", mt: "UserEnd", user: user, src: conn.sip + "," + info.pbx };
-                rcc.send(JSON.stringify(msg));
-            }
-        })
-        //connectionsUser.splice(connectionsUser.indexOf(conn), 1);
-        connectionsUser = connectionsUser.filter(deleteCallsBySrc(conn.sip));
-        log("connectionsUser: after delete conn "+JSON.stringify(connectionsUser));
-        if (sendCallEvents) {
-            log("danilo-req : connectionUser:logout:sendCallEvents=true");
-            var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "logout" };
 
-            httpClient(urlPhoneApiEvents, msg);
+        //connectionsUser.splice(connectionsUser.indexOf(conn), 1);
+        connectionsUser = connectionsUser.filter(function (c) { return c.session != conn.session });
+        log("connectionsUser: after delete conn "+JSON.stringify(connectionsUser));
+
+        var userHasMultiConn = connectionsUser.filter(function (c) { return c.sip == conn.sip });
+        log("connectionsUser: after delete conn "+JSON.stringify(connectionsUser));
+        if(userHasMultiConn.length==0){
+            log("connectionsUser: last connection for this user " + conn.sip);
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == info.pbx) {
+                    var user = rcc[conn.sip];
+                    log("connectionsUser: calling RCC API to End user Monitor " + String(conn.sip) + " on PBX " + info.pbx);
+                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: conn.sip + "," + info.pbx };
+                    rcc.send(JSON.stringify(msg));
+                }
+            })
+
+            if (sendCallEvents) {
+                log("danilo-req : connectionUser:logout:sendCallEvents=true");
+                var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "logout" };
+                httpClient(urlPhoneApiEvents, msg);
+            }
         }
     });
 });
@@ -1465,76 +1447,99 @@ function delConnectionsByCall(call) {
 }
 
 //function to get User Login URL from Wecall
-function getURLLogin(sip) {
+function getURLLogin(sip, session) {
 
-    var msg = { user: sip, client: codClient };
-    log("danilo req : getURLLogin url" + urlSSO);
-    log("danilo req : getURLLogin msg" + JSON.stringify(msg));
+    var foundConn = connectionsUser.filter(function (c) { return c.sip == sip });
+    var foundSession = connectionsUser.filter(function (c) { return c.session == session });
+    if(foundConn[0].url){
+            var url = Config.url;
+            var urlAlt = foundConn[0].url;
+            if (urlAlt != "") {
+                url = url + sip + "/" + urlAlt;
+                log("danilo req : UserMessage url " + url);
 
-    var responseData = "";
-    var req = HttpClient.request("POST", urlSSO);
-    req.header("X-Token", "danilo");
-    req.contentType("application/json");
-    req.onsend(function (req) {
-        req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-    });
-    req.onrecv(function (req, data, last) {
-        responseData += new TextDecoder("utf-8").decode(data);
-        if (!last) req.recv();
-    }, 1024);
-    req.oncomplete(function (req, success) {
-        log("danilo-req : getURLLogin complete");
-        log("danilo-req : getURLLogin responseData " + responseData);
-        try {
-            var obj = JSON.parse(responseData);
-            if (obj.status == "success") {
-                connectionsUser.forEach(function (conn) {
-                    if (conn.sip == sip) {
-                        conn["url"] = obj.token;
-                        var url = Config.url;
-                        var urlAlt = conn["url"];
-                        log("danilo req : getLoginResponse sip " + conn.sip);
-                        if (urlAlt != "") {
-                            url = url + conn.sip + "/" + urlAlt;
-                            log("danilo req : UserMessage url " + url);
-
-                        }
-                        conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    }
-                })
-                //Atualiza connections 
-                //updateConnections(sip, "url", obj.token,"");
-
-            } else {
-                log("danilo req : getLoginResponse " + obj.msg);
-                connectionsUser.forEach(function (conn) {
-                    if (conn.sip == sip) {
-                        var url = Config.url;
-                        var urlAlt = "";
-                        log("danilo req : getLoginResponse sip " + conn.sip);
-                        if (urlAlt != "") {
-                            url = url + conn.sip + "/" + urlAlt;
-                            log("danilo req : UserMessage url " + url);
-
-                        }
-                        conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    }
-                })
             }
-        } catch (e) {
-            log("danilo req : getLoginResponse Erro " + e);
-            connectionsUser.forEach(function (conn) {
-                if (conn.sip == sip) {
+            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+    }else{
+        var msg = { user: sip, client: codClient };
+        log("danilo req : getURLLogin url" + urlSSO);
+        log("danilo req : getURLLogin msg" + JSON.stringify(msg));
+
+        var responseData = "";
+        var req = HttpClient.request("POST", urlSSO);
+        req.header("X-Token", "danilo");
+        req.contentType("application/json");
+        req.onsend(function (req) {
+            req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        });
+        req.onrecv(function (req, data, last) {
+            responseData += new TextDecoder("utf-8").decode(data);
+            if (!last) req.recv();
+        }, 1024);
+        req.oncomplete(function (req, success) {
+            log("danilo-req : getURLLogin complete");
+            log("danilo-req : getURLLogin responseData " + responseData);
+            try {
+                var obj = JSON.parse(responseData);
+                if (obj.status == "success") {
+                    connectionsUser.forEach(function (conn) {
+                        if (conn.sip == sip) {
+                            conn["url"] = obj.token;
+                            var url = Config.url;
+                            var urlAlt = conn["url"];
+                            log("danilo req : getLoginResponse sip " + conn.sip);
+                            if (urlAlt != "") {
+                                url = url + conn.sip + "/" + urlAlt;
+                                log("danilo req : UserMessage url " + url);
+
+                            }
+                            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                        }
+                    })
+
+                } else {
+                    log("danilo req : getLoginResponse " + obj.msg);
                     var url = Config.url;
-                    conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    var urlAlt = "";
+                    log("danilo req : getLoginResponse sip " + sip);
+                    if (urlAlt != "") {
+                        url = url + sip + "/" + urlAlt;
+                        log("danilo req : UserMessage url " + url);
+
+                    }
+                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                        
+                    // connectionsUser.forEach(function (conn) {
+                    //     if (conn.sip == sip) {
+                    //         var url = Config.url;
+                    //         var urlAlt = "";
+                    //         log("danilo req : getLoginResponse sip " + conn.sip);
+                    //         if (urlAlt != "") {
+                    //             url = url + conn.sip + "/" + urlAlt;
+                    //             log("danilo req : UserMessage url " + url);
+
+                    //         }
+                    //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    //     }
+                    // })
                 }
-            })
-        }
-    })
+            } catch (e) {
+                log("danilo req : getLoginResponse Erro " + e);
+                var url = Config.url;
+                foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    
+                // connectionsUser.forEach(function (conn) {
+                //     if (conn.sip == sip) {
+                //         var url = Config.url;
+                //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                //     }
+                // })
+            }
+        })
         .onerror(function (error) {
             log("danilo-req : getURLLogin error=" + error);
         });
-
+    } 
 }
 
 //Functions to Initialize monitor of Queues from Wecall

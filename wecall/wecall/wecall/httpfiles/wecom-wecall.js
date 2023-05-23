@@ -57,23 +57,11 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
 
     }
-    
 
     function app_connected(domain, user, dn, appdomain) {
         userUI = user;
-        //if (app.logindata.info.unlicensed) {
-        //    //sem licença
-        //    var counter = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:calc(5% - 15px); font-size:30px; text-align:center", texts.text("licText")));
-        //    that.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:calc(15% - 6px); font-size:12px; text-align:center", null, "button")).addTranslation(texts, "licContinue").addEvent("click", function () {
-        //        app.send({ api: "user", mt: "UserMessage" });
-        //    });
-
-        //} else {
-
-        //    app.send({ api: "user", mt: "UserMessage" });
-        //}
-        //app.send({ api: "user", mt: "UserMessage" });
-        app.send({ api: "user", mt: "InitializeMessage" });
+        
+        app.send({ api: "user", mt: "UserSession" });
 
         var phoneinfoApi = start.provideApi("com.innovaphone.phoneinfo");
         phoneinfoApi.onmessage.attach(function (sender, obj) {
@@ -104,8 +92,33 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserSessionResult") {
-            console.info("::Session "+obj.session+"::");
+            console.warn("::Session:: "+obj.session);
             session = obj.session;
+            var brand;
+            var version;
+            try{
+                var brand =  navigator.userAgentData.brands[0].brand;
+                var version =  navigator.userAgentData.brands[0].version;
+                fetch('https://ipinfo.io/json')
+                    .then(response => response.json())
+                    .then(data => {
+                        var ip = data.ip;
+                        console.log(ip);
+                        // Faça o que você quiser com o endereço IP aqui
+                        app.send({ api: "user", mt: "InitializeMessage", session: obj.session, info: brand + " v" + version + " IP" + ip });
+                    })
+                    .catch(error => {
+                        console.error('Ocorreu um erro:', error);
+                        app.send({ api: "user", mt: "InitializeMessage", session: obj.session, info: brand + " v" + version });
+                    });
+                
+            }catch(e){
+                app.send({ api: "user", mt: "InitializeMessage", session: obj.session, info: brand + " v" + version });
+            }
+        }
+        if (obj.api == "user" && obj.mt == "UserSessionResultDuplicated") {
+            console.log(obj.result);
+            makeDivNoLicense(obj.result);
         }
         if (obj.api == "user" && obj.mt == "NoLicense") {
             console.log(obj.result);
