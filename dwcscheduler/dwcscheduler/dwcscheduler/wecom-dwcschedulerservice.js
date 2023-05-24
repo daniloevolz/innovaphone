@@ -202,10 +202,31 @@ if (license != null && license.System==true) {
                                                         }
                                                         try {
                                                             var today = convertDateTimeLocalToCustomFormat(getDateNow());
+                                                            log("today" + today); 
                                                             var arrayToday = obj.start.split("T");
                                                             var day = arrayToday[0];
                                                             var time = arrayToday[1];
                                                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
+
+                                                            //Início teste url temporária
+                                                            var version = 0;
+                                                            var flags = 0;
+                                                            var roomNumber = [0, 0, 0, 1];
+                                                            var meetingId = [0, 0, 0, 1];
+                                                            var startTimestamp = convertDateTimeToTimestamp(obj.start);
+                                                            log("startTimestamp " + startTimestamp);
+                                                            var endTimestamp = convertDateTimeToTimestamp(obj.end);
+                                                            log("endTimestamp " + endTimestamp);
+                                                            var reservedChannels = 2;
+                                                            var creationTimestamp = convertDateTimeToTimestamp(today);
+                                                            log("creationTimestamp " + creationTimestamp);
+                                                            var md5Hash = 'b42f6e2c0f130900f6b62c51e74dc2aa';
+                                                            
+                                                            var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
+                                                            log("conferenceLink" + conferenceLink);    
+                                                            //Fim teste url temporária
+
+
                                                             //Email Cliente
                                                             var dataClient = "<!DOCTYPE html>"
                                                                 + "<html>"
@@ -937,5 +958,304 @@ function convertDateTimeLocalToCustomFormat(datetimeLocal) {
 function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
+function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain) {
+    // Convert each parameter to its corresponding hexadecimal string representation
+    var versionHex = byteToHex(version);
+    var flagsHex = byteToHex(flags);
+    var roomNumberLengthHex = byteToHex(roomNumber.length);
+    var roomNumberHex = byteArrayToHex(roomNumber);
+    var meetingIdHex = byteArrayToHex(meetingId);
+    var startTimestampHex = intToHex(startTimestamp);
+    var endTimestampHex = intToHex(endTimestamp);
+    var reservedChannelsHex = shortToHex(reservedChannels);
+    var creationTimestampHex = intToHex(creationTimestamp);
+  
+    // Calculate the MD5 hash
+    var md5String = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + md5Hash;
+    var calculatedHash = calculateMD5(md5String);
+    log("calculatedHash " + calculatedHash);
+    // Construct the final data string for the link hash value
+    var dataString = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + calculatedHash;
+  
+    // Base64 encode the data string
+    var base64Encoded = base64Encode(dataString);
+    log("base64Encoded " + base64Encoded);
+    // Replace '+' with '-' and '/' with '_' to make it URL-compatible
+    var urlEncoded = base64Encoded.replace(/\+/g, '-').replace(/\//g, '_');
+  
+    // Construct the final conference link
+    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conference-en/webaccess.htm?m=' + urlEncoded;
+  
+    return conferenceLink;
+}
+function convertDateTimeToTimestamp(dateTimeString) {
+    var dateTimeParts = dateTimeString.split('T');
+    var dateParts = dateTimeParts[0].split('-');
+    var timeParts = dateTimeParts[1].split(':');
+  
+    var year = parseInt(dateParts[0]);
+    var month = parseInt(dateParts[1]) - 1; // Month is zero-based in JavaScript
+    var day = parseInt(dateParts[2]);
+    var hours = parseInt(timeParts[0]);
+    var minutes = parseInt(timeParts[1]);
+  
+    var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
+  
+    return timestamp;
+}
+// Função para calcular o hash MD5
+function calculateMD5(input) {
+    var rotateLeft = function (lValue, iShiftBits) {
+      return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
+    };
+  
+    var addUnsigned = function (lX, lY) {
+      var lX8 = (lX & 0x80000000) === 0x80000000 ? lX & 0x7fffffff : lX;
+      var lY8 = (lY & 0x80000000) === 0x80000000 ? lY & 0x7fffffff : lY;
+      return (lX8 + lY8) & 0xffffffff;
+    };
+  
+    var f = function (x, y, z) {
+      return (x & y) | (~x & z);
+    };
+    var g = function (x, y, z) {
+      return (x & z) | (y & ~z);
+    };
+    var h = function (x, y, z) {
+      return x ^ y ^ z;
+    };
+    var i = function (x, y, z) {
+      return y ^ (x | ~z);
+    };
+  
+    var ff = function (a, b, c, d, x, s, ac) {
+      a = addUnsigned(a, addUnsigned(addUnsigned(f(b, c, d), x), ac));
+      return addUnsigned(rotateLeft(a, s), b);
+    };
+  
+    var gg = function (a, b, c, d, x, s, ac) {
+      a = addUnsigned(a, addUnsigned(addUnsigned(g(b, c, d), x), ac));
+      return addUnsigned(rotateLeft(a, s), b);
+    };
+  
+    var hh = function (a, b, c, d, x, s, ac) {
+      a = addUnsigned(a, addUnsigned(addUnsigned(h(b, c, d), x), ac));
+      return addUnsigned(rotateLeft(a, s), b);
+    };
+  
+    var ii = function (a, b, c, d, x, s, ac) {
+      a = addUnsigned(a, addUnsigned(addUnsigned(i(b, c, d), x), ac));
+      return addUnsigned(rotateLeft(a, s), b);
+    };
+  
+    var convertToWordArray = function (input) {
+      var lWordCount;
+      var lMessageLength = input.length;
+      var lNumberOfWords_temp1 = lMessageLength + 8;
+      var lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
+      var lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
+      var lWordArray = Array(lNumberOfWords - 1);
+      var lBytePosition = 0;
+      var lByteCount = 0;
+  
+      while (lByteCount < lMessageLength) {
+        lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+        lBytePosition = (lByteCount % 4) * 8;
+        lWordArray[lWordCount] =
+          lWordArray[lWordCount] |
+          (input.charCodeAt(lByteCount) << lBytePosition);
+        lByteCount++;
+      }
+  
+      lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+      lBytePosition = (lByteCount % 4) * 8;
+      lWordArray[lWordCount] =
+        lWordArray[lWordCount] | (0x80 << lBytePosition);
+      lWordArray[lNumberOfWords - 2] = lMessageLength << 3;
+      lWordArray[lNumberOfWords - 1] = lMessageLength >>> 29;
+  
+      return lWordArray;
+    };
+  
+    var wordToHex = function (lValue) {
+      var wordToHexValue = '',
+        wordToHexValue_temp = '',
+        lByte,
+        lCount;
+  
+      for (lCount = 0; lCount <= 3; lCount++) {
+        lByte = (lValue >>> (lCount * 8)) & 255;
+        wordToHexValue_temp = '0' + lByte.toString(16);
+        wordToHexValue =
+          wordToHexValue +
+          wordToHexValue_temp.substr(wordToHexValue_temp.length - 2, 2);
+      }
+  
+      return wordToHexValue;
+    };
+  
+    var x = [];
+    var k, AA, BB, CC, DD, a, b, c, d;
+    var S11 = 7,
+      S12 = 12,
+      S13 = 17,
+      S14 = 22;
+    var S21 = 5,
+      S22 = 9,
+      S23 = 14,
+      S24 = 20;
+    var S31 = 4,
+      S32 = 11,
+      S33 = 16,
+      S34 = 23;
+    var S41 = 6,
+      S42 = 10,
+      S43 = 15,
+      S44 = 21;
+  
+    x = convertToWordArray(input);
+  
+    a = 0x67452301;
+    b = 0xefcdab89;
+    c = 0x98badcfe;
+    d = 0x10325476;
+  
+    for (k = 0; k < x.length; k += 16) {
+      AA = a;
+      BB = b;
+      CC = c;
+      DD = d;
+      a = ff(a, b, c, d, x[k + 0], S11, 0xd76aa478);
+      d = ff(d, a, b, c, x[k + 1], S12, 0xe8c7b756);
+      c = ff(c, d, a, b, x[k + 2], S13, 0x242070db);
+      b = ff(b, c, d, a, x[k + 3], S14, 0xc1bdceee);
+      a = ff(a, b, c, d, x[k + 4], S11, 0xf57c0faf);
+      d = ff(d, a, b, c, x[k + 5], S12, 0x4787c62a);
+      c = ff(c, d, a, b, x[k + 6], S13, 0xa8304613);
+      b = ff(b, c, d, a, x[k + 7], S14, 0xfd469501);
+      a = ff(a, b, c, d, x[k + 8], S11, 0x698098d8);
+      d = ff(d, a, b, c, x[k + 9], S12, 0x8b44f7af);
+      c = ff(c, d, a, b, x[k + 10], S13, 0xffff5bb1);
+      b = ff(b, c, d, a, x[k + 11], S14, 0x895cd7be);
+      a = ff(a, b, c, d, x[k + 12], S11, 0x6b901122);
+      d = ff(d, a, b, c, x[k + 13], S12, 0xfd987193);
+      c = ff(c, d, a, b, x[k + 14], S13, 0xa679438e);
+      b = ff(b, c, d, a, x[k + 15], S14, 0x49b40821);
+      a = gg(a, b, c, d, x[k + 1], S21, 0xf61e2562);
+      d = gg(d, a, b, c, x[k + 6], S22, 0xc040b340);
+      c = gg(c, d, a, b, x[k + 11], S23, 0x265e5a51);
+      b = gg(b, c, d, a, x[k + 0], S24, 0xe9b6c7aa);
+      a = gg(a, b, c, d, x[k + 5], S21, 0xd62f105d);
+      d = gg(d, a, b, c, x[k + 10], S22, 0x2441453);
+      c = gg(c, d, a, b, x[k + 15], S23, 0xd8a1e681);
+      b = gg(b, c, d, a, x[k + 4], S24, 0xe7d3fbc8);
+      a = gg(a, b, c, d, x[k + 9], S21, 0x21e1cde6);
+      d = gg(d, a, b, c, x[k + 14], S22, 0xc33707d6);
+      c = gg(c, d, a, b, x[k + 3], S23, 0xf4d50d87);
+      b = gg(b, c, d, a, x[k + 8], S24, 0x455a14ed);
+      a = gg(a, b, c, d, x[k + 13], S21, 0xa9e3e905);
+      d = gg(d, a, b, c, x[k + 2], S22, 0xfcefa3f8);
+      c = gg(c, d, a, b, x[k + 7], S23, 0x676f02d9);
+      b = gg(b, c, d, a, x[k + 12], S24, 0x8d2a4c8a);
+      a = hh(a, b, c, d, x[k + 5], S31, 0xfffa3942);
+      d = hh(d, a, b, c, x[k + 8], S32, 0x8771f681);
+      c = hh(c, d, a, b, x[k + 11], S33, 0x6d9d6122);
+      b = hh(b, c, d, a, x[k + 14], S34, 0xfde5380c);
+      a = hh(a, b, c, d, x[k + 1], S31, 0xa4beea44);
+      d = hh(d, a, b, c, x[k + 4], S32, 0x4bdecfa9);
+      c = hh(c, d, a, b, x[k + 7], S33, 0xf6bb4b60);
+      b = hh(b, c, d, a, x[k + 10], S34, 0xbebfbc70);
+      a = hh(a, b, c, d, x[k + 13], S31, 0x289b7ec6);
+      d = hh(d, a, b, c, x[k + 0], S32, 0xeaa127fa);
+      c = hh(c, d, a, b, x[k + 3], S33, 0xd4ef3085);
+      b = hh(b, c, d, a, x[k + 6], S34, 0x4881d05);
+      a = hh(a, b, c, d, x[k + 9], S31, 0xd9d4d039);
+      d = hh(d, a, b, c, x[k + 12], S32, 0xe6db99e5);
+      c = hh(c, d, a, b, x[k + 15], S33, 0x1fa27cf8);
+      b = hh(b, c, d, a, x[k + 2], S34, 0xc4ac5665);
+      a = ii(a, b, c, d, x[k + 0], S41, 0xf4292244);
+      d = ii(d, a, b, c, x[k + 7], S42, 0x432aff97);
+      c = ii(c, d, a, b, x[k + 14], S43, 0xab9423a7);
+      b = ii(b, c, d, a, x[k + 5], S44, 0xfc93a039);
+      a = ii(a, b, c, d, x[k + 12], S41, 0x655b59c3);
+      d = ii(d, a, b, c, x[k + 3], S42, 0x8f0ccc92);
+      c = ii(c, d, a, b, x[k + 10], S43, 0xffeff47d);
+      b = ii(b, c, d, a, x[k + 1], S44, 0x85845dd1);
+      a = ii(a, b, c, d, x[k + 8], S41, 0x6fa87e4f);
+      d = ii(d, a, b, c, x[k + 15], S42, 0xfe2ce6e0);
+      c = ii(c, d, a, b, x[k + 6], S43, 0xa3014314);
+      b = ii(b, c, d, a, x[k + 13], S44, 0x4e0811a1);
+      a = ii(a, b, c, d, x[k + 4], S41, 0xf7537e82);
+      d = ii(d, a, b, c, x[k + 11], S42, 0xbd3af235);
+      c = ii(c, d, a, b, x[k + 2], S43, 0x2ad7d2bb);
+      b = ii(b, c, d, a, x[k + 9], S44, 0xeb86d391);
+      a = addUnsigned(a, AA);
+      b = addUnsigned(b, BB);
+      c = addUnsigned(c, CC);
+      d = addUnsigned(d, DD);
+    }
+  
+    var temp = wordToHex(a) + wordToHex(b) + wordToHex(c) + wordToHex(d);
+    return temp.toLowerCase();
+}
+  
+  // Função para codificar em base64
+function base64Encode(str) {
+    var keyStr =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  
+    var output = '';
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+    var i = 0;
+  
+    while (i < str.length) {
+      chr1 = str.charCodeAt(i++);
+      chr2 = str.charCodeAt(i++);
+      chr3 = str.charCodeAt(i++);
+  
+      enc1 = chr1 >> 2;
+      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+      enc4 = chr3 & 63;
+  
+      if (isNaN(chr2)) {
+        enc3 = enc4 = 64;
+      } else if (isNaN(chr3)) {
+        enc4 = 64;
+      }
+  
+      output +=
+        keyStr.charAt(enc1) +
+        keyStr.charAt(enc2) +
+        keyStr.charAt(enc3) +
+        keyStr.charAt(enc4);
+    }
+  
+    return output;
+  }
+  
+  // Helper function to convert a byte value to its hexadecimal string representation
+  function byteToHex(byte) {
+    return ('0' + byte.toString(16)).slice(-2);
+  }
+  
+  // Helper function to convert a byte array to its hexadecimal string representation
+  function byteArrayToHex(byteArray) {
+    var hexArray = [];
+    for (var i = 0; i < byteArray.length; i++) {
+      hexArray.push(byteToHex(byteArray[i]));
+    }
+    return hexArray.join('');
+  }
+  
+  // Helper function to convert an integer to its hexadecimal string representation
+  function intToHex(integer) {
+    return ('00000000' + integer.toString(16)).slice(-8);
+  }
+  
+  // Helper function to convert a short value to its hexadecimal string representation
+  function shortToHex(short) {
+    return ('0000' + short.toString(16)).slice(-4);
+  }
 
 
