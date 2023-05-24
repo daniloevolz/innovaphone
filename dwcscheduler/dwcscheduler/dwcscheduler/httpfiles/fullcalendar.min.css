@@ -209,10 +209,10 @@ min-height: 0em;
 display: none;
 }
 .unavailable{
-background-color: #f4a083 
+background-color: #f89598
 }
 .available{
-background-color: rgb(188, 232, 241)
+background-color: #9DDBBD
 }
 .subtitle-divs{
 display: inline-flex;
@@ -221,6 +221,9 @@ align-items: center;
 #calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-scroller.fc-time-grid-container{
     height: auto !important;
     overflow: hidden;
+}
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-scroller.fc-time-grid-container > div > hr{
+    display: none;
 }
 /* .calendar-subtitle{
     max-width: 900px;S
