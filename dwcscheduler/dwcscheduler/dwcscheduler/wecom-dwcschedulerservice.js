@@ -202,25 +202,37 @@ if (license != null && license.System==true) {
                                                         }
                                                         try {
                                                             var today = convertDateTimeLocalToCustomFormat(getDateNow());
-                                                            log("today" + today); 
                                                             var arrayToday = obj.start.split("T");
                                                             var day = arrayToday[0];
                                                             var time = arrayToday[1];
                                                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
 
                                                             //Início teste url temporária
-                                                            var version = 0;
-                                                            var flags = 0;
-                                                            var roomNumber = [0, 0, 0, 1];
-                                                            var meetingId = [0, 0, 0, 1];
+                                                            function creationDate(date) {
+                                                                var ano = date.substring(0, 4);
+                                                                var mes = date.substring(4, 6);
+                                                                var dia = date.substring(6, 8);
+                                                                var hora = date.substring(9, 11);
+                                                                var minuto = date.substring(11, 13);
+                                                                var segundo = date.substring(13, 15);
+                                                                return ano + '-' + mes + '-' + dia + 'T' + hora + ':' + minuto + ':' + segundo;
+                                                              }  
+                                                            var version = '00';
+                                                            var flags = '00';
+                                                            var rand = String(Random.dword());
+                                                            rand = rand.substring(0, 6);
+                                                            log("rand" + rand);
+                                                            var roomNumber = '02';
+                                                            var meetingId = rand;
                                                             var startTimestamp = convertDateTimeToTimestamp(obj.start);
                                                             log("startTimestamp " + startTimestamp);
                                                             var endTimestamp = convertDateTimeToTimestamp(obj.end);
                                                             log("endTimestamp " + endTimestamp);
-                                                            var reservedChannels = 2;
-                                                            var creationTimestamp = convertDateTimeToTimestamp(today);
+                                                            var reservedChannels = '02';
+                                                            var timeNow = creationDate(today);
+                                                            var creationTimestamp = convertDateTimeToTimestamp(timeNow);
                                                             log("creationTimestamp " + creationTimestamp);
-                                                            var md5Hash = 'b42f6e2c0f130900f6b62c51e74dc2aa';
+                                                            var md5Hash = 'Wecom12#';
                                                             
                                                             var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
                                                             log("conferenceLink" + conferenceLink);    
@@ -240,7 +252,7 @@ if (license != null && license.System==true) {
                                                                 + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
                                                                 + "</td>"
                                                                 + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                                + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + cfg[0].url_conference + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
+                                                                + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
                                                                 + "</span>"
                                                                 + "</a>"
                                                                 + "</td>"
@@ -961,14 +973,23 @@ function padZero(num) {
 function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain) {
     // Convert each parameter to its corresponding hexadecimal string representation
     var versionHex = byteToHex(version);
+    log("versionHex" + versionHex);
     var flagsHex = byteToHex(flags);
+    log("flagsHex" + flagsHex);
     var roomNumberLengthHex = byteToHex(roomNumber.length);
-    var roomNumberHex = byteArrayToHex(roomNumber);
-    var meetingIdHex = byteArrayToHex(meetingId);
+    log("roomNumberLengthHex" + roomNumberLengthHex);
+    var roomNumberHex = byteToHex(roomNumber);
+    log("roomNumberHex" + roomNumberHex);
+    var meetingIdHex =  byteToHex(meetingId);
+    log("meetingIdHex" + meetingIdHex);
     var startTimestampHex = intToHex(startTimestamp);
+    log("startTimestampHex" + startTimestampHex);
     var endTimestampHex = intToHex(endTimestamp);
+    log("endTimestampHex" + endTimestampHex);
     var reservedChannelsHex = shortToHex(reservedChannels);
+    log("reservedChannelsHex" + reservedChannelsHex);
     var creationTimestampHex = intToHex(creationTimestamp);
+    log("creationTimestampHex" + creationTimestampHex);
   
     // Calculate the MD5 hash
     var md5String = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + md5Hash;
