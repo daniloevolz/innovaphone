@@ -80,6 +80,8 @@
         var dataTime_end;
         var dataavailability;
         var dataschedules;
+        var timeStart_schedules;
+        var timeEnd_schedules;
         
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
@@ -114,11 +116,18 @@
                         if(dataavailability[0])  dataTime_start = dataavailability[0].time_start 
                         
                         if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
+
+                        if(dataschedules[0])  timeStart_schedules = dataschedules[0].time_start 
+                        
+                        if(dataschedules[0])    timeEnd_schedules = dataschedules[0].time_end
                         
                         console.log("Data Availability: " + JSON.stringify(dataavailability));
-                        console.log("Time Start \n" + dataTime_start)
-                        console.log("Time End \n" + dataTime_end)
+                        console.log("Data Start \n" + dataTime_start)
+                        console.log("Data End \n" + dataTime_end)
                         
+                        console.log("Data Schedules:" + JSON.stringify(dataschedules));
+                        console.log("Time Start \n" + timeStart_schedules);
+                        console.log("Time End \n" + timeEnd_schedules);
                         //     //Eventos já existentes
                         // for (var i = 0; i < dataschedules.length; i++) {
                         //         var eventData = {
@@ -249,6 +258,7 @@
                                     console.log("Elemento clicado está disponível");
                                     $('#calendar').fullCalendar('changeView', 'agendaDay');
                                     $('#calendar').fullCalendar('gotoDate', start);
+                                    UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability);
                                     teste = true;
                             } 
                         })
@@ -285,8 +295,9 @@
                         })
                         if(!teste) window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
                         
-                    } else {
-                        console.log("START " + start + "\n" + "END " + end)
+                    } 
+                    else {
+                        // console.log("START " + start + "\n" + "END " + end)
                         document.getElementById("MyModal").style.display = 'block';
                         
                         document.getElementById("iptName").value = '';
@@ -342,8 +353,7 @@
 
                         $('#calendar').append(subtitleDiv);
                         }
-
-                    
+                  
         function hideEventContainer() {
             var container = document.querySelectorAll('.fc-event-container, .fc-more-cell');
                 container.forEach(function(td) {
@@ -352,14 +362,14 @@
             console.log("HideEventContainer Result Success");
         }
         
-        
         function UpdateAvailability(datastart,dataend,availability){
                             var tds = document.querySelectorAll('.fc-day','.fc-highlight');
                                 if (availability.length === 0) {
                                     tds.forEach(function(td) {
                                         td.classList.add('unavailable');  
                                     });
-                                    } else {
+                                    } 
+                                    else {
                                         availability.forEach(function(dates){
                                             var datastart = moment(dates.time_start).format('YYYY-MM-DD');
                                             var dataend = moment(dates.time_end).format('YYYY-MM-DD');
@@ -381,6 +391,57 @@
                                 hideEventContainer()
 
                                 }
+                            
+        function UpdateDayAvailability(datastart,dataend,availability){
+               // var tds = document.querySelectorAll('.fc-widget-content');
+                var trs = document.querySelectorAll('.fc-slats tbody tr');
+
+                    if (availability.length === 0) {
+                        trs.forEach(function(tr) {
+                            console.log("Availability: 0");
+                            tr.classList.add('unavailable');  
+                        });
+                    } 
+                    else {
+                        console.log("UpdateDayAvailability")
+
+                            availability.forEach(function(dates){
+                                
+                                var datastart = moment(dates.time_start).format('HH:mm:ss');
+                                var dataend = moment(dates.time_end).format('HH:mm:ss');
+                                console.log(datastart + "\n" +dataend)
+                               
+                                trs.forEach(function(tr) {
+                                    //var dataTime = moment(tr.getAttribute('data-time')).format('HH:mm:ss');
+                                    var dataTime = tr.getAttribute('data-time')
+                                    //console.log(dataTime)
+                                        if (dataTime >= datastart && dataTime <= dataend) {
+                                            tr.classList.add('available');
+                                        } else {
+                                            tr.classList.add('unavailable');
+                                        }
+                            });
+                        })
+                        
+                      
+                      /*
+                        availability.forEach(function(dates){
+                             var datastart = moment(dates.time_start).format('HH:mm:ss');
+                             var dataend = moment(dates.time_end).format('HH:mm:ss');
+                            tds.forEach(function(td) {
+                                var tr = td.parentNode.parentNode;
+                                var dataTime = moment(tr.getAttribute('data-time')).format('HH:mm:ss');
+                                    if (dataTime >= datastart && dataTime <= dataend) {
+                                        td.classList.add('available');
+                                    } else {
+                                        td.classList.add('unavailable');
+                                     // td.setAttribute("id","unavailable")
+                                    }
+                            });
+                        })
+                        */            
+                    }
+            }
 
         function sendAgenda(id,name, email,start,end){
             document.getElementById("MyModal").style.display = 'none';
