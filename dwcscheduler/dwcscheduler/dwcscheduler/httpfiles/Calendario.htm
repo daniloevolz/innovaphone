@@ -113,13 +113,13 @@
                         // var dataTime_start;
                         // var dataTime_end;
 
-                        if(dataavailability[0])  dataTime_start = dataavailability[0].time_start 
+                        if(dataavailability[0])    dataTime_start = dataavailability[0].time_start 
                         
                         if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
 
-                        if(dataschedules[0])  timeStart_schedules = dataschedules[0].time_start 
+                        if(dataschedules[0])       timeStart_schedules = dataschedules[0].time_start 
                         
-                        if(dataschedules[0])    timeEnd_schedules = dataschedules[0].time_end
+                        if(dataschedules[0])       timeEnd_schedules = dataschedules[0].time_end
                         
                         console.log("Data Availability: " + JSON.stringify(dataavailability));
                         console.log("Data Start \n" + dataTime_start)
@@ -163,14 +163,16 @@
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
+  
+
             // evt listener para o button month
-            var monthButtons = document.querySelectorAll('.fc-month-button');
-            monthButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-                    console.log("Onclick Success, View: Month, Availability Updated")    
-                });
-            });
+            // var monthButtons = document.querySelectorAll('.fc-month-button');
+            // monthButtons.forEach(function(button) {
+            //     button.addEventListener('click', function() {
+            //         UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
+            //         console.log("Onclick Success, View: Month, Availability Updated")    
+            //     });
+            // });
             // //evt listener para o button week
             // var weekButton = document.querySelectorAll('.fc-agendaWeek-button');
             // weekButton.forEach(function(button){
@@ -200,10 +202,10 @@
                 UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
             });
             */
-
+            
             }); // final .then (response)
 
-            $('#calendar').fullCalendar({
+           $('#calendar').fullCalendar({
                 
                 header: {
                     left: 'today',
@@ -251,15 +253,17 @@
                         var teste = false;
                         dataavailability.forEach(function(dates){
             
-                            var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                            var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+                                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
 
-                            if (clickedDate >= datastart && clickedDate <= dataend ) {
-                                    console.log("Elemento clicado está disponível");
-                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                    $('#calendar').fullCalendar('gotoDate', start);
-                                    UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability);
-                                    teste = true;
+                                if (clickedDate >= datastart && clickedDate <= dataend ) {
+                                        console.log("Elemento clicado está disponível");
+                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                        $('#calendar').fullCalendar('gotoDate', start);
+                                        UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability);
+                                        //setTimeout(UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability),500)
+                                        teste = true;
+                                   
                             } 
                         })
                         if(!teste) window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
@@ -308,7 +312,25 @@
                 editable: false,
                 eventLimit: true,
                 events: [],
-                eventRender: function (event, element) {}
+                eventRender: function (event, element) {},
+
+                viewRender: function(view, element) {
+                    if (view.name === 'month') {
+                        setTimeout(function() {
+                            UpdateAvailability(dataTime_start, dataTime_end, dataavailability)
+                        }, 100);
+                        console.log('View: Modo mês');
+                    } else if(view.name === 'agendaWeek') {
+                        var dayName = view.title
+                        setTimeout(function() {
+                           // UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
+                        }, 100);
+                    }else{
+                        setTimeout(function() {
+                           UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability)
+                        }, 100);
+                    }
+    },
             });
             // Enviar os dados 
             document.getElementById("btnSendName").addEventListener("click",function(){
@@ -318,9 +340,9 @@
                             sendAgenda(id,name, email,selectstart,selectend); 
                            
         })
-
-        });
         
+        });
+    
         // Função para obter o valor de um parâmetro de URL
         $.urlParam = function (name) {
             var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -329,9 +351,7 @@
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-        
-        
-        //funções internas 
+
         function MakeSubtitleDiv(){
                             var subtitleDiv = document.createElement('div');
                             subtitleDiv.className = 'calendar-subtitle';
@@ -381,7 +401,7 @@
                                                     td.classList.add('available');
                                                 } else {
                                                     td.classList.add('unavailable');
-                                                // td.setAttribute("id","unavailable")
+                                               
                                                 }
                                             });
                                         })
@@ -392,9 +412,9 @@
 
                                 }
                             
-        function UpdateDayAvailability(datastart,dataend,availability){
+        function UpdateDayAvailability(datastart,dataend,availability,day){
                // var tds = document.querySelectorAll('.fc-widget-content');
-                var trs = document.querySelectorAll('.fc-slats tbody tr');
+                var trs = document.querySelectorAll('.fc-slats tr');
 
                     if (availability.length === 0) {
                         trs.forEach(function(tr) {
@@ -403,25 +423,81 @@
                         });
                     } 
                     else {
+                        /////////////////////////////////////// FORMATAR A DATA
+
+
+                        var dateString = "25 de Maio de 2023";
+var dateParts = dateString.split(" de "); // Divide a string em partes separadas por " de "
+
+// Obtém os valores do dia, mês e ano
+var day = parseInt(dateParts[0]);
+var month = getMonthIndex(dateParts[1]);
+var year = parseInt(dateParts[2]);
+
+// Função auxiliar para obter o índice do mês com base no nome do mês
+function getMonthIndex(monthName) {
+    var months = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return months.indexOf(monthName);
+}
+
+// Cria o objeto de data
+var date = new Date(year, month, day);
+
+console.log(date);
+
+//////////////////////////////////////////////// FORMATAR A O HORARIO 
+// Supondo que você já tenha o horário em uma variável chamada time no formato 'HH:mm:ss'
+var time = "12:30:00"; // Exemplo de horário
+
+// Cria um objeto moment para a data
+var momentDate = moment(dateStr, 'YYYY-MM-DD');
+
+// Separa as partes do horário
+var timeParts = time.split(":");
+var hours = parseInt(timeParts[0]);
+var minutes = parseInt(timeParts[1]);
+var seconds = parseInt(timeParts[2]);
+
+// Define as horas, minutos e segundos no objeto momentDate
+momentDate.hours(hours);
+momentDate.minutes(minutes);
+momentDate.seconds(seconds);
+
+// Obtém a data final no formato desejado (YYYY-MM-DD HH:mm:ss)
+var dateTime = momentDate.format('YYYY-MM-DD HH:mm:ss');
+
+console.log(dateTime);
+////////////////////////////////////////////////////////////// RESTO DA FUNÇÃO
+
+
                         console.log("UpdateDayAvailability")
 
-                            availability.forEach(function(dates){
+                        availability.forEach(function(dates) {
+                            var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                            var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
+                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+
+                            console.log(datastart + "\n" + dataend);
+
+                            trs.forEach(function(tr) {
                                 
-                                var datastart = moment(dates.time_start).format('HH:mm:ss');
-                                var dataend = moment(dates.time_end).format('HH:mm:ss');
-                                console.log(datastart + "\n" +dataend)
-                               
-                                trs.forEach(function(tr) {
-                                    //var dataTime = moment(tr.getAttribute('data-time')).format('HH:mm:ss');
-                                    var dataTime = tr.getAttribute('data-time')
-                                    //console.log(dataTime)
-                                        if (dataTime >= datastart && dataTime <= dataend) {
-                                            tr.classList.add('available');
-                                        } else {
-                                            tr.classList.add('unavailable');
-                                        }
+                                var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+
+
+                                console.log(dataTime);
+
+                                if (dataTime.isSameOrAfter(datastart) && dataTime.isSameOrBefore(dataend)) {
+                                    tr.classList.add('unavailable');
+                                }
+                                // else {
+                                //     tr.classList.add('unavailable');
+                                // }
                             });
-                        })
+                        });
                         
                       
                       /*
