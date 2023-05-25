@@ -220,7 +220,7 @@ if (license != null && license.System==true) {
                                                             var version = '00';
                                                             var flags = '00';
                                                             var rand = String(Random.dword());
-                                                            rand = rand.substring(0, 6);
+                                                            rand = rand.substring(0, 4);
                                                             log("rand" + rand);
                                                             var roomNumber = '02';
                                                             var meetingId = rand;
@@ -978,9 +978,9 @@ function createConferenceLink(version, flags, roomNumber, meetingId, startTimest
     log("flagsHex" + flagsHex);
     var roomNumberLengthHex = byteToHex(roomNumber.length);
     log("roomNumberLengthHex" + roomNumberLengthHex);
-    var roomNumberHex = byteToHex(roomNumber);
+    var roomNumberHex = stringToHex(roomNumber);
     log("roomNumberHex" + roomNumberHex);
-    var meetingIdHex =  byteToHex(meetingId);
+    var meetingIdHex = stringToHex(meetingId);
     log("meetingIdHex" + meetingIdHex);
     var startTimestampHex = intToHex(startTimestamp);
     log("startTimestampHex" + startTimestampHex);
@@ -990,14 +990,19 @@ function createConferenceLink(version, flags, roomNumber, meetingId, startTimest
     log("reservedChannelsHex" + reservedChannelsHex);
     var creationTimestampHex = intToHex(creationTimestamp);
     log("creationTimestampHex" + creationTimestampHex);
+    var md5HashHex = stringToHex(md5Hash);
+    log("md5HashHex" + md5HashHex);
   
     // Calculate the MD5 hash
-    var md5String = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + md5Hash;
+    var md5String = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + md5HashHex;
+    log("md5String " + md5String);
+
     var calculatedHash = calculateMD5(md5String);
     log("calculatedHash " + calculatedHash);
+
     // Construct the final data string for the link hash value
     var dataString = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + calculatedHash;
-  
+    log("dataString " + dataString);
     // Base64 encode the data string
     var base64Encoded = base64Encode(dataString);
     log("base64Encoded " + base64Encoded);
@@ -1008,6 +1013,17 @@ function createConferenceLink(version, flags, roomNumber, meetingId, startTimest
     var conferenceLink = 'https://' + domain + '/PBX0/APPS/conference-en/webaccess.htm?m=' + urlEncoded;
   
     return conferenceLink;
+}
+function stringToHex(str) {
+    var hex = '';
+    for (var i = 0; i < str.length; i++) {
+        var charCode = str.charCodeAt(i).toString(16);
+        hex += ('00' + charCode).slice(-2);
+    }
+    while (hex.length < 6) {
+        hex = '0' + hex;
+    }
+    return hex;
 }
 function convertDateTimeToTimestamp(dateTimeString) {
     var dateTimeParts = dateTimeString.split('T');
