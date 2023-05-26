@@ -209,7 +209,7 @@
                 
                 header: {
                     left: 'today',
-                    center: 'title , month,agendaWeek,agendaDay',
+                   center: 'title , month,agendaDay', //agendaWeek,
                     right: 'prev,next'
                 },
                 buttonText: {
@@ -416,6 +416,7 @@
             if (availability.length === 0) {
                 trs.forEach(function(tr) {
                     console.log("Availability: 0");
+                    tr.classList.remove('available');
                     tr.classList.add('unavailable');  
                 });
             } 
@@ -497,16 +498,18 @@
                         console.log(dateView);
 
                         if (dateView.isSameOrAfter(datastart) && dateView.isSameOrBefore(dataend)) {
+                            tr.classList.remove('unavailable');
                             tr.classList.add('available');
                         }
                         else {
+                             tr.classList.remove('available');
                              tr.classList.add('unavailable');
                         }
                     });
                 });
                 schedules.forEach(function (dates) {
-                    var datastart = moment(dates.time_start, );
-                    var dataend = moment(dates.time_end);
+                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                    var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                     //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
                     //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
@@ -527,11 +530,12 @@
                         var second = parseInt(moment(dataTime).format('ss'));
 
                         // Cria o objeto de data
-                        var dateView = moment(new Date(year, month, day, hour, minute, second));
+                        var dateView = moment(new Date(year, month, day, hour, minute, second), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');;
 
                         console.log(dateView);
 
-                        if (dateView.isSameOrAfter(datastart) && dateView.isSameOrBefore(dataend)) {
+                        if (dateView >= datastart && dateView <= dataend) {
+                            tr.classList.remove('available');
                             tr.classList.add('unavailable');
                         }
                     });
