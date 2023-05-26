@@ -320,14 +320,18 @@
                             UpdateAvailability(dataTime_start, dataTime_end, dataavailability)
                         }, 100);
                         console.log('View: Modo mês');
-                    } else if(view.name === 'agendaWeek') {
+                    } 
+                    else if(view.name === 'agendaWeek') {
+                        console.log("View Modo Semana")
+                        // setTimeout(function() {
+                        //     UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
+                        // }, 100);
+                    }
+                    else{
                         var dayName = view.title
+                        console.log("View title result = " + dayName)
                         setTimeout(function() {
-                           // UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
-                        }, 100);
-                    }else{
-                        setTimeout(function() {
-                           UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability)
+                           UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
                         }, 100);
                     }
     },
@@ -342,7 +346,6 @@
         })
         
         });
-    
         // Função para obter o valor de um parâmetro de URL
         $.urlParam = function (name) {
             var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -412,10 +415,37 @@
 
                                 }
                             
+        function UpdateDayAvailability(datastart,dataend,availability,dayname){
+               // var tds = document.querySelectorAll('.fc-widget-content');
+                var trs = document.querySelectorAll('.fc-slats tr');
         function UpdateDayAvailability(datastart,dataend,availability,dateString){
             // var tds = document.querySelectorAll('.fc-widget-content');
             var trs = document.querySelectorAll('.fc-slats tr');
 
+                    if (availability.length === 0) {
+                        trs.forEach(function(tr) {
+                            console.log("Availability: 0");
+                            tr.classList.add('unavailable');  
+                        });
+                    } 
+                    else {
+
+                        console.log("UpdateDayAvailability")
+
+                        availability.forEach(function(dates) {
+                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                            //var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
+                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+                            console.log(datastart + "\n" + dataend);
+
+                            trs.forEach(function(tr) {
+                                
+                                var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss')
+                                //lembrete pietro - testar sem o moment amanha !!!
+                            
+                                console.log("Data Time" +dataTime);
+                                console.log("View Title(Day Name)" + dayname)
             if (availability.length === 0) {
                 trs.forEach(function(tr) {
                     console.log("Availability: 0");
@@ -429,6 +459,11 @@
                 //dateString = "25 de Maio de 2023";
                 var dateParts = dateString.split(" de "); // Divide a string em partes separadas por " de "
 
+                                var dateParts = dayname.split(" de "); // Divide a string em partes separadas por " de "
+                                 // Obtém os valores do dia, mês e ano
+                                var day = parseInt(dateParts[0]);
+                                var month = getMonthIndex(dateParts[1]);
+                                var year = parseInt(dateParts[2]);
                 // Obtém os valores do dia, mês e ano
                 var day = parseInt(dateParts[0]);
                 var month = getMonthIndex(dateParts[1]);
