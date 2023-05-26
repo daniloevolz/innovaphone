@@ -412,112 +412,124 @@
 
                                 }
                             
-        function UpdateDayAvailability(datastart,dataend,availability,day){
-               // var tds = document.querySelectorAll('.fc-widget-content');
-                var trs = document.querySelectorAll('.fc-slats tr');
+        function UpdateDayAvailability(datastart,dataend,availability,dateString){
+            // var tds = document.querySelectorAll('.fc-widget-content');
+            var trs = document.querySelectorAll('.fc-slats tr');
 
-                    if (availability.length === 0) {
-                        trs.forEach(function(tr) {
-                            console.log("Availability: 0");
-                            tr.classList.add('unavailable');  
-                        });
-                    } 
-                    else {
-                        /////////////////////////////////////// FORMATAR A DATA
-
-
-                        var dateString = "25 de Maio de 2023";
-var dateParts = dateString.split(" de "); // Divide a string em partes separadas por " de "
-
-// Obtém os valores do dia, mês e ano
-var day = parseInt(dateParts[0]);
-var month = getMonthIndex(dateParts[1]);
-var year = parseInt(dateParts[2]);
-
-// Função auxiliar para obter o índice do mês com base no nome do mês
-function getMonthIndex(monthName) {
-    var months = [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
-    return months.indexOf(monthName);
-}
-
-// Cria o objeto de data
-var date = new Date(year, month, day);
-
-console.log(date);
-
-//////////////////////////////////////////////// FORMATAR A O HORARIO 
-// Supondo que você já tenha o horário em uma variável chamada time no formato 'HH:mm:ss'
-var time = "12:30:00"; // Exemplo de horário
-
-// Cria um objeto moment para a data
-var momentDate = moment(dateStr, 'YYYY-MM-DD');
-
-// Separa as partes do horário
-var timeParts = time.split(":");
-var hours = parseInt(timeParts[0]);
-var minutes = parseInt(timeParts[1]);
-var seconds = parseInt(timeParts[2]);
-
-// Define as horas, minutos e segundos no objeto momentDate
-momentDate.hours(hours);
-momentDate.minutes(minutes);
-momentDate.seconds(seconds);
-
-// Obtém a data final no formato desejado (YYYY-MM-DD HH:mm:ss)
-var dateTime = momentDate.format('YYYY-MM-DD HH:mm:ss');
-
-console.log(dateTime);
-////////////////////////////////////////////////////////////// RESTO DA FUNÇÃO
+            if (availability.length === 0) {
+                trs.forEach(function(tr) {
+                    console.log("Availability: 0");
+                    tr.classList.add('unavailable');  
+                });
+            } 
+            else {
+                /////////////////////////////////////// FORMATAR A DATA
 
 
-                        console.log("UpdateDayAvailability")
+                //dateString = "25 de Maio de 2023";
+                var dateParts = dateString.split(" de "); // Divide a string em partes separadas por " de "
 
-                        availability.forEach(function(dates) {
-                            var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
-                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+                // Obtém os valores do dia, mês e ano
+                var day = parseInt(dateParts[0]);
+                var month = getMonthIndex(dateParts[1]);
+                var year = parseInt(dateParts[2]);
 
-                            console.log(datastart + "\n" + dataend);
+                // Função auxiliar para obter o índice do mês com base no nome do mês
+                function getMonthIndex(monthName) {
+                    var months = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                    ];
+                    return months.indexOf(monthName);
+                }
 
-                            trs.forEach(function(tr) {
-                                
-                                var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                // // Cria o objeto de data
+                // var date = new Date(year, month, day);
+
+                // console.log(date);
+
+                // //////////////////////////////////////////////// FORMATAR A O HORARIO 
+                // // Supondo que você já tenha o horário em uma variável chamada time no formato 'HH:mm:ss'
+                // var time = "12:30:00"; // Exemplo de horário
+
+                // // Cria um objeto moment para a data
+                // var momentDate = moment(dateStr, 'YYYY-MM-DD');
+
+                // // Separa as partes do horário
+                // var timeParts = time.split(":");
+                // var hours = parseInt(timeParts[0]);
+                // var minutes = parseInt(timeParts[1]);
+                // var seconds = parseInt(timeParts[2]);
+
+                // // Define as horas, minutos e segundos no objeto momentDate
+                // momentDate.hours(hours);
+                // momentDate.minutes(minutes);
+                // momentDate.seconds(seconds);
+
+                // // Obtém a data final no formato desejado (YYYY-MM-DD HH:mm:ss)
+                // var dateTime = momentDate.format('YYYY-MM-DD HH:mm:ss');
+
+                // console.log(dateTime);
+                // ////////////////////////////////////////////////////////////// RESTO DA FUNÇÃO
 
 
-                                console.log(dataTime);
+                console.log("UpdateDayAvailability")
 
-                                if (dataTime.isSameOrAfter(datastart) && dataTime.isSameOrBefore(dataend)) {
-                                    tr.classList.add('unavailable');
-                                }
-                                // else {
-                                //     tr.classList.add('unavailable');
-                                // }
-                            });
-                        });
+                availability.forEach(function(dates) {
+                    var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                    var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
+                    //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                    //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+
+                    console.log(datastart + "\n" + dataend);
+
+                    trs.forEach(function(tr) {
                         
-                      
-                      /*
-                        availability.forEach(function(dates){
-                             var datastart = moment(dates.time_start).format('HH:mm:ss');
-                             var dataend = moment(dates.time_end).format('HH:mm:ss');
-                            tds.forEach(function(td) {
-                                var tr = td.parentNode.parentNode;
-                                var dataTime = moment(tr.getAttribute('data-time')).format('HH:mm:ss');
-                                    if (dataTime >= datastart && dataTime <= dataend) {
-                                        td.classList.add('available');
-                                    } else {
-                                        td.classList.add('unavailable');
-                                     // td.setAttribute("id","unavailable")
-                                    }
-                            });
-                        })
-                        */            
-                    }
+                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+
+
+                        console.log(dataTime);
+
+                        var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
+
+                        // Obtém os valores do dia, mês e ano
+                        var hour = parseInt(hourParts[0]);
+                        var minute = parseInt(hourParts[1]);
+                        var second = parseInt(hourParts[2]);
+
+                        // Cria o objeto de data
+                        var dateView = new Date(year, month, day, hour, minute, second );
+
+                        console.log(date);
+
+                        if (dateView.isSameOrAfter(datastart) && dateView.isSameOrBefore(dataend)) {
+                            tr.classList.add('available');
+                        }
+                        else {
+                             tr.classList.add('unavailable');
+                        }
+                    });
+                });
+                
+            
+            /*
+                availability.forEach(function(dates){
+                    var datastart = moment(dates.time_start).format('HH:mm:ss');
+                    var dataend = moment(dates.time_end).format('HH:mm:ss');
+                    tds.forEach(function(td) {
+                        var tr = td.parentNode.parentNode;
+                        var dataTime = moment(tr.getAttribute('data-time')).format('HH:mm:ss');
+                            if (dataTime >= datastart && dataTime <= dataend) {
+                                td.classList.add('available');
+                            } else {
+                                td.classList.add('unavailable');
+                            // td.setAttribute("id","unavailable")
+                            }
+                    });
+                })
+                */            
             }
+        }
 
         function sendAgenda(id,name, email,start,end){
             document.getElementById("MyModal").style.display = 'none';
