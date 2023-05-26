@@ -147,9 +147,9 @@ if (license != null && license.System==true) {
                                 log("SelectAvailabilityMessage:result=" + JSON.stringify(dataAvail, null, 4));
                                 var objAvail = dataAvail;
                                 objAvail.forEach(function (a) {
-                                    if (obj.start >= a.time_start && obj.end <= a.time_end) {
+                                    if (obj.time_start >= a.time_start && obj.time_end <= a.time_end) {
                                         schedule_valid = true;
-                                        Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end) VALUES ('" + obj.sip + "','" + obj.title + "','" + obj.email + "','" + obj.start + "','" + obj.end + "')")
+                                        Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "')")
                                             .oncomplete(function () {
                                                 Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
                                                     .oncomplete(function (data) {
@@ -163,7 +163,7 @@ if (license != null && license.System==true) {
                                                         try {
                                                             connectionsUser.forEach(function (conn) {
                                                                 if (conn.sip == obj.sip) {
-                                                                    conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.title, email: obj.email, time_start: obj.start }));
+                                                                    conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
                                                                 }
                                                             })
 
@@ -202,7 +202,7 @@ if (license != null && license.System==true) {
                                                         }
                                                         try {
                                                             var today = convertDateTimeLocalToCustomFormat(getDateNow());
-                                                            var arrayToday = obj.start.split("T");
+                                                            var arrayToday = obj.time_start.split("T");
                                                             var day = arrayToday[0];
                                                             var time = arrayToday[1];
                                                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
@@ -224,9 +224,9 @@ if (license != null && license.System==true) {
                                                             log("rand" + rand);
                                                             var roomNumber = '02';
                                                             var meetingId = rand;
-                                                            var startTimestamp = convertDateTimeToTimestamp(obj.start);
+                                                            var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
                                                             log("startTimestamp " + startTimestamp);
-                                                            var endTimestamp = convertDateTimeToTimestamp(obj.end);
+                                                            var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
                                                             log("endTimestamp " + endTimestamp);
                                                             var reservedChannels = '02';
                                                             var timeNow = creationDate(today);
@@ -278,7 +278,7 @@ if (license != null && license.System==true) {
                                                                 + "<head></head>"
                                                                 + "<body>"
                                                                 + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
-                                                                + "<b>Nome: " + obj.title + "</b><br/>"
+                                                                + "<b>Nome: " + obj.name + "</b><br/>"
                                                                 + "<b>E-mail:</b> " + obj.email + "<br/>"
                                                                 + "<b>Quando:</b> " + day + "<br/>"
                                                                 + "<b>Horário:</b> " + time + "<br/><br/>"
@@ -306,8 +306,8 @@ if (license != null && license.System==true) {
                                                                 + "END:STANDARD\n"
                                                                 + "END:VTIMEZONE\n"
                                                                 + "BEGIN:VEVENT\n"
-                                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.start) + "\n"
-                                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.end) + "\n"
+                                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
+                                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
                                                                 + "DTSTAMP:" + today + "Z\n"
                                                                 + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                                 + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
