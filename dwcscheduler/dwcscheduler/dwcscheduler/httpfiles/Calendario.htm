@@ -385,67 +385,34 @@
             console.log("HideEventContainer Result Success");
         }
         
-        function UpdateAvailability(datastart,dataend,availability){
-                            var tds = document.querySelectorAll('.fc-day','.fc-highlight');
-                                if (availability.length === 0) {
-                                    tds.forEach(function(td) {
-                                        td.classList.add('unavailable');  
-                                    });
-                                    } 
-                                    else {
-                                        availability.forEach(function(dates){
-                                            var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                                            var dataend = moment(dates.time_end).format('YYYY-MM-DD');
-
-                                            tds.forEach(function(td) {
-                                                var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-
-                                                if (dataDate >= datastart && dataDate <= dataend) {
-                                                    td.classList.add('available');
-                                                } else {
-                                                    td.classList.add('unavailable');
-                                               
-                                                }
-                                            });
-                                        })
-                                    
-                                    }
-                                console.log("UpdateAvailability Result Success");
-                                hideEventContainer()
-
-                                }
+        function UpdateAvailability(datastart,dataend,availability){                    
+            var tds = document.querySelectorAll('.fc-day','.fc-highlight');
+            if (availability.length === 0) {
+                tds.forEach(function(td) {
+                    td.classList.add('unavailable');  
+                });
+            } 
+            else {
+                availability.forEach(function(dates){
+                    var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                    var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+                    tds.forEach(function(td) {
+                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                        if (dataDate >= datastart && dataDate <= dataend) {
+                            td.classList.add('available');
+                        } else {
+                            td.classList.add('unavailable');                 
+                        }
+                    });
+                })
+            }
+            console.log("UpdateAvailability Result Success");
+            hideEventContainer()                                
+        }
                             
-        function UpdateDayAvailability(datastart,dataend,availability,dayname){
-               // var tds = document.querySelectorAll('.fc-widget-content');
-                var trs = document.querySelectorAll('.fc-slats tr');
         function UpdateDayAvailability(datastart,dataend,availability,dateString){
             // var tds = document.querySelectorAll('.fc-widget-content');
             var trs = document.querySelectorAll('.fc-slats tr');
-
-                    if (availability.length === 0) {
-                        trs.forEach(function(tr) {
-                            console.log("Availability: 0");
-                            tr.classList.add('unavailable');  
-                        });
-                    } 
-                    else {
-
-                        console.log("UpdateDayAvailability")
-
-                        availability.forEach(function(dates) {
-                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            //var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
-                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
-                            console.log(datastart + "\n" + dataend);
-
-                            trs.forEach(function(tr) {
-                                
-                                var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss')
-                                //lembrete pietro - testar sem o moment amanha !!!
-                            
-                                console.log("Data Time" +dataTime);
-                                console.log("View Title(Day Name)" + dayname)
             if (availability.length === 0) {
                 trs.forEach(function(tr) {
                     console.log("Availability: 0");
@@ -454,16 +421,8 @@
             } 
             else {
                 /////////////////////////////////////// FORMATAR A DATA
-
-
                 //dateString = "25 de Maio de 2023";
                 var dateParts = dateString.split(" de "); // Divide a string em partes separadas por " de "
-
-                                var dateParts = dayname.split(" de "); // Divide a string em partes separadas por " de "
-                                 // Obtém os valores do dia, mês e ano
-                                var day = parseInt(dateParts[0]);
-                                var month = getMonthIndex(dateParts[1]);
-                                var year = parseInt(dateParts[2]);
                 // Obtém os valores do dia, mês e ano
                 var day = parseInt(dateParts[0]);
                 var month = getMonthIndex(dateParts[1]);
@@ -616,18 +575,18 @@
         }
 
         function closeModal(event){
-        if(event.target.id === "spanX"){
-            // limpar as divs
-            document.getElementById("iptName").innerHTML = '';
-            document.getElementById("iptEmail").innerHTML = '';
-            console.log("DIVS LIMPAS")
-            // sumir o modal 
-            document.getElementById("MyModal").style.display = 'none';
-            // setTimeout(function() {
-            //     location.reload();
-            // }, 200);
-            
-        }
+            if(event.target.id === "spanX"){
+                // limpar as divs
+                document.getElementById("iptName").innerHTML = '';
+                document.getElementById("iptEmail").innerHTML = '';
+                console.log("DIVS LIMPAS")
+                // sumir o modal 
+                document.getElementById("MyModal").style.display = 'none';
+                // setTimeout(function() {
+                //     location.reload();
+                // }, 200);
+                
+            }
     }
         document.addEventListener('click', closeModal);
     </script>
@@ -661,4 +620,3 @@
 
 </body>
 </html>
-
