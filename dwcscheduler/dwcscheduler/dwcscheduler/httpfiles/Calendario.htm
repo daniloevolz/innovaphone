@@ -35,7 +35,7 @@
             top: 1%;
             z-index: 1000;
             width: 70%;
-            height: 100%;
+            height: 50%;
             border-radius: 20px;
             box-shadow: 0.5em 0.5em 1em 0.5em rgba(0,0,0,0.5);
 }
@@ -331,7 +331,7 @@
                         var dayName = view.title
                         console.log("View title result = " + dayName)
                         setTimeout(function() {
-                           UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
+                           UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, dayName)
                         }, 100);
                     }
     },
@@ -410,7 +410,7 @@
             hideEventContainer()                                
         }
                             
-        function UpdateDayAvailability(datastart,dataend,availability,dateString){
+        function UpdateDayAvailability(datastart,dataend,availability, schedules,dateString){
             // var tds = document.querySelectorAll('.fc-widget-content');
             var trs = document.querySelectorAll('.fc-slats tr');
             if (availability.length === 0) {
@@ -470,8 +470,8 @@
                 console.log("UpdateDayAvailability")
 
                 availability.forEach(function(dates) {
-                    var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                    var dataend = moment(dates.time_end).endOf('hour').format('HH:mm:ss');
+                    var datastart = moment(dates.time_start);
+                    var dataend = moment(dates.time_end);
                     //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
                     //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
@@ -484,23 +484,55 @@
 
                         console.log(dataTime);
 
-                        var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
+                        //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
 
                         // Obtém os valores do dia, mês e ano
-                        var hour = parseInt(hourParts[0]);
-                        var minute = parseInt(hourParts[1]);
-                        var second = parseInt(hourParts[2]);
+                        var hour = parseInt(moment(dataTime).format('HH'));
+                        var minute = parseInt(moment(dataTime).format('mm'));
+                        var second = parseInt(moment(dataTime).format('ss'));
 
                         // Cria o objeto de data
-                        var dateView = new Date(year, month, day, hour, minute, second );
+                        var dateView = moment(new Date(year, month, day, hour, minute, second ));
 
-                        console.log(date);
+                        console.log(dateView);
 
                         if (dateView.isSameOrAfter(datastart) && dateView.isSameOrBefore(dataend)) {
                             tr.classList.add('available');
                         }
                         else {
                              tr.classList.add('unavailable');
+                        }
+                    });
+                });
+                schedules.forEach(function (dates) {
+                    var datastart = moment(dates.time_start, );
+                    var dataend = moment(dates.time_end);
+                    //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                    //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+
+                    console.log(datastart + "\n" + dataend);
+
+                    trs.forEach(function (tr) {
+
+                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+
+
+                        console.log(dataTime);
+
+                        //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
+
+                        // Obtém os valores do dia, mês e ano
+                        var hour = parseInt(moment(dataTime).format('HH'));
+                        var minute = parseInt(moment(dataTime).format('mm'));
+                        var second = parseInt(moment(dataTime).format('ss'));
+
+                        // Cria o objeto de data
+                        var dateView = moment(new Date(year, month, day, hour, minute, second));
+
+                        console.log(dateView);
+
+                        if (dateView.isSameOrAfter(datastart) && dateView.isSameOrBefore(dataend)) {
+                            tr.classList.add('unavailable');
                         }
                     });
                 });
