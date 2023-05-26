@@ -301,11 +301,11 @@
                         
                     } 
                     else {
-                        // console.log("START " + start + "\n" + "END " + end)
-                        document.getElementById("MyModal").style.display = 'block';
-                        
-                        document.getElementById("iptName").value = '';
-                        document.getElementById("iptEmail").value = '';
+                        var dayName = view.title
+                        var clickedTime = start.format('HH:mm:ss');
+                        console.log("Dia do elemento clicado:" + dayName)
+                        console.log("Hora do elemento clicado:", clickedTime);
+                        makeModal(dayName,clickedTime);
                         $('#calendar').fullCalendar('unselect');
                     }
                 },
@@ -354,7 +354,16 @@
             }
             return decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
+        
+        
+        function makeModal(day,time){
+                // console.log("START " + start + "\n" + "END " + end)
+                document.getElementById("MyModal").style.display = 'block';
+                document.getElementById("iptName").value = '';
+                document.getElementById("iptEmail").value = '';
+                document.getElementById("DateToday").innerHTML = day + " " + time
+        }
+        
         function MakeSubtitleDiv(){
                             var subtitleDiv = document.createElement('div');
                             subtitleDiv.className = 'calendar-subtitle';
@@ -639,6 +648,7 @@
             <br>
             </br>
             <div class="data-person">
+                <h3 id="DateToday"></h3>
                 <h2 style="    margin-block-end: 0;">Digite seu nome e e-mail</h2>
                 <p class="identify">Se identifique para continuar o agendamento</p>
                 <p></p>
