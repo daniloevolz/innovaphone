@@ -214,9 +214,12 @@ background-color: #f89598
 .available{
 background-color: #9DDBBD
 }
-.subtitle-divs{
-display: inline-flex;
-align-items: center;
+.parcialavailable {
+    background-color: #FFEE92
+}
+.subtitle-divs {
+    display: inline-flex;
+    align-items: center;
 }
 #calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-scroller.fc-time-grid-container{
     height: auto !important;

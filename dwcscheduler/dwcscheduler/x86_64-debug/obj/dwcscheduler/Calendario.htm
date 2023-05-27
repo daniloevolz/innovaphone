@@ -241,8 +241,8 @@
 
                 selectHelper: true,
                 select: function (start, end, jsEvent, view) {
-                    selectstart = start
-                    selectend = end
+                    selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
+                    selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
                     // If user cli  cks on a day in month view, switch to day view and let them select a time
                     if (view.name === 'month') {
                         console.log("View: Month");
@@ -261,7 +261,7 @@
                                         console.log("Elemento clicado está disponível");
                                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                                         $('#calendar').fullCalendar('gotoDate', start);
-                                        UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability);
+                                        //UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules, );
                                         //setTimeout(UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability),500)
                                         teste = true;
                                    
@@ -280,82 +280,83 @@
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
                         var teste = false;
-                        dataavailability.forEach(function(dates){
-            
-                            var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                            var dataend = moment(dates.time_end).format('YYYY-MM-DD');
-
-                            if (clickedDate >= datastart && clickedDate <= dataend ) {
+                        if(dataavailability.length>0){
+                            dataavailability.forEach(function(dates){
+                                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+                                if (clickedDate >= datastart && clickedDate <= dataend ) {
                                     console.log("Elemento clicado está disponível");
-
                                     document.getElementById("MyModal").style.display = 'block';
-                    
                                     document.getElementById("iptName").value = '';
                                     document.getElementById("iptEmail").value = '';
                                     $('#calendar').fullCalendar('unselect');
-                                    
+                                        
                                     // $('#calendar').fullCalendar('changeView', 'agendaDay');
                                     // $('#calendar').fullCalendar('gotoDate', start);
-                                    teste = true;
-                            } 
-                        })
-                        if(!teste) window.alert(" Data indisponível \n Por favor, escolha outro dia.");
-                        
+                                    teste = true;    
+                                } 
+                            })
+                            if(!teste) window.alert(" Data indisponível \n Por favor, escolha outro dia.");
+                        }
                     } 
                     else {
                         ///TESTE DANILO
                         var valid = false;
-                        dataavailability.forEach(function (dates) {
-                            var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                            var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+                        if(dataavailability.length>0){
+                            dataavailability.forEach(function (dates) {
+                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                                //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
-                            console.log(datastart + "\n" + dataend);
+                                console.log(datastart + "\n" + dataend);
 
-                            // Obtém os valores do ano, mês e ano
-                            var year = moment(start).format('YYYY');
-                            var month = moment(start).format('MM');
-                            var day = moment(start).format('DD');
-                            // Obtém os valores do hora, minuto e segundos
-                            var hour = moment(start).format('HH');
-                            var minute = moment(start).format('mm');
-                            var second = moment(start).format('ss');
-                            var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                            // Cria o objeto de data
-                            var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                // Obtém os valores do ano, mês e ano
+                                var year = moment(start).format('YYYY');
+                                var month = moment(start).format('MM');
+                                var day = moment(start).format('DD');
+                                // Obtém os valores do hora, minuto e segundos
+                                var hour = moment(start).format('HH');
+                                var minute = moment(start).format('mm');
+                                var second = moment(start).format('ss');
+                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                // Cria o objeto de data
+                                var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                            console.log(dateView);
+                                console.log(dateView);
 
-                            if (dateView >= datastart && dateView <= dataend) {
-                                valid = true;
-                            }
-                        });
-                        dataschedules.forEach(function (dates) {
-                            var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                            var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                            //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                            //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+                                if (dateView >= datastart && dateView <= dataend) {
+                                    valid = true;
+                                }
+                            });
+                        }
+                        if(dataschedules.length>0){
+                            dataschedules.forEach(function (dates) {
+                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                                //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
-                            console.log(datastart + "\n" + dataend);
-                            // Obtém os valores do ano, mês e ano
-                            var year = moment(start).format('YYYY');
-                            var month = moment(start).format('MM');
-                            var day = moment(start).format('DD');
-                            // Obtém os valores do hora, minuto e segundos
-                            var hour = moment(start).format('HH');
-                            var minute = moment(start).format('mm');
-                            var second = moment(start).format('ss');
-                            var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                            // Cria o objeto de data
-                            var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                console.log(datastart + "\n" + dataend);
+                                // Obtém os valores do ano, mês e ano
+                                var year = moment(start).format('YYYY');
+                                var month = moment(start).format('MM');
+                                var day = moment(start).format('DD');
+                                // Obtém os valores do hora, minuto e segundos
+                                var hour = moment(start).format('HH');
+                                var minute = moment(start).format('mm');
+                                var second = moment(start).format('ss');
+                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                // Cria o objeto de data
+                                var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                            console.log(dateView);
+                                console.log(dateView);
 
-                            if (dateView == datastart) {
-                                valid = false;
-                            }
-                        });
+                                if (dateView == datastart) {
+                                    valid = false;
+                                }
+                            });
+                        }
                         if (valid) {
                             dayName = view.title;
                             var clickedTime = start.format('HH:mm:ss');
@@ -379,7 +380,7 @@
                 viewRender: function(view, element) {
                     if (view.name === 'month') {
                         setTimeout(function() {
-                            UpdateAvailability(dataTime_start, dataTime_end, dataavailability)
+                            UpdateAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules)
                         }, 100);
                         console.log('View: Modo mês');
                     } 
@@ -474,7 +475,7 @@
         //    console.log("HideEventContainer Result Success");
         //}
         
-        function UpdateAvailability(datastart,dataend,availability){                    
+        function UpdateAvailability(datastart, dataend, availability, schedules){
             var tds = document.querySelectorAll('.fc-day','.fc-highlight');
             if (availability.length === 0) {
                 tds.forEach(function(td) {
@@ -482,6 +483,7 @@
                 });
             } 
             else {
+                /* Aqui funciona sem o parcialavailable
                 availability.forEach(function(dates){
                     var datastart = moment(dates.time_start).format('YYYY-MM-DD');
                     var dataend = moment(dates.time_end).format('YYYY-MM-DD');
@@ -494,6 +496,29 @@
                         }
                     });
                 })
+                Aqui começa o teste do parcialavailable*/
+                availability.forEach(function (dates) {
+                    var datastart = moment(dates.time_start);
+                    var dataend = moment(dates.time_end);
+                    var startString = moment(dates.time_start).format('YYYY-MM-DD');
+                    var endString = moment(dates.time_end).format('YYYY-MM-DD');
+                    tds.forEach(function (td) {
+                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                        if (dataDate >= startString && dataDate <= endString) {
+                            var totalHours = dataend.diff(datastart, 'hours');
+                            if (totalHours < 5) {
+                                td.classList.remove('unavailable');
+                                td.classList.add('parcialavailable');
+                            } else {
+                                td.classList.remove('unavailable');
+                                td.classList.add('available');
+                            }
+                        } else {
+                            td.classList.remove('available');
+                            td.classList.add('unavailable');
+                        }
+                    });
+                });
             }
             console.log("UpdateAvailability Result Success");
             //hideEventContainer()                                
@@ -557,39 +582,41 @@
                     });
                 });
                 console.log("UpdateDayAvailabilitySuccess");
-                schedules.forEach(function (dates) {
-                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                    var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                    //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                    //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
+                if(schedules.length >0){
+                    schedules.forEach(function (dates) {
+                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                        //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
+                        //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
-                    //console.log(datastart + "\n" + dataend);
+                        //console.log(datastart + "\n" + dataend);
 
-                    trs.forEach(function (tr) {
+                        trs.forEach(function (tr) {
 
-                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                            var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
 
 
-                        //console.log(dataTime);
+                            //console.log(dataTime);
 
-                        //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
+                            //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
 
-                        // Obtém os valores do dia, mês e ano
-                        var hour = moment(dataTime).format('HH');
-                        var minute = moment(dataTime).format('mm');
-                        var second = moment(dataTime).format('ss');
-                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                        // Cria o objeto de data
-                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                            // Obtém os valores do dia, mês e ano
+                            var hour = moment(dataTime).format('HH');
+                            var minute = moment(dataTime).format('mm');
+                            var second = moment(dataTime).format('ss');
+                            var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                            // Cria o objeto de data
+                            var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                        //console.log(dateView);
+                            //console.log(dateView);
 
-                        if (dateView == datastart) {
-                            tr.classList.remove('available');
-                            tr.classList.add('unavailable');
-                        }
+                            if (dateView == datastart) {
+                                tr.classList.remove('available');
+                                tr.classList.add('unavailable');
+                            }
+                        });
                     });
-                });
+                }
                 console.log("UpdateDaySchedulesSuccess");         
             }
         }
@@ -599,8 +626,8 @@
             console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
             "end " + end + "\n" + "email " + email)
                             if (name && email) {
-                                start = moment(start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                end = moment(end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                //start = moment(start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                //end = moment(end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                                 var eventData;
                                 eventData = {
                                     id: '',
