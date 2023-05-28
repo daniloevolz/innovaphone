@@ -149,237 +149,239 @@ if (license != null && license.System==true) {
                                 objAvail.forEach(function (a) {
                                     if (obj.time_start >= a.time_start && obj.time_end <= a.time_end) {
                                         schedule_valid = true;
-                                        Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "')")
-                                            .oncomplete(function () {
-                                                Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
-                                                    .oncomplete(function (data) {
-                                                        msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!" };
-                                                        req.responseContentType("application/json")
-                                                            .sendResponse()
-                                                            .onsend(function (req) {
-                                                                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-                                                            });
-                                                        var cfg = JSON.parse(JSON.stringify(data));
-                                                        try {
-                                                            connectionsUser.forEach(function (conn) {
-                                                                if (conn.sip == obj.sip) {
-                                                                    conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
+                                        var today = convertDateTimeLocalToCustomFormat(getDateNow());
+                                        var arrayToday = obj.time_start.split("T");
+                                        var day = arrayToday[0];
+                                        var time = arrayToday[1];
+                                        var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
+
+                                        //Início teste url temporária
+                                        function creationDate(date) {
+                                            var ano = date.substring(0, 4);
+                                            var mes = date.substring(4, 6);
+                                            var dia = date.substring(6, 8);
+                                            var hora = date.substring(9, 11);
+                                            var minuto = date.substring(11, 13);
+                                            var segundo = date.substring(13, 15);
+                                            return ano + '-' + mes + '-' + dia + 'T' + hora + ':' + minuto + ':' + segundo;
+                                          }  
+                                        var version = 0;
+                                        var flags = 0;
+                                        var rand = String(Random.dword());
+                                        rand = rand.substring(0, 4);
+                                        log("rand" + rand);
+                                        var roomNumber = 2;
+                                        var meetingId = rand;
+                                        var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
+                                        log("startTimestamp " + startTimestamp);
+                                        var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
+                                        log("endTimestamp " + endTimestamp);
+                                        var reservedChannels = 2;
+                                        var timeNow = creationDate(today);
+                                        var creationTimestamp = convertDateTimeToTimestamp(timeNow);
+                                        log("creationTimestamp " + creationTimestamp);
+                                        var md5Hash = 'Wecom12#';
+                                        selectUserConfigs(obj, function(error, resultConfigs) {
+                                            if (error) {
+                                              log("selectUserConfigs Ocorreu um erro:", error);
+                                            } else {
+                                                log("selectUserConfigs Resultado:", JSON.stringify(resultConfigs));
+                                                var cfg = JSON.parse(JSON.stringify(resultConfigs.msg));
+                                                if(resultConfigs.status==200){
+                                                    log("resultConfigs.status==200");
+                                                    var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
+                                                    log("conferenceLink" + conferenceLink);    
+                                                    insertConferenceSchedule(obj, conferenceLink,function(error, resultSchedule) {
+                                                        if (error) {
+                                                          log("selectUserConfigs Ocorreu um erro:", error);
+                                                          msg = JSON.parse(JSON.stringify(resultSchedule));
+                                                          req.responseContentType("application/json")
+                                                                .sendResponse()
+                                                                .onsend(function (resp) {
+                                                                    resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                                                                });
+                                                        } else {
+                                                            log("insertConferenceSchedule Resultado:", JSON.stringify(resultSchedule));
+                                                            if(resultSchedule.status==200){
+                                                                log("resultSchedule.status==200");
+                                                                req.responseContentType("application/json")
+                                                                req.sendResponse()
+                                                                    .onsend(function (req) {
+                                                                        log("salvar-evento:result="+JSON.stringify(resultSchedule));
+                                                                        req.send(new TextEncoder("utf-8").encode(JSON.stringify(resultSchedule)), true);
+                                                                    });
+                                                                //Notify user 
+                                                                try {
+                                                                    connectionsUser.forEach(function (conn) {
+                                                                        if (conn.sip == obj.sip) {
+                                                                            conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
+                                                                        }
+                                                                    })
+        
+                                                                } catch (e) {
+                                                                    log("danilo req: erro send UserEventMessage: " + e);
                                                                 }
-                                                            })
-
-                                                        } catch (e) {
-                                                            log("danilo req: erro send UserEventMessage: " + e);
-                                                        }
-                                                        try {
-                                                            var count = 0;
-                                                            PbxSignal.forEach(function (signal) {
-                                                                log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
-                                                                var call = signal[obj.sip];
-                                                                log("pietro-log: call = " + call);
-                                                                if (call != null) {
-                                                                    log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
-                                                                    try {
-                                                                        pbxTableUsers.forEach(function (user) {
-
-                                                                            if (user.columns.h323 == obj.sip) {
-                                                                                var old_badge = user.badge;
-                                                                                user.badge += 1;
-                                                                                log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
-                                                                                count = user.badge;
+                                                                //Update Badge
+                                                                try {
+                                                                    var count = 0;
+                                                                    PbxSignal.forEach(function (signal) {
+                                                                        log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
+                                                                        var call = signal[obj.sip];
+                                                                        log("pietro-log: call = " + call);
+                                                                        if (call != null) {
+                                                                            log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
+                                                                            try {
+                                                                                pbxTableUsers.forEach(function (user) {
+        
+                                                                                    if (user.columns.h323 == obj.sip) {
+                                                                                        var old_badge = user.badge;
+                                                                                        user.badge += 1;
+                                                                                        log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
+                                                                                        count = user.badge;
+                                                                                    }
+                                                                                })
+                                                                                updateBadge(signal, call, count);
+                                                                            } catch (e) {
+                                                                                log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
                                                                             }
-                                                                        })
-                                                                        updateBadge(signal, call, count);
-                                                                    } catch (e) {
-                                                                        log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
-                                                                    }
+                                                                        }
+        
+                                                                    })
+        
                                                                 }
-
-                                                            })
-
+                                                                catch (e) {
+                                                                    log("danilo req: erro send badge: " + e);
+                                                                }
+                                                                //Send e-mails to users
+                                                                try {
+                                                                    //Email Cliente
+                                                                    var dataClient = "<!DOCTYPE html>"
+                                                                        + "<html>"
+                                                                        + "<head></head>"
+                                                                        + "<body>"
+                                                                        + "<div style = 'border: solid 1px #dadce0;border-radius: 8px;'>"
+                                                                        + "<h3>" + cfg[0].text_invite + "</h3>"
+                                                                        + "<p></p>"
+                                                                        + "<table style='width: 100%;'>"
+                                                                        + "<tr style='width: 100%;'>"
+                                                                        + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
+                                                                        + "</td>"
+                                                                        + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
+                                                                        + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
+                                                                        + "</span>"
+                                                                        + "</a>"
+                                                                        + "</td>"
+                                                                        + "</tr>"
+                                                                        + "<tr style='height: 25px;'></tr>"
+                                                                        + "</tr>"
+                                                                        + "<tr>"
+                                                                        + "<td>"
+                                                                        + "<b>Participantes</b>"
+                                                                        + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'> - organizador </span>"
+                                                                        + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
+                                                                        + "</td>"
+                                                                        + "<td><b>Url da Reunião</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
+                                                                        + "</tr>"
+                                                                        + "</table>"
+                                                                        + "</div>"
+                                                                        + "</body>"
+                                                                        + "</html>";
+        
+                                                                    //Email Usuario
+                                                                    var dataUser = "<!DOCTYPE html>"
+                                                                        + "<html>"
+                                                                        + "<head></head>"
+                                                                        + "<body>"
+                                                                        + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
+                                                                        + "<b>Nome: " + obj.name + "</b><br/>"
+                                                                        + "<b>E-mail:</b> " + obj.email + "<br/>"
+                                                                        + "<b>Quando:</b> " + day + "<br/>"
+                                                                        + "<b>Horário:</b> " + time + "<br/><br/>"
+                                                                        + "<b>URL Conferência:</b> " + conferenceLink + "<br/><br/>"
+                                                                        + "Atenciosamente<br/>"
+                                                                        + "<i>DWC Wecom</i>"
+                                                                        + "</body>"
+                                                                        + "</html>";
+        
+        
+                                                                    //Anexo
+                                                                    var attachment = "BEGIN:VCALENDAR\n"
+                                                                        + "PRODID:-//DWC Wecom//EN\n"
+                                                                        + "VERSION:2.0\n"
+                                                                        + "CALSCALE:GREGORIAN\n"
+                                                                        + "METHOD:REQUEST\n"
+                                                                        + "BEGIN:VTIMEZONE\n"
+                                                                        + "TZID:America/Sao_Paulo\n"
+                                                                        + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                                        + "BEGIN:STANDARD\n"
+                                                                        + "TZOFFSETFROM:-0300\n"
+                                                                        + "TZOFFSETTO:-0300\n"
+                                                                        + "TZNAME:-03\n"
+                                                                        + "DTSTART:19700101T000000\n"
+                                                                        + "END:STANDARD\n"
+                                                                        + "END:VTIMEZONE\n"
+                                                                        + "BEGIN:VEVENT\n"
+                                                                        + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
+                                                                        + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
+                                                                        + "DTSTAMP:" + today + "Z\n"
+                                                                        + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                                        + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                                        + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                                        + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                                        + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
+                                                                        + "X-GOOGLE-CONFERENCE:" + conferenceLink + "\n"
+                                                                        + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
+                                                                        + "CREATED:" + today + "Z\n"
+                                                                        + "DESCRIPTION:" + conferenceLink + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                                        + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLink + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                                        + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
+                                                                        + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
+                                                                        + "LAST-MODIFIED:" + today + "Z\n"
+                                                                        + "LOCATION:\n"
+                                                                        + "SEQUENCE:0\n"
+                                                                        + "STATUS:CONFIRMED\n"
+                                                                        + "SUMMARY:" + cfg[0].title_conference + "\n"
+                                                                        + "TRANSP:OPAQUE\n"
+                                                                        + "BEGIN:VALARM\n"
+                                                                        + "DESCRIPTION:REMINDER\n"
+                                                                        + "TRIGGER;RELATED=START:-PT15M\n"
+                                                                        + "ACTION:DISPLAY\n"
+                                                                        + "END:VALARM\n"
+                                                                        + "END:VEVENT\n"
+                                                                        + "END:VCALENDAR";
+        
+                                                                    sendEmail(cfg[0].email_title, obj.email, dataClient, attachment, function(error, resultEmail) {
+                                                                        if (error) {
+                                                                          log("sendEmail Ocorreu um erro:", error);
+                                                                          
+                                                                        } else {
+                                                                            log("sendEmail:", resultEmail);
+                                                                        }
+                                                                    });
+        
+                                                                    sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment, function(error, resultEmail) {
+                                                                        if (error) {
+                                                                          log("sendEmail Ocorreu um erro:", error);
+                                                                          
+                                                                        } else {
+                                                                            log("sendEmail:", resultEmail);
+                                                                        }
+                                                                    });
+                                                                }
+                                                                catch (e) {
+                                                                    log("danilo req: erro send email:" + e);
+                                                                    //msg = { status: 200, msg: "Evento agendado, Tivemos um problema ao enviar o email, no dia, utilize o link para ingresso: " + cfg[0].url_conference};
+                                                                }
+                                                            }
                                                         }
-                                                        catch (e) {
-                                                            log("danilo req: erro send badge: " + e);
-                                                        }
-                                                        try {
-                                                            var today = convertDateTimeLocalToCustomFormat(getDateNow());
-                                                            var arrayToday = obj.time_start.split("T");
-                                                            var day = arrayToday[0];
-                                                            var time = arrayToday[1];
-                                                            var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
-
-                                                            //Início teste url temporária
-                                                            function creationDate(date) {
-                                                                var ano = date.substring(0, 4);
-                                                                var mes = date.substring(4, 6);
-                                                                var dia = date.substring(6, 8);
-                                                                var hora = date.substring(9, 11);
-                                                                var minuto = date.substring(11, 13);
-                                                                var segundo = date.substring(13, 15);
-                                                                return ano + '-' + mes + '-' + dia + 'T' + hora + ':' + minuto + ':' + segundo;
-                                                              }  
-                                                            var version = '00';
-                                                            var flags = '00';
-                                                            var rand = String(Random.dword());
-                                                            rand = rand.substring(0, 4);
-                                                            log("rand" + rand);
-                                                            var roomNumber = '02';
-                                                            var meetingId = rand;
-                                                            var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
-                                                            log("startTimestamp " + startTimestamp);
-                                                            var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
-                                                            log("endTimestamp " + endTimestamp);
-                                                            var reservedChannels = '02';
-                                                            var timeNow = creationDate(today);
-                                                            var creationTimestamp = convertDateTimeToTimestamp(timeNow);
-                                                            log("creationTimestamp " + creationTimestamp);
-                                                            var md5Hash = 'Wecom12#';
-                                                            
-                                                            var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
-                                                            log("conferenceLink" + conferenceLink);    
-                                                            //Fim teste url temporária
-
-
-                                                            //Email Cliente
-                                                            var dataClient = "<!DOCTYPE html>"
-                                                                + "<html>"
-                                                                + "<head></head>"
-                                                                + "<body>"
-                                                                + "<div style = 'border: solid 1px #dadce0;border-radius: 8px;'>"
-                                                                + "<h3>" + cfg[0].text_invite + "</h3>"
-                                                                + "<p></p>"
-                                                                + "<table style='width: 100%;'>"
-                                                                + "<tr style='width: 100%;'>"
-                                                                + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
-                                                                + "</td>"
-                                                                + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                                + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
-                                                                + "</span>"
-                                                                + "</a>"
-                                                                + "</td>"
-                                                                + "</tr>"
-                                                                + "<tr style='height: 25px;'></tr>"
-                                                                + "</tr>"
-                                                                + "<tr>"
-                                                                + "<td>"
-                                                                + "<b>Participantes</b>"
-                                                                + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'> - organizador </span>"
-                                                                + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
-                                                                + "</td>"
-                                                                + "<td><b>Url da Reunião</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
-                                                                + "</tr>"
-                                                                + "</table>"
-                                                                + "</div>"
-                                                                + "</body>"
-                                                                + "</html>";
-
-                                                            //Email Usuario
-                                                            var dataUser = "<!DOCTYPE html>"
-                                                                + "<html>"
-                                                                + "<head></head>"
-                                                                + "<body>"
-                                                                + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
-                                                                + "<b>Nome: " + obj.name + "</b><br/>"
-                                                                + "<b>E-mail:</b> " + obj.email + "<br/>"
-                                                                + "<b>Quando:</b> " + day + "<br/>"
-                                                                + "<b>Horário:</b> " + time + "<br/><br/>"
-                                                                + "<b>URL Conferência:</b> " + conferenceLink + "<br/><br/>"
-                                                                + "Atenciosamente<br/>"
-                                                                + "<i>DWC Wecom</i>"
-                                                                + "</body>"
-                                                                + "</html>";
-
-
-                                                            //Anexo
-                                                            var attachment = "BEGIN:VCALENDAR\n"
-                                                                + "PRODID:-//DWC Wecom//EN\n"
-                                                                + "VERSION:2.0\n"
-                                                                + "CALSCALE:GREGORIAN\n"
-                                                                + "METHOD:REQUEST\n"
-                                                                + "BEGIN:VTIMEZONE\n"
-                                                                + "TZID:America/Sao_Paulo\n"
-                                                                + "X-LIC-LOCATION:America/Sao_Paulo\n"
-                                                                + "BEGIN:STANDARD\n"
-                                                                + "TZOFFSETFROM:-0300\n"
-                                                                + "TZOFFSETTO:-0300\n"
-                                                                + "TZNAME:-03\n"
-                                                                + "DTSTART:19700101T000000\n"
-                                                                + "END:STANDARD\n"
-                                                                + "END:VTIMEZONE\n"
-                                                                + "BEGIN:VEVENT\n"
-                                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
-                                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
-                                                                + "DTSTAMP:" + today + "Z\n"
-                                                                + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
-                                                                + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
-                                                                + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
-                                                                + "X-GOOGLE-CONFERENCE:" + conferenceLink + "\n"
-                                                                + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
-                                                                + "CREATED:" + today + "Z\n"
-                                                                + "DESCRIPTION:" + conferenceLink + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
-                                                                + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLink + " \n\nLearn more about Meet at: https://support.google.com/"
-                                                                + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
-                                                                + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
-                                                                + "LAST-MODIFIED:" + today + "Z\n"
-                                                                + "LOCATION:\n"
-                                                                + "SEQUENCE:0\n"
-                                                                + "STATUS:CONFIRMED\n"
-                                                                + "SUMMARY:" + cfg[0].title_conference + "\n"
-                                                                + "TRANSP:OPAQUE\n"
-                                                                + "BEGIN:VALARM\n"
-                                                                + "DESCRIPTION:REMINDER\n"
-                                                                + "TRIGGER;RELATED=START:-PT15M\n"
-                                                                + "ACTION:DISPLAY\n"
-                                                                + "END:VALARM\n"
-                                                                + "END:VEVENT\n"
-                                                                + "END:VCALENDAR";
-
-                                                            sendEmail(cfg[0].email_title, obj.email, dataClient, attachment);
-
-                                                            sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment);
-                                                        }
-                                                        catch (e) {
-                                                            log("danilo req: erro send email:" + e);
-                                                            //msg = { status: 200, msg: "Evento agendado, Tivemos um problema ao enviar o email, no dia, utilize o link para ingresso: " + cfg[0].url_conference};
-                                                        }
-
-                                                    })
-                                                    .onerror(function (error, errorText, dbErrorCode) {
-                                                        msg = { status: 400, msg: "ERRO: " + errorText };
-                                                        req.responseContentType("application/json")
-                                                        req.sendResponse()
-                                                            .onsend(function (req) {
-                                                                log("salvar-evento:result=402");
-                                                                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-                                                            });
-                                                    });
-
-                                            })
-                                            .onerror(function (error, errorText, dbErrorCode) {
-                                                msg = { status: 400, msg: "ERRO: " + errorText };
-                                                req.responseContentType("application/json")
-                                                req.sendResponse()
-                                                    .onsend(function (req) {
-                                                        log("salvar-evento:result=403");
-                                                        req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-                                                    });
-                                            });
-
+                                                    })                
+                                                }
+                                            }
+                                        });
+                                        //Fim teste url temporária
                                     }
                                 })
-                                if (!schedule_valid) {
-                                    msg = { status: 400, msg: "Período inválido, tente outro dia e horário!" };
-                                    // value exists, send it back as text/plain
-                                    req.responseContentType("application/json")
-                                        .sendResponse()
-                                        .onsend(function (resp) {
-                                            resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-                                        });
-
-                                }
-
-
+                                
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -844,7 +846,7 @@ function updateBadge(ws, call, count) {
     ws.send(JSON.stringify(msg));
 }
 
-function sendEmail(subject, to, data, str) {
+function sendEmail(subject, to, data, str, callback) {
     log("danilo req : SendEmail : to: " + to + " email: " + data);
 
     var uint8array = new Uint8Array(str.length);
@@ -892,8 +894,14 @@ function sendEmail(subject, to, data, str) {
         .sendMail(subject)
         .to(to)
         .body(body.data, body.mimeType, body.charset)
-        .oncomplete(function () { log("danilo req : sending email complete"); })
-        .onerror(function () { log("danilo req : sending email failed"); });
+        .oncomplete(function () { 
+            log("danilo req : sending email complete"); 
+            callback(null,"danilo req : sending email complete");
+        })
+        .onerror(function (e) { 
+            log("danilo req : sending email failed");
+            callback(e,"danilo req : sending email failed");
+     });
 
     // Attachments
     attachments.forEach(function (file) {
@@ -971,60 +979,85 @@ function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
 function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain) {
-    // Convert each parameter to its corresponding hexadecimal string representation
-    var versionHex = byteToHex(version);
-    log("versionHex" + versionHex);
-    var flagsHex = byteToHex(flags);
-    log("flagsHex" + flagsHex);
-    var roomNumberLengthHex = byteToHex(roomNumber.length);
-    log("roomNumberLengthHex" + roomNumberLengthHex);
-    var roomNumberHex = stringToHex(roomNumber);
-    log("roomNumberHex" + roomNumberHex);
-    var meetingIdHex = stringToHex(meetingId);
-    log("meetingIdHex" + meetingIdHex);
-    var startTimestampHex = intToHex(startTimestamp);
-    log("startTimestampHex" + startTimestampHex);
-    var endTimestampHex = intToHex(endTimestamp);
-    log("endTimestampHex" + endTimestampHex);
-    var reservedChannelsHex = shortToHex(reservedChannels);
-    log("reservedChannelsHex" + reservedChannelsHex);
-    var creationTimestampHex = intToHex(creationTimestamp);
-    log("creationTimestampHex" + creationTimestampHex);
-    var md5HashHex = stringToHex(md5Hash);
-    log("md5HashHex" + md5HashHex);
-  
-    // Calculate the MD5 hash
-    var md5String = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + md5HashHex;
-    log("md5String " + md5String);
+    log("version"+version+", flags"+flags+", roomNumber"+roomNumber+", meetingId"+meetingId+", startTimestamp"+startTimestamp+", endTimestamp"+endTimestamp+", reservedChannels"+reservedChannels+", creationTimestamp"+creationTimestamp+", md5Hash"+md5Hash+", domain"+domain);
+    var conf = {
+        version: toUint8Array(version, 1),
+        flags: toUint8Array(flags, 1),
+        roomNumberLength: toUint8Array(2, 1),
+        roomNumber: toUint8Array(roomNumber, 4),
+        meetingId: toUint8Array(meetingId, 4),
+        startTimestamp: toUint8Array(startTimestamp, 4),
+        endTimestamp: toUint8Array(endTimestamp, 4),
+        channels: toUint8Array(reservedChannels, 2),
+        mKey: Encoding.stringToBin(md5Hash) // m-key property from config line of the Conference PBX Object
+    };
+    
+    
+    var confValues = [];
+    Object.keys(conf).forEach(function (key) { confValues.push(conf[key]) });
+    
+    var hashInputBytes = mergeUint8Arrays(confValues);
+    log("Input for MD5 Digest: " + Encoding.binToHex(hashInputBytes));
+    
+    var digest = Crypto.hash("MD5").update(hashInputBytes).final();
+    log("MD5 Digest: " + digest);
+    
+    var creationTimestamp = toUint8Array(creationTimestamp, 4);
+    confValues.pop(); // remove last element (mKey)
+    confValues.push(creationTimestamp); // add creationTimestamp instead
+    confValues.push(Encoding.hexToBin(digest)); // add MD5 hash from previous step
+    
+    var base64InputBytes = mergeUint8Arrays(confValues);
+    log("Input for Base64 Encoding: " + Encoding.binToHex(base64InputBytes));
+    
+    var result = Duktape.enc('base64', base64InputBytes);
+    log("Base64 String: " + result);
 
-    var calculatedHash = calculateMD5(md5String);
-    log("calculatedHash " + calculatedHash);
-
-    // Construct the final data string for the link hash value
-    var dataString = versionHex + flagsHex + roomNumberLengthHex + roomNumberHex + meetingIdHex + startTimestampHex + endTimestampHex + reservedChannelsHex + creationTimestampHex + calculatedHash;
-    log("dataString " + dataString);
-    // Base64 encode the data string
-    var base64Encoded = base64Encode(dataString);
-    log("base64Encoded " + base64Encoded);
-    // Replace '+' with '-' and '/' with '_' to make it URL-compatible
-    var urlEncoded = base64Encoded.replace(/\+/g, '-').replace(/\//g, '_');
-  
     // Construct the final conference link
-    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conference-en/webaccess.htm?m=' + urlEncoded;
+    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conf-dedicated/webaccess.htm?m=' + result;
   
     return conferenceLink;
 }
-function stringToHex(str) {
-    var hex = '';
-    for (var i = 0; i < str.length; i++) {
-        var charCode = str.charCodeAt(i).toString(16);
-        hex += ('00' + charCode).slice(-2);
+// helper functions
+// convert decimal to Uint8Array of specific length with padding
+function toUint8Array(decimal, arrayLength) {
+    log("toUint8Array decimal "+decimal);
+    var binaryString = decimal.toString(2);  // Convert decimal to binary string
+    var binaryStringLength = binaryString.length;
+    var paddingLength = 8 * arrayLength - binaryStringLength;
+
+    // Pad binary string with leading zeroes if necessary
+    if (paddingLength > 0) {
+        binaryString = new Array(paddingLength + 1).join('0') + binaryString;
     }
-    while (hex.length < 6) {
-        hex = '0' + hex;
+
+    var uint8Array = new Uint8Array(arrayLength);
+
+    for (var i = 0; i < arrayLength; i++) {
+        uint8Array[i] = parseInt(binaryString.slice(i * 8, (i + 1) * 8), 2);
     }
-    return hex;
+
+    return uint8Array;
 }
+
+function mergeUint8Arrays(arrays) {
+    var totalLength = arrays.reduce(function (acc, value) {
+        return acc + value.length;
+    }, 0);
+
+    if (arrays.length === 0) return null;
+
+    var result = new Uint8Array(totalLength);
+
+    var length = 0;
+    for (var i = 0; i < arrays.length; i++) {
+        result.set(arrays[i], length);
+        length += arrays[i].length;
+    }
+
+    return result;
+}    
+
 function convertDateTimeToTimestamp(dateTimeString) {
     var dateTimeParts = dateTimeString.split('T');
     var dateParts = dateTimeParts[0].split('-');
@@ -1040,259 +1073,26 @@ function convertDateTimeToTimestamp(dateTimeString) {
   
     return timestamp;
 }
-// Função para calcular o hash MD5
-function calculateMD5(input) {
-    var rotateLeft = function (lValue, iShiftBits) {
-      return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
-    };
-  
-    var addUnsigned = function (lX, lY) {
-      var lX8 = (lX & 0x80000000) === 0x80000000 ? lX & 0x7fffffff : lX;
-      var lY8 = (lY & 0x80000000) === 0x80000000 ? lY & 0x7fffffff : lY;
-      return (lX8 + lY8) & 0xffffffff;
-    };
-  
-    var f = function (x, y, z) {
-      return (x & y) | (~x & z);
-    };
-    var g = function (x, y, z) {
-      return (x & z) | (y & ~z);
-    };
-    var h = function (x, y, z) {
-      return x ^ y ^ z;
-    };
-    var i = function (x, y, z) {
-      return y ^ (x | ~z);
-    };
-  
-    var ff = function (a, b, c, d, x, s, ac) {
-      a = addUnsigned(a, addUnsigned(addUnsigned(f(b, c, d), x), ac));
-      return addUnsigned(rotateLeft(a, s), b);
-    };
-  
-    var gg = function (a, b, c, d, x, s, ac) {
-      a = addUnsigned(a, addUnsigned(addUnsigned(g(b, c, d), x), ac));
-      return addUnsigned(rotateLeft(a, s), b);
-    };
-  
-    var hh = function (a, b, c, d, x, s, ac) {
-      a = addUnsigned(a, addUnsigned(addUnsigned(h(b, c, d), x), ac));
-      return addUnsigned(rotateLeft(a, s), b);
-    };
-  
-    var ii = function (a, b, c, d, x, s, ac) {
-      a = addUnsigned(a, addUnsigned(addUnsigned(i(b, c, d), x), ac));
-      return addUnsigned(rotateLeft(a, s), b);
-    };
-  
-    var convertToWordArray = function (input) {
-      var lWordCount;
-      var lMessageLength = input.length;
-      var lNumberOfWords_temp1 = lMessageLength + 8;
-      var lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
-      var lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
-      var lWordArray = Array(lNumberOfWords - 1);
-      var lBytePosition = 0;
-      var lByteCount = 0;
-  
-      while (lByteCount < lMessageLength) {
-        lWordCount = (lByteCount - (lByteCount % 4)) / 4;
-        lBytePosition = (lByteCount % 4) * 8;
-        lWordArray[lWordCount] =
-          lWordArray[lWordCount] |
-          (input.charCodeAt(lByteCount) << lBytePosition);
-        lByteCount++;
-      }
-  
-      lWordCount = (lByteCount - (lByteCount % 4)) / 4;
-      lBytePosition = (lByteCount % 4) * 8;
-      lWordArray[lWordCount] =
-        lWordArray[lWordCount] | (0x80 << lBytePosition);
-      lWordArray[lNumberOfWords - 2] = lMessageLength << 3;
-      lWordArray[lNumberOfWords - 1] = lMessageLength >>> 29;
-  
-      return lWordArray;
-    };
-  
-    var wordToHex = function (lValue) {
-      var wordToHexValue = '',
-        wordToHexValue_temp = '',
-        lByte,
-        lCount;
-  
-      for (lCount = 0; lCount <= 3; lCount++) {
-        lByte = (lValue >>> (lCount * 8)) & 255;
-        wordToHexValue_temp = '0' + lByte.toString(16);
-        wordToHexValue =
-          wordToHexValue +
-          wordToHexValue_temp.substr(wordToHexValue_temp.length - 2, 2);
-      }
-  
-      return wordToHexValue;
-    };
-  
-    var x = [];
-    var k, AA, BB, CC, DD, a, b, c, d;
-    var S11 = 7,
-      S12 = 12,
-      S13 = 17,
-      S14 = 22;
-    var S21 = 5,
-      S22 = 9,
-      S23 = 14,
-      S24 = 20;
-    var S31 = 4,
-      S32 = 11,
-      S33 = 16,
-      S34 = 23;
-    var S41 = 6,
-      S42 = 10,
-      S43 = 15,
-      S44 = 21;
-  
-    x = convertToWordArray(input);
-  
-    a = 0x67452301;
-    b = 0xefcdab89;
-    c = 0x98badcfe;
-    d = 0x10325476;
-  
-    for (k = 0; k < x.length; k += 16) {
-      AA = a;
-      BB = b;
-      CC = c;
-      DD = d;
-      a = ff(a, b, c, d, x[k + 0], S11, 0xd76aa478);
-      d = ff(d, a, b, c, x[k + 1], S12, 0xe8c7b756);
-      c = ff(c, d, a, b, x[k + 2], S13, 0x242070db);
-      b = ff(b, c, d, a, x[k + 3], S14, 0xc1bdceee);
-      a = ff(a, b, c, d, x[k + 4], S11, 0xf57c0faf);
-      d = ff(d, a, b, c, x[k + 5], S12, 0x4787c62a);
-      c = ff(c, d, a, b, x[k + 6], S13, 0xa8304613);
-      b = ff(b, c, d, a, x[k + 7], S14, 0xfd469501);
-      a = ff(a, b, c, d, x[k + 8], S11, 0x698098d8);
-      d = ff(d, a, b, c, x[k + 9], S12, 0x8b44f7af);
-      c = ff(c, d, a, b, x[k + 10], S13, 0xffff5bb1);
-      b = ff(b, c, d, a, x[k + 11], S14, 0x895cd7be);
-      a = ff(a, b, c, d, x[k + 12], S11, 0x6b901122);
-      d = ff(d, a, b, c, x[k + 13], S12, 0xfd987193);
-      c = ff(c, d, a, b, x[k + 14], S13, 0xa679438e);
-      b = ff(b, c, d, a, x[k + 15], S14, 0x49b40821);
-      a = gg(a, b, c, d, x[k + 1], S21, 0xf61e2562);
-      d = gg(d, a, b, c, x[k + 6], S22, 0xc040b340);
-      c = gg(c, d, a, b, x[k + 11], S23, 0x265e5a51);
-      b = gg(b, c, d, a, x[k + 0], S24, 0xe9b6c7aa);
-      a = gg(a, b, c, d, x[k + 5], S21, 0xd62f105d);
-      d = gg(d, a, b, c, x[k + 10], S22, 0x2441453);
-      c = gg(c, d, a, b, x[k + 15], S23, 0xd8a1e681);
-      b = gg(b, c, d, a, x[k + 4], S24, 0xe7d3fbc8);
-      a = gg(a, b, c, d, x[k + 9], S21, 0x21e1cde6);
-      d = gg(d, a, b, c, x[k + 14], S22, 0xc33707d6);
-      c = gg(c, d, a, b, x[k + 3], S23, 0xf4d50d87);
-      b = gg(b, c, d, a, x[k + 8], S24, 0x455a14ed);
-      a = gg(a, b, c, d, x[k + 13], S21, 0xa9e3e905);
-      d = gg(d, a, b, c, x[k + 2], S22, 0xfcefa3f8);
-      c = gg(c, d, a, b, x[k + 7], S23, 0x676f02d9);
-      b = gg(b, c, d, a, x[k + 12], S24, 0x8d2a4c8a);
-      a = hh(a, b, c, d, x[k + 5], S31, 0xfffa3942);
-      d = hh(d, a, b, c, x[k + 8], S32, 0x8771f681);
-      c = hh(c, d, a, b, x[k + 11], S33, 0x6d9d6122);
-      b = hh(b, c, d, a, x[k + 14], S34, 0xfde5380c);
-      a = hh(a, b, c, d, x[k + 1], S31, 0xa4beea44);
-      d = hh(d, a, b, c, x[k + 4], S32, 0x4bdecfa9);
-      c = hh(c, d, a, b, x[k + 7], S33, 0xf6bb4b60);
-      b = hh(b, c, d, a, x[k + 10], S34, 0xbebfbc70);
-      a = hh(a, b, c, d, x[k + 13], S31, 0x289b7ec6);
-      d = hh(d, a, b, c, x[k + 0], S32, 0xeaa127fa);
-      c = hh(c, d, a, b, x[k + 3], S33, 0xd4ef3085);
-      b = hh(b, c, d, a, x[k + 6], S34, 0x4881d05);
-      a = hh(a, b, c, d, x[k + 9], S31, 0xd9d4d039);
-      d = hh(d, a, b, c, x[k + 12], S32, 0xe6db99e5);
-      c = hh(c, d, a, b, x[k + 15], S33, 0x1fa27cf8);
-      b = hh(b, c, d, a, x[k + 2], S34, 0xc4ac5665);
-      a = ii(a, b, c, d, x[k + 0], S41, 0xf4292244);
-      d = ii(d, a, b, c, x[k + 7], S42, 0x432aff97);
-      c = ii(c, d, a, b, x[k + 14], S43, 0xab9423a7);
-      b = ii(b, c, d, a, x[k + 5], S44, 0xfc93a039);
-      a = ii(a, b, c, d, x[k + 12], S41, 0x655b59c3);
-      d = ii(d, a, b, c, x[k + 3], S42, 0x8f0ccc92);
-      c = ii(c, d, a, b, x[k + 10], S43, 0xffeff47d);
-      b = ii(b, c, d, a, x[k + 1], S44, 0x85845dd1);
-      a = ii(a, b, c, d, x[k + 8], S41, 0x6fa87e4f);
-      d = ii(d, a, b, c, x[k + 15], S42, 0xfe2ce6e0);
-      c = ii(c, d, a, b, x[k + 6], S43, 0xa3014314);
-      b = ii(b, c, d, a, x[k + 13], S44, 0x4e0811a1);
-      a = ii(a, b, c, d, x[k + 4], S41, 0xf7537e82);
-      d = ii(d, a, b, c, x[k + 11], S42, 0xbd3af235);
-      c = ii(c, d, a, b, x[k + 2], S43, 0x2ad7d2bb);
-      b = ii(b, c, d, a, x[k + 9], S44, 0xeb86d391);
-      a = addUnsigned(a, AA);
-      b = addUnsigned(b, BB);
-      c = addUnsigned(c, CC);
-      d = addUnsigned(d, DD);
-    }
-  
-    var temp = wordToHex(a) + wordToHex(b) + wordToHex(c) + wordToHex(d);
-    return temp.toLowerCase();
+function selectUserConfigs(obj, callback){
+    Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
+            .oncomplete(function (data) {
+                log("selectUserConfigs result success = "+JSON.stringify(data))
+                msg = { status: 200, msg: data };
+                callback(null, msg);
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                msg = { status: 400, msg: "ERRO: " + errorText };
+                callback(msg);
+            });
 }
-  
-  // Função para codificar em base64
-function base64Encode(str) {
-    var keyStr =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  
-    var output = '';
-    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-    var i = 0;
-  
-    while (i < str.length) {
-      chr1 = str.charCodeAt(i++);
-      chr2 = str.charCodeAt(i++);
-      chr3 = str.charCodeAt(i++);
-  
-      enc1 = chr1 >> 2;
-      enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-      enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-      enc4 = chr3 & 63;
-  
-      if (isNaN(chr2)) {
-        enc3 = enc4 = 64;
-      } else if (isNaN(chr3)) {
-        enc4 = 64;
-      }
-  
-      output +=
-        keyStr.charAt(enc1) +
-        keyStr.charAt(enc2) +
-        keyStr.charAt(enc3) +
-        keyStr.charAt(enc4);
-    }
-  
-    return output;
-  }
-  
-  // Helper function to convert a byte value to its hexadecimal string representation
-  function byteToHex(byte) {
-    return ('0' + byte.toString(16)).slice(-2);
-  }
-  
-  // Helper function to convert a byte array to its hexadecimal string representation
-  function byteArrayToHex(byteArray) {
-    var hexArray = [];
-    for (var i = 0; i < byteArray.length; i++) {
-      hexArray.push(byteToHex(byteArray[i]));
-    }
-    return hexArray.join('');
-  }
-  
-  // Helper function to convert an integer to its hexadecimal string representation
-  function intToHex(integer) {
-    return ('00000000' + integer.toString(16)).slice(-8);
-  }
-  
-  // Helper function to convert a short value to its hexadecimal string representation
-  function shortToHex(short) {
-    return ('0000' + short.toString(16)).slice(-4);
-  }
-
-
+function insertConferenceSchedule(obj, conferenceLink, callback){
+    Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end, conf_link) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "','" + conferenceLink + "')")
+    .oncomplete(function () {
+        msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!" };
+        callback(null, msg);
+    })
+    .onerror(function (error, errorText, dbErrorCode) {
+        msg = { status: 400, msg: "ERRO: " + errorText };
+        callback(msg);
+    });
+}

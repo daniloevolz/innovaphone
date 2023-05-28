@@ -289,6 +289,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                     var day = arrayDate[0];
                     var time = arrayDate[1];
                     row.push(day + " " + time);
+                    row.push('<a href="'+b.conf_link+'"><img src="link.svg" alt="Imagem Link Conf" width="40" height="40"></a>');
                     ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
                 }
             })
@@ -301,7 +302,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
         var list = new innovaphone.ui1.Div(null, null, "");
-        var columns = 5;
+        var columns = 6;
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         t.add(scroll_container);
         next();

@@ -36,6 +36,11 @@
             "cmd": "column",
             "name": "time_end",
             "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "conf_link",
+            "type": "text"
           }
         ]
       },
