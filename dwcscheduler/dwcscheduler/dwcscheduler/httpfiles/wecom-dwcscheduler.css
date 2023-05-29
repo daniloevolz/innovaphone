@@ -63,6 +63,23 @@ div.button-inn {
     cursor: pointer;
     opacity: 0.7;
 }
+div.button-link {
+    top: calc(50% - 20px);
+    border-radius: 50px;
+    position: absolute;
+    /* left: 10px; */
+    /* top: 10px; */
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: #02163F;
+    color: whitesmoke;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7;
+}
 
 div.button-inn-del {
     border-radius: 50px;
@@ -82,7 +99,8 @@ div.button-inn-del {
 }
 
 .button-inn-del:hover,
-.button-inn:hover {
+.button-inn:hover,
+.button-link:hover {
     transition: all .5s ease-in-out;
     opacity: 1;
 }

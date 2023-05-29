@@ -260,10 +260,18 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 var day = arrayDate[0];
                 var time = arrayDate[1];
                 row.push(day + " " + time);
+                var img = new innovaphone.ui1.Div(null, null, "button-link").addTranslation(texts, "btnLink").addEvent("click", function () {
+                    newWindow(b.conf_link);
+                });
+                    //new innovaphone.ui1.Node("a", null, new innovaphone.ui1.Node("img", "alt:'Imagem Link Conf'; width:40px; height:40px;", null, null).setAttribute("src", "link.svg"), null).setAttribute("src", b.conf_link);
+                row.push(img);
                 ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
             })
             scroll_container.add(list);
         });
+        function newWindow(url) {
+            window.open(url);
+        }
         function next() {
             scroll_container.clear();
             list.clear();
@@ -288,7 +296,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                     var day = arrayDate[0];
                     var time = arrayDate[1];
                     row.push(day + " " + time);
-                    var img = new innovaphone.ui1.Node("a", null, new innovaphone.ui1.Node("img", "alt:'Imagem Link Conf'; width:40px; height:40px;", null, null).setAttribute("src","link.svg"), null).setAttribute("src",b.conf_link);
+                    var img = new innovaphone.ui1.Div(null, null, "button-link").addTranslation(texts, "btnLink").addEvent("click", function () {
+                        newWindow(b.conf_link);
+                    });
+                    //var img = new innovaphone.ui1.Node("a", null, new innovaphone.ui1.Node("img", "alt:'Imagem Link Conf'; width:40px; height:40px;", null, null).setAttribute("src","link.svg"), null).setAttribute("src",b.conf_link);
                     row.push(img);
                     ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
                 }

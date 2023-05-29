@@ -1020,9 +1020,11 @@ function createConferenceLink(version, flags, roomNumber, meetingId, startTimest
     
     var result = Duktape.enc('base64', base64InputBytes);
     log("Base64 String: " + result);
+    // Replace '+' with '-' and '/' with '_' to make it URL-compatible
+    var urlEncoded = result.replace(/\+/g, '-').replace(/\//g, '_');
 
     // Construct the final conference link
-    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conf-dedicated/webaccess.htm?m=' + result;
+    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conf-dedicated/webaccess.htm?m=' + urlEncoded;
   
     return conferenceLink;
 }
