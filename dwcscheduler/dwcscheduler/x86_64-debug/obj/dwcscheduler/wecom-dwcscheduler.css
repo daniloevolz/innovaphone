@@ -7,7 +7,10 @@ table {
     background: #80808096;
     color: #B0132B;
 }
-
+.urlcalendar{
+    box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
+    background: #97929263;
+}
 
     table td {
         border: 1px solid #02163F;
@@ -320,3 +323,26 @@ a {
 }
 /*Fim Menu Admin*/
 
+@media screen and (max-width: 500px) and (orientation: portrait) {
+    .colunaesquerda {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #02163F;
+        color: white;
+        opacity: 0.9;
+        display:block;
+    }
+    .colunadireita{
+        display: block;
+    }
+    /* a#CfgGeral:active .colunadireita,
+    a#CfgGeral:focus .colunadireita{
+        display: block !important;
+    } 
+    a#CfgGeral:active .colunaesquerda,
+    a#CfgGeral:focus .colunaesquerda{
+        display: none !important;
+        visibility: hidden ;
+    } */
+  }

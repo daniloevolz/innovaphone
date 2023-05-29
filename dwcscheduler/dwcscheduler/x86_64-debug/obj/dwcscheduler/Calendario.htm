@@ -96,16 +96,7 @@
 
                     response.text().then(function (text) {
                         var obj = JSON.parse(String(text));
-                        //obj.push({
-                        //    title: "Indisponível",
-                        //    time_start: "2000-12-30T00:00",
-                        //    time_end: "2000-12-30T23:00"
-                        //});
-                        //obj.push({
-                        //        title: "Indisponível",
-                        //        time_start: "2999-01-01T00:00",
-                        //        time_end: "2999-01-01T01:00"
-                        //    });
+
                         console.log("get-agenda result=" + JSON.stringify(obj))
                         var first_start = "2999-01-01T01:00";
                         var last_end = "2000-12-30T23:00";
@@ -129,31 +120,7 @@
                         console.log("Data Schedules:" + JSON.stringify(dataschedules));
                         console.log("Time Start \n" + timeStart_schedules);
                         console.log("Time End \n" + timeEnd_schedules);
-                        //     //Eventos já existentes
-                        // for (var i = 0; i < dataschedules.length; i++) {
-                        //         var eventData = {
-                        //             title: "Indisponível",
-                        //             start: dataschedules[i].time_start,
-                        //             end: dataschedules[i].time_end,
-                        //             editable: false,
-                        //             backgroundColor: '#02163F',
-
-                        //         };
-                        //         $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        //         console.log("DataSchedules " + JSON.stringify(dataschedules))
-
-                        // }
-                        
-                    
-                        // dataschedules.forEach(function(data){
-                        //     var start_schedule = moment(data.time_start).format('HH:mm:ss');
-                        //     var end_schedule = moment(data.time_end).format('HH:mm:ss');
-
-                        //     console.log("Horário de início:", start_schedule);
-                        //     console.log("Horário de fim:", end_schedule);
-                        // })
-                        
-
+                
                         UpdateAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules);
                         MakeSubtitleDiv();
                     });
@@ -164,46 +131,6 @@
                         window.alert("Algo saiu errado:\n" + text);
                     });
                 }
-  
-
-            // evt listener para o button month
-            // var monthButtons = document.querySelectorAll('.fc-month-button');
-            // monthButtons.forEach(function(button) {
-            //     button.addEventListener('click', function() {
-            //         UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-            //         console.log("Onclick Success, View: Month, Availability Updated")    
-            //     });
-            // });
-            // //evt listener para o button week
-            // var weekButton = document.querySelectorAll('.fc-agendaWeek-button');
-            // weekButton.forEach(function(button){
-            //     button.addEventListener('click',function(){
-            //         UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-            //         console.log("Onclick Success, View: Week, Availability Updated") 
-            //     })
-            // })
-            // //evt listener para o button day
-            // var dayButton = document.querySelectorAll('.fc-agendaDay-button');
-            // dayButton.forEach(function(button){
-            //     button.addEventListener('click',function(){
-            //         UpdateAvailability(dataTime_start,dataTime_end,dataavailability)
-            //         console.log("Onclick Success, View: Day, Availability Updated") 
-            //     })
-            // })
-
-            // evt listener para o button prev,next
-
-            /*
-            var prevButton = document.querySelector('.fc-prev-button');
-            var nextButton = document.querySelector('.fc-next-button');
-            prevButton.addEventListener('click', function() {
-                UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
-            });
-            nextButton.addEventListener('click', function() {
-                UpdateAvailability(dataTime_start, dataTime_end, dataavailability);
-            });
-            */
-            
             }); // final .then (response)
 
            $('#calendar').fullCalendar({
@@ -243,34 +170,26 @@
                 select: function (start, end, jsEvent, view) {
                     selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
                     selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
-                    // If user cli  cks on a day in month view, switch to day view and let them select a time
+    
                     if (view.name === 'month') {
                         console.log("View: Month");
-                        //.dataset.date;
                         var clickedElement = jsEvent.target
                         console.log(" Elemento clicado " + clickedElement);
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
                         var teste = false;
                         dataavailability.forEach(function(dates){
-            
                                 var datastart = moment(dates.time_start).format('YYYY-MM-DD');
                                 var dataend = moment(dates.time_end).format('YYYY-MM-DD');
-
                                 if (clickedDate >= datastart && clickedDate <= dataend ) {
                                         console.log("Elemento clicado está disponível");
                                         $('#calendar').fullCalendar('changeView', 'agendaDay');
                                         $('#calendar').fullCalendar('gotoDate', start);
-                                        //UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules, );
-                                        //setTimeout(UpdateDayAvailability(dataTime_start,dataTime_end,dataavailability),500)
-                                        teste = true;
-                                   
+                                        teste = true;      
                             } 
                         })
                         if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
-                        $('#calendar').fullCalendar('unselect');
-
-                        
+                        $('#calendar').fullCalendar('unselect'); 
                     }
                     else if (view.name === 'agendaWeek') {
                         console.log("View: " + "Week");
@@ -290,9 +209,6 @@
                                     document.getElementById("iptName").value = '';
                                     document.getElementById("iptEmail").value = '';
                                     $('#calendar').fullCalendar('unselect');
-                                        
-                                    // $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                    // $('#calendar').fullCalendar('gotoDate', start);
                                     teste = true;    
                                 } 
                             })
@@ -306,9 +222,6 @@
                             dataavailability.forEach(function (dates) {
                                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                                 var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                                //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
-
                                 console.log(datastart + "\n" + dataend);
 
                                 // Obtém os valores do ano, mês e ano
@@ -334,8 +247,6 @@
                             dataschedules.forEach(function (dates) {
                                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                                 var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                                //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
 
                                 console.log(datastart + "\n" + dataend);
                                 // Obtém os valores do ano, mês e ano
@@ -386,15 +297,10 @@
                     } 
                     else if(view.name === 'agendaWeek') {
                         console.log("View Modo Semana")
-                        // setTimeout(function() {
-                        //     UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability,dayName)
-                        // }, 100);
                     }
                     else{
                         dayName = view.title
                         console.log("View title result = " + dayName)
-                        /////////////////////////////////////// FORMATAR A DATA
-                        //dateString = "25 de Maio de 2023";
                         var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
                         // Obtém os valores do dia, mês e ano
                         var day = String(dateParts[0]).padStart(2, '0');
@@ -417,7 +323,6 @@
                     }
     },
             });
-            // Enviar os dados 
             document.getElementById("btnSendName").addEventListener("click",function(){
                             var name = document.getElementById("iptName").value;
                             var email = document.getElementById("iptEmail").value;
@@ -466,15 +371,7 @@
 
                         $('#calendar').append(subtitleDiv);
         }
-                  
-        //function hideEventContainer() {
-        //    var container = document.querySelectorAll('.fc-event-container, .fc-more-cell');
-        //        container.forEach(function(td) {
-        //            td.classList.add("hide-container");
-        //        });
-        //    console.log("HideEventContainer Result Success");
-        //}
-        
+
         function UpdateAvailability(datastart, dataend, availability, schedules){
             var tds = document.querySelectorAll('.fc-day','.fc-highlight');
             if (availability.length === 0) {
@@ -493,7 +390,7 @@
                         hourAvail -=hourBusy;
                         console.log("Horas disponivies " + hourAvail+ " em " + String(dataDate))
                         if (dataDate >= datastart && dataDate <= dataend) {
-                            if(hourAvail<=7){
+                            if(hourAvail<=6){
                                 td.classList.remove('unavailable');
                                 td.classList.add('parcialavailable');
                             }else{
@@ -506,32 +403,8 @@
                         }
                     });
                 })
-                /*Aqui começa o teste do parcialavailable
-                availability.forEach(function (dates) {
-                    var datastart = moment(dates.time_start);
-                    var dataend = moment(dates.time_end);
-                    var startString = moment(dates.time_start).format('YYYY-MM-DD');
-                    var endString = moment(dates.time_end).format('YYYY-MM-DD');
-                    tds.forEach(function (td) {
-                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        if (dataDate >= startString && dataDate <= endString) {
-                            var totalHours = dataend.diff(datastart, 'hours');
-                            if (totalHours < 5) {
-                                td.classList.remove('unavailable');
-                                td.classList.add('parcialavailable');
-                            } else {
-                                td.classList.remove('unavailable');
-                                td.classList.add('available');
-                            }
-                        } else {
-                            td.classList.remove('available');
-                            td.classList.add('unavailable');
-                        }
-                    });
-                });*/
             }
-            console.log("UpdateAvailability Result Success");
-            //hideEventContainer()                                
+            console.log("UpdateAvailability Result Success");                             
         }
         function countTotalHoursAvailability(dataString, array) {
             var targetDate = moment(dataString);
@@ -595,20 +468,9 @@
                 availability.forEach(function(dates) {
                     var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                     var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                    //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                    //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
-
-                    //console.log(datastart + "\n" + dataend);
-
                     trs.forEach(function(tr) {
                         
                         var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-
-
-                        //console.log(dataTime);
-
-                        //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
-
                         // Obtém os valores do dia, mês e ano
                         var hour = moment(dataTime).format('HH');
                         var minute = moment(dataTime).format('mm');
@@ -623,40 +485,21 @@
                             tr.classList.remove('unavailable');
                             tr.classList.add('available');
                         }
-                        //else {
-                        //     tr.classList.remove('available');
-                        //     tr.classList.add('unavailable');
-                        //}
                     });
                 });
                 console.log("UpdateDayAvailabilitySuccess");
                 if(schedules.length >0){
                     schedules.forEach(function (dates) {
                         var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                        //var datastart = moment(dates.time_start).startOf('hour').format('HH:mm:ss');
-                        //var dataend = moment(dates.time_end).startOf('hour').format('HH:mm:ss');
-
-                        //console.log(datastart + "\n" + dataend);
-
+                        
                         trs.forEach(function (tr) {
-
                             var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-
-
-                            //console.log(dataTime);
-
-                            //var hourParts = dataTime.split(":"); // Divide a string em partes separadas por " de "
-
-                            // Obtém os valores do dia, mês e ano
                             var hour = moment(dataTime).format('HH');
                             var minute = moment(dataTime).format('mm');
                             var second = moment(dataTime).format('ss');
                             var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
                             // Cria o objeto de data
                             var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-
-                            //console.log(dateView);
 
                             if (dateView == datastart) {
                                 tr.classList.remove('available');
@@ -674,8 +517,7 @@
             console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
             "end " + end + "\n" + "email " + email)
                             if (name && email) {
-                                //start = moment(start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                //end = moment(end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                
                                 var eventData;
                                 eventData = {
                                     id: '',
@@ -708,7 +550,6 @@
                                                     dataschedules.push(eventData);
                                                     UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
                                                     window.alert("\n" + obj.msg);
-                                                    //$('#calendar').fullCalendar('renderEvent', eventData, true);
                                                     break;
                                                 default:
                                                     window.alert(obj.msg);
@@ -722,9 +563,6 @@
                                     }
 
                                 });
-
-                                //var mailto = "mailto:" + email + "?subject=" + encodeURIComponent("Agendamento de evento") + "&body=" + encodeURIComponent("Ol�,\n\nSeu evento foi agendado para " + moment(start).format("DD/MM/YYYY [�s] HH:mm") + " e ter� dura��o de " + duration + " minutos.\n\nAtenciosamente,\nAgenda Online");
-                                //window.open(mailto);
                             }
         }
 
@@ -736,10 +574,6 @@
                 console.log("DIVS LIMPAS")
                 // sumir o modal 
                 document.getElementById("MyModal").style.display = 'none';
-                // setTimeout(function() {
-                //     location.reload();
-                // }, 200);
-                
             }
     }
         document.addEventListener('click', closeModal);
