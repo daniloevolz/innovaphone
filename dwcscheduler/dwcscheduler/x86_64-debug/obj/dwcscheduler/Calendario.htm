@@ -704,6 +704,7 @@
                                                     var year = moment(start).format('YYYY');
                                                     var month = moment(start).format('MM');
                                                     var day = moment(start).format('DD');
+                                                    eventData.id = obj.id;
                                                     dataschedules.push(eventData);
                                                     UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
                                                     window.alert("\n" + obj.msg);

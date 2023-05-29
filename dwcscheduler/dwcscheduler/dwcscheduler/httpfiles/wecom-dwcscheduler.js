@@ -264,7 +264,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             })
             scroll_container.add(list);
         });
-
         function next() {
             scroll_container.clear();
             list.clear();
@@ -289,7 +288,8 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                     var day = arrayDate[0];
                     var time = arrayDate[1];
                     row.push(day + " " + time);
-                    row.push('<a href="'+b.conf_link+'"><img src="link.svg" alt="Imagem Link Conf" width="40" height="40"></a>');
+                    var img = new innovaphone.ui1.Node("a", null, new innovaphone.ui1.Node("img", "alt:'Imagem Link Conf'; width:40px; height:40px;", null, null).setAttribute("src","link.svg"), null).setAttribute("src",b.conf_link);
+                    row.push(img);
                     ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
                 }
             })

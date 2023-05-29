@@ -141,6 +141,241 @@ if (license != null && license.System==true) {
                     log("danilo req : received POST data " + value);
                     try {
                         var obj = JSON.parse(String(value));
+                        var today = convertDateTimeLocalToCustomFormat(getDateNow());
+                        var arrayToday = obj.time_start.split("T");
+                        var day = arrayToday[0];
+                        var time = arrayToday[1];
+                        var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
+
+                        //Início teste url temporária
+                        function creationDate(date) {
+                            var ano = date.substring(0, 4);
+                            var mes = date.substring(4, 6);
+                            var dia = date.substring(6, 8);
+                            var hora = date.substring(9, 11);
+                            var minuto = date.substring(11, 13);
+                            var segundo = date.substring(13, 15);
+                            return ano + '-' + mes + '-' + dia + 'T' + hora + ':' + minuto + ':' + segundo;
+                          }  
+                        var version = 0;
+                        var flags = 0;
+                        var rand = String(Random.dword());
+                        rand = rand.substring(0, 4);
+                        log("rand" + rand);
+                        var roomNumber = 2;
+                        var meetingId = 1;
+                        var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
+                        log("startTimestamp " + startTimestamp);
+                        var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
+                        log("endTimestamp " + endTimestamp);
+                        var reservedChannels = 5;
+                        var timeNow = creationDate(today);
+                        var creationTimestamp = convertDateTimeToTimestamp(timeNow);
+                        log("creationTimestamp " + creationTimestamp);
+                        var md5Hash = '7894';
+                        selectUserConfigs(obj, function(error, resultConfigs) {
+                            if (error) {
+                                log("selectUserConfigs Ocorreu um erro:", error);
+                                msg = JSON.parse(JSON.stringify(resultConfigs));
+                                req.responseContentType("application/json")
+                                        .sendResponse()
+                                        .onsend(function (resp) {
+                                            resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                                        });                          
+                            } else {
+                                log("selectUserConfigs Resultado:", JSON.stringify(resultConfigs));
+                                var cfg = JSON.parse(JSON.stringify(resultConfigs.msg));
+                                log("resultConfigs.status=="+resultConfigs.status);
+                                var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
+                                log("conferenceLink" + conferenceLink);    
+                                insertConferenceSchedule(obj, conferenceLink,function(error, resultSchedule) {
+                                    if (error) {
+                                        log("selectUserConfigs Ocorreu um erro:", error);
+                                        msg = JSON.parse(JSON.stringify(resultSchedule));
+                                        req.responseContentType("application/json")
+                                                .sendResponse()
+                                                .onsend(function (resp) {
+                                                    resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                                                });
+                                    } else {
+                                        log("insertConferenceSchedule Resultado:", JSON.stringify(resultSchedule));
+                                        log("resultSchedule.status=="+resultSchedule.status);
+                                        req.responseContentType("application/json")
+                                        req.sendResponse()
+                                            .onsend(function (req) {
+                                                log("salvar-evento:result="+JSON.stringify(resultSchedule));
+                                                req.send(new TextEncoder("utf-8").encode(JSON.stringify(resultSchedule)), true);
+                                            });
+                                        //Notify user 
+                                        try {
+                                            connectionsUser.forEach(function (conn) {
+                                                if (conn.sip == obj.sip) {
+                                                    conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
+                                                }
+                                            })
+
+                                        } catch (e) {
+                                            log("danilo req: erro send UserEventMessage: " + e);
+                                        }
+                                        //Update Badge
+                                        try {
+                                            var count = 0;
+                                            PbxSignal.forEach(function (signal) {
+                                                log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
+                                                var call = signal[obj.sip];
+                                                log("pietro-log: call = " + call);
+                                                if (call != null) {
+                                                    log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
+                                                    try {
+                                                        pbxTableUsers.forEach(function (user) {
+
+                                                            if (user.columns.h323 == obj.sip) {
+                                                                var old_badge = user.badge;
+                                                                user.badge += 1;
+                                                                log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
+                                                                count = user.badge;
+                                                            }
+                                                        })
+                                                        updateBadge(signal, call, count);
+                                                    } catch (e) {
+                                                        log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
+                                                    }
+                                                }
+
+                                            })
+
+                                        }
+                                        catch (e) {
+                                            log("danilo req: erro send badge: " + e);
+                                        }
+                                        //Send e-mails to users
+                                        try {
+                                            //Email Cliente
+                                            var dataClient = "<!DOCTYPE html>"
+                                                + "<html>"
+                                                + "<head></head>"
+                                                + "<body>"
+                                                + "<div style = 'border: solid 1px #dadce0;border-radius: 8px;'>"
+                                                + "<h3>" + cfg[0].text_invite + "</h3>"
+                                                + "<p></p>"
+                                                + "<table style='width: 100%;'>"
+                                                + "<tr style='width: 100%;'>"
+                                                + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
+                                                + "</td>"
+                                                + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
+                                                + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
+                                                + "</span>"
+                                                + "</a>"
+                                                + "</td>"
+                                                + "</tr>"
+                                                + "<tr style='height: 25px;'></tr>"
+                                                + "</tr>"
+                                                + "<tr>"
+                                                + "<td>"
+                                                + "<b>Participantes</b>"
+                                                + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'> - organizador </span>"
+                                                + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
+                                                + "</td>"
+                                                + "<td><b>Url da Reunião</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
+                                                + "</tr>"
+                                                + "</table>"
+                                                + "</div>"
+                                                + "</body>"
+                                                + "</html>";
+
+                                            //Email Usuario
+                                            var dataUser = "<!DOCTYPE html>"
+                                                + "<html>"
+                                                + "<head></head>"
+                                                + "<body>"
+                                                + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
+                                                + "<b>Nome: " + obj.name + "</b><br/>"
+                                                + "<b>E-mail:</b> " + obj.email + "<br/>"
+                                                + "<b>Quando:</b> " + day + "<br/>"
+                                                + "<b>Horário:</b> " + time + "<br/><br/>"
+                                                + "<b>URL Conferência:</b> " + conferenceLink + "<br/><br/>"
+                                                + "Atenciosamente<br/>"
+                                                + "<i>DWC Wecom</i>"
+                                                + "</body>"
+                                                + "</html>";
+
+
+                                            //Anexo
+                                            var attachment = "BEGIN:VCALENDAR\n"
+                                                + "PRODID:-//DWC Wecom//EN\n"
+                                                + "VERSION:2.0\n"
+                                                + "CALSCALE:GREGORIAN\n"
+                                                + "METHOD:REQUEST\n"
+                                                + "BEGIN:VTIMEZONE\n"
+                                                + "TZID:America/Sao_Paulo\n"
+                                                + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                + "BEGIN:STANDARD\n"
+                                                + "TZOFFSETFROM:-0300\n"
+                                                + "TZOFFSETTO:-0300\n"
+                                                + "TZNAME:-03\n"
+                                                + "DTSTART:19700101T000000\n"
+                                                + "END:STANDARD\n"
+                                                + "END:VTIMEZONE\n"
+                                                + "BEGIN:VEVENT\n"
+                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
+                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
+                                                + "DTSTAMP:" + today + "Z\n"
+                                                + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
+                                                + "X-GOOGLE-CONFERENCE:" + conferenceLink + "\n"
+                                                + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
+                                                + "CREATED:" + today + "Z\n"
+                                                + "DESCRIPTION:" + conferenceLink + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLink + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
+                                                + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
+                                                + "LAST-MODIFIED:" + today + "Z\n"
+                                                + "LOCATION:\n"
+                                                + "SEQUENCE:0\n"
+                                                + "STATUS:CONFIRMED\n"
+                                                + "SUMMARY:" + cfg[0].title_conference + "\n"
+                                                + "TRANSP:OPAQUE\n"
+                                                + "BEGIN:VALARM\n"
+                                                + "DESCRIPTION:REMINDER\n"
+                                                + "TRIGGER;RELATED=START:-PT15M\n"
+                                                + "ACTION:DISPLAY\n"
+                                                + "END:VALARM\n"
+                                                + "END:VEVENT\n"
+                                                + "END:VCALENDAR";
+
+                                            sendEmail(cfg[0].email_title, obj.email, dataClient, attachment, function(error, resultEmail) {
+                                                if (error) {
+                                                  log("sendEmail Ocorreu um erro:", error);
+                                                  
+                                                } else {
+                                                    log("sendEmail:", resultEmail);
+                                                }
+                                            });
+
+                                            sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment, function(error, resultEmail) {
+                                                if (error) {
+                                                  log("sendEmail Ocorreu um erro:", error);
+                                                  
+                                                } else {
+                                                    log("sendEmail:", resultEmail);
+                                                }
+                                            });
+                                        }
+                                        catch (e) {
+                                            log("danilo req: erro send email:" + e);
+                                            //msg = { status: 200, msg: "Evento agendado, Tivemos um problema ao enviar o email, no dia, utilize o link para ingresso: " + cfg[0].url_conference};
+                                        }            
+                                    }
+                                })            
+                            }
+                        });                    
+
+
+
+                        /*Verificação desnecessária pois o calendário já tem as verificações
                         var schedule_valid = false;
                         Database.exec("SELECT * FROM tbl_availability WHERE sip ='" + obj.sip + "';")
                             .oncomplete(function (dataAvail) {
@@ -148,237 +383,8 @@ if (license != null && license.System==true) {
                                 var objAvail = dataAvail;
                                 objAvail.forEach(function (a) {
                                     if (obj.time_start >= a.time_start && obj.time_end <= a.time_end) {
+                                        log("danilo req : Time schedule valid")
                                         schedule_valid = true;
-                                        var today = convertDateTimeLocalToCustomFormat(getDateNow());
-                                        var arrayToday = obj.time_start.split("T");
-                                        var day = arrayToday[0];
-                                        var time = arrayToday[1];
-                                        var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
-
-                                        //Início teste url temporária
-                                        function creationDate(date) {
-                                            var ano = date.substring(0, 4);
-                                            var mes = date.substring(4, 6);
-                                            var dia = date.substring(6, 8);
-                                            var hora = date.substring(9, 11);
-                                            var minuto = date.substring(11, 13);
-                                            var segundo = date.substring(13, 15);
-                                            return ano + '-' + mes + '-' + dia + 'T' + hora + ':' + minuto + ':' + segundo;
-                                          }  
-                                        var version = 0;
-                                        var flags = 0;
-                                        var rand = String(Random.dword());
-                                        rand = rand.substring(0, 4);
-                                        log("rand" + rand);
-                                        var roomNumber = 2;
-                                        var meetingId = rand;
-                                        var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
-                                        log("startTimestamp " + startTimestamp);
-                                        var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
-                                        log("endTimestamp " + endTimestamp);
-                                        var reservedChannels = 2;
-                                        var timeNow = creationDate(today);
-                                        var creationTimestamp = convertDateTimeToTimestamp(timeNow);
-                                        log("creationTimestamp " + creationTimestamp);
-                                        var md5Hash = 'Wecom12#';
-                                        selectUserConfigs(obj, function(error, resultConfigs) {
-                                            if (error) {
-                                              log("selectUserConfigs Ocorreu um erro:", error);
-                                            } else {
-                                                log("selectUserConfigs Resultado:", JSON.stringify(resultConfigs));
-                                                var cfg = JSON.parse(JSON.stringify(resultConfigs.msg));
-                                                if(resultConfigs.status==200){
-                                                    log("resultConfigs.status==200");
-                                                    var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
-                                                    log("conferenceLink" + conferenceLink);    
-                                                    insertConferenceSchedule(obj, conferenceLink,function(error, resultSchedule) {
-                                                        if (error) {
-                                                          log("selectUserConfigs Ocorreu um erro:", error);
-                                                          msg = JSON.parse(JSON.stringify(resultSchedule));
-                                                          req.responseContentType("application/json")
-                                                                .sendResponse()
-                                                                .onsend(function (resp) {
-                                                                    resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-                                                                });
-                                                        } else {
-                                                            log("insertConferenceSchedule Resultado:", JSON.stringify(resultSchedule));
-                                                            if(resultSchedule.status==200){
-                                                                log("resultSchedule.status==200");
-                                                                req.responseContentType("application/json")
-                                                                req.sendResponse()
-                                                                    .onsend(function (req) {
-                                                                        log("salvar-evento:result="+JSON.stringify(resultSchedule));
-                                                                        req.send(new TextEncoder("utf-8").encode(JSON.stringify(resultSchedule)), true);
-                                                                    });
-                                                                //Notify user 
-                                                                try {
-                                                                    connectionsUser.forEach(function (conn) {
-                                                                        if (conn.sip == obj.sip) {
-                                                                            conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
-                                                                        }
-                                                                    })
-        
-                                                                } catch (e) {
-                                                                    log("danilo req: erro send UserEventMessage: " + e);
-                                                                }
-                                                                //Update Badge
-                                                                try {
-                                                                    var count = 0;
-                                                                    PbxSignal.forEach(function (signal) {
-                                                                        log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
-                                                                        var call = signal[obj.sip];
-                                                                        log("pietro-log: call = " + call);
-                                                                        if (call != null) {
-                                                                            log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
-                                                                            try {
-                                                                                pbxTableUsers.forEach(function (user) {
-        
-                                                                                    if (user.columns.h323 == obj.sip) {
-                                                                                        var old_badge = user.badge;
-                                                                                        user.badge += 1;
-                                                                                        log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
-                                                                                        count = user.badge;
-                                                                                    }
-                                                                                })
-                                                                                updateBadge(signal, call, count);
-                                                                            } catch (e) {
-                                                                                log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
-                                                                            }
-                                                                        }
-        
-                                                                    })
-        
-                                                                }
-                                                                catch (e) {
-                                                                    log("danilo req: erro send badge: " + e);
-                                                                }
-                                                                //Send e-mails to users
-                                                                try {
-                                                                    //Email Cliente
-                                                                    var dataClient = "<!DOCTYPE html>"
-                                                                        + "<html>"
-                                                                        + "<head></head>"
-                                                                        + "<body>"
-                                                                        + "<div style = 'border: solid 1px #dadce0;border-radius: 8px;'>"
-                                                                        + "<h3>" + cfg[0].text_invite + "</h3>"
-                                                                        + "<p></p>"
-                                                                        + "<table style='width: 100%;'>"
-                                                                        + "<tr style='width: 100%;'>"
-                                                                        + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
-                                                                        + "</td>"
-                                                                        + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                                        + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
-                                                                        + "</span>"
-                                                                        + "</a>"
-                                                                        + "</td>"
-                                                                        + "</tr>"
-                                                                        + "<tr style='height: 25px;'></tr>"
-                                                                        + "</tr>"
-                                                                        + "<tr>"
-                                                                        + "<td>"
-                                                                        + "<b>Participantes</b>"
-                                                                        + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'> - organizador </span>"
-                                                                        + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
-                                                                        + "</td>"
-                                                                        + "<td><b>Url da Reunião</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
-                                                                        + "</tr>"
-                                                                        + "</table>"
-                                                                        + "</div>"
-                                                                        + "</body>"
-                                                                        + "</html>";
-        
-                                                                    //Email Usuario
-                                                                    var dataUser = "<!DOCTYPE html>"
-                                                                        + "<html>"
-                                                                        + "<head></head>"
-                                                                        + "<body>"
-                                                                        + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
-                                                                        + "<b>Nome: " + obj.name + "</b><br/>"
-                                                                        + "<b>E-mail:</b> " + obj.email + "<br/>"
-                                                                        + "<b>Quando:</b> " + day + "<br/>"
-                                                                        + "<b>Horário:</b> " + time + "<br/><br/>"
-                                                                        + "<b>URL Conferência:</b> " + conferenceLink + "<br/><br/>"
-                                                                        + "Atenciosamente<br/>"
-                                                                        + "<i>DWC Wecom</i>"
-                                                                        + "</body>"
-                                                                        + "</html>";
-        
-        
-                                                                    //Anexo
-                                                                    var attachment = "BEGIN:VCALENDAR\n"
-                                                                        + "PRODID:-//DWC Wecom//EN\n"
-                                                                        + "VERSION:2.0\n"
-                                                                        + "CALSCALE:GREGORIAN\n"
-                                                                        + "METHOD:REQUEST\n"
-                                                                        + "BEGIN:VTIMEZONE\n"
-                                                                        + "TZID:America/Sao_Paulo\n"
-                                                                        + "X-LIC-LOCATION:America/Sao_Paulo\n"
-                                                                        + "BEGIN:STANDARD\n"
-                                                                        + "TZOFFSETFROM:-0300\n"
-                                                                        + "TZOFFSETTO:-0300\n"
-                                                                        + "TZNAME:-03\n"
-                                                                        + "DTSTART:19700101T000000\n"
-                                                                        + "END:STANDARD\n"
-                                                                        + "END:VTIMEZONE\n"
-                                                                        + "BEGIN:VEVENT\n"
-                                                                        + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
-                                                                        + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
-                                                                        + "DTSTAMP:" + today + "Z\n"
-                                                                        + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                                        + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
-                                                                        + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
-                                                                        + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
-                                                                        + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
-                                                                        + "X-GOOGLE-CONFERENCE:" + conferenceLink + "\n"
-                                                                        + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
-                                                                        + "CREATED:" + today + "Z\n"
-                                                                        + "DESCRIPTION:" + conferenceLink + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
-                                                                        + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLink + " \n\nLearn more about Meet at: https://support.google.com/"
-                                                                        + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
-                                                                        + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
-                                                                        + "LAST-MODIFIED:" + today + "Z\n"
-                                                                        + "LOCATION:\n"
-                                                                        + "SEQUENCE:0\n"
-                                                                        + "STATUS:CONFIRMED\n"
-                                                                        + "SUMMARY:" + cfg[0].title_conference + "\n"
-                                                                        + "TRANSP:OPAQUE\n"
-                                                                        + "BEGIN:VALARM\n"
-                                                                        + "DESCRIPTION:REMINDER\n"
-                                                                        + "TRIGGER;RELATED=START:-PT15M\n"
-                                                                        + "ACTION:DISPLAY\n"
-                                                                        + "END:VALARM\n"
-                                                                        + "END:VEVENT\n"
-                                                                        + "END:VCALENDAR";
-        
-                                                                    sendEmail(cfg[0].email_title, obj.email, dataClient, attachment, function(error, resultEmail) {
-                                                                        if (error) {
-                                                                          log("sendEmail Ocorreu um erro:", error);
-                                                                          
-                                                                        } else {
-                                                                            log("sendEmail:", resultEmail);
-                                                                        }
-                                                                    });
-        
-                                                                    sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment, function(error, resultEmail) {
-                                                                        if (error) {
-                                                                          log("sendEmail Ocorreu um erro:", error);
-                                                                          
-                                                                        } else {
-                                                                            log("sendEmail:", resultEmail);
-                                                                        }
-                                                                    });
-                                                                }
-                                                                catch (e) {
-                                                                    log("danilo req: erro send email:" + e);
-                                                                    //msg = { status: 200, msg: "Evento agendado, Tivemos um problema ao enviar o email, no dia, utilize o link para ingresso: " + cfg[0].url_conference};
-                                                                }
-                                                            }
-                                                        }
-                                                    })                
-                                                }
-                                            }
-                                        });
-                                        //Fim teste url temporária
                                     }
                                 })
                                 
@@ -386,6 +392,8 @@ if (license != null && license.System==true) {
                             .onerror(function (error, errorText, dbErrorCode) {
                                 conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                             });
+                            */
+
 
                     } catch (e) {
                         msg = { status: 400, msg: e };
@@ -1057,27 +1065,26 @@ function mergeUint8Arrays(arrays) {
 
     return result;
 }    
-
 function convertDateTimeToTimestamp(dateTimeString) {
     var dateTimeParts = dateTimeString.split('T');
     var dateParts = dateTimeParts[0].split('-');
     var timeParts = dateTimeParts[1].split(':');
-  
+    
     var year = parseInt(dateParts[0]);
     var month = parseInt(dateParts[1]) - 1; // Month is zero-based in JavaScript
     var day = parseInt(dateParts[2]);
     var hours = parseInt(timeParts[0]);
     var minutes = parseInt(timeParts[1]);
-  
-    var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
-  
+    
+    var timestamp = new Date(year, month, day, hours+3, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
+    
     return timestamp;
-}
+  }
 function selectUserConfigs(obj, callback){
     Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
             .oncomplete(function (data) {
                 log("selectUserConfigs result success = "+JSON.stringify(data))
-                msg = { status: 200, msg: data };
+                msg = { status: 201, msg: data };
                 callback(null, msg);
             })
             .onerror(function (error, errorText, dbErrorCode) {
@@ -1087,8 +1094,8 @@ function selectUserConfigs(obj, callback){
 }
 function insertConferenceSchedule(obj, conferenceLink, callback){
     Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end, conf_link) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "','" + conferenceLink + "')")
-    .oncomplete(function () {
-        msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!" };
+    .oncomplete(function (id) {
+        msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!",id:id };
         callback(null, msg);
     })
     .onerror(function (error, errorText, dbErrorCode) {

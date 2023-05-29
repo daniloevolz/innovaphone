@@ -8,6 +8,7 @@ table {
     color: #B0132B;
 }
 
+
     table td {
         border: 1px solid #02163F;
         width: -webkit-fill-available;
@@ -116,7 +117,7 @@ div.button-inn-del {
     background-repeat: no-repeat;
 }
 
-/*Início Loader*/
+/*Inï¿½cio Loader*/
 * {
     border: 0;
     box-sizing: border-box;
@@ -229,7 +230,7 @@ main {
     }
 }
 /*Fim Loader*/
-/*Início Menu Admin*/
+/*Inï¿½cio Menu Admin*/
 .arrow {
     height: 30px;
     width: 30px;
