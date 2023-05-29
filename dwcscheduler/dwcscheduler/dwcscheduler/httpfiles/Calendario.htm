@@ -493,7 +493,7 @@
                         hourAvail -=hourBusy;
                         console.log("Horas disponivies " + hourAvail+ " em " + String(dataDate))
                         if (dataDate >= datastart && dataDate <= dataend) {
-                            if(hourAvail<=7){
+                            if(hourAvail<=6){
                                 td.classList.remove('unavailable');
                                 td.classList.add('parcialavailable');
                             }else{
