@@ -47,6 +47,7 @@ Wecom.dwcschedulerTexts = {
         labelCopy: "Copiar",
         idInfo: "id=" + "  " +":sempre será o seu sip id no pbx ",
         nota: "Nota: ",
+        Copied: "Copiado para área de transferência",
         notaId: "Lembre-se de sempre usar o seu id corretamente \n caso contrário, o calendário nao irá carregar suas disponibilidades e agendamentos.",
         infoUrl: "Utilize a URL abaixo para acessar o seu calendário de agendamentos, \n você também pode utilizar esse link em sites, e-mails, botões html, ou onde for suportado.",
         meaningURL: "Signifcado dos parâmetros (corpo) da URL:",

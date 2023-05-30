@@ -139,14 +139,17 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function constructor() {
         that.clear();
-        // col direita
-        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
-        //T�tulo
-        colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
-
         // col Esquerda
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         colEsquerda.setAttribute("id","colesquerda")
+
+         // col direita
+         var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+         colDireita.setAttribute("id","coldireita")
+        
+         //T�tulo
+         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
+
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
         var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
         imglogo.setAttribute("src", "logo-wecom.png");
@@ -183,26 +186,61 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
         var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
         imgconfig.setAttribute("src", "logo.png");
-        //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
-        //Aconfig.setAttribute("href", "#");
 
         var a = document.getElementById("CfgGeral");
         a.addEventListener("click", function () { 
             ChangeView("CfgGeral", colDireita) 
             if (window.matchMedia("(max-width: 500px)").matches) {
                 document.getElementById("colesquerda").style.display = "none"; 
-            
+                document.getElementById("coldireita").style.display = "block"; 
+                // document.getElementById("divmenu").style.display = 'block';
+            }
+            else{
+                console.log("View Desktop")
+                // document.getElementById("divmenu").style.display = 'none';
+            }
+        })
+        var a = document.getElementById("CfgSchedules");
+        a.addEventListener("click", function () { 
+            ChangeView("CfgSchedules", colDireita)
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                document.getElementById("colesquerda").style.display = "none"; 
+                document.getElementById("coldireita").style.display = "block"; 
+                // document.getElementById("divmenu").style.display = 'block';
+            }
+            else{
+                console.log("View Desktop")
+                // document.getElementById("divmenu").style.display = 'none';
             }
         })
 
-        var a = document.getElementById("CfgSchedules");
-        a.addEventListener("click", function () { ChangeView("CfgSchedules", colDireita) })
-
         var a = document.getElementById("CfgAvailability");
-        a.addEventListener("click", function () { ChangeView("CfgAvailability", colDireita) })
+        a.addEventListener("click", function () { 
+            ChangeView("CfgAvailability", colDireita)
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                document.getElementById("colesquerda").style.display = "none"; 
+                document.getElementById("coldireita").style.display = "block"; 
+                // document.getElementById("divmenu").style.display = 'block';
+            }
+            else{
+                console.log("View Desktop")
+                // document.getElementById("divmenu").style.display = 'none';
+            }
+         })
 
         var a = document.getElementById("CfgHelp");
-        a.addEventListener("click", function(){ ChangeView("CfgHelp",colDireita)})
+        a.addEventListener("click", function(){ 
+            ChangeView("CfgHelp",colDireita)
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                document.getElementById("colesquerda").style.display = "none"; 
+                document.getElementById("coldireita").style.display = "block"; 
+                // document.getElementById("divmenu").style.display = 'block';
+            }
+            else{
+                console.log("View Desktop")
+                // document.getElementById("divmenu").style.display = 'none';
+            }
+        })
 
         _colDireita = colDireita;
     }
@@ -435,24 +473,31 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             var title_conference = null;
         }
 
-        
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
 
-        var emailContato = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 20%; left: 6%; font-weight: bold;", texts.text("labelEmailContato"), null));
-        var InputEmailContato = t.add(new innovaphone.ui1.Input("position: absolute;  top: 20%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_contato, "Insira aqui o e-mail de contato", null, "email", null).setAttribute("id", "InputEmailContato"));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloAdmin"),"DivGeralTitle"));
 
-        var divTitleEmail = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 30%; left: 6%; font-weight: bold;", texts.text("labelTitleEmail"), null));
-        var InputTitleEmail = t.add(new innovaphone.ui1.Input("position: absolute;  top: 30%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", email_title,"Insira aqui o titulo do e-mail", null, "url", null).setAttribute("id", "InputTitleEmail"));
+        var emailContato = t.add(new innovaphone.ui1.Div(null, texts.text("labelEmailContato"),"DivGeralEmail"));
+        var InputEmailContato = t.add(new innovaphone.ui1.Input(null, email_contato, "Insira aqui o e-mail de contato", null, "email","DivGeralIptEmail").setAttribute("id", "InputEmailContato"));
 
-        var divURLConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelURLContato"), null));
-        var InputURLConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", url_conference, "Insira aqui a URL do evento", null, "url", null).setAttribute("id", "InputURLConference"));
+        var divTitleEmail = t.add(new innovaphone.ui1.Div(null, texts.text("labelTitleEmail"),"DivGeralTitleEmail"));
+        var InputTitleEmail = t.add(new innovaphone.ui1.Input(null, email_title,"Insira aqui o titulo do e-mail", null, "url","DivGeralIptTitleEmail").setAttribute("id", "InputTitleEmail"));
 
-        var divTitleConference = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 40%; left: 6%; font-weight: bold;", texts.text("labelTitleConference"), null));
-        var InputTitleConference = t.add(new innovaphone.ui1.Input("position: absolute;  top: 40%; left: 21%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", title_conference,"Insira aqui o título do evento", null, "url", null).setAttribute("id", "InputTitleConference"));
+        var divURLConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelURLContato"),"DivGeralUrlConference"));
+        var InputURLConference = t.add(new innovaphone.ui1.Input(null, url_conference, "Insira aqui a URL do evento", null, "url","DivGeralIptUrlConf").setAttribute("id", "InputURLConference"));
 
-        var divTextInvite = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelTxtInvite"), null));
-        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea", "position: absolute; padding:5px; top: 45%; left: 21%; height: 150px; rows=5; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", text_invite, null).setAttribute("id", "InputTxtInvite"));
+        var divTitleConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelTitleConference"),"DivGeralTitleConf"));
+        var InputTitleConference = t.add(new innovaphone.ui1.Input(null, title_conference,"Insira aqui o título do evento", null, "url","DivGeralIptTitleConf").setAttribute("id", "InputTitleConference"));
+
+        var divTextInvite = t.add(new innovaphone.ui1.Div(null, texts.text("labelTxtInvite"), "DivGeralTextInvite"));
+        var InputTextInvite = t.add(new innovaphone.ui1.Node("textarea",null, text_invite,"DivGeralIptTextInvite").setAttribute("id", "InputTxtInvite"));
         InputTextInvite.setAttribute("placeholder", "Insira aqui o texto do e-mail de convite")
+        
+        
+        // openMenu();
         // buttons
         t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             
@@ -479,6 +524,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var btnCopy = divIptUrl.add(new innovaphone.ui1.Node("button","position: absolute;width: 6%; left: 68%;height: 25px;background-color: #02163f;color: white;border-radius: 10px;",texts.text("labelCopy"),null))
         btnCopy.setAttribute("id","btnCopy");
         document.getElementById("btnCopy").addEventListener("click",copyText); 
+        var CopyPopUp = t.add(new innovaphone.ui1.Div(null,texts.text("Copied"),"CopyPopUp"));
+        CopyPopUp.setAttribute("id","copyPopUp")
+        document.getElementById("btnCopy").addEventListener("click",ShowCopyPopUp); 
+        // ainda nao acabei essa parte do pop up quando texto é copiado
         t.add(new innovaphone.ui1.Node("p","position: absolute;top: 20%;left: 5%; width:90%; color:black !important;",texts.text("infoUrl"),null));
         t.add(new innovaphone.ui1.Node("h2","position: absolute;top: 45%;left: 5%; width:90%; color:black !important;",texts.text("meaningURL"),null));
         var lista = t.add(new innovaphone.ui1.Node("ul","position:absolute; left:5%; top:55%; display: display: inline-flex; align-items: center;",null,null));
@@ -495,7 +544,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         navigator.clipboard.writeText(input.value)  
         //alert("Texto copiado: " + input.value);
     }
-
     function getDateNow() {
         // Cria uma nova data com a data e hora atuais em UTC
         var date = new Date();
@@ -574,6 +622,34 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 break;
         }
     }
+    function openMenu(){
+        var colunaEsquerda = document.getElementById("colesquerda");
+        var colunaDireita = document.getElementById("coldireita");
+        var imgMenu = document.getElementById("imgmenu");
+        colunaEsquerda.style.display = 'block';
+        colunaEsquerda.style.transform = 'translateX(-100%)';
+        colunaEsquerda.style.transition = 'transform 1s';
+        colunaDireita.style.display = 'none';
+        imgMenu.style.display = 'none';
+        
+        // setTimeout(function() {
+        //     colunaEsquerda.style.transform = 'translateX(0)';
+        //   }, 0);
+    }
+    function ShowCopyPopUp() {
+    var popup = document.getElementById("copyPopUp");
+    popup.classList.add("show");
+  
+    setTimeout(function() {
+        popup.classList.add("hide");
+      }, 1000);
+
+      setTimeout(function() {
+        popup.remove();
+      }, 2000);
+
+    }
+  
 }
 
 Wecom.dwcscheduler.prototype = innovaphone.ui1.nodePrototype;
