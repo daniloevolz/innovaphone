@@ -53,14 +53,14 @@ Config.onchanged(function () {
     updateConfigUsers();
 });
 
-
+//WebServers
 WebServer.onurlchanged(function (newUrl) {
     baseUrl = newUrl;
     log("danilo req urlchaged: " + baseUrl);
 });
 WebServer.onrequest("value", function (req) {
     if (req.method == "GET") {
-        var valueteste = "Danilo is the big dev from Wecom..";
+        var valueteste = "Congrats, you are here!\nBig dev, from Wecom..";
         if (valueteste) {
             // value exists, send it back as text/plain
             req.responseContentType("txt")
@@ -1365,9 +1365,10 @@ function pbxTableRequest(value) {
             }
         }
         pbxTable.forEach(function (conn) {
+            log("danilo-req pbxTable: forEach conn "+ JSON.stringify(conn));
             if (conn.pbx == user[0].src) {
                 user[0].mt="ReplicateUpdate";
-                log("pbxTable found PBX connection"+ JSON.stringify(user[0]));
+                log("danilo-req pbxTable: found PBX connection user "+ JSON.stringify(user[0]));
                 conn.send(JSON.stringify(user[0]));
             }
         })
@@ -1375,6 +1376,7 @@ function pbxTableRequest(value) {
             if (u.columns.h323 == user[0].columns.h323) {
                 user[0].mt = "ReplicateNextResult";
                 Object.assign(u, user[0])
+                log("danilo-req pbxTable: pbxTableUsers list updated "+ JSON.stringify(pbxTableUsers));
             }
         })
 
