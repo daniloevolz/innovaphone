@@ -162,8 +162,8 @@ if (license != null && license.System==true) {
                         var rand = String(Random.dword());
                         rand = rand.substring(0, 4);
                         log("rand" + rand);
-                        var roomNumber = 2;
-                        var meetingId = 1;
+                        var roomNumber = 02;
+                        var meetingId = rand;
                         var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
                         log("startTimestamp " + startTimestamp);
                         var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
@@ -172,7 +172,7 @@ if (license != null && license.System==true) {
                         var timeNow = creationDate(today);
                         var creationTimestamp = convertDateTimeToTimestamp(timeNow);
                         log("creationTimestamp " + creationTimestamp);
-                        var md5Hash = '7894';
+                        var md5Hash = decodeURIComponent('I\\29C\\299\\29S\\29');
                         selectUserConfigs(obj, function(error, resultConfigs) {
                             if (error) {
                                 log("selectUserConfigs Ocorreu um erro:", error);
@@ -987,7 +987,7 @@ function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
 function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain) {
-    log("version"+version+", flags"+flags+", roomNumber"+roomNumber+", meetingId"+meetingId+", startTimestamp"+startTimestamp+", endTimestamp"+endTimestamp+", reservedChannels"+reservedChannels+", creationTimestamp"+creationTimestamp+", md5Hash"+md5Hash+", domain"+domain);
+    log("version "+version+", flags "+flags+", roomNumber "+roomNumber+", meetingId "+meetingId+", startTimestamp "+startTimestamp+", endTimestamp "+endTimestamp+", reservedChannels "+reservedChannels+", creationTimestamp "+creationTimestamp+", md5Hash "+md5Hash+", domain "+domain);
     var conf = {
         version: toUint8Array(version, 1),
         flags: toUint8Array(flags, 1),

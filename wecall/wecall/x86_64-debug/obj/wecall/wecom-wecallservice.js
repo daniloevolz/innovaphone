@@ -549,7 +549,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
 
     // for each PBX API connection an own call array is maintained
     var signalFound = pbxTable.filter(function (pbx) { return pbx.pbx === conn.pbx });
-    if (signalFound.length == 0) {
+    if (pbxTable.length == 0) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
         conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
@@ -972,28 +972,30 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     break;
                                 case 134:
                                     //Receptiva (Disconnect Sent)
-                                    if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
-                                        var e164 = obj.peer.e164;
-                                        if (queues.some(function (v) { return v.Fila === sip })) {
-                                            if (e164 == "") {
-                                                var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
+                                    if(obj.msg!="del"){
+                                        if (sendCallEvents) {
+                                            log("danilo-req : RCC message::sendCallEvents=true");
+                                            var e164 = obj.peer.e164;
+                                            if (queues.some(function (v) { return v.Fila === sip })) {
+                                                if (e164 == "") {
+                                                    var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
+                                                } else {
+                                                    var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
+                                                }
                                             } else {
-                                                var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
+                                                if (e164 == "") {
+                                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
+                                                } else {
+                                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
+                                                }
                                             }
-                                        } else {
-                                            if (e164 == "") {
-                                                var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
-                                            } else {
-                                                var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
-                                            }
+                                            httpClient(urlPhoneApiEvents, msg);
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        //Remove
+                                        log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
+                                        calls = calls.filter(deleteCallsBySrc(sip));
+                                        log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     }
-                                    //Remove
-                                    log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(sip));
-                                    log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     break;
                                 case 135:
                                     //Receptiva (Disconnect Received)
@@ -1364,14 +1366,22 @@ function pbxTableRequest(value) {
                 user[0].columns.grps.push({ name: obj.group, dyn: "out" })
             }
         }
-        pbxTable.forEach(function (conn) {
-            log("danilo-req pbxTable: forEach conn "+ JSON.stringify(conn));
-            if (conn.pbx == user[0].src) {
-                user[0].mt="ReplicateUpdate";
-                log("danilo-req pbxTable: found PBX connection user "+ JSON.stringify(user[0]));
-                conn.send(JSON.stringify(user[0]));
-            }
-        })
+        //Teste do problema de antrar e sair de grupos
+        if (pbxTable.length >0) {
+            user[0].mt="ReplicateUpdate";
+            log("danilo-req pbxTable: found PBX connection user "+ JSON.stringify(user[0]));
+            pbxTable[0].send(JSON.stringify(user[0]));
+        }else{
+            log("danilo-req pbxTable: PBX connection is 0 ");
+        }
+        // pbxTable.forEach(function (conn) {
+        //     log("danilo-req pbxTable: forEach conn "+ JSON.stringify(conn));
+        //     if (conn.pbx == user[0].src) {
+        //         user[0].mt="ReplicateUpdate";
+        //         log("danilo-req pbxTable: found PBX connection user "+ JSON.stringify(user[0]));
+        //         conn.send(JSON.stringify(user[0]));
+        //     }
+        // })
         pbxTableUsers.forEach(function (u) {
             if (u.columns.h323 == user[0].columns.h323) {
                 user[0].mt = "ReplicateNextResult";
