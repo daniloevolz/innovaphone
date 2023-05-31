@@ -193,28 +193,22 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
         var a = document.getElementById("CfgGeral");
         a.addEventListener("click", function () { 
-            ChangeView("CfgGeral", colDireita) 
+            ChangeView("CfgGeral", colDireita)
             if (window.matchMedia("(max-width: 500px)").matches) {
-                document.getElementById("colesquerda").style.display = "none"; 
-                document.getElementById("coldireita").style.display = "block"; 
-                // document.getElementById("divmenu").style.display = 'block';
+                openColDireita()
             }
             else{
                 console.log("View Desktop")
-                // document.getElementById("divmenu").style.display = 'none';
             }
         })
         var a = document.getElementById("CfgSchedules");
         a.addEventListener("click", function () { 
             ChangeView("CfgSchedules", colDireita)
             if (window.matchMedia("(max-width: 500px)").matches) {
-                document.getElementById("colesquerda").style.display = "none"; 
-                document.getElementById("coldireita").style.display = "block"; 
-                // document.getElementById("divmenu").style.display = 'block';
+                openColDireita()
             }
             else{
                 console.log("View Desktop")
-                // document.getElementById("divmenu").style.display = 'none';
             }
         })
 
@@ -222,13 +216,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         a.addEventListener("click", function () { 
             ChangeView("CfgAvailability", colDireita)
             if (window.matchMedia("(max-width: 500px)").matches) {
-                document.getElementById("colesquerda").style.display = "none"; 
-                document.getElementById("coldireita").style.display = "block"; 
-                // document.getElementById("divmenu").style.display = 'block';
+               openColDireita()
             }
             else{
                 console.log("View Desktop")
-                // document.getElementById("divmenu").style.display = 'none';
             }
          })
 
@@ -236,13 +227,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         a.addEventListener("click", function(){ 
             ChangeView("CfgHelp",colDireita)
             if (window.matchMedia("(max-width: 500px)").matches) {
-                document.getElementById("colesquerda").style.display = "none"; 
-                document.getElementById("coldireita").style.display = "block"; 
-                // document.getElementById("divmenu").style.display = 'block';
+                openColDireita()
             }
             else{
                 console.log("View Desktop")
-                // document.getElementById("divmenu").style.display = 'none';
             }
         })
 
@@ -520,26 +508,32 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivHelp(t){
         t.clear();
-        t.add(new innovaphone.ui1.Node("h2","position:absolute;width:80%;top:10%;text-align:left;left:5%;",texts.text("labelcalendarURL"),null));
-        var divIptUrl = t.add(new innovaphone.ui1.Div("position:absolute;top:33%;display:inline-block;width:100%;",null,null));
-        var iptURL =  divIptUrl.add(new innovaphone.ui1.Input("position:absolute; width: 60%; left:5%; height:25px; text-align:left; border-radius:6px; padding-left: 20px;",appUrl,null,200,"text","urlcalendar"));
+
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+
+        t.add(new innovaphone.ui1.Node("h2",null,texts.text("labelcalendarURL"),"DivHelpCalendarTitle"));
+        var divIptUrl = t.add(new innovaphone.ui1.Div(null,null,"DivHelpDivIptUrl"));
+        var iptURL =  divIptUrl.add(new innovaphone.ui1.Input(null,appUrl,null,200,"text","urlcalendar"));
         iptURL.setAttribute("readonly", "readonly");
         iptURL.setAttribute("id","iptUrl")
-        var btnCopy = divIptUrl.add(new innovaphone.ui1.Node("button","position: absolute;width: 6%; left: 68%;height: 25px;background-color: #02163f;color: white;border-radius: 10px;",texts.text("labelCopy"),null))
+        var btnCopy = divIptUrl.add(new innovaphone.ui1.Node("button",null,texts.text("labelCopy"),"DivHelpBtnCopy"))
         btnCopy.setAttribute("id","btnCopy");
         document.getElementById("btnCopy").addEventListener("click",copyText); 
         var CopyPopUp = t.add(new innovaphone.ui1.Div(null,texts.text("Copied"),"CopyPopUp"));
         CopyPopUp.setAttribute("id","copyPopUp")
         document.getElementById("btnCopy").addEventListener("click",ShowCopyPopUp); 
         // ainda nao acabei essa parte do pop up quando texto é copiado
-        t.add(new innovaphone.ui1.Node("p","position: absolute;top: 20%;left: 5%; width:90%; color:black !important;",texts.text("infoUrl"),null));
-        t.add(new innovaphone.ui1.Node("h2","position: absolute;top: 45%;left: 5%; width:90%; color:black !important;",texts.text("meaningURL"),null));
-        var lista = t.add(new innovaphone.ui1.Node("ul","position:absolute; left:5%; top:55%; display: display: inline-flex; align-items: center;",null,null));
-        lista.add(new innovaphone.ui1.Node("li","font-weight:bold; list-style-type: disc; color:black !important; ","id="+UIsip,null));
+        t.add(new innovaphone.ui1.Node("p",null,texts.text("infoUrl"),"DivHelpPInfo"));
+        t.add(new innovaphone.ui1.Node("h2",null,texts.text("meaningURL"),"DivHelpH2"));
+        var lista = t.add(new innovaphone.ui1.Node("ul",null,null,"DivHelpUlLista"));
+        lista.add(new innovaphone.ui1.Node("li",null,"id="+UIsip,"DivHelpLi"));
         lista.add(new innovaphone.ui1.Node("br",null,null,null));
-        lista.add(new innovaphone.ui1.Node("h3","font-weight:bold;color:black !important;",texts.text("idInfo"),null))
-        lista.add(new innovaphone.ui1.Node("p","font-weight:bold;color:#d50000 !important; margin-top:10px",texts.text("nota"),null))
-        lista.add(new innovaphone.ui1.Node("p","font-weight:bold;color:black !important; margin-top:10px",texts.text("notaId"),null))
+        lista.add(new innovaphone.ui1.Node("h3",null,texts.text("idInfo"),"DivHelpH3"))
+        lista.add(new innovaphone.ui1.Node("p",null,texts.text("nota"),"DivHelpNota"))
+        lista.add(new innovaphone.ui1.Node("p",null,texts.text("notaId"),"DivHelpNotaInfo"))
     }
     function copyText() {
         var input = document.getElementById("iptUrl");
@@ -626,19 +620,46 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 break;
         }
     }
-    function openMenu(){
+    function openMenu() {
         var colunaEsquerda = document.getElementById("colesquerda");
         var colunaDireita = document.getElementById("coldireita");
         var imgMenu = document.getElementById("imgmenu");
+        
         colunaEsquerda.style.display = 'block';
         colunaEsquerda.style.transform = 'translateX(-100%)';
-        colunaEsquerda.style.transition = 'transform 1s';
-        colunaDireita.style.display = 'none';
-        imgMenu.style.display = 'none';
+        colunaEsquerda.style.transition = 'transform 1s ease-in-out, opacity 1s ease-in-out';
         
-        // setTimeout(function() {
-        //     colunaEsquerda.style.transform = 'translateX(0)';
-        //   }, 0);
+        colunaDireita.style.opacity = '1';
+        colunaDireita.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(function() {
+            colunaEsquerda.style.transform = 'translateX(0)';
+            colunaDireita.style.opacity = '0';
+        }, 0);
+        
+        setTimeout(function() {
+            colunaDireita.style.display = 'none';
+            imgMenu.style.display = 'none';
+            colunaDireita.style.opacity = '1';
+        }, 1000);
+    }
+    function openColDireita(){
+        var colunaEsquerda = document.getElementById("colesquerda");
+        var colunaDireita = document.getElementById("coldireita");
+        var imgMenu = document.getElementById("imgmenu");
+        
+        colunaEsquerda.style.transform = 'translateX(-100%)';
+        colunaEsquerda.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+        
+        colunaDireita.style.display = 'block';
+        colunaDireita.style.opacity = '0';
+        colunaDireita.style.transition = 'opacity 0.3s ease-in-out';
+        
+        setTimeout(function() {
+            colunaEsquerda.style.display = 'none';
+            colunaEsquerda.style.transform = 'translateX(0)';
+            colunaDireita.style.opacity = '1';
+        }, 300);
     }
     function ShowCopyPopUp() {
     var popup = document.getElementById("copyPopUp");
@@ -649,13 +670,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         popup.classList.remove("show");
         popup.classList.add("hide");
       }, 1000);
-
-    //   setTimeout(function() {
-    //     popup.remove();
-    //   }, 2000);
-
+    
     }
-  
 }
-
 Wecom.dwcscheduler.prototype = innovaphone.ui1.nodePrototype;
