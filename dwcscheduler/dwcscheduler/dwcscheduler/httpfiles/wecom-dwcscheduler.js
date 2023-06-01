@@ -594,13 +594,19 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         const calls = arg0.model[provider].model.calls;
         calls.forEach(function (call) {
             if (call.sip == "extern-web") {
-                if (!dwcLocation) {
+                if (dwcCaller.length>1 && dwcLocation.length<1) {
                     phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div>" });
+                }else if(dwcCaller.length>1 && dwcLocation.length>1){
+                    phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div><div style='top:40px; width: 100%; height: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'><iframe src='"+dwcLocation+"' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe></div>" });
+                }else if(dwcCaller.length<1 && dwcLocation.length<1){
+                    phoneApi.send({ mt: "CallInfo", id: call.id, html: ""});
                 }
-                phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div><div style='top:40px; width: 100%; height: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'><iframe src='"+dwcLocation+"' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe></div>" });
+                dwcLocation ='';
+                dwcCaller='';
             } else {
                 phoneApi.send({ mt: "CallInfo", id: call.id, html: ""});
             }
+            
             //if (call.state == "Alerting" || call.state == "Ringback" || call.state == "Connected") {
             //    }
         });
