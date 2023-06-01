@@ -396,11 +396,11 @@ a {
     text-align: center;
 }
 .DivGeralEmail {
-        position: absolute;
-        text-align: right;
-        top: 20%;
-        left: 6%;
-        font-weight: bold;
+    position: absolute;
+    text-align: right;
+    top: 15%;
+    left: 21%;
+    font-weight: bold;
 }
 .DivGeralIptEmail{
     position: absolute;
@@ -413,24 +413,24 @@ a {
     border: 2px solid;
     border-color: #02163F;
 }
-.DivGeralTitleEmail{
+.DivGeralTitleEmail {
     position: absolute;
     text-align: right;
-    top: 30%;
-    left: 6%;
+    top: 27%;
+    left: 21%;
     font-weight: bold;
 }
 
-.DivGeralUrlConference{
+.DivGeralUrlConference {
     position: absolute;
     text-align: right;
-    top: 35%;
-    left: 6%;
+    top: 38%;
+    left: 21%;
     font-weight: bold;
 }
 .DivGeralIptTitleEmail{
     position: absolute;
-    top: 30%;
+    top: 32%;
     left: 21%;
     height: 30px;
     padding: 5px;
@@ -439,52 +439,49 @@ a {
     border: 2px solid;
     border-color: #02163F;
 }
-.DivGeralIptUrlConf{
+.DivGeralIptUrlConf {
     position: absolute;
-    top: 35%;
+    top: 43%;
     left: 21%;
     height: 30px;
     padding: 5px;
     width: 50%;
     border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
+    border: 2px solid rgb(2, 22, 63);
 }
-.DivGeralTitleConf{
+.DivGeralTitleConf {
     position: absolute;
     text-align: right;
-    top: 40%;
-    left: 6%;
+    top: 49%;
+    left: 21%;
     font-weight: bold;
 }
-.DivGeralIptTitleConf{
+.DivGeralIptTitleConf {
     position: absolute;
-    top: 40%;
+    top: 53%;
     left: 21%;
     height: 30px;
     padding: 5px;
     width: 50%;
     border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
+    border: 2px solid rgb(2, 22, 63);
 }
-.DivGeralTextInvite{
+.DivGeralTextInvite {
     position: absolute;
     text-align: right;
-    top: 55%;
-    left: 6%;
+    top: 60%;
+    left: 21%;
     font-weight: bold;
 }
-.DivGeralIptTextInvite{  
+.DivGeralIptTextInvite {
     position: absolute;
     padding: 5px;
-    top: 45%;
+    top: 65%;
     left: 21%;
     height: 150px;
     width: 50%;
     border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
+    border: 2px solid rgb(2, 22, 63);
 }
 .DivHelpH2{
     position: absolute;
@@ -520,8 +517,36 @@ a {
     opacity: 1;
     opacity: 1s ease-in-out
 }
+.TitleAvailTable{
+    position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold;
+}
+.DivStartAddAvail{
+    position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;
+}
+.IptStartAddAvail{
+    position: absolute;  top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;
+}
+.DivEndAddAvail{
+    position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;
+}
+.DivSchedulesTableTitle{
+    position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold;
+}
 
 @media screen and (max-width: 500px) and (orientation: portrait) {
+    .listSchedules{
+        width: 200%;
+    }
+    .scroll-container-table{
+            overflow-y: auto;
+            position: absolute;
+            left: 1%;
+            top: 25%;
+            right: 1%;
+            width: 100%;
+            height: -webkit-fill-available;
+    }
+
     .imgMenu{
         width: 50px;
         padding-left: 15px;
@@ -758,6 +783,47 @@ a {
     /* font-weight: bold; */
     margin-top: 10px;
     color: black !important;
+}
+.DivSchedulesTableTitle{
+    position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
+}
+
+.TitleAvailTable{
+    position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
+}
+.DivStartAddAvail{
+    position: absolute;
+    text-align: right;
+    top: 25%;
+    left: 30%;
+    font-weight: bold;
+}
+.IptStartAddAvail {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    height: 30px;
+    width: 40%;
+    border-radius: 10px;
+    border: 2px solid;
+    border-color: #02163F;
+}
+.DivEndAddAvail {
+    position: absolute;
+    text-align: right;
+    top: 40%;
+    left: 30%;
+    font-weight: bold;
+}
+.IptEndAddAvail{
+        position: absolute;
+        top: 45%;
+        left: 30%;
+        height: 30px;
+        width: 40%;
+        border-radius: 10px;
+        border: 2px solid;
+        border-color: #02163F;
 }
 
 body {

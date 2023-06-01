@@ -165,15 +165,17 @@
                 minTime: '00:00:00',
                 maxTime: '24:00:00',
                 selectable: true,
+                selectLongPressDelay: 0,
 
                 selectHelper: true,
                 select: function (start, end, jsEvent, view) {
                     selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
                     selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
-    
+                    
                     if (view.name === 'month') {
                         console.log("View: Month");
                         var clickedElement = jsEvent.target
+                        
                         console.log(" Elemento clicado " + clickedElement);
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
