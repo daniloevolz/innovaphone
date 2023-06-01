@@ -7,10 +7,7 @@ table {
     background: #80808096;
     color: #B0132B;
 }
-.urlcalendar{
-    box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
-    background: #97929263;
-}
+
 
     table td {
         border: 1px solid #02163F;
@@ -322,6 +319,74 @@ a {
     background: rgb(19, 33, 71);
 }
 
+.DivHelpCalendarTitle{
+    position:absolute;
+    width:80%;
+    top:10%;
+    text-align:left;
+    left:5%;
+}
+.DivHelpDivIptUrl{
+    position:absolute;
+    top:33%;
+    display:inline-block;
+    width:100%;
+}
+
+.urlcalendar{
+    box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
+    background: #97929263;
+    position:absolute;
+     width: 60%; 
+     left:5%;
+      height:25px; 
+      text-align:left; 
+      border-radius:6px; 
+      padding-left: 20px;
+    
+}
+.DivHelpUlLista{
+    position:absolute; 
+    left:5%;
+    top:55%; 
+    align-items: center;
+}
+.DivHelpLi{
+    font-weight:bold; 
+    list-style-type: disc;
+     color:black !important; 
+}
+.DivHelpPInfo{
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width:90%; 
+    color:black !important;
+}
+.DivHelpH3{
+    font-weight:bold;
+    color:black !important;
+}
+.DivHelpNota{
+    font-weight:bold;
+    color:#d50000 !important; 
+    margin-top:10px;
+}
+.DivHelpNotaInfo{
+    font-weight:bold;
+    color:black !important; 
+    margin-top:10px;
+}
+.DivHelpBtnCopy{
+    position: absolute;
+    width: 6%; 
+    left: 68%;
+    height: 25px;
+    background-color: 
+    #02163f;
+    color: white;
+    border-radius: 10px;
+}
 .DivGeralTitle{
     position: absolute;
     left: 0px;
@@ -421,36 +486,46 @@ a {
     border: 2px solid;
     border-color: #02163F;
 }
+.DivHelpH2{
+    position: absolute;
+    top: 45%;
+    left: 5%; 
+    width:90%; 
+    color:black;
+}
 .imgMenu{
     width: 40px;
     display: none;
 }
-.CopyPopUp{
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        font-size: 14px;
-        opacity: 0;
-        display: none;
-        transition: opacity 0.3s, visibility 0.3s;
+.CopyPopUp {
+    position: fixed;
+    top: 42%;
+    left: 70%;
+    transform: translate(-40%, -40%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    display: none;
+    transition: opacity 0.3s, visibility 0.3s;
 }
 .CopyPopUp.show {
     opacity: 1;
     display: block;
   }
-  .CopyPopUp.hide {
-    opacity: 0;
-  }
 
+.CopyPopUp.hide {
+    opacity: 1;
+    opacity: 1s ease-in-out
+}
 
 @media screen and (max-width: 500px) and (orientation: portrait) {
     .imgMenu{
-        width: 40px;
+        width: 50px;
+        padding-left: 15px;
+        padding-top: 15px;
         display: block;
         position: absolute;
     }
@@ -460,7 +535,8 @@ a {
         height: 100%;
         background-color: #02163F;
         color: white;
-        opacity: 0.9;
+        /* opacity: 0.9; */
+        opacity: 1;
         display:block;
     }
     .colunadireita{
@@ -468,14 +544,15 @@ a {
         width: 100%;
         left:0%;
     }
-    .DivGeralTitle{
+    .DivGeralTitle {
         position: absolute;
-        left: 0px;
-        width: 100%;
+        left: 10%;
+        width: 75%;
         top: 12%;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: bold;
         text-align: center;
+        /* word-break: break-all; */
     }
     .DivGeralEmail {
         position: absolute;
@@ -590,6 +667,99 @@ a {
     border: 2px solid;
     border-color: #02163F;
 }
+.DivHelpCalendarTitle{
+    position: absolute;
+    width: 80%;
+    top: 12%;
+    text-align: left;
+    left: 5%;
+    font-size: 20px;
+}
+.DivHelpPInfo{
+    position: absolute;
+    top: 19%;
+    left: 5%;
+    font-size: 13px;
+    width: 90%;
+    color: black !important;
+}
+.DivHelpDivIptUrl{
+    position: absolute;
+    top: 35%;
+    display: inline-block;
+    width: 100%;
+}
+.urlcalendar {
+    box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
+    background: rgba(151, 146, 146, 0.39);
+    position: absolute;
+    width: 60%;
+    left: 5%;
+    height: 25px;
+    font-size: 10px;
+    text-align: left;
+    border-radius: 6px;
+    padding-left: 5px;
+}
+.DivHelpBtnCopy {
+    position: absolute;
+    width: 16%;
+    left: 68%;
+    height: 25px;
+    background-color: rgb(2, 22, 63);
+    color: white;
+    border-radius: 10px;
+}
+.CopyPopUp {
+    position: fixed;
+    top: 42%;
+    left: 70%;
+    width: 50%;
+    text-align: center;
+    /* height: 20px; */
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    display: none;
+    transition: opacity 0.3s ease 0s, visibility 0.3s ease 0s;
+}
+.DivHelpH2{
+        position: absolute;
+        top: 42%;
+        left: 5%;
+        width: 90%;
+        /* color: black !important; */
+        font-size: 18px;
+}
+.DivHelpUlLista {
+    position: absolute;
+    left: 5%;
+    top: 52%;
+    /* display: inline-flex; */
+    align-items: center;
+}
+.DivHelpLi {
+    font-weight: bold;
+    list-style-type: disc;
+    padding: 5px;
+    font-size: 15px;
+    color: black !important;
+}
+.DivHelpH3 {
+    font-weight: bold;
+    font-size: 15px;
+    color: black !important;
+}
+.DivHelpNotaInfo {
+    /* font-weight: bold; */
+    margin-top: 10px;
+    color: black !important;
+}
+
 body {
     background-image: none;
     color: var(--text-standard);
