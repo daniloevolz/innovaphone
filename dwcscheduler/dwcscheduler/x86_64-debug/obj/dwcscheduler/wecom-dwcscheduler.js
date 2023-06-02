@@ -601,14 +601,14 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 }else if(dwcCaller.length<1 && dwcLocation.length<1){
                     phoneApi.send({ mt: "CallInfo", id: call.id, html: ""});
                 }
-                dwcLocation ='';
-                dwcCaller='';
+                
             } else {
                 phoneApi.send({ mt: "CallInfo", id: call.id, html: ""});
             }
-            
-            //if (call.state == "Alerting" || call.state == "Ringback" || call.state == "Connected") {
-            //    }
+            if (call.state == "Connected") {
+                dwcLocation ='';
+                dwcCaller='';
+            }
         });
     }
     function onSearchApiMessage(consumer, obj) {
