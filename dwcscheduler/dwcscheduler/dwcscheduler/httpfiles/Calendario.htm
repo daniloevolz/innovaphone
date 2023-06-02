@@ -123,6 +123,7 @@
                 
                         UpdateAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules);
                         MakeSubtitleDiv();
+                        
                     });
                 } 
                 // fim da resposta STATUS 200
@@ -134,7 +135,7 @@
             }); // final .then (response)
 
            $('#calendar').fullCalendar({
-                
+            
                 header: {
                     left: 'today',
                    center: 'title , month,agendaDay', //agendaWeek,
@@ -161,7 +162,7 @@
                 'Dezembro'
   ],
                 defaultView: 'month',
-                slotDuration: '01:00:00',  // mexer dps 
+                slotDuration: '01:00:00', 
                 minTime: '00:00:00',
                 maxTime: '24:00:00',
                 selectable: true,
@@ -291,6 +292,7 @@
                 eventRender: function (event, element) {},
 
                 viewRender: function(view, element) {
+                    
                     if (view.name === 'month') {
                         setTimeout(function() {
                             UpdateAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules)
@@ -582,8 +584,13 @@
     </script>
 </head>
 <body>
-    <!--Calendário-->
+    <!--Calendário
     <div id='calendar'></div>
+-->
+    <div id="calendar-container">
+        <button id="custom-button">X</button>
+        <div id="calendar"></div>
+      </div>
 
          <!--MODAL DIGITE SEU NOME-->
          <div class="mainModalName" id="MyModal">

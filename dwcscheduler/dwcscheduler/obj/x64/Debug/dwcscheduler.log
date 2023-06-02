@@ -3,11 +3,7 @@
       Project output dirctory : x86_64-debug/dwcscheduler
       Temp directory          : x86_64-debug\obj\dwcscheduler
       Runtime binary          : jse/x86_64/generic
-<<<<<<< HEAD
-      Build Number            : 13B1175
-=======
-      Build Number            : 13B1189
->>>>>>> 16170d83bc610a584810ea2de93c052e047df22f
+      Build Number            : 13B1199
   
   Removing old files from x86_64-debug\obj\dwcscheduler...
   Creating directories...
@@ -30,4 +26,24 @@
       .\dwcscheduler\wecom-dwcschedulerservice.js => x86_64-debug\obj\dwcscheduler
   
   Compressing files to x86_64-debug\dwcscheduler\httpfiles.zip...
+  ZipArchiveHelper : O processo não pode acessar o arquivo 'C:\Users\Pietro Fiori\Desktop\innovaphone\dwcscheduler\dwcsch
+  eduler\x86_64-debug\obj\dwcscheduler\web1\fonts\titilliumtext25l003Webfont.ttf' porque ele está sendo usado por outro 
+  processo.
+  No 
+  C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Archive\Microsoft.PowerShell.Archive.psm1:697 
+  caractere:30
+  + ... sArchived = ZipArchiveHelper $subDirFiles.ToArray() $destinationPath  ...
+  +                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : PermissionDenied: (C:\Users\Pietro...l003Webfont.ttf:String) [Write-Error], IOException
+      + FullyQualifiedErrorId : CompressArchiveUnauthorizedAccessError,ZipArchiveHelper
+   
+  New-Object : Exceção ao chamar ".ctor" com "1" argumento(s): "O fluxo não era legível."
+  No 
+  C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Archive\Microsoft.PowerShell.Archive.psm1:808 
+  caractere:38
+  + ...     $srcStream = New-Object System.IO.BinaryReader $currentFileStream
+  +                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : InvalidOperation: (:) [New-Object], MethodInvocationException
+      + FullyQualifiedErrorId : ConstructorInvokedThrowException,Microsoft.PowerShell.Commands.NewObjectCommand
+   
   Comando de build remoto não configurado, ignorando.

@@ -526,6 +526,17 @@ a {
 .IptStartAddAvail{
     position: absolute;  top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;
 }
+.IptEndAddAvail{
+    position: absolute;
+    top: 45%;
+    left: 20%;
+    height: 30px;
+    width: 20%;
+    border-radius: 10px;
+    border: 2px solid;
+    border-color: #02163F;
+}
+
 .DivEndAddAvail{
     position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;
 }

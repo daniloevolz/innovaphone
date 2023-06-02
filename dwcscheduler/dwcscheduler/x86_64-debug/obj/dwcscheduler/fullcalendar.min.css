@@ -125,6 +125,19 @@
 .fc-month-button ,.fc-button, .fc-state-default ,.fc-corner-left{
     background-color: none;
 }
+#calendar > div.fc-toolbar.fc-header-toolbar{
+    width: 96.2%;
+}
+#custom-button {
+    position: absolute;
+    top: 10px; /* Ajuste a posição vertical conforme necessário */
+    right: 10px; /* Ajuste a posição horizontal conforme necessário */
+    /* padding: 5px; */
+    font-size: 20px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+  }
 
 .fc-event.fc-draggable,.fc-event[href],.fc-popover .fc-header .fc-close,a[data-goto] {
     cursor: pointer
