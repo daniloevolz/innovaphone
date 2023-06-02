@@ -261,6 +261,12 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivSchedules(t) {
         t.clear();
+
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+
         var today = getDateNow();
         //Botoes Tabela de Agendamentos
         //t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
@@ -354,11 +360,11 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         }
 
         //Titulo Tabela
-        var labelTituloTabeaAcoes = t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloSchedules")));
+        var labelTituloTabeaAcoes = t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloSchedules"),"DivSchedulesTableTitle"));
 
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
-        var list = new innovaphone.ui1.Div(null, null, "");
+        var list = new innovaphone.ui1.Div(null, null, "listSchedules");
         var columns = 6;
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         t.add(scroll_container);
@@ -366,6 +372,11 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivAvailabilities(t) {
         t.clear();
+
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
 
         //Botoes Tabela de Disponibilidades
         t.add(new innovaphone.ui1.Div("position:absolute; left:68%; width:15%; top:3%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAdd").addEvent("click", function () {
@@ -390,7 +401,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
 
         //Titulo Tabela
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloAvail")));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloAvail"),"TitleAvailTable"));
 
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
@@ -421,14 +432,20 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivAddAvail(colDireita) {
         colDireita.clear();
+
+        var imgMenu = colDireita.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+
         //var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
         //var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "datetime-local", null).setAttribute("id", "dateFrom"));
+       
+        var divStart = colDireita.add(new innovaphone.ui1.Div(null, texts.text("labelStart"), "DivStartAddAvail"));
+        var InputStart = colDireita.add(new innovaphone.ui1.Input(null, null, null, null, "datetime-local","IptStartAddAvail").setAttribute("id", "timeStart"));
 
-        var divStart = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelStart"), null));
-        var InputStart = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "datetime-local", null).setAttribute("id", "timeStart"));
-
-        var divEnd = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelEnd"), null));
-        var InputEnd = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 45%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "datetime-local", null).setAttribute("id", "timeEnd"));
+        var divEnd = colDireita.add(new innovaphone.ui1.Div(null, texts.text("labelEnd"), "DivEndAddAvail"));
+        var InputEnd = colDireita.add(new innovaphone.ui1.Input(null, null, null, null, "datetime-local","IptEndAddAvail").setAttribute("id", "timeEnd"));
         // buttons
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             //var from = document.getElementById("dateFrom").value;
@@ -439,7 +456,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             waitConnection(colDireita);
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            constructor();
+            makeDivAvailabilities(colDireita);
         });
     }
     function waitConnection(t) {
@@ -505,7 +522,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             waitConnection(t);
         });
 
-    }
+    } 
     function makeDivHelp(t){
         t.clear();
 

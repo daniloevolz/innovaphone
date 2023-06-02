@@ -3,7 +3,11 @@
       Project output dirctory : x86_64-debug/dwcscheduler
       Temp directory          : x86_64-debug\obj\dwcscheduler
       Runtime binary          : jse/x86_64/generic
+<<<<<<< HEAD
       Build Number            : 13B1175
+=======
+      Build Number            : 13B1189
+>>>>>>> 16170d83bc610a584810ea2de93c052e047df22f
   
   Removing old files from x86_64-debug\obj\dwcscheduler...
   Creating directories...
