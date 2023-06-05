@@ -581,6 +581,12 @@
             }
     }
         document.addEventListener('click', closeModal);
+
+    function closeAgenda(){
+        window.parent.postMessage('ocultarDiv', '*');
+        console.log("MSG ENVIADA")
+    }
+
     </script>
 </head>
 <body>
@@ -588,7 +594,7 @@
     <div id='calendar'></div>
 -->
     <div id="calendar-container">
-        <button id="custom-button">X</button>
+        <button id="custom-button" onclick="closeAgenda()">X</button>
         <div id="calendar"></div>
       </div>
 
