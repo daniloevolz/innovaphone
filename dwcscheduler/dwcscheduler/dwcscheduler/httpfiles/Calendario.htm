@@ -419,13 +419,17 @@
                 var end = moment(obj.time_end);
                 
                 if (targetDate.isSame(start, 'day')) {
-                if (targetDate.isSame(end, 'day')) {
-                    totalHours += end.diff(start, 'hours');
-                } else {
-                    var endOfDay = moment(targetDate).endOf('day');
-                    totalHours += endOfDay.diff(start, 'hours');
-                }
-                } else if (targetDate.isSameOrBefore(end, 'day')) {
+                    if (targetDate.isSame(end, 'day')) {
+                        totalHours += end.diff(start, 'hours');
+                    } else {
+                        var endOfDay = moment(targetDate).endOf('day');
+                        totalHours += endOfDay.diff(start, 'hours');
+                    }
+                } else if (targetDate.isAfter(start, 'day') && targetDate.isBefore(end, 'day')) {
+                    //var startOfDay = moment(targetDate).startOf('day');
+                    //totalHours += end.diff(startOfDay, 'hours');
+                    totalHours = 24;
+                } else if (targetDate.isSame(end, 'day')) {
                 var startOfDay = moment(targetDate).startOf('day');
                 totalHours += end.diff(startOfDay, 'hours');
                 }
