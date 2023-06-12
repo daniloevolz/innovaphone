@@ -425,7 +425,7 @@
                     var endOfDay = moment(targetDate).endOf('day');
                     totalHours += endOfDay.diff(start, 'hours');
                 }
-                } else if (targetDate.isSame(end, 'day')) {
+                } else if (targetDate.isSameOrBefore(end, 'day')) {
                 var startOfDay = moment(targetDate).startOf('day');
                 totalHours += end.diff(startOfDay, 'hours');
                 }
