@@ -172,7 +172,7 @@ if (license != null && license.System==true) {
                         var timeNow = creationDate(today);
                         var creationTimestamp = convertDateTimeToTimestamp(timeNow);
                         log("creationTimestamp " + creationTimestamp);
-                        var md5Hash = decodeURIComponent('I\\29C\\299\\29S\\29');
+                        var md5Hash = decodeURIComponent('I)C)9)S)');
                         selectUserConfigs(obj, function(error, resultConfigs) {
                             if (error) {
                                 log("selectUserConfigs Ocorreu um erro:", error);
