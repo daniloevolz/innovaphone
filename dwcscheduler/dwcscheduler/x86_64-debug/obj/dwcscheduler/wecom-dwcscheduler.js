@@ -498,6 +498,9 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var divURLConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelURLContato"),"DivGeralUrlConference"));
         var InputURLConference = t.add(new innovaphone.ui1.Input(null, url_conference, "Insira aqui a URL do evento", null, "url","DivGeralIptUrlConf").setAttribute("id", "InputURLConference"));
 
+        var divConfRoom = t.add(new innovaphone.ui1.Div(null,texts.text("labelConfRoom"),"DivConfRoom"));
+        var selectConfNumber = t.add(new innovaphone.ui1.Node("select",null,texts.text("labelConfNumber"),"SelectConfNumber"));
+
         var divTitleConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelTitleConference"),"DivGeralTitleConf"));
         var InputTitleConference = t.add(new innovaphone.ui1.Input(null, title_conference,"Insira aqui o título do evento", null, "url","DivGeralIptTitleConf").setAttribute("id", "InputTitleConference"));
 
