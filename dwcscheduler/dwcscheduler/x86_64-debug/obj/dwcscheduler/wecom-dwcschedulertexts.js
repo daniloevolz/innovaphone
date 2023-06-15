@@ -46,7 +46,7 @@ Wecom.dwcschedulerTexts = {
         labelCfgHelp: "Ajuda",
         labelcalendarURL: "Url Calendário",
         labelDivGeralChannelsReserved: "Canais Reservados para a Reunião:",
-        labelConfRoom: "Nº Sala de reuniões:",
+        labelConfRoom: "Sala de reuniões:",
         labelConfNumber: "Escolha a Sala",
         labelCopy: "Copiar",
         idInfo: "id=" + "  " +":sempre será o seu sip id no pbx ",

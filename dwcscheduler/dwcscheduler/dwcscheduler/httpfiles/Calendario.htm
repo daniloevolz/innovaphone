@@ -225,7 +225,7 @@
                             dataavailability.forEach(function (dates) {
                                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                                 var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                console.log(datastart + "\n" + dataend);
+                                console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
 
                                 // Obtém os valores do ano, mês e ano
                                 var year = moment(start).format('YYYY');
@@ -251,7 +251,7 @@
                                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                                 var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                                console.log(datastart + "\n" + dataend);
+                                console.log("Agendamento: \n"+datastart + "\n" + dataend);
                                 // Obtém os valores do ano, mês e ano
                                 var year = moment(start).format('YYYY');
                                 var month = moment(start).format('MM');
@@ -271,6 +271,24 @@
                                 }
                             });
                         }
+
+                        var year = moment(start).format('YYYY');
+                        var month = moment(start).format('MM');
+                        var day = moment(start).format('DD');
+                        // Obtém os valores do hora, minuto e segundos
+                        var hour = moment(start).format('HH');
+                        var minute = moment(start).format('mm');
+                        var second = moment(start).format('ss');
+                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        // Cria o objeto de data
+                        var datastart = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                        var now = moment().format("YYYY-MM-DDTHH:mm:ss");
+                        if (datastart < now) {
+                            console.warn("Data selecionada está no passado.");
+                            valid = false;
+                        }
+
                         if (valid) {
                             dayName = view.title;
                             var clickedTime = start.format('HH:mm:ss');
@@ -605,10 +623,9 @@
          <!--MODAL DIGITE SEU NOME-->
          <div class="mainModalName" id="MyModal">
             <div class="divSpan">
-            <span class="spanX" id="spanX">✕</span>
-        </div>
-            <br>
-            </br>
+                <span class="spanX" id="spanX">✕</span>
+            </div>
+            <br/>
             <div class="data-person">
                 <h3 id="DateToday"></h3>
                 <h2 style="    margin-block-end: 0;">Digite seu nome e e-mail</h2>
@@ -619,12 +636,10 @@
                 <br>
                 <p>E-mail:</p>
                 <input type="text" class="iptName" placeholder="Seu E-mail" id="iptEmail">
-                </br>
-                <br>
-               </br>
+                <br/>
+                <br/>
                 <button class="btnSendName" id="btnSendName" >Enviar</button>
             </div>
         </div>
-
 </body>
 </html>

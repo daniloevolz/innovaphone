@@ -403,10 +403,11 @@ a {
     left: 21%;
     font-weight: bold;
 }
-.DivGeralIptEmail{
+.DivGeralIptEmail {
     position: absolute;
     top: 20%;
     left: 21%;
+    text-align: center;
     height: 30px;
     padding: 5px;
     width: 50%;
@@ -429,8 +430,9 @@ a {
     left: 21%;
     font-weight: bold;
 }
-.DivGeralIptTitleEmail{
+.DivGeralIptTitleEmail {
     position: absolute;
+    text-align: center;
     top: 32%;
     left: 21%;
     height: 30px;
@@ -442,6 +444,7 @@ a {
 }
 .DivGeralIptUrlConf {
     position: absolute;
+    text-align: center;
     top: 43%;
     left: 21%;
     height: 30px;
@@ -461,13 +464,13 @@ a {
 
 .DivGeralIptTitleConf {
     position: absolute;
+    text-align: center;
     top: 86%;
     left: 21%;
     height: 30px;
     /*font-size: 10px;*/
     /* display: flex; */
     padding: 5px;
-    /* align-items: center; */
     width: 50%;
     border-radius: 10px;
     border: 2px solid;
@@ -482,6 +485,7 @@ a {
 }
 .DivGeralIptObjConf {
     position: absolute;
+    text-align: center;
     top: 54%;
     left: 21%;
     height: 30px;
@@ -517,10 +521,11 @@ a {
 }
 .SelectConfNumber {
     /* display: block; */
+    text-align: center;
     position: absolute;
     left: 21%;
     top: 65%;
-    height:30px;
+    height: 30px;
     /* color: black; */
     width: 50%;
     border-radius: 10px;
@@ -666,8 +671,9 @@ a {
         font-size: 13px;
         font-weight: bold;
     }
-    .DivGeralIptEmail{
+    .DivGeralIptEmail {
         position: absolute;
+        text-align: center;
         top: 20%;
         left: 21%;
         height: 25px;
@@ -688,6 +694,7 @@ a {
     }
     .DivGeralIptTitleEmail {
         position: absolute;
+        text-align: center;
         top: 20%;
         left: 21%;
         height: 25px;
@@ -698,8 +705,9 @@ a {
         border: 2px solid;
         border-color: #02163F;
     }
-    .DivGeralIptEmail{
+    .DivGeralIptEmail {
         position: absolute;
+        text-align: center;
         top: 31%;
         left: 21%;
         height: 25px;
@@ -718,8 +726,9 @@ a {
         font-size: 13px;
         font-weight: bold;
     }
-    .DivGeralIptUrlConf{
+    .DivGeralIptUrlConf {
         position: absolute;
+        text-align: center;
         top: 42%;
         left: 21%;
         height: 25px;
@@ -740,6 +749,7 @@ a {
     }
     .DivGeralIptObjConf {
         position: absolute;
+        text-align: center;
         top: 53%;
         left: 21%;
         height: 25px;
@@ -759,6 +769,7 @@ a {
     }
     .SelectConfNumber {
         display: block;
+        text-align: center;
         position: absolute;
         left: 21%;
         top: 64%;
@@ -805,6 +816,7 @@ a {
 
     .DivGeralIptUrlConf {
         position: absolute;
+        text-align: center;
         top: 42%;
         left: 21%;
         height: 25px;
