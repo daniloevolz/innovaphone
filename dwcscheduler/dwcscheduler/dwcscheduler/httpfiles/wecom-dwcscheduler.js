@@ -42,11 +42,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     var list_availabilities = [];
     var list_schedules = [];
     var list_configs = [];
+    var list_rooms = [];
     var UIuserPicture;
     var UIuser;
     var UIsip;
     var dwcCaller;
     var dwcLocation;
+    var key_conference;
 
     var phoneApi;
     var searchApi;
@@ -78,6 +80,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
             console.log(obj.result);
             list_configs = JSON.parse(obj.result);
+            app.send({ api: "user", mt: "FindObjConfMessage", obj_conference: list_configs[0].obj_conference });
             makeDivHelp(_colDireita);
             //makeDivGeral(_colDireita);
         }
@@ -139,6 +142,38 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         if (obj.api == "user" && obj.mt == "DWCCallRequest") {
             dwcCaller = obj.caller;
             dwcLocation = obj.location;
+        }
+        if (obj.api == "user" && obj.mt == "FindObjConfMessageResult") {
+            console.log(obj);
+            if (obj.found == true) {
+                list_rooms = obj.rooms;
+                try {
+                    if (list_rooms.length == 0) {
+                        window.alert("Atenção! Não há Salas disponíveis neste Objeto de Conferências")
+                    }
+                    else {
+                        key_conference = obj.key;
+
+                        var selectElement = document.getElementById("selectConfNumber");
+                        while (selectElement.options.length > 0) {
+                            selectElement.remove(0);
+                        }
+
+                        for (var i = 0; i < list_rooms.length; i++) {
+                            var option = document.createElement("option");
+                            option.text = list_rooms[i].dn;
+                            option.id = list_rooms[i]["room-number"];
+                            selectElement.appendChild(option);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("FindObjConfMessageResult: list_rooms atualizado.");
+                }
+                
+
+            } else {
+                window.alert("Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.")
+            }
         }
     }
     function constructor() {
@@ -467,19 +502,26 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
     }
     function makeDivGeral(t){
         t.clear();
-        //Titulo
+        var email_contato = null;
+        var text_invite = null;
+        var url_conference = null;
+        var email_title = null;
+        var title_conference = null;
+        var obj_conference = null;
+        var room = null;
+        var reserved_conference = null;
         try {
             var email_contato = list_configs[0].email_contato;
             var text_invite = list_configs[0].text_invite;
             var url_conference = list_configs[0].url_conference;
             var email_title = list_configs[0].email_title;
-            var title_conference = list_configs[0].title_conference
+            var title_conference = list_configs[0].title_conference;
+            var obj_conference = list_configs[0].obj_conference;
+            var room = list_configs[0].number_conference;
+            key_conference = list_configs[0].key_conference;
+            var reserved_conference = list_configs[0].reserved_conference;
         } catch (e) {
-            var email_contato = null;
-            var text_invite = null;
-            var url_conference = null;
-            var email_title = null;
-            var title_conference = null;
+            
         }
 
         var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
@@ -498,8 +540,32 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var divURLConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelURLContato"),"DivGeralUrlConference"));
         var InputURLConference = t.add(new innovaphone.ui1.Input(null, url_conference, "Insira aqui a URL do evento", null, "url","DivGeralIptUrlConf").setAttribute("id", "InputURLConference"));
 
+        //Sala de Conf dinâmica
+        var divObjConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelObjConf"), "DivGeralObjConference"));
+        var InputObjConference = t.add(new innovaphone.ui1.Input(null, obj_conference, "Insira aqui o nome do Objeto de Conferência que possui as Salas", null, "text", "DivGeralIptObjConf").setAttribute("id", "InputObjConference"));
+        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:54%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnFind").addEvent("click", function () {
+
+            var obj_conference = document.getElementById("InputObjConference").value;
+            app.send({ api: "user", mt: "FindObjConfMessage", obj_conference: obj_conference });
+            //waitConnection(t);
+        });
         var divConfRoom = t.add(new innovaphone.ui1.Div(null,texts.text("labelConfRoom"),"DivConfRoom"));
-        var selectConfNumber = t.add(new innovaphone.ui1.Node("select",null,texts.text("labelConfNumber"),"SelectConfNumber"));
+        var selectConfNumber = t.add(new innovaphone.ui1.Node("select", null, null, "SelectConfNumber").setAttribute("id", "selectConfNumber"));
+        selectConfNumber.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
+        list_rooms.forEach(function (r) {
+            selectConfNumber.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", r.dn, null).setAttribute("id", r["room-number"]));
+        })
+        if (list_configs[0].number_conference) {
+            var cn = list_rooms.filter(function (r) { return r["room-number"] === room })[0].dn;
+            var select = document.getElementById('selectConfNumber');
+            select.remove(0);
+            select.value = cn;
+        }
+
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelDivGeralChannelsReserved"), "DivGeralChannelsReserved"));
+        t.add(new innovaphone.ui1.Input(null, reserved_conference, "Insira aqui o número de canais reservados", null, "number", "DivGeralIptChannelsReserved").setAttribute("id", "InputChannelsReserved"));
+
+
 
         var divTitleConference = t.add(new innovaphone.ui1.Div(null, texts.text("labelTitleConference"),"DivGeralTitleConf"));
         var InputTitleConference = t.add(new innovaphone.ui1.Input(null, title_conference,"Insira aqui o título do evento", null, "url","DivGeralIptTitleConf").setAttribute("id", "InputTitleConference"));
@@ -518,10 +584,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             var text_invite = document.getElementById("InputTxtInvite").value;
             var email_title = document.getElementById("InputTitleEmail").value;
             var title_conference = document.getElementById("InputTitleConference").value;
-             
-            
+            var obj_conference = document.getElementById("InputObjConference").value;
+            var reserved_conference = document.getElementById("InputChannelsReserved").value;
+            var room_number = document.getElementById("selectConfNumber");
+            var selectedroom = room_number.options[room_number.selectedIndex];
+            var number_conference = selectedroom.id;
 
-            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite, email_title: email_title, title_conference: title_conference });
+            app.send({ api: "user", mt: "UpdateConfigMessage", email: email_contato, url_conference: url_conference, text_invite: text_invite, email_title: email_title, title_conference: title_conference, obj_conference: obj_conference, number_conference: number_conference, key_conference: key_conference, reserved_conference: reserved_conference});
             waitConnection(t);
         });
 
@@ -688,14 +757,14 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         }, 300);
     }
     function ShowCopyPopUp() {
-    var popup = document.getElementById("copyPopUp");
-    popup.classList.remove("hide");
-    popup.classList.add("show");
+        var popup = document.getElementById("copyPopUp");
+        popup.classList.remove("hide");
+        popup.classList.add("show");
   
-    setTimeout(function() {
-        popup.classList.remove("show");
-        popup.classList.add("hide");
-      }, 1000);
+        setTimeout(function() {
+            popup.classList.remove("show");
+            popup.classList.add("hide");
+          }, 1000);
     
     }
 }

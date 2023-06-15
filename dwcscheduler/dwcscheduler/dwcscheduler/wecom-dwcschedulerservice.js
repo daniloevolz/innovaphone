@@ -1,6 +1,7 @@
 ﻿var PbxSignal = [];
 var pbxTableUsers = [];
 var pbxTable = [];
+var PbxAdminApi;
 var connectionsUser = [];
 
 var license = getLicense();
@@ -162,17 +163,17 @@ if (license != null && license.System==true) {
                         var rand = String(Random.dword());
                         rand = rand.substring(0, 4);
                         log("rand" + rand);
-                        var roomNumber = 02;
+                        
                         var meetingId = rand;
                         var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
                         log("startTimestamp " + startTimestamp);
                         var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
                         log("endTimestamp " + endTimestamp);
-                        var reservedChannels = 5;
+                        
                         var timeNow = creationDate(today);
                         var creationTimestamp = convertDateTimeToTimestamp(timeNow);
                         log("creationTimestamp " + creationTimestamp);
-                        var md5Hash = decodeURIComponent('I)C)9)S)');
+                        
                         selectUserConfigs(obj, function(error, resultConfigs) {
                             if (error) {
                                 log("selectUserConfigs Ocorreu um erro:", error);
@@ -185,8 +186,11 @@ if (license != null && license.System==true) {
                             } else {
                                 log("selectUserConfigs Resultado:", JSON.stringify(resultConfigs));
                                 var cfg = JSON.parse(JSON.stringify(resultConfigs.msg));
-                                log("resultConfigs.status=="+resultConfigs.status);
-                                var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference);
+                                log("resultConfigs.status==" + resultConfigs.status);
+                                var roomNumber = cfg[0].number_conference;
+                                var md5Hash = decodeURIComponent(cfg[0].key_conference);
+                                var reservedChannels = cfg[0].reserved_conference;
+                                var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
                                 log("conferenceLink" + conferenceLink);    
                                 insertConferenceSchedule(obj, conferenceLink,function(error, resultSchedule) {
                                     if (error) {
@@ -500,7 +504,7 @@ new JsonApi("user").onconnected(function(conn) {
                     }
 
                     try {
-                        Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, url_conference, email_contato, email_title, title_conference) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.url_conference + "','" + obj.email + "','" + obj.email_title + "','" + obj.title_conference + "')")
+                        Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, url_conference, email_contato, email_title, title_conference, obj_conference, number_conference, key_conference, reserved_conference) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.url_conference + "','" + obj.email + "','" + obj.email_title + "','" + obj.title_conference + "','" + obj.obj_conference + "','" + obj.number_conference + "','" + obj.key_conference + "','" + obj.reserved_conference+ "')")
                             .oncomplete(function () {
                                 log("UpdateConfigMessage:result=");
                                 conn.send(JSON.stringify({ api: "user", mt: "UpdateConfigMessageSuccess" }));
@@ -600,6 +604,9 @@ new JsonApi("user").onconnected(function(conn) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                         });
                 }
+                if (obj.mt == "FindObjConfMessage") {
+                    PbxAdminApi.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "h323": obj.obj_conference, "template": "without", "src": conn.sip }));
+                }
             }
             else {
                 log("danilo req: No license Available")
@@ -683,6 +690,38 @@ new JsonApi("admin").onconnected(function(conn) {
         });
     }
 });
+
+new PbxApi("PbxAdminApi").onconnected(function(conn){
+    log("PbxAdminApi: connected conn " + JSON.stringify(conn));
+    PbxAdminApi = conn;
+    //conn.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "cn":"Conference", "template": "without", "src": conn.pbx }));
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+        log("PbxAdminApi msg "+msg);
+
+        if (obj.mt === "GetObjectResult") {
+            var found = false;
+            var rooms;
+            var key;
+            if (obj.guid) {
+                found = true;
+                rooms = obj.pseudo["static-room"];
+                key = obj.pseudo["m-key"];
+                log("PbxAdminApi msg " + JSON.stringify(rooms));
+            }
+            connectionsUser.forEach(function (c) {
+                if (c.sip == obj.src) {
+                    c.send(JSON.stringify({ api: "user", mt: "FindObjConfMessageResult", found: found, rooms: rooms, key: key}));
+                }
+            })
+            
+        }
+    });
+    conn.onclose(function () {
+        PbxAdminApi = null;
+        log("PbxAdminApi: disconnected");
+    });
+})
 
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
@@ -986,7 +1025,7 @@ function convertDateTimeLocalToCustomFormat(datetimeLocal) {
 function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
-function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain) {
+function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain, obj) {
     log("version "+version+", flags "+flags+", roomNumber "+roomNumber+", meetingId "+meetingId+", startTimestamp "+startTimestamp+", endTimestamp "+endTimestamp+", reservedChannels "+reservedChannels+", creationTimestamp "+creationTimestamp+", md5Hash "+md5Hash+", domain "+domain);
     var conf = {
         version: toUint8Array(version, 1),
@@ -1024,7 +1063,7 @@ function createConferenceLink(version, flags, roomNumber, meetingId, startTimest
     var urlEncoded = result.replace(/\+/g, '-').replace(/\//g, '_');
 
     // Construct the final conference link
-    var conferenceLink = 'https://' + domain + '/PBX0/APPS/conf-dedicated/webaccess.htm?m=' + urlEncoded;
+    var conferenceLink = 'https://' + domain + '/PBX0/APPS/' + obj.toLowerCase()+'/webaccess.htm?m=' + urlEncoded;
   
     return conferenceLink;
 }

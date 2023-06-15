@@ -103,11 +103,31 @@
             "cmd": "column",
             "name": "email_title",
             "type": "text"
-            
+
           },
           {
             "cmd": "column",
             "name": "title_conference",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "obj_conference",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "number_conference",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "key_conference",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "reserved_conference",
             "type": "text"
           }
         ]

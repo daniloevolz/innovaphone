@@ -265,6 +265,7 @@ main {
 }
 
 .colunadireita {
+    overflow-y:auto;
     width: 85%;
     height: 100%;
     position: absolute;
@@ -452,13 +453,36 @@ a {
 .DivGeralTitleConf {
     position: absolute;
     text-align: right;
-    top: 58%;
+    top: 81%;
+    font-size: 13px;
     left: 21%;
     font-weight: bold;
 }
+
 .DivGeralIptTitleConf {
     position: absolute;
-    top: 63%;
+    top: 86%;
+    left: 21%;
+    height: 30px;
+    /*font-size: 10px;*/
+    /* display: flex; */
+    padding: 5px;
+    /* align-items: center; */
+    width: 50%;
+    border-radius: 10px;
+    border: 2px solid;
+    border-color: #02163F;
+}
+.DivGeralObjConference {
+    position: absolute;
+    text-align: right;
+    top: 49%;
+    left: 21%;
+    font-weight: bold;
+}
+.DivGeralIptObjConf {
+    position: absolute;
+    top: 54%;
     left: 21%;
     height: 30px;
     padding: 5px;
@@ -466,17 +490,18 @@ a {
     border-radius: 10px;
     border: 2px solid rgb(2, 22, 63);
 }
+
 .DivGeralTextInvite {
     position: absolute;
     text-align: right;
-    top: 70%;
+    top: 92%;
     left: 21%;
     font-weight: bold;
 }
 .DivGeralIptTextInvite {
     position: absolute;
     padding: 5px;
-    top: 75%;
+    top: 97%;
     left: 21%;
     height: 100px;
     width: 50%;
@@ -486,19 +511,42 @@ a {
 .DivConfRoom {
     position: absolute;
     text-align: right;
-    top: 51%;
+    top: 60%;
     left: 21%;
     font-weight: bold;
 }
 .SelectConfNumber {
     /* display: block; */
     position: absolute;
-    left: 30%;
-    top: 51%;
+    left: 21%;
+    top: 65%;
+    height:30px;
     /* color: black; */
-    width: 200px;
+    width: 50%;
     border-radius: 10px;
     color: black !important;
+    border: 2px solid rgb(2, 22, 63);
+}
+
+.DivGeralChannelsReserved {
+    position: absolute;
+    text-align: right;
+    /* top: 48%; */
+    top: 71%;
+    left: 21%;
+    font-weight: bold;
+}
+
+.DivGeralIptChannelsReserved {
+    text-align: center;
+    top: 75%;
+    position: absolute;
+    left: 21%;
+    height: 30px;
+    font-size: 13px;
+    padding: 5px;
+    width: 50%;
+    border-radius: 10px;
     border: 2px solid rgb(2, 22, 63);
 }
 
@@ -582,7 +630,7 @@ a {
         padding-left: 15px;
         padding-top: 15px;
         display: block;
-        position: absolute;
+        position: fixed;
     }
     .colunaesquerda {
         position: absolute ;
@@ -595,6 +643,7 @@ a {
         display:block;
     }
     .colunadireita{
+        overflow-y: auto;
         display: none;
         width: 100%;
         left:0%;
@@ -603,7 +652,7 @@ a {
         position: absolute;
         left: 10%;
         width: 75%;
-        top: 12%;
+        top: 5%;
         font-size: 15px;
         font-weight: bold;
         text-align: center;
@@ -612,18 +661,18 @@ a {
     .DivGeralEmail {
         position: absolute;
         text-align: right;
-        top: 26%;
+        top: 16%;
         left: 21%;
         font-size: 13px;
         font-weight: bold;
     }
     .DivGeralIptEmail{
         position: absolute;
-        top: 30%;
+        top: 20%;
         left: 21%;
         height: 25px;
         padding: 5px;
-        font-size: 10px;
+        font-size: 13px;
         width: 50%;
         border-radius: 10px;
         border: 2px solid;
@@ -632,17 +681,17 @@ a {
     .DivGeralTitleEmail{
         position: absolute;
         text-align: right;
-        top: 37%;
+        top: 27%;
         font-size: 13px;
         left: 21%;
         font-weight: bold;
     }
     .DivGeralIptTitleEmail {
         position: absolute;
-        top: 30%;
+        top: 20%;
         left: 21%;
         height: 25px;
-        font-size: 10px;
+        font-size: 13px;
         padding: 5px;
         width: 50%;
         border-radius: 10px;
@@ -651,10 +700,10 @@ a {
     }
     .DivGeralIptEmail{
         position: absolute;
-        top: 41%;
+        top: 31%;
         left: 21%;
         height: 25px;
-        font-size: 10px;
+        font-size: 13px;
         padding: 5px;
         width: 50%;
         border-radius: 10px;
@@ -664,203 +713,282 @@ a {
     .DivGeralUrlConference{
         position: absolute;
         text-align: right;
-        top: 48%;
+        top: 38%;
         left: 21%;
         font-size: 13px;
         font-weight: bold;
     }
     .DivGeralIptUrlConf{
         position: absolute;
-        top: 52%;
+        top: 42%;
         left: 21%;
         height: 25px;
-        font-size: 10px;
+        font-size: 13px;
         padding: 5px;
         width: 50%;
         border-radius: 10px;
         border: 2px solid;
         border-color: #02163F;
     }
-    .DivGeralTextInvite{
-            position: absolute;
-            text-align: right;
-            top: 69%;
-            left: 21%;
-            font-size: 13px;
-            font-weight: bold;
+    .DivGeralObjConference {
+        position: absolute;
+        text-align: right;
+        font-size: 13px;
+        top: 49%;
+        left: 21%;
+        font-weight: bold;
     }
-.DivGeralIptTextInvite{  
-    position: absolute;
-    padding: 5px;
-    top: 73%;
-    left: 21%;
-    height: 100px;
-    width: 50%;
-    border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
-}
-.DivGeralTitleConf{
-    position: absolute;
-    text-align: right;
-    top: 58%;
-    font-size: 13px;
-    left: 21%;
-    font-weight: bold;
-}
-.DivGeralIptTitleConf{
-    position: absolute;
-    top: 62%;
-    left: 21%;
-    height: 25px;
-    font-size: 10px;
-    /* display: flex; */
-    padding: 5px;
-    /* align-items: center; */
-    width: 50%;
-    border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
-}
-.DivHelpCalendarTitle{
-    position: absolute;
-    width: 80%;
-    top: 12%;
-    text-align: left;
-    left: 5%;
-    font-size: 20px;
-}
-.DivHelpPInfo{
-    position: absolute;
-    top: 19%;
-    left: 5%;
-    font-size: 13px;
-    width: 90%;
-    color: black !important;
-}
-.DivHelpDivIptUrl{
-    position: absolute;
-    top: 35%;
-    display: inline-block;
-    width: 100%;
-}
-.urlcalendar {
-    box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
-    background: rgba(151, 146, 146, 0.39);
-    position: absolute;
-    width: 60%;
-    left: 5%;
-    height: 25px;
-    font-size: 10px;
-    text-align: left;
-    border-radius: 6px;
-    padding-left: 5px;
-}
-.DivHelpBtnCopy {
-    position: absolute;
-    width: 16%;
-    left: 68%;
-    height: 25px;
-    background-color: rgb(2, 22, 63);
-    color: white;
-    border-radius: 10px;
-}
-.CopyPopUp {
-    position: fixed;
-    top: 42%;
-    left: 70%;
-    width: 50%;
-    text-align: center;
-    /* height: 20px; */
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 12px;
-    opacity: 0;
-    display: none;
-    transition: opacity 0.3s ease 0s, visibility 0.3s ease 0s;
-}
-.DivHelpH2{
+    .DivGeralIptObjConf {
+        position: absolute;
+        top: 53%;
+        left: 21%;
+        height: 25px;
+        font-size: 13px;
+        padding: 5px;
+        width: 50%;
+        border-radius: 10px;
+        border: 2px solid rgb(2, 22, 63);
+    }
+    .DivConfRoom {
+        position: absolute;
+        text-align: right;
+        top: 60%;
+        left: 21%;
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .SelectConfNumber {
+        display: block;
+        position: absolute;
+        left: 21%;
+        top: 64%;
+        height: 25px;
+        /* color: black; */
+        width: 50%;
+        font-size: 13px;
+        border-radius: 10px;
+        color: black !important;
+        border: 2px solid rgb(2, 22, 63);
+    }
+
+    .DivGeralChannelsReserved {
+        position: absolute;
+        text-align: right;
+        /* top: 48%; */
+        top: 71%;
+        left: 21%;
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .DivGeralIptChannelsReserved {
+        text-align: center;
+        top: 75%;
+        position: absolute;
+        left: 21%;
+        height: 25px;
+        font-size: 13px;
+        padding: 5px;
+        width: 50%;
+        border-radius: 10px;
+        border: 2px solid rgb(2, 22, 63);
+    }
+
+    .DivGeralTitleConf {
+        position: absolute;
+        text-align: right;
+        /* top: 48%; */
+        top: 81%;
+        left: 21%;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .DivGeralIptUrlConf {
         position: absolute;
         top: 42%;
-        left: 5%;
-        width: 90%;
-        /* color: black !important; */
-        font-size: 18px;
-}
-.DivHelpUlLista {
-    position: absolute;
-    left: 5%;
-    top: 52%;
-    /* display: inline-flex; */
-    align-items: center;
-}
-.DivHelpLi {
-    font-weight: bold;
-    list-style-type: disc;
-    padding: 5px;
-    font-size: 15px;
-    color: black !important;
-}
-.DivHelpH3 {
-    font-weight: bold;
-    font-size: 15px;
-    color: black !important;
-}
-.DivHelpNotaInfo {
-    /* font-weight: bold; */
-    margin-top: 10px;
-    color: black !important;
-}
-.DivSchedulesTableTitle{
-    position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
-}
-
-.TitleAvailTable{
-    position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
-}
-.DivStartAddAvail{
-    position: absolute;
-    text-align: right;
-    top: 25%;
-    left: 30%;
-    font-weight: bold;
-}
-.IptStartAddAvail {
-    position: absolute;
-    top: 30%;
-    left: 30%;
-    height: 30px;
-    width: 40%;
-    border-radius: 10px;
-    border: 2px solid;
-    border-color: #02163F;
-}
-.DivEndAddAvail {
-    position: absolute;
-    text-align: right;
-    top: 40%;
-    left: 30%;
-    font-weight: bold;
-}
-.IptEndAddAvail{
+        left: 21%;
+        height: 25px;
+        font-size: 13px;
+        padding: 5px;
+        font-size: 13px;
+        width: 50%;
+        border-radius: 10px;
+        border: 2px solid;
+        border-color: #02163F;
+    }
+    .DivGeralIptTitleConf {
         position: absolute;
-        top: 45%;
+        top: 85%;
+        left: 21%;
+        height: 25px;
+        font-size: 13px;
+        /* display: flex; */
+        padding: 5px;
+        /* align-items: center; */
+        width: 50%;
+        border-radius: 10px;
+        border: 2px solid;
+        border-color: #02163F;
+    }
+    .DivGeralTextInvite {
+        position: absolute;
+        text-align: right;
+        top: 90%;
+        left: 21%;
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .DivGeralIptTextInvite {
+        position: absolute;
+        padding: 5px;
+        top: 93%;
+        left: 21%;
+        height: 100px;
+        width: 50%;
+        font-size: 13px;
+        border-radius: 10px;
+        border: 2px solid;
+        border-color: #02163F;
+    }
+    .DivHelpCalendarTitle{
+        position: absolute;
+        width: 80%;
+        top: 12%;
+        text-align: left;
+        left: 5%;
+        font-size: 20px;
+    }
+    .DivHelpPInfo{
+        position: absolute;
+        top: 19%;
+        left: 5%;
+        font-size: 13px;
+        width: 90%;
+        color: black !important;
+    }
+    .DivHelpDivIptUrl{
+        position: absolute;
+        top: 35%;
+        display: inline-block;
+        width: 100%;
+    }
+    .urlcalendar {
+        box-shadow: rgb(0, 152, 179) 0px 0px 3px 1px;
+        background: rgba(151, 146, 146, 0.39);
+        position: absolute;
+        width: 60%;
+        left: 5%;
+        height: 25px;
+        font-size: 10px;
+        text-align: left;
+        border-radius: 6px;
+        padding-left: 5px;
+    }
+    .DivHelpBtnCopy {
+        position: absolute;
+        width: 16%;
+        left: 68%;
+        height: 25px;
+        background-color: rgb(2, 22, 63);
+        color: white;
+        border-radius: 10px;
+    }
+    .CopyPopUp {
+        position: fixed;
+        top: 42%;
+        left: 70%;
+        width: 50%;
+        text-align: center;
+        /* height: 20px; */
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 12px;
+        opacity: 0;
+        display: none;
+        transition: opacity 0.3s ease 0s, visibility 0.3s ease 0s;
+    }
+    .DivHelpH2{
+            position: absolute;
+            top: 42%;
+            left: 5%;
+            width: 90%;
+            /* color: black !important; */
+            font-size: 18px;
+    }
+    .DivHelpUlLista {
+        position: absolute;
+        left: 5%;
+        top: 52%;
+        /* display: inline-flex; */
+        align-items: center;
+    }
+    .DivHelpLi {
+        font-weight: bold;
+        list-style-type: disc;
+        padding: 5px;
+        font-size: 15px;
+        color: black !important;
+    }
+    .DivHelpH3 {
+        font-weight: bold;
+        font-size: 15px;
+        color: black !important;
+    }
+    .DivHelpNotaInfo {
+        /* font-weight: bold; */
+        margin-top: 10px;
+        color: black !important;
+    }
+    .DivSchedulesTableTitle{
+        position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
+    }
+
+    .TitleAvailTable{
+        position:absolute; left:5%; width:30%; top:15%; font-size:17px; text-align:center; font-weight: bold;
+    }
+    .DivStartAddAvail{
+        position: absolute;
+        text-align: right;
+        top: 25%;
+        left: 30%;
+        font-weight: bold;
+    }
+    .IptStartAddAvail {
+        position: absolute;
+        top: 30%;
         left: 30%;
         height: 30px;
         width: 40%;
         border-radius: 10px;
         border: 2px solid;
         border-color: #02163F;
-}
-
-body {
-    background-image: none;
-    color: var(--text-standard);
-}
     }
+    .DivEndAddAvail {
+        position: absolute;
+        text-align: right;
+        top: 40%;
+        left: 30%;
+        font-weight: bold;
+    }
+    .IptEndAddAvail{
+            position: absolute;
+            top: 45%;
+            left: 30%;
+            height: 30px;
+            width: 40%;
+            border-radius: 10px;
+            border: 2px solid;
+            border-color: #02163F;
+    }
+
+    body {
+        background-image: var(--bg);
+        color: var(--text-standard);
+    }
+}
     
 
     
