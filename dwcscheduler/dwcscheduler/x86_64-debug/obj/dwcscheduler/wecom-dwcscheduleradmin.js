@@ -117,11 +117,13 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         that.clear();
         // col direita
         var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
+        colDireita.setAttribute("id","coldireita")
         //Título
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         // col Esquerda
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        colEsquerda.setAttribute("id","colesquerda")
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
         var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
         imglogo.setAttribute("src", "logo-wecom.png");
@@ -159,12 +161,30 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         //Aconfig.setAttribute("href", "#");
 
         var a = document.getElementById("CfgGeral");
-        a.addEventListener("click", function () { ChangeView("CfgGeral", colDireita) })
+        a.addEventListener("click", function () {
+            ChangeView("CfgGeral", colDireita) 
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                openColDireita()
+                console.log("Media Query 500px");
+            }
+            })
         var a = document.getElementById("CfgGoogle");
-        a.addEventListener("click", function () { ChangeView("CfgGoogle", colDireita) })
+        a.addEventListener("click", function () { 
+            ChangeView("CfgGoogle", colDireita) 
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                openColDireita()
+                console.log("Media Query 500px");
+            }
+            })
 
         var a = document.getElementById("CfgLicense");
-        a.addEventListener("click", function () { ChangeView("CfgLicense", colDireita) })
+        a.addEventListener("click", function () { 
+            ChangeView("CfgLicense", colDireita) 
+            if (window.matchMedia("(max-width: 500px)").matches) {
+                openColDireita()
+                console.log("Media Query 500px");
+            }
+        })
 
         _colDireita = colDireita;
     }
@@ -189,23 +209,29 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     }
     function makeDivGeral(t) {
         t.clear();
+        
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+        
         //Título
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloSmtp")));
 
-        var lblfrom = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelfrom"), null));
-        var Inputfrom = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", from, null, null, "email", null).setAttribute("id", "Inputfrom"));
+        var lblfrom = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelfrom"), "DivGeralAdminContaEmail"));
+        var Inputfrom = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", from, null, null, "email","DivGeralAdminIptEmail").setAttribute("id", "Inputfrom"));
 
-        var lblfromName = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelfromName"), null));
-        var InputfromName = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", fromName, null, null, "url", null).setAttribute("id", "InputfromName"));
+        var lblfromName = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelfromName"), "DivGeralAdminNameConta"));
+        var InputfromName = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", fromName, null, null, "url","DivGeralAdminIptConta").setAttribute("id", "InputfromName"));
 
-        var lblserver = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelserver"), null));
-        var Inputserver = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 45%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", server, null, null,"text",null).setAttribute("id", "Inputserver"));
+        var lblserver = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelserver"), "DivGeralAdminServerName"));
+        var Inputserver = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 45%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", server, null, null,"text","DivGeralAdminIptServer").setAttribute("id", "Inputserver"));
 
-        var lblusername = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelusername"), null));
-        var Inputusername = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 55%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", username, null,null, "text", null).setAttribute("id", "Inputusername"));
+        var lblusername = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelusername"), "DivGeralAdminUsername"));
+        var Inputusername = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 55%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", username, null,null, "text", "DivGeralAdminIptUsername").setAttribute("id", "Inputusername"));
 
-        var lblpassword = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelpassword"), null));
-        var Inputpassword = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 65%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", password, null, null, "text", null).setAttribute("id", "Inputpassword"));
+        var lblpassword = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelpassword"), "DivGeralAdminSenha"));
+        var Inputpassword = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 65%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", password, null, null, "text","DivGeralAdminIptSenha").setAttribute("id", "Inputpassword"));
 
 
         // buttons
@@ -225,14 +251,19 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     function makeDivGoogle(t) {
         t.clear();
         //Título
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloGoogle")));
 
-        var lblsendLocation = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblsendLocation"), null));
-        var switchsendLocation = t.add(new innovaphone.ui1.Switch("position:absolute; left:40%; top:25%;", null, null, sendLocation));
+        var lblsendLocation = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblsendLocation"),"DivGoogleSendLocation"));
+        var switchsendLocation = t.add(new innovaphone.ui1.Switch("position:absolute; left:40%; top:25%;",null, null, sendLocation,"DivGoogleSwitch"));
         switchsendLocation.addEvent("click", onsendLocationSwitchCLick);
 
-        var lblgoogleApiKey = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelgoogleApiKey"), null));
-        var InputgoogleApiKey = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", googleApiKey, null, null, null, null).setAttribute("id", "InputgoogleApiKey"));
+        var lblgoogleApiKey = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelgoogleApiKey"), "DivGoogleApiKey"));
+        var InputgoogleApiKey = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", googleApiKey, null, null, null,"DivGoogleIptApi").setAttribute("id", "InputgoogleApiKey"));
 
         var onsendLocationSwitchCLick = function () {
             
@@ -253,22 +284,28 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     function makeDivLicense(t) {
         t.clear();
         //Título
+
+        var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+        imgMenu.setAttribute("src","menu-icon.png");
+        imgMenu.setAttribute("id","imgmenu");
+        document.getElementById("imgmenu").addEventListener("click",openMenu);
+
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloLicense")));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, "DivLicenseToken"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"), null));
-        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, null).setAttribute("id", "InputLicenseFile"));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"),"DivLicenseKey"));
+        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", licenseActive, null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", licenseActive, "DivLicenseSystem"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", licenseInstallDate, null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), null));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
+        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
 
 
         // buttons
@@ -298,6 +335,49 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
         return dateString.slice(0, -5);
+    }
+    function openMenu() {
+        var colunaEsquerda = document.getElementById("colesquerda");
+        var colunaDireita = document.getElementById("coldireita");
+        var imgMenu = document.getElementById("imgmenu");
+        
+        colunaEsquerda.style.display = 'block';
+        colunaEsquerda.style.transform = 'translateX(-100%)';
+        colunaEsquerda.style.transition = 'transform 1s ease-in-out, opacity 1s ease-in-out';
+        
+        colunaDireita.style.opacity = '1';
+        colunaDireita.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(function() {
+            colunaEsquerda.style.transform = 'translateX(0)';
+            colunaDireita.style.opacity = '0';
+        }, 0);
+        
+        setTimeout(function() {
+            colunaDireita.style.display = 'none';
+            imgMenu.style.display = 'none';
+            colunaDireita.style.opacity = '1';
+        }, 1000);
+    }
+
+    function openColDireita(){
+        var colunaEsquerda = document.getElementById("colesquerda");
+        var colunaDireita = document.getElementById("coldireita");
+        var imgMenu = document.getElementById("imgmenu");
+        
+        colunaEsquerda.style.transform = 'translateX(-100%)';
+        colunaEsquerda.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+        
+        colunaDireita.style.display = 'block';
+        colunaDireita.style.opacity = '0';
+        colunaDireita.style.transition = 'opacity 0.3s ease-in-out';
+        
+        setTimeout(function() {
+            colunaEsquerda.style.display = 'none';
+            colunaEsquerda.style.transform = 'translateX(0)';
+            colunaDireita.style.opacity = '1';
+        }, 300);
+       
     }
 }
 

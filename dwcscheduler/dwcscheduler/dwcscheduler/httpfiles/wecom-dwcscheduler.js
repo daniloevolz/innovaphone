@@ -231,11 +231,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             ChangeView("CfgGeral", colDireita)
             if (window.matchMedia("(max-width: 500px)").matches) {
                 openColDireita()
-            }
-            else{
-                console.log("View Desktop")
+                console.log("Media Query 500px");
             }
         })
+
         var a = document.getElementById("CfgSchedules");
         a.addEventListener("click", function () { 
             ChangeView("CfgSchedules", colDireita)
@@ -755,6 +754,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             colunaEsquerda.style.transform = 'translateX(0)';
             colunaDireita.style.opacity = '1';
         }, 300);
+       
     }
     function ShowCopyPopUp() {
         var popup = document.getElementById("copyPopUp");

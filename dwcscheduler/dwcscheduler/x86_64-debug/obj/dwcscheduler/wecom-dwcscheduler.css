@@ -615,6 +615,13 @@ a {
 .DivSchedulesTableTitle{
     position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold;
 }
+/*admin mobile*/
+
+
+
+
+
+
 
 @media screen and (max-width: 500px) and (orientation: portrait) {
     .listSchedules{
