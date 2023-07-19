@@ -83,11 +83,13 @@
         var timeStart_schedules;
         var timeEnd_schedules;
         var dayName;
-        
+        var url = document.URL;
+        var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
+        var url = url.substring(0, penultimateSlashIndex);
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             var id = $.urlParam('id');
-            fetch('/dwcscheduler/get-agenda?id=' + id, {
+            fetch(url+'/get-agenda?id=' + id, {
                 method: 'GET',
                 headers: {}
             }).then(function (response) {
@@ -554,7 +556,7 @@
                                     time_start: start,
                                     time_end: end
                                 };
-                                fetch('/dwcscheduler/salvar-evento', {
+                                fetch(url+'/salvar-evento', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'

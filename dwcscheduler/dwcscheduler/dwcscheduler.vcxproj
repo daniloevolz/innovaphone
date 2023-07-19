@@ -126,6 +126,10 @@
     <None Include="dwcscheduler\httpfiles\Calendario.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="dwcscheduler\httpfiles\wecom-dwcidentity.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="dwcscheduler\httpfiles\wecom-dwcidentity.js" />
     <None Include="dwcscheduler\plugins.json" />
     <None Include="dwcscheduler\wecom-dwcschedulerservice.js" />
     <None Include="dwcscheduler\httpfiles\httpfiles.mak" />
@@ -140,6 +144,7 @@
     <None Include="dwcscheduler\httpfiles\wecom.dwcschedulermanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="dwcscheduler\httpfiles\wecom-dwcidentity.png" />
     <Image Include="dwcscheduler\httpfiles\wecom-dwcscheduler.png" />
     <Image Include="dwcscheduler\httpfiles\wecom-dwcscheduleradmin.png" />
     <Image Include="dwcscheduler\dwcscheduler.png" />

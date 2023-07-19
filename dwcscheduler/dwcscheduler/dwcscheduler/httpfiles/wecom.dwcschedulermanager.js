@@ -45,9 +45,10 @@ plugin.wecom.dwcschedulermanager = wecom.dwcschedulermanager || function (start,
 
     var panel = this.add(new innovaphone.ui1.Div(null, null, "wecom-dwcscheduler-panel"));
     var src = new app.Src(pbx);
-    var typeText = ["dwcscheduler", "dwcscheduleradmin"];
-    var typeUrl = ["/wecom-dwcscheduler", "/wecom-dwcscheduleradmin"];
+    var typeText = ["dwcscheduler", "dwcscheduleradmin","dwcidentity"];
+    var typeUrl = ["/wecom-dwcscheduler", "/wecom-dwcscheduleradmin", "/wecom-dwcidentity"];
     var typeCheckmarks = [
+        { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
     ];
@@ -96,6 +97,7 @@ plugin.wecom.dwcschedulermanager = wecom.dwcschedulermanager || function (start,
         var select = content.add(new innovaphone.ui1.Div("position:relative; width:100%; display:flex; flex-wrap:wrap; align-content:flex-start"));
         addSelect(select, 0, "dwcscheduler", "/wecom-dwcscheduler.png");
         addSelect(select, 1, "dwcscheduleradmin", "/wecom-dwcscheduleradmin.png");
+        addSelect(select, 2, "dwcidentity", "/wecom-dwcidentity.png");
 
         function addSelect(select, typeIndex, appid, iconpath) {
             if (!appid) appid = typeText[typeIndex];
@@ -144,6 +146,7 @@ plugin.wecom.dwcschedulermanager = wecom.dwcschedulermanager || function (start,
             obj.type = 0;
             if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[0]) obj.type = 0;
             else if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[1]) obj.type = 1;
+            else if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[2]) obj.type = 2;
         }
 
         this.createNode("div", null, null, "wecom-dwcscheduler-obj").testId("wecom-dwcscheduler-obj-" + obj.sip);

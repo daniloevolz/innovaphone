@@ -49,6 +49,7 @@ plugin.wecom.wecallmanager = wecom.wecallmanager || function (start, item, app) 
     var typeUrl = ["/wecom-wecall", "/wecom-wecalladmin", "/wecom-wecalldash"];
     var typeCheckmarks = [
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
+        { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
     ];
 
@@ -146,6 +147,7 @@ plugin.wecom.wecallmanager = wecom.wecallmanager || function (start, item, app) 
             obj.type = 0;
             if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[0]) obj.type = 0;
             else if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[1]) obj.type = 1;
+            else if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[2]) obj.type = 2;
         }
 
         this.createNode("div", null, null, "wecom-wecall-obj").testId("wecom-wecall-obj-" + obj.sip);

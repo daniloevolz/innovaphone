@@ -63,13 +63,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         appUrl = appUrl+"/Calendario.htm?id="+user;
         constructor();
         app.send({ api: "user", mt: "UserMessage" });
-        searchApi = start.provideApi("com.innovaphone.search");
-        searchApi.onmessage.attach(onSearchApiMessage);
+        //searchApi = start.provideApi("com.innovaphone.search");
+        //searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
-        phoneApi = start.consumeApi("com.innovaphone.phone");
-        if (phoneApi) {
-            phoneApi.onupdate.attach(onPhoneApiUpdate);
-        }
+        //phoneApi = start.consumeApi("com.innovaphone.phone");
+        //if (phoneApi) {
+        //    phoneApi.onupdate.attach(onPhoneApiUpdate);
+        //}
     }
 
     function app_message(obj) {
@@ -140,8 +140,8 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             _popup.content.add(btnAckEvent);
         }
         if (obj.api == "user" && obj.mt == "DWCCallRequest") {
-            dwcCaller = obj.caller;
-            dwcLocation = obj.location;
+            //dwcCaller = obj.caller;
+            //dwcLocation = obj.location;
         }
         if (obj.api == "user" && obj.mt == "FindObjConfMessageResult") {
             console.log(obj);
@@ -554,12 +554,17 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         list_rooms.forEach(function (r) {
             selectConfNumber.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", r.dn, null).setAttribute("id", r["room-number"]));
         })
-        if (list_configs[0].number_conference) {
-            var cn = list_rooms.filter(function (r) { return r["room-number"] === room })[0].dn;
-            var select = document.getElementById('selectConfNumber');
-            select.remove(0);
-            select.value = cn;
+        try {
+            if (list_configs[0].number_conference) {
+                var cn = list_rooms.filter(function (r) { return r["room-number"] === room })[0].dn;
+                var select = document.getElementById('selectConfNumber');
+                select.remove(0);
+                select.value = cn;
+            }
+        } catch (e) {
+
         }
+        
 
         t.add(new innovaphone.ui1.Div(null, texts.text("labelDivGeralChannelsReserved"), "DivGeralChannelsReserved"));
         t.add(new innovaphone.ui1.Input(null, reserved_conference, "Insira aqui o número de canais reservados", null, "number", "DivGeralIptChannelsReserved").setAttribute("id", "InputChannelsReserved"));

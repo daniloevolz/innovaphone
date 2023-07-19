@@ -140,20 +140,25 @@
     ]
   },
   "apis": {
-    "wecom-dwcscheduler": {
+    "wecom-dwcidentity": {
+      "com.innovaphone.phoneinfo": {
+        "info": {}
+      },
+      "com.innovaphone.calllist": {
+        "info": {}
+      },
       "com.innovaphone.search": {
         "info": {}
       },
       "com.innovaphone.phone": {
         "info": {}
       },
-      "presence": true
+      "hidden": true
     },
-    "wecom-dwcschedulerservice": {
-      "com.innovaphone.search": {
-        "info": {}
-      }
+    "wecom-dwcscheduler": {
+      "presence": true
     }
+
   },
   "config": {
     "init": [

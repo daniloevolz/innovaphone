@@ -4,6 +4,7 @@ wecom.dwcschedulermanagertexts = {
     en: {
         pluginTitle: "dwcscheduler",
         dwcscheduler: "dwcscheduler",
+        dwcidentity: "dwc Identity",
         dwcscheduleradmin: "dwcscheduler Admin",
         title: "Name",
         sip: "SIP",
@@ -17,6 +18,7 @@ wecom.dwcschedulermanagertexts = {
     de: {
         pluginTitle: "dwcscheduler",
         dwcscheduler: "dwcscheduler",
+        dwcidentity: "dwc identity",
         dwcscheduleradmin: "dwcscheduler Admin",
         title: "Name",
         sip: "SIP",

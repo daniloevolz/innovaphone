@@ -616,6 +616,140 @@ a {
     position:absolute; left:0%; width:30%; top:20%; font-size:17px; text-align:center; font-weight: bold;
 }
 /*admin mobile*/
+.DivGeralTitle{
+    position:absolute; 
+    left:0px;
+    width:100%; 
+    top:5%; 
+    font-size:25px; 
+    text-align:center;
+}
+.DivGeralAdminContaEmail{
+    position: absolute;
+     text-align: right; 
+    top: 25%;
+     left: 6%; 
+    font-weight: bold;
+}
+.DivGeralAdminIptEmail{
+    position: absolute;  top: 25%; left: 20%; height: 30px; 
+    padding:5px; 
+    width: 50%; 
+    border-radius: 10px; 
+    border: 2px solid;
+     border-color:#02163F;
+}
+.DivGeralAdminNameConta{
+    position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;
+}
+.DivGeralAdminIptConta{
+    position: absolute;  
+    top: 35%; 
+    left: 20%; 
+    height: 30px; 
+    padding:5px; 
+    width: 50%; 
+    border-radius: 10px; 
+    border: 2px solid; 
+    border-color:#02163F;
+}
+.DivGeralAdminServerName{
+    position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;
+}
+.DivGeralAdminIptServer{
+    position: absolute; 
+    padding:5px;
+     top: 45%; 
+     left: 20%; 
+     height: 30px;
+      width: 50%; 
+      border-radius: 10px;
+       border: 2px solid; 
+       border-color:#02163F;
+}
+.DivGeralAdminUsername{
+    position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;
+}
+.DivGeralAdminIptUsername{
+    position: absolute; 
+    padding:5px; 
+    top: 55%;
+    left: 20%; 
+    height: 30px;
+    width: 50%;
+    border-radius: 10px; 
+    border: 2px solid; border-color:#02163F;
+}
+.DivGeralAdminSenha{
+    position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;
+}
+.DivGeralAdminIptSenha{
+    position: absolute; 
+    padding:5px; 
+    top: 65%; 
+    left: 20%; 
+    height: 30px;
+     width: 50%; 
+     border-radius: 10px; 
+     border: 2px solid; 
+     border-color:#02163F;
+}
+.DivGoogle{
+    position:absolute; 
+    left:0px;
+    width:100%; 
+    top:5%; 
+    font-size:25px; 
+    text-align:center
+}
+.DivGoogleSendLocation{
+    position: absolute; 
+    text-align: right; 
+    top: 25%; 
+    left: 6%; 
+    font-weight: bold;
+}
+.DivGoogleSwitch{
+    position:absolute; 
+    left:40%; 
+    top:25%;
+}
+.DivGoogleApiKey{
+    position: absolute; 
+    text-align: right; 
+    top: 35%; 
+    left: 6%; 
+    font-weight: bold;
+}
+.DivGoogleIptApi{
+    position: absolute;  
+    top: 35%; 
+    left: 40%; 
+    height: 30px; 
+    padding:5px; 
+    width: 50%; 
+    border-radius: 10px; 
+    border: 2px solid; 
+    border-color:#02163F;
+}
+.DivLicenseTitle{
+    position:absolute; 
+    left:0px; 
+    width:100%; 
+    top:5%; 
+    font-size:25px; 
+    text-align:center
+}
+.DivLicenseTokenTitle{
+    position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;
+}
+.DivLicenseToken{
+    position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;
+}
+.DivLicenseKey{
+    position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;
+}
+
 
 
 

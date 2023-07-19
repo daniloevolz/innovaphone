@@ -216,22 +216,22 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         document.getElementById("imgmenu").addEventListener("click",openMenu);
         
         //Título
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloSmtp")));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloSmtp"),"DivGeralTitle"));
 
-        var lblfrom = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelfrom"), "DivGeralAdminContaEmail"));
-        var Inputfrom = t.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", from, null, null, "email","DivGeralAdminIptEmail").setAttribute("id", "Inputfrom"));
+        var lblfrom = t.add(new innovaphone.ui1.Div(null, texts.text("labelfrom"), "DivGeralAdminContaEmail"));
+        var Inputfrom = t.add(new innovaphone.ui1.Input(null, from, null, null, "email","DivGeralAdminIptEmail").setAttribute("id", "Inputfrom"));
 
-        var lblfromName = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelfromName"), "DivGeralAdminNameConta"));
-        var InputfromName = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 20%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", fromName, null, null, "url","DivGeralAdminIptConta").setAttribute("id", "InputfromName"));
+        var lblfromName = t.add(new innovaphone.ui1.Div(null, texts.text("labelfromName"), "DivGeralAdminNameConta"));
+        var InputfromName = t.add(new innovaphone.ui1.Input(null, fromName, null, null, "url","DivGeralAdminIptConta").setAttribute("id", "InputfromName"));
 
-        var lblserver = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelserver"), "DivGeralAdminServerName"));
-        var Inputserver = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 45%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", server, null, null,"text","DivGeralAdminIptServer").setAttribute("id", "Inputserver"));
+        var lblserver = t.add(new innovaphone.ui1.Div(null, texts.text("labelserver"), "DivGeralAdminServerName"));
+        var Inputserver = t.add(new innovaphone.ui1.Input(null, server, null, null,"text","DivGeralAdminIptServer").setAttribute("id", "Inputserver"));
 
-        var lblusername = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelusername"), "DivGeralAdminUsername"));
-        var Inputusername = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 55%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", username, null,null, "text", "DivGeralAdminIptUsername").setAttribute("id", "Inputusername"));
+        var lblusername = t.add(new innovaphone.ui1.Div(null, texts.text("labelusername"), "DivGeralAdminUsername"));
+        var Inputusername = t.add(new innovaphone.ui1.Input(null, username, null,null, "text", "DivGeralAdminIptUsername").setAttribute("id", "Inputusername"));
 
-        var lblpassword = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelpassword"), "DivGeralAdminSenha"));
-        var Inputpassword = t.add(new innovaphone.ui1.Input("position: absolute; padding:5px; top: 65%; left: 20%; height: 30px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", password, null, null, "text","DivGeralAdminIptSenha").setAttribute("id", "Inputpassword"));
+        var lblpassword = t.add(new innovaphone.ui1.Div(null, texts.text("labelpassword"), "DivGeralAdminSenha"));
+        var Inputpassword = t.add(new innovaphone.ui1.Input(null, password, null, null, "text","DivGeralAdminIptSenha").setAttribute("id", "Inputpassword"));
 
 
         // buttons
@@ -256,14 +256,14 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         imgMenu.setAttribute("id","imgmenu");
         document.getElementById("imgmenu").addEventListener("click",openMenu);
 
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloGoogle")));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloGoogle"),"DivGoogle"));
 
-        var lblsendLocation = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblsendLocation"),"DivGoogleSendLocation"));
-        var switchsendLocation = t.add(new innovaphone.ui1.Switch("position:absolute; left:40%; top:25%;",null, null, sendLocation,"DivGoogleSwitch"));
+        var lblsendLocation = t.add(new innovaphone.ui1.Div(null, texts.text("lblsendLocation"),"DivGoogleSendLocation"));
+        var switchsendLocation = t.add(new innovaphone.ui1.Switch(null,null, null, sendLocation,"DivGoogleSwitch"));
         switchsendLocation.addEvent("click", onsendLocationSwitchCLick);
 
-        var lblgoogleApiKey = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelgoogleApiKey"), "DivGoogleApiKey"));
-        var InputgoogleApiKey = t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", googleApiKey, null, null, null,"DivGoogleIptApi").setAttribute("id", "InputgoogleApiKey"));
+        var lblgoogleApiKey = t.add(new innovaphone.ui1.Div(null, texts.text("labelgoogleApiKey"), "DivGoogleApiKey"));
+        var InputgoogleApiKey = t.add(new innovaphone.ui1.Input(null, googleApiKey, null, null, null,"DivGoogleIptApi").setAttribute("id", "InputgoogleApiKey"));
 
         var onsendLocationSwitchCLick = function () {
             
@@ -290,12 +290,12 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         imgMenu.setAttribute("id","imgmenu");
         document.getElementById("imgmenu").addEventListener("click",openMenu);
 
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloLicense")));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, "DivLicenseToken"));
+        t.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
+        t.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"),"DivLicenseKey"));
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
         t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
 
         t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
