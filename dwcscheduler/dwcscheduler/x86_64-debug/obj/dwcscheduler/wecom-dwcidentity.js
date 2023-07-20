@@ -57,7 +57,7 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
 
-        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "user", mt: "UserSession" });
         searchApi = start.provideApi("com.innovaphone.search");
         searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
@@ -68,6 +68,10 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     }
 
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "UserSessionResult") {
+            console.log("UserSessionResult "+ obj.session);
+            app.send({ api: "user", mt: "InitializeMessage", session: obj.session });
+        }
         if (obj.api == "user" && obj.mt == "NoLicense") {
             console.log(obj.result);
             makeDivNoLicense(obj.result);

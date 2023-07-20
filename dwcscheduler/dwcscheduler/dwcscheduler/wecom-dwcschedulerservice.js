@@ -200,15 +200,23 @@ if (license != null && license.System==true) {
                                             //Update Badge
                                             try {
                                                 var count = 0;
+                                                
                                                 PbxSignal.forEach(function (signal) {
                                                     log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
-                                                    var call = signal[obj.sip];
-                                                    log("pietro-log: call = " + call);
-                                                    if (call != null) {
-                                                        log("danilo-req salvar-evento call " + String(call) + ", will call updateBadge");
+                                                    //var call = signal[obj.sip];
+                                                    //Teste Danilo 20/07:
+                                                    var foundCalls = [];
+                                                    for (var key in signal) {
+                                                        if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] === obj.sip) {
+                                                            foundCalls.push(key);
+                                                        }
+                                                    }
+                                                    //
+                                                    log("pietro-log: call = " + foundCalls);
+                                                    if (foundCalls.length >0) {
+                                                        log("danilo-req salvar-evento call " + foundCalls + ", will call updateBadge");
                                                         try {
                                                             pbxTableUsers.forEach(function (user) {
-
                                                                 if (user.columns.h323 == obj.sip) {
                                                                     var old_badge = user.badge;
                                                                     user.badge += 1;
@@ -216,7 +224,10 @@ if (license != null && license.System==true) {
                                                                     count = user.badge;
                                                                 }
                                                             })
-                                                            updateBadge(signal, call, count);
+                                                            foundCalls.forEach(function (call) {
+                                                                updateBadge(signal, parseInt(call,10), count);
+                                                            })
+                                                            
                                                         } catch (e) {
                                                             log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
                                                         }
@@ -412,8 +423,10 @@ if (license != null && license.System==true) {
                         log("put-caller:user connected notified caller=" + caller);
                         if (sendLocation && license.Location == true) {
                             c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+                            log("put-caller: sendLocation true");
                         } else {
                             c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "" }));
+                            log("put-caller: sendLocation false");
                         }
                     }
                 })
@@ -493,9 +506,17 @@ new JsonApi("user").onconnected(function(conn) {
                     var count = 0;
                     PbxSignal.forEach(function (signal) {
                         log("danilo-req badge2:UserAckEventMessage " + JSON.stringify(signal));
-                        var call = signal[conn.sip];
-                        if (call != null) {
-                            log("danilo-req badge2:UserAckEventMessage call " + String(call) + ", will call updateBadge");
+                        //var call = signal[conn.sip];
+                        //Teste Danilo 20/07:
+                        var foundCalls = [];
+                        for (var key in signal) {
+                            if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] === conn.sip) {
+                                foundCalls.push(key);
+                            }
+                        }
+                        //
+                        if (foundCalls.length > 0) {
+                            log("danilo-req badge2:UserAckEventMessage call " + foundCalls + ", will call updateBadge");
                             try {
                                 pbxTableUsers.forEach(function (user) {
                                     if (user.columns.h323 == conn.sip) {
@@ -504,7 +525,10 @@ new JsonApi("user").onconnected(function(conn) {
                                     }
                                 })
                             } finally {
-                                updateBadge(signal, call, count);
+                                //updateBadge(signal, call, count);
+                                foundCalls.forEach(function (call) {
+                                    updateBadge(signal, parseInt(call, 10), count);
+                                })
                             }
                         }
 
@@ -639,24 +663,45 @@ new JsonApi("user").onconnected(function(conn) {
         })
     }
     if (conn.app == "wecom-dwcidentity") {
-        if (connectionsIdentity.length < license.HiddenUsers) {
-            connectionsIdentity.push(conn);
-            log("Identity Conectado:  " + conn.sip+". Usuários conectados:" + connectionsIdentity.length);
-        } else {
-            log("Identity Conectado Não Licenciado:  " + conn.sip);
-        }
-
         conn.onmessage(function (msg) {
-
+            var obj = JSON.parse(msg);
             if (license != null && connectionsIdentity.length <= license.HiddenUsers) {
+                if (obj.mt == "UserSession") {
+                    log("connectionsUser: UserSession");
+                    var session = Random.bytes(16);
+                    conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
 
+                }
+                if (obj.mt == "InitializeMessage") {
+                    log("connectionsUser: InitializeMessage");
+                    if (connectionsIdentity.length > 0) {
+                        log("connectionsUser: InitializeMessage connectionsIdentity.length > 0");
+                        var foundConn = connectionsIdentity.filter(function (c) { return c.session == obj.session });
+                        log("connectionsUser: InitializeMessage foundConn " + JSON.stringify(foundConn));
+                        if (foundConn.length==0) {
+                            log("connectionsUser: not found conn");
+                            conn["session"] = obj.session;
+                            connectionsIdentity.push(conn);
+                            log("Identity Conectado:  " + conn.sip + ". Usuários conectados:" + connectionsIdentity.length);
+                        }
+                    } else {
+                        log("connectionsUser: InitializeMessage connectionsUser.length == 0");
+                        conn["session"] = obj.session;
+                        connectionsIdentity.push(conn);
+                        log("Identity Conectado:  " + conn.sip + ". Usuários conectados:" + connectionsIdentity.length);
+                    }
+
+                }
             }
         })
 
         conn.onclose(function () {
-            connectionsIdentity = connectionsIdentity.filter(deleteBySip(conn.sip));
-            log("connectionsIdentity: after delete conn " + JSON.stringify(connectionsIdentity));
-        })
+
+            //Remove cennection from array
+            connectionsIdentity = connectionsIdentity.filter(function (c) { return c.session != conn.session });
+            log("danilo req : connectionsIdentity after delete conn of user " + conn.sip + " : " + JSON.stringify(connectionsIdentity));
+
+            })
     }
 });
 
@@ -767,11 +812,17 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
 
     // for each PBX API connection an own call array is maintained
-    PbxSignal.push(conn);
-    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
+    var signalFound = PbxSignal.filter(function (signal) { return signal.pbx === conn.pbx });
+    if (signalFound.length == 0) {
+        PbxSignal.push(conn);
+        log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
 
+        // register to the PBX in order to acceppt incoming presence calls
+        conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
+    }
+    //PbxSignal.push(conn);
     // register to the PBX in order to acceppt incoming presence calls
-    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
+    //conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
 
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
@@ -795,11 +846,19 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var myArray = src.split(",");
             var pbx = myArray[0];
             log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
+            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
             PbxSignal.forEach(function (signal) {
                 if (signal.pbx == pbx) {
-                    signal[obj.sig.cg.sip] = obj.call;
+                    var call = obj.call.toString();
+                    signal[call] = obj.sig.cg.sip;
                 }
             })
+            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
+            //PbxSignal.forEach(function (signal) {
+            //    if (signal.pbx == pbx) {
+            //        signal[obj.sig.cg.sip] = obj.call;
+            //    }
+            //})
             log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
             var name = "";
             var myArray = obj.sig.fty;
@@ -809,6 +868,8 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 }
             })
 
+
+            
             // send notification with badge count first time the user has connected
             var count = 0;
             try {
@@ -838,8 +899,10 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     });
 
     conn.onclose(function () {
+        //Remove cennection from array
+        PbxSignal = PbxSignal.filter(function (c) { return c.pbx != conn.pbx });
         log("PbxSignal: disconnected");
-        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
+        //PbxSignal.splice(PbxSignal.indexOf(conn), 1);
         //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
@@ -859,7 +922,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         var obj = JSON.parse(msg);
         //var today = getDateNow();
 
-        log("PbxTableUsers: msg received " + msg);
+        //log("PbxTableUsers: msg received " + msg);
 
         if (obj.mt == "ReplicateStartResult") {
             pbxTableUsers = [];
@@ -898,8 +961,9 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     });
 
     conn.onclose(function () {
-        log("PbxTableUsers: disconnected");
+        
         pbxTable.splice(pbxTable.indexOf(conn), 1);
+        log("PbxTableUsers: disconnected");
     });
 });
 
