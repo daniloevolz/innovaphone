@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - PbxApi</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>PbxApi</h1>
+    <p>
+        This document describes the PbxApi object in the JavaScript environment for app serivices.
+    </p>
+    <p>
+        PBX APIs are used on incoming <a href="../appwebsocket/AppWebsocket.htm">AppWebsocket</a> connections from app objects on the PBX to the app service. You can use any PBX API in your app service that is activated at the app object in the PBX.
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#PbxApi">PbxApi</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#onconnected">onconnected</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Object</b></td>
+            <td>
+                <b><a href="#PbxApiConnection">PbxApiConnection</a></b><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Members</b></td>
+            <td>
+                <a href="#api">api</a><br />
+                <a href="#domain">domain</a><br />
+                <a href="#pbx">pbx</a><br />
+                <a href="#pbxDns">pbxDns</a><br />
+                <a href="#version">version</a><br />
+                <a href="#build">build</a><br />
+                <a href="#info">info</a><br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#onmessage">onmessage</a><br />
+                <a href="#onclose">onclose</a><br />
+                <a href="#send">send</a><br />
+                <a href="#setFlowControl">setFlowControl</a><br />
+                <a href="#messageComplete">messageComplete</a><br />
+                <a href="#encrypt">encrypt</a><br />
+                <a href="#decrypt">decrypt</a><br />
+                <a href="#hash">hash</a><br />
+                <a href="#create">create</a><br />
+                <a href="#close">close</a><br />
+                <br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="PbxApi">PbxApi</a></h2>
+
+    <a name="PbxApi"><div class="fnhead" style="margin-top:5px">PbxApi</div></a>
+    <dd>
+        Constructor for creating a PBX API object.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>api</b></td><td>The identifier for the API.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var replicationApi = new PbxApi("PbxTableUsers");</code></pre>
+    </dd>
+
+    <a name="onconnected"><div class="fnhead" style="margin-top:5px">onconnected</div></a>
+    <dd>
+        Registers a callback function that is invoked when a new AppWebsocket from a PBX is connected that supports the API.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(<a name="PbxApiConnection">PbxApiConnection</a> conn)</td><td>The conn parameter passed with the callback can be used to send and receive API messages on the connection.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApi">PbxApi</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxTableUsers").onconnected(function(conn) {
+    log("new connection with PbxTableUsers support");
+});</code></pre>
+    </dd>
+
+    <h2><a name="PbxApiConnection">PbxApiConnection</a></h2>
+
+    <a name="api"><div class="fnhead" style="margin-top:5px">api</div></a>
+    <dd>
+        The ID of the API.
+    </dd>
+    <a name="domain"><div class="fnhead" style="margin-top:5px">domain</div></a>
+    <dd>
+        The domain of the connected PBX.
+    </dd>
+    <a name="pbx"><div class="fnhead" style="margin-top:5px">pbx</div></a>
+    <dd>
+        The name of the connected PBX.
+    </dd>
+    <a name="pbxDns"><div class="fnhead" style="margin-top:5px">pbxDns</div></a>
+    <dd>
+        The DNS name of the connected PBX.
+    </dd>
+    <a name="version"><div class="fnhead" style="margin-top:5px">version</div></a>
+    <dd>
+        The version of the PBX.
+    </dd>
+    <a name="build"><div class="fnhead" style="margin-top:5px">build</div></a>
+    <dd>
+        The build number of the PBX.
+    </dd>
+    <a name="info"><div class="fnhead" style="margin-top:5px">info</div></a>
+    <dd>
+        A string containing the info of the app object the AppWebsocket connection was established from. It contains a JSON structure that includes additional info like the app object name or number of service licenses assigned to this app object.
+    </dd>
+
+    <a name="onmessage"><div class="fnhead" style="margin-top:5px">onmessage</div></a>
+    <dd>
+        Registers a callback function that is invoked when receiving an API message
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>(string msg)</td><td>A string containg a JSON structure. Must be parsed using JSON.parse.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxApi").onconnected(function(conn) {
+    conn.send(JSON.stringify({ api: "PbxApi", mt: "SubscribePresence", sip: "johndoe" }));
+
+    conn.onmessage(function(msg) {
+        var obj = JSON.parse(msg);
+        if (obj.mt == "SubscribePresenceResult") {
+            conn.send(JSON.stringify({ api: "PbxApi", mt: "UnsubscribePresence", src: obj.src }));
+        }
+    });
+});</code></pre>
+    </dd>
+
+    <a name="onclose"><div class="fnhead" style="margin-top:5px">onclose</div></a>
+    <dd>
+        Registers a callback function that is invoked when the AppWebsocket connection was closed by the PBX.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">function <b>callback</b>()</td><td>The callback that shall be invoked when the connection was closed.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxTableusers").onconnected(function(conn) {
+    log("connected");
+    conn.onclose(function() {
+        log("closed");
+    });
+});</code></pre>
+    </dd>
+
+    <a name="send"><div class="fnhead" style="margin-top:5px">send</div></a>
+    <dd>
+        Sends a JSON message.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>message</b></td><td>A string (max. length 65535) containing a JSON structure that represents the API message.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">conn.send(JSON.stringify({ api: "PbxApi", mt: "SubscribePresence", sip: "john.doe" }));</code></pre>
+    </dd>
+
+    <a name="setFlowControl"><div class="fnhead" style="margin-top:5px">setFlowControl</div></a>
+    <dd>
+        Tells the library that it wants to use flow control. That means that after receiving the <a href="#onmessage">onmessage</a> callback, the library should deliver no more messages until the application has called <a href="#messageComplete">messageComplete</a>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">bool <b>on</b></td><td>true if flow control shall be used. false if flow control should not be used.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxApi").onconnected(function(conn) {
+    conn.setFlowControl(true)
+        .onmessage(function(msg) {
+            var obj = JSON.parse(msg);
+            if (obj.mt == "SubscribePresenceResult") {
+                // do something
+            }
+            conn.messageComplete();
+        });
+});</code></pre>
+    </dd>
+
+    <a name="messageComplete"><div class="fnhead" style="margin-top:5px">messageComplete</div></a>
+    <dd>
+        Tells the library that the application is ready to receive the next message using the <a href="#onmessage">onmessage</a> callback.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>A reference to the object itself. Useful for method chaining.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxApi").onconnected(function(conn) {
+    conn.setFlowControl(true)
+        .onmessage(function(msg) {
+            var obj = JSON.parse(msg);
+            if (obj.mt == "SubscribePresenceResult") {
+                // do something
+            }
+            conn.messageComplete();
+        });
+});</code></pre>
+    </dd>
+
+    <a name="encrypt"><div class="fnhead" style="margin-top:5px">encrypt</div></a>
+    <dd>
+        Encrypts a string using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>A seed value that shall be unique for each call. The seed is needed by the remote party for decryption.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The string to be encrypted.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The encrypted string.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var seed = "some seed";
+var secret = "some secret text";
+var encryptedText = conn.encrypt(seed, secret);
+conn.send(JSON.stringify({ mt: "SomeMessage", seed: seed, encryptedText: encryptedText }));</code></pre>
+    </dd>
+
+    <a name="decrypt"><div class="fnhead" style="margin-top:5px">decrypt</div></a>
+    <dd>
+        Decrypts a string using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>The seed needs to be given by the remote party for decryption.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The encrypted string.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The decrypted string.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">conn.onmessage(function(msg) {
+    var obj = JSON.parse(msg);
+    if (obj.mt == "SomeMessage") {
+        var secret = conn.decrypt(obj.seed, obj.encryptedText);
+    }
+});</code></pre>
+    </dd>
+
+    <a name="hash"><div class="fnhead" style="margin-top:5px">hash</div></a>
+    <dd>
+        Calculates a hash value using the shared secret of the connection and a random seed.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>seed</b></td><td>A seed value that shall be unique for each call.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>The string to be hashed.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>The calculated hash value.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var seed = "some seed";
+var text = "some secret text";
+var hash = conn.hash(seed, secret);
+conn.send(JSON.stringify({ mt: "SomeMessage", text: text, seed: seed, hash, hash }));</code></pre>
+    </dd>
+
+    <a name="create"><div class="fnhead" style="margin-top:5px">create</div></a>
+    <dd>
+        Creates a new <a href="#PbxApiConnection">PbxApiConnection</a> object, that uses the same underlying websocket connection, but with a different target API.
+        This mechanism can be used along with the PbxImpersonation API.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>targetApi</b></td><td>The target API value, as returned with the CreateApiResult message of the PbxImpersonationApi</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param"><a href="#PbxApiConnection">PbxApiConnection</a></td><td>The new connection object.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxImpersonation").onconnected(function(conn) {
+    conn.send(JSON.stringify({ api: "PbxImpersonation", mt: "CreateApi", sip: "johndoe", target: "PbxApi" }));
+
+    conn.onmessage(function(msg) {
+        var obj = JSON.parse(msg);
+        if (obj.mt == "CreateApiResult") {
+
+            // create new PbxApiConnection object with the returned target API name
+            var targetApi = obj.target;
+            var pbxApiConn = conn.create(targetApi);
+            
+            pbxApiConn.onmessage(function(msg) { });
+
+            pbxApiConn.send(JSON.stringify({ api: targetApi, mt: "SubscribeProfile", sip: "johndoe" }));
+        }
+    });
+});</code></pre>
+    </dd>
+
+    <a name="close"><div class="fnhead" style="margin-top:5px">close</div></a>
+    <dd>
+        Closes the <a href="#PbxApiConnection">PbxApiConnection</a> object. This should be done if the application is not or no longer interested in using
+        the related PbxApi on that connection.
+        Please note that the underlying websocket connection is not affected and stays connected.
+        <h4>Return value</h4>
+    </dd>
+    <dd>
+        <pre><code class="JS">new PbxApi("PbxApi").onconnected(function(conn) {
+    if (pbx != "master") conn.close();
+});</code></pre>
+    </dd>
+
+</body>
+</html>

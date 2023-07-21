@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.muralmanager",
+            "icon": "wecom-mural.png",
+            "lang": "wecom.muralmanagertexts",
+            "domains": false
+        }
+    ]
+}
