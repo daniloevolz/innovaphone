@@ -1,0 +1,57 @@
+﻿body {
+    background-color: var(--bg);
+    color: var(--text-standard);
+}
+/*Início Menu Admin*/
+.arrow {
+    height: 30px;
+    width: 30px;
+    /*visibility: hidden;*/
+}
+
+.colunaesquerda {
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    background-color: #02163F;
+    color: white;
+    opacity: 0.9;
+}
+
+.colunadireita {
+    overflow-y: auto;
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    /* background-color: purple; */
+    left: 15%;
+    background-color: rgb(196, 196, 196,0.5);
+    color: darkblue;
+    font-size: 15px;
+}
+
+li {
+    padding: 10px;
+    list-style-type: none;
+    margin-left: 20px;
+    font-size: 13pt;
+}
+
+.liOptions:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.otherli {
+    margin-left: 10px;
+}
+
+.config {
+    margin-left: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}

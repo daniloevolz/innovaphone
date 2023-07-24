@@ -3,8 +3,8 @@ new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-mural") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
-            if (obj.mt == "UserMessage") {
-                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
+            if (obj.mt == "Ping") {
+                conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
             }
         });
     }

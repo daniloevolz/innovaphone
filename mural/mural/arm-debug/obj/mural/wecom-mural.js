@@ -32,7 +32,7 @@ Wecom.mural = Wecom.mural || function (start, args) {
     app.onmessage = app_message;
 
     function app_connected(domain, user, dn, appdomain) {
-        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "user", mt: "Ping"});
     }
 
     function app_message(obj) {

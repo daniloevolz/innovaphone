@@ -121,6 +121,9 @@
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
     <None Include="mural.mak" />
+    <None Include="mural\httpfiles\images\wecom-white.svg" />
+    <None Include="mural\httpfiles\loader.css" />
+    <None Include="mural\httpfiles\wecom-muraladmin.css" />
     <None Include="mural\mural.mak" />
     <None Include="mural\config.json" />
     <None Include="mural\plugins.json" />
@@ -137,6 +140,10 @@
     <None Include="mural\httpfiles\wecom.muralmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="mural\httpfiles\images\bg.png" />
+    <Image Include="mural\httpfiles\images\logo-wecom.png" />
+    <Image Include="mural\httpfiles\images\logo.png" />
+    <Image Include="mural\httpfiles\images\menu-icon.png" />
     <Image Include="mural\httpfiles\wecom-mural.png" />
     <Image Include="mural\httpfiles\wecom-muraladmin.png" />
     <Image Include="mural\mural.png" />
