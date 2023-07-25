@@ -1,5 +1,5 @@
 ﻿body {
-    background-color: var(--bg);
+    background-image: var(--bg);
     color: var(--text-standard);
 }
 /*Início Menu Admin*/
@@ -54,4 +54,18 @@ li {
 a {
     text-decoration: none;
     color: white;
+}
+.divDepartTitle{
+    text-align: center;
+}
+.IptAddDepart{
+    width: 150px;
+    height: 30px;
+}
+.btnAddDepart{
+    background-color: rgb(2, 22, 63);
+    color: white;
+    opacity: 0.8;
+    width: 80px;
+    height: 30px;
 }

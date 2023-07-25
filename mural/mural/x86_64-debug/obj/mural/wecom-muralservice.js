@@ -29,22 +29,32 @@ new JsonApi("admin").onconnected(function(conn) {
                 Database.exec("INSERT INTO tbl_departments (name) VALUES ('" + obj.name + "')")
                     .oncomplete(function () {
                         log("InsertDepartment:result=success");
-                        conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertDepartmentSuccess" }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
             if (obj.mt == "SelectDepartments") {
                 Database.exec("SELECT * FROM tbl_departments;")
                     .oncomplete(function (data) {
                         log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "DeleteDepartments") {
+                 Database.exec("DELETE FROM tbl_departments WHERE id=" + obj.id + ";")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteDepartmentsSuccess", result: JSON.stringify(data, null, 4) }));
+
+                     })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+                }
         });
     }
 });

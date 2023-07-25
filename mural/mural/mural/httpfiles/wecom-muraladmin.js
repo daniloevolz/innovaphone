@@ -9,6 +9,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     var that = this;
 
     var list_users = [];
+    var list_departments = []
     var _colDireita;
     var UIuserPicture;
     var UIuser;
@@ -49,11 +50,21 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         constructor();
 
         app.send({ api: "admin", mt: "TableUsers" });
+        // app.send({ api: "admin", mt: "SelectDepartment"})
     }
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
             list_users = obj.result;
+        }
+        if (obj.api == "admin" && obj.mt == "InsertDepartmentSuccess") { 
+            app.send({api: "admin", mt: "SelectDepartments"})
+            window.alert("Departamento Inserido com Sucesso")
+        }
+        if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") { 
+            list_departments = JSON.parse(obj.result)
+            makeDivDepartments(_colDireita)
+             // pop up depois
         }
     }
 
@@ -62,7 +73,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         // col direita
         var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
         colDireita.setAttribute("id", "coldireita")
-        //Título
+        //Tï¿½tulo
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         // col Esquerda
@@ -98,6 +109,11 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center", null, "config"));
         liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null).setAttribute("src", "./images/logo.png"));
 
+        var a = document.getElementById("CfgDepartments");
+        a.addEventListener("click", function(){ 
+            ChangeView("CfgDepartments", colDireita)
+        })
+
         _colDireita = colDireita;
     }
 
@@ -109,6 +125,74 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+    }
+    function ChangeView(ex, colDireita) {
+
+        if (ex == "CfgDepartments") {
+            // makeDivDepartments(colDireita);
+            app.send({ api: "admin", mt: "SelectDepartments"})
+        }
+    }
+    function makeDivDepartments(t){
+        t.clear();
+
+       var divmain = t.add(new innovaphone.ui1.Div(null,null,null))
+       divmain.add(new innovaphone.ui1.Node("button",null,texts.text("labelAdd"),"btnAddDepart")).addEvent("click", function () {
+        makeDivAddDepartments(t)     
+        });  
+        divmain.add(new innovaphone.ui1.Div(null, null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
+            var selected = ListView.getSelectedRows();
+            console.log(selected);
+            var selectedrows = [];
+
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(ListView.getRowData(s))
+                
+            })
+            selectedrows.forEach(function (row) {
+                console.log(row);
+                app.send({ api: "admin", mt: "DeleteDepartments", id: parseInt(row) });
+                app.send({ api: "admin", mt: "SelectDepartments"});
+            })
+        });
+
+        //Titulo Tabela
+        t.add(new innovaphone.ui1.Div("text-align:center", texts.text("labelTitleDepartmentsTable"),"TituloTable"));
+
+        var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
+
+        var list = new innovaphone.ui1.Div(null, null, "");
+        var columns = 2;
+        var rows = list_departments.length;
+        var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+        //CabeÃ§alho
+        for (i = 0; i < columns; i++) {
+            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalho" + i), i, 10, false);
+        }
+        //Tabela    
+        list_departments.forEach(function (dep) {
+            var row = [];
+            row.push(dep.id);
+            row.push(dep.name);
+            ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
+        })
+        scroll_container.add(list);
+        t.add(scroll_container);
+    }
+
+    function makeDivAddDepartments(t){
+        t.clear();
+        var divMain = t.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center",null,null))
+        divMain.add(new innovaphone.ui1.Div(null,null,"divDepartTitle")).add(new innovaphone.ui1.Node("h1",null,texts.text("labelDepartsTitle"),null))
+        divMain.add(new innovaphone.ui1.Node("h3",null,texts.text("labelAddDepart"),"divAddDepart"))
+        divMain.add(new innovaphone.ui1.Input(null,null,texts.text("labelAddDepart"),100,"text","IptAddDepart").setAttribute("id","IptAddDepart"))
+        divMain.add(new innovaphone.ui1.Node("button",null,texts.text("labelAdd"),"btnAddDepart")).addEvent("click", function () {
+            
+             var department = document.getElementById("IptAddDepart").value;
+            app.send({ api: "admin", mt: "InsertDepartment", name: department});
+            // waitConnection(t);
+        });
     }
 
 }
