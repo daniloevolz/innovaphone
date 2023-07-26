@@ -8,9 +8,15 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
 
+<<<<<<< Updated upstream
     var list_Users = [];
     var TableUsers = []
     var list_departments = []
+=======
+    var list_users = [];
+    var list_tableUsers = [];
+    var list_departments = [];
+>>>>>>> Stashed changes
     var _colDireita;
     var UIuserPicture;
     var UIuser;
@@ -51,25 +57,32 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         constructor();
 
         app.send({ api: "admin", mt: "TableUsers" });
-        // app.send({ api: "admin", mt: "SelectDepartment"})
     }
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
+<<<<<<< Updated upstream
             TableUsers = JSON.parse(obj.result);
+=======
+            list_tableUsers = obj.result;
+>>>>>>> Stashed changes
         }
         if (obj.api == "admin" && obj.mt == "InsertDepartmentSuccess") { 
             app.send({api: "admin", mt: "SelectDepartments"})
             window.alert("Departamento Inserido com Sucesso")
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") { 
-            list_departments = JSON.parse(obj.result)
+            list_departments = obj.result;
             makeDivDepartments(_colDireita)
              // pop up depois
         }
         if (obj.api == "admin" && obj.mt == "SelectUsersResult") { 
-             list_Users = JSON.parse(obj.result)
+             list_users = obj.result;
              makedivUsers(_colDireita)  
+        }
+        if (obj.api == "admin" && obj.mt == "InsertUserSuccess") { 
+            app.send({api: "admin", mt: "SelectUsers"})
+            window.alert("Usuário Inserido com Sucesso")
         }
     }
 
@@ -178,7 +191,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         //Cabeçalho
         for (i = 0; i < columns; i++) {
-            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalho" + i), i, 10, false);
+            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoDepartment" + i), i, 10, false);
         }
         //Tabela    
         list_departments.forEach(function (dep) {
@@ -216,25 +229,46 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         });
 
         //Titulo Tabela
-        t.add(new innovaphone.ui1.Div("text-align:center", texts.text("labelTitleDepartmentsTable"), "TituloTable"));
+        t.add(new innovaphone.ui1.Div("text-align:center", texts.text("labelTitleUsersTable"), "TituloTable"));
 
         var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
 
         var list = new innovaphone.ui1.Div(null, null, "");
         var columns = 4;
-        var rows = list_departments.length;
+        var rows = list_users.length;
         var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
         //Cabeçalho
         for (i = 0; i < columns; i++) {
             ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoUser" + i), i, 10, false);
         }
         //Tabela    
-        list_departments.forEach(function (dep) {
+        list_users.forEach(function (user) {
             var row = [];
+<<<<<<< Updated upstream
             row.push(dep.id);
             row.push(dep.guid);
             row.push(dep.editor);
             row.push(dep.viewer);
+=======
+            row.push(user.id);
+            var user_name = list_tableUsers.filter(function (tbl) { return tbl.guid === user.guid })[0].cn;     
+            row.push(user_name);
+
+            var list_editor = [];
+            var editor = user.editor;
+            editor.forEach(function(e){
+                var dep_name = list_departments.filter(function (dep) { return dep.id === e.id })[0].name;
+                list_editor.push(dep_name);
+            })
+            row.push(list_editor);
+            var list_viewer = [];
+            var viewer = user.viewer;
+            viewer.forEach(function(v){
+                var dep_name = list_departments.filter(function (dep) { return dep.id === v.id })[0].name;
+                list_viewer.push(dep_name);
+            })
+            row.push(list_viewer);
+>>>>>>> Stashed changes
             ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
         })
         scroll_container.add(list);
