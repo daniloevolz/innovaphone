@@ -8,7 +8,8 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
 
-    var list_users = [];
+    var list_Users = [];
+    var list_AllUsers = []
     var list_departments = []
     var _colDireita;
     var UIuserPicture;
@@ -55,7 +56,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
-            list_users = obj.result;
+            list_AllUsers = JSON.parse(obj.result);
         }
         if (obj.api == "admin" && obj.mt == "InsertDepartmentSuccess") { 
             app.send({api: "admin", mt: "SelectDepartments"})
@@ -65,6 +66,10 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             list_departments = JSON.parse(obj.result)
             makeDivDepartments(_colDireita)
              // pop up depois
+        }
+        if (obj.api == "admin" && obj.mt == "SelectUsersResult") { 
+             list_Users = JSON.parse(obj.result)
+             makedivUsers(_colDireita)  
         }
     }
 
