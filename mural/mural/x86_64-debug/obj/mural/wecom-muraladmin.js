@@ -8,7 +8,8 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
 
-    var list_users = [];
+    var list_Users = [];
+    var TableUsers = []
     var list_departments = []
     var _colDireita;
     var UIuserPicture;
@@ -55,7 +56,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
 
     function app_message(obj) {
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
-            list_users = obj.result;
+            TableUsers = JSON.parse(obj.result);
         }
         if (obj.api == "admin" && obj.mt == "InsertDepartmentSuccess") { 
             app.send({api: "admin", mt: "SelectDepartments"})
@@ -65,6 +66,10 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             list_departments = JSON.parse(obj.result)
             makeDivDepartments(_colDireita)
              // pop up depois
+        }
+        if (obj.api == "admin" && obj.mt == "SelectUsersResult") { 
+             list_Users = JSON.parse(obj.result)
+             makedivUsers(_colDireita)  
         }
     }
 
@@ -129,7 +134,6 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     function ChangeView(ex, colDireita) {
 
         if (ex == "CfgDepartments") {
-            // makeDivDepartments(colDireita);
             app.send({ api: "admin", mt: "SelectDepartments" })
             waitConnection(_colDireita);
         }
@@ -228,7 +232,9 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         list_departments.forEach(function (dep) {
             var row = [];
             row.push(dep.id);
-            row.push(dep.name);
+            row.push(dep.guid);
+            row.push(dep.editor);
+            row.push(dep.viewer);
             ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
         })
         scroll_container.add(list);
@@ -238,12 +244,16 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     function makeDivAddUsers(t) {
         t.clear();
         var divMain = t.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center", null, null))
-        divMain.add(new innovaphone.ui1.Div(null, null, "divTitle")).add(new innovaphone.ui1.Node("h1", null, texts.text("labelDepartsTitle"), null))
+        divMain.add(new innovaphone.ui1.Div(null, null, "divTitle")).add(new innovaphone.ui1.Node("h1", null, texts.text("labelUsersTitle"), null))
 
-        divMain.add(new innovaphone.ui1.Node("h3", null, texts.text("labelAddDepart"), "divAddDepart"))
-        divMain.add(new innovaphone.ui1.Input(null, null, texts.text("labelAddDepart"), 100, "text", "IptAddDepart").setAttribute("id", "IptAddDepart"))
+        t.add(new innovaphone.ui1.Node("for",null,texts.text("labelSelectUser"),"forSelectUser"));
+        t.add(new innovaphone.ui1.Node("select",null,null,"SelectUsers").setAttribute("id","userSelect"));
+        t.add(new innovaphone.ui1.Node("h2",null,texts.text("labelDepartments"),"h2Departments"))
+        t.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","departmentsGrid"))
+        //divMain.add(new innovaphone.ui1.Node("h3", null, texts.text("labelAddUser"), "divAddUsers"))
+        //divMain.add(new innovaphone.ui1.Input(null, null, texts.text("labelAddUser"), 100, "text", "IptAddUsers").setAttribute("id", "IptAddUsers"))
 
-        divMain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAdd")).addEvent("click", function () {
+        divMain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAdd")).setAttribute("id","saveButton").addEvent("click", function () {
 
             var userId = document.getElementById('userSelect').value;
             var editorDepartments = getSelectedDepartments('editor');
@@ -268,7 +278,112 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             waitConnection(t);
         });
     }
-
+    // Função para preencher o select de usuários
+function fillUserSelect() {
+    const userSelect = document.getElementById('userSelect');
+  
+    users.forEach(user => {
+      const option = document.createElement('option');
+      option.value = user.id;
+      option.text = user.name;
+      userSelect.appendChild(option);
+    });
+  }
+  
+  
+  // Função para obter os departamentos selecionados para editor e visualizador
+  function getSelectedDepartments(departmentType) {
+    const checkboxes = document.getElementsByName(`${departmentType}Departments`);
+    const selectedDepartments = Array.from(checkboxes)
+      .filter(checkbox => checkbox.checked)
+      .map(checkbox => checkbox.value);
+  
+    return selectedDepartments;
+  }
+  
+  // Função para salvar os dados selecionados
+  function saveData() {
+    const userId = document.getElementById('userSelect').value;
+    const editorDepartments = getSelectedDepartments('editor');
+    const viewerDepartments = getSelectedDepartments('viewer');
+  
+    // Faça o que for necessário com os dados selecionados, por exemplo, enviar para o servidor.
+    console.log('ID do Usuário:', userId);
+    console.log('Departamentos de Editor:', editorDepartments);
+    console.log('Departamentos de Visualizador:', viewerDepartments);
+  }
+  
+  // Evento para acionar a função saveData quando o botão for clicado
+  const saveButton = document.getElementById('saveButton');
+  saveButton.addEventListener('click', saveData);
+  
+  // Preencha o select de usuários e crie os checkboxes dos departamentos
+  fillUserSelect();
+  
+  
+  // Função para criar o grid com as informações dos departamentos
+  function createDepartmentsGrid() {
+    const departmentsGrid = document.getElementById('departmentsGrid');
+  
+    // Criar a primeira linha para os cabeçalhos das colunas
+    const headerRow = document.createElement('div');
+    headerRow.classList.add('row');
+  
+    const nameCol = document.createElement('div');
+    nameCol.classList.add('column');
+    nameCol.textContent = 'Nome do Departamento';
+  
+    const editorCol = document.createElement('div');
+    editorCol.classList.add('column');
+    editorCol.textContent = 'Editor';
+  
+    const viewerCol = document.createElement('div');
+    viewerCol.classList.add('column');
+    viewerCol.textContent = 'Visualizador';
+  
+    headerRow.appendChild(nameCol);
+    headerRow.appendChild(editorCol);
+    headerRow.appendChild(viewerCol);
+  
+    departmentsGrid.appendChild(headerRow);
+  
+    // Criar as demais linhas com os dados dos departamentos
+    departments.forEach(department => {
+      var row = document.createElement('div');
+      row.classList.add('row');
+  
+      var nameCol = document.createElement('div');
+      nameCol.classList.add('column');
+      nameCol.textContent = department;
+  
+      const editorCol = document.createElement('div');
+      editorCol.classList.add('column');
+      const editorCheckbox = document.createElement('input');
+      editorCheckbox.type = 'checkbox';
+      editorCheckbox.name = 'editorDepartments';
+      editorCheckbox.value = department;
+      editorCol.appendChild(editorCheckbox);
+  
+      const viewerCol = document.createElement('div');
+      viewerCol.classList.add('column');
+      const viewerCheckbox = document.createElement('input');
+      viewerCheckbox.type = 'checkbox';
+      viewerCheckbox.name = 'viewerDepartments';
+      viewerCheckbox.value = department;
+      viewerCol.appendChild(viewerCheckbox);
+  
+      row.appendChild(nameCol);
+      row.appendChild(editorCol);
+      row.appendChild(viewerCol);
+  
+  
+      departmentsGrid.appendChild(row);
+    });
+  }
+  
+  
+  // Função para criar o grid
+  createDepartmentsGrid()
 }
 
 Wecom.muralAdmin.prototype = innovaphone.ui1.nodePrototype;

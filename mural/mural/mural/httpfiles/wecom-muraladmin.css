@@ -69,3 +69,19 @@ a {
     width: 80px;
     height: 30px;
 }
+.button-inn-del {
+    border-radius: 50px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: #B0132B;
+    color: whitesmoke;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7;
+}

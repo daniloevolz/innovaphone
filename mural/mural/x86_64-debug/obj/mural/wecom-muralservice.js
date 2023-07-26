@@ -41,7 +41,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, guid: u.columns.guid })
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: list_users, src: obj.src }));
             }
@@ -79,7 +79,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 Database.exec("INSERT INTO tbl_users (guid,editor,viewer) VALUES ('" + obj.guid + "','"+obj.editor+"','"+obj.viewer+"')")
                     .oncomplete(function () {
                         log("InsertUser:result=success");
-                        conn.send(JSON.stringify({ api: "admin", mt: "IInsertUserSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertUserSuccess" }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
