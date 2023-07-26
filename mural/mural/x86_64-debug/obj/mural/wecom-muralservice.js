@@ -43,7 +43,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 pbxTableUsers.forEach(function (u) {
                     list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                 })
-                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: list_users, src: obj.src }));
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name) VALUES ('" + obj.name + "')")
@@ -95,6 +95,16 @@ new JsonApi("admin").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "DeleteUsers") {
+                Database.exec("DELETE FROM tbl_users WHERE id=" + obj.id + ";")
+                   .oncomplete(function () {
+                       conn.send(JSON.stringify({ api: "admin", mt: "DeleteUsersSuccess", result: JSON.stringify(data, null, 4) }));
+
+                    })
+                   .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                   });
+           }
         });
     }
 });

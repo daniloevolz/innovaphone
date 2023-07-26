@@ -43,7 +43,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 pbxTableUsers.forEach(function (u) {
                     list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                 })
-                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: list_users, src: obj.src }));
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name) VALUES ('" + obj.name + "')")

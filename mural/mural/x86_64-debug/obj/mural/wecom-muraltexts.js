@@ -17,12 +17,13 @@ Wecom.muralTexts = {
         labelAddDepart: "Adicionar Departamento",
         labelAdd: "Adicionar",
         btnDel: "Deletar",
-        cabecalho0: "id",
-        cabecalho1: "Departamento",
+        cabecalhoDepartment0: "id",
+        cabecalhoDepartment1: "Departamento",
         labelTitleDepartmentsTable: "Tabela de Departamentos",
         cabecalhoUser0: "id",
         cabecalhoUser1: "Usuário",
         cabecalhoUser2: "Editor",
-        cabecalhoUser3: "Visualizador"
+        cabecalhoUser3: "Visualizador",
+        labelUsersTitle: "Adicionar Usuário"
     }
 }
