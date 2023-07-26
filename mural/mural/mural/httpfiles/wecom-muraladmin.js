@@ -130,7 +130,12 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
 
         if (ex == "CfgDepartments") {
             // makeDivDepartments(colDireita);
-            app.send({ api: "admin", mt: "SelectDepartments"})
+            app.send({ api: "admin", mt: "SelectDepartments" })
+            waitConnection(_colDireita);
+        }
+        if (ex == "CfgUsers") {
+            app.send({ api: "admin", mt: "SelectUsers" })
+            waitConnection(_colDireita);
         }
     }
     function makeDivDepartments(t){
@@ -153,8 +158,9 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             selectedrows.forEach(function (row) {
                 console.log(row);
                 app.send({ api: "admin", mt: "DeleteDepartments", id: parseInt(row) });
-                app.send({ api: "admin", mt: "SelectDepartments"});
             })
+            waitConnection(t);
+            app.send({ api: "admin", mt: "SelectDepartments" });
         });
 
         //Titulo Tabela
@@ -180,18 +186,86 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         scroll_container.add(list);
         t.add(scroll_container);
     }
+    function makedivUsers(t) {
+        t.clear();
+
+        var divmain = t.add(new innovaphone.ui1.Div(null, null, null))
+        divmain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAddUser")).addEvent("click", function () {
+            makeDivAddUsers(t)
+        });
+        divmain.add(new innovaphone.ui1.Div(null, null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
+            var selected = ListView.getSelectedRows();
+            console.log(selected);
+            var selectedrows = [];
+
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(ListView.getRowData(s))
+
+            })
+            selectedrows.forEach(function (row) {
+                console.log(row);
+                app.send({ api: "admin", mt: "DeleteUsers", id: parseInt(row) });
+            })
+            waitConnection(t);
+            app.send({ api: "admin", mt: "SelectUsers" });
+        });
+
+        //Titulo Tabela
+        t.add(new innovaphone.ui1.Div("text-align:center", texts.text("labelTitleDepartmentsTable"), "TituloTable"));
+
+        var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
+
+        var list = new innovaphone.ui1.Div(null, null, "");
+        var columns = 4;
+        var rows = list_departments.length;
+        var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoUser" + i), i, 10, false);
+        }
+        //Tabela    
+        list_departments.forEach(function (dep) {
+            var row = [];
+            row.push(dep.id);
+            row.push(dep.name);
+            ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
+        })
+        scroll_container.add(list);
+        t.add(scroll_container);
+
+    }
+    function makeDivAddUsers(t) {
+        t.clear();
+        var divMain = t.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center", null, null))
+        divMain.add(new innovaphone.ui1.Div(null, null, "divTitle")).add(new innovaphone.ui1.Node("h1", null, texts.text("labelDepartsTitle"), null))
+
+        divMain.add(new innovaphone.ui1.Node("h3", null, texts.text("labelAddDepart"), "divAddDepart"))
+        divMain.add(new innovaphone.ui1.Input(null, null, texts.text("labelAddDepart"), 100, "text", "IptAddDepart").setAttribute("id", "IptAddDepart"))
+
+        divMain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAdd")).addEvent("click", function () {
+
+            var userId = document.getElementById('userSelect').value;
+            var editorDepartments = getSelectedDepartments('editor');
+            var viewerDepartments = getSelectedDepartments('viewer');
+            app.send({ api: "admin", mt: "InsertUser", user: userId, editor: editorDepartments, viewer: viewerDepartments  });
+            waitConnection(t);
+        });
+
+    }
 
     function makeDivAddDepartments(t){
         t.clear();
         var divMain = t.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center",null,null))
-        divMain.add(new innovaphone.ui1.Div(null,null,"divDepartTitle")).add(new innovaphone.ui1.Node("h1",null,texts.text("labelDepartsTitle"),null))
-        divMain.add(new innovaphone.ui1.Node("h3",null,texts.text("labelAddDepart"),"divAddDepart"))
+        divMain.add(new innovaphone.ui1.Div(null,null,"divTitle")).add(new innovaphone.ui1.Node("h1",null,texts.text("labelDepartsTitle"),null))
+
+        divMain.add(new innovaphone.ui1.Node("h3", null, texts.text("labelAddDepart"), "divAddDepart"))
         divMain.add(new innovaphone.ui1.Input(null,null,texts.text("labelAddDepart"),100,"text","IptAddDepart").setAttribute("id","IptAddDepart"))
         divMain.add(new innovaphone.ui1.Node("button",null,texts.text("labelAdd"),"btnAddDepart")).addEvent("click", function () {
             
              var department = document.getElementById("IptAddDepart").value;
             app.send({ api: "admin", mt: "InsertDepartment", name: department});
-            // waitConnection(t);
+            waitConnection(t);
         });
     }
 

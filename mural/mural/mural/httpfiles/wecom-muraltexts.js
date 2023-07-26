@@ -19,6 +19,10 @@ Wecom.muralTexts = {
         btnDel: "Deletar",
         cabecalho0: "id",
         cabecalho1: "Departamento",
-        labelTitleDepartmentsTable: "Tabela de Departamentos"
+        labelTitleDepartmentsTable: "Tabela de Departamentos",
+        cabecalhoUser0: "id",
+        cabecalhoUser1: "Usuário",
+        cabecalhoUser2: "Editor",
+        cabecalhoUser3: "Visualizador"
     }
 }

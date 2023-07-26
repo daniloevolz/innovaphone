@@ -55,14 +55,14 @@ a {
     text-decoration: none;
     color: white;
 }
-.divDepartTitle{
+.divTitle{
     text-align: center;
 }
 .IptAddDepart{
     width: 150px;
     height: 30px;
 }
-.btnAddDepart{
+.btnAdd{
     background-color: rgb(2, 22, 63);
     color: white;
     opacity: 0.8;
