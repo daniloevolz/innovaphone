@@ -6,6 +6,26 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
             }
+            if (obj.mt == "InsertPost") {
+                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + obj.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + obj.date_creation + "','" + obj.dte_start + "','" + obj.date_end+ "')")
+                    .oncomplete(function () {
+                        log("InsertPost:result=success");
+                        conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectPosts") {
+                Database.exec("SELECT * FROM tbl_posts where department ='"+obj.department+"';")
+                    .oncomplete(function (data) {
+                        log("SelectPosts:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }
         });
     }
 });
@@ -21,7 +41,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, guid: u.columns.guid })
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: list_users, src: obj.src }));
             }
@@ -54,7 +74,27 @@ new JsonApi("admin").onconnected(function(conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                          conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
-                }
+            }
+            if (obj.mt == "InsertUser") {
+                Database.exec("INSERT INTO tbl_users (guid,editor,viewer) VALUES ('" + obj.guid + "','"+obj.editor+"','"+obj.viewer+"')")
+                    .oncomplete(function () {
+                        log("InsertUser:result=success");
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertUserSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectUsers") {
+                Database.exec("SELECT * FROM tbl_users;")
+                    .oncomplete(function (data) {
+                        log("SelectUsers:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectUsersResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
         });
     }
 });
