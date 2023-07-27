@@ -235,29 +235,33 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         for (i = 0; i < columns; i++) {
             ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoUser" + i), i, 10, false);
         }
-        //Tabela    
+        //Tabela 
+
         list_users.forEach(function (user) {
             var row = [];
             row.push(user.id);
-            var user_name = list_tableUsers.filter(function (tbl) { return tbl.guid === user.guid })[0].cn;     
+            var match_user = list_tableUsers.find(function (tbl) { return tbl.guid === user.guid });
+            var user_name = match_user ? match_user.cn : '';
             row.push(user_name);
 
-            var list_editor = [];
-            var editor = user.editor;
-            editor.forEach(function(e){
-                var dep_name = list_departments.filter(function (dep) { return dep.id === e.id })[0].name;
-                list_editor.push(dep_name);
-            })
-            row.push(list_editor);
+            var match_dep = list_departments.find(function (dep) { return dep.id === user.editor });
+            console.log("match_Dep ", match_dep)
+            var dep_name = match_dep ? match_dep.name : 'CARALHO';
+            row.push(dep_name);
+
             var list_viewer = [];
-            var viewer = user.viewer;
-            viewer.forEach(function(v){
-                var dep_name = list_departments.filter(function (dep) { return dep.id === v.id })[0].name;
+            var viewerArray = Array.from(user.viewer)
+
+            viewerArray.forEach(function (v) {
+                var match_dep = list_departments.find(function (dep) { return dep.id === v.id });
+                var dep_name = match_dep ? match_dep.name : 'CARALHO';
                 list_viewer.push(dep_name);
-            })
+            });
+
             row.push(list_viewer);
+        
             ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
-        })
+        });
         scroll_container.add(list);
         t.add(scroll_container);
 
