@@ -11,6 +11,8 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
     var list_users = [];
     var list_tableUsers = [];
     var list_departments = [];
+    var list_posts = [];
+    var licenses;
     var _colDireita;
     var UIuserPicture;
     var UIuser;
@@ -67,12 +69,21 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
              // pop up depois
         }
         if (obj.api == "admin" && obj.mt == "SelectUsersResult") { 
-            list_users = JSON.parse(obj.result);
-             makedivUsers(_colDireita)  
+            list_users = JSON.parse(obj.resultUsers);
+            list_departments = JSON.parse(obj.resultDepartments);
+            makedivUsers(_colDireita)  
         }
         if (obj.api == "admin" && obj.mt == "InsertUserSuccess") { 
             app.send({api: "admin", mt: "SelectUsers"})
             window.alert("Usuário Inserido com Sucesso")
+        }
+        if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
+            list_posts = JSON.parse(obj.result);
+            makedivPosts(_colDireita)
+        }
+        if (obj.api == "admin" && obj.mt == "SelectLicenseResult") {
+            licenses = JSON.parse(obj.result);
+            makedivLicense(_colDireita)
         }
     }
 
@@ -108,9 +119,10 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         divMenu.add(li1);
         var li2 = new innovaphone.ui1.Node("li", "opacity: 0.9", new innovaphone.ui1.Node("a", null, texts.text("labelCfgDepartments"), null).setAttribute("id", "CfgDepartments"), "liOptions");
         divMenu.add(li2);
-        var li3 = new innovaphone.ui1.Node("li", "opacity: 0.9", new innovaphone.ui1.Node("a", null, texts.text("labelCfgSkills"), null).setAttribute("id", "CfgSkills"), "liOptions");
+        var li3 = new innovaphone.ui1.Node("li", "opacity: 0.9", new innovaphone.ui1.Node("a", null, texts.text("labelCfgPosts"), null).setAttribute("id", "CfgPosts"), "liOptions");
         divMenu.add(li3);
-
+        var li4 = new innovaphone.ui1.Node("li", "opacity: 0.9", new innovaphone.ui1.Node("a", null, texts.text("labelCfgLicense"), null).setAttribute("id", "CfgLicense"), "liOptions");
+        divMenu.add(li4);
 
         colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null).add(new innovaphone.ui1.Div(null, null, "otherli")));
         var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 90%;", null, null));
@@ -124,6 +136,14 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         var a = document.getElementById("CfgUsers");
         a.addEventListener("click", function () {
             ChangeView("CfgUsers", colDireita)
+        })
+        var a = document.getElementById("CfgPosts");
+        a.addEventListener("click", function () {
+            ChangeView("CfgPosts", colDireita)
+        })
+        var a = document.getElementById("CfgLicense");
+        a.addEventListener("click", function () {
+            ChangeView("CfgLicense", colDireita)
         })
 
         _colDireita = colDireita;
@@ -148,12 +168,20 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             app.send({ api: "admin", mt: "SelectUsers" })
             waitConnection(_colDireita);
         }
+        if (ex == "CfgPosts") {
+            app.send({ api: "admin", mt: "SelectPosts" })
+            waitConnection(_colDireita);
+        }
+        if (ex == "CfgLicense") {
+            app.send({ api: "admin", mt: "SelectLicenseInfo" })
+            waitConnection(_colDireita);
+        }
     }
     function makeDivDepartments(t){
         t.clear();
 
        var divmain = t.add(new innovaphone.ui1.Div(null,null,null))
-       divmain.add(new innovaphone.ui1.Node("button",null,texts.text("labelAdd"),"btnAddDepart")).addEvent("click", function () {
+       divmain.add(new innovaphone.ui1.Node("button",null,texts.text("labelAdd"),"btnAdd")).addEvent("click", function () {
         makeDivAddDepartments(t)     
         });  
         divmain.add(new innovaphone.ui1.Div(null, null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
@@ -201,7 +229,7 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         t.clear();
 
         var divmain = t.add(new innovaphone.ui1.Div(null, null, null))
-        divmain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAddUser")).addEvent("click", function () {
+        divmain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAdd")).addEvent("click", function () {
             makeDivAddUsers(t)
         });
         divmain.add(new innovaphone.ui1.Div(null, null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
@@ -244,21 +272,38 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
             var user_name = match_user ? match_user.cn : '';
             row.push(user_name);
 
-            var match_dep = list_departments.find(function (dep) { return dep.id === user.editor });
-            console.log("match_Dep ", match_dep)
-            var dep_name = match_dep ? match_dep.name : 'CARALHO';
-            row.push(dep_name);
+            //var editorArray = Array.from(user.editor)
 
-            var list_viewer = [];
-            var viewerArray = Array.from(user.viewer)
+            var editorValuesArray = user.editor.split(',');
 
-            viewerArray.forEach(function (v) {
-                var match_dep = list_departments.find(function (dep) { return dep.id === v.id });
-                var dep_name = match_dep ? match_dep.name : 'CARALHO';
-                list_viewer.push(dep_name);
+            // Converta a lista de strings em uma lista de inteiros
+            var editorIntegersArray = editorValuesArray.map(function (value) {
+                return parseInt(value, 10); // O segundo argumento (base) é 10 para tratar números decimais corretamente
+            });
+            var list_editorName =[];
+            editorIntegersArray.forEach(function(e){
+                var match_dep = list_departments.find(function (dep) { return dep.id == e });
+                console.log("match_Dep ", match_dep)
+                var dep_name = match_dep ? match_dep.name : '';
+                list_editorName.push(dep_name); 
+            })
+            row.push(list_editorName);
+
+            var list_viewerName = [];
+            //var viewerArray = Array.from(user.viewer)
+            var viewerValuesArray = user.viewer.split(',');
+
+            // Converta a lista de strings em uma lista de inteiros
+            var viewerIntegersArray = viewerValuesArray.map(function (value) {
+                return parseInt(value, 10); // O segundo argumento (base) é 10 para tratar números decimais corretamente
+            });
+            viewerIntegersArray.forEach(function (v) {
+                var match_dep = list_departments.find(function (dep) { return dep.id == v });
+                var dep_name = match_dep ? match_dep.name : '';
+                list_viewerName.push(dep_name);
             });
 
-            row.push(list_viewer);
+            row.push(list_viewerName);
         
             ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
         });
@@ -292,6 +337,73 @@ Wecom.muralAdmin = Wecom.muralAdmin || function (start, args) {
         // Função para criar o grid
         createDepartmentsGrid();
 
+    }
+
+    function makedivPosts(t) {
+        t.clear();
+
+        var divmain = t.add(new innovaphone.ui1.Div(null, null, null))
+        divmain.add(new innovaphone.ui1.Node("button", null, texts.text("labelAdd"), "btnAdd")).addEvent("click", function () {
+            makeDivAddUsers(t)
+        });
+        divmain.add(new innovaphone.ui1.Div(null, null, "button-inn-del")).addTranslation(texts, "btnDel").addEvent("click", function () {
+            var selected = ListView.getSelectedRows();
+            console.log(selected);
+            var selectedrows = [];
+
+            selected.forEach(function (s) {
+                console.log(s);
+                selectedrows.push(ListView.getRowData(s))
+
+            })
+            selectedrows.forEach(function (row) {
+                console.log(row);
+                app.send({ api: "admin", mt: "DeletePosts", id: parseInt(row) });
+            })
+            waitConnection(t);
+            app.send({ api: "admin", mt: "SelectPosts" });
+        });
+
+        //Titulo Tabela
+        t.add(new innovaphone.ui1.Div("text-align:center", texts.text("labelTitlePostsTable"), "TituloTable"));
+
+        var scroll_container = new innovaphone.ui1.Node("scroll-container", "overflow-y: auto; position: absolute; left:1%; top:25%; right:1%; width:98%; height:-webkit-fill-available;", null, "scroll-container-table");
+
+        var list = new innovaphone.ui1.Div(null, null, "");
+        var columns = 9;
+        var rows = list_users.length;
+        var ListView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
+        //Cabeçalho
+        for (i = 0; i < columns; i++) {
+            ListView.addColumn("column", "text_cabecalho", texts.text("cabecalhoPosts" + i), i, 10, false);
+        }
+        //Tabela 
+
+        list_posts.forEach(function (post) {
+            var row = [];
+            row.push(post.id);
+            var match_user = list_tableUsers.find(function (tbl) { return tbl.guid === post.user_guid });
+            var user_name = match_user ? match_user.cn : '';
+            row.push(user_name);
+
+            row.push(post.color);
+            row.push(post.title);
+            row.push(post.description);
+            var department_name = list_departments.find(function (dep) { return dep.id == post.department });
+            row.push(department_name);
+            row.push(post.date_creation);
+            row.push(post.date_start);
+            row.push(post.date_end);
+
+            ListView.addRow(i, row, "rowaction", "#A0A0A0", "#82CAE2");
+        });
+        scroll_container.add(list);
+        t.add(scroll_container);
+
+    }
+
+    function makedivLicense(t) {
+        t.clear();
     }
 
     function makeDivAddDepartments(t){

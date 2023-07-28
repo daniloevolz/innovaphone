@@ -9,10 +9,16 @@ Wecom.muralTexts = {
     de: {
     },
     pt: {
+        labelTituloAdmin: "Administração",
+        labelSelectUser: "Selecione o Usuário:",
+        labelDepartments: "Selecione os Departamentos",
+        labelTitleUsersTable: "Tabela de Usuários",
+        labelTitlePostsTable: "Tabela de Posts",
         labelAdmin:"Administração",
         labelCfgUsers: "Usuários",
         labelCfgDepartments: "Departamentos",
-        labelCfgSkills: "Habilidades",
+        labelCfgLicense: "Licensa",
+        labelCfgPosts: "Posts",
         labelDepartsTitle: "Adição de Departamentos",
         labelAddDepart: "Adicionar Departamento",
         labelNameDepart: "Nome do Departamento",
@@ -27,6 +33,15 @@ Wecom.muralTexts = {
         cabecalhoUser1: "Usuário",
         cabecalhoUser2: "Editor",
         cabecalhoUser3: "Visualizador",
-        labelUsersTitle: "Adicionar Usuário"
+        labelUsersTitle: "Adicionar Usuário",
+        cabecalhoPosts0: "Id",
+        cabecalhoPosts1: "Usuário",
+        cabecalhoPosts2: "Cor",
+        cabecalhoPosts3: "Título",
+        cabecalhoPosts4: "Descrição",
+        cabecalhoPosts5: "Departamento",
+        cabecalhoPosts6: "Criação",
+        cabecalhoPosts7: "Começo",
+        cabecalhoPosts8: "Fim"
     }
 }

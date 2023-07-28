@@ -45,6 +45,16 @@ new JsonApi("admin").onconnected(function(conn) {
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
+            if (obj.mt == "SelectPosts") {
+                Database.exec("SELECT * FROM tbl_posts;")
+                    .oncomplete(function (data) {
+                        log("SelectPosts:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name) VALUES ('" + obj.name + "')")
                     .oncomplete(function () {
@@ -87,9 +97,18 @@ new JsonApi("admin").onconnected(function(conn) {
             }
             if (obj.mt == "SelectUsers") {
                 Database.exec("SELECT * FROM tbl_users;")
-                    .oncomplete(function (data) {
-                        log("SelectUsers:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectUsersResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    .oncomplete(function (dataUsers) {
+                        log("SelectUsers:result=" + JSON.stringify(dataUsers, null, 4));
+
+                        Database.exec("SELECT * FROM tbl_departments;")
+                            .oncomplete(function (dataDep) {
+                                log("SelectDepartments:result=" + JSON.stringify(dataDep, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "SelectUsersResult", src: obj.src, resultUsers: JSON.stringify(dataUsers, null, 4), resultDepartments: JSON.stringify(dataDep, null, 4) }));
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));

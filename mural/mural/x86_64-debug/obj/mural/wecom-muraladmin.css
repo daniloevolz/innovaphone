@@ -62,23 +62,31 @@ a {
     width: 150px;
     height: 30px;
 }
-.btnAdd{
-    background-color: rgb(2, 22, 63);
-    color: white;
-    opacity: 0.8;
-    width: 80px;
-    height: 30px;
-}
+
 .button-inn-del {
-    border-radius: 50px;
+    position: absolute;
+    left: 10px;
+    top: 50px;
+    box-sizing: border-box;
+    width: fit-content;
+    height: 40px;
+    padding: 10px;
+    background-color: #B0132B;
+    color: whitesmoke;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.btnAdd {
     position: absolute;
     left: 10px;
     top: 10px;
     box-sizing: border-box;
-    width: calc(100% - 20px);
+    width: fit-content;
     height: 40px;
     padding: 10px;
-    background-color: #B0132B;
+    background-color: #1813b0;
     color: whitesmoke;
     font-size: 14px;
     text-align: center;

@@ -39,6 +39,7 @@ Wecom.mural = Wecom.mural || function (start, args) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
         }
     }
+    function 
 }
 
 Wecom.mural.prototype = innovaphone.ui1.nodePrototype;
