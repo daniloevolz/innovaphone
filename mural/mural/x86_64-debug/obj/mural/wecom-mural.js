@@ -32,13 +32,16 @@ Wecom.mural = Wecom.mural || function (start, args) {
     app.onmessage = app_message;
 
     function app_connected(domain, user, dn, appdomain) {
-        app.send({ api: "user", mt: "Ping"});
+        app.send({ api: "user", mt: "SelectDepartments"});
     }
 
     function app_message(obj) {
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
         }
-    }
+        if (obj.api == "user" && obj.mt == "SelectDepartmentsResult") {
+            console.log(obj.result);
+        }
+    } 
 }
 
 Wecom.mural.prototype = innovaphone.ui1.nodePrototype;

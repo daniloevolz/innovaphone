@@ -1,5 +1,6 @@
 ﻿
-new JsonApi("user").onconnected(function(conn) {
+new JsonApi("user").onconnected(function (conn) {
+    log("JsonApi:conn=" + JSON.stringify(conn));
     if (conn.app == "wecom-mural") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
@@ -25,6 +26,20 @@ new JsonApi("user").onconnected(function(conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
+            }
+            if (obj.mt == "SelectDepartments")  {
+                log("SelectDepartments:");
+                
+                Database.exec("SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');")
+                    .oncomplete(function (dataUsersViewer) {
+                        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+                
+                
             }
         });
     }
@@ -56,7 +71,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
             }
             if (obj.mt == "InsertDepartment") {
-                Database.exec("INSERT INTO tbl_departments (name) VALUES ('" + obj.name + "')")
+                Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name +"','"+ obj.color + "')")
                     .oncomplete(function () {
                         log("InsertDepartment:result=success");
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDepartmentSuccess" }));

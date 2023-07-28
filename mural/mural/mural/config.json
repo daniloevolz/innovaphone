@@ -14,6 +14,11 @@
             "cmd": "column",
             "name": "name",
             "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "color",
+            "type": "VARCHAR(120)"
           }
         ]
       },
