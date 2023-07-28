@@ -24,7 +24,7 @@
       },
       {
         "cmd": "table",
-        "name": "tbl_users",
+        "name": "tbl_views_history",
         "init": [
           {
             "cmd": "column",
@@ -33,17 +33,49 @@
           },
           {
             "cmd": "column",
-            "name": "guid",
+            "name": "user_guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
             "cmd": "column",
-            "name": "editor",
-            "type": "VARCHAR(120) NOT NULL"
+            "name": "post_id",
+            "type": "BIGINT NOT NULL"
           },
           {
             "cmd": "column",
-            "name": "viewer",
+            "name": "date",
+            "type": "TEXT NOT NULL"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "tbl_department_viewers",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "department_id",
+            "type": "BIGINT NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "viewer_guid",
+            "type": "VARCHAR(120) NOT NULL"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "tbl_department_editors",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "department_id",
+            "type": "BIGINT NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "editor_guid",
             "type": "VARCHAR(120) NOT NULL"
           }
         ]
