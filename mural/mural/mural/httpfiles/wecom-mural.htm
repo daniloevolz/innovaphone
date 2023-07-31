@@ -73,19 +73,16 @@
 </body>
 <script>
     var depcards = document.getElementById("depcards")
-    var pgbuttom = document.getElementById("pgbuttom")
     var postdepart = document.getElementById("post-depart")
     var postmsg = document.getElementById("postmsg")
     var postview = document.getElementById("post#1")
     document.getElementById('voltar').addEventListener("click", function(){
         depcards.style.display="flex"
-        pgbuttom.style.display="flex"
         postdepart.style.display="none"
         postmsg.style.display="none"
         })
     document.getElementById('card-fin').addEventListener("click", function(){
         depcards.style.display="none"
-        pgbuttom.style.display="none"
         postdepart.style.display="flex"
         postmsg.style.display="none"
         })
