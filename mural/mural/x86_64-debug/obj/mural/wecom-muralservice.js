@@ -2,13 +2,21 @@
 new JsonApi("user").onconnected(function (conn) {
     log("JsonApi:conn=" + JSON.stringify(conn));
     if (conn.app == "wecom-mural") {
-        conn.onmessage(function(msg) {
+        conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
             }
+            if (obj.mt == "TableUsers") {
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
+                })
+                conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+            }
             if (obj.mt == "InsertPost") {
-                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + obj.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + obj.date_creation + "','" + obj.dte_start + "','" + obj.date_end+ "')")
+                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + obj.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + obj.date_creation + "','" + obj.dte_start + "','" + obj.date_end + "')")
                     .oncomplete(function () {
                         log("InsertPost:result=success");
                         conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess" }));
@@ -18,7 +26,7 @@ new JsonApi("user").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "SelectPosts") {
-                Database.exec("SELECT * FROM tbl_posts where department ='"+obj.department+"';")
+                Database.exec("SELECT * FROM tbl_posts where department ='" + obj.department + "';")
                     .oncomplete(function (data) {
                         log("SelectPosts:result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
@@ -27,50 +35,58 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
-            if (obj.mt == "SelectDepartments")  {
+            if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
-                var query = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '"+conn.guid+"';";
+                var query = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
                 var querylegado = "SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');";
                 Database.exec(query)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
+                        selectViewsHistory(conn, dataUsersViewer);
                         conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
-                
-                
             }
 
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
-                    .oncomplete(function (id) {
-                        log("InsertDepartment:result=success id "+id);
+                    .oncomplete(function () {
+                        log("InsertDepartment:result=success ");
 
-                        var viewers = obj.viewers;
-                        viewers.forEach(function(v){
-                            Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES ('" + id + "','" + v + "')")
-                            .oncomplete(function () {
-                                log("InsertDepartmentViewer:result=success");
-                                
+                        Database.exec("SELECT id FROM tbl_departments where name ='" + obj.name + "';")
+                            .oncomplete(function (data) {
+                                log("SelectDepartments:result=" + data[0].id);
+                                var viewers = obj.viewers;
+                                viewers.forEach(function (v) {
+                                    Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + parseInt(JSON.stringify(data[0].id), 10) + ",'" + v + "')")
+                                        .oncomplete(function () {
+                                            log("InsertDepartmentViewer:result=success");
+
+                                        })
+                                        .onerror(function (error, errorText, dbErrorCode) {
+                                            log("InsertDepartmentViewer:result=Error " + String(errorText));
+                                        });
+                                })
+                                var editors = obj.editors;
+                                editors.forEach(function (e) {
+                                    Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES ('" + parseInt(JSON.stringify(data[0].id), 10) + "','" + e + "')")
+                                        .oncomplete(function () {
+                                            log("InsertDepartmentEditor:result=success");
+
+                                        })
+                                        .onerror(function (error, errorText, dbErrorCode) {
+                                            log("InsertDepartmentEditor:result=Error " + String(errorText));
+                                        });
+                                })
+                                conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
+
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDepartmentViewer:result=Error "+String(errorText));
+
                             });
-                        })
-                        var editors = obj.editors;
-                        editors.forEach(function(e){
-                            Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES ('" + id + "','" + e + "')")
-                            .oncomplete(function () {
-                                log("InsertDepartmentEditor:result=success");
-                                
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDepartmentEditor:result=Error "+String(errorText));
-                            });
-                        })
-                        conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
+
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -78,33 +94,33 @@ new JsonApi("user").onconnected(function (conn) {
             }
             if (obj.mt == "DeleteDepartments") {
                 Database.exec("DELETE FROM tbl_departments WHERE id=" + obj.id + ";")
-                   .oncomplete(function () {
-                       Database.exec("DELETE FROM tbl_departments_viewers WHERE department_id=" + obj.id + ";")
-                       .oncomplete(function () {
-                           Database.exec("DELETE FROM tbl_departments_editors WHERE department_id=" + obj.id + ";")
-                           .oncomplete(function () {
-                               conn.send(JSON.stringify({ api: "user", mt: "DeleteDepartmentsSuccess", result: JSON.stringify(data, null, 4) }));
-                           })
-                           .onerror(function (error, errorText, dbErrorCode) {
-                               log("InsertDepartmentEditor:result=success");
-                           });
+                    .oncomplete(function () {
+                        Database.exec("DELETE FROM tbl_departments_viewers WHERE department_id=" + obj.id + ";")
+                            .oncomplete(function () {
+                                Database.exec("DELETE FROM tbl_departments_editors WHERE department_id=" + obj.id + ";")
+                                    .oncomplete(function () {
+                                        conn.send(JSON.stringify({ api: "user", mt: "DeleteDepartmentsSuccess", result: JSON.stringify(data, null, 4) }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("InsertDepartmentEditor:result=success");
+                                    });
 
-                       })
-                       .onerror(function (error, errorText, dbErrorCode) {
-                           log("InsertDepartmentViewer:result=success");
-                       });
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("InsertDepartmentViewer:result=success");
+                            });
                     })
-                   .onerror(function (error, errorText, dbErrorCode) {
+                    .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                   });
-           }
+                    });
+            }
         });
     }
 });
 
-new JsonApi("admin").onconnected(function(conn) {
+new JsonApi("admin").onconnected(function (conn) {
     if (conn.app == "wecom-muraladmin") {
-        conn.onmessage(function(msg) {
+        conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src }));
@@ -128,7 +144,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
             }
             if (obj.mt == "InsertDepartment") {
-                Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name +"','"+ obj.color + "')")
+                Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
                     .oncomplete(function () {
                         log("InsertDepartment:result=success");
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDepartmentSuccess" }));
@@ -148,13 +164,13 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
             }
             if (obj.mt == "DeleteDepartments") {
-                 Database.exec("DELETE FROM tbl_departments WHERE id=" + obj.id + ";")
+                Database.exec("DELETE FROM tbl_departments WHERE id=" + obj.id + ";")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteDepartmentsSuccess", result: JSON.stringify(data, null, 4) }));
 
-                     })
+                    })
                     .onerror(function (error, errorText, dbErrorCode) {
-                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
         });
@@ -180,7 +196,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
-        log("PbxSignal msg: "+msg);
+        log("PbxSignal msg: " + msg);
 
         if (obj.mt === "RegisterResult") {
             log("PBXSignal: registration result " + JSON.stringify(obj));
@@ -324,3 +340,10 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         log("PbxTableUsers: disconnected");
     });
 });
+
+
+
+//Internal supporters functions
+function selectViewsHistory(conn, departments) {
+
+}

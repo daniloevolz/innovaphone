@@ -13,6 +13,82 @@
     <script src="wecom-muraltexts.js" type="text/javascript"></script>
 </head>
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.mural(start, { }); })">
-    
+    <div id="bcground"  style="width: 100%; height: calc(100vh - 50px); margin: 0; background-color: black;">
+        <div id="billboard" style="display: flex; width: 100%; height: 100%; justify-content: center; align-items: center; background: linear-gradient(#415F77,#5F5264);">
+            <div id="postmsg" style="display: none; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
+                <div id="namebox" style="display: flex; color: white; width: 90%; height: 10%; justify-content: center;">
+                    <UL>NAME BOX - ATESTADOS</UL>
+                </div>
+                <div id="titlemsg" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 10%; margin-top: 05px;margin-bottom: 15px;">
+                    <UL>TITLE BOX</UL>
+                </div>
+                <div id="msgbox" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 80%; ">
+                    <scroll-box style="display: flex; color: white; width: 100%; height: 100%;">
+                        <ul><span>TEXTO DA MENSAGEM</span></ul>
+                    </scroll-box>
+                </div>
+                <div id="closedate" style="display: flex; color: white; width: 90%; height: 10%; justify-content: flex-end;">
+                    <UL>Expirate date:  31/12/2023</UL>
+                </div>
+            </div>
+
+        
+            <div id="worktable" style="height: 95%; width: 95%;">
+                <ul id="voltar" style="position: relative; display: flex; align-items: flex-start; justify-content: center; margin: 0; padding: 0;">Voltar</ul>
+                <div id="depcards" style="display: flex; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
+
+                    <div id="card-fin" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #0088f8; margin: 10px; font-size: 25px; color: white;">Financeiro</div>
+                    <div id="card-adm" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #3541ad; margin: 10px; font-size: 25px; color: white;">Administração</div>
+                    <div id="card-tec" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #387012; margin: 10px; font-size: 25px; color: white;">Técnica</div>
+                    <div id="card-sup" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #0b97b3; margin: 10px; font-size: 25px; color: white;">Suporte</div>
+                    <div id="card-rh" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #ad446c; margin: 10px; font-size: 25px; color: white;">RH</div>
+                    <div id="card-dir" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #eb1e1e; margin: 10px; font-size: 25px; color: white;">Diretoria</div>
+                    <div id="card-vend" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #020e53; margin: 10px; font-size: 25px; color: white;">Vendas</div>
+                    <div id="card-pvend" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #8b6f13; margin: 10px; font-size: 25px; color: white;">Pré-Vendas</div>
+                    <div id="card-price" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #7eff34; margin: 10px; font-size: 25px; color: white;">Price</div>
+                    <div id="card-logi" style="display: flex; text-align: center; justify-content: center; align-items: center; width:220px; height: 60px; border-radius: 05px; background: #80e8fd;  margin: 10px; font-size: 25px; color: white;">Logistica</div>
+                    <div id="card-mark" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #1ad601; margin: 10px; font-size: 25px; color: white;">Marketing</div>
+                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
+                </div>
+                <div id="post-depart" style="display: flex;  flex-wrap: wrap; width: 100%; height: 100%; justify-content: center; align-items: center; align-content: center;">
+                    <div id="post#1" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #f83200; margin: 15px; font-size: 25px; color: white;">ATESTADOS</div>
+                    <div id="post#2" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #7ff6ff; margin: 15px; font-size: 25px; color: white;">ALTERAÇÕES DO PLANO DE SAÚDE</div>
+                    <div id="post#3" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #13a31b; margin: 15px; font-size: 25px; color: white;">PAGAMENTO DE BÔNUS</div>                    
+                    <div id="post#4" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #920d0d; margin: 15px; font-size: 25px; color: white;">IR DATAS</div>
+                    <div id="post#5" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #31c214; margin: 15px; font-size: 25px; color: white;">REUNIÕES</div>
+                    <div id="post#6" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #cea00b; margin: 15px; font-size: 25px; color: white;">HORÁRIOS</div>
+                    <div id="post#7" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #1b24a1; margin: 15px; font-size: 25px; color: white;">AGENDA</div>
+                    <div id="post#8" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #0088f8; margin: 15px; font-size: 25px; color: white;">ANIVERSÁRIOS DO MÊS</div>
+                    <div id="postnew" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #44575B; margin: 15px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="postnew" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #44575B; margin: 15px; font-size: 25px; color: white;">Adicionar +</div>
+                </div>
+
+            </div>
+        </div> 
+        </div>
+    </div>
 </body>
+<script>
+    var depcards = document.getElementById("depcards")
+    var postdepart = document.getElementById("post-depart")
+    var postmsg = document.getElementById("postmsg")
+    var postview = document.getElementById("post#1")
+    document.getElementById('voltar').addEventListener("click", function(){
+        depcards.style.display="flex"
+        postdepart.style.display="none"
+        postmsg.style.display="none"
+        })
+    document.getElementById('card-fin').addEventListener("click", function(){
+        depcards.style.display="none"
+        postdepart.style.display="flex"
+        postmsg.style.display="none"
+        })
+    postview.addEventListener("click", function(){
+        postmsg.style.display="flex"
+        })
+
+</script>
 </html>
