@@ -7,8 +7,9 @@ var Wecom = Wecom || {};
 Wecom.mural = Wecom.mural || function (start, args) {
     this.createNode("body");
     var that = this;
-    var list_departments = []
+    var list_departments = [];
     var list_tableUsers = [];
+    var list_posts = [];
 
     var colorSchemes = {
         dark: {
@@ -48,6 +49,11 @@ Wecom.mural = Wecom.mural || function (start, args) {
             console.log(obj.result);
             list_departments = JSON.parse(obj.result);
             makeDivDepartments();
+        }
+        if (obj.api == "user" && obj.mt == "SelectPostsResult") {
+            console.log(obj.result);
+            list_posts = JSON.parse(obj.result);
+            makeDivPosts();
         }
     }
     function makeDivDepartments() {
@@ -139,6 +145,15 @@ Wecom.mural = Wecom.mural || function (start, args) {
             div.style.backgroundColor = department.color;
             div.style.margin = '10px';
 
+            // Adicionar o event listener de clique
+            div.addEventListener('click', function () {
+                // Coletar o ID do elemento div clicado
+                var clickedId = this.id;
+                console.log('ID do elemento div clicado:', clickedId);
+                app.send({ api: "user", mt: "SelectPosts", department: clickedId });
+
+            });
+
 
             depCardsContainer.appendChild(div);
 
@@ -163,7 +178,177 @@ Wecom.mural = Wecom.mural || function (start, args) {
             createDepartmentForm();
         });
     }
+    function makeDivPosts() {
+        // Criar os elementos HTML
+        var postDepartDiv = document.createElement('div');
+        postDepartDiv.id = 'post-depart';
+        postDepartDiv.style.display = 'flex';
+        postDepartDiv.style.flexWrap = 'wrap';
+        postDepartDiv.style.width = '100%';
+        postDepartDiv.style.height = '100%';
+        postDepartDiv.style.justifyContent = 'center';
+        postDepartDiv.style.alignItems = 'center';
+        postDepartDiv.style.alignContent = 'center';
 
+        var departments = [
+            { id: 'post#1', title: 'ATESTADOS', color: '#f83200', description: 'Testes de descrição' },
+            { id: 'post#2', title: 'ALTERAÇÕES DO PLANO DE SAÚDE', color: '#7ff6ff', description: 'Testes de descrição' },
+            { id: 'post#3', title: 'PAGAMENTO DE BÔNUS', color: '#13a31b', description: 'Testes de descrição'},
+            { id: 'post#4', title: 'IR DATAS', color: '#920d0d', description: 'Testes de descrição' },
+            { id: 'post#5', title: 'REUNIÕES', color: '#31c214', description: 'Testes de descrição' },
+            { id: 'post#6', title: 'HORÁRIOS', color: '#cea00b', description: 'Testes de descrição' },
+            { id: 'post#7', title: 'AGENDA', color: '#1b24a1', description: 'Testes de descrição' },
+            { id: 'post#8', title: 'ANIVERSÁRIOS DO MÊS', color: '#0088f8', description: 'Testes de descrição' },
+        ];
+
+        // Criar divs para cada departamento
+        departments.forEach(function(post) {
+            var postDiv = document.createElement('div');
+            postDiv.id = post.id;
+            postDiv.textContent = post.title;
+            postDiv.style.display = 'flex';
+            postDiv.style.justifyContent = 'center';
+            postDiv.style.alignItems = 'center';
+            postDiv.style.width = '17%';
+            postDiv.style.height = '30%';
+            postDiv.style.textAlign = 'center';
+            postDiv.style.borderRadius = '0px';
+            postDiv.style.backgroundColor = post.color;
+            postDiv.style.margin = '15px';
+            postDiv.style.fontSize = '25px';
+            postDiv.style.color = 'white';
+
+            // Adicionar o event listener de clique
+            postDiv.addEventListener('click', function () {
+                // Coletar o ID do elemento div clicado
+                var clickedId = this.id;
+                console.log('ID do elemento div clicado:', clickedId);
+                makeDivPostMessage(clickedId);
+
+            });
+
+            postDepartDiv.appendChild(postDiv);
+        });
+
+        // Criar os elementos 'Adicionar +'
+        var postNew1Div = document.createElement('div');
+        postNew1Div.id = 'postnew1';
+        postNew1Div.textContent = 'Adicionar +';
+        postNew1Div.style.display = 'flex';
+        postNew1Div.style.justifyContent = 'center';
+        postNew1Div.style.alignItems = 'center';
+        postNew1Div.style.width = '17%';
+        postNew1Div.style.height = '30%';
+        postNew1Div.style.textAlign = 'center';
+        postNew1Div.style.borderRadius = '0px';
+        postNew1Div.style.backgroundColor = '#44575B';
+        postNew1Div.style.margin = '15px';
+        postNew1Div.style.fontSize = '25px';
+        postNew1Div.style.color = 'white';
+
+        var postNew2Div = document.createElement('div');
+        postNew2Div.id = 'postnew2';
+        postNew2Div.textContent = 'Adicionar +';
+        postNew2Div.style.display = 'flex';
+        postNew2Div.style.justifyContent = 'center';
+        postNew2Div.style.alignItems = 'center';
+        postNew2Div.style.width = '17%';
+        postNew2Div.style.height = '30%';
+        postNew2Div.style.textAlign = 'center';
+        postNew2Div.style.borderRadius = '0px';
+        postNew2Div.style.backgroundColor = '#44575B';
+        postNew2Div.style.margin = '15px';
+        postNew2Div.style.fontSize = '25px';
+        postNew2Div.style.color = 'white';
+
+        // Adicionar os elementos criados à div com o ID 'post-depart'
+        postDepartDiv.appendChild(postNew1Div);
+        postDepartDiv.appendChild(postNew2Div);
+
+        // Obter a div com o ID 'billboard'
+        var billboardDiv = document.getElementById('billboard');
+        if (billboardDiv) {
+            // Adicionar o elemento 'postDepartDiv' ao 'billboardDiv'
+            billboardDiv.appendChild(postDepartDiv);
+        } else {
+            console.error("A div com o ID 'billboard' não foi encontrada.");
+        }
+    }
+    function makeDivPostMessage(id) {
+        var post = list_posts.filter(function (item) {
+            return item.id === id;
+        })[0];
+        // Criar os elementos HTML
+        var postMsgDiv = document.createElement('div');
+        postMsgDiv.id = 'postmsg';
+        postMsgDiv.style.display = 'flex';
+        postMsgDiv.style.flexDirection = 'column';
+        postMsgDiv.style.alignItems = 'center';
+        postMsgDiv.style.position = 'absolute';
+        postMsgDiv.style.width = '40%';
+        postMsgDiv.style.height = '80%';
+        postMsgDiv.style.backgroundColor = '#29336ed0';
+
+        var nameBoxDiv = document.createElement('div');
+        nameBoxDiv.id = 'namebox';
+        nameBoxDiv.style.display = 'flex';
+        nameBoxDiv.style.color = 'white';
+        nameBoxDiv.style.width = '90%';
+        nameBoxDiv.style.height = '10%';
+        nameBoxDiv.style.justifyContent = 'center';
+        nameBoxDiv.innerHTML = post.title;
+
+        var titleMsgDiv = document.createElement('div');
+        titleMsgDiv.id = 'titlemsg';
+        titleMsgDiv.style.display = 'flex';
+        titleMsgDiv.style.color = 'white';
+        titleMsgDiv.style.width = '90%';
+        titleMsgDiv.style.height = '10%';
+        titleMsgDiv.innerHTML = '<ul>TITLE BOX</ul>';
+
+        var msgBoxDiv = document.createElement('div');
+        msgBoxDiv.id = 'msgbox';
+        msgBoxDiv.style.display = 'flex';
+        msgBoxDiv.style.color = 'white';
+        msgBoxDiv.style.width = '90%';
+        msgBoxDiv.style.height = '80%';
+
+        var scrollBox = document.createElement('scroll-box');
+        scrollBox.style.display = 'flex';
+        scrollBox.style.color = 'white';
+        scrollBox.style.width = '100%';
+        scrollBox.style.height = '100%';
+
+        var msgContent = document.createElement('ul');
+        msgContent.innerHTML = post.description;
+
+        var closeDateDiv = document.createElement('div');
+        closeDateDiv.id = 'closedate';
+        closeDateDiv.style.display = 'flex';
+        closeDateDiv.style.color = 'white';
+        closeDateDiv.style.width = '90%';
+        closeDateDiv.style.height = '10%';
+        closeDateDiv.style.justifyContent = 'flex-end';
+        closeDateDiv.innerHTML = post.date_end;
+
+        // Adicionar os elementos criados à div com o ID 'billboard'
+        var billboardDiv = document.getElementById('billboard');
+        if (billboardDiv) {
+            billboardDiv.innerHTML = '';
+            scrollBox.appendChild(msgContent);
+            msgBoxDiv.appendChild(scrollBox);
+
+            postMsgDiv.appendChild(nameBoxDiv);
+            postMsgDiv.appendChild(titleMsgDiv);
+            postMsgDiv.appendChild(msgBoxDiv);
+            postMsgDiv.appendChild(closeDateDiv);
+
+            billboardDiv.appendChild(postMsgDiv);
+        } else {
+            console.error("A div com o ID 'billboard' não foi encontrada.");
+        }
+
+    }
     function createPostMessage() {
         // Criar os elementos HTML
         var postMsgDiv = document.createElement('div');

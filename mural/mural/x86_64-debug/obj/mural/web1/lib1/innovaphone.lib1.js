@@ -623,7 +623,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             else if (argname == "scheme") {
                 start.scheme = value;
             }
-            else if (argname == "name") {
+            else if (argname == "title") {
                 start.name = value;
             }
             else if (argname == "title") {

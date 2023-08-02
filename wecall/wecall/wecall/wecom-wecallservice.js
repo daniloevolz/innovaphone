@@ -665,15 +665,99 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.splice(pbxTable.indexOf(conn), 1);
     });
 });
+//new PbxApi("PbxSignal").onconnected(function (conn) {
+//    log("PbxSignal: connected conn " + JSON.stringify(conn));
+    
+//    // for each PBX API connection an own call array is maintained
+//    PbxSignal.push(conn);
+//    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
+
+//    // register to the PBX in order to acceppt incoming presence calls
+//    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" ,"src": conn.pbx}));
+
+//    conn.onmessage(function (msg) {
+//        var obj = JSON.parse(msg);
+//        log(msg);
+
+//        if (obj.mt === "RegisterResult") {
+//            log("PBXSignal: registration result " + JSON.stringify(obj));
+//        }
+
+//        // handle incoming presence_subscribe call setup messages
+//        // the callid "obj.call" required later for sending badge notifications
+//        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
+
+//            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
+
+//            // connect call
+//            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
+
+//            //Update signals
+//            var src = obj.src;
+//            var myArray = src.split(",");
+//            var pbx = myArray[0];
+//            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
+//            PbxSignal.forEach(function (signal) {
+//                if (signal.pbx == pbx) {
+//                    signal[obj.sig.cg.sip] = obj.call;
+//                }
+//            })
+//            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
+//            var name = "";
+//            var myArray = obj.sig.fty;
+//            myArray.forEach(function (fty) {
+//                if (fty.name) {
+//                    name = fty.name;
+//                }
+//            })
+            
+//            // send notification with badge count first time the user has connected
+//            updateBadge(conn, obj.call, count);
+//        }
+
+//        // handle incoming call release messages
+//        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
+//            //Remove signals
+//            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
+//            var src = obj.src;
+//            var myArray = src.split(",");
+//            var sip = "";
+//            var pbx = myArray[0];
+//            PbxSignal.forEach(function (signal) {
+//                if (signal.pbx == pbx) {
+//                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
+//                    delete signal[sip];
+                    
+//                }
+//            })
+//            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
+//        }
+//    });
+
+//    conn.onclose(function () {
+//        log("PbxSignal: disconnected");
+//        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
+//        //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
+//    });
+//});
+
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
-    
-    // for each PBX API connection an own call array is maintained
-    PbxSignal.push(conn);
-    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
 
+    // for each PBX API connection an own call array is maintained
+    var signalFound = PbxSignal.filter(function (signal) { return signal.pbx === conn.pbx });
+    if (signalFound.length == 0) {
+        PbxSignal.push(conn);
+        log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
+        // register to the PBX in order to acceppt incoming presence calls
+        conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
+        
+    }
+    
+
+    //PbxSignal.push(conn);
     // register to the PBX in order to acceppt incoming presence calls
-    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" ,"src": conn.pbx}));
+    //conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
 
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
@@ -697,11 +781,19 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var myArray = src.split(",");
             var pbx = myArray[0];
             log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
+            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
             PbxSignal.forEach(function (signal) {
                 if (signal.pbx == pbx) {
-                    signal[obj.sig.cg.sip] = obj.call;
+                    var call = obj.call.toString();
+                    signal[call] = obj.sig.cg.sip;
                 }
             })
+            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
+            //PbxSignal.forEach(function (signal) {
+            //    if (signal.pbx == pbx) {
+            //        signal[obj.sig.cg.sip] = obj.call;
+            //    }
+            //})
             log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
             var name = "";
             var myArray = obj.sig.fty;
@@ -710,9 +802,6 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
-            
-            // send notification with badge count first time the user has connected
-            updateBadge(conn, obj.call, count);
         }
 
         // handle incoming call release messages
@@ -727,7 +816,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 if (signal.pbx == pbx) {
                     sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
                     delete signal[sip];
-                    
+
                 }
             })
             log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
@@ -735,11 +824,14 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     });
 
     conn.onclose(function () {
+        //Remove cennection from array
+        PbxSignal = PbxSignal.filter(function (c) { return c.pbx != conn.pbx });
         log("PbxSignal: disconnected");
-        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
+        //PbxSignal.splice(PbxSignal.indexOf(conn), 1);
         //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
 });
+
 new PbxApi("RCC").onconnected(function (conn) {
     log("RCC: connected conn " + JSON.stringify(conn));
     var rccFound = RCC.filter(function (rcc) { return rcc.pbx === conn.pbx });
@@ -1196,15 +1288,50 @@ function badgeRequest2(value) {
     var obj = JSON.parse(value);
 
     obj.listuser.forEach(function (user) {
-        PbxSignal.forEach(function (signal) {
-            log("danilo-req badge2:PbxSignal " + JSON.stringify(signal));
-            var call = signal[user.user];
-            if (call != null) {
-                log("danilo-req badge2:call " + String(call)+", will call updateBadge");
-                updateBadge(signal, call, user.num);
-            }
+        //Update Badge
+        try {
+            var count = 0;
+
+            PbxSignal.forEach(function (signal) {
+                log("danilo-req badge2: signal" + JSON.stringify(signal));
+                //var call = signal[obj.sip];
+                //Teste Danilo 20/07:
+                var foundCalls = [];
+                for (var key in signal) {
+                    if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] == user.user) {
+                        foundCalls.push(key);
+                    }
+                }
+                //
+                log("danilo-req: badge2:call = " + foundCalls);
+                if (foundCalls.length > 0) {
+                    log("danilo-req badge2 call " + foundCalls + ", will call updateBadge");
+                    try {
+                        foundCalls.forEach(function (call) {
+                            updateBadge(signal, parseInt(call, 10), user.num);
+                        })
+
+                    } catch (e) {
+                        log("danilo-req badge2: User " + user.user + " Erro " + e)
+                    }
+                }
+
+            })
+
+        }
+        catch (e) {
+            log("danilo req: erro send badge: " + e);
+        }
+
+        //PbxSignal.forEach(function (signal) {
+        //    log("danilo-req badge2:PbxSignal " + JSON.stringify(signal));
+        //    var call = signal[user.user];
+        //    if (call != null) {
+        //        log("danilo-req badge2:call " + String(call)+", will call updateBadge");
+        //        updateBadge(signal, call, user.num);
+        //    }
             
-        })
+        //})
     });
 }
 function updateBadge(ws, call, count) {

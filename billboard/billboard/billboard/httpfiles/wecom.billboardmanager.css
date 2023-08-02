@@ -1,0 +1,95 @@
+
+div.wecom-billboard-panel {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:var(--wecom-billboard-item-text);
+    font-size:14px;
+}
+
+div.wecom-billboard-obj {
+    position:relative;
+    margin:10px;
+    padding:5px;
+    background-color:var(--wecom-billboard-item);
+    color:var(--wecom-billboard-item-text);
+    font-size:14px;
+}
+
+div.wecom-billboard-header {
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+div.wecom-billboard-label {
+    position:relative;
+    margin:5px 10px;
+    color:var(--wecom-billboard-c2);
+}
+
+div.wecom-billboard-label2 {
+    position:relative;
+    width:100px;
+    margin:5px 10px;
+    font-size: 15px;
+    text-align: left;
+    color: var(--innovaphone-billboard-item-text);
+}
+
+div.wecom-billboard-value {
+    position:relative;
+    margin:5px 0px;
+    /*background-color:var(--wecom-billboard-input);*/
+    color:var(--wecom-billboard-input-text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+div.wecom-billboard-appicon {
+    background-size: cover;
+    position: absolute;
+    height: 50px;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+}
+
+div.wecom-billboard-button {
+    position:absolute;
+    width:120px;
+    height:25px;
+    background-color:var(--wecom-billboard-button);
+    color:var(--wecom-billboard-button-text);
+    text-align:center;
+    cursor:pointer;
+}
+
+input.wecom-billboard-input {
+    width:100%;
+    box-sizing:border-box;
+    border:none;
+    margin:5px 0px;
+    padding: 5px 10px;
+    background-color:var(--wecom-billboard-input);
+    color:var(--wecom-billboard-input-text);
+}
+
+div.wecom-billboard-choice {
+    box-sizing: border-box;
+    position:relative;
+    width:120px;
+    height:30px;
+    text-align:center;
+    background-color:var(--wecom-billboard-button-bg);
+    margin:10px;
+    padding: 5px;
+}
+
+div.wecom-billboard-choice:hover {
+    background-color:var(--wecom-billboard-highlight-bg);
+}
+

@@ -37,7 +37,7 @@ new JsonApi("user").onconnected(function (conn) {
             }
             if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
-                var query = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                var query = "SELECT d.id, d.title, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
                 var querylegado = "SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');";
                 Database.exec(query)
                     .oncomplete(function (dataUsersViewer) {
@@ -51,11 +51,11 @@ new JsonApi("user").onconnected(function (conn) {
             }
 
             if (obj.mt == "InsertDepartment") {
-                Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
+                Database.exec("INSERT INTO tbl_departments (title, color) VALUES ('" + obj.name + "','" + obj.color + "')")
                     .oncomplete(function () {
                         log("InsertDepartment:result=success ");
 
-                        Database.exec("SELECT id FROM tbl_departments where name ='" + obj.name + "';")
+                        Database.exec("SELECT id FROM tbl_departments where title ='" + obj.name + "';")
                             .oncomplete(function (data) {
                                 log("SelectDepartments:result=" + data[0].id);
                                 var viewers = obj.viewers;
@@ -104,7 +104,6 @@ new JsonApi("user").onconnected(function (conn) {
                                     .onerror(function (error, errorText, dbErrorCode) {
                                         log("InsertDepartmentEditor:result=success");
                                     });
-
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 log("InsertDepartmentViewer:result=success");
@@ -144,7 +143,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "InsertDepartment") {
-                Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
+                Database.exec("INSERT INTO tbl_departments (title, color) VALUES ('" + obj.name + "','" + obj.color + "')")
                     .oncomplete(function () {
                         log("InsertDepartment:result=success");
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDepartmentSuccess" }));
@@ -176,6 +175,7 @@ new JsonApi("admin").onconnected(function (conn) {
         });
     }
 });
+
 
 var PbxSignal = [];
 new PbxApi("PbxSignal").onconnected(function (conn) {
@@ -340,7 +340,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         log("PbxTableUsers: disconnected");
     });
 });
-
 
 
 //Internal supporters functions
