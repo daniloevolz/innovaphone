@@ -18,3 +18,25 @@ div.button {
     text-align:center;
     cursor:pointer;
 }
+/*Tabela dos usuários Admin*/
+#departmentsTable {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+}
+
+.column {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+/*Fim*/

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone.test</title>
+    <link rel="stylesheet" href="../doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../doc/vs.css">
+</head>
+
+<body>
+    <script src="../doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <p>
+        The innovaphone.test.js lib provides a simple framework for Javascript Unit tests. Scripts can
+        be defined to execute "exe" and "chk" commands. With the "exe" commands mockup objects are addressed
+        to perform simulated functions. With the "chk" commands it is verified that the correct functions of
+        the mockup objects are called.
+    </p>
+    <p>
+        The scripts are defined as Javascript files, which push objects containing the tests into a global
+        testScrips array.
+    </p>
+    <p>
+        The user has to provide a test.htm file, which includes all the necessary script and css files and
+        a run.htm, which defines the tests to be executed for automatic tests.
+    </p>
+
+    <dl>
+        <dt>Content</dt>
+        <dd><a href="#innovaphone.test Namespace">innovaphone.test Namespace</a></dd>
+        <dd><a href="#innovaphone.appwebsocket.Connection">innovaphone.appwebsocket.Connection</a>></dd>
+        <dd><a href="#Scripts">Scripts</a></dd>
+        <dd><a href="#test.htm">test.htm</a></dd>
+        <dd><a href="#test.js">test.js</a></dd>
+        <dd><a href="#run.htm">run.htm</a></dd>
+    </dl>
+
+    <h2><a id="innovaphone.test Namespace">innovaphone.test Namespace</a></h2>
+
+    <p>
+        The innovaphone.test.js lib defines an object innovaphone.test for all functions related to the
+        Javascript unit test environment.
+    </p>
+
+    <h3>innovaphone.test.obj</h3>
+
+    <p>
+        This is an object, which should be used as prototype for each object, which needs to be addressed
+        by the test scripts. Typically mockup objects for interfaces use this. The Function init(id) of this
+        object is used to push the object into the innovaphone.test.objs array,
+        in which it can be found by the id.
+    </p>
+
+    <h3>innovaphone.test.run</h3>
+    
+    <p>
+        Internal function, which is used to start the execution of a test script. Typicall the innovaphone.test
+        Console uses this function.
+    </p>
+    
+    <h3>innovaphone.test.exe</h3>
+
+    <p>
+        Internal function to execute the next test step. If the test step addresses a mockup object as
+        "obj", this mockup object is found in innovaphone.test.objs and the function exe of this object
+        is called.
+    </p>
+
+    <h3>innovaphone.test.chk</h3>
+
+    <p>
+        Function, which can be called by a mockup object to verify if the detected operation is expected
+        according to the test script. It returns the args object defined in the test script so that the
+        mockup object can verify all parameters.
+    </p>
+ 
+    <h3>innovaphone.test.reset</h3>
+
+    <p>
+        Internal function to reset everything for the next test. innerHTML of document.body is set to null.
+    </p>
+
+    <h3>innovaphone.test.Start</h3>
+
+    <p>
+        Constructor function to create a myApps Start object as mockup. This is needed to Test a complete
+        App
+    </p>
+
+    <h3>innovaphone.test.Console</h3>
+
+    <p>
+        Constructor function which allocales the test console. The console is displayed as a movable div
+        on top of the module to be tested. It provides the following functions
+        <ul>
+            <li>
+                Load javascript files, which contain test scripts
+            </li>
+            <li>
+                Available tests scripts are displayed and can be started by clicking on them
+            </li>
+            <li>
+                Reset button to reset the page
+            </li>
+            <li>
+                Receive posted message which contains test scripts, which are executed automatically
+            </li>
+            <li>
+                Logging of executed test scripts and steps and test output from mockup objects
+            </li>
+            <li>
+                Different execution modes:
+                <dl>
+                    <dt>&gt;&gt;</dt>
+                    <dd>
+                        Fast execution. No delay before any step
+                    </dd>
+                    <dt>&gt;</dt>
+                    <dd>
+                        Default delay before each step. The defautt is 4s, but can be overridden in script.
+                    </dd>
+                    <dt>||</dt>
+                    <dd>
+                        Pause excution
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </p>
+ 
+    <h3>innovaphone.test.Obj</h3>
+
+    <p>
+        The function innovaphone.ui1.nodePrototype.testId is set to not only set the id of the object as
+        in the original function, but also to allocate an innovaphone.test.Obj object, so that this object
+        can be addressed from the test script.
+    </p>
+    <p>
+        This object provides the following functions:
+        <dl>
+            <dt>event</dt>
+            <dd>
+                Calls dispatch event for the element
+            </dd>
+            <dt>set</dt>
+            <dd>
+                Set a property of the event
+            </dd>
+            <dt>html</dt>
+            <dd>
+                Executes xpath expressions to verify the element
+            </dd>
+        </dl>
+    </p>
+
+    <h2><a id="innovaphone.appwebsocket.Connection">innovaphone.appwebsocket.Connection</a></h2>
+
+    <p>
+        Mockup for the real innovaphone.appwebsocket.Connection object. The script file
+        innovaphone.appwebsocket.Connection.js which contains the "real" AppWebsocket lib
+        should not be used.
+    </p>
+
+    <h2><a id="Scripts">Scripts</a></h2>
+
+    <p>
+        Scripts can be loaded as Javascript files. For the manual tests, the console allows to load
+        these scripts from the local file system. The files are executed with the eval function.
+    </p>
+    <p>
+        The javascript files for test scripts should contain instances as follows for each script
+        (the first line is only needed once).
+    </p>
+    <pre><code class="JS">var testScripts = testScripts || [];
+
+testScripts.push({
+    title: TITLE;,
+    file: FILE,
+    delay: DEFAULT-DELAY,
+    run: [
+        [SCRIPTS],
+    ],
+    steps: [
+        { cmd: CMD;, obj: OBJ, op: OP, args: { ARGS }, delay: DELAY},
+        ...
+    ]
+});
+</code></pre>
+
+    <dl>
+        <dt>TITLE</dt>
+        <dd>
+            The title of the script. This is used to identify the script.
+        </dd>
+        <dt>FILE</dt>
+        <dd>
+            The filename can be put here. It is displayed in the logging when running all test automatically
+            to identify where the script was defined.
+        </dd>
+        <dt>SCRIPTS</dt>
+        <dd>
+            Scripts identified by title which should be executed when automatically execute this script.
+            Some other may need to be executed together with this script.
+        </dd>
+        <dt>DEFAULT-DELAY</dt>
+        <dd>
+            An optional default delay before each step when manually executing the script.
+        </dd>
+        <dt>CMD</dt>
+        <dd>
+            Can be either "exe" to execute a stelp or "chk" to verify an action
+        </dd>
+        <dt>OP</dt>
+        <dd>
+            Operation as defined by the object addressed in this step.
+        </dd>
+        <dt>ARGS</dt>
+        <dd>
+            Arguments as defined by the object addressed in the step
+        </dd>
+        <dt>DELAY</dt>
+        <dd>
+            An optional delay before executing this step.
+        </dd>
+    </dl>
+
+    <h2><a id="test.htm">test.htm</a></h2>
+
+    <p>
+        An html file is needed to load the module to be tested and the innovaphone.test lib. It is recommended
+        to use the name test.htm for this file. The body onload event handler should be used to load a main
+        Javascript object
+    </p>
+    <p>
+        A test.htm would look like this:
+    </p>
+    <pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;title&gt;NAME&lt;/title&gt;
+    &lt;link rel="stylesheet" type="text/css" href="..." /&gt;
+    &lt;script type="text/javascript" src="..."&gt;&lt;/script&gt;
+    ...
+    &lt;script type="text/javascript" src="test.js"&gt;&lt;/script&gt;
+    &lt;style&gt;
+        ul,ol {}
+        
+        div::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+        }
+
+        div::-webkit-scrollbar-thumb {
+            background-color: green;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body onload="new NAME()"&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+    <h2><a id="test.js">test.js</a></h2>
+    
+    <p>
+        A javascript file is needed for the module specific mockups and as main object to load
+        the module to be tested
+    </p>
+    <pre><code class="javascrip">function NAME() {
+    this.exe = function (op, args) {
+        if (op == "init") {
+            /* load module to be tested */
+            ...
+            document.body.appendChild(...);
+        }
+        else if(... more operations ...) {
+        }
+        ...
+    }
+
+    var con = new innovaphone.test.Console(this, "NAME", innovaphone.test);
+}
+NAME.prototype = innovaphone.test.obj;</code></pre>
+
+    <h2><a id="run.htm">run.htm</a></h2>
+
+    <p>
+        A html file is used to define the tests to be executed automatically. It is recommended
+        to use the name run.htm for this file. It should include all the files for the test
+        scripts and uses postMessage to send the test to an iframe, in which test.htm is
+        loaded
+    </p>
+    <pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height:100%"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;title&gt;Run&lt;/title&gt;
+    &lt;script type="text/javascript" src="... script ..."&gt;&lt;/script&gt;
+    ...
+    &lt;script type="text/javascript"&gt;
+        function test() {
+            document.getElementById("test").contentWindow.postMessage(JSON.stringify(testScripts), "*");
+        }
+    &lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body onload="test()" style="width:100%; height:100%; margin:0px; padding:0px"&gt;
+    &lt;iframe title="test" id="test" style="width:100%; height:calc(100% - 5px); border:0px" src="test.htm"&gt;&lt;/iframe&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+</code></pre>
+</body>
+</html>

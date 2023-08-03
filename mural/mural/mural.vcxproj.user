@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteTarget>-1856571323;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggerCommandArguments>--app-name=mural --app-domain=wecom.com.br --app-password=pwd --webserver-path=mural --db-name=mural --db-user=mural --db-password=mural --service-id=mural</RemoteDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>
