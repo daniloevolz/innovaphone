@@ -40,7 +40,7 @@
                     <div id="savemsg" class="saveclose">Inserir</div>
                     <div id="closemsg" class="saveclose">Fechar</div>
                 </div>
-            </div>-->
+            </div>
 
         
             <div id="worktable" style="height: 95%; width: 95%;">
@@ -265,7 +265,8 @@ function updateColor(event) {
     input{
         border: none;
     }
-    .saveclose{
+    .saveclose {
+        cursor: pointer;
         width: 40%;
         margin-right: 0%;
         margin-left: 5%;
@@ -278,17 +279,20 @@ function updateColor(event) {
         align-items: center;
         color: #ffff;
         background-color: #5d7e83ef;
-        border-color: black;;
+        border-color: black;
+        ;
         border-radius: 2ch;
     }
-    .buttons{
+    .buttons {
+        cursor: pointer;
         margin-top: 2%;
         width: 90%;
         height: 10%;
         display: flex;
-        position: relative;        
+        position: relative;
     }
-    #closewindow{
+    #closewindow {
+        cursor: pointer;
         background-color: rgb(255, 255, 255);
         position: absolute;
         top: -10px;
@@ -308,7 +312,8 @@ function updateColor(event) {
         margin-top: 10px;
          
     }
-    .palette{
+    .palette {
+        cursor: pointer;
         background-image: url(./images/icons-palette.png);
         width: 40px;
         height: 40px;
