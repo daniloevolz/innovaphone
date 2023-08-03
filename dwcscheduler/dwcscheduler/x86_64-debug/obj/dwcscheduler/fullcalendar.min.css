@@ -355,8 +355,11 @@ a[data-goto]:hover {
 .fc-scroller {
     -webkit-overflow-scrolling: touch
 }
+#calendar > div.fc-view-container > div > table > tbody > tr > td > div {
+    height: auto !important;
+}
 
-.fc-day-grid-event .fc-content,.fc-icon,.fc-row.fc-rigid,.fc-time-grid-event {
+.fc-day-grid-event .fc-content, .fc-icon, .fc-row.fc-rigid, .fc-time-grid-event {
     overflow: hidden
 }
 
