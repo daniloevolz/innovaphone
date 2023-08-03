@@ -15,60 +15,73 @@
 <body onload="innovaphone.lib1.Start(function (start) { new Wecom.mural(start, { }); })">
     <div id="bcground"  style="width: 100%; height: calc(100vh - 50px); margin: 0; background-color: black;">
         <div id="billboard" style="display: flex; width: 100%; height: 100%; justify-content: center; align-items: center; background: linear-gradient(#415F77,#5F5264);">
-            <!--<div id="postmsg" style="display: none; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
+            <div id="postmsg" style="display: none; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
                 <div id="namebox" style="display: flex; color: white; width: 90%; height: 10%; justify-content: center;">
                     <UL>NAME BOX - ATESTADOS</UL>
                 </div>
-                <div id="titlemsg" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 10%; margin-top: 05px;margin-bottom: 15px;">
-                    <UL>TITLE BOX</UL>
+                <div id="closewindow"></div>
+                <div id="titlemsg" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 8%; margin-top: 05px;margin-bottom: 15px;">
+
+                    <input id="text" type="text" placeholder="Título" style="color: #ffff;">
                 </div>
-                <div id="msgbox" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 80%; ">
-                    <scroll-box style="display: flex; color: white; width: 100%; height: 100%;">
-                        <ul><span>TEXTO DA MENSAGEM</span></ul>
-                    </scroll-box>
+                <div id="msgbox" style="display: flex; background-color:#5d7e83ef; color: white; width: 90%; height: 55%; ">
+                    <textarea name="" id="" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>
                 </div>
-                <div id="closedate" style="display: flex; color: white; width: 90%; height: 10%; justify-content: flex-end;">
-                    <UL>Expirate date:  31/12/2023</UL>
+                <div id="date" style="font-size: 12px;">
+                    Data de Início: <input type="datetime-local" id="startevent" class="dateinput">
+                    Data de Expiração: <input type="datetime-local" id="endevent" class="dateinput">
+                </div> 
+                <div class="buttons">
+                    <div style="display: flex; align-items: center;justify-content: flex-start;width: 90%; color: #FFFF;">
+                        <a>Selecione a cor:</a>
+                        <ul class="palette" onclick="openColorPicker()"></ul>
+                        <input type="color" id="colorbox" style="display: none;" onchange="updateColor(event)">
+                    </div>
+                    <div id="savemsg" class="saveclose">Inserir</div>
+                    <div id="closemsg" class="saveclose">Fechar</div>
                 </div>
             </div>-->
 
         
             <div id="worktable" style="height: 95%; width: 95%;">
                 <ul id="voltar" style="position: relative; display: flex; align-items: flex-start; justify-content: center; margin: 0; padding: 0;">Voltar</ul>
-                <div id="depcards" style="display: flex; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
+                <div id="depcards" style="display: none; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
 
-                    <div id="card-fin" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #0088f8; margin: 10px; font-size: 25px; color: white;">Financeiro</div>
-                    <div id="card-adm" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #3541ad; margin: 10px; font-size: 25px; color: white;">Administração</div>
-                    <div id="card-tec" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #387012; margin: 10px; font-size: 25px; color: white;">Técnica</div>
-                    <div id="card-sup" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #0b97b3; margin: 10px; font-size: 25px; color: white;">Suporte</div>
-                    <div id="card-rh" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #ad446c; margin: 10px; font-size: 25px; color: white;">RH</div>
-                    <div id="card-dir" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #eb1e1e; margin: 10px; font-size: 25px; color: white;">Diretoria</div>
-                    <div id="card-vend" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #020e53; margin: 10px; font-size: 25px; color: white;">Vendas</div>
-                    <div id="card-pvend" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #8b6f13; margin: 10px; font-size: 25px; color: white;">Pré-Vendas</div>
-                    <div id="card-price" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #7eff34; margin: 10px; font-size: 25px; color: white;">Price</div>
-                    <div id="card-logi" style="display: flex; text-align: center; justify-content: center; align-items: center; width:220px; height: 60px; border-radius: 05px; background: #80e8fd;  margin: 10px; font-size: 25px; color: white;">Logistica</div>
-                    <div id="card-mark" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #1ad601; margin: 10px; font-size: 25px; color: white;">Marketing</div>
-                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
-                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
-                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
-                    <div id="cardnew" style="display: flex; text-align: center; justify-content: center; align-items: center; width: 220px; height: 60px; border-radius: 05px; background: #44575B; margin: 10px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="card-fin" class="card">Financeiro</div>
+                    <div id="card-adm" class="card" style="background: #3541ad;">Administração</div>
+                    <div id="card-tec" class="card" style="background: #387012;">Técnica</div>
+                    <div id="card-sup" class="card" style="background: #0b97b3;">Suporte</div>
+                    <div id="card-rh" class="card" style="background: #ad446c;">RH</div>
+                    <div id="card-dir" class="card" style="background: #eb1e1e;">Diretoria</div>
+                    <div id="card-vend" class="card" style="background: #020e53;">Vendas</div>
+                    <div id="card-pvend" class="card" style="background: #8b6f13;">Pré-Vendas</div>
+                    <div id="card-price" class="card" style="background: #7eff34;">Price</div>
+                    <div id="card-logi" class="card" style="background: #80e8fd;">Logistica</div>
+                    <div id="card-mark" class="card" style="background: #1ad601;">Marketing</div>
+                    <div id="cardnew" class="cardnew">Adicionar +</div>
+                    <div id="cardnew" class="cardnew">Adicionar +</div>
+                    <div id="cardnew" class="cardnew">Adicionar +</div>
+                    <div id="cardnew" class="cardnew">Adicionar +</div>
                 </div>
                 <div id="post-depart" style="display: flex;  flex-wrap: wrap; width: 100%; height: 100%; justify-content: center; align-items: center; align-content: center;">
-                    <div id="post#1" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #f83200; margin: 15px; font-size: 25px; color: white;">ATESTADOS</div>
-                    <div id="post#2" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #7ff6ff; margin: 15px; font-size: 25px; color: white;">ALTERAÇÕES DO PLANO DE SAÚDE</div>
-                    <div id="post#3" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #13a31b; margin: 15px; font-size: 25px; color: white;">PAGAMENTO DE BÔNUS</div>                    
-                    <div id="post#4" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #920d0d; margin: 15px; font-size: 25px; color: white;">IR DATAS</div>
-                    <div id="post#5" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #31c214; margin: 15px; font-size: 25px; color: white;">REUNIÕES</div>
-                    <div id="post#6" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #cea00b; margin: 15px; font-size: 25px; color: white;">HORÁRIOS</div>
-                    <div id="post#7" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #1b24a1; margin: 15px; font-size: 25px; color: white;">AGENDA</div>
-                    <div id="post#8" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #0088f8; margin: 15px; font-size: 25px; color: white;">ANIVERSÁRIOS DO MÊS</div>
-                    <div id="postnew" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #44575B; margin: 15px; font-size: 25px; color: white;">Adicionar +</div>
-                    <div id="postnew" style="display: flex; justify-content: center; align-items: center; width: 17%; height: 30%; text-align: center; border-radius: 00px; background: #44575B; margin: 15px; font-size: 25px; color: white;">Adicionar +</div>
+                    <div id="post#1" class="post" style="background: #000501;">
+                        <ul id="new" class="new"></ul>
+                        <span class="flag">NEW</span>
+                        ATESTADOS
+                    </div>
+                    <div id="post#2" class="post" style="background: #7ff6ff;">ALTERAÇÕES DO PLANO DE SAÚDE</div>
+                    <div id="post#3" class="post" style="background: #13a31b; margin: 15px; font-size: 25px; color: white;">PAGAMENTO DE BÔNUS</div>                    
+                    <div id="post#4" class="post" style="background: #920d0d; margin: 15px; font-size: 25px; color: white;">IR DATAS</div>
+                    <div id="post#5" class="post" style="background: #31c214; margin: 15px; font-size: 25px; color: white;">REUNIÕES</div>
+                    <div id="post#6" class="post" style="background: #cea00b; margin: 15px; font-size: 25px; color: white;">HORÁRIOS</div>
+                    <div id="post#7" class="post" style="background: #1b24a1; margin: 15px; font-size: 25px; color: white;">AGENDA</div>
+                    <div id="post#8" class="post" style="background: #0088f8; margin: 15px; font-size: 25px; color: white;">ANIVERSÁRIOS DO MÊS</div>
+                    <div id="postnew" class="postnew">Adicionar +</div>
+                    <div id="postnew" class="postnew">Adicionar +</div>
                 </div>
 
             </div>
         </div> 
-        </div>
     </div>
 </body>
 <script>
@@ -76,6 +89,10 @@
     var postdepart = document.getElementById("post-depart")
     var postmsg = document.getElementById("postmsg")
     var postview = document.getElementById("post#1")
+    var closemsg = document.getElementById("closemsg")
+    var savemsg = document.getElementById("savemsg")
+    var colorbox = document.getElementById("colorbox")
+
     document.getElementById('voltar').addEventListener("click", function(){
         depcards.style.display="flex"
         postdepart.style.display="none"
@@ -89,6 +106,220 @@
     postview.addEventListener("click", function(){
         postmsg.style.display="flex"
         })
+    closemsg.addEventListener("click", function(){
+        depcards.style.display="none"
+        postdepart.style.display="flex"
+        postmsg.style.display="none"
+        console.log("MENSAGEM FECHADA")
+    })
+    savemsg.addEventListener("click", function(){
+        depcards.style.display="none"
+        postdepart.style.display="flex"
+        postmsg.style.display="none"
+        console.log("MENSAGEM SALVA")
+    })
+    colorbox.addEventListener("change", function(){
+        postmsg.style.backgroundColor = colorbox.value;
+    })
+    function openColorPicker() {
+  const colorPicker = document.getElementById("colorbox");
+  colorPicker.click();
+}
+
+function updateColor(event) {
+  const selectedColor = event.target.value;
+  console.log("Cor selecionada:", selectedColor);
+}
 
 </script>
+<style>
+    .logo{
+        display: block;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 300px;
+        height: 30%;
+        background-image: url(../httpfiles/images/wecom-white.png);
+        background-repeat: no-repeat;
+        background-size: auto;
+        
+    }
+    .card{
+        display: flex; 
+        text-align: center; 
+        justify-content: center; 
+        align-items: center; 
+        width: 220px; 
+        height: 60px; 
+        border-radius: 05px; 
+        background: #0088f8; 
+        margin: 10px; 
+        font-size: 25px;
+        color: white;
+
+    }
+    .cardnew{
+        display: flex; 
+        text-align: center; 
+        justify-content: center; 
+        align-items: center; 
+        width: 220px; 
+        height: 60px; 
+        border-radius: 05px; 
+        background: #44575B; 
+        margin: 10px; 
+        font-size: 25px;
+        color: white;
+    }
+    .post{
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        width: 17%; 
+        height: 30%; 
+        text-align: center; 
+        border-radius: 00px; 
+        margin: 15px; 
+        font-size: 25px; 
+        color: white;
+    }
+    .postnew{
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        width: 17%; 
+        height: 30%; 
+        text-align: center; 
+        border-radius: 00px; 
+        margin: 15px; 
+        font-size: 25px; 
+        color: white;
+        background: #44575B
+    }
+    .new{
+        display: flex; 
+        position: absolute; 
+        align-items: flex-start; 
+        background-color: rgb(76, 0, 255); 
+        justify-content: flex-start;
+    }
+    .flag {
+        display: flex;
+        position: relative;
+        top: 0%;
+        left: 0%;
+        background-color: red;
+        color: white;
+        padding: 5px;
+    }
+    .flag.show {
+        display: block;
+    }
+    #date{
+        display: flex; 
+        align-items: center; 
+        color: white; 
+        width: 90%; 
+        height: 10%; 
+        justify-content: space-between;
+        background: #5d7e83ef; 
+    }
+    .dateinput{
+        margin-left: 5px;
+    }
+    input[type="datetime-local" i] {
+        font-family: Arial;
+        font-size: 12px;
+        padding: 5px;
+        background-color: #5d7e8300;
+        color: white; 
+    }
+    #titlemsg input{
+        font-size: 25px;
+        background-color:#5d7e83ef; 
+        color: white; 
+        width: 100%; 
+        height: 100%;
+        text-transform: capitalize;
+    }
+    #msgbox textarea{
+        font-size: 15px;
+        background: #5d7e8300; 
+        color: white; 
+        width: 100%; 
+        height: 100%;
+        resize: none;
+        
+    }
+    ::placeholder {
+        color: #ffff
+    }
+    #msgbox textarea::-webkit-scrollbar {
+        font-size: 15px;
+        background:#616b63ef; 
+        color: white; 
+        width: 5px; 
+        height: 10px;
+    }
+    input{
+        border: none;
+    }
+    .saveclose{
+        width: 40%;
+        margin-right: 0%;
+        margin-left: 5%;
+        height: 90%;
+        font-size: 20px;
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-self: start;
+        align-items: center;
+        color: #ffff;
+        background-color: #5d7e83ef;
+        border-color: black;;
+        border-radius: 2ch;
+    }
+    .buttons{
+        margin-top: 2%;
+        width: 90%;
+        height: 10%;
+        display: flex;
+        position: relative;        
+    }
+    #closewindow{
+        background-color: rgb(255, 255, 255);
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 25px;
+        height: 25px;
+        border-radius: 2ch;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url(./images/icon-x.png);
+        background-size: 25px;
+    }
+    #colorbox{
+        width: 5%;
+        padding: 0;
+        margin-top: 10px;
+         
+    }
+    .palette{
+        background-image: url(./images/icons-palette.png);
+        width: 40px;
+        height: 40px;
+        background-size: 40px;
+        background-repeat: no-repeat;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 20px;
+    }
+</style>
 </html>
