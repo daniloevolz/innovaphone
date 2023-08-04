@@ -60,7 +60,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "SelectViewsHistoryResult") {
             console.log(obj.result);
             views_history = JSON.parse(obj.result);
-            updateFlagNew();
         }
         if (obj.api == "user" && obj.mt == "SelectDepartmentsViewerResult") {
             console.log(obj.result);
@@ -195,6 +194,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             billboardDiv.appendChild(worktable);
         } else {
             console.error("A div com o ID 'billboard' não foi encontrada.");
+        }
+        // Iterar sobre a lista inputData e chamar a função para cada item
+        for (var i = 0; i < views_history.length; i++) {
+            var department = views_history[i].department;
+            changeBackgroundColor(department);
         }
     }
     function makeDivPosts(dep_id) {
@@ -338,6 +342,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             billboardDiv.appendChild(worktable);
         } else {
             console.error("A div com o ID 'billboard' não foi encontrada.");
+        }
+        // Iterar sobre a lista inputData e chamar a função para cada item
+        for (var i = 0; i < views_history.length; i++) {
+            var post = views_history[i].id;
+            changeBackgroundColor(post);
         }
     }
     function makeDivPostMessage(id) {
@@ -740,8 +749,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         return selectedUsers;
     }
-    function updateFlagNew(){
-
+    // Função para buscar e alterar a cor de background do elemento
+    function changeBackgroundColor(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            element.style.backgroundColor = "red";
+        }
     }
 }
 

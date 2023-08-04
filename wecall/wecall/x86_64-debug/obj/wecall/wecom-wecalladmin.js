@@ -41,6 +41,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var CallList;
     var CallEvents;
     var UrlDashboard;
+    var urlMobile;
     var UrlSSO;
     var CodClient;
     var url;
@@ -206,6 +207,13 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:35%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "Url", vl: String(ipturl.getValue()) });
         });
+
+        //URL Autenticação SSO MOBILE (telas largura <1000px)
+        //var labelUrlM = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:45%; font-size:15px; text-align:right", texts.text("labelUrlM")));
+        //var ipturlM = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:45%; font-size:12px; text-align:center", urlMobile, texts.text("urlText"), 255, "url", null));
+        //t.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:45%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+        //    app.send({ api: "admin", mt: "UpdateConfig", prt: "UrlM", vl: String(ipturlM.getValue()) });
+        //});
     }
     
     function makeDivMonitor(t) {
@@ -290,7 +298,8 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             UrlCallEvents=obj.urlP;
             CallList=obj.sH;
             CallEvents=obj.sP;
-            UrlDash=obj.urlD;
+            UrlDash = obj.urlD;
+            urlMobile = obj.urlM;
             UrlSSO=obj.urlSSO;
             CodClient=obj.CodCli;
             url=obj.url;
@@ -340,6 +349,9 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
                 console.log("ERRO LicenseMessageResult:" + e)
             }
             makeDivLicense(_colDireita);
+        }
+        if (obj.mt == "UpdateConfigMessageErro") {
+            window.alert("ERRO: Verifique os logs do serviço!");
         }
     }
     
@@ -435,11 +447,19 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         }
     }
 
-    function waitConnection(t) {
-        t.clear();
-        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
-        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
-        t.add(bodywait);
+    function waitConnection(div) {
+        //t.clear();
+        //var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        //bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        //t.add(bodywait);
+
+        div.clear();
+        var div1 = div.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
 }
 

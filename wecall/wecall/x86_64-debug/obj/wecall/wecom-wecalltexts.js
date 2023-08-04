@@ -36,6 +36,7 @@ Wecom.wecallTexts = {
         labelCodCient: "Código de Cliente Wecall:",
         labelSSO: "Configure o provedor Single Sign-On Wecall",
         labelUrlSSO: "URL provedor de token SSO:",
+        labelUrlM: "URL Mobile (Telas<1000px):",
         labelUrl: "URL de Autenticação SSO:",
         labelUrlG: "URL provedor de Filas a serem monitoradas:",
         labelCodLeaveGroups: "Código do PBX para sair de todos os grupos:",

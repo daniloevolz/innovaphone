@@ -87,6 +87,13 @@
       },
       {
         "cmd": "item",
+        "name": "urlmobile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "sendCallHistory",
         "type": "BOOL",
         "default": false,

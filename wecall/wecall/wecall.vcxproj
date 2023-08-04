@@ -121,6 +121,7 @@
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
     <None Include="wecall.mak" />
+    <None Include="wecall\httpfiles\loader.css" />
     <None Include="wecall\httpfiles\wecom-wecalldash.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>

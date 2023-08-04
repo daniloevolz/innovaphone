@@ -15,6 +15,7 @@ var sendCallEvents = Config.sendCallEvents;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var urlCallHistory = Config.urlCallHistory;
 var urlDashboard = Config.urldash;
+var urlMobile = Config.urlmobile;
 var codClient = Config.CodClient;
 var codLeaveAllGroups = Config.CodLeaveAllGroups;
 var leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
@@ -42,6 +43,7 @@ Config.onchanged(function () {
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
     urlCallHistory = Config.urlCallHistory;
     urlDashboard = Config.urldash;
+    urlMobile = Config.urlmobile;
     urlSSO = Config.urlSSO;
     codClient = Config.CodClient;
     url = Config.url;
@@ -422,6 +424,10 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.urldash = obj.vl;
                     Config.save();
                 }
+                if (obj.prt == "urlM") {
+                    Config.urlmobile = obj.vl;
+                    Config.save();
+                }
                 if (obj.prt == "urlSSO") {
                     Config.urlSSO = obj.vl;
                     Config.save();
@@ -473,9 +479,6 @@ new JsonApi("admin").onconnected(function (conn) {
 
 
                 }
-            }
-            if (obj.mt =="UpdateConfigMessageErro") {
-                window.alert("ERRO: Verifique os logs do serviço!");
             }
         });
     }
@@ -1277,7 +1280,7 @@ function updateConfigUsers() {
     log("danilo-req updateConfigUsers:");
     connectionsAdmin.forEach(function (connection) {
         log("danilo-req updateConfigUsers:connection user" + connection.guid);
-        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: sendCallHistory, sP: sendCallEvents, urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory), urlD: String(urlDashboard), urlSSO: String(urlSSO), CodCli: String(codClient), url: String(url), urlG: String(urlGetGroups), CodLeave: String(codLeaveAllGroups), sLS: leaveAllGroupsOnStatup}));
+        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: sendCallHistory, sP: sendCallEvents, urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory), urlD: String(urlDashboard), urlSSO: String(urlSSO), CodCli: String(codClient), url: String(url), urlG: String(urlGetGroups), urlM: String(urlMobile), CodLeave: String(codLeaveAllGroups), sLS: leaveAllGroupsOnStatup}));
     });
 }
 
@@ -1792,14 +1795,16 @@ function getURLLogin(sip, session) {
                         if (conn.sip == sip) {
                             conn["url"] = obj.token;
                             var url = Config.url;
+                            var urlM = Config.url;
                             var urlAlt = conn["url"];
                             log("danilo req : getLoginResponse sip " + conn.sip);
                             if (urlAlt != "") {
-                                url = url + conn.sip + "/" + urlAlt;
+                                url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
+                                urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
                                 log("danilo req : UserMessage url " + url);
 
                             }
-                            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
                         }
                     })
 

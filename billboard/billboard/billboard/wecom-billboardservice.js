@@ -302,8 +302,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     });
 });
 
-
-//Internal supporters functions
 function selectViewsHistory(conn, departments) {
     // Dados de entrada (lista de objetos JSON)
     var inputData = [
@@ -330,40 +328,23 @@ function selectViewsHistory(conn, departments) {
         idsToSearch.push(departments[i].id);
     }
 
-    // Consulta na tabela 'tbl_posts'
-    var queryPosts = "SELECT * FROM tbl_posts WHERE id IN (" + idsToSearch.join(",") + ")";
+    // Consulta na tabela 'tbl_posts' com LEFT JOIN e WHERE para filtrar os resultados
+    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL";
 
     // Executar consulta na tabela 'tbl_posts'
     Database.exec(queryPosts)
         .oncomplete(function (dataPosts) {
             // Dados retornados da consulta na tabela 'tbl_posts'
             log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
-
-            // Construir uma lista com os post_ids da consulta anterior
-            var postIdsToSearch = [];
-            for (var j = 0; j < dataPosts.length; j++) {
-                postIdsToSearch.push(dataPosts[j].id);
-            }
-
-            // Consulta na tabela 'tbl_views_history'
-            var queryViewsHistory = "SELECT * FROM tbl_views_history WHERE post_id IN (" + postIdsToSearch.join(",") + ")";
-
-            // Executar consulta na tabela 'tbl_views_history'
-            Database.exec(queryViewsHistory)
-                .oncomplete(function (dataViewsHistory) {
-                    // Dados retornados da consulta na tabela 'tbl_views_history'
-                    log("SelectViewsHistory:result=" + JSON.stringify(dataViewsHistory, null, 4));
-                    conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataViewsHistory, null, 4) }));
-                })
-                .onerror(function (error, errorText, dbErrorCode) {
-                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                });
+            conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataPosts, null, 4) }));
         })
         .onerror(function (error, errorText, dbErrorCode) {
             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
         });
 
 }
+//Internal supporters functions
+
 function getDateNow() {
     // Cria uma nova data com a data e hora atuais em UTC
     var date = new Date();
