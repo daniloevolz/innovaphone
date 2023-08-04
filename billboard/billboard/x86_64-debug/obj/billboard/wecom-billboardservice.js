@@ -15,10 +15,11 @@ new JsonApi("user").onconnected(function(conn) {
                 conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
             if (obj.mt == "InsertPost") {
-                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + obj.date_creation + "','" + obj.dte_start + "','" + obj.date_end + "')")
+                var now = getDateNow();
+                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "')")
                     .oncomplete(function () {
                         log("InsertPost:result=success");
-                        conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess" }));
+                        conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess", department: obj.department }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -36,13 +37,24 @@ new JsonApi("user").onconnected(function(conn) {
             }
             if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
-                var query = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
                 var querylegado = "SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');";
-                Database.exec(query)
+                Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
                         selectViewsHistory(conn, dataUsersViewer);
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+                var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
+                var querylegado = "SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');";
+                Database.exec(queryEditor)
+                    .oncomplete(function (dataUsersViewer) {
+                        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
+                       
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -293,6 +305,63 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
 
 //Internal supporters functions
 function selectViewsHistory(conn, departments) {
+    // Dados de entrada (lista de objetos JSON)
+    var inputData = [
+        {
+            "id": 1,
+            "name": "Teste",
+            "color": "#d522d8"
+        },
+        {
+            "id": 4,
+            "name": "Suporte",
+            "color": "#ff0000"
+        },
+        {
+            "id": 5,
+            "name": "Pré Vendas",
+            "color": "#045bb9"
+        }
+    ];
+
+    // Construir uma lista com os ids dos objetos de entrada
+    var idsToSearch = [];
+    for (var i = 0; i < departments.length; i++) {
+        idsToSearch.push(departments[i].id);
+    }
+
+    // Consulta na tabela 'tbl_posts'
+    var queryPosts = "SELECT * FROM tbl_posts WHERE id IN (" + idsToSearch.join(",") + ")";
+
+    // Executar consulta na tabela 'tbl_posts'
+    Database.exec(queryPosts)
+        .oncomplete(function (dataPosts) {
+            // Dados retornados da consulta na tabela 'tbl_posts'
+            log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
+
+            // Construir uma lista com os post_ids da consulta anterior
+            var postIdsToSearch = [];
+            for (var j = 0; j < dataPosts.length; j++) {
+                postIdsToSearch.push(dataPosts[j].id);
+            }
+
+            // Consulta na tabela 'tbl_views_history'
+            var queryViewsHistory = "SELECT * FROM tbl_views_history WHERE post_id IN (" + postIdsToSearch.join(",") + ")";
+
+            // Executar consulta na tabela 'tbl_views_history'
+            Database.exec(queryViewsHistory)
+                .oncomplete(function (dataViewsHistory) {
+                    // Dados retornados da consulta na tabela 'tbl_views_history'
+                    log("SelectViewsHistory:result=" + JSON.stringify(dataViewsHistory, null, 4));
+                    conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataViewsHistory, null, 4) }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                });
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+        });
 
 }
 function getDateNow() {

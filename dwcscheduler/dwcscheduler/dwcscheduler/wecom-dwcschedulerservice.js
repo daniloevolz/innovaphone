@@ -422,9 +422,9 @@ if (license != null && license.System==true) {
                     if (c.sip == sip) {
                         log("put-caller:user connected notified caller=" + caller);
                         if (sendLocation && license.Location == true) {
-                            var mapbox = 'https://api.mapbox.com/styles/v1/mapbox/streets-v12.html?title=true&zoomwheel=false&access_token=' + google_api_key + '#15/' + x + '/' + y + '/70';
+                            //var mapbox = 'https://api.mapbox.com/styles/v1/mapbox/streets-v12.html?title=true&zoomwheel=false&access_token=' + google_api_key + '#15/' + x + '/' + y + '/70';
                             var google = "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15";
-                            c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: mapbox }));
+                            c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: google }));
                             log("put-caller: sendLocation true");
                         } else {
                             c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "" }));
