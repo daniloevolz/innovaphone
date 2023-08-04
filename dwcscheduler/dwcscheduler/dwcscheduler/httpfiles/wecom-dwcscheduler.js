@@ -224,7 +224,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center; justify-content:center;", null, "config"));
 
         var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
-        imgconfig.setAttribute("src", "wecom-white.svg");
+        imgconfig.setAttribute("src", "logo.png");
 
         var a = document.getElementById("CfgGeral");
         a.addEventListener("click", function () { 

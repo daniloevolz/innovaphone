@@ -130,7 +130,6 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="dwcscheduler\httpfiles\wecom-dwcidentity.js" />
-    <None Include="dwcscheduler\httpfiles\wecom-white.svg" />
     <None Include="dwcscheduler\plugins.json" />
     <None Include="dwcscheduler\wecom-dwcschedulerservice.js" />
     <None Include="dwcscheduler\httpfiles\httpfiles.mak" />

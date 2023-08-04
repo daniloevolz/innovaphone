@@ -122,9 +122,9 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
         console.log("onSearchApiMessage:obj " + JSON.stringify(obj));
         switch (obj.msg.mt) {
             case "Search":
-                if (obj.msg.search == "Direct Web Call") {
+                if (obj.msg.search == "Extern Web") {
                     obj.msg = "";
-                    obj.msg = { mt: "SearchInfo", type: "contact", dn: dwcCaller, avatar: "danilo.volz", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3", link: dwcLocation, contact: { givenname: "Danilo", sn: "Volz", company: "", sip: ["danilo.volz@wecom.com.br"] }, pbx: "inn-lab-ipva", node: "root", template: "Config Admin" };
+                    obj.msg = { mt: "SearchInfo", type: "contact", dn: dwcCaller, avatar: "danilo.volz", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3", link: "users?id=danilo.volz@wecom.com.br", contact: { givenname: "Danilo", sn: "Volz", company: "", sip: ["danilo.volz@wecom.com.br"] }, pbx: "inn-lab-ipva", node: "root", template: "Config Admin" };
                     searchApi.send(obj);
                     obj.msg = "";
                     obj.msg = { mt: "SearchResult" };
