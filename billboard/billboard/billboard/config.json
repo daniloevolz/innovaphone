@@ -133,6 +133,12 @@
       }
     ]
   },
+  "apis": {
+    "wecom-billboard": {
+      "presence": true
+    }
+
+  },
   "javascript": {
     "eval": [
       "wecom-billboardservice.js"

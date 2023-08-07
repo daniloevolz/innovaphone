@@ -1,10 +1,17 @@
-﻿
-new JsonApi("user").onconnected(function(conn) {
+﻿var connectionsUser = [];
+new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-billboard") {
+
+        connectionsUser.push(conn);
+        log("Usuario Conectado:  " + connectionsUser.length);
+
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
+            }
+            if (obj.mt == "SelectViewHistory") {
+                selectViewsHistory(conn.sip, conn);
             }
             if (obj.mt == "TableUsers") {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
@@ -12,20 +19,48 @@ new JsonApi("user").onconnected(function(conn) {
                 pbxTableUsers.forEach(function (u) {
                     list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                 })
+                selectViewsHistory(conn.sip, conn);
                 conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
             if (obj.mt == "InsertPost") {
-                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + obj.date_creation + "','" + obj.dte_start + "','" + obj.date_end + "')")
+                var now = getDateNow();
+                Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "')")
                     .oncomplete(function () {
                         log("InsertPost:result=success");
-                        conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess" }));
+                        conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess", src: obj.department }));
+
+                        //Atualiza usuários sobre NEW Post
+                        for (var pbx in PbxSignalUsers) {
+                            if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                                var entry = PbxSignalUsers[pbx];
+                                entry.forEach(function (e) {
+                                    selectViewsHistory(e.sip);
+                                })
+                            }
+                        }
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "InsertViewHistory") {
+                var now = getDateNow();
+                Database.exec("INSERT INTO tbl_views_history (user_guid, post_id, date) VALUES ('" + conn.guid + "','" + obj.post + "','" + now + "')")
+                    .oncomplete(function () {
+                        log("InsertViewHistory:result=success");
+                        conn.send(JSON.stringify({ api: "user", mt: "InsertViewHistorySuccess", src: obj.src }));
+                        selectViewsHistory(conn.sip, conn);
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
             if (obj.mt == "SelectPosts") {
-                Database.exec("SELECT * FROM tbl_posts where department ='" + obj.department + "';")
+                //var query = "SELECT * FROM tbl_posts where department ='" + obj.department + "';";
+                //query com condição de data e horario
+                var now = getDateNow();
+                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+now+"' >= date_start AND '"+now+"' < date_end";
+                Database.exec(query)
                     .oncomplete(function (data) {
                         log("SelectPosts:result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
@@ -36,17 +71,27 @@ new JsonApi("user").onconnected(function(conn) {
             }
             if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
-                var query = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
-                var querylegado = "SELECT * FROM tbl_departments WHERE id = ANY(SELECT unnest(string_to_array(viewer, ','))::bigint FROM tbl_users WHERE guid ='" + conn.guid + "');";
-                Database.exec(query)
+                selectViewsHistory(conn.sip, conn);
+                var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-                        selectViewsHistory(conn, dataUsersViewer);
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
+
+                var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
+                Database.exec(queryEditor)
+                    .oncomplete(function (dataUsersViewer) {
+                        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
+
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    }); 
             }
 
             if (obj.mt == "InsertDepartment") {
@@ -113,12 +158,16 @@ new JsonApi("user").onconnected(function(conn) {
                     });
             }
         });
+        conn.onclose(function () {
+            connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
+            log("connectionsUser: after delete conn " + JSON.stringify(connectionsUser));
+        })
     }
 });
 
-new JsonApi("admin").onconnected(function(conn) {
+new JsonApi("admin").onconnected(function (conn) {
     if (conn.app == "wecom-billboardadmin") {
-        conn.onmessage(function(msg) {
+        conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src }));
@@ -126,7 +175,9 @@ new JsonApi("admin").onconnected(function(conn) {
         });
     }
 });
+
 var PbxSignal = [];
+var PbxSignalUsers = {};
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
 
@@ -135,7 +186,6 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     if (signalFound.length == 0) {
         PbxSignal.push(conn);
         log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
-
         // register to the PBX in order to acceppt incoming presence calls
         conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
     }
@@ -164,21 +214,34 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var src = obj.src;
             var myArray = src.split(",");
             var pbx = myArray[0];
-            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
+            //log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
             //Teste Danilo 20/07: armazenar o conte�do call no par�metro e o sip no valor
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    var call = obj.call.toString();
-                    signal[call] = obj.sig.cg.sip;
-                }
-            })
+            //PbxSignal.forEach(function (signal) {
+            //    if (signal.pbx == pbx) {
+            //        var call = obj.call.toString();
+            //        signal[call] = obj.sig.cg.sip;
+            //    }
+            //})
             //Teste Danilo 20/07: armazenar o conte�do call no pa�metro e o sip no valor
             //PbxSignal.forEach(function (signal) {
             //    if (signal.pbx == pbx) {
             //        signal[obj.sig.cg.sip] = obj.call;
             //    }
             //})
-            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
+            //Teste Danilo 05/08: armazenar o conteudo call em nova lista
+            var sip = obj.sig.cg.sip;
+            var call = obj.call;
+            var callData = { call, sip };
+            //Adiciona o PBX2 no objeto caso ele não exista
+            if (!PbxSignalUsers[pbx]) {
+                PbxSignalUsers[pbx] = [];
+                PbxSignalUsers[pbx].push(callData);
+            } else {
+                PbxSignalUsers[pbx].push(callData);
+            }
+            //Teste Danilo 05/08: armazenar o conteudo call em nova lista
+
+            log("PbxSignalUsers: after add new userclient " + JSON.stringify(PbxSignalUsers));
             var name = "";
             var myArray = obj.sig.fty;
             myArray.forEach(function (fty) {
@@ -186,34 +249,70 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
-
-
-
             // send notification with badge count first time the user has connected
-            var count = 0;
-            try {
-                count = pbxTableUsers.filter(findBySip(obj.sig.cg.sip))[0].badge;
-            } finally {
-                updateBadge(conn, obj.call, count);
-            }
+            log("PbxSignal:pbxTable=" + JSON.stringify(pbxTable));
+            var user = pbxTableUsers.filter(function (item) {
+                return item.columns.h323 === obj.sig.cg.sip;
+            })[0];
+            log("PbxSignal:connUser=" + JSON.stringify(user));
+            // Consulta na tabela 'tbl_posts' com LEFT JOIN e WHERE para filtrar os resultados
+            var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + user.columns.guid + "';";
+            Database.exec(queryViewer)
+                .oncomplete(function (departments) {
+                    log("SelectDepartments:result=" + JSON.stringify(departments, null, 4));
+
+
+
+                    var idsToSearch = [];
+                    for (var i = 0; i < departments.length; i++) {
+                        idsToSearch.push("'"+departments[i].id+"'");
+                    }
+
+                    // Formatar a lista de ids para uso na consulta SQL
+                    var departmentIdsFormatted = idsToSearch.join(",");
+
+                    // Consulta na tabela 'tbl_posts' com LEFT JOIN, filtrando por 'user_guid' e 'department'
+                    //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
+                    //query com condição de data e horario
+                    var now = getDateNow();
+                    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '"+now+"' >= p.date_start AND '"+now+"' < p.date_end";
+                    // Executar consulta na tabela 'tbl_posts'
+                    Database.exec(queryPosts)
+                        .oncomplete(function (dataPosts) {
+                            // Dados retornados da consulta na tabela 'tbl_posts'
+                            log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
+                            
+                            updateBadge(obj.sig.cg.sip, dataPosts.length)
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("PbxSignal:SelectPosts:result=" + JSON.stringify(errorText, null, 4));
+                        });
+                    //conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("PbxSignal:SelectDepartments:result=" + JSON.stringify(errorText, null, 4));
+                });
         }
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
             //Remove signals
-            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
+            //log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
             var src = obj.src;
             var myArray = src.split(",");
             var sip = "";
             var pbx = myArray[0];
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[sip];
+            //PbxSignal.forEach(function (signal) {
+            //    if (signal.pbx == pbx) {
+            //        sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
+            //        delete signal[sip];
 
-                }
-            })
-            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
+            //    }
+            //})
+            removeObjectByCall(PbxSignalUsers, pbx, obj.call);
+            
+            log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
         }
     });
 
@@ -290,49 +389,61 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     });
 });
 
-function selectViewsHistory(conn, departments) {
-    // Dados de entrada (lista de objetos JSON)
-    var inputData = [
-        {
-            "id": 1,
-            "name": "Teste",
-            "color": "#d522d8"
-        },
-        {
-            "id": 4,
-            "name": "Suporte",
-            "color": "#ff0000"
-        },
-        {
-            "id": 5,
-            "name": "Pré Vendas",
-            "color": "#045bb9"
-        }
-    ];
 
-    // Construir uma lista com os ids dos objetos de entrada
-    var idsToSearch = [];
-    for (var i = 0; i < departments.length; i++) {
-        idsToSearch.push(departments[i].id);
-    }
+//Internal supporters functions
+function selectViewsHistory(sip, conn) {
+    var guid = pbxTableUsers.filter(function (item) {
+        return item.columns.h323 === sip;
+    })[0].columns.guid;
+    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + guid + "';";
+    Database.exec(queryViewer)
+        .oncomplete(function (departments) {
+            log("SelectDepartments:result=" + JSON.stringify(departments, null, 4));
 
-    // Consulta na tabela 'tbl_posts' com LEFT JOIN e WHERE para filtrar os resultados
-    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL";
+            var idsToSearch = [];
+            for (var i = 0; i < departments.length; i++) {
+                idsToSearch.push("'" + departments[i].id + "'");
+            }
 
-    // Executar consulta na tabela 'tbl_posts'
-    Database.exec(queryPosts)
-        .oncomplete(function (dataPosts) {
-            // Dados retornados da consulta na tabela 'tbl_posts'
-            log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
-            conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataPosts, null, 4) }));
+            // Consulta na tabela 'tbl_posts' com LEFT JOIN e WHERE para filtrar os resultados
+            //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL";
+            // Formatar a lista de ids para uso na consulta SQL
+            var departmentIdsFormatted = idsToSearch.join(",");
+            // Consulta na tabela 'tbl_posts' com LEFT JOIN, filtrando por 'user_guid' e 'department'
+            //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
+            //query com condição de data e hora
+            var now = getDateNow();
+            var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now +"' < p.date_end";
+            // Executar consulta na tabela 'tbl_posts'
+            Database.exec(queryPosts)
+                .oncomplete(function (dataPosts) {
+                    // Dados retornados da consulta na tabela 'tbl_posts'
+                    log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
+                    if (conn) {
+                        log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataPosts, null, 4) }));
+                    }
+                    updateBadge(sip, dataPosts.length)
+
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    if (conn) {
+                        log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4)+" ERRO="+errorText);
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    } else {
+                        log("SelectPosts: ERRO=" + errorText);
+                    }
+                });
         })
         .onerror(function (error, errorText, dbErrorCode) {
-            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+            if (conn) {
+                log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4) + " ERRO=" + errorText);
+                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+            } else {
+                log("SelectPosts: ERRO=" + errorText);
+            }
         });
-
 }
-//Internal supporters functions
-
 function getDateNow() {
     // Cria uma nova data com a data e hora atuais em UTC
     var date = new Date();
@@ -348,3 +459,73 @@ function getDateNow() {
     // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
     return dateString.slice(0, -5);
 }
+function updateBadge(sip, count) {
+    //Update Badge
+    try {
+        for (var pbx in PbxSignalUsers) {
+            if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                var entry = PbxSignalUsers[pbx];
+                entry.forEach(function (e) {
+                    if (e.sip == sip) {
+                        log('danilo-req updateBadge: PBX:', pbx, ', Call:', e.call, ', Sip:', e.sip);
+                        var signal = PbxSignal.filter(function (item) {
+                            return item.pbx === pbx;
+                        })[0];
+                        var msg = {
+                            "api": "PbxSignal", "mt": "Signaling", "call": parseInt(e.call, 10), "src": "badge",
+                            "sig": {
+                                "type": "facility",
+                                "fty": [{ "type": "presence_notify", "status": "open", "note": "#badge:" + count, "contact": "app:" }]
+                            }
+                        };
+                        if (signal) {
+                            log("danilo-req updateBadge:msg " + JSON.stringify(msg));
+                            signal.send(JSON.stringify(msg));
+                        }
+                    }
+                })
+            }
+        }
+    }
+    catch (e) {
+        log("danilo req: erro send badge: " + e);
+    }
+}
+function deleteBySip(sip) {
+    return function (value) {
+        if (value.sip != sip) {
+            return true;
+        }
+        //countInvalidEntries++
+        return false;
+    }
+}
+function removeObjectByCall(arr, pbx, callToRemove) {
+    for (var i = 0; i < arr.length; i++) {
+        var pbxEntry = arr[i][pbx];
+        if (pbxEntry) {
+            for (var j = 0; j < pbxEntry.length; j++) {
+                if (pbxEntry[j].call === callToRemove) {
+                    pbxEntry.splice(j, 1);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// Chamar a função novamente após 3 minutos
+log("+++++++++++++++++++++++++++++++TUDO OK+++++++++++++++++++++++++++++++");
+log("+++++++++++++++++++++++++++++++INICIANDO INTREVALO+++++++++++++++++++++++++++++++");
+var i = Timers.setInterval(function () {
+    log("+++++++++++++++++++++++++++++++TIMER+++++++++++++++++++++++++++++++");
+    for (var pbx in PbxSignalUsers) {
+        if (PbxSignalUsers.hasOwnProperty(pbx)) {
+            var entry = PbxSignalUsers[pbx];
+            entry.forEach(function (e) {
+                selectViewsHistory(e.sip);
+            })
+        }
+    }
+}, 3*60*1000);
+
