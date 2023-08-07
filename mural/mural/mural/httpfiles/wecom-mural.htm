@@ -20,12 +20,12 @@
                     <UL style="padding: 0; margin: 0; display: flex; align-items: center; font-size: 20px;">ATESTADOS</UL>
                 </div>
                 <div id="closewindow"></div>
-                <div id="titlemsg" style="display: flex; background-color:#ffffff00; color: white; width: 90%; height: 8%;margin-bottom: 15px;">
+                <div id="titlemsg" style="display: flex; background-color:#ffffff33; color: white; width: 90%; height: 8%;margin-bottom: 15px;">
 
                     <input id="text" type="text" placeholder=" Título" style="color: #ffff;">
                 </div>
                 <div id="msgbox" style="display: flex; background-color:#ffffff33; color: white; width: 90%; height: 55%; ">
-                    <textarea name="" id="" cols="30" rows="80" placeholder=" Texto da mensagem" maxlength="1000"></textarea>
+                    <textarea name="" id="" cols="30" rows="80" placeholder=" Texto da mensagem" maxlength="1000" style="border-width: 0;"></textarea>
                 </div>
                 <div id="date" class="datebox">
                     Data de Início: <input type="datetime-local" id="startevent" class="dateinput">
@@ -41,7 +41,7 @@
                     <div id="closemsg" class="saveclose">Fechar</div>
                 </div>
             </div>
-            <div id="newdep" style="display: none; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
+            <div id="newdep" style="display: flex; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
                 <div id="closewindow"></div>
                 <div id="namedep" style="display: flex; background-color:#ffffff33; color: white; width: 90%; height: 8%; margin-bottom: 15px; margin-top: 15px;">
 
@@ -75,7 +75,71 @@
                                 <td><input type="checkbox" class="checkbox"></td>
                             </tr>
                             <tr>
- 
+                                <td>Rodrigo Pinheiro</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Uberlan Aquino</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Wilson Uelnner</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Cesar Correia</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Billy James</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Kelly Stringhini</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>João Paulo Santos</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Crisciano Garcia</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Rosana Ramos</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Rodrigo Oliveira</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Rodrigo Rosa</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>    
+                            <tr>
+                                <td>Clarissa Assis</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <td>Daniel Farias</td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                                <td><input type="checkbox" class="checkbox"></td>
+                            </tr>
+
                         </table>
                 </div>
                 <div class="buttons">
@@ -92,7 +156,11 @@
                 <ul id="voltar" style="position: relative; display: flex; align-items: flex-start; justify-content: center; margin: 0; padding: 0;">Voltar</ul>
                 <div id="depcards" style="display: flex; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
 
-                    <div id="card-fin" class="card">Financeiro</div>
+                    <div id="card-fin" class="card">
+                        <ul id="newDepPost" class="newDepPost"></ul>
+                        <a>Financeiro</a>
+                        <ul id="rightDep" class="rightDep"></ul>
+                    </div>
                     <div id="card-adm" class="card" style="background: #3541ad;">Administração</div>
                     <div id="card-tec" class="card" style="background: #387012;">Técnica</div>
                     <div id="card-sup" class="card" style="background: #0b97b3;">Suporte</div>
@@ -147,38 +215,40 @@
         depcards.style.display="flex"
         postdepart.style.display="none"
         postmsg.style.display="none"
+        newdep.style.display="none"
         })
     cardfin.addEventListener("click", function(){
         depcards.style.display="none"
         postdepart.style.display="flex"
         postmsg.style.display="none"
+        newdep.style.display="none"
         })
     postview.addEventListener("click", function(){
         postmsg.style.display="flex"
         })
     closemsg.addEventListener("click", function(){
-        depcards.style.display="none"
-        postdepart.style.display="flex"
+        depcards.style.display="flex"
+        postdepart.style.display="none"
         postmsg.style.display="none"
         newdep.style.display="none"
         console.log("MENSAGEM FECHADA")
     })
     savemsg.addEventListener("click", function(){
-        depcards.style.display="none"
-        postdepart.style.display="flex"
+        depcards.style.display="flex"
+        postdepart.style.display="none"
         postmsg.style.display="none"
         newdep.style.display="none"
         console.log("MENSAGEM SALVA")
     })
     closewindow.addEventListener("click", function(){
-        depcards.style.display="none"
-        postdepart.style.display="flex"
+        depcards.style.display="flex"
+        postdepart.style.display="none"
         postmsg.style.display="none"
         newdep.style.display="none"
         console.log("MENSAGEM FECHADA")
     })
     newcard.addEventListener("click", function(){
-        depcards.style.display="none"
+        depcards.style.display="flex"
         postdepart.style.display="none"
         postmsg.style.display="none"
         newdep.style.display="flex"
@@ -223,7 +293,9 @@
         background: #0088f8; 
         margin: 10px; 
         font-size: 25px;
+
     }
+    
     .cardnew{
         display: flex; 
         text-align: center; 
@@ -250,7 +322,7 @@
         border-collapse: collapse;
         border-spacing: 0;
         width: 100%;
-        border: 1px solid #ffffff00;
+        border: 1px solid #ffffff3f;
         max-height: 15px;
     }
 
@@ -315,6 +387,27 @@
         padding: 0;
         margin: 0;
     }
+    .newDepPost{
+        display: flex; 
+        position: relative; 
+        top: -30%;
+        left: -3%;
+        width: 100%;
+        height: 60%;
+        background-color: rgba(255, 255, 255, 0); 
+        justify-content: flex-start;
+        background-image: url(./images/flag_new.png);
+        background-size: 60px;
+        background-repeat: no-repeat;
+        padding: 0;
+        margin: 0;
+    }
+    .rightDep{
+        width: 100%;
+        height: 15%;
+        padding: 0;
+        margin: 0;
+    }
     .post a{
         height: 70%;
         display: flex;
@@ -333,7 +426,7 @@
         width: 90%; 
         height: 5%; 
         justify-content: space-between;
-        background: #ffffff00; 
+        background: #ffffff33; 
     }
     input[type="datetime-local" i] {
         font-family: Arial;
@@ -366,10 +459,20 @@
         color: #ffff
     }
     ::-webkit-scrollbar {
-        font-size: 15px;
-        background:#616b63ef; 
-        width: 5px; 
-        height: 10px;
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track{
+        box-shadow: inset 0 0 5px grey; 
+    }
+    ::-webkit-scrollbar-track:hover{
+        box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.349); 
+    }
+    ::-webkit-scrollbar-thumb{
+        background:#bebebeef;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover{
+        background:#ffffffef; 
     }
     input{
         border: none;
