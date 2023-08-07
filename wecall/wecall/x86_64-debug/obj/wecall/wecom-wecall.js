@@ -43,13 +43,17 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     var session;
 
     function wait() {
+        //that.clear();
+        //var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center;", null, "bodywaitconnection")
+        //bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        //that.add(bodywait);
         that.clear();
-        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center;", null, "bodywaitconnection")
-        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
-        that.add(bodywait);
-        //const myInterval = window.setInterval(function () {
-        //    moedas();
-        //}, 60000);
+        var div1 = that.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
     function makeDivNoLicense(msg) {
         that.clear();
@@ -136,7 +140,13 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
                 });
             } else {
                 var bodyIframe = that.add(new innovaphone.ui1.Node("iframe", "position:fixed; top:0px; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;", null, "iframebody"));
-                bodyIframe.setAttribute("src", obj.src);
+                var larguraDoNavegador = window.innerWidth;
+                if (larguraDoNavegador < 1000) {
+                    bodyIframe.setAttribute("src", obj.urlM);
+                } else {
+                    bodyIframe.setAttribute("src", obj.src);
+                }
+                
             } 
         }
         if (obj.api == "user" && obj.mt == "DevicesList") {

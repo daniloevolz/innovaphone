@@ -138,8 +138,12 @@
     <None Include="billboard\httpfiles\wecom.billboardmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="billboard\httpfiles\images\back.png" />
     <Image Include="billboard\httpfiles\images\bg.png" />
+    <Image Include="billboard\httpfiles\images\flag_new.png" />
     <Image Include="billboard\httpfiles\images\header_wecom.png" />
+    <Image Include="billboard\httpfiles\images\icon-x.png" />
+    <Image Include="billboard\httpfiles\images\icons-palette.png" />
     <Image Include="billboard\httpfiles\images\logo-wecom.png" />
     <Image Include="billboard\httpfiles\images\logo.png" />
     <Image Include="billboard\httpfiles\images\menu-icon.png" />
