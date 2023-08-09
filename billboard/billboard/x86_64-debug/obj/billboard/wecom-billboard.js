@@ -7,11 +7,17 @@ var Wecom = Wecom || {};
 Wecom.billboard = Wecom.billboard || function (start, args) {
     this.createNode("body");
     var that = this;
-    var list_departments = [];
+    var list_departments = [    {
+        "id": 7,
+        "name": "Teste ",
+        "color": "#0e5319"
+    }];
     var list_departments_editor = [];
     var list_tableUsers = [];
     var list_posts = [];
     var views_history = [];
+    var list_editors_departments = [];
+    var list_viewers_departments = [];
     var postsProvisorio = [
         { id: 'post#1', department: 1, title: 'ATESTADOS', color: '#f83200', description: 'Testes de descrição hsadeih dusaid, dsdjsakkdbdk dhuatrnadbiwr gusdjsa gjdv gvadwvawh vdvwvda. Gdshuhdsu syuw!', date_end: '31/02/2024 00:01:34' },
         { id: 'post#2', department: 1, title: 'ALTERAÇÕES DO PLANO DE SAÚDE', color: '#7ff6ff', description: 'Testes de descrição hsadeih dusaid, dsdjsakkdbdk dhuatrnadbiwr gusdjsa gjdv gvadwvawh vdvwvda. Gdshuhdsu syuw!', date_end: '31/02/2024 00:01:34' },
@@ -65,12 +71,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             views_history = JSON.parse(obj.result);
             
         }
-        if (obj.api == "user" && obj.mt == "SelectDepartmentsViewerResult") {
+        if (obj.api == "user" && obj.mt == "SelectUserDepartmentsViewerResult") {
             console.log(obj.result);
             list_departments = JSON.parse(obj.result);
             makeDivDepartments();
         }
-        if (obj.api == "user" && obj.mt == "SelectDepartmentsEditorResult") {
+        if (obj.api == "user" && obj.mt == "SelectUserDepartmentsEditorResult") {
             console.log(obj.result);
             list_departments_editor = JSON.parse(obj.result);
         }
@@ -85,7 +91,14 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "InsertPostSuccess") {
             app.send({ api: "user", mt: "SelectPosts", department: obj.src });
         }
-
+        if (obj.api == "user" && obj.mt == "SelectDepartmentViewersResult") {
+            console.log(obj.result);
+            list_viewers_departments = JSON.parse(obj.result);
+        }
+        if (obj.api == "user" && obj.mt == "SelectDepartmentEditorsResult") {
+            console.log(obj.result);
+            list_editors_departments = JSON.parse(obj.result);
+        }
     }
 
     function makeDivDepartments() {
@@ -317,15 +330,30 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                 console.log("O elemento divAdd foi clicado!");
                 createPostForm(dep_id);
+
+
+
             });
             // Adicionar os elementos criados � div com o ID 'post-depart'
             postDepartDiv.appendChild(postNew1Div);
         }
+        var footButtons = document.createElement('div');
+        footButtons.id = 'footbuttons';
+        footButtons.style.position = 'absolute';
+        footButtons.style.display = 'flex';
+        footButtons.style.overflowY = 'auto';
+        footButtons.style.width = '100%';
+        footButtons.style.height = '10%';
+        footButtons.style.top = '90%';
+        footButtons.style.justifyContent = 'center';
+        footButtons.style.alignItems = 'center';
+        footButtons.style.alignContent = 'center';
+        worktable.appendChild(footButtons);
+
 
         var backDiv = document.createElement('div');
         backDiv.id = 'backDiv';
         backDiv.style.display = 'flex';
-        backDiv.style.position = 'absolute';
         backDiv.style.backgroundImage = 'url("./images/back.png")';
         backDiv.style.backgroundRepeat = 'no-repeat';
         backDiv.style.backgroundPosition = 'center';
@@ -334,8 +362,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         backDiv.style.flexWrap = 'wrap';
         backDiv.style.overflowY = 'auto';
         backDiv.style.width = '100%';
-        backDiv.style.height = '20%';
-        backDiv.style.top = '80%';
+        backDiv.style.height = '100%';
         backDiv.style.justifyContent = 'center';
         backDiv.style.alignItems = 'center';
         backDiv.style.alignContent = 'center';
@@ -344,8 +371,31 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             makeDivDepartments();
         })
 
-        worktable.appendChild(backDiv);
+        footButtons.appendChild(backDiv);
+        if(isEditor){
+            var editDepDiv = document.createElement("div");
+            editDepDiv.style.display = 'flex';
+            editDepDiv.style.backgroundImage = 'url("./images/engine.png")';
+            editDepDiv.style.backgroundRepeat = 'no-repeat';
+            editDepDiv.style.backgroundPosition = 'center';
+            editDepDiv.style.backgroundSize = '50px';
+            editDepDiv.style.display = 'flex';
+            editDepDiv.style.flexWrap = 'wrap';
+            editDepDiv.style.overflowY = 'auto';
+            editDepDiv.style.width = '100%';
+            editDepDiv.style.height = '100%';
+            editDepDiv.style.justifyContent = 'center';
+            editDepDiv.style.alignItems = 'center';
+            editDepDiv.style.alignContent = 'center';
 
+            editDepDiv.addEventListener("click", function (isEditor) {
+                console.log("CLICK BOTÃO EDITAR")
+                editDepartmentForm(dep_id)
+               
+            })
+            footButtons.appendChild(editDepDiv);
+        }
+        
         // Obter a div com o ID 'billboard'
         var billboardDiv = document.getElementById('billboard');
         if (billboardDiv) {
@@ -741,17 +791,116 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             editorCol.classList.add('column');
             var editorCheckbox = document.createElement('input');
             editorCheckbox.type = 'checkbox';
+
             editorCheckbox.name = 'editorDepartments';
             editorCheckbox.value = user.guid;
+            editorCheckbox.className = 'checkbox'
+
+            editorCheckbox.addEventListener('change', function () {
+
+                viewerCheckbox.checked = this.checked;
+            });
+
             editorCol.appendChild(editorCheckbox);
 
             var viewerCol = document.createElement('td');
             viewerCol.classList.add('column');
             var viewerCheckbox = document.createElement('input');
             viewerCheckbox.type = 'checkbox';
+
             viewerCheckbox.name = 'viewerDepartments';
             viewerCheckbox.value = user.guid;
+            viewerCheckbox.className = 'checkbox'
             viewerCol.appendChild(viewerCheckbox);
+
+            viewerCheckbox.checked = editorCheckbox.checked;
+
+            row.appendChild(nameCol);
+            row.appendChild(editorCol);
+            row.appendChild(viewerCol);
+
+            table.appendChild(row);
+        });
+        usersListDiv.appendChild(table);
+        return usersListDiv;
+    }
+    function editUsersDepartmentsGrid() {
+        var usersListDiv = document.createElement('div');
+        usersListDiv.id = 'userslist';
+        usersListDiv.className = 'userlist';
+        usersListDiv.innerHTML = '';
+
+        var table = document.createElement('table');
+        table.classList.add('table');
+        // Criar a primeira linha para os cabeçalhos das colunas
+        var headerRow = document.createElement('tr');
+        headerRow.classList.add('row');
+
+        var nameCol = document.createElement('th');
+        nameCol.classList.add('column');
+        nameCol.textContent = 'Usuário';
+
+        var editorCol = document.createElement('th');
+        editorCol.classList.add('column');
+        editorCol.textContent = 'Editor';
+
+        var viewerCol = document.createElement('th');
+        viewerCol.classList.add('column');
+        viewerCol.textContent = 'Visualizador';
+
+        headerRow.appendChild(nameCol);
+        headerRow.appendChild(editorCol);
+        headerRow.appendChild(viewerCol);
+
+        table.appendChild(headerRow);
+
+        // Criar as demais linhas com os dados dos departamentos
+        list_tableUsers.forEach(function (user) {
+            var row = document.createElement('tr');
+            row.classList.add('row');
+
+            var nameCol = document.createElement('td');
+            nameCol.classList.add('column');
+            nameCol.textContent = user.cn;
+
+            var userV = list_viewers_departments.filter(function (item) {
+                return item.viewer_guid === user.guid;
+            })[0];
+            var userE = list_editors_departments.filter(function (item) {
+                return item.editor_guid === user.guid;
+            })[0];
+
+            var editorCol = document.createElement('td');
+            editorCol.classList.add('column');
+            var editorCheckbox = document.createElement('input');
+            editorCheckbox.type = 'checkbox';
+            if (userE) {
+                editorCheckbox.checked = 'true';
+            }
+            editorCheckbox.name = 'editorDepartments';
+            editorCheckbox.value = user.guid;
+            editorCheckbox.className = 'checkbox'
+
+            editorCheckbox.addEventListener('change', function () {
+
+                viewerCheckbox.checked = this.checked;
+            });
+
+            editorCol.appendChild(editorCheckbox);
+
+            var viewerCol = document.createElement('td');
+            viewerCol.classList.add('column');
+            var viewerCheckbox = document.createElement('input');
+            viewerCheckbox.type = 'checkbox';
+            if (userV) {
+                viewerCheckbox.checked = 'true';
+            }
+            viewerCheckbox.name = 'viewerDepartments';
+            viewerCheckbox.value = user.guid;
+            viewerCheckbox.className = 'checkbox'
+            viewerCol.appendChild(viewerCheckbox);
+
+            viewerCheckbox.checked = editorCheckbox.checked;
 
             row.appendChild(nameCol);
             row.appendChild(editorCol);
@@ -828,6 +977,111 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             element.appendChild(aElement);
             element.appendChild(ulFoot);
         }
+    }
+    function editDepartmentForm(dep_id) {
+        var department = list_departments.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+        // Criar os elementos HTML
+        var postMsgDiv = document.createElement('div');
+        postMsgDiv.id = 'editdep';
+        postMsgDiv.style.display = 'flex';
+        postMsgDiv.style.flexDirection = 'column';
+        postMsgDiv.style.alignItems = 'center';
+        postMsgDiv.style.position = 'absolute';
+        postMsgDiv.style.width = '40%';
+        postMsgDiv.style.height = '80%';
+        postMsgDiv.style.backgroundColor = department.color;
+
+        var closeWindowDiv = document.createElement('div');
+        closeWindowDiv.id = 'closewindow';
+
+        // Adicionando o listener de clique
+        closeWindowDiv.addEventListener('click', function () {
+            console.log("O elemento closeWindowDiv foi clicado!");
+            makeDivPosts(dep_id);
+        });
+
+        var nameDepDiv = document.createElement('div');
+        nameDepDiv.id = 'nameDepDiv';
+        nameDepDiv.style.display = 'flex';
+        nameDepDiv.style.backgroundColor = '#ffffff33';
+        nameDepDiv.style.color = 'white';
+        nameDepDiv.style.width = '90%';
+        nameDepDiv.style.height = '8%';
+        nameDepDiv.style.marginBottom = '15px';
+        nameDepDiv.style.marginTop = '15px';
+        nameDepDiv.style.fontSize = '25px';
+        nameDepDiv.style.justifyContent = 'center';
+        nameDepDiv.style.alignItems = 'center';
+        nameDepDiv.innerHTML = department.name;
+
+
+        var buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'buttons';
+        buttonsDiv.style.display = 'flex';
+        buttonsDiv.style.alignItems = 'center';
+        buttonsDiv.style.justifyContent = 'flex-start';
+        buttonsDiv.style.width = '90%';
+        buttonsDiv.style.color = '#FFFF';
+        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+
+        var closeMsgDiv = document.createElement('div');
+        closeMsgDiv.id = 'closemsg';
+        closeMsgDiv.className = 'saveclose';
+        closeMsgDiv.textContent = 'Fechar';
+        // Adicionando o listener de clique
+        closeMsgDiv.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivPosts(dep_id);
+        });
+
+        var saveMsgDiv = document.createElement('div');
+        saveMsgDiv.id = 'savemsg';
+        saveMsgDiv.className = 'saveclose';
+        saveMsgDiv.textContent = 'Atualizar';
+        // Event listener de clique para o bot�o "Salvar"
+        saveMsgDiv.addEventListener('click', function () {
+            // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
+            var departmentName = document.getElementById("nameDepDiv").value;
+            var departmentColor = document.getElementById("colorbox").value;
+            console.log("Salvar clicado!");
+            console.log("Nome do departamento:", departmentName);
+            console.log("Cor selecionada:", departmentColor);
+            var editorDepartments = getSelectedUsersDepartments('editor');
+            var viewerDepartments = getSelectedUsersDepartments('viewer');
+            console.log("Nome dos departamentos visiveis:", viewerDepartments);
+            console.log("Nome dos departamentos editaveis:", editorDepartments);
+            app.send({ api: "user", mt: "UpdateDepartment", id: dep_id, name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+        });
+
+        // Adicionar os elementos criados � div com o ID 'billboard'
+        var billboardDiv = document.getElementById('billboard');
+        if (billboardDiv) {
+            buttonsDiv.appendChild(saveMsgDiv);
+            buttonsDiv.appendChild(closeMsgDiv);
+            postMsgDiv.appendChild(closeWindowDiv);
+            postMsgDiv.appendChild(nameDepDiv);
+            var userTable = editUsersDepartmentsGrid();
+            postMsgDiv.appendChild(userTable);
+            postMsgDiv.appendChild(buttonsDiv);
+
+            billboardDiv.appendChild(postMsgDiv);
+
+            var colorbox = document.getElementById("colorbox")
+            colorbox.addEventListener("change", function () {
+                postMsgDiv.style.backgroundColor = colorbox.value;
+            })
+            var palette = document.getElementById("palette")
+            palette.addEventListener("click", function () {
+                colorbox.click();
+            })
+
+        } else {
+            console.error("A div com o ID 'billboard' não foi encontrada.");
+        }
+
     }
 }
 

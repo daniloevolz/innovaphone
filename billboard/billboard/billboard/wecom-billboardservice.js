@@ -103,6 +103,26 @@ new JsonApi("user").onconnected(function (conn) {
                     .oncomplete(function (data) {
                         log("SelectPosts:result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+
+                        var queryV = "SELECT viewer_guid FROM tbl_department_viewers WHERE department_id =" + parseInt(obj.department, 10);
+                        Database.exec(queryV)
+                            .oncomplete(function (data) {
+                                log("SelectPosts:viewer_guid result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentViewersResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+
+                                var queryE = "SELECT editor_guid FROM tbl_department_editors WHERE department_id =" + parseInt(obj.department, 10);
+                                Database.exec(queryE)
+                                    .oncomplete(function (data) {
+                                        log("SelectPosts:editor_guid result=" + JSON.stringify(data, null, 4));
+                                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentEditorsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                                    });
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -115,7 +135,7 @@ new JsonApi("user").onconnected(function (conn) {
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -126,7 +146,7 @@ new JsonApi("user").onconnected(function (conn) {
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
 
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -505,7 +525,10 @@ function selectViewsHistory(sip, conn) {
             //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
             //query com condição de data e hora
             var now = getDateNow();
-            var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now +"' < p.date_end";
+            var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v" +
+                " ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND" +
+                " p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND" +
+                " '" + now + "' < p.date_end";
             // Executar consulta na tabela 'tbl_posts'
             Database.exec(queryPosts)
                 .oncomplete(function (dataPosts) {

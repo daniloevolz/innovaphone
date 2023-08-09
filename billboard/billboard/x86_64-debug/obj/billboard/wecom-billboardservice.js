@@ -43,6 +43,27 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "UpdatePost") {
+                Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "' WHERE id = " + obj.id)
+                    .oncomplete(function () {
+                        log("UpdatePost:result=success");
+            
+                        // Atualize os usuários sobre o post atualizado, se necessário
+                        for (var pbx in PbxSignalUsers) {
+                            if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                                var entry = PbxSignalUsers[pbx];
+                                entry.forEach(function (e) {
+                                    selectViewsHistory(e.sip);
+                                });
+                            }
+                        }
+            
+                        conn.send(JSON.stringify({ api: "user", mt: "UpdatePostSuccess", src: obj.department }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }
             if (obj.mt == "InsertViewHistory") {
                 var now = getDateNow();
                 Database.exec("INSERT INTO tbl_views_history (user_guid, post_id, date) VALUES ('" + conn.guid + "','" + obj.post + "','" + now + "')")
@@ -55,15 +76,53 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "SelectHistoryByPost") {
+                var now = getDateNow();
+                Database.exec("SELECT * FROM tbl_views_history where post_id ='"+obj.post+"'")
+                    .oncomplete(function (data) {
+                        log("SelectHistoryByPost:result=success");
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectHistoryByPostResult", src: obj.src, result: JSON.stringify(data) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }
             if (obj.mt == "SelectPosts") {
                 //var query = "SELECT * FROM tbl_posts where department ='" + obj.department + "';";
                 //query com condição de data e horario
-                var now = getDateNow();
-                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+now+"' >= date_start AND '"+now+"' < date_end";
+                var end = getDateNow();
+                var start = getDateNow();
+                if(obj.start){
+                    start = obj.start;
+                }
+                if(obj.end){
+                    end = obj.end;
+                }
+                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+start+"' >= date_start AND '"+end+"' < date_end";
                 Database.exec(query)
                     .oncomplete(function (data) {
                         log("SelectPosts:result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+
+                        var queryV = "SELECT viewer_guid FROM tbl_department_viewers WHERE department_id =" + parseInt(obj.department, 10);
+                        Database.exec(queryV)
+                            .oncomplete(function (data) {
+                                log("SelectPosts:viewer_guid result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentViewersResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+
+                                var queryE = "SELECT editor_guid FROM tbl_department_editors WHERE department_id =" + parseInt(obj.department, 10);
+                                Database.exec(queryE)
+                                    .oncomplete(function (data) {
+                                        log("SelectPosts:editor_guid result=" + JSON.stringify(data, null, 4));
+                                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentEditorsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                                    });
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -76,7 +135,7 @@ new JsonApi("user").onconnected(function (conn) {
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -87,13 +146,12 @@ new JsonApi("user").onconnected(function (conn) {
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
 
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     }); 
             }
-
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
                     .oncomplete(function () {
@@ -157,6 +215,60 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "UpdateDepartment") {
+                Database.exec("UPDATE tbl_departments SET name = '" + obj.name + "', color = '" + obj.color + "' WHERE id = " + obj.id)
+                    .oncomplete(function () {
+                        log("UpdateDepartment:result=success");
+            
+                        var viewers = obj.viewers;
+                        var editors = obj.editors;
+            
+                        // Primeiro, exclua os registros antigos da tabela tbl_department_viewers e tbl_department_editors
+                        Database.exec("DELETE FROM tbl_department_viewers WHERE department_id = " + obj.id)
+                            .oncomplete(function () {
+                                log("DeleteDepartmentViewers:result=success");
+            
+                                // Agora insira os novos registros em tbl_department_viewers
+                                viewers.forEach(function (v) {
+                                    Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + obj.id + ",'" + v + "')")
+                                        .oncomplete(function () {
+                                            log("InsertDepartmentViewer:result=success");
+                                        })
+                                        .onerror(function (error, errorText, dbErrorCode) {
+                                            log("InsertDepartmentViewer:result=Error " + String(errorText));
+                                        });
+                                });
+            
+                                // Exclua os registros antigos da tabela tbl_department_editors
+                                Database.exec("DELETE FROM tbl_department_editors WHERE department_id = " + obj.id)
+                                    .oncomplete(function () {
+                                        log("DeleteDepartmentEditors:result=success");
+            
+                                        // Agora insira os novos registros em tbl_department_editors
+                                        editors.forEach(function (e) {
+                                            Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES (" + obj.id + ",'" + e + "')")
+                                                .oncomplete(function () {
+                                                    log("InsertDepartmentEditor:result=success");
+                                                })
+                                                .onerror(function (error, errorText, dbErrorCode) {
+                                                    log("InsertDepartmentEditor:result=Error " + String(errorText));
+                                                });
+                                        });
+            
+                                        conn.send(JSON.stringify({ api: "user", mt: "UpdateDepartmentSuccess" }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("DeleteDepartmentEditors:result=Error " + String(errorText));
+                                    });
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("DeleteDepartmentViewers:result=Error " + String(errorText));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+            }            
         });
         conn.onclose(function () {
             connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
@@ -413,7 +525,10 @@ function selectViewsHistory(sip, conn) {
             //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
             //query com condição de data e hora
             var now = getDateNow();
-            var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now +"' < p.date_end";
+            var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v" +
+                " ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND" +
+                " p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND" +
+                " '" + now + "' < p.date_end";
             // Executar consulta na tabela 'tbl_posts'
             Database.exec(queryPosts)
                 .oncomplete(function (dataPosts) {
