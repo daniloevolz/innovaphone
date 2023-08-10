@@ -32,7 +32,7 @@ td.checkbox {
     display: flex;
     font-size: 18px;
     background: #ffffff33;
-    width: 90%;
+    width: 80%;
     height: 75%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -44,6 +44,7 @@ td.checkbox {
 
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -75,17 +76,39 @@ td.checkbox {
     width: 100%;
 }
 /*Fim*/
+#billboard {
+        position: absolute; 
+        display: flex; 
+        width: 100%; 
+        height: 100%; 
+        justify-content: center; 
+        align-items: center; 
+        background-image: url(./images/background.png)
+}
+
+.postmsg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 45%;
+    height: 70%;
+    min-width: 350px;
+    min-height: 450px
+}
+
 
 .logo {
-    display: block;
+    display: flex;
     position: absolute;
     bottom: 0;
-    right: 0;
+    right: 20px;
     width: 300px;
-    height: 30%;
-    background-image: url(../httpfiles/images/wecom-white.png);
+    height: 100px;
+    background-image: url(./images/wecom-white.png);
     background-repeat: no-repeat;
-    background-size: auto;
+    background-size: 300px;
+    opacity: 0.2;
 }
 .card {
     cursor: pointer;
@@ -152,7 +175,32 @@ td.checkbox {
     background-color: rgb(76, 0, 255);
     justify-content: flex-start;
 }
-
+.namebox {
+    font-size: 20px;
+    display: flex;
+    color: white;
+    width: 80%;
+    height: 10%;
+    justify-content: center;
+ }
+.closedate{
+    display: flex;
+    color: white;
+    width: 80%;
+    height: 10%;
+    justify-content: flex-end;
+}
+.depcards{
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+}
 .flag {
     display: flex;
     position: relative;
@@ -171,7 +219,7 @@ td.checkbox {
     display: flex;
     align-items: center;
     color: white;
-    width: 90%;
+    width: 80%;
     height: 10%;
     justify-content: space-between;
     background: #5d7e83ef;
@@ -188,16 +236,28 @@ input[type="datetime-local" i] {
     background-color: #5d7e8300;
     color: white;
 }
-
+.titlemsg {
+    display: flex;
+    justify-content: center;
+    color: white;
+    width: 80%;
+    height: 10%;
+    font-size: 30px;
+}
 #titlemsg input {
     font-size: 25px;
     background-color: #5d7e83ef;
     color: white;
     width: 100%;
     height: 100%;
-    text-transform: capitalize;
 }
-
+.msgbox {
+    display: flex;
+    color: white;
+    width: 80%;
+    height: 80%;
+    font-size: 15px;
+}
 #msgbox textarea {
     font-size: 15px;
     background: #5d7e8300;
@@ -228,7 +288,7 @@ input {
     width: 40%;
     margin-right: 0%;
     margin-left: 5%;
-    height: 90%;
+    height: 100%;
     font-size: 20px;
     display: flex;
     position: relative;
@@ -239,31 +299,73 @@ input {
     background-color: #5d7e83ef;
     border-color: black;
     border-radius: 2ch;
+    max-height:30px;
 }
 
 .buttons {
     cursor: pointer;
     margin-top: 2%;
-    width: 90%;
+    width: 80%;
     height: 10%;
     display: flex;
     position: relative;
 }
 
 #closewindow {
-    cursor: pointer;
-    background-color: rgb(255, 255, 255);
     position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 25px;
-    height: 25px;
-    border-radius: 2ch;
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url(./images/icon-x.png);
-    background-size: 25px;
+    background-image: url(./images/close.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+#historypost {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./images/timed_glass.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+#editpost {
+    position: absolute;
+    top: 90px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./images/edit_glass.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+#deletepost {
+    position: absolute;
+    top: 130px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./images/trash_glass.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
 #colorbox {
