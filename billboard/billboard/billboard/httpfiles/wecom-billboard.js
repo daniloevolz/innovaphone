@@ -66,6 +66,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "UserMessageResult") {
         }
+        if (obj.api == "user" && obj.mt == "UpdateDepartmentSuccess") {
+            app.send({ api: "user", mt: "SelectDepartments" });
+        }
+        if (obj.api == "user" && obj.mt == "DeleteDepartmentsSuccess") {
+            app.send({ api: "user", mt: "SelectDepartments" });
+        }
         if (obj.api == "user" && obj.mt == "SelectViewsHistoryResult") {
             console.log(obj.result);
             views_history = JSON.parse(obj.result);
@@ -342,7 +348,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footButtons.style.position = 'absolute';
         footButtons.style.display = 'flex';
         footButtons.style.overflowY = 'auto';
-        footButtons.style.width = '100%';
+        footButtons.style.width = '250px';
         footButtons.style.height = '10%';
         footButtons.style.top = '90%';
         footButtons.style.justifyContent = 'center';
@@ -393,6 +399,54 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 editDepartmentForm(dep_id)
                
             })
+            var delDepDiv = document.createElement("div");
+            delDepDiv.style.display = 'flex';
+            delDepDiv.style.backgroundImage = 'url("./images/trash.png")';
+            delDepDiv.style.backgroundRepeat = 'no-repeat';
+            delDepDiv.style.backgroundPosition = 'center';
+            delDepDiv.style.backgroundSize = '50px';
+            delDepDiv.style.display = 'flex';
+            delDepDiv.style.flexWrap = 'wrap';
+            delDepDiv.style.overflowY = 'auto';
+            delDepDiv.style.width = '100%';
+            delDepDiv.style.height = '100%';
+            delDepDiv.style.justifyContent = 'center';
+            delDepDiv.style.alignItems = 'center';
+            delDepDiv.style.alignContent = 'center';
+
+            delDepDiv.addEventListener("click", function (isEditor) {
+                console.log("CLICK BOTÃO DELETAR")
+                var hasPosts = list_posts.filter(function (item) {
+                    return item.department === parseInt(dep_id, 10);
+                });
+                if (hasPosts) {
+                    window.alert("ATENÇÃO!!!\n\nVocê deve excluir todos os Posts antes de excluir o Departamento.")
+                } else {
+                    app.send({ api: "user", mt: "DeleteDepartments", id: dep_id });
+                }
+                
+            })
+            var timedDepDiv = document.createElement("div");
+            timedDepDiv.style.display = 'flex';
+            timedDepDiv.style.backgroundImage = 'url("./images/timed.png")';
+            timedDepDiv.style.backgroundRepeat = 'no-repeat';
+            timedDepDiv.style.backgroundPosition = 'center';
+            timedDepDiv.style.backgroundSize = '50px';
+            timedDepDiv.style.display = 'flex';
+            timedDepDiv.style.flexWrap = 'wrap';
+            timedDepDiv.style.overflowY = 'auto';
+            timedDepDiv.style.width = '100%';
+            timedDepDiv.style.height = '100%';
+            timedDepDiv.style.justifyContent = 'center';
+            timedDepDiv.style.alignItems = 'center';
+            timedDepDiv.style.alignContent = 'center';
+
+            timedDepDiv.addEventListener("click", function (isEditor) {
+                console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS eENTÂO ENVIAR APP.SEND")
+            })
+            
+            footButtons.appendChild(delDepDiv);
+            footButtons.appendChild(timedDepDiv);
             footButtons.appendChild(editDepDiv);
         }
         
@@ -797,8 +851,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             editorCheckbox.className = 'checkbox'
 
             editorCheckbox.addEventListener('change', function () {
-
-                viewerCheckbox.checked = this.checked;
+                if (editorCheckbox.checked) {
+                    viewerCheckbox.checked = this.checked;
+                }
             });
 
             editorCol.appendChild(editorCheckbox);
@@ -882,8 +937,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             editorCheckbox.className = 'checkbox'
 
             editorCheckbox.addEventListener('change', function () {
-
-                viewerCheckbox.checked = this.checked;
+                if (editorCheckbox.checked) {
+                    viewerCheckbox.checked = this.checked;
+                }
             });
 
             editorCol.appendChild(editorCheckbox);
@@ -900,7 +956,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             viewerCheckbox.className = 'checkbox'
             viewerCol.appendChild(viewerCheckbox);
 
-            viewerCheckbox.checked = editorCheckbox.checked;
+            //viewerCheckbox.checked = editorCheckbox.checked;
 
             row.appendChild(nameCol);
             row.appendChild(editorCol);
@@ -1024,7 +1080,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         buttonsDiv.style.justifyContent = 'flex-start';
         buttonsDiv.style.width = '90%';
         buttonsDiv.style.color = '#FFFF';
-        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" value="' + department.color +'" id="colorbox" style="display: none;">';
 
         var closeMsgDiv = document.createElement('div');
         closeMsgDiv.id = 'closemsg';
@@ -1044,7 +1100,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         // Event listener de clique para o bot�o "Salvar"
         saveMsgDiv.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
-            var departmentName = document.getElementById("nameDepDiv").value;
+            var departmentName = document.getElementById("nameDepDiv").innerHTML;
             var departmentColor = document.getElementById("colorbox").value;
             console.log("Salvar clicado!");
             console.log("Nome do departamento:", departmentName);
