@@ -513,12 +513,67 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         });
         historyPostDiv.addEventListener('click', function () {
-            console.log("O elemento historyPostDiv foi clicado!");
-            
+            console.log("O elemento historyPostDiv foi clicado!", historypost);
+            msgBoxDiv.innerHTML = ''
+            var historypost = this.id
+            var table = document.createElement('table');
+            table.classList.add('table');
+            // Criar a primeira linha para os cabeçalhos das colunas
+            var headerRow = document.createElement('tr');
+            headerRow.classList.add('row');
+
+            var nameCol = document.createElement('th');
+            nameCol.classList.add('column');
+            nameCol.textContent = 'Usuário';
+
+            var viewerCol = document.createElement('th');
+            viewerCol.classList.add('column');
+            viewerCol.textContent = 'Visualizador';
+
+            headerRow.appendChild(nameCol);
+            headerRow.appendChild(editorCol);
+            headerRow.appendChild(viewerCol);
+
+            table.appendChild(headerRow);
+
+            // Criar as demais linhas com os dados dos departamentos
+            list_tableUsers.forEach(function (user) {
+                var row = document.createElement('tr');
+                row.classList.add('row');
+
+                var nameCol = document.createElement('td');
+                nameCol.classList.add('column');
+                nameCol.textContent = user.cn;
+
+                var editorCol = document.createElement('td');
+                editorCol.classList.add('column');
+                var editorCheckbox = document.createElement('input');
+                editorCheckbox.type = 'checkbox';
+
+                var viewerCol = document.createElement('td');
+                viewerCol.classList.add('column');
+                var viewerCheckbox = document.createElement('input');
+                viewerCheckbox.type = 'checkbox';
+
+                viewerCheckbox.name = 'viewerDepartments';
+                viewerCheckbox.value = user.guid;
+                viewerCheckbox.className = 'checkbox'
+                viewerCol.appendChild(viewerCheckbox);
+
+                viewerCheckbox.checked = editorCheckbox.checked;
+
+                row.appendChild(nameCol);
+                row.appendChild(editorCol);
+                row.appendChild(viewerCol);
+
+                table.appendChild(row);
+            });
+            usersListDiv.appendChild(table);
+            return usersListDiv;
         });
         editPostDiv.addEventListener('click', function () {
             console.log("O elemento editPostDiv foi clicado!");
-            
+                        
         });
         deletePostDiv.addEventListener('click', function () {
             console.log("O elemento deletePostDiv foi clicado!");
@@ -539,6 +594,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var msgBoxDiv = document.createElement('div');
         msgBoxDiv.id = 'msgbox';
         msgBoxDiv.className = 'msgbox';
+        msgBoxDiv.style.height = '75%'
 
 
         var scrollBox = document.createElement('scroll-box');
@@ -568,10 +624,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             postMsgDiv.appendChild(titleMsgDiv);
             postMsgDiv.appendChild(msgBoxDiv);
             postMsgDiv.appendChild(closeDateDiv);
-
-            //postMsgDiv.appendChild(historyPostDiv);
-            //postMsgDiv.appendChild(editPostDiv);
-            //postMsgDiv.appendChild(deletePostDiv);
             if (isEditor) {
                 postMsgDiv.appendChild(historyPostDiv);
                 postMsgDiv.appendChild(editPostDiv);
@@ -590,21 +642,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'postmsg';
-        postMsgDiv.style.display = 'flex';
-        postMsgDiv.style.flexDirection = 'column';
-        postMsgDiv.style.alignItems = 'center';
-        postMsgDiv.style.position = 'absolute';
-        postMsgDiv.style.width = '40%';
-        postMsgDiv.style.height = '80%';
+        postMsgDiv.className = 'postmsg';
         postMsgDiv.style.backgroundColor = '#0f243f';
 
         var nameBoxDiv = document.createElement('div');
         nameBoxDiv.id = 'namebox';
-        nameBoxDiv.style.display = 'flex';
-        nameBoxDiv.style.color = 'white';
-        nameBoxDiv.style.width = '80%';
-        nameBoxDiv.style.height = '10%';
-        nameBoxDiv.style.justifyContent = 'center';
+        nameBoxDiv.className = 'namebox';
         nameBoxDiv.innerHTML = department.name;
 
         var closeWindowDiv = document.createElement('div');
@@ -612,37 +655,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         var titleMsgDiv = document.createElement('div');
         titleMsgDiv.id = 'titlemsg';
-        titleMsgDiv.style.display = 'flex';
-        /*titleMsgDiv.style.backgroundColor = '#5d7e83ef';*/
-        titleMsgDiv.style.color = 'white';
-        titleMsgDiv.style.width = '80%';
-        titleMsgDiv.style.height = '8%';
-        titleMsgDiv.style.marginTop = '5px';
-        titleMsgDiv.style.marginBottom = '15px';
+        titleMsgDiv.className = 'titlemsg';
         titleMsgDiv.innerHTML = '<input id="titleevent" type="text" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
 
         var msgBoxDiv = document.createElement('div');
         msgBoxDiv.id = 'msgbox';
-        msgBoxDiv.style.display = 'flex';
-        msgBoxDiv.style.backgroundColor = 'rgb(93 126 131 / 36%);';
-        msgBoxDiv.style.color = 'white';
-        msgBoxDiv.style.width = '80%';
-        msgBoxDiv.style.height = '55%';
-        msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>';
+        msgBoxDiv.className = 'msgbox';
+        msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>' + '<p class="char-counter"><span id="charCount">1000</span> /1000</p>';
+
+        document.body.appendChild(msgBoxDiv);
+
+        var textarea = document.getElementById("msgevent");
+        var charCountSpan = document.getElementById("charCount");
+        var maxChars = 1000;
+
+        textarea.addEventListener("input", function () {
+            var remainingChars = maxChars - textarea.value.length;
+            charCountSpan.textContent = remainingChars;
+        });
+
+
 
         var dateDiv = document.createElement('div');
         dateDiv.id = 'date';
         dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
         dateDiv.style.fontSize = '12px';
-        dateDiv.innerHTML = 'Data de Início: <input type="datetime-local" id="startevent" class="dateinput"> Data de Expiração: <input type="datetime-local" id="endevent" class="dateinput">';
+        dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
 
         var buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'buttons';
-        buttonsDiv.style.display = 'flex';
-        buttonsDiv.style.alignItems = 'center';
-        buttonsDiv.style.justifyContent = 'flex-start';
-        buttonsDiv.style.width = '80%';
-        buttonsDiv.style.color = '#FFFF';
         buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
 
         var saveMsgDiv = document.createElement('div');
@@ -723,13 +764,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         // Criar os elementos HTML
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'newdep';
-        postMsgDiv.style.display = 'flex';
-        postMsgDiv.style.flexDirection = 'column';
-        postMsgDiv.style.alignItems = 'center';
-        postMsgDiv.style.position = 'absolute';
-        postMsgDiv.style.width = '40%';
-        postMsgDiv.style.height = '80%';
-        postMsgDiv.style.backgroundColor = '#0f243f';
+        postMsgDiv.className = 'newdep';
+
 
         var closeWindowDiv = document.createElement('div');
         closeWindowDiv.id = 'closewindow';
@@ -1057,12 +1093,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         // Criar os elementos HTML
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'editdep';
-        postMsgDiv.style.display = 'flex';
-        postMsgDiv.style.flexDirection = 'column';
-        postMsgDiv.style.alignItems = 'center';
-        postMsgDiv.style.position = 'absolute';
-        postMsgDiv.style.width = '40%';
-        postMsgDiv.style.height = '80%';
+        postMsgDiv.className = 'editdep';
         postMsgDiv.style.backgroundColor = department.color;
 
         var closeWindowDiv = document.createElement('div');

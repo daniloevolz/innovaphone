@@ -63,13 +63,32 @@ td.checkbox {
 ::-webkit-scrollbar-thumb:hover {
     background: #ffffffef;
 }
-
+.newdep {
+    min-width: 350px;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 80%;
+    background-color: #0f243f;
+}
 #newdep input {
     font-size: 25px;
     background-color: #ffffff00;
     width: 100%;
 }
-
+.editdep {
+    min-width: 350px;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 80%;
+}
 #editdep input {
     font-size: 25px;
     background-color: #ffffff00;
@@ -94,7 +113,7 @@ td.checkbox {
     width: 45%;
     height: 70%;
     min-width: 350px;
-    min-height: 450px
+    min-height: 450px;
 }
 
 
@@ -241,7 +260,9 @@ input[type="datetime-local" i] {
     justify-content: center;
     color: white;
     width: 80%;
-    height: 10%;
+    height: 8%;
+    margin-top: 5px;
+    margin-bottom: 15px;
     font-size: 30px;
 }
 #titlemsg input {
@@ -252,19 +273,29 @@ input[type="datetime-local" i] {
     height: 100%;
 }
 .msgbox {
+    position: relative;
     display: flex;
     color: white;
     width: 80%;
-    height: 80%;
+    height: 55%;
     font-size: 15px;
+    margin: 5px;
+    border: none;
+}
+.char-counter {
+    position: absolute;
+    bottom: 0px;
+    right: 10px;
+    opacity: 0.3;
 }
 #msgbox textarea {
     font-size: 15px;
-    background: #5d7e8300;
+    background-color: rgb(93 126 131 / 36%);
     color: white;
     width: 100%;
     height: 100%;
     resize: none;
+    border-width: 0;
 }
 
 ::placeholder {
@@ -304,11 +335,14 @@ input {
 
 .buttons {
     cursor: pointer;
-    margin-top: 2%;
+    margin-top: 3%;
     width: 80%;
-    height: 10%;
+    height: 5%;
     display: flex;
     position: relative;
+    align-items: center;
+    justify-content: center;
+    color: #ffff;
 }
 
 #closewindow {
