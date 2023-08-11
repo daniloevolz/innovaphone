@@ -900,18 +900,19 @@ new PbxApi("RCC").onconnected(function (conn) {
             var num;
             //Define num
             try {
-                if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
-                    num = obj.peer.h323;
-                    log("danilo req : RCC message:CallUpdate: num = obj.peer.h323");
-                } else if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
                     num = obj.peer.e164;
                     log("danilo req : RCC message:CallUpdate: num = obj.local.e164;");
+                } else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                    num = obj.peer.h323;
+                    log("danilo req : RCC message:CallUpdate: num = obj.peer.h323");
                 } else {
                     // Se nenhum dos parâmetros estiver definido, ignore o evento
                     log("danilo req : RCC message:CallUpdate: num = null");
                     return;
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 log("danilo req : RCC message:CallUpdate NUM Catch "+e);
                 if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
                     num = obj.peer.e164;
@@ -997,18 +998,24 @@ new PbxApi("RCC").onconnected(function (conn) {
             else {
                 log("danilo-req : RCC message::CallInfo foundCall " + JSON.stringify(foundCall));
                 var cause;
+                var message;
                 if (obj.cause) cause = obj.cause;
+                if (obj.msg) message = obj.msg;
                 calls.forEach(function (call) {
                     if (call.sip == sip) {
                         if (call.callid < obj.call && cause !=26) {
                             call.callid = obj.call;
                         }
                         if (call.state < obj.state && cause != 26) {
+                            //Condicao de fuga dos states malucos que surgem eventualmente em Park ou Hold
+                            if (obj.state == 4 || obj.state == 5 || obj.state == 132 || obj.state == 133) {
+                                call.state = obj.state;
+                            }
                             switch (obj.state) {
                                 case 4:
                                     //Ativa (Alert)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:4:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
                                             var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "out" };
@@ -1031,7 +1038,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 case 132:
                                     //Receptiva (Alert)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:132:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
                                             var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
@@ -1054,7 +1061,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 case 5:
                                     //Ativa (Connected)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:5:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
                                             var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "ans" };
@@ -1065,7 +1072,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             // }
                                         } else {
                                             var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "ans" };
-                                           
+
                                             // if (e164 == "") {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "ans" };
                                             // } else {
@@ -1078,7 +1085,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 case 133:
                                     //Receptiva (Connected)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:133:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
                                             var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "ans" };
@@ -1101,18 +1108,18 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 case 6:
                                     //Ativa (Disconnect Sent)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:6:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
-                                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del" };
-                                            
+                                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del", Direction: "out" };
+
                                             // if (e164 == "") {
                                             //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
                                             // } else {
                                             //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
                                             // }
                                         } else {
-                                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del" };
+                                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del", Direction: "out" };
                                             // if (e164 == "") {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
                                             // } else {
@@ -1129,17 +1136,17 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 case 7:
                                     //Ativa (Disconnect Received)
                                     if (sendCallEvents) {
-                                        log("danilo-req : RCC message::sendCallEvents=true");
+                                        log("danilo-req : RCC message:7:sendCallEvents=true");
                                         //var e164 = obj.peer.e164;
                                         if (queues.some(function (v) { return v.Fila === sip })) {
-                                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del" };
+                                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del", Direction: "inc" };
                                             // if (e164 == "") {
                                             //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
                                             // } else {
                                             //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
                                             // }
                                         } else {
-                                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del" };
+                                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del", Direction: "inc" };
                                             // if (e164 == "") {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
                                             // } else {
@@ -1155,19 +1162,21 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     break;
                                 case 134:
                                     //Receptiva (Disconnect Sent)
-                                    if(obj.msg!="del"){
+                                    log("danilo-req : RCC message:134:obj.msg " + message);
+                                    if (message == 'r-rel' || message == 'x-rel') {
+                                        log("danilo-req : RCC message:134:obj.msg == x-rel || r-rel");
                                         if (sendCallEvents) {
-                                            log("danilo-req : RCC message::sendCallEvents=true");
+                                            log("danilo-req : RCC message:134:sendCallEvents=true");
                                             //var e164 = obj.peer.e164;
                                             if (queues.some(function (v) { return v.Fila === sip })) {
-                                                var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del" };
+                                                var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del", Direction: "out" };
                                                 // if (e164 == "") {
                                                 //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
                                                 // } else {
                                                 //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
                                                 // }
                                             } else {
-                                                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del" };
+                                                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del", Direction: "out" };
                                                 // if (e164 == "") {
                                                 //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
                                                 // } else {
@@ -1184,39 +1193,37 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     break;
                                 case 135:
                                     //Receptiva (Disconnect Received)
-                                    if(obj.msg!="del"){
-                                        if (sendCallEvents) {
-                                            log("danilo-req : RCC message::sendCallEvents=true");
-                                            //var e164 = obj.peer.e164;
-                                            if (queues.some(function (v) { return v.Fila === sip })) {
-                                                var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del" };
-                                                // if (e164 == "") {
-                                                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
-                                                // } else {
-                                                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
-                                                // }
-                                            } else {
-                                                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del" };
-                                                // if (e164 == "") {
-                                                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
-                                                // } else {
-                                                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
-                                                // }
-                                            }
-                                            httpClient(urlPhoneApiEvents, msg);
+                                    //log("danilo-req : RCC message:135:obj.del " + del);
+                                    log("danilo-req : RCC message:135:");
+                                    if (sendCallEvents) {
+                                        log("danilo-req : RCC message:135:sendCallEvents=true");
+                                        //var e164 = obj.peer.e164;
+                                        if (queues.some(function (v) { return v.Fila === sip })) {
+                                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "del", Direction: "inc" };
+                                            // if (e164 == "") {
+                                            //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "del" };
+                                            // } else {
+                                            //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "del" };
+                                            // }
+                                        } else {
+                                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "del", Direction: "inc" };
+                                            // if (e164 == "") {
+                                            //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "del" };
+                                            // } else {
+                                            //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
+                                            // }
                                         }
-                                        //Remove
-                                        log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                        calls = calls.filter(deleteCallsBySrc(sip));
-                                        log("danilo req : after deleteCall " + JSON.stringify(calls));
+                                        httpClient(urlPhoneApiEvents, msg);
                                     }
-                                    
+                                    //Remove
+                                    log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
+                                    calls = calls.filter(deleteCallsBySrc(sip));
+                                    log("danilo req : after deleteCall " + JSON.stringify(calls));
+                                    //if (del == true) {
+
+                                    //}
+
                                     break;
-                                
-                            }
-                            //Condicao de fuga dos states malucos que surgem eventualmente em Park ou Hold
-                            if (obj.state == 4 || obj.state == 5 || obj.state == 6 || obj.state == 7 || obj.state == 132 || obj.state == 133 || obj.state == 134 || obj.state == 135) {
-                                call.state = obj.state;
                             }
                         }
                         
