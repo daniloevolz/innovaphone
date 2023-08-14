@@ -47,7 +47,7 @@ new JsonApi("user").onconnected(function (conn) {
                 Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "' WHERE id = " + obj.id)
                     .oncomplete(function () {
                         log("UpdatePost:result=success");
-            
+
                         // Atualize os usuários sobre o post atualizado, se necessário
                         for (var pbx in PbxSignalUsers) {
                             if (PbxSignalUsers.hasOwnProperty(pbx)) {
@@ -57,12 +57,25 @@ new JsonApi("user").onconnected(function (conn) {
                                 });
                             }
                         }
-            
+
                         conn.send(JSON.stringify({ api: "user", mt: "UpdatePostSuccess", src: obj.department }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
+            }
+            if (obj.mt == "DeletePost") {
+                var now = getDateNow();
+                var query = "UPDATE tbl_posts SET deleted = '" + now + "', deleted_guid = '" + conn.guid + "' WHERE id = '" + obj.id + "'";
+                Database.exec(query)
+                    .oncomplete(function () {
+                        log("UpdateDeletedColumns:result=success");
+                        conn.send(JSON.stringify({ api: "user", mt: "DeletePostSuccess", src:obj.src }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    });
+
             }
             if (obj.mt == "InsertViewHistory") {
                 var now = getDateNow();
@@ -78,7 +91,7 @@ new JsonApi("user").onconnected(function (conn) {
             }
             if (obj.mt == "SelectHistoryByPost") {
                 var now = getDateNow();
-                Database.exec("SELECT * FROM tbl_views_history where post_id ='"+obj.post+"'")
+                Database.exec("SELECT * FROM tbl_views_history where post_id ='" + obj.post + "'")
                     .oncomplete(function (data) {
                         log("SelectHistoryByPost:result=success");
                         conn.send(JSON.stringify({ api: "user", mt: "SelectHistoryByPostResult", src: obj.src, result: JSON.stringify(data) }));
@@ -92,18 +105,23 @@ new JsonApi("user").onconnected(function (conn) {
                 //query com condição de data e horario
                 var end = getDateNow();
                 var start = getDateNow();
-                if(obj.start){
+                if (obj.start) {
                     start = obj.start;
                 }
-                if(obj.end){
+                if (obj.end) {
                     end = obj.end;
                 }
-                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+start+"' >= date_start AND '"+end+"' < date_end";
+                var query;
+                if (obj.deleted) {
+                    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND date_start >= '" + start + "' AND date_end <= '" + end + "'";
+                } else {
+                    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND date_start >= '" + start + "' AND date_end <= '" + end + "' AND deleted IS NULL";
+                }
+                //var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+start+"' >= date_start AND '"+end+"' < date_end AND deleted IS NULL";
                 Database.exec(query)
                     .oncomplete(function (data) {
                         log("SelectPosts:result=" + JSON.stringify(data, null, 4));
                         conn.send(JSON.stringify({ api: "user", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4), department: obj.department }));
-
                         var queryV = "SELECT viewer_guid FROM tbl_department_viewers WHERE department_id =" + parseInt(obj.department, 10);
                         Database.exec(queryV)
                             .oncomplete(function (data) {
@@ -131,7 +149,13 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
                 selectViewsHistory(conn.sip, conn);
-                var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                var queryViewer;
+                if (obj.deleted) {
+                    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                } else {
+                    //Query para Departamentos Não Excluídos
+                    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
+                }
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
@@ -140,8 +164,12 @@ new JsonApi("user").onconnected(function (conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
-
-                var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
+                if (obj.deleted) {
+                    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
+                } else {
+                    //Query para Departamentos Não Excluídos
+                    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
+                }
                 Database.exec(queryEditor)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
@@ -150,7 +178,7 @@ new JsonApi("user").onconnected(function (conn) {
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                    }); 
+                    });
             }
             if (obj.mt == "InsertDepartment") {
                 Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
@@ -194,22 +222,13 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
-            if (obj.mt == "DeleteDepartments") {
-                Database.exec("DELETE FROM tbl_departments WHERE id=" + obj.id + ";")
+            if (obj.mt == "DeleteDepartment") {
+                var now = getDateNow();
+                var query = "UPDATE tbl_departments SET deleted = '" + now + "', deleted_guid = '" + conn.guid + "' WHERE id = '" + obj.id + "'";
+                Database.exec(query)
                     .oncomplete(function () {
-                        Database.exec("DELETE FROM tbl_departments_viewers WHERE department_id=" + obj.id + ";")
-                            .oncomplete(function () {
-                                Database.exec("DELETE FROM tbl_departments_editors WHERE department_id=" + obj.id + ";")
-                                    .oncomplete(function () {
-                                        conn.send(JSON.stringify({ api: "user", mt: "DeleteDepartmentsSuccess", result: JSON.stringify(data, null, 4) }));
-                                    })
-                                    .onerror(function (error, errorText, dbErrorCode) {
-                                        log("InsertDepartmentEditor:result=success");
-                                    });
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDepartmentViewer:result=success");
-                            });
+                        log("UpdateDeletedColumns:result=success");
+                        conn.send(JSON.stringify({ api: "user", mt: "DeleteDepartmentSuccess" }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -219,15 +238,15 @@ new JsonApi("user").onconnected(function (conn) {
                 Database.exec("UPDATE tbl_departments SET name = '" + obj.name + "', color = '" + obj.color + "' WHERE id = " + obj.id)
                     .oncomplete(function () {
                         log("UpdateDepartment:result=success");
-            
+
                         var viewers = obj.viewers;
                         var editors = obj.editors;
-            
+
                         // Primeiro, exclua os registros antigos da tabela tbl_department_viewers e tbl_department_editors
                         Database.exec("DELETE FROM tbl_department_viewers WHERE department_id = " + obj.id)
                             .oncomplete(function () {
                                 log("DeleteDepartmentViewers:result=success");
-            
+
                                 // Agora insira os novos registros em tbl_department_viewers
                                 viewers.forEach(function (v) {
                                     Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + obj.id + ",'" + v + "')")
@@ -238,12 +257,12 @@ new JsonApi("user").onconnected(function (conn) {
                                             log("InsertDepartmentViewer:result=Error " + String(errorText));
                                         });
                                 });
-            
+
                                 // Exclua os registros antigos da tabela tbl_department_editors
                                 Database.exec("DELETE FROM tbl_department_editors WHERE department_id = " + obj.id)
                                     .oncomplete(function () {
                                         log("DeleteDepartmentEditors:result=success");
-            
+
                                         // Agora insira os novos registros em tbl_department_editors
                                         editors.forEach(function (e) {
                                             Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES (" + obj.id + ",'" + e + "')")
@@ -254,7 +273,7 @@ new JsonApi("user").onconnected(function (conn) {
                                                     log("InsertDepartmentEditor:result=Error " + String(errorText));
                                                 });
                                         });
-            
+
                                         conn.send(JSON.stringify({ api: "user", mt: "UpdateDepartmentSuccess" }));
                                     })
                                     .onerror(function (error, errorText, dbErrorCode) {
@@ -268,7 +287,7 @@ new JsonApi("user").onconnected(function (conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
-            }            
+            }
         });
         conn.onclose(function () {
             connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
@@ -377,7 +396,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
                     var idsToSearch = [];
                     for (var i = 0; i < departments.length; i++) {
-                        idsToSearch.push("'"+departments[i].id+"'");
+                        idsToSearch.push("'" + departments[i].id + "'");
                     }
 
                     // Formatar a lista de ids para uso na consulta SQL
@@ -387,13 +406,13 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
                     //query com condição de data e horario
                     var now = getDateNow();
-                    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '"+now+"' >= p.date_start AND '"+now+"' < p.date_end";
+                    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now + "' < p.date_end";
                     // Executar consulta na tabela 'tbl_posts'
                     Database.exec(queryPosts)
                         .oncomplete(function (dataPosts) {
                             // Dados retornados da consulta na tabela 'tbl_posts'
                             log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
-                            
+
                             updateBadge(obj.sig.cg.sip, dataPosts.length)
 
                         })
@@ -423,7 +442,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             //    }
             //})
             removeObjectByCall(PbxSignalUsers, pbx, obj.call);
-            
+
             log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
         }
     });
@@ -507,7 +526,7 @@ function selectViewsHistory(sip, conn) {
     var guid = pbxTableUsers.filter(function (item) {
         return item.columns.h323 === sip;
     })[0].columns.guid;
-    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + guid + "';";
+    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + guid + "' AND d.deleted IS NULL;";
     Database.exec(queryViewer)
         .oncomplete(function (departments) {
             log("SelectDepartments:result=" + JSON.stringify(departments, null, 4));
@@ -543,7 +562,7 @@ function selectViewsHistory(sip, conn) {
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
                     if (conn) {
-                        log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4)+" ERRO="+errorText);
+                        log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4) + " ERRO=" + errorText);
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     } else {
                         log("SelectPosts: ERRO=" + errorText);
@@ -642,5 +661,5 @@ var i = Timers.setInterval(function () {
             })
         }
     }
-}, 3*60*1000);
+}, 3 * 60 * 1000);
 

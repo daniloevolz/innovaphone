@@ -19,6 +19,16 @@
             "cmd": "column",
             "name": "color",
             "type": "VARCHAR(120)"
+          },
+          {
+            "cmd": "column",
+            "name": "deleted",
+            "type": "TEXT"
+          },
+          {
+            "cmd": "column",
+            "name": "deleted_guid",
+            "type": "VARCHAR(120)"
           }
         ]
       },
@@ -128,6 +138,16 @@
             "cmd": "column",
             "name": "date_end",
             "type": "text NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "deleted",
+            "type": "TEXT"
+          },
+          {
+            "cmd": "column",
+            "name": "deleted_guid",
+            "type": "VARCHAR(120)"
           }
         ]
       }

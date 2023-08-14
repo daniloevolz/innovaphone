@@ -7,27 +7,14 @@ var Wecom = Wecom || {};
 Wecom.billboard = Wecom.billboard || function (start, args) {
     this.createNode("body");
     var that = this;
-    var list_departments = [    {
-        "id": 7,
-        "name": "Teste ",
-        "color": "#0e5319"
-    }];
+    var list_departments = [];
     var list_departments_editor = [];
     var list_tableUsers = [];
     var list_posts = [];
     var views_history = [];
     var list_editors_departments = [];
     var list_viewers_departments = [];
-    var postsProvisorio = [
-        { id: 'post#1', department: 1, title: 'ATESTADOS', color: '#f83200', description: 'Testes de descrição hsadeih dusaid, dsdjsakkdbdk dhuatrnadbiwr gusdjsa gjdv gvadwvawh vdvwvda. Gdshuhdsu syuw!', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#2', department: 1, title: 'ALTERAÇÕES DO PLANO DE SAÚDE', color: '#7ff6ff', description: 'Testes de descrição hsadeih dusaid, dsdjsakkdbdk dhuatrnadbiwr gusdjsa gjdv gvadwvawh vdvwvda. Gdshuhdsu syuw!', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#3', department: 1, title: 'PAGAMENTO DE BONUS', color: '#13a31b', description: 'Testes de descrição', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#4', department: 4, title: 'IR DATAS', color: '#920d0d', description: 'Testes de descrição hsadeih dusaid, dsdjsakkdbdk dhuatrnadbiwr gusdjsa gjdv gvadwvawh vdvwvda. Gdshuhdsu syuw!', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#5', department: 4, title: 'REUNIÕES', color: '#31c214', description: 'Testes de descrição', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#6', department: 1, title: 'HORÁRIOS', color: '#cea00b', description: 'Testes de descrição', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#7', department: 3, title: 'AGENDA', color: '#1b24a1', description: 'Testes de descrição', date_end: '31/02/2024 00:01:34' },
-        { id: 'post#8', department: 3, title: 'ANIVERSÁRIOS DO MÊS', color: '#0088f8', description: 'Testes de descrição', date_end: '31/02/2024 00:01:34' },
-    ];
+    
 
     var colorSchemes = {
         dark: {
@@ -51,10 +38,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
+    app.onerror = waitConnection(that);
+    app.onclosed = waitConnection(that);
+
+    waitConnection(that);
 
     function app_connected(domain, user, dn, appdomain) {
+        that.clear();
+        that.add(new innovaphone.ui1.Div(null, null, "billboard").setAttribute("id", "billboard"))
         app.send({ api: "user", mt: "TableUsers" });
         app.send({ api: "user", mt: "SelectDepartments" });
+
     }
     
     function app_message(obj) {
@@ -69,13 +63,23 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "UpdateDepartmentSuccess") {
             app.send({ api: "user", mt: "SelectDepartments" });
         }
-        if (obj.api == "user" && obj.mt == "DeleteDepartmentsSuccess") {
+        if (obj.api == "user" && obj.mt == "UpdatePostSuccess") {
+            app.send({ api: "user", mt: "SelectPosts", department: obj.src });
+        }
+        if (obj.api == "user" && obj.mt == "DeleteDepartmentSuccess") {
             app.send({ api: "user", mt: "SelectDepartments" });
+        }
+        if (obj.api == "user" && obj.mt == "DeletePostSuccess") {
+            app.send({ api: "user", mt: "SelectPosts", department: obj.src });
         }
         if (obj.api == "user" && obj.mt == "SelectViewsHistoryResult") {
             console.log(obj.result);
             views_history = JSON.parse(obj.result);
             
+        }
+        if (obj.api == "user" && obj.mt == "SelectHistoryByPostResult") {
+            console.log(obj.result);
+            createHistoryViewsPostGrid(JSON.parse(obj.result))
         }
         if (obj.api == "user" && obj.mt == "SelectUserDepartmentsViewerResult") {
             console.log(obj.result);
@@ -424,7 +428,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 if (hasPosts) {
                     window.alert("ATENÇÃO!!!\n\nVocê deve excluir todos os Posts antes de excluir o Departamento.")
                 } else {
-                    app.send({ api: "user", mt: "DeleteDepartments", id: dep_id });
+                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
                 }
                 
             })
@@ -445,6 +449,126 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
             timedDepDiv.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS eENTÂO ENVIAR APP.SEND")
+                var worktable = document.getElementById('worktable');
+                var depTimeManager = document.getElementById('depTimeManager');
+
+                if (depTimeManager) {
+                    worktable.removeChild(depTimeManager);
+
+                } else {
+                    var depTimeManager = document.createElement('div');
+                    depTimeManager.id = 'depTimeManager';
+                    depTimeManager.style.position = 'fixed';
+                    depTimeManager.style.backgroundColor = 'rgb(215,215,215)';
+                    depTimeManager.style.bottom = '10%';
+                    depTimeManager.style.width = '250px';
+                    depTimeManager.style.height = '200px';
+
+                    var select = document.createElement('select');
+                    select.id = 'periodSelector';
+
+                    var options = [
+                        'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Desde Sempre', 'Período Customizado'
+                    ];
+
+                    options.forEach(function (optionText) {
+                        var option = document.createElement('option');
+                        option.value = optionText.toLowerCase().replace(/\s/g, '');
+                        option.textContent = optionText;
+                        select.appendChild(option);
+                    });
+
+                    var customPeriodDiv = document.createElement('div');
+                    customPeriodDiv.id = 'customPeriod';
+                    customPeriodDiv.style.display = 'none';
+
+                    var startDateLabel = document.createElement('label');
+                    startDateLabel.textContent = 'Data de início:';
+                    var startDateInput = document.createElement('input');
+                    startDateInput.type = 'date';
+                    startDateInput.id = 'data_start';
+
+                    var endDateLabel = document.createElement('label');
+                    endDateLabel.textContent = 'Data de término:';
+                    var endDateInput = document.createElement('input');
+                    endDateInput.type = 'date';
+                    endDateInput.id = 'data_end';
+
+                    var radioButtonLabel = document.createElement('label');
+                    radioButtonLabel.textContent = 'Excluídos:';
+                    var radioButton1 = document.createElement('input');
+                    radioButton1.type = 'radio';
+                    radioButton1.name = 'radioDeleted';
+                    radioButton1.value = 'deleted';
+
+                    var submitButton = document.createElement('button');
+                    submitButton.textContent = 'OK';
+                    submitButton.id = 'submitButton';
+
+                    depTimeManager.appendChild(select);
+
+                    customPeriodDiv.appendChild(startDateLabel);
+                    customPeriodDiv.appendChild(startDateInput);
+                    customPeriodDiv.appendChild(endDateLabel);
+                    customPeriodDiv.appendChild(endDateInput);
+
+                    depTimeManager.appendChild(customPeriodDiv);
+                    
+                    depTimeManager.appendChild(radioButtonLabel);
+                    depTimeManager.appendChild(radioButton1);
+                    depTimeManager.appendChild(submitButton);
+
+                    select.addEventListener('change', function () {
+                        if (select.value === 'períodocustomizado') {
+                            customPeriodDiv.style.display = 'block';
+                        } else {
+                            customPeriodDiv.style.display = 'none';
+                        }
+                    });
+
+                    submitButton.addEventListener('click', function () {
+                        var selectedValue = select.value;
+                        var startDate, endDate;
+
+                        switch (selectedValue) {
+                            case 'hoje':
+                                startDate = endDate = new Date().toISOString().split('T')[0];
+                                break;
+                            case 'últimos7dias':
+                                endDate = new Date().toISOString().split('T')[0];
+                                startDate = new Date();
+                                startDate.setDate(startDate.getDate() - 6);
+                                startDate = startDate.toISOString().split('T')[0];
+                                break;
+                            case 'últimos30dias':
+                                endDate = new Date().toISOString().split('T')[0];
+                                startDate = new Date();
+                                startDate.setDate(startDate.getDate() - 29);
+                                startDate = startDate.toISOString().split('T')[0];
+                                break;
+                            case 'desdesempre':
+                                startDate = '1970-01-01';
+                                endDate = '2099-12-01';
+                                break;
+                            case 'períodocustomizado':
+                                startDate = startDateInput.value.split('T')[0];
+                                endDate = endDateInput.value.split('T')[0];
+                                break;
+                        }
+
+                        var selectedRadioButton= false;
+
+                        if (radioButton1.checked) {
+                            selectedRadioButton = true;
+                        }
+
+                        console.log('Data de início:', startDate);
+                        console.log('Data de término:', endDate);
+                        app.send({ api: "user", mt: "SelectPosts", department: parseInt(dep_id, 10), start: startDate, end: endDate, deleted: selectedRadioButton });
+                    });
+
+                    worktable.appendChild(depTimeManager);
+                }
             })
             
             footButtons.appendChild(delDepDiv);
@@ -508,76 +632,18 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else {
                 makeDivPosts(post.department);
             }
-
-            
-
         });
         historyPostDiv.addEventListener('click', function () {
-            console.log("O elemento historyPostDiv foi clicado!", historypost);
-            msgBoxDiv.innerHTML = ''
-            var historypost = this.id
-            var table = document.createElement('table');
-            table.classList.add('table');
-            // Criar a primeira linha para os cabeçalhos das colunas
-            var headerRow = document.createElement('tr');
-            headerRow.classList.add('row');
-
-            var nameCol = document.createElement('th');
-            nameCol.classList.add('column');
-            nameCol.textContent = 'Usuário';
-
-            var viewerCol = document.createElement('th');
-            viewerCol.classList.add('column');
-            viewerCol.textContent = 'Visualizador';
-
-            headerRow.appendChild(nameCol);
-            headerRow.appendChild(editorCol);
-            headerRow.appendChild(viewerCol);
-
-            table.appendChild(headerRow);
-
-            // Criar as demais linhas com os dados dos departamentos
-            list_tableUsers.forEach(function (user) {
-                var row = document.createElement('tr');
-                row.classList.add('row');
-
-                var nameCol = document.createElement('td');
-                nameCol.classList.add('column');
-                nameCol.textContent = user.cn;
-
-                var editorCol = document.createElement('td');
-                editorCol.classList.add('column');
-                var editorCheckbox = document.createElement('input');
-                editorCheckbox.type = 'checkbox';
-
-                var viewerCol = document.createElement('td');
-                viewerCol.classList.add('column');
-                var viewerCheckbox = document.createElement('input');
-                viewerCheckbox.type = 'checkbox';
-
-                viewerCheckbox.name = 'viewerDepartments';
-                viewerCheckbox.value = user.guid;
-                viewerCheckbox.className = 'checkbox'
-                viewerCol.appendChild(viewerCheckbox);
-
-                viewerCheckbox.checked = editorCheckbox.checked;
-
-                row.appendChild(nameCol);
-                row.appendChild(editorCol);
-                row.appendChild(viewerCol);
-
-                table.appendChild(row);
-            });
-            usersListDiv.appendChild(table);
-            return usersListDiv;
+            console.log("O elemento historyPostDiv foi clicado!", id);
+            app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10),})
         });
         editPostDiv.addEventListener('click', function () {
             console.log("O elemento editPostDiv foi clicado!");
-                        
+            editPostForm(id, dep_id);            
         });
         deletePostDiv.addEventListener('click', function () {
             console.log("O elemento deletePostDiv foi clicado!");
-            
+            app.send({ api: "user", mt: "DeletePost", id: parseInt(id,10), src:dep_id });
         });
 
         var nameBoxDiv = document.createElement('div');
@@ -759,6 +825,150 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
 
 
+    }
+    function editPostForm(id, dep_id) {
+        console.log("O elemento historyPostDiv foi clicado!", id);
+        var department = list_departments.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+
+        var post = list_posts.filter(function (item) {
+            return item.id === parseInt(id, 10);
+        })[0];
+        var maxChars = 1000;
+        var postMsgDiv = document.getElementById('postmsg');
+        postMsgDiv.innerHTML = '';
+        postMsgDiv.style.backgroundColor = post.color;
+
+        var nameBoxDiv = document.createElement('div');
+        nameBoxDiv.id = 'namebox';
+        nameBoxDiv.className = 'namebox';
+        nameBoxDiv.innerHTML = department.name;
+
+        var closeWindowDiv = document.createElement('div');
+        closeWindowDiv.id = 'closewindow';
+
+        var titleMsgDiv = document.createElement('div');
+        titleMsgDiv.id = 'titlemsg';
+        titleMsgDiv.className = 'titlemsg';
+        titleMsgDiv.innerHTML = '<input id="titleevent" type="text" value="'+post.title+'" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
+        var remainingChars = maxChars - post.description.length
+        var msgBoxDiv = document.createElement('div');
+        msgBoxDiv.id = 'msgbox';
+        msgBoxDiv.className = 'msgbox';
+        msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000">' + post.description + '</textarea>' + '<p class="char-counter"><span id="charCount">' + remainingChars +'</span> /'+ maxChars +'</p>';
+
+        //document.body.appendChild(msgBoxDiv);
+
+        //var textarea = document.getElementById("msgevent");
+        //var charCountSpan = document.getElementById("charCount");
+        //var maxChars = 1000;
+
+        //textarea.addEventListener("input", function () {
+        //    var remainingChars = maxChars - textarea.value.length;
+        //    charCountSpan.textContent = remainingChars;
+        //});
+
+
+
+        var dateDiv = document.createElement('div');
+        dateDiv.id = 'date';
+        dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
+        dateDiv.style.fontSize = '12px';
+        dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" value="'+post.date_start+'" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" value="'+post.date_end+'" class="dateinput">';
+
+        var buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'buttons';
+        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" value="'+post.color+'" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
+
+        var saveMsgDiv = document.createElement('div');
+        saveMsgDiv.id = 'savemsg';
+        saveMsgDiv.className = 'saveclose';
+        saveMsgDiv.textContent = 'Atualizar';
+
+        var closeMsgDiv = document.createElement('div');
+        closeMsgDiv.id = 'closemsg';
+        closeMsgDiv.className = 'saveclose';
+        closeMsgDiv.textContent = 'Fechar';
+
+
+        // Adicionando o listener de clique
+        saveMsgDiv.addEventListener('click', function () {
+
+            console.log("O elemento saveMsgDiv foi clicado!");
+            var startPost = document.getElementById('startevent').value;
+            var endPost = document.getElementById('endevent').value;
+            var msgPost = document.getElementById('msgevent').value;
+            var titlePost = document.getElementById('titleevent').value;
+            var colorPost = document.getElementById('colorbox').value;
+
+            console.log("Data Start:", startPost);
+            app.send({ api: "user", mt: "UpdatePost", id: parseInt(id,10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+        });
+
+        var closeMsgDiv = document.createElement('div');
+        closeMsgDiv.id = 'closemsg';
+        closeMsgDiv.className = 'saveclose';
+        closeMsgDiv.textContent = 'Fechar';
+
+        // Adicionando o listener de clique
+        closeMsgDiv.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivPosts(dep_id);
+        });
+
+        // Adicionando o listener de clique
+        closeWindowDiv.addEventListener('click', function () {
+
+            console.log("O elemento closeWindowDiv foi clicado!");
+            makeDivPosts(dep_id);
+        });
+
+
+
+        buttonsDiv.appendChild(saveMsgDiv);
+        buttonsDiv.appendChild(closeMsgDiv);
+        postMsgDiv.appendChild(nameBoxDiv);
+        postMsgDiv.appendChild(closeWindowDiv);
+        postMsgDiv.appendChild(titleMsgDiv);
+        postMsgDiv.appendChild(msgBoxDiv);
+        postMsgDiv.appendChild(dateDiv);
+        postMsgDiv.appendChild(buttonsDiv);
+
+        var textarea = document.getElementById("msgevent");
+        var charCountSpan = document.getElementById("charCount");
+        
+
+        textarea.addEventListener("input", function () {
+            var remainingChars = maxChars - textarea.value.length;
+            charCountSpan.textContent = remainingChars;
+        });
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            postMsgDiv.style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        })
+
+        // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
+        //var billboardDiv = document.getElementById('billboard');
+        //if (billboardDiv) {
+        //    billboardDiv.appendChild(postMsgDiv);
+
+        //    var colorbox = document.getElementById("colorbox")
+        //    colorbox.addEventListener("change", function () {
+        //        postMsgDiv.style.backgroundColor = colorbox.value;
+        //    })
+        //    var palette = document.getElementById("palette")
+        //    palette.addEventListener("click", function () {
+        //        colorbox.click();
+        //    })
+        //} else {
+        //    console.error("A div com o ID 'billboard' não foi encontrada.");
+        //}
     }
     function createDepartmentForm() {
         // Criar os elementos HTML
@@ -1191,6 +1401,59 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.error("A div com o ID 'billboard' não foi encontrada.");
         }
 
+    }
+    function createHistoryViewsPostGrid(views_post_history) {
+        var msgBoxDiv = document.getElementById('msgbox');
+        msgBoxDiv.innerHTML = ''
+        var table = document.createElement('table');
+        table.classList.add('table');
+        // Criar a primeira linha para os cabeçalhos das colunas
+        var headerRow = document.createElement('tr');
+        headerRow.classList.add('row');
+
+        var nameCol = document.createElement('th');
+        nameCol.classList.add('column');
+        nameCol.textContent = 'Usuário';
+
+        var dateCol = document.createElement('th');
+        dateCol.classList.add('column');
+        dateCol.textContent = 'Data';
+
+        headerRow.appendChild(nameCol);
+        headerRow.appendChild(dateCol);
+
+        table.appendChild(headerRow);
+
+        // Criar as demais linhas com os dados dos departamentos
+        views_post_history.forEach(function (view) {
+            var row = document.createElement('tr');
+            row.classList.add('row');
+            var user = list_tableUsers.filter(function (item) {
+                return item.guid == view.user_guid;
+            })[0];
+            var nameCol = document.createElement('td');
+            nameCol.classList.add('column');
+            nameCol.textContent = user.cn;
+
+            var dateCol = document.createElement('td');
+            dateCol.classList.add('column');
+            dateCol.textContent = view.date;
+
+            row.appendChild(nameCol);
+            row.appendChild(dateCol);
+
+            table.appendChild(row);
+        });
+        msgBoxDiv.appendChild(table);
+    }
+    function waitConnection(div) {
+        div.clear();
+        var div1 = div.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
 }
 

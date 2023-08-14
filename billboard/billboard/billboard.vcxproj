@@ -119,6 +119,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="billboard\httpfiles\images\wecom-white.svg" />
+    <None Include="billboard\httpfiles\loader.css" />
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
     <None Include="billboard.mak" />
