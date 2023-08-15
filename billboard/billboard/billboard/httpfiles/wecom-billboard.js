@@ -1293,28 +1293,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     function changeBackgroundColor(elementId) {
         var element = document.getElementById(elementId);
         if (element) {
-            // Salva o conteúdo atual da div
-            var conteudoAntigo = element.innerHTML;
 
-            // Limpa o conteúdo da div encontrada
-            element.innerHTML = '';
-
-            // Cria os novos elementos (ul e a)
-            var ulNew = document.createElement('ul');
-            ulNew.id = 'new';
-            ulNew.className = 'newpost';
-            var aElement = document.createElement('a');
-            // Adiciona o conteúdo antigo de volta à div no elemento A
-            aElement.textContent = conteudoAntigo;
-
-            var ulFoot = document.createElement('ul');
-            ulFoot.id = 'foot';
-            ulFoot.className = 'footpost';
-
-            // Adiciona os novos elementos à div
-            element.appendChild(ulNew);
-            element.appendChild(aElement);
-            element.appendChild(ulFoot);
+        // Salva o conteúdo atual da div
+        var conteudoAntigo = element.innerHTML;
+        
+        element.innerHTML = '';
+        
+        var ulNew = document.createElement('ul');
+        ulNew.id = 'new';
+        ulNew.className = 'newpost';
+        element.appendChild(ulNew);
+        element.innerHTML += conteudoAntigo;
         }
     }
     function changeDepBackgroundColor(elementId) {

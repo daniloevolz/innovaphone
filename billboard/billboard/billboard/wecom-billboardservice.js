@@ -101,7 +101,7 @@ new JsonApi("user").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "SelectPosts") {
-                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' ";
+                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND deleted IS NULL ";
                 if (obj.query) {
                     query += obj.query;
                 } else {
