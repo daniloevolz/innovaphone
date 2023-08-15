@@ -101,22 +101,26 @@ new JsonApi("user").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "SelectPosts") {
+                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' ";
+                if (obj.query) {
+                    query += obj.query;
+                } else {
+                    var end = getDateNow();
+                    var start = getDateNow();
+                    query += "AND date_start <= '" + start + "' AND date_end >= '" + end + "'";
+                }
                 //var query = "SELECT * FROM tbl_posts where department ='" + obj.department + "';";
                 //query com condição de data e horario
-                var end = getDateNow();
-                var start = getDateNow();
-                if (obj.start) {
-                    start = obj.start;
-                }
-                if (obj.end) {
-                    end = obj.end;
-                }
-                var query;
-                if (obj.deleted) {
-                    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND date_start >= '" + start + "' AND date_end <= '" + end + "'";
-                } else {
-                    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND date_start >= '" + start + "' AND date_end <= '" + end + "' AND deleted IS NULL";
-                }
+                //var end = getDateNow();
+                //var start = getDateNow();
+                //var query;
+                //if (obj.deleted) {
+                //    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department +
+                //        "' AND date_start >= '" + start + "' AND date_end <= '" + end + "'";
+                //} else {
+                //    var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department +
+                //        "' AND date_start >= '" + start + "' AND date_end <= '" + end + "' AND deleted IS NULL";
+                //}
                 //var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND '"+start+"' >= date_start AND '"+end+"' < date_end AND deleted IS NULL";
                 Database.exec(query)
                     .oncomplete(function (data) {

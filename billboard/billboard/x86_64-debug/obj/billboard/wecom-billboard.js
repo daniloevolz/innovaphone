@@ -278,25 +278,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         logoWecom.id = 'logowecom';
         logoWecom.className = 'logo'
         worktable.appendChild(logoWecom);
-
+        
         // Criar divs para cada departamento
         list_posts.forEach(function (post) {
             var postDiv = document.createElement('div');
             postDiv.id = post.id;
             postDiv.className = 'post';
             postDiv.textContent = post.title;
-            postDiv.style.display = 'flex';
-            postDiv.style.flexDirection= 'column';
-            postDiv.style.justifyContent = 'center';
-            postDiv.style.alignItems = 'center';
-            postDiv.style.width = '250px';
-            postDiv.style.height = '200px';
-            postDiv.style.textAlign = 'center';
-            postDiv.style.borderRadius = '0px';
             postDiv.style.backgroundColor = post.color;
-            postDiv.style.margin = '15px';
-            postDiv.style.fontSize = '25px';
-            postDiv.style.color = 'white';
+
 
             // Adicionar o event listener de clique
             postDiv.addEventListener('click', function () {
@@ -306,6 +296,61 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 makeDivPostMessage(clickedId, dep_id);
 
             });
+            var isEditor = list_departments_editor.filter(function (item) {
+                return item.id === parseInt(dep_id, 10);
+            })[0];
+
+            if (isEditor) {
+                var starDate = new Date(post.date_start);
+                var endDate = new Date(post.date_end);
+
+                var headpost = document.createElement('ul');
+                headpost.id = 'headpost';
+
+                if (post.deleted) {
+                    headpost.className = 'deletedpost';
+                };
+                 
+                var textpost = document.createElement('a');
+                textpost.id = 'textpost';
+                textpost.textContent = post.title;
+
+                var footpost = document.createElement('ul');
+                footpost.id = 'footpost';
+                footpost.className = "footpost";
+
+                var spanStart = document.createElement('span');
+                spanStart.id = 'dateS';
+                spanStart.style.fontSize = '10px';
+                spanStart.textContent = "Início: " + formatDate(starDate);
+                var spanEnd = document.createElement('span');
+                spanEnd.id = 'dateE';
+                spanEnd.style.fontSize = '10px';
+                spanEnd.textContent = "Fim: " + formatDate(endDate);
+
+                function formatDate(date) {
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1; // Months are 0-indexed
+                    var year = date.getFullYear();
+
+                    // Add leading zeros if needed
+                    if (day < 10) day = '0' + day;
+                    if (month < 10) month = '0' + month;
+
+                    return day + '/' + month + '/' + year;
+                }
+
+                footpost.appendChild(spanStart);
+                footpost.appendChild(spanEnd);
+
+                postDiv.innerHTML = '';
+                postDiv.id = post.id;
+                postDiv.className = 'post';
+                postDiv.style.backgroundColor = post.color;
+                postDiv.appendChild(headpost);
+                postDiv.appendChild(textpost);
+                postDiv.appendChild(footpost);
+            }
 
             postDepartDiv.appendChild(postDiv);
         });
@@ -321,18 +366,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             postNew1Div.id = 'postnew1';
             postNew1Div.className = 'postnew';
             postNew1Div.textContent = 'Adicionar +';
-            postNew1Div.style.display = 'flex';
-            postNew1Div.style.flexDirection = 'column';
-            postNew1Div.style.justifyContent = 'center';
-            postNew1Div.style.alignItems = 'center';
-            postNew1Div.style.width = '250px';
-            postNew1Div.style.height = '200px';
-            postNew1Div.style.textAlign = 'center';
-            postNew1Div.style.borderRadius = '0px';
-            postNew1Div.style.backgroundColor = '#44575B';
-            postNew1Div.style.margin = '15px';
-            postNew1Div.style.fontSize = '25px';
-            postNew1Div.style.color = 'white';
+
 
             // Adicionando o listener de clique
             postNew1Div.addEventListener('click', function () {
@@ -359,25 +393,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footButtons.style.alignContent = 'center';
         worktable.appendChild(footButtons);
 
-        
-      
-
-
         var backDiv = document.createElement('div');
         backDiv.id = 'backDiv';
-        backDiv.style.display = 'flex';
-        backDiv.style.backgroundImage = 'url("./images/back.png")';
-        backDiv.style.backgroundRepeat = 'no-repeat';
-        backDiv.style.backgroundPosition = 'center';
-        backDiv.style.backgroundSize = '50px';
-        backDiv.style.display = 'flex';
-        backDiv.style.flexWrap = 'wrap';
-        backDiv.style.overflowY = 'auto';
-        backDiv.style.width = '100%';
-        backDiv.style.height = '100%';
-        backDiv.style.justifyContent = 'center';
-        backDiv.style.alignItems = 'center';
-        backDiv.style.alignContent = 'center';
+        backDiv.className = 'backDiv'
+
 
         backDiv.addEventListener("click", function () {
             makeDivDepartments();
@@ -386,19 +405,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footButtons.appendChild(backDiv);
         if(isEditor){
             var editDepDiv = document.createElement("div");
-            editDepDiv.style.display = 'flex';
-            editDepDiv.style.backgroundImage = 'url("./images/engine.png")';
-            editDepDiv.style.backgroundRepeat = 'no-repeat';
-            editDepDiv.style.backgroundPosition = 'center';
-            editDepDiv.style.backgroundSize = '50px';
-            editDepDiv.style.display = 'flex';
-            editDepDiv.style.flexWrap = 'wrap';
-            editDepDiv.style.overflowY = 'auto';
-            editDepDiv.style.width = '100%';
-            editDepDiv.style.height = '100%';
-            editDepDiv.style.justifyContent = 'center';
-            editDepDiv.style.alignItems = 'center';
-            editDepDiv.style.alignContent = 'center';
+            editDepDiv.className = 'editDepDiv'
+
 
             editDepDiv.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO EDITAR")
@@ -406,19 +414,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                
             })
             var delDepDiv = document.createElement("div");
-            delDepDiv.style.display = 'flex';
-            delDepDiv.style.backgroundImage = 'url("./images/trash.png")';
-            delDepDiv.style.backgroundRepeat = 'no-repeat';
-            delDepDiv.style.backgroundPosition = 'center';
-            delDepDiv.style.backgroundSize = '50px';
-            delDepDiv.style.display = 'flex';
-            delDepDiv.style.flexWrap = 'wrap';
-            delDepDiv.style.overflowY = 'auto';
-            delDepDiv.style.width = '100%';
-            delDepDiv.style.height = '100%';
-            delDepDiv.style.justifyContent = 'center';
-            delDepDiv.style.alignItems = 'center';
-            delDepDiv.style.alignContent = 'center';
+            delDepDiv.className = 'delDepDiv'
+
 
             delDepDiv.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
@@ -433,22 +430,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 
             })
             var timedDepDiv = document.createElement("div");
-            timedDepDiv.style.display = 'flex';
-            timedDepDiv.style.backgroundImage = 'url("./images/timed.png")';
-            timedDepDiv.style.backgroundRepeat = 'no-repeat';
-            timedDepDiv.style.backgroundPosition = 'center';
-            timedDepDiv.style.backgroundSize = '50px';
-            timedDepDiv.style.display = 'flex';
-            timedDepDiv.style.flexWrap = 'wrap';
-            timedDepDiv.style.overflowY = 'auto';
-            timedDepDiv.style.width = '100%';
-            timedDepDiv.style.height = '100%';
-            timedDepDiv.style.justifyContent = 'center';
-            timedDepDiv.style.alignItems = 'center';
-            timedDepDiv.style.alignContent = 'center';
+            timedDepDiv.className= 'timedDepDiv'
 
             timedDepDiv.addEventListener("click", function (isEditor) {
-                console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS eENTÂO ENVIAR APP.SEND")
+                console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS E ENTÂO ENVIAR APP.SEND")
+               
                 var worktable = document.getElementById('worktable');
                 var depTimeManager = document.getElementById('depTimeManager');
 
@@ -458,17 +444,16 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 } else {
                     var depTimeManager = document.createElement('div');
                     depTimeManager.id = 'depTimeManager';
-                    depTimeManager.style.position = 'fixed';
-                    depTimeManager.style.backgroundColor = 'rgb(215,215,215)';
-                    depTimeManager.style.bottom = '10%';
-                    depTimeManager.style.width = '250px';
-                    depTimeManager.style.height = '200px';
+                    depTimeManager.className = 'depTimeManager'
 
                     var select = document.createElement('select');
                     select.id = 'periodSelector';
+                    select.style.position = 'relative';
+                    select.style.width = '230px';
+                    select.style.margin = '010px';
 
                     var options = [
-                        'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Desde Sempre', 'Período Customizado'
+                        'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
                     ];
 
                     options.forEach(function (optionText) {
@@ -484,39 +469,69 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                     var startDateLabel = document.createElement('label');
                     startDateLabel.textContent = 'Data de início:';
+                    startDateLabel.style.marginLeft = '10px';
+                    startDateLabel.style.marginRight = '20px';
+                    startDateLabel.style.fontSize = '16px';
                     var startDateInput = document.createElement('input');
                     startDateInput.type = 'date';
                     startDateInput.id = 'data_start';
 
                     var endDateLabel = document.createElement('label');
                     endDateLabel.textContent = 'Data de término:';
+                    endDateLabel.style.marginLeft = '10px';
+                    endDateLabel.style.marginRight = '1px';
+                    endDateLabel.style.fontSize = '16px';
                     var endDateInput = document.createElement('input');
                     endDateInput.type = 'date';
                     endDateInput.id = 'data_end';
 
-                    var radioButtonLabel = document.createElement('label');
-                    radioButtonLabel.textContent = 'Excluídos:';
-                    var radioButton1 = document.createElement('input');
-                    radioButton1.type = 'radio';
-                    radioButton1.name = 'radioDeleted';
-                    radioButton1.value = 'deleted';
+                    var checkboxButtonLabel = document.createElement('label');
+                    checkboxButtonLabel.textContent = 'Excluídos:';
+                    checkboxButtonLabel.style.marginLeft = '10px';
+                    checkboxButtonLabel.style.marginRight = '43px';
+                    checkboxButtonLabel.style.fontSize = '16px';
+                    var checkboxButton1 = document.createElement('input');
+                    checkboxButton1.type = 'checkbox';
+                    checkboxButton1.style.width = '115px'
+                    checkboxButton1.style.height = '20px'
+                    checkboxButton1.name = 'checkboxDeleted';
+                    checkboxButton1.value = 'deleted';
 
                     var submitButton = document.createElement('button');
                     submitButton.textContent = 'OK';
                     submitButton.id = 'submitButton';
+                    submitButton.style.width = '230px';
+                    submitButton.style.margin = '10px';
 
-                    depTimeManager.appendChild(select);
+                    var topSelect = document.createElement('div');
+                    topSelect.id = 'topselect'
+                    topSelect.className = 'topselect'
+
+                    var middleSelect = document.createElement('div');
+                    middleSelect.id = 'mdselect'
+                    middleSelect.className = 'mdselect'
+
+                    var bottomSelect = document.createElement('div');
+                    bottomSelect.id = 'btselect'
+                    bottomSelect.className = 'btselect'
+
+                    depTimeManager.appendChild(topSelect);
+                    depTimeManager.appendChild(middleSelect);
+                    depTimeManager.appendChild(bottomSelect);
+
+                    topSelect.appendChild(select);
 
                     customPeriodDiv.appendChild(startDateLabel);
                     customPeriodDiv.appendChild(startDateInput);
                     customPeriodDiv.appendChild(endDateLabel);
                     customPeriodDiv.appendChild(endDateInput);
 
-                    depTimeManager.appendChild(customPeriodDiv);
-                    
-                    depTimeManager.appendChild(radioButtonLabel);
-                    depTimeManager.appendChild(radioButton1);
-                    depTimeManager.appendChild(submitButton);
+                    middleSelect.appendChild(customPeriodDiv);
+
+                    bottomSelect.appendChild(checkboxButtonLabel);
+                    bottomSelect.appendChild(checkboxButton1);
+                    bottomSelect.appendChild(submitButton);
+
 
                     select.addEventListener('change', function () {
                         if (select.value === 'períodocustomizado') {
@@ -526,48 +541,81 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                         }
                     });
 
+
+
                     submitButton.addEventListener('click', function () {
                         var selectedValue = select.value;
                         var startDate, endDate;
-
+                        var query;
                         switch (selectedValue) {
                             case 'hoje':
                                 startDate = endDate = new Date().toISOString().split('T')[0];
+                                query = "AND date_start <= '" + startDate + "' AND date_end >= '" + endDate + "'";
                                 break;
                             case 'últimos7dias':
-                                endDate = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 6);
                                 startDate = startDate.toISOString().split('T')[0];
+                                query = "AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
                                 break;
                             case 'últimos30dias':
-                                endDate = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 29);
                                 startDate = startDate.toISOString().split('T')[0];
+                                query = "AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
+                                break;
+                            case 'próximos7dias':
+                                now = new Date().toISOString().split('T')[0];
+                                startDate = new Date();
+                                startDate.setDate(startDate.getDate() + 6);
+                                startDate = startDate.toISOString().split('T')[0];
+                                query = "AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
+                                break;
+                            case 'próximos30dias':
+                                now = new Date().toISOString().split('T')[0];
+                                startDate = new Date();
+                                startDate.setDate(startDate.getDate() + 29);
+                                startDate = startDate.toISOString().split('T')[0];
+                                query = "AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
                                 break;
                             case 'desdesempre':
-                                startDate = '1970-01-01';
-                                endDate = '2099-12-01';
+                                query = "";
                                 break;
                             case 'períodocustomizado':
                                 startDate = startDateInput.value.split('T')[0];
                                 endDate = endDateInput.value.split('T')[0];
+                                query = "AND date_start >= '" + startDate + "' AND date_end <= '" + endDate + "'";
                                 break;
                         }
 
-                        var selectedRadioButton= false;
-
-                        if (radioButton1.checked) {
-                            selectedRadioButton = true;
+                        if (!checkboxButton1.checked) {
+                            query += " AND deleted IS NULL";
                         }
 
                         console.log('Data de início:', startDate);
                         console.log('Data de término:', endDate);
-                        app.send({ api: "user", mt: "SelectPosts", department: parseInt(dep_id, 10), start: startDate, end: endDate, deleted: selectedRadioButton });
+                        //var query = "AND date_start >= '" + startDate + "' AND date_end <= '" + endDate + "' AND deleted IS NULL";
+                        app.send({ api: "user", mt: "SelectPosts", department: parseInt(dep_id, 10), query: query });
                     });
 
                     worktable.appendChild(depTimeManager);
+
+                    var animatedDiv = document.getElementById("depTimeManager");
+                    setTimeout(function () {
+                        animatedDiv.style.opacity = 1;
+                        animatedDiv.style.transform = "translate(0%, 0%)";
+                    }, 10);
+                    document.getElementById('submitButton').addEventListener('click', function () {
+                    setTimeout(function () {
+                        animatedDiv.style.opacity = 0;
+                        animatedDiv.style.transform = "translate(0%, -100%)";
+
+                    }, 10);
+
+                    })
+
                 }
             })
             
@@ -1252,14 +1300,14 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             element.innerHTML = '';
 
             // Cria os novos elementos (ul e a)
-            var ulNew = document.createElement('pre');
+            var ulNew = document.createElement('ul');
             ulNew.id = 'new';
             ulNew.className = 'newpost';
             var aElement = document.createElement('a');
             // Adiciona o conteúdo antigo de volta à div no elemento A
             aElement.textContent = conteudoAntigo;
 
-            var ulFoot = document.createElement('pre');
+            var ulFoot = document.createElement('ul');
             ulFoot.id = 'foot';
             ulFoot.className = 'footpost';
 
@@ -1279,14 +1327,14 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             element.innerHTML = '';
 
             // Cria os novos elementos (ul e a)
-            var ulNew = document.createElement('pre');
+            var ulNew = document.createElement('ul');
             ulNew.id = 'newDepPost';
             ulNew.className = 'newDepPost';
             var aElement = document.createElement('a');
             // Adiciona o conteúdo antigo de volta à div no elemento A
             aElement.textContent = conteudoAntigo;
 
-            var ulFoot = document.createElement('pre');
+            var ulFoot = document.createElement('ul');
             ulFoot.id = 'rightDep';
             ulFoot.className = 'rightDep';
 

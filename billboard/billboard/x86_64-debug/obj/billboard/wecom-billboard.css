@@ -66,6 +66,8 @@ td.checkbox {
 .newdep {
     min-width: 350px;
     min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -82,6 +84,8 @@ td.checkbox {
 .editdep {
     min-width: 350px;
     min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,6 +93,78 @@ td.checkbox {
     width: 40%;
     height: 80%;
 }
+.backDiv {
+    display: flex;
+    background-image: url(./images/back.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
+}
+.delDepDiv {
+    display: flex;
+    background-image: url(./images/trash.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
+}
+.editDepDiv {
+    display: flex;
+    background-image: url(./images/engine.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
+}
+.timedDepDiv {
+    display: flex;
+    background-image: url(./images/timed.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
+}
+.depTimeManager {
+    position: fixed;
+    background-color: rgb(215, 215, 215);
+    bottom: 10%;
+    width: 250px;
+    height: 250px;
+    transform: translate(0%, 100%);
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 1s, transform 1s;
+}
+
 #editdep input {
     font-size: 25px;
     background-color: #ffffff00;
@@ -96,13 +172,13 @@ td.checkbox {
 }
 /*Fim*/
 #billboard {
-        position: absolute; 
-        display: flex; 
-        width: 100%; 
-        height: 100%; 
-        justify-content: center; 
-        align-items: center; 
-        background-image: url(./images/background.png)
+    position: absolute; 
+    display: flex; 
+    width: 100%; 
+    height: 100%; 
+    justify-content: center; 
+    align-items: center; 
+    background-image: url(./images/background.png)
 }
 
 .postmsg {
@@ -114,6 +190,8 @@ td.checkbox {
     height: 70%;
     min-width: 350px;
     min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
 }
 
 
@@ -157,28 +235,68 @@ td.checkbox {
     font-size: 25px;
     color: white;
 }
+.footpost {
+    width: 100%;
+    height: 15%;
+    padding: 0;
+    margin: 0;
 
+}
+.footpost span {
+    width: 50%;
+    height: 100%;
+    padding: 0;
+    margin: 0 5px 0 5px;
+}
+.deletedpost {
+    display: flex;
+    position: relative;
+    top: 1%;
+    left: 43%;
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    background-image: url(./images/trash_glass.png);
+    background-size: 25px;
+    background-repeat: no-repeat;
+    padding: 0;
+    margin: 0;
+}
 .post {
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 17%;
-    height: 30%;
+    width: 250px;
+    height: 200px;
     text-align: center;
     border-radius: 00px;
     margin: 15px;
     font-size: 25px;
     color: white;
 }
+.mdselect{
+    height: 100px;
+}
+.btselect {
+    display: flex;
+    position: relative;
+    height: 60px;
+    top: 35px;
+    align-content: center;
+    flex-wrap: wrap;
+}
 
 .postnew {
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 17%;
-    height: 30%;
+    width: 250px;
+    height: 200px;
     text-align: center;
     border-radius: 00px;
     margin: 15px;
@@ -219,6 +337,7 @@ td.checkbox {
     position: absolute;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 .flag {
     display: flex;
@@ -230,9 +349,9 @@ td.checkbox {
     padding: 5px;
 }
 
-    .flag.show {
-        display: block;
-    }
+.flag.show {
+    display: block;
+}
 
 #date {
     display: flex;
@@ -434,13 +553,6 @@ input {
     background-image: url(./images/flag_new.png);
     background-size: 70px;
     background-repeat: no-repeat;
-    padding: 0;
-    margin: 0;
-}
-
-.footpost {
-    width: 100%;
-    height: 15%;
     padding: 0;
     margin: 0;
 }

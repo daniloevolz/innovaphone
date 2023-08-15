@@ -41,7 +41,7 @@
                     <div id="closemsg" class="saveclose">Fechar</div>
                 </div>
             </div>
-            <div id="newdep" style="display: flex; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
+            <div id="newdep" style="display: none; flex-direction: column; align-items: center; position: absolute; width: 40%; height: 80%; background-color: #0f243f59;">
                 <div id="closewindow"></div>
                 <div id="namedep" style="display: flex; background-color:#ffffff33; color: white; width: 90%; height: 8%; margin-bottom: 15px; margin-top: 15px;">
 
@@ -154,7 +154,7 @@
             </div>                
             <div id="worktable" style="height: 95%; width: 95%;">
                 <ul id="voltar" style="position: relative; display: flex; align-items: flex-start; justify-content: center; margin: 0; padding: 0;">Voltar</ul>
-                <div id="depcards" style="display: flex; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
+                <div id="depcards" style="display: none; flex-wrap: wrap; width: 100%; height: 92%; justify-content: center; align-items: center; align-content: center;">
 
                     <div id="card-fin" class="card">
                         <ul id="newDepPost" class="newDepPost"></ul>
@@ -176,14 +176,17 @@
                     <div id="cardnew" class="cardnew">Adicionar +</div>
                     <div id="cardnew" class="cardnew">Adicionar +</div>
                 </div>
-                <div id="post-depart" style="display: none; flex-wrap: wrap; width: 100%; height: 100%; justify-content: center; align-items: center; align-content: center;">
+                <div id="post-depart" style="display: flex; flex-wrap: wrap; width: 100%; height: 100%; justify-content: center; align-items: center; align-content: center;">
                     <div id="post#1" class="post" style="background: #000501;">
-                        <ul id="new" class="newpost"></ul>
+                        <ul id="new" class="deletedpost"></ul>
                         <a>ATESTADOS</a>
-                        <ul id="foot" class="footpost"></ul>
+                        <ul id="foot" class="footpost">
+                            <span id="dateS" style="font-size: 10px;">Início: 15/07/2023</span>
+                            <span id="dateE"style="font-size: 10px;">Fim: 17/08/2023</span>
+                        </ul>
                     </div>
                     <div id="post#2" class="post" style="background: #7ff6ff;">
-                        <ul id="foot" class="footpost"></ul>
+                        <ul id="new" class="newpost"></ul>
                         <a>ALTERAÇÕES DO PLANO DE SAÚDE</a>
                         <ul id="foot" class="footpost"></ul></div>
                     <div id="post#3" class="post" style="background: #13a31b; margin: 15px; font-size: 25px; color: white;">PAGAMENTO DE BÔNUS</div>                    
@@ -196,6 +199,7 @@
                     <div id="postnew" class="postnew">Adicionar +</div>
                 </div>
 
+                </div>
             </div>
         </div> 
     </div>
@@ -285,6 +289,8 @@
         background-size: auto;
         
     }
+
+
     .card{
         display: flex; 
         text-align: center; 
@@ -384,6 +390,22 @@
         padding: 0;
         margin: 0;
     }
+    .deletedpost{
+        display: flex; 
+        position: relative; 
+        top: 1%;
+        left: 43%;
+        width: 25px;
+        height: 25px;
+        background-color: rgba(255, 255, 255, 0); 
+        justify-content: flex-start;
+        background-image: url(./images/trash_glass.png);
+        background-size: 25px;
+        background-repeat: no-repeat;
+        padding: 0;
+        margin: 0;
+    }
+
     .footpost{
         width: 100%;
         height: 15%;
