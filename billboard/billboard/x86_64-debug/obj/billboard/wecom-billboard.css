@@ -156,16 +156,40 @@ td.checkbox {
 }
 .depTimeManager {
     position: fixed;
-    background-color: rgb(215, 215, 215);
+    background-color: rgb(215, 215, 215, 90%);
     bottom: 10%;
-    width: 250px;
-    height: 250px;
+    width: 400px;
+    height: 200px;
     transform: translate(0%, 30%);
-    border-radius: 10px;
     opacity: 0;
     transition: opacity 1s, transform 1s;
 }
-
+.periodSelector {
+    height: 30px;
+    position: relative;
+    width: 200px;
+    margin: 1px;
+    border: none;
+    left: 160px;
+    top: 30px;
+    font-size: 15px;
+    text-align: center;
+}
+.customPeriod {
+    display: flex;
+    position: relative;
+    width: 90%;
+    height: 100%;
+    top: 40px;
+    flex-wrap: wrap;
+}
+.dateinput {
+    text-align: center;
+    position: relative;
+    width: 200px;
+    height: 30px;
+    font-size: 18px;
+}
 #editdep input {
     font-size: 25px;
     background-color: #ffffff00;
@@ -205,7 +229,7 @@ td.checkbox {
     top: 0%;
     height: 82%;
     justify-items: center;
-    align-content: center;
+    align-content: flex-start;
 }
 .footbuttons {
     position: absolute;
@@ -225,13 +249,10 @@ td.checkbox {
     transform: translateY(0);
 }
 
-@media (max-width: 700px) {
-    .post-depart {
-        align-content: flex-start;
-    }
+@media (max-width: 900px) {
 
    .footbuttons {
-    transform: translateY(0); /* Alteração para a media query */
+        transform: translateY(0);
 }
 }
 .logo {
@@ -326,9 +347,12 @@ td.checkbox {
     display: flex;
     position: relative;
     height: 60px;
-    top: 35px;
+    top: 25px;
+    right: 27px;
     align-content: center;
     flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .postnew {

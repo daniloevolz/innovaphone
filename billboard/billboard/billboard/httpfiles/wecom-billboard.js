@@ -431,9 +431,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                     var select = document.createElement('select');
                     select.id = 'periodSelector';
-                    select.style.position = 'relative';
-                    select.style.width = '230px';
-                    select.style.margin = '010px';
+                    select.className = 'periodSelector';
+
 
                     var options = [
                         'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
@@ -448,42 +447,53 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                     var customPeriodDiv = document.createElement('div');
                     customPeriodDiv.id = 'customPeriod';
+                    customPeriodDiv.className = 'customPeriod';
                     customPeriodDiv.style.display = 'none';
 
                     var startDateLabel = document.createElement('label');
-                    startDateLabel.textContent = 'Data de início:';
+                    startDateLabel.textContent = 'Início:';
                     startDateLabel.style.marginLeft = '10px';
-                    startDateLabel.style.marginRight = '20px';
-                    startDateLabel.style.fontSize = '16px';
+                    startDateLabel.style.marginRight = '0px';
+                    startDateLabel.style.fontSize = '18px';
+                    startDateLabel.style.height = '20px';
+                    startDateLabel.style.width = '150px';
+                    startDateLabel.style.position = 'relative';
+                    startDateLabel.style.left = '95px';
                     var startDateInput = document.createElement('input');
                     startDateInput.type = 'date';
                     startDateInput.id = 'data_start';
+                    startDateInput.className = 'dateinput';
 
                     var endDateLabel = document.createElement('label');
-                    endDateLabel.textContent = 'Data de término:';
+                    endDateLabel.textContent = 'Expiração:';
                     endDateLabel.style.marginLeft = '10px';
-                    endDateLabel.style.marginRight = '1px';
-                    endDateLabel.style.fontSize = '16px';
+                    endDateLabel.style.marginRight = '0px';
+                    endDateLabel.style.fontSize = '18px';
+                    endDateLabel.style.height = '20px';
+                    endDateLabel.style.width = '150px';
+                    endDateLabel.style.position = 'relative';
+                    endDateLabel.style.left = '61px';
                     var endDateInput = document.createElement('input');
                     endDateInput.type = 'date';
                     endDateInput.id = 'data_end';
+                    endDateInput.className = 'dateinput';
 
                     var checkboxButtonLabel = document.createElement('label');
                     checkboxButtonLabel.textContent = 'Excluídos:';
-                    checkboxButtonLabel.style.marginLeft = '10px';
-                    checkboxButtonLabel.style.marginRight = '43px';
-                    checkboxButtonLabel.style.fontSize = '16px';
+                    checkboxButtonLabel.style.fontSize = '18px';
                     var checkboxButton1 = document.createElement('input');
                     checkboxButton1.type = 'checkbox';
-                    checkboxButton1.style.width = '115px'
-                    checkboxButton1.style.height = '20px'
+                    checkboxButton1.style.width = '30px'
+                    checkboxButton1.style.height = '25px'
+                    checkboxButton1.style.margin = '0px 20px 0px 20px';
                     checkboxButton1.name = 'checkboxDeleted';
                     checkboxButton1.value = 'deleted';
 
                     var submitButton = document.createElement('button');
                     submitButton.textContent = 'OK';
                     submitButton.id = 'submitButton';
-                    submitButton.style.width = '230px';
+                    submitButton.style.width = '46px';
+                    submitButton.style.height = '25px';
                     submitButton.style.margin = '10px';
 
                     var topSelect = document.createElement('div');
@@ -502,7 +512,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     depTimeManager.appendChild(middleSelect);
                     depTimeManager.appendChild(bottomSelect);
 
-                    topSelect.appendChild(select);
+                    topSelect.appendChild(s0elect);
 
                     customPeriodDiv.appendChild(startDateLabel);
                     customPeriodDiv.appendChild(startDateInput);
