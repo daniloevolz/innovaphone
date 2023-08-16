@@ -101,13 +101,13 @@ new JsonApi("user").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "SelectPosts") {
-                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "' AND deleted IS NULL ";
+                var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department + "'";
                 if (obj.query) {
                     query += obj.query;
                 } else {
                     var end = getDateNow();
                     var start = getDateNow();
-                    query += "AND date_start <= '" + start + "' AND date_end >= '" + end + "'";
+                    query += " AND date_start <= '" + start + "' AND date_end >= '" + end + "' AND deleted IS NULL";
                 }
                 //var query = "SELECT * FROM tbl_posts where department ='" + obj.department + "';";
                 //query com condição de data e horario

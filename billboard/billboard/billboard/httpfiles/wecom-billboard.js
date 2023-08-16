@@ -264,15 +264,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         postDepartDiv.id = 'post-depart';
         postDepartDiv.style.position = 'absolute';
         postDepartDiv.style.display = 'flex';
+        postDepartDiv.style.alignContent = 'flex-start';
         /*postDepartDiv.style.paddingTop = '4%';*/
         postDepartDiv.style.flexWrap = 'wrap';
         postDepartDiv.style.overflowY = 'auto';
         postDepartDiv.style.width = '100%';
         postDepartDiv.style.top = '0%';
-        postDepartDiv.style.height = '80%';
+        postDepartDiv.style.height = '100%';
         postDepartDiv.style.justifyContent = 'center';
         postDepartDiv.style.alignItems = 'center';
-        postDepartDiv.style.alignContent = 'center';
 
         var logoWecom = document.createElement('div');
         logoWecom.id = 'logowecom';
@@ -420,7 +420,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             delDepDiv.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
                 var hasPosts = list_posts.filter(function (item) {
-                    return item.department === parseInt(dep_id, 10);
+                    return item.department === parseInt(dep_id, 10) && item.deleted == "";
                 });
                 if (hasPosts) {
                     window.alert("ATENÇÃO!!!\n\nVocê deve excluir todos os Posts antes de excluir o Departamento.")
@@ -546,53 +546,55 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     submitButton.addEventListener('click', function () {
                         var selectedValue = select.value;
                         var startDate, endDate;
-                        var query;
+                        var query = '';
+
+                        if (!checkboxButton1.checked) {
+                            query += " AND deleted IS NULL";
+                        }
+
                         switch (selectedValue) {
                             case 'hoje':
                                 startDate = endDate = new Date().toISOString().split('T')[0];
-                                query = "AND date_start <= '" + startDate + "' AND date_end >= '" + endDate + "'";
+                                query += " AND date_start <= '" + startDate + "' AND date_end >= '" + endDate + "'";
                                 break;
                             case 'últimos7dias':
                                 now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 6);
                                 startDate = startDate.toISOString().split('T')[0];
-                                query = "AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
+                                query += " AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
                                 break;
                             case 'últimos30dias':
                                 now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 29);
                                 startDate = startDate.toISOString().split('T')[0];
-                                query = "AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
+                                query += " AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
                                 break;
                             case 'próximos7dias':
                                 now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() + 6);
                                 startDate = startDate.toISOString().split('T')[0];
-                                query = "AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
+                                query = " AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
                                 break;
                             case 'próximos30dias':
                                 now = new Date().toISOString().split('T')[0];
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() + 29);
                                 startDate = startDate.toISOString().split('T')[0];
-                                query = "AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
+                                query += " AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
                                 break;
                             case 'desdesempre':
-                                query = "";
+                                query += ";";
                                 break;
                             case 'períodocustomizado':
                                 startDate = startDateInput.value.split('T')[0];
                                 endDate = endDateInput.value.split('T')[0];
-                                query = "AND date_start >= '" + startDate + "' AND date_end <= '" + endDate + "'";
+                                query += " AND date_start >= '" + startDate + "' AND date_end <= '" + endDate + "'";
                                 break;
                         }
 
-                        if (!checkboxButton1.checked) {
-                            query += " AND deleted IS NULL";
-                        }
 
                         console.log('Data de início:', startDate);
                         console.log('Data de término:', endDate);
