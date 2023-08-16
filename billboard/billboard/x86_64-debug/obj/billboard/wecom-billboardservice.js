@@ -1,11 +1,32 @@
 ﻿var connectionsUser = [];
+var license = getLicense();
+
+//Config variables
+var licenseAppToken = Config.licenseAppToken;
+if (licenseAppToken == "") {
+    var rand = Random.bytes(16);
+    Config.licenseAppToken = String(rand);
+    Config.save();
+}
+var licenseAppFile = Config.licenseAppFile;
+var licenseInstallDate = Config.licenseInstallDate;
+
+Config.onchanged(function () {
+    licenseAppFile = Config.licenseAppFile;
+    licenseInstallDate = Config.licenseInstallDate;
+})
+
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-billboard") {
-
+        
+        
         connectionsUser.push(conn);
         log("Usuario Conectado:  " + connectionsUser.length);
-
+        
         conn.onmessage(function (msg) {
+            
+            // if (license != null && connectionsUser.length <= license.Users) {
+
             var obj = JSON.parse(msg);
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
@@ -292,6 +313,11 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
+      //  }
+            // else {
+            //     log("danilo req: No license Available")
+            //     conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
+            // }
         });
         conn.onclose(function () {
             connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
@@ -306,6 +332,38 @@ new JsonApi("admin").onconnected(function (conn) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src }));
+            }
+            if (obj.mt == "TableUsers") {
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
+                })
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+            }
+            if (obj.mt == "ConfigLicense") {
+                var licenseAppToken = Config.licenseAppToken;
+                licenseInstallDate = Config.licenseInstallDate;
+                licenseAppFile = Config.licenseAppFile;
+                var licUsed = connectionsUser.length;
+                var lic = decrypt(licenseAppToken, licenseAppFile)
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult",licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate }));
+            }
+            if (obj.mt == "UpdateConfigLicenseMessage") {
+                try {
+                    var lic = decrypt(obj.licenseToken,obj.licenseFile)
+                    log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
+                    Config.licenseAppFile = obj.licenseFile;
+                    Config.licenseInstallDate = getDateNow();
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigLicenseMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigLicenseMessage:" + e);
+
+
+                }
             }
         });
     }
@@ -524,6 +582,42 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     });
 });
 
+//License Function
+function getLicense() {
+    var key = Config.licenseAppToken;
+    var hash = Config.licenseAppFile;
+    var lic = '';
+    try {
+       lic = decrypt(key, hash);
+    } catch (e) {
+        
+    }
+    
+    return lic;
+}
+//Decrypt Function 
+function decrypt(key,hash) {
+    //var iv = iv.substring(0, 16);
+
+    log("key: " + key)
+    log("hash: " + hash)
+
+    try {
+        // encryption using AES-128 in CTR mode
+        //var ciphertext = Crypto.cipher("AES", "CTR", key, true).iv(key).crypt(hash);
+        //log("Crypted: " + ciphertext);
+        // decryption using AES-128 in CTR mode
+        var decrypted = Crypto.cipher("AES", "CTR", key, false).iv(key).crypt(hash);
+        log("Decrypted: " + decrypted);
+        // now decrypted contains the plain text again
+
+    } catch (e) {
+        log("ERRO decrypt: " + e);
+    }
+    
+
+    return JSON.parse(decrypted);
+ }
 
 //Internal supporters functions
 function selectViewsHistory(sip, conn) {

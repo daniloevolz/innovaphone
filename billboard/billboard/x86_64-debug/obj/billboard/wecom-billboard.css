@@ -205,7 +205,7 @@ td.checkbox {
     top: 0%;
     height: 82%;
     justify-items: center;
-    align-content: center;
+    align-content: flex-start;
 }
 .footbuttons {
     position: absolute;
@@ -225,13 +225,10 @@ td.checkbox {
     transform: translateY(0);
 }
 
-@media (max-width: 700px) {
-    .post-depart {
-        align-content: flex-start;
-    }
+@media (max-width: 900px) {
 
    .footbuttons {
-    transform: translateY(0); /* Alteração para a media query */
+        transform: translateY(0);
 }
 }
 .logo {
