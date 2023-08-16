@@ -262,17 +262,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         var postDepartDiv = document.createElement('div');
         postDepartDiv.id = 'post-depart';
-        postDepartDiv.style.position = 'absolute';
-        postDepartDiv.style.display = 'flex';
-        postDepartDiv.style.alignContent = 'flex-start';
-        /*postDepartDiv.style.paddingTop = '4%';*/
-        postDepartDiv.style.flexWrap = 'wrap';
-        postDepartDiv.style.overflowY = 'auto';
-        postDepartDiv.style.width = '100%';
-        postDepartDiv.style.top = '0%';
-        postDepartDiv.style.height = '100%';
-        postDepartDiv.style.justifyContent = 'center';
-        postDepartDiv.style.alignItems = 'center';
+        postDepartDiv.className = 'post-depart';
+
 
         var logoWecom = document.createElement('div');
         logoWecom.id = 'logowecom';
@@ -382,15 +373,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         var footButtons = document.createElement('div');
         footButtons.id = 'footbuttons';
-        footButtons.style.position = 'absolute';
-        footButtons.style.display = 'flex';
-        footButtons.style.overflowY = 'auto';
-        footButtons.style.width = '250px';
-        footButtons.style.height = '10%';
-        footButtons.style.top = '90%';
-        footButtons.style.justifyContent = 'center';
-        footButtons.style.alignItems = 'center';
-        footButtons.style.alignContent = 'center';
+        footButtons.className = 'footbuttons';
         worktable.appendChild(footButtons);
 
         var backDiv = document.createElement('div');

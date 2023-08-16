@@ -160,7 +160,7 @@ td.checkbox {
     bottom: 10%;
     width: 250px;
     height: 250px;
-    transform: translate(0%, 100%);
+    transform: translate(0%, 30%);
     border-radius: 10px;
     opacity: 0;
     transition: opacity 1s, transform 1s;
@@ -172,6 +172,7 @@ td.checkbox {
     width: 100%;
 }
 /*Fim*/
+
 #billboard {
     position: absolute; 
     display: flex; 
@@ -194,8 +195,45 @@ td.checkbox {
     max-width: 700px;
     max-height: 600px;
 }
+.post-depart {
+    position: absolute;
+    display: flex;
+    place-content: flex-start center;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    width: 100%;
+    top: 0%;
+    height: 82%;
+    justify-items: center;
+    align-content: center;
+}
+.footbuttons {
+    position: absolute;
+    display: flex;
+    width: 250px;
+    height: 10%;
+    top: 90%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    opacity: 0.70;
+    transform: translateY(70%);
+    transition: transform 0.3s, opacity 0.3s;
+}
+.footbuttons:hover {
+    opacity: 1;
+    transform: translateY(0);
+}
 
+@media (max-width: 700px) {
+    .post-depart {
+        align-content: flex-start;
+    }
 
+   .footbuttons {
+    transform: translateY(0); /* Alteração para a media query */
+}
+}
 .logo {
     display: flex;
     position: absolute;
@@ -261,8 +299,8 @@ td.checkbox {
     height: 25px;
     background-color: rgba(255, 255, 255, 0);
     justify-content: flex-start;
-    background-image: url(./images/trash_glass.png);
-    background-size: 25px;
+    background-image: url(./images/trash_post.png);
+    background-size: 20px;
     background-repeat: no-repeat;
     padding: 0;
     margin: 0;
@@ -402,8 +440,7 @@ input[type="datetime-local" i] {
     width: 80%;
     height: 55%;
     font-size: 15px;
-    margin: 5px;
-    border: none;
+
 }
 .char-counter {
     position: absolute;
