@@ -19,7 +19,8 @@ Config.onchanged(function () {
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-billboard") {
         
-        
+       // log("connectionsUser: license.Users " + license.Users);
+
         connectionsUser.push(conn);
         log("Usuario Conectado:  " + connectionsUser.length);
         
@@ -615,7 +616,7 @@ function decrypt(key,hash) {
         log("ERRO decrypt: " + e);
     }
     
-
+    // Esta dando erro aqui 
     return JSON.parse(decrypted);
  }
 
