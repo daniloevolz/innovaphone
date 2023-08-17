@@ -6,6 +6,7 @@ FILES += \
 	../$(SDK-WEB1)/lib1/*.css \
 	../$(SDK-WEB1)/ui1.lib/*.js \
 	../$(SDK-WEB1)/ui1.svg/*.js \
+	../$(SDK-WEB1)/com.innovaphone.avatar/*.js \
 	../$(SDK-WEB1)/fonts/*.ttf
 	
 # Files for your app

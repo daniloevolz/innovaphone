@@ -17,6 +17,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var licenseActive = null;
     var licenseInstallDate = null;
     var licenseUsed = 0;
+    var avatar = start.consumeApi("com.innovaphone.avatar");
 
     var colorSchemes = {
         dark: {
@@ -41,9 +42,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     app.onmessage = app_message;
 
     function app_connected(domain, user, dn, appdomain) {
+        avatar = new innovaphone.Avatar(start, user, domain);
+        UIuserPicture = avatar.url(user, 80, dn);
+        UIuser = dn
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "admin", mt: "TableUsers" });
-        UIuser = dn
         constructor();
     }
 
@@ -66,6 +69,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 licenseActive = obj.licenseActive;
                 licenseInstallDate = obj.licenseInstallDate;
                 licenseUsed = obj.licenseUsed;
+                console.log("LicenseMessageResult = Success + License File: " + licenseFile)
 
             } catch (e) {
                 console.log("ERRO LicenseMessageResult:" + e)
@@ -92,7 +96,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
         //imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, null));
-        username.setAttribute("id", "user")
+        username.setAttribute("id", "user");
+        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
+        imguser.setAttribute("src", UIuserPicture);
 
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
         var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));

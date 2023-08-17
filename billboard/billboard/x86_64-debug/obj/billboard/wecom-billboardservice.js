@@ -26,7 +26,7 @@ new JsonApi("user").onconnected(function (conn) {
         
         conn.onmessage(function (msg) {
             
-            // if (license != null && connectionsUser.length <= license.Users) {
+             if (license != null && connectionsUser.length <= license.Users) {
 
             var obj = JSON.parse(msg);
             if (obj.mt == "Ping") {
@@ -314,11 +314,12 @@ new JsonApi("user").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
-      //  }
-            // else {
-            //     log("danilo req: No license Available")
-            //     conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
-            // }
+        }
+        // fechamento do if de licença 
+             else {
+                 log("danilo req: No license Available")
+                conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
+             }
         });
         conn.onclose(function () {
             connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
@@ -358,12 +359,9 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.licenseInstallDate = getDateNow();
                     Config.save();
                     conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigLicenseMessageSuccess" }));
-
                 } catch (e) {
                     conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
                     log("ERRO UpdateConfigLicenseMessage:" + e);
-
-
                 }
             }
         });
@@ -596,12 +594,12 @@ function getLicense() {
     
     return lic;
 }
-//Decrypt Function 
+
 function decrypt(key,hash) {
     //var iv = iv.substring(0, 16);
 
-    log("key: " + key)
-    log("hash: " + hash)
+    log("Key : " + key)
+    log("Hash : " + hash)
 
     try {
         // encryption using AES-128 in CTR mode
