@@ -172,6 +172,13 @@
       },
       {
         "cmd": "item",
+        "name": "appInstallDate",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "licenseInstallDate",
         "type": "STRING",
         "default": "",

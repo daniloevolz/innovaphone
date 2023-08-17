@@ -52,6 +52,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     }
     
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "NoLicense") {
+            console.log(obj.result);
+            makeDivNoLicense(obj.result);
+        }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
             list_tableUsers = JSON.parse(obj.result);
         }
@@ -110,7 +114,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             list_editors_departments = JSON.parse(obj.result);
         }
     }
- 
+    function makeDivNoLicense(msg) {
+        that.clear();
+        //Titulo 
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
+
+    }
     function makeDivDepartments() {
         // Cria��o do elemento ftground
         var worktable = document.createElement('div');

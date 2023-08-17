@@ -3,10 +3,12 @@ var license = getLicense();
 
 //Config variables
 var licenseAppToken = Config.licenseAppToken;
+var appInstallDate =  Config.appInstallDate
 if (licenseAppToken == "") {
     var rand = Random.bytes(16);
     Config.licenseAppToken = String(rand);
     Config.save();
+    Config.appInstallDate = getDateNow();
 }
 var licenseAppFile = Config.licenseAppFile;
 var licenseInstallDate = Config.licenseInstallDate;
@@ -14,6 +16,7 @@ var licenseInstallDate = Config.licenseInstallDate;
 Config.onchanged(function () {
     licenseAppFile = Config.licenseAppFile;
     licenseInstallDate = Config.licenseInstallDate;
+    appInstallDate =  Config.appInstallDate;
 })
 
 new JsonApi("user").onconnected(function (conn) {
@@ -25,8 +28,9 @@ new JsonApi("user").onconnected(function (conn) {
         log("Usuario Conectado:  " + connectionsUser.length);
         
         conn.onmessage(function (msg) {
-            
-             if (license != null && connectionsUser.length <= license.Users) {
+            var now = Date();
+            now.setDate(now.getDate() + 29);
+             if (license != null && connectionsUser.length <= license.Users ||  ) {
 
             var obj = JSON.parse(msg);
             if (obj.mt == "Ping") {
