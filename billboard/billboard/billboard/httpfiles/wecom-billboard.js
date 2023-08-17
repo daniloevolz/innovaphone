@@ -121,6 +121,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         worktable.style.justifyContent = 'center';
         worktable.style.flexDirection = 'column';
         worktable.style.alignItems = 'center';
+        worktable.style.fontFamily = 'Montserrat';
         //worktable.style.backgroundColor = 'white';
         // ftground.style.borderRadius = '20px';
 
@@ -187,7 +188,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         });
         var divAdd = document.createElement('div');
         divAdd.className = "cardnew";
-        divAdd.textContent = "Adicionar +";
+        divAdd.textContent = "adicionar+";
         divAdd.style.display = 'flex';
         divAdd.style.justifyContent = 'center';
         divAdd.style.alignItems = 'center';
@@ -356,7 +357,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var postNew1Div = document.createElement('div');
             postNew1Div.id = 'postnew1';
             postNew1Div.className = 'postnew';
-            postNew1Div.textContent = 'Adicionar +';
+            postNew1Div.textContent = 'adicionar +';
 
 
             // Adicionando o listener de clique
@@ -456,7 +457,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     startDateLabel.style.marginRight = '0px';
                     startDateLabel.style.fontSize = '18px';
                     startDateLabel.style.height = '20px';
-                    startDateLabel.style.width = '150px';
+                    startDateLabel.style.width = '145px';
                     startDateLabel.style.position = 'relative';
                     startDateLabel.style.left = '95px';
                     var startDateInput = document.createElement('input');
@@ -470,7 +471,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     endDateLabel.style.marginRight = '0px';
                     endDateLabel.style.fontSize = '18px';
                     endDateLabel.style.height = '20px';
-                    endDateLabel.style.width = '150px';
+                    endDateLabel.style.width = '145px';
                     endDateLabel.style.position = 'relative';
                     endDateLabel.style.left = '61px';
                     var endDateInput = document.createElement('input');
@@ -485,7 +486,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     checkboxButton1.type = 'checkbox';
                     checkboxButton1.style.width = '30px'
                     checkboxButton1.style.height = '25px'
-                    checkboxButton1.style.margin = '0px 20px 0px 20px';
+                    checkboxButton1.style.margin = '0px 15px';
                     checkboxButton1.name = 'checkboxDeleted';
                     checkboxButton1.value = 'deleted';
 
@@ -512,7 +513,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     depTimeManager.appendChild(middleSelect);
                     depTimeManager.appendChild(bottomSelect);
 
-                    topSelect.appendChild(s0elect);
+                    topSelect.appendChild(select);
 
                     customPeriodDiv.appendChild(startDateLabel);
                     customPeriodDiv.appendChild(startDateInput);
@@ -528,9 +529,21 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                     select.addEventListener('change', function () {
                         if (select.value === 'períodocustomizado') {
-                            customPeriodDiv.style.display = 'block';
+                            customPeriodDiv.style.display = 'flex';
+                            depTimeManager.className = 'depTimeManagerPersonal';
+                            middleSelect.style.display = 'flex';
+                            select.className = 'periodSelectorPersonal';
+                            topSelect.className = 'topselectPersonal';
+                            bottomSelect.className = 'btselectPersonal';
+                          //depTimeManager.style.transition = 'width 1s, height 1s';//
                         } else {
                             customPeriodDiv.style.display = 'none';
+                            depTimeManager.className = 'depTimeManager';
+                            middleSelect.style.display = 'none';
+                            select.className = 'periodSelector';
+                            topSelect.className = 'topselect';
+                            bottomSelect.className = 'btselect';
+                          //depTimeManager.style.transition = '';//
                         }
                     });
 
@@ -602,6 +615,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                         animatedDiv.style.opacity = 1;
                         animatedDiv.style.transform = "translate(0%, 0%)";
                     }, 10);
+
                     document.getElementById('submitButton').addEventListener('click', function () {
                     setTimeout(function () {
                         animatedDiv.style.opacity = 0;
