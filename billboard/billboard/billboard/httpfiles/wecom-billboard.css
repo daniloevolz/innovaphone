@@ -39,7 +39,7 @@ td.checkbox {
 }
 
 ::placeholder {
-    color: #ffff
+    color: #ffff;
 }
 
 ::-webkit-scrollbar {
@@ -62,6 +62,9 @@ td.checkbox {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #ffffffef;
+}
+#worktable{
+    font-family: Montserrat;
 }
 .newdep {
     z-index: 99;
@@ -158,11 +161,18 @@ td.checkbox {
     position: fixed;
     background-color: rgb(215, 215, 215, 90%);
     bottom: 10%;
-    width: 400px;
-    height: 200px;
+    width: 250px;
+    height: 100px;
     transform: translate(0%, 30%);
     opacity: 0;
     transition: opacity 1s, transform 1s;
+}
+.depTimeManagerPersonal {
+    position: fixed;
+    background-color: rgb(215, 215, 215, 90%);
+    bottom: 10%;
+    width: 400px;
+    height: 200px;
 }
 .periodSelector {
     height: 30px;
@@ -170,8 +180,18 @@ td.checkbox {
     width: 200px;
     margin: 1px;
     border: none;
-    left: 160px;
-    top: 30px;
+    font-size: 15px;
+    text-align: center;
+    overflow: scroll;
+}
+.periodSelectorPersonal {
+    height: 30px;
+    position: relative;
+    width: 200px;
+    margin: 1px;
+    border: none;
+    left: 61px;
+    top: 23px;
     font-size: 15px;
     text-align: center;
 }
@@ -250,10 +270,17 @@ td.checkbox {
 }
 
 @media (max-width: 900px) {
-
-   .footbuttons {
-        transform: translateY(0);
-}
+    .periodSelector {
+        font-size: 12px;
+        height: 30px;
+    }
+    .periodSelector option {
+        height: 5px;
+    }
+    .footbuttons {
+            opacity: 1;
+            transform: translateY(0);
+    }
 }
 .logo {
     display: flex;
@@ -300,13 +327,20 @@ td.checkbox {
     height: 15%;
     padding: 0;
     margin: 0;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .footpost span {
     width: 50%;
-    height: 100%;
+    height: 70%;
     padding: 0;
     margin: 0 5px 0 5px;
+    background-color: rgb(255 255 255 / 25%);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 #headpost{
     /*display: none;*/
@@ -340,19 +374,45 @@ td.checkbox {
     font-size: 25px;
     color: white;
 }
-.mdselect{
-    height: 100px;
+.topselect {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50%;
+}
+.topselectPersonal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 10%;
+}
+.mdselect {
+    display: none;
+    height: 50%;
 }
 .btselect {
     display: flex;
     position: relative;
-    height: 60px;
-    top: 25px;
-    right: 27px;
+    width: 100%;
+    height: 50%;
     align-content: center;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
+}
+.btselectPersonal {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 10%;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    right: -17%;
+    top: 18%;
 }
 
 .postnew {
@@ -483,7 +543,7 @@ input[type="datetime-local" i] {
 }
 
 ::placeholder {
-    color: #ffff
+    color: #ffff;
 }
 
 #msgbox textarea::-webkit-scrollbar {
