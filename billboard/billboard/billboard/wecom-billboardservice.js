@@ -387,9 +387,9 @@ new JsonApi("admin").onconnected(function (conn) {
                 Database.exec("DELETE FROM tbl_admins;")
                     .oncomplete(function () {
                         log("DeleteAdmins:result=success");
-                        var list_guids = JSON.parse(obj.users);
+                        var list_guids = obj.users;
                         list_guids.forEach(function (guid) {
-                            Database.exec("INSERT INTO tbl_admins (guid) VALUES ('" + guid + "',true)")
+                            Database.exec("INSERT INTO tbl_admins (guid,create_department) VALUES ('" + guid + "'," + true + ")")
                                 .oncomplete(function () {
                                     log("InsertAdmin:result=success");
                                     
@@ -698,7 +698,7 @@ function selectViewsHistory(sip, connOld) {
             var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v" +
                 " ON p.id = v.post_id AND v.user_guid = '" + guid + "' WHERE v.post_id IS NULL AND" +
                 " p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND" +
-                " '" + now + "' < p.date_end";
+                " '" + now + "' < p.date_end AND p.deleted IS NULL";
             // Executar consulta na tabela 'tbl_posts'
             Database.exec(queryPosts)
                 .oncomplete(function (dataPosts) {

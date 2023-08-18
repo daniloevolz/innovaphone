@@ -10,6 +10,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     var list_tableUsers = [];
+    var list_admins = [];
     var _colDireita;
     //license
     var licenseToken = null;
@@ -48,6 +49,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         UIuser = dn
         app.send({ api: "admin", mt: "AdminMessage" });
         app.send({ api: "admin", mt: "TableUsers" });
+        app.send({ api: "admin", mt: "SelectAdmins" });
         constructor();
     }
 
@@ -77,6 +79,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 console.log("ERRO LicenseMessageResult:" + e)
             }
             makeDivLicense(_colDireita);
+        }
+        if (obj.api == "admin" && obj.mt == "InsertAdminsSuccess"){
+            window.alert("Usuários Inseridos com sucesso!")
+        }
+        if (obj.api == "admin" && obj.mt == "SelectAdminsResult"){
+            list_admins = JSON.parse(obj.result)
+            console.log("LIST ADMINS" + JSON.stringify(list_admins))
+            makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
     }
     function constructor() {
@@ -144,39 +154,105 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
         if (ex == "CfgUsers") {
            // app.send({ api: "admin", mt: "TableUsers" });
-            makeDivUsers(colDireita,list_tableUsers);
+           app.send({ api: "admin", mt: "SelectAdmins" });
+            
         }
         if (ex == "CfgLicense") {
             app.send({ api: "admin", mt: "ConfigLicense"});
             //waitConnection(colDireita);
         }
     }
-    function makeDivUsers(t,users){
-       t.clear();
-       var scrollcontainer = t.add(new innovaphone.ui1.Div(null,null,"list-box scrolltable"))
-       var tableMain =  scrollcontainer.add(new innovaphone.ui1.Node("table",null,null,"table").setAttribute("id","local-table"));
-       tableMain.add(new innovaphone.ui1.Node("th",null,"Nome",null));
-       tableMain.add(new innovaphone.ui1.Node("th",null,"Pode Criar Departamento",null));
-    
+    function makeDivUsers(t, users, admins) {
+        t.clear();
+        // app.send({ api: "admin", mt: "SelectAdmins" });
+        var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Nome", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Pode Criar Departamento", null));
+
+        var adminGuids = admins.map(admin => admin.guid);
+        console.log("Admin Guids: " + adminGuids);
+        
         users.forEach(function (user) {
+            var isChecked = adminGuids.includes(user.guid) ? 'checked' : ''; 
+            console.log("User:", user.guid, "Is Checked:", isChecked);
             var html = `
-          <tr>
-            <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
-            <td style="text-align: center;"><input type = "checkbox" id = "checkUser"></td>
-          </tr>
-        `;
-            document.getElementById("local-table").innerHTML += html
+              <tr>
+                <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
+                <td style="text-align: center;"><input type="checkbox" id="${user.guid}" class="userCheckbox" ${isChecked}></td>
+              </tr>
+            `;
+            document.getElementById("local-table").innerHTML += html;
         });
 
-        scrollcontainer.add(new innovaphone.ui1.Node("button","height: 40px;width: 100px;position: relative;top: 90%;","Salvar",null)).addEvent("click",function(){
+        scrollcontainer.add(new innovaphone.ui1.Node("button","height: 40px;width: 100px;position: relative;top: 90%; margin-left: 15px;","Salvar",null).setAttribute("id","btnSave")).addEvent("click",function(){
             console.log("Ok Funcionando")
-            // <td>${user.guid}</td> , enviar o guid para o user
+
+            var checkboxes = document.querySelectorAll(".userCheckbox");
+            // var btnSave = document.getElementById("btnSave");
+
+            var Users = [];
+
+            checkboxes.forEach(function (checkbox) {
+            if (checkbox.checked) {
+                Users.push(checkbox.getAttribute("id"));
+            }
+        });
+          console.log("Enviados:" + Users)
+          app.send({ api: "admin", mt: "InsertAdmins", users: Users  });
+
         })
 
    
 
         }
         
+    // function makeDivLicense(t) {
+    //     t.clear();
+    //     //Título
+
+    //     // var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
+    //     // imgMenu.setAttribute("src","menu-icon.png");
+    //     // imgMenu.setAttribute("id","imgmenu");
+    //     //document.getElementById("imgmenu").addEventListener("click",openMenu);
+
+    //     t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
+
+    //     t.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
+    //     t.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
+
+    //     t.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
+    //     t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
+    //     var lic = "Temporária";
+    //     if (licenseActive != "null") {
+    //         lic = licenseActive
+    //     }
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
+
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", appInstall, "DivAppDate"));
+
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
+
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
+    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
+
+
+    //     // buttons
+    //     t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+    //         licenseFile = document.getElementById("InputLicenseFile").value;
+    //         if (licenseFile.length > 0) {
+    //             app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
+    //             //waitConnection(t);
+    //         } else {
+    //             window.alert("A chave de licença precisa ser informada!");
+    //         }
+            
+    //     });
+
+    // }
     function makeDivLicense(t) {
         t.clear();
         //Título
@@ -185,33 +261,34 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         // imgMenu.setAttribute("src","menu-icon.png");
         // imgMenu.setAttribute("id","imgmenu");
         //document.getElementById("imgmenu").addEventListener("click",openMenu);
+        var worktable = t.add(new innovaphone.ui1.Div(null, null,"list-box scrolltable"));
+        worktable.setAttribute('id', 'worktable')
+        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
+    
+        worktable.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
+        worktable.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
 
-        t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
-
-        t.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
-        t.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
-
-        t.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
-        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
+        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
+        worktable.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
         var lic = "Temporária";
         if (licenseActive != "null") {
             lic = licenseActive
         }
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", appInstall, "DivAppDate"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", appInstall, "DivAppDate"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
 
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
 
 
         // buttons
-        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+        worktable.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
             licenseFile = document.getElementById("InputLicenseFile").value;
             if (licenseFile.length > 0) {
                 app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
