@@ -79,6 +79,19 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "SelectViewsHistoryResult") {
             console.log(obj.result);
             views_history = JSON.parse(obj.result);
+            // Objeto para rastrear os ids únicos
+            var uniqueIds = {};
+            // Iterar sobre a lista inputData e chamar a função para cada item
+            for (var i = 0; i < views_history.length; i++) {
+                var post = views_history[i].id;
+                changeBackgroundColor(post);
+                var department = views_history[i].department;
+                if (!uniqueIds[department]) {
+                    uniqueIds[department] = true;
+                    console.log("Id único encontrado:", department);
+                    changeDepBackgroundColor(department);
+                }
+            }
             
         }
         if (obj.api == "user" && obj.mt == "SelectHistoryByPostResult") {
@@ -174,7 +187,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var div = document.createElement('div');
             div.id = department.id;
             div.className = 'card';
-            div.textContent = department.name;
+            /*div.textContent = department.name;*/
             div.style.display = 'flex';
             div.style.justifyContent = 'center';
             div.style.alignItems = 'center';
@@ -190,9 +203,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 app.send({ api: "user", mt: "SelectPosts", department: clickedId });
 
             });
-
-
+            var ulNew = document.createElement('ul');
+            ulNew.id = 'newDepPost';
+            div.appendChild(ulNew);
+            var aElement = document.createElement('a');
+            aElement.textContent = department.name;
+            div.appendChild(aElement);
             depcards.appendChild(div);
+
+            
 
         });
         var divAdd = document.createElement('div');
@@ -1309,47 +1328,78 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     }
     // Função para buscar e alterar a cor de background do elemento
     function changeBackgroundColor(elementId) {
-        var element = document.getElementById(elementId);
-        if (element) {
+        var elementPostsTable = document.getElementById(elementId);
+        if (elementPostsTable) {
+            var element = document.getElementById(elementId);
+            if (element) {
+                var childElement = element.querySelector('#headpost');
 
-        // Salva o conteúdo atual da div
-        var conteudoAntigo = element.innerHTML;
-        
-        element.innerHTML = '';
-        
-        var ulNew = document.createElement('ul');
-        ulNew.id = 'new';
-        ulNew.className = 'newpost';
-        element.appendChild(ulNew);
-        element.innerHTML += conteudoAntigo;
+                // Verifique se o elemento filho foi encontrado
+                if (childElement) {
+                    // Altere a classe do elemento filho para 'newpost'
+                    childElement.className = 'newpost';
+                } else {
+                    console.log("Elemento filho não encontrado.");
+                }
+                // Salva o conteúdo atual da div
+                //var conteudoAntigo = element.innerHTML;
+
+                //element.innerHTML = '';
+
+                //var ulNew = document.createElement('ul');
+                //ulNew.id = 'new';
+                //ulNew.className = 'newpost';
+                //element.appendChild(ulNew);
+                //element.innerHTML += conteudoAntigo;
+            }
+
+        } else {
+            console.log('Não estava na tabela de posts!!')
         }
+        
     }
     function changeDepBackgroundColor(elementId) {
-        var element = document.getElementById(elementId);
-        if (element) {
-            // Salva o conteúdo atual da div
-            var conteudoAntigo = element.innerHTML;
+        var elementDepartmentsTable = document.getElementById("depcards");
+        if (elementDepartmentsTable) {
+            var element = document.getElementById(elementId);
+            if (element) {
+                var childElement = element.querySelector('#newDepPost');
 
-            // Limpa o conteúdo da div encontrada
-            element.innerHTML = '';
+                // Verifique se o elemento filho foi encontrado
+                if (childElement) {
+                    // Altere a classe do elemento filho para 'newpost'
+                    childElement.className = 'newDepPost';
+                } else {
+                    console.log("Elemento filho não encontrado.");
+                }
 
-            // Cria os novos elementos (ul e a)
-            var ulNew = document.createElement('ul');
-            ulNew.id = 'newDepPost';
-            ulNew.className = 'newDepPost';
-            var aElement = document.createElement('a');
-            // Adiciona o conteúdo antigo de volta à div no elemento A
-            aElement.textContent = conteudoAntigo;
+                // Salva o conteúdo atual da div
+                //var conteudoAntigo = element.innerHTML;
 
-            var ulFoot = document.createElement('ul');
-            ulFoot.id = 'rightDep';
-            ulFoot.className = 'rightDep';
+                // Limpa o conteúdo da div encontrada
+                //element.innerHTML = '';
 
-            // Adiciona os novos elementos à div
-            element.appendChild(ulNew);
-            element.appendChild(aElement);
-            element.appendChild(ulFoot);
+                // Cria os novos elementos (ul e a)
+                //var ulNew = document.createElement('ul');
+                //ulNew.id = 'newDepPost';
+                //ulNew.className = 'newDepPost';
+                //var aElement = document.createElement('a');
+                //// Adiciona o conteúdo antigo de volta à div no elemento A
+                //aElement.textContent = conteudoAntigo;
+
+                ////var ulFoot = document.createElement('ul');
+                ////ulFoot.id = 'rightDep';
+                ////ulFoot.className = 'rightDep';
+
+                //// Adiciona os novos elementos à div
+                //element.appendChild(ulNew);
+                //element.appendChild(aElement);
+                //element.appendChild(ulFoot);
+            }
+        } else {
+            console.log('Não estava na tabela de departamentos!!')
         }
+
     }
     function editDepartmentForm(dep_id) {
         var department = list_departments.filter(function (item) {

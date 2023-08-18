@@ -247,7 +247,7 @@ td.checkbox {
     overflow-y: auto;
     width: 100%;
     top: 0%;
-    height: 82%;
+    height: 100%;
     justify-items: center;
     align-content: flex-start;
 }
@@ -342,14 +342,23 @@ td.checkbox {
     align-items: center;
     justify-content: center;
 }
-#headpost{
+#headpost {
+    display: flex;
+    position: relative;
+    top: 0;
+    padding: 0px;
+    margin: 0px;
+    /* left: -3%; */
+    width: 100%;
+    height: 30px;
     /*display: none;*/
 }
 .deletedpost {
+    background-position: right;
     display: flex;
     position: relative;
     top: 1%;
-    left: 43%;
+    /*left: 43%;*/
     width: 25px;
     height: 25px;
     background-color: rgba(255, 255, 255, 0);
