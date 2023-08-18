@@ -14,6 +14,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     var views_history = [];
     var list_editors_departments = [];
     var list_viewers_departments = [];
+    var createDepartment = false;
     
 
     var colorSchemes = {
@@ -58,6 +59,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
             list_tableUsers = JSON.parse(obj.result);
+            createDepartment = Boolean(obj.create_department);
         }
         if (obj.api == "user" && obj.mt == "InsertViewHistorySuccess") {
             app.send({ api: "user", mt: "SelectPosts", department: obj.src });
@@ -214,24 +216,29 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             
 
         });
-        var divAdd = document.createElement('div');
-        divAdd.className = "cardnew";
-        divAdd.textContent = "adicionar+";
-        divAdd.style.display = 'flex';
-        divAdd.style.justifyContent = 'center';
-        divAdd.style.alignItems = 'center';
-        divAdd.style.borderRadius = '5px';
-        divAdd.style.backgroundColor = 'rgb(68, 87, 91)';
-        divAdd.style.margin = '10px';
 
-        depcards.appendChild(divAdd)
+        if (createDepartment == true) {
+            var divAdd = document.createElement('div');
+            divAdd.className = "cardnew";
+            divAdd.textContent = "adicionar+";
+            divAdd.style.display = 'flex';
+            divAdd.style.justifyContent = 'center';
+            divAdd.style.alignItems = 'center';
+            divAdd.style.borderRadius = '5px';
+            divAdd.style.backgroundColor = 'rgb(68, 87, 91)';
+            divAdd.style.margin = '10px';
 
-        // Adicionando o listener de clique
-        divAdd.addEventListener('click', function () {
+            depcards.appendChild(divAdd)
+            // Adicionando o listener de clique
+            divAdd.addEventListener('click', function () {
 
-            console.log("O elemento divAdd foi clicado!");
-            createDepartmentForm();
-        });
+                console.log("O elemento divAdd foi clicado!");
+                createDepartmentForm();
+            });
+        }
+        
+
+        
 
         // Obter a div com o ID 'billboard'
         var billboardDiv = document.getElementById('billboard');

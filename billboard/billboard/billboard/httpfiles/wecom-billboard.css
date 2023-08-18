@@ -713,6 +713,9 @@ input {
     align-items: center;
     justify-content: center;
 }
+#newDepPost {
+    position: absolute;
+}
 .newDepPost {
     display: flex;
     position: absolute;

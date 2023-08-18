@@ -60,7 +60,23 @@ new JsonApi("user").onconnected(function (conn) {
                         list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
                     })
                     selectViewsHistory(conn.sip, conn);
-                    conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+
+                    var query = "SELECT create_department FROM tbl_admins WHERE guid ='" + conn.guid + "'";
+                    Database.exec(query)
+                        .oncomplete(function (data) {
+                            log("tbl_admins:result=" + JSON.stringify(data, null, 4)+" data.lenght="+data.lenght);
+                            var adm = data;
+                            if (adm.length > 0) {
+                                adm = true;
+                            } else {
+                                adm = false;
+                            }
+                            conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), create_department: Boolean(adm), src: obj.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        });
+                    
                 }
                 if (obj.mt == "InsertPost") {
                     var now = getDateNow();

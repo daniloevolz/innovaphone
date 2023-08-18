@@ -185,7 +185,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             document.getElementById("local-table").innerHTML += html;
         });
 
-        scrollcontainer.add(new innovaphone.ui1.Node("button","height: 40px;width: 100px;position: relative;top: 90%; margin-left: 15px;","Salvar",null).setAttribute("id","btnSave")).addEvent("click",function(){
+        scrollcontainer.add(new innovaphone.ui1.Node("div",null,"Salvar","button-inn").setAttribute("id","btnSave")).addEvent("click",function(){
             console.log("Ok Funcionando")
 
             var checkboxes = document.querySelectorAll(".userCheckbox");
@@ -269,7 +269,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         worktable.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
 
         worktable.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
-        worktable.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
+        worktable.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 15px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
         var lic = "Temporária";
         if (licenseActive != "null") {
             lic = licenseActive

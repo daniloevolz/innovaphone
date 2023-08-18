@@ -6,7 +6,18 @@
     color: white;
     opacity: 0.9;
 }
-
+.button-inn {
+    position: absolute;
+    left: 82%;
+    width: 15%;
+    height: 25px;
+    top: 90%;
+    font-size: 12px;
+    text-align: center;
+    background-color: rgb(255, 255, 255, 50%);
+    border-radius: 30px;
+    cursor: pointer;
+}
 .colunadireita {
     overflow-y:auto;
     width: 85%;
@@ -87,4 +98,12 @@ a {
 }
 .DivLicenseKey{
     position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;
+}
+@media (max-width: 1000px) {
+    p {
+        font-size: 1em;
+    }
+    .CfgUsers {
+        font-size: 1em;
+    }
 }
