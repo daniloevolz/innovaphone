@@ -384,25 +384,26 @@ new JsonApi("admin").onconnected(function (conn) {
                 }
             }
             if (obj.mt == "InsertAdmins") {
-                Database.exec("INSERT INTO tbl_admins (guid, create_department) VALUES ('" + obj.guid + "'," + obj.department + ")")
-                    .oncomplete(function () {
-                        log("InsertAdmin:result=success");
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertAdminsSuccess", src: obj.src }));
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
-                    });
-            }
-            if (obj.mt == "DeleteAdmins") {
-                Database.exec("DELETE FROM tbl_admins WHERE guid=" + obj.guid + ";")
+                Database.exec("DELETE FROM tbl_admins;")
                     .oncomplete(function () {
                         log("DeleteAdmins:result=success");
-                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteAdminsSuccess", src: obj.src }));
+                        var list_guids = JSON.parse(obj.users);
+                        list_guids.forEach(function (guid) {
+                            Database.exec("INSERT INTO tbl_admins (guid) VALUES ('" + guid + "',true)")
+                                .oncomplete(function () {
+                                    log("InsertAdmin:result=success");
+                                    
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                                });
+                        })
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertAdminsSuccess", src: obj.src }));
+                        
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
-
                 
             }
             if (obj.mt == "SelectAdmins") {
@@ -685,7 +686,6 @@ function selectViewsHistory(sip, connOld) {
             for (var i = 0; i < departments.length; i++) {
                 idsToSearch.push("'" + departments[i].id + "'");
             }
-
 
             // Consulta na tabela 'tbl_posts' com LEFT JOIN e WHERE para filtrar os resultados
             //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + conn.guid + "' WHERE v.post_id IS NULL";

@@ -369,6 +369,22 @@ td.checkbox {
     padding: 0;
     margin: 0;
 }
+.futurepost {
+    background-position: center;
+    display: flex;
+    position: relative;
+    top: 1%;
+    /*left: 43%;*/
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    background-image: url(./images/timed_glass.png);
+    background-size: 20px;
+    background-repeat: no-repeat;
+    padding: 0;
+    margin: 0;
+}
 .post {
     cursor: pointer;
     display: flex;

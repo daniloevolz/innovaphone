@@ -293,6 +293,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         postDepartDiv.id = 'post-depart';
         postDepartDiv.className = 'post-depart';
 
+        worktable.appendChild(postDepartDiv);
 
         var logoWecom = document.createElement('div');
         logoWecom.id = 'logowecom';
@@ -304,7 +305,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var postDiv = document.createElement('div');
             postDiv.id = post.id;
             postDiv.className = 'post';
-            postDiv.textContent = post.title;
+            /*postDiv.textContent = post.title;*/
             postDiv.style.backgroundColor = post.color;
 
 
@@ -320,20 +321,26 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 return item.id === parseInt(dep_id, 10);
             })[0];
 
+            var headpost = document.createElement('ul');
+            headpost.id = 'headpost';
+            postDiv.appendChild(headpost);
+
+            var textpost = document.createElement('a');
+            textpost.id = 'textpost';
+            textpost.textContent = post.title;
+            postDiv.appendChild(textpost);
+
             if (isEditor) {
                 var starDate = new Date(post.date_start);
                 var endDate = new Date(post.date_end);
+                var now = new Date();
 
-                var headpost = document.createElement('ul');
-                headpost.id = 'headpost';
-
+                if (starDate>now) {
+                    headpost.className ='futurepost';
+                }
                 if (post.deleted) {
-                    headpost.className = 'deletedpost';
+                    headpost.className ='deletedpost';
                 };
-                 
-                var textpost = document.createElement('a');
-                textpost.id = 'textpost';
-                textpost.textContent = post.title;
 
                 var footpost = document.createElement('ul');
                 footpost.id = 'footpost';
@@ -363,19 +370,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 footpost.appendChild(spanStart);
                 footpost.appendChild(spanEnd);
 
-                postDiv.innerHTML = '';
                 postDiv.id = post.id;
                 postDiv.className = 'post';
                 postDiv.style.backgroundColor = post.color;
-                postDiv.appendChild(headpost);
-                postDiv.appendChild(textpost);
+                
                 postDiv.appendChild(footpost);
             }
 
             postDepartDiv.appendChild(postDiv);
         });
 
-        worktable.appendChild(postDepartDiv);
+        
 
         var isEditor = list_departments_editor.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
@@ -1337,7 +1342,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 // Verifique se o elemento filho foi encontrado
                 if (childElement) {
                     // Altere a classe do elemento filho para 'newpost'
-                    childElement.className = 'newpost';
+                    childElement.classList.add('newpost');
+                    /*childElement.className = 'newpost';*/
                 } else {
                     console.log("Elemento filho não encontrado.");
                 }
@@ -1368,7 +1374,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 // Verifique se o elemento filho foi encontrado
                 if (childElement) {
                     // Altere a classe do elemento filho para 'newpost'
-                    childElement.className = 'newDepPost';
+                    childElement.classList.add('newDepPost');
+                    /*childElement.className = 'newDepPost';*/
                 } else {
                     console.log("Elemento filho não encontrado.");
                 }
