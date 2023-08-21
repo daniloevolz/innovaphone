@@ -471,12 +471,16 @@ td.checkbox {
     height: 10%;
     justify-content: center;
  }
-.closedate{
+.closedate {
+    width: 30%;
+    height: 50%;
+    padding: 0;
+    margin: 0 5px 0 5px;
+    background-color: rgb(255 255 255 / 25%);
+    text-align: center;
     display: flex;
-    color: white;
-    width: 80%;
-    height: 10%;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
 }
 .depcards{
     display: flex;
@@ -713,8 +717,28 @@ input {
     align-items: center;
     justify-content: center;
 }
+.footShowPost {
+    display: flex;
+    color: white;
+    width: 80%;
+    height: 10%;
+    justify-content: flex-end;
+    align-items: center;
+}
 #newDepPost {
     position: absolute;
+}
+.creatorPost {
+    width: 30%;
+    height: 50%;
+    padding: 0;
+    margin: 0 5px 0 5px;
+    background-color: rgb(255 255 255 / 25%);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
 }
 .newDepPost {
     display: flex;

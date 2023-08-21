@@ -203,6 +203,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 var clickedId = this.id;
                 console.log('ID do elemento div clicado:', clickedId);
                 app.send({ api: "user", mt: "SelectPosts", department: clickedId });
+                
 
             });
             var ulNew = document.createElement('ul');
@@ -321,7 +322,14 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 // Coletar o ID do elemento div clicado
                 var clickedId = this.id;
                 console.log('ID do elemento div clicado:', clickedId);
-                makeDivPostMessage(clickedId, dep_id);
+                console.log(post)
+                var user = post.user_guid;
+                console.log(user)
+                var user = list_tableUsers.filter(function (item) {
+                    return item.guid == post.user_guid;
+                })[0];
+                console.log(user)
+                makeDivPostMessage(clickedId, dep_id, user);
 
             });
             var isEditor = list_departments_editor.filter(function (item) {
@@ -689,7 +697,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             changeBackgroundColor(post);
         }
     }
-    function makeDivPostMessage(id, dep_id) {
+    function makeDivPostMessage(id, dep_id, user) {
         var post = list_posts.filter(function (item) {
             return item.id === parseInt(id, 10);
         })[0];
@@ -771,11 +779,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         msgContent.style.overflowX = 'auto'
         msgContent.innerHTML = post.description;
 
+        var footShowPost = document.createElement('div');
+        footShowPost.id = 'footShowPost';
+        footShowPost.className = 'footShowPost';
+
+        var creatorPost = document.createElement('div');
+        creatorPost.id = 'creatorPost';
+        creatorPost.className = 'creatorPost';
+        creatorPost.innerHTML = 'Creador: ' + user.cn;
+
+        console.log('Quero saber: ', user.cn);
+
         var closeDateDiv = document.createElement('div');
         closeDateDiv.id = 'closedate';
         closeDateDiv.className = 'closedate';
-        closeDateDiv.innerHTML = post.date_end;
 
+        var dateString = post.date_end;
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+        closeDateDiv.innerHTML = formattedDate;
+
+        footShowPost.appendChild(creatorPost);
+        footShowPost.appendChild(closeDateDiv);
+        
         // Adicionar os elementos criados � div com o ID 'billboard'
         var billboardDiv = document.getElementById('billboard');
         if (billboardDiv) {
@@ -786,7 +818,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             postMsgDiv.appendChild(nameBoxDiv);
             postMsgDiv.appendChild(titleMsgDiv);
             postMsgDiv.appendChild(msgBoxDiv);
-            postMsgDiv.appendChild(closeDateDiv);
+            postMsgDiv.appendChild(footShowPost);
             if (isEditor) {
                 postMsgDiv.appendChild(historyPostDiv);
                 postMsgDiv.appendChild(editPostDiv);
@@ -1550,13 +1582,24 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var user = list_tableUsers.filter(function (item) {
                 return item.guid == view.user_guid;
             })[0];
+
             var nameCol = document.createElement('td');
             nameCol.classList.add('column');
             nameCol.textContent = user.cn;
 
             var dateCol = document.createElement('td');
             dateCol.classList.add('column');
-            dateCol.textContent = view.date;
+
+            var dateString = view.date;
+            var date = new Date(dateString);
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+            dateCol.innerHTML = formattedDate;
 
             row.appendChild(nameCol);
             row.appendChild(dateCol);
