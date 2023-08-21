@@ -268,6 +268,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
     }
     function makeDivPosts(dep_id) {
+
         // Criar os elementos HTML
         var worktable = document.createElement('div');
         worktable.id = 'worktable';
@@ -608,44 +609,49 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                         switch (selectedValue) {
                             case 'hoje':
-                                startDate = endDate = new Date().toISOString().split('T')[0];
+                                startDate = endDate = new Date().toISOString()
                                 query += " AND date_start <= '" + startDate + "' AND date_end >= '" + endDate + "'";
                                 break;
                             case 'últimos7dias':
-                                now = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString();
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 6);
-                                startDate = startDate.toISOString().split('T')[0];
+                                startDate = startDate.toISOString();
                                 query += " AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
                                 break;
                             case 'últimos30dias':
-                                now = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString();
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() - 29);
-                                startDate = startDate.toISOString().split('T')[0];
+                                startDate = startDate.toISOString();
                                 query += " AND date_start >= '" + startDate + "' AND date_start <= '" + now + "'";
                                 break;
                             case 'próximos7dias':
-                                now = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString();
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() + 6);
-                                startDate = startDate.toISOString().split('T')[0];
+                                startDate = startDate.toISOString();
                                 query = " AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
                                 break;
                             case 'próximos30dias':
-                                now = new Date().toISOString().split('T')[0];
+                                now = new Date().toISOString();
                                 startDate = new Date();
                                 startDate.setDate(startDate.getDate() + 29);
-                                startDate = startDate.toISOString().split('T')[0];
+                                startDate = startDate.toISOString();
                                 query += " AND date_start >= '" + now + "' AND date_start <= '" + startDate + "'";
                                 break;
                             case 'desdesempre':
                                 query += ";";
                                 break;
                             case 'períodocustomizado':
-                                startDate = startDateInput.value.split('T')[0];
-                                endDate = endDateInput.value.split('T')[0];
-                                query += " AND date_start >= '" + startDate + "' AND date_end <= '" + endDate + "'";
+                                startDate = startDateInput.value;
+                                endDate = endDateInput.value;
+                                var startDateObj = new Date(startDate).toISOString()
+                                var endDateObj = new Date(endDate);
+                                endDateObj.setUTCHours(23,59,59)
+                                endDateObj = endDateObj.toISOString()
+                                console.log("END DATE OBJ" + endDateObj)
+                                query += " AND date_start >= '" + startDateObj + "' AND date_end <= '" + endDateObj + "'";
                                 break;
                         }
 
@@ -709,6 +715,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             return item.id === parseInt(post.department, 10);
         })[0];
         // Criar os elementos HTML
+        var insideDiv = document.createElement('div');
+        insideDiv.className = 'insideDiv';
+        // insideDiv.style.backgroundColor = post.color;
+
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'postmsg';
         postMsgDiv.className = 'postmsg'
@@ -824,7 +834,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 postMsgDiv.appendChild(editPostDiv);
                 postMsgDiv.appendChild(deletePostDiv);
             }
-            billboardDiv.appendChild(postMsgDiv);
+            billboardDiv.appendChild(insideDiv);
+            insideDiv.appendChild(postMsgDiv);
         } else {
             console.error("A div com o ID 'billboard' não foi encontrada.");
         }
