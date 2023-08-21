@@ -536,7 +536,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     //var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ")";
                     //query com condição de data e horario
                     var now = getDateNow();
-                    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now + "' < p.date_end";
+                    var queryPosts = "SELECT p.* FROM tbl_posts p LEFT JOIN tbl_views_history v ON p.id = v.post_id AND v.user_guid = '" + user.columns.guid + "' WHERE v.post_id IS NULL AND p.department IN (" + departmentIdsFormatted + ") AND '" + now + "' >= p.date_start AND '" + now + "' < p.date_end AND p.deleted IS NULL";
                     // Executar consulta na tabela 'tbl_posts'
                     Database.exec(queryPosts)
                         .oncomplete(function (dataPosts) {
