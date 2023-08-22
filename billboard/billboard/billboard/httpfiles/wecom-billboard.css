@@ -663,6 +663,21 @@ input {
     background-repeat: no-repeat;
     cursor: pointer;
 }
+#backDescription {
+
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./images/back.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
 #editpost {
     position: absolute;
     top: 90px;

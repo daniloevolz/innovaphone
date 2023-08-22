@@ -729,6 +729,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         closeWindowDiv.id = 'closewindow';
         var historyPostDiv = document.createElement('div');
         historyPostDiv.id = 'historypost';
+        var backDescription = document.createElement('div');
+        backDescription.id = 'backDescription';
+        backDescription.style.display = 'none';
         var editPostDiv = document.createElement('div');
         editPostDiv.id = 'editpost';
         var deletePostDiv = document.createElement('div');
@@ -750,8 +753,23 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         });
         historyPostDiv.addEventListener('click', function () {
             console.log("O elemento historyPostDiv foi clicado!", id);
-            app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10),})
+            app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10), })
+
+            historyPostDiv.style.display = 'none';
+            backDescription.style.display = 'block';
+            historyPostDiv.removeEventListener('click');
         });
+
+        backDescription.addEventListener('click', function () {
+            msgContent.innerHTML = post.description;
+            msgBoxDiv.innerHTML = '';
+            msgBoxDiv.appendChild(msgContent);
+
+            historyPostDiv.style.display = 'flex';
+            backDescription.style.display = 'none';
+            backDescription.removeEventListener('click')
+        });
+
         editPostDiv.addEventListener('click', function () {
             console.log("O elemento editPostDiv foi clicado!");
             editPostForm(id, dep_id);            
@@ -796,7 +814,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var creatorPost = document.createElement('div');
         creatorPost.id = 'creatorPost';
         creatorPost.className = 'creatorPost';
-        creatorPost.innerHTML = 'Creador: ' + user.cn;
+        creatorPost.innerHTML = 'Criador: ' + user.cn;
 
         console.log('Quero saber: ', user.cn);
 
@@ -831,6 +849,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             postMsgDiv.appendChild(footShowPost);
             if (isEditor) {
                 postMsgDiv.appendChild(historyPostDiv);
+                postMsgDiv.appendChild(backDescription);
                 postMsgDiv.appendChild(editPostDiv);
                 postMsgDiv.appendChild(deletePostDiv);
             }
@@ -870,6 +889,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>' + '<p class="char-counter"><span id="charCount">1000</span> /1000</p>';
 
         document.body.appendChild(msgBoxDiv);
+
+        var insideDiv = document.createElement('div');
+        insideDiv.className = 'insideDiv';
 
         var textarea = document.getElementById("msgevent");
         var charCountSpan = document.getElementById("charCount");
@@ -937,6 +959,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         });
 
 
+        
 
         buttonsDiv.appendChild(saveMsgDiv);
         buttonsDiv.appendChild(closeMsgDiv);
@@ -946,11 +969,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         postMsgDiv.appendChild(msgBoxDiv);
         postMsgDiv.appendChild(dateDiv);
         postMsgDiv.appendChild(buttonsDiv);
+        insideDiv.appendChild(postMsgDiv);
 
         // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
         var billboardDiv = document.getElementById('billboard');
         if (billboardDiv) {
-            billboardDiv.appendChild(postMsgDiv);
+            billboardDiv.appendChild(insideDiv);
 
             var colorbox = document.getElementById("colorbox")
             colorbox.addEventListener("change", function () {
@@ -1111,6 +1135,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         //}
     }
     function createDepartmentForm() {
+        var insideDiv = document.createElement('div');
+        insideDiv.className = 'insideDiv';
+
         // Criar os elementos HTML
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'newdep';
@@ -1187,8 +1214,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var userTable = createUsersDepartmentsGrid();
             postMsgDiv.appendChild(userTable);
             postMsgDiv.appendChild(buttonsDiv);
-
-            billboardDiv.appendChild(postMsgDiv);
+            insideDiv.appendChild(postMsgDiv);
+            billboardDiv.appendChild(insideDiv);
 
             var colorbox = document.getElementById("colorbox")
             colorbox.addEventListener("change", function () {
@@ -1462,6 +1489,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+
+        var insideDiv = document.createElement('div');
+        insideDiv.className = 'insideDiv';
+
         // Criar os elementos HTML
         var postMsgDiv = document.createElement('div');
         postMsgDiv.id = 'editdep';
@@ -1547,8 +1578,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var userTable = editUsersDepartmentsGrid();
             postMsgDiv.appendChild(userTable);
             postMsgDiv.appendChild(buttonsDiv);
-
-            billboardDiv.appendChild(postMsgDiv);
+            insideDiv.appendChild(postMsgDiv);
+            billboardDiv.appendChild(insideDiv);
 
             var colorbox = document.getElementById("colorbox")
             colorbox.addEventListener("change", function () {

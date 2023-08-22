@@ -92,8 +92,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     function constructor() {
         that.clear();
         // col direita
-        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
-        colDireita.setAttribute("id","coldireita")
+        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita").setAttribute("id","coldireita"));
         //Título
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
@@ -101,8 +100,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         colEsquerda.setAttribute("id","colesquerda")
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
-        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null));
-        imglogo.setAttribute("src", "./images/logo-wecom.png");
+        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
+     
         var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; color:white; margin : 5px;", appdn, null));
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
@@ -115,7 +114,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
         var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));
         var br = relatorios.add(new innovaphone.ui1.Node("br", null, null, null));
-
+    
         var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         // var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
