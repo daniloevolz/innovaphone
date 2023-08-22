@@ -15,6 +15,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     var list_editors_departments = [];
     var list_viewers_departments = [];
     var createDepartment = false;
+    var billboard;
     
 
     var colorSchemes = {
@@ -46,7 +47,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         that.clear();
-        that.add(new innovaphone.ui1.Div(null, null, "billboard").setAttribute("id", "billboard"))
+        billboard = that.add(new innovaphone.ui1.Div(null, null, "billboard").setAttribute("id", "billboard"))
         app.send({ api: "user", mt: "TableUsers" });
         app.send({ api: "user", mt: "SelectDepartments" });
 
@@ -136,126 +137,38 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
     }
     function makeDivDepartments() {
-        // Cria��o do elemento ftground
-        var worktable = document.createElement('div');
-        worktable.id = 'worktable';
-        worktable.style.display = 'flex';
-        worktable.style.width = '100%';
-        worktable.style.height = '100vh';
-        worktable.style.justifyContent = 'center';
-        worktable.style.flexDirection = 'column';
-        worktable.style.alignItems = 'center';
-        worktable.style.fontFamily = 'Montserrat';
-        //worktable.style.backgroundColor = 'white';
-        // ftground.style.borderRadius = '20px';
-
-        // Cria��o do elemento headbanner
-        //var headbanner = document.createElement('div');
-        //headbanner.id = 'headbanner';
-        //headbanner.style.backgroundImage = 'url("./images/header_wecom.png")';
-        ////headbanner.style.backgroundColor = 'rgba(132, 0, 255, 0.644)';
-        //headbanner.style.backgroundRepeat = 'no-repeat';
-        //headbanner.style.backgroundSize = 'cover';
-        //headbanner.style.position = 'absolute';
-        //headbanner.style.height = '20%';
-        //headbanner.style.top = '0%';
-        //headbanner.style.width = '100%';
-        //headbanner.style.fontSize = '35px';
-        //headbanner.style.display = 'flex';
-        //headbanner.style.justifyContent = 'center';
-        //headbanner.style.alignItems = 'center';
-        // headbanner.style.borderTopLeftRadius = '20px';
-        // headbanner.style.borderTopRightRadius = '20px';
-        //headbanner.textContent = 'MURAL DE AVISOS WECOM';
-        //worktable.appendChild(headbanner);
-
-        // Cria��o do elemento depcards
-        var depcards = document.createElement('div');
-        depcards.id = 'depcards';
-        depcards.className = 'depcards';
-        worktable.appendChild(depcards);
-
-        var logoWecom = document.createElement('div');
-        logoWecom.id = 'logowecom';
-        logoWecom.className = 'logo'
-        worktable.appendChild(logoWecom);
-
-        //var depCardsContainer = document.getElementById('depcards');
-
+        document.getElementById("billboard").innerHTML = '';
+        var worktable = billboard.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id",'worktable'))
+        var depcards = worktable.add(new innovaphone.ui1.Node("div",null,null,"depcards").setAttribute("id","depcards"))
+        var logoWecom = worktable.add(new innovaphone.ui1.Node("div",null,null,"logo").setAttribute("id","logowecom"))
         depcards.innerHTML = '';
-
         list_departments.forEach(function (department) {
-
-            var div = document.createElement('div');
-            div.id = department.id;
-            div.className = 'card';
-            /*div.textContent = department.name;*/
-            div.style.display = 'flex';
-            div.style.justifyContent = 'center';
-            div.style.alignItems = 'center';
-            div.style.borderRadius = '5px';
-            div.style.backgroundColor = department.color;
-            div.style.margin = '10px';
-
-            // Adicionar o event listener de clique
-            div.addEventListener('click', function () {
-                // Coletar o ID do elemento div clicado
-                var clickedId = this.id;
-                console.log('ID do elemento div clicado:', clickedId);
-                app.send({ api: "user", mt: "SelectPosts", department: clickedId });
-                
-
-            });
-            var ulNew = document.createElement('ul');
-            ulNew.id = 'newDepPost';
-            div.appendChild(ulNew);
-            var aElement = document.createElement('a');
-            aElement.textContent = department.name;
-            div.appendChild(aElement);
-            depcards.appendChild(div);
-
-            
-
+            var div = depcards.add(new innovaphone.ui1.Node("div",`display:flex;justify-content:center;align-items:center;border-radius:5px;margin:10px;background-color:${department.color};`,null,"card"));
+            div.setAttribute("id",department.id)
+            var card = document.querySelectorAll(".card")
+            card.forEach(function(cards){
+                cards.addEventListener('click', function () {
+                    // Coletar o ID do elemento div clicado
+                    var clickedId = this.id;
+                    console.log('ID do elemento div clicado:', clickedId);
+                    app.send({ api: "user", mt: "SelectPosts", department: clickedId });
+                })
+            })
+            var ulNew = div.add(new innovaphone.ui1.Node("ul",null,null,null).setAttribute("id","newDepPost"))
+            var aElement = div.add(new innovaphone.ui1.Node("a",null,department.name,null))
         });
 
         if (createDepartment == true) {
-            var divAdd = document.createElement('div');
-            divAdd.className = "cardnew";
-            divAdd.textContent = "adicionar+";
-            divAdd.style.display = 'flex';
-            divAdd.style.justifyContent = 'center';
-            divAdd.style.alignItems = 'center';
-            divAdd.style.borderRadius = '5px';
-            divAdd.style.backgroundColor = 'rgb(68, 87, 91)';
-            divAdd.style.margin = '10px';
-
-            depcards.appendChild(divAdd)
-            // Adicionando o listener de clique
-            divAdd.addEventListener('click', function () {
-
-                console.log("O elemento divAdd foi clicado!");
-                createDepartmentForm();
-            });
+            var divAdd = depcards.add(new innovaphone.ui1.Node("div","display:flex;justify-content:center;align-items:center;border-radius:5px;background-color: rgb(68, 87, 91);margin:10px;",texts.text("labelAdd"),"cardnew"))
+            var cardnew = document.querySelectorAll(".cardnew")
+            cardnew.forEach(function(add){
+                add.addEventListener('click',function(){
+                    console.log("O elemento divAdd foi clicado!");
+                    createDepartmentForm();
+                })
+            })
         }
-        
 
-        
-
-        // Obter a div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
-
-            // Adicionar o elemento 'worktable' ao 'billboardDiv'
-            billboardDiv.innerHTML = '';
-            billboardDiv.appendChild(worktable);
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
-        // Iterar sobre a lista inputData e chamar a função para cada item
-        //for (var i = 0; i < views_history.length; i++) {
-        //    var department = views_history[i].department;
-        //    changeDepBackgroundColor(department);
-        //}
         // Objeto para rastrear os ids únicos
         var uniqueIds = {};
         for (var i = 0; i < views_history.length; i++) {
@@ -267,84 +180,54 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             }
         }
     }
+
+
     function makeDivPosts(dep_id) {
 
         // Criar os elementos HTML
-        var worktable = document.createElement('div');
-        worktable.id = 'worktable';
-        worktable.style.display = 'flex';
-        worktable.style.width = '100%';
-        worktable.style.height = '100vh';
-        worktable.style.justifyContent = 'center';
-        worktable.style.flexDirection = 'column';
-        worktable.style.alignItems = 'center';
+        document.getElementById("billboard").innerHTML = '';
+        var worktable = billboard.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","worktable"))
+        var postDepartDiv = worktable.add(new innovaphone.ui1.Node("div",null,null,"post-depart").setAttribute("id","post-depart"));
+        var logoWecom = worktable.add(new innovaphone.ui1.Node("div",null,null,"logo").setAttribute("id","logowecom"))
 
-        // Cria��o do elemento headbanner
-        //var headbanner = document.createElement('div');
-        //headbanner.id = 'headbanner';
-        //headbanner.style.position = 'absolute';
-        //headbanner.style.backgroundImage = 'url("./images/header_wecom.png")';
-        //headbanner.style.backgroundRepeat = 'no-repeat';
-        //headbanner.style.backgroundSize = 'cover';
-        //headbanner.style.height = '20%';
-        //headbanner.style.top = '0%';
-        //headbanner.style.width = '100%';
-        //headbanner.style.fontSize = '35px';
-        //headbanner.style.display = 'flex';
-        //headbanner.style.justifyContent = 'center';
-        //headbanner.style.alignItems = 'center';
-        // headbanner.style.borderTopLeftRadius = '20px';
-        // headbanner.style.borderTopRightRadius = '20px';
-        //headbanner.textContent = 'MURAL DE AVISOS WECOM';
-        //worktable.appendChild(headbanner);
-
-        var postDepartDiv = document.createElement('div');
-        postDepartDiv.id = 'post-depart';
-        postDepartDiv.className = 'post-depart';
-
-        worktable.appendChild(postDepartDiv);
-
-        var logoWecom = document.createElement('div');
-        logoWecom.id = 'logowecom';
-        logoWecom.className = 'logo'
-        worktable.appendChild(logoWecom);
-        
         // Criar divs para cada departamento
         list_posts.forEach(function (post) {
-            var postDiv = document.createElement('div');
-            postDiv.id = post.id;
-            postDiv.className = 'post';
-            /*postDiv.textContent = post.title;*/
-            postDiv.style.backgroundColor = post.color;
-
+            var postDiv = postDepartDiv.add(new innovaphone.ui1.Node("div",`background-color:${post.color}`,null,"post").setAttribute("id",post.id))
+            // postDiv.setAttribute("id","postdiv")
+            // postDiv.id = post.id;
+            // postDiv.className = 'post';
+            // /*postDiv.textContent = post.title;*/
+            // postDiv.style.backgroundColor = post.color;
 
             // Adicionar o event listener de clique
-            postDiv.addEventListener('click', function () {
-                // Coletar o ID do elemento div clicado
-                var clickedId = this.id;
-                console.log('ID do elemento div clicado:', clickedId);
-                console.log(post)
-                var user = post.user_guid;
-                console.log(user)
-                var user = list_tableUsers.filter(function (item) {
-                    return item.guid == post.user_guid;
+            var a = document.getElementById(post.id)
+
+                a.addEventListener('click', function () {
+                    var clickedId = this.id;
+                        console.log('ID do elemento div clicado:', clickedId);
+                         console.log(post)
+                        var user = post.user_guid;
+                        console.log(user)
+                        var user = list_tableUsers.filter(function (item) {
+                            return item.guid == post.user_guid;
                 })[0];
                 console.log(user)
                 makeDivPostMessage(clickedId, dep_id, user);
-
             });
             var isEditor = list_departments_editor.filter(function (item) {
                 return item.id === parseInt(dep_id, 10);
+            
             })[0];
 
-            var headpost = document.createElement('ul');
-            headpost.id = 'headpost';
-            postDiv.appendChild(headpost);
-
-            var textpost = document.createElement('a');
-            textpost.id = 'textpost';
-            textpost.textContent = post.title;
-            postDiv.appendChild(textpost);
+            var headpost = postDiv.add(new innovaphone.ui1.Node("ul",null,null,null).setAttribute("id","headpost"))
+            // postDiv.appendChild(headpost);
+            // var headpost = document.createElement('ul');
+            // headpost.id = 'headpost';
+            var textpost = postDiv.add(new innovaphone.ui1.Node("a",null,post.title,null).setAttribute("id","textpost"))
+            // var textpost = document.createElement('a');
+            // textpost.id = 'textpost';
+            // textpost.textContent = post.title;
+            // postDiv.appendChild(textpost);
 
             if (isEditor) {
                 var starDate = new Date(post.date_start);
@@ -357,19 +240,18 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 if (post.deleted) {
                     headpost.className ='deletedpost';
                 };
+                var footpost = postDiv.add(new innovaphone.ui1.Node("ul",null,null,"footpost").setAttribute("id","footpost"))
+                // var footpost = document.createElement('ul');
+                // footpost.id = 'footpost';
+                // footpost.className = "footpost";
 
-                var footpost = document.createElement('ul');
-                footpost.id = 'footpost';
-                footpost.className = "footpost";
-
-                var spanStart = document.createElement('span');
-                spanStart.id = 'dateS';
-                spanStart.style.fontSize = '10px';
+                var spanStart = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,null).setAttribute("id","dateS"))
                 spanStart.textContent = "Início: " + formatDate(starDate);
-                var spanEnd = document.createElement('span');
-                spanEnd.id = 'dateE';
-                spanEnd.style.fontSize = '10px';
-                spanEnd.textContent = "Fim: " + formatDate(endDate);
+                
+                // var spanEnd = document.createElement('span');
+                // spanEnd.id = 'dateE';
+                // spanEnd.style.fontSize = '10px';
+                // spanEnd.textContent = "Fim: " + formatDate(endDate);
 
                 function formatDate(date) {
                     var day = date.getDate();
@@ -383,74 +265,73 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     return day + '/' + month + '/' + year;
                 }
 
-                footpost.appendChild(spanStart);
-                footpost.appendChild(spanEnd);
+                // footpost.appendChild(spanStart);
+                // footpost.appendChild(spanEnd);
 
                 postDiv.id = post.id;
                 postDiv.className = 'post';
-                postDiv.style.backgroundColor = post.color;
+                document.getElementById(post.id).style.backgroundColor = post.color;
+                //postDiv.style.backgroundColor = post.color;
                 
-                postDiv.appendChild(footpost);
+                postDiv.add(footpost);
             }
-
-            postDepartDiv.appendChild(postDiv);
-        });
-
-        
-
+            postDepartDiv.add(postDiv);
+        })
         var isEditor = list_departments_editor.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
         if (isEditor) {
             // Criar os elementos 'Adicionar +'
-            var postNew1Div = document.createElement('div');
-            postNew1Div.id = 'postnew1';
-            postNew1Div.className = 'postnew';
-            postNew1Div.textContent = 'adicionar +';
 
-
+                var postNew1Div = postDepartDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelAdd"),"postnew").setAttribute("id","postnew1"))
+            // var postNew1Div = document.createElement('div');
+            // postNew1Div.id = 'postnew1';
+            // postNew1Div.className = 'postnew';
+            // postNew1Div.textContent = 'adicionar +';
             // Adicionando o listener de clique
-            postNew1Div.addEventListener('click', function () {
-
+            var postnew = document.getElementById("postnew1");
+            postnew.addEventListener('click', function () {
                 console.log("O elemento divAdd foi clicado!");
                 createPostForm(dep_id);
-
-
-
             });
             // Adicionar os elementos criados � div com o ID 'post-depart'
-            postDepartDiv.appendChild(postNew1Div);
+            // postDepartDiv.appendChild(postNew1Div);
         }
-        var footButtons = document.createElement('div');
-        footButtons.id = 'footbuttons';
-        footButtons.className = 'footbuttons';
-        worktable.appendChild(footButtons);
+            var footButtons = worktable.add(new innovaphone.ui1.Node("div",null,null,"footbuttons").setAttribute("id","footbuttons"))
+        // var footButtons = document.createElement('div');
+        // footButtons.id = 'footbuttons';
+        // footButtons.className = 'footbuttons';
+        // worktable.appendChild(footButtons);
+            var backDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"backDiv").setAttribute("id","backDiv"))
 
-        var backDiv = document.createElement('div');
-        backDiv.id = 'backDiv';
-        backDiv.className = 'backDiv'
+        // var backDiv = document.createElement('div');
+        // backDiv.id = 'backDiv';
+        // backDiv.className = 'backDiv'
+            var back = document.getElementById("backDiv");
 
-
-        backDiv.addEventListener("click", function () {
+        back.addEventListener("click", function () {
+            document.getElementById("post-depart").style.display = 'none';
             makeDivDepartments();
         })
 
-        footButtons.appendChild(backDiv);
+        //footButtons.appendChild(backDiv);
+
         if(isEditor){
-            var editDepDiv = document.createElement("div");
-            editDepDiv.className = 'editDepDiv'
 
-
-            editDepDiv.addEventListener("click", function (isEditor) {
+            var editDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"editDepDiv").setAttribute("id","editDepDiv"));
+            
+            // var editDepDiv = document.createElement("div");
+            // editDepDiv.className = 'editDepDiv'
+            var edit = document.getElementById("editDepDiv")
+            edit.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO EDITAR")
                 editDepartmentForm(dep_id)
-               
             })
-            var delDepDiv = document.createElement("div");
-            delDepDiv.className = 'delDepDiv'
-
-
-            delDepDiv.addEventListener("click", function (isEditor) {
+                var delDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"delDepDiv").setAttribute("id","delDepDiv"));
+            // var delDepDiv = document.createElement("div");
+            // delDepDiv.className = 'delDepDiv'
+            var del = document.getElementById("delDepDiv")
+            del.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
                 var hasPosts = list_posts.filter(function (item) {
                     return item.department === parseInt(dep_id, 10) && item.deleted == "";
@@ -462,28 +343,28 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 }
                 
             })
-            var timedDepDiv = document.createElement("div");
-            timedDepDiv.className= 'timedDepDiv'
-
-            timedDepDiv.addEventListener("click", function (isEditor) {
+            var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"timeDepDiv").setAttribute("id","timeDepDiv"))
+            // var timedDepDiv = document.createElement("div");
+            // timedDepDiv.className= 'timedDepDiv'
+            var time = document.getElementById("timeDepDiv")
+            time.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS E ENTÂO ENVIAR APP.SEND")
                
                 var worktable = document.getElementById('worktable');
                 var depTimeManager = document.getElementById('depTimeManager');
 
                 if (depTimeManager) {
-                    worktable.removeChild(depTimeManager);
+                    worktable.remove(depTimeManager);
 
                 } else {
-                    var depTimeManager = document.createElement('div');
-                    depTimeManager.id = 'depTimeManager';
-                    depTimeManager.className = 'depTimeManager'
-
-                    var select = document.createElement('select');
-                    select.id = 'periodSelector';
-                    select.className = 'periodSelector';
-
-
+                    var depTimeManager = new innovaphone.ui1.Node("div",null,null,"depTimeManager").setAttribute("id","depTimeManager")
+                    // var depTimeManager = document.createElement('div');
+                    // depTimeManager.id = 'depTimeManager';
+                    // depTimeManager.className = 'depTimeManager'
+                    var select = new innovaphone.ui1.Node("div",null,null,"periodSelector").setAttribute("id","periodSelector")
+                    // var select = document.createElement('select');
+                    // select.id = 'periodSelector';
+                    // select.className = 'periodSelector';
                     var options = [
                         'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
                     ];
@@ -492,7 +373,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                         var option = document.createElement('option');
                         option.value = optionText.toLowerCase().replace(/\s/g, '');
                         option.textContent = optionText;
-                        select.appendChild(option);
+                        select.add(option);
                     });
 
                     var customPeriodDiv = document.createElement('div');
@@ -682,28 +563,33 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 }
             })
             
-            footButtons.appendChild(delDepDiv);
-            footButtons.appendChild(timedDepDiv);
-            footButtons.appendChild(editDepDiv);
+            // footButtons.appendChild(delDepDiv);
+            // footButtons.appendChild(timedDepDiv);
+            // footButtons.appendChild(editDepDiv);
         }
         
         // Obter a div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
+        // var billboardDiv = document.getElementById('billboard');
+        // if (billboardDiv) {
 
-            // Adicionar o elemento 'worktable' ao 'billboardDiv'
-            billboardDiv.innerHTML = '';
-            billboardDiv.appendChild(worktable);
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
+        //     // Adicionar o elemento 'worktable' ao 'billboardDiv'
+        //     billboardDiv.innerHTML = '';
+        //     billboardDiv.appendChild(worktable);
+        // } else {
+        //     console.error("A div com o ID 'billboard' não foi encontrada.");
+        // }
         // Iterar sobre a lista inputData e chamar a função para cada item
         for (var i = 0; i < views_history.length; i++) {
             var post = views_history[i].id;
             changeBackgroundColor(post);
         }
+        
     }
+    
     function makeDivPostMessage(id, dep_id, user) {
+        //limpa a div BILlBOARD
+        document.getElementById('billboard').innerHTML = '';
+
         var post = list_posts.filter(function (item) {
             return item.id === parseInt(id, 10);
         })[0];
@@ -714,31 +600,40 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(post.department, 10);
         })[0];
+
         // Criar os elementos HTML
-        var insideDiv = document.createElement('div');
-        insideDiv.className = 'insideDiv';
+        var insideDiv = billboard.add(new innovaphone.ui1.Node('div', null, null, 'insideDiv').setAttribute('id', 'insideDiv'));
+        // insideDiv.className = 'insideDiv';
         // insideDiv.style.backgroundColor = post.color;
 
-        var postMsgDiv = document.createElement('div');
-        postMsgDiv.id = 'postmsg';
-        postMsgDiv.className = 'postmsg'
-        postMsgDiv.style.backgroundColor = post.color;
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node('div', `background-color:${post.color}`, null, 'postmsg').setAttribute('id', 'postmsg'));
+        //postMsgDiv.id = 'postmsg';
+        //postMsgDiv.className = 'postmsg'
+        //postMsgDiv.style.backgroundColor = post.color;
 
 
-        var closeWindowDiv = document.createElement('div');
-        closeWindowDiv.id = 'closewindow';
-        var historyPostDiv = document.createElement('div');
-        historyPostDiv.id = 'historypost';
-        var backDescription = document.createElement('div');
-        backDescription.id = 'backDescription';
-        backDescription.style.display = 'none';
-        var editPostDiv = document.createElement('div');
-        editPostDiv.id = 'editpost';
-        var deletePostDiv = document.createElement('div');
-        deletePostDiv.id = 'deletepost';
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'closewindow').setAttribute('id', 'closewindow'));
+        //closeWindowDiv.id = 'closewindow';
+            if (isEditor) {
+            var historyPostDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'historypost').setAttribute('id', 'historypost'));
+            //historyPostDiv.id = 'historypost';
+            var backDescription = postMsgDiv.add(new innovaphone.ui1.Node('div','display: none;', null, 'backDescription').setAttribute('id', 'backDescription'));
+            //backDescription.id = 'backDescription';
+            //backDescription.style.display = 'none';
+            var editPostDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'editpost').setAttribute('id', 'editpost'));
+            //editPostDiv.id = 'editpost';
+            var deletePostDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'deletepost').setAttribute('id', 'deletepost'));
+            //deletePostDiv.id = 'deletepost';
+            
+                //postMsgDiv.appendChild(historyPostDiv);
+                //postMsgDiv.appendChild(backDescription);
+                //postMsgDiv.appendChild(editPostDiv);
+                //postMsgDiv.appendChild(deletePostDiv);
+            }
 
         // Adicionando o listener de clique
-        closeWindowDiv.addEventListener('click', function () {
+        var a = document.getElementById('closewindow');
+        a.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             var isNew = views_history.filter(function (item) {
                 return item.id === parseInt(id, 10);
@@ -751,76 +646,119 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 makeDivPosts(post.department);
             }
         });
-        historyPostDiv.addEventListener('click', function () {
+        //closeWindowDiv.addEventListener('click', function () {
+        //    console.log("O elemento closeWindowDiv foi clicado!");
+        //    var isNew = views_history.filter(function (item) {
+        //        return item.id === parseInt(id, 10);
+        //    })[0];
+        //    if (isNew) {
+        //        console.log("Post NEW Visualizado:", post.id);
+        //        app.send({ api: "user", mt: "InsertViewHistory", post: post.id, src: parseInt(department.id, 10) });
+
+        //    } else {
+        //        makeDivPosts(post.department);
+        //    }
+        //});
+        var hist = document.getElementById('historypost');
+        var back = document.getElementById('backDescription');
+        hist.addEventListener('click', function () {
             console.log("O elemento historyPostDiv foi clicado!", id);
             app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10), })
 
-            historyPostDiv.style.display = 'none';
-            backDescription.style.display = 'block';
-            historyPostDiv.removeEventListener('click');
+            hist.style.display = 'none';
+            back.style.display = 'block';
+            hist.removeEventListener("click",hist);
         });
 
-        backDescription.addEventListener('click', function () {
+        //historyPostDiv.addEventListener('click', function () {
+        //    console.log("O elemento historyPostDiv foi clicado!", id);
+        //    app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10), })
+
+        //    historyPostDiv.style.display = 'none';
+        //    backDescription.style.display = 'block';
+        //    historyPostDiv.removeEventListener('click');
+        //});
+        var back = document.getElementById('backDescription');
+        back.addEventListener('click', function () {
             msgContent.innerHTML = post.description;
-            msgBoxDiv.innerHTML = '';
-            msgBoxDiv.appendChild(msgContent);
+            document.getElementById("msgbox").innerHTML = ''
+            msgBoxDiv.add(msgContent);
 
-            historyPostDiv.style.display = 'flex';
-            backDescription.style.display = 'none';
-            backDescription.removeEventListener('click')
+            hist.style.display = 'flex';
+            back.style.display = 'none';
+            back.removeEventListener('click',back)
         });
+        //backDescription.addEventListener('click', function () {
+        //    msgContent.innerHTML = post.description;
+        //    msgBoxDiv.innerHTML = '';
+        //    msgBoxDiv.appendChild(msgContent);
 
-        editPostDiv.addEventListener('click', function () {
+        //    historyPostDiv.style.display = 'flex';
+        //    backDescription.style.display = 'none';
+        //    backDescription.removeEventListener('click')
+        //});
+        var edit = document.getElementById('editpost');
+        edit.addEventListener('click', function () {
             console.log("O elemento editPostDiv foi clicado!");
-            editPostForm(id, dep_id);            
+            editPostForm(id, dep_id);
         });
-        deletePostDiv.addEventListener('click', function () {
+        //editPostDiv.addEventListener('click', function () {
+        //    console.log("O elemento editPostDiv foi clicado!");
+        //    editPostForm(id, dep_id);            
+        //});
+        var del = document.getElementById('deletepost');
+        del.addEventListener('click', function () {
             console.log("O elemento deletePostDiv foi clicado!");
-            app.send({ api: "user", mt: "DeletePost", id: parseInt(id,10), src:dep_id });
+            app.send({ api: "user", mt: "DeletePost", id: parseInt(id, 10), src: dep_id });
         });
+        //deletePostDiv.addEventListener('click', function () {
+        //    console.log("O elemento deletePostDiv foi clicado!");
+        //    app.send({ api: "user", mt: "DeletePost", id: parseInt(id,10), src:dep_id });
+        //});
 
-        var nameBoxDiv = document.createElement('div');
-        nameBoxDiv.id = 'namebox';
-        nameBoxDiv.className = 'namebox';
+        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, department.name, 'namebox').setAttribute('id', 'namebox'));
+        //nameBoxDiv.id = 'namebox';
+        //nameBoxDiv.className = 'namebox';
 
-        nameBoxDiv.innerHTML = department.name;
+        //nameBoxDiv.innerHTML = department.name;
 
-        var titleMsgDiv = document.createElement('div');
-        titleMsgDiv.id = 'titlemsg';
-        titleMsgDiv.className = 'titlemsg'
-        titleMsgDiv.innerHTML = post.title;
+        var titleMsgDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, post.title, 'titlemsg').setAttribute('id', 'titlemsg'));
+        //titleMsgDiv.id = 'titlemsg';
+        //titleMsgDiv.className = 'titlemsg'
+        //titleMsgDiv.innerHTML = post.title;
 
-        var msgBoxDiv = document.createElement('div');
-        msgBoxDiv.id = 'msgbox';
-        msgBoxDiv.className = 'msgbox';
-        msgBoxDiv.style.height = '75%'
+        var msgBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'height: 75%;', null, 'msgbox').setAttribute('id', 'msgbox'));
+        //msgBoxDiv.id = 'msgbox';
+        //msgBoxDiv.className = 'msgbox';
+        //msgBoxDiv.style.height = '75%';
 
 
-        var scrollBox = document.createElement('scroll-box');
-        scrollBox.style.display = 'flex';
-        scrollBox.style.color = 'white';
-        scrollBox.style.width = '100%';
-        scrollBox.style.height = '100%';
+        var scrollBox = msgBoxDiv.add(new innovaphone.ui1.Node('scrollbox', 'display: flex; color:white; width:100%; height:100%;', null, 'scrollbox').setAttribute('id', 'scrollbox'));
+        //scrollBox.style.display = 'flex';
+        //scrollBox.style.color = 'white';
+        //scrollBox.style.width = '100%';
+        //scrollBox.style.height = '100%';
 
-        var msgContent = document.createElement('pre');
-        msgContent.style.overflowY = 'auto'
-        msgContent.style.overflowX = 'auto'
-        msgContent.innerHTML = post.description;
+        var msgContent = scrollBox.add(new innovaphone.ui1.Node('div', 'overflow:auto;',post.description, 'msgcontent').setAttribute('id', 'msgcontent'));
+        //msgContent.style.overflowY = 'auto'
+        //msgContent.style.overflowX = 'auto'
+        //msgContent.innerHTML = post.description;
 
-        var footShowPost = document.createElement('div');
+
+        var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
 
-        var creatorPost = document.createElement('div');
-        creatorPost.id = 'creatorPost';
-        creatorPost.className = 'creatorPost';
-        creatorPost.innerHTML = 'Criador: ' + user.cn;
+        var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
+        //creatorPost.id = 'creatorPost';
+        //creatorPost.className = 'creatorPost';
+        //creatorPost.innerHTML = 'Criador: ' + user.cn;
 
-        console.log('Quero saber: ', user.cn);
+        //console.log('Quero saber: ', user.cn);
 
-        var closeDateDiv = document.createElement('div');
-        closeDateDiv.id = 'closedate';
-        closeDateDiv.className = 'closedate';
+        var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
+        //closeDateDiv.id = 'closedate';
+        //closeDateDiv.className = 'closedate';
 
         var dateString = post.date_end;
         var date = new Date(dateString);
@@ -831,35 +769,28 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var minutes = date.getMinutes();
         var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
-        closeDateDiv.innerHTML = formattedDate;
+        //closeDateDiv.innerHTML = formattedDate;
 
-        footShowPost.appendChild(creatorPost);
-        footShowPost.appendChild(closeDateDiv);
+        //footShowPost.appendChild(creatorPost);
+        //footShowPost.appendChild(closeDateDiv);
         
         // Adicionar os elementos criados � div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
-            //billboardDiv.innerHTML = '';
-            scrollBox.appendChild(msgContent);
-            msgBoxDiv.appendChild(scrollBox);
-            postMsgDiv.appendChild(closeWindowDiv);
-            postMsgDiv.appendChild(nameBoxDiv);
-            postMsgDiv.appendChild(titleMsgDiv);
-            postMsgDiv.appendChild(msgBoxDiv);
-            postMsgDiv.appendChild(footShowPost);
-            if (isEditor) {
-                postMsgDiv.appendChild(historyPostDiv);
-                postMsgDiv.appendChild(backDescription);
-                postMsgDiv.appendChild(editPostDiv);
-                postMsgDiv.appendChild(deletePostDiv);
-            }
-            billboardDiv.appendChild(insideDiv);
-            insideDiv.appendChild(postMsgDiv);
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
+        //var billboardDiv = document.getElementById('billboard');
+        
+        //    //billboardDiv.innerHTML = '';
+        //    scrollBox.appendChild(msgContent);
+        //    msgBoxDiv.appendChild(scrollBox);
+        //    postMsgDiv.appendChild(closeWindowDiv);
+        //    postMsgDiv.appendChild(nameBoxDiv);
+        //    postMsgDiv.appendChild(titleMsgDiv);
+        //    postMsgDiv.appendChild(msgBoxDiv);
+        //    postMsgDiv.appendChild(footShowPost);
+
+        //    billboardDiv.appendChild(insideDiv);
+        //    insideDiv.appendChild(postMsgDiv);
 
     }
+
     function createPostForm(dep_id) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);

@@ -9,6 +9,7 @@ Wecom.billboardTexts = {
         labelTituloAdmin: "Bem vindo ao Quadro de Avisos",
         labelTituloLicense: "Gerenciamento de Licenças",
         labelAdmin: "Administração",
+        labelAdd: "adicionar+",
         btnOk: "Ok",
         labelCfgUsers: "Usuários",
         labelCfgLicense: "Licenças",
