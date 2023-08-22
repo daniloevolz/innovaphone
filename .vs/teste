@@ -1,0 +1,26 @@
+{
+    "mt": "ApiResult",
+    "api": "com.innovaphone.search",
+    "consumer": "dev:SwPh_danilo.volz_641e0284",
+    "provider": "users-apis",
+    "src": "2",
+    "msg": {
+        "mt": "SearchInfo",
+        "type": "contact",
+        "dn": "Danilo Volz",
+        "avatar": "danilo.volz",
+        "guid": "8e4b16d1-d798-40ba-9800-43ea0d9523a3",
+        "link": "users?id=danilo.volz@wecom.com.br",
+        "contact": {
+            "givenname": "Danilo",
+            "sn": "Volz",
+            "company": "",
+            "sip": [
+                "danilo.volz@wecom.com.br"
+            ]
+        },
+        "pbx": "inn-lab-ipva",
+        "node": "root",
+        "template": "Config Admin"
+    }
+}

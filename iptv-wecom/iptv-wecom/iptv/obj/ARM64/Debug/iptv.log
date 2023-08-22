@@ -1,0 +1,27 @@
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "arm64-debug/iptv" -temp "arm64-debug/obj/" -project "iptv" -rtm "jse/arm64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, ../web1/ui1.popup/*.js, ../web1/ui1.listview/*.js, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-iptvservice.js," -copyRTM 1
+  Building project ...
+      Project output dirctory : arm64-debug/iptv
+      Temp directory          : arm64-debug\obj\iptv
+      Runtime binary          : jse/arm64/generic
+      Build Number            : 13B488
+  
+  Removing old files from arm64-debug\obj\iptv...
+  Creating directories...
+  Checking for new items to add...
+      .\iptv\..\web1\appwebsocket\innovaphone.appwebsocket.Connection.js => arm64-debug\obj\iptv\web1\appwebsocket
+      .\iptv\..\web1\lib1\*.js => arm64-debug\obj\iptv\web1\lib1
+      .\iptv\..\web1\lib1\*.css => arm64-debug\obj\iptv\web1\lib1
+      .\iptv\..\web1\ui1.lib\*.js => arm64-debug\obj\iptv\web1\ui1.lib
+      .\iptv\..\web1\ui1.svg\*.js => arm64-debug\obj\iptv\web1\ui1.svg
+      .\iptv\..\web1\fonts\*.ttf => arm64-debug\obj\iptv\web1\fonts
+      .\iptv\..\web1\ui1.popup\*.js => arm64-debug\obj\iptv\web1\ui1.popup
+      .\iptv\..\web1\ui1.listview\*.js => arm64-debug\obj\iptv\web1\ui1.listview
+      .\iptv\httpfiles\* => arm64-debug\obj\iptv
+      .\iptv\build.txt => arm64-debug\obj\iptv
+      .\iptv\label.txt => arm64-debug\obj\iptv
+      .\iptv\config.json => arm64-debug\obj\iptv
+      .\iptv\plugins.json => arm64-debug\obj\iptv
+      .\iptv\wecom-iptvservice.js => arm64-debug\obj\iptv
+  
+  Compressing files to arm64-debug\iptv\httpfiles.zip...
+  Comando de build remoto não configurado, ignorando.

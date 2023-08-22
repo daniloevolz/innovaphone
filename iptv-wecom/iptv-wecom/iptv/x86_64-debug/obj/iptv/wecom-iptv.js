@@ -14,16 +14,16 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191918",
+            "--bg": "url('./images/background.png')",
             "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--text-standard": "#ffffff",
             "--nav-bg": "rgba(255, 255, 255, 0.5)",
 
         },
         light: {
-            "--bg": "white",
+            "--bg": "url('./images/background.png')",
             "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--text-standard": "#ffffff",
             "--nav-bg": "rgba(75, 71, 71, 0.7)",
         }
     };
@@ -74,7 +74,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
        wecomA.setAttribute("href","https://wecom.com.br")
        wecomA.setAttribute("id","wecomA")
        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-       imgwecom.setAttribute("src","logo.png")
+       imgwecom.setAttribute("src","./images/wecom-white.svg")
         var divunlicensed = that.add(new innovaphone.ui1.Div("position:absolute;width:85%;left:15%; height: 100%;align-items: center;text-align: center;display: flex;justify-content: center;", null, null));
         divunlicensed.add(new innovaphone.ui1.Node("h1", "font-size: 40px; text-align: center", texts.text("labelUnlicensed"), null))
         divunlicensed.setAttribute("id", "container");
@@ -92,7 +92,7 @@ Wecom.iptv = Wecom.iptv || function (start, args) {
        wecomA.setAttribute("href","https://wecom.com.br")
        wecomA.setAttribute("id","wecomA")
        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-       imgwecom.setAttribute("src","logo.png")
+       imgwecom.setAttribute("src","./images/wecom-white.svg")
        var scroll = colesquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
        var uliptv = scroll.add(new innovaphone.ui1.Node("ul",null,null,null));
        uliptv.setAttribute("id","listchannels");

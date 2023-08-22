@@ -12,15 +12,15 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('./images/background.png')",
             "--button": "#c6c6c6",
-            "--text-standard": "#004c84",
+            "--text-standard": "#ffffff",
             "--div-DelBtn": "#f2f5f6",
         },
         light: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('./images/background.png')",
             "--button": "#c6c6c6",
-            "--text-standard": "#004c84",
+            "--text-standard": "#ffffff",
             "--div-DelBtn": "#f2f5f6",
         }
     };
@@ -125,7 +125,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         var imgGrafico = a3.add(new innovaphone.ui1.Node("img","width:40px;",null,"linkimgs"));
         imgCam.setAttribute("src","cameraIPTV.png")
         imgPlay.setAttribute("src","playIPTV.png")
-        imgGrafico.setAttribute("src","graficoIPTV.png")
+        imgGrafico.setAttribute("src","playIPTV.png")
 
         var linkImg = "cameraIPTV.png"
         console.log("Link da Imagem "+ linkImg)
@@ -154,7 +154,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
      var Play = document.getElementById("PlayIPTV");
      Play.addEventListener("click", function () { MudarDiv("PlayIPTV"),linkImg = "playIPTV.png" }, false);
      var Grafico = document.getElementById("GraficoIPTV");
-     Grafico.addEventListener("click", function () { MudarDiv("GraficoIPTV"),linkImg = "graficoIPTV.png" }, false);
+        Grafico.addEventListener("click", function () { MudarDiv("GraficoIPTV"), linkImg = "playIPTV.png" }, false);
 
     }
     
@@ -166,7 +166,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
         wecomA.setAttribute("href","https://wecom.com.br")
         var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-        imgwecom.setAttribute("src","logo.png")
+        imgwecom.setAttribute("src","./images/wecom-white.svg")
         // titulo
         var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
     }
@@ -219,7 +219,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
             document.getElementById("imgMain").setAttribute("src","playIPTV.png")
 
         } else if (el == "GraficoIPTV") {
-            document.getElementById("imgMain").setAttribute("src","graficoIPTV.png")
+            document.getElementById("imgMain").setAttribute("src","playIPTV.png")
         }
         
     }

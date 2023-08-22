@@ -153,6 +153,9 @@
       "com.innovaphone.phone": {
         "info": {}
       },
+      "com.innovaphone.phonelookup": {
+        "info": {}
+      },
       "hidden": true
     },
     "wecom-dwcscheduler": {

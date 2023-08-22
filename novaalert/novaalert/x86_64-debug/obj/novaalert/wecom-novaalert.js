@@ -19,12 +19,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('wecom-white.png')",
             "--button": "#929292",
             "--text-standard": "white",
         },
         light: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('wecom-white.png')",
             "--button": "#929292",
             "--text-standard": "white",
         }

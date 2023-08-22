@@ -130,6 +130,7 @@
     <None Include="novaalert\httpfiles\video.js" />
     <None Include="novaalert\httpfiles\videojs-contrib-hls.js" />
     <None Include="novaalert\httpfiles\videojs-contrib-hls.min.js" />
+    <None Include="novaalert\httpfiles\wecom-white.svg" />
     <None Include="novaalert\novaalert.mak" />
     <None Include="novaalert\config.json" />
     <None Include="novaalert\plugins.json" />

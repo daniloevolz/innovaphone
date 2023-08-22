@@ -22,13 +22,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var colDireita;
     var colorSchemes = {
         dark: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('wecom-white.png')",
             "--button": "#c6c6c6",
             "--text-standard": "#004c84",
             "--div-DelBtn" : "#f2f5f6",
         },
         light: {
-            "--bg": "url('bg.png')",
+            "--bg": "url('wecom-white.png')",
             "--button": "#c6c6c6",
             "--text-standard": "#004c84",
             "--div-DelBtn" : "#f2f5f6",

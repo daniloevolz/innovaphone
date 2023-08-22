@@ -55,10 +55,27 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     var searchApi;
 
 
+
+    var phonelookupApi = start.provideApi("com.innovaphone.phonelookup");
+
+    phonelookupApi.onmessage.attach(function (sender, phonelookupApiRequest) {
+        // usually the requests should be queued and processed
+        // one by one to avoid heavy load, also a local cache can be created
+        // we forward them directly to app service to keep it simple
+
+        var response = { mt: "LookupInfo", dn: undefined, link: undefined, contact: {}, photourl: undefined, adjust: true }; //adjust number by a trunk prefix
+        response.dn = "Caralho de merda";
+        console.log("phonelookup:obj " + JSON.stringify(response));
+        sender.send(response, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // consumer and src must be returned to sender
+        sender.send({ mt: "LookupResult" }, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // finishing LookupResult message
+    });
+
+
     function app_connected(domain, user, dn, appdomain) {
 
         app.send({ api: "user", mt: "UserSession" });
         searchApi = start.provideApi("com.innovaphone.search");
+        searchApi.update({ relevance: 2000 });
         searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
         phoneApi = start.consumeApi("com.innovaphone.phone");
@@ -120,15 +137,25 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     }
     function onSearchApiMessage(consumer, obj) {
         console.log("onSearchApiMessage:obj " + JSON.stringify(obj));
+
         switch (obj.msg.mt) {
             case "Search":
                 if (obj.msg.search == "Extern Web") {
-                    obj.msg = "";
-                    obj.msg = { mt: "SearchInfo", type: "contact", dn: dwcCaller, avatar: "danilo.volz", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3", link: "users?id=danilo.volz@wecom.com.br", contact: { givenname: "Danilo", sn: "Volz", company: "", sip: ["danilo.volz@wecom.com.br"] }, pbx: "inn-lab-ipva", node: "root", template: "Config Admin" };
-                    searchApi.send(obj);
-                    obj.msg = "";
-                    obj.msg = { mt: "SearchResult" };
-                    searchApi.send(obj);
+                    console.log("onSearchApiMessage:obj.msg.search == Extern Web");
+                    searchApi.send({
+                        mt: "SearchInfo", type: "contact", dn: dwcCaller, cn: dwcCaller,
+                        avatar: "extern-web", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3",
+                        link: dwcLocation, contact: {
+                            givenname: dwcCaller,
+                            sn: "",
+                            company: "",
+                            sip: [
+                                "extern-web@wecom.com.br"
+                            ]
+                        },
+                        pbx: "inn-lab-ipva", node: "root", template: "Config Admin", nodeprefix: ""
+                    }, obj.consumer, obj.src);
+                    searchApi.send({ mt: "SearchResult" }, obj.consumer, obj.src); 
                 }
                 break;
         }

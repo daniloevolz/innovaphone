@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.iptvmanager",
+            "icon": "wecom-iptv.png",
+            "lang": "wecom.iptvmanagertexts",
+            "domains": false
+        }
+    ]
+}

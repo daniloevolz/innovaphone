@@ -3,7 +3,7 @@ body {
     /* background-color: var(--bg); */
     color: var(--text-standard);
     font-family: arial;
-    background-image: url(fundoIPTV.png);
+    background-image: var(--bg);
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
@@ -130,7 +130,7 @@ div.button-inn {
     left: 10px;
     top: 10px;
     box-sizing: border-box;
-    width: calc(100% - 20px);
+    /* width: calc(100% - 20px); */
     height: 40px;
     padding: 10px;
     background-color: var(--button);
@@ -179,3 +179,44 @@ div.button-inn {
   
   .logos:hover .logos-conteudos {display: block; width: 100%;}
 
+/*Inicío Tabelas*/
+
+table {
+    border-collapse: collapse; /* CSS2 */
+    background: #80808096;
+    color: #B0132B;
+}
+
+    table td {
+        border: 1px solid #02163F;
+        width: -webkit-fill-available;
+        padding: 10px;
+        height: 50px
+    }
+
+/*.table-actions table td {
+    width: 14.285%;
+}
+
+.table-buttons table td {
+    width: 25%;
+}*/
+
+table tr {
+    border: 1px solid #02163F;
+    height: 50px;
+    color: white;
+}
+
+table th {
+    border: 1px solid #02163F;
+    background: #F0FFF0;
+    height: 50px;
+    color: white;
+}
+
+.headercl {
+    font-size: 12px;
+    background-color: #02163F;
+}
+/*End Tabelas*/
