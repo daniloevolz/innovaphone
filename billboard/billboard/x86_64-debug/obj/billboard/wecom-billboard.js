@@ -234,19 +234,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 var endDate = new Date(post.date_end);
                 var now = new Date();
 
-                if (starDate>now) {
-                    headpost.className ='futurepost';
-                }
-                if (post.deleted) {
-                    headpost.className ='deletedpost';
-                };
+                var hdpost = document.querySelectorAll("#headpost");
+
+                    hdpost.forEach(function(hd) {
+                        if(starDate>now){
+                            hd.className ='futurepost';
+                        }
+                        if (post.deleted) {
+                            hd.className = 'deletedpost';
+                        }
+                    });
+
+                // if (starDate>now) {
+                //     headpost.className ='futurepost';
+                // }
+                // if (post.deleted) {
+                //     document.getElementById("headpost").className = 'deletedpost'
+                //     //headpost.className ='deletedpost';
+                // };
+                
                 var footpost = postDiv.add(new innovaphone.ui1.Node("ul",null,null,"footpost").setAttribute("id","footpost"))
                 // var footpost = document.createElement('ul');
                 // footpost.id = 'footpost';
                 // footpost.className = "footpost";
 
                 var spanStart = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,null).setAttribute("id","dateS"))
-                spanStart.textContent = "Início: " + formatDate(starDate);
+                document.getElementById("dateS").innerHTML = "Início: " + formatDate(starDate);
+                
+                var spanEnd = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,null).setAttribute("id","dateE"))
+                document.getElementById("dateE").innerHTML = "Fim: " + formatDate(endDate);
                 
                 // var spanEnd = document.createElement('span');
                 // spanEnd.id = 'dateE';
@@ -343,148 +359,188 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 }
                 
             })
-            var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"timeDepDiv").setAttribute("id","timeDepDiv"))
+            var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"timedDepDiv").setAttribute("id","timeDepDiv"))
             // var timedDepDiv = document.createElement("div");
             // timedDepDiv.className= 'timedDepDiv'
             var time = document.getElementById("timeDepDiv")
             time.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO SELETOR TEMPO ABRIR POSTS E ENTÂO ENVIAR APP.SEND")
                
-                var worktable = document.getElementById('worktable');
+                var worktable1 = document.getElementById('worktable');
                 var depTimeManager = document.getElementById('depTimeManager');
 
                 if (depTimeManager) {
-                    worktable.remove(depTimeManager);
+                    worktable1.remove(depTimeManager);
 
                 } else {
-                    var depTimeManager = new innovaphone.ui1.Node("div",null,null,"depTimeManager").setAttribute("id","depTimeManager")
+                    var depTimeManager = worktable.add(new innovaphone.ui1.Node("div",null,null,"depTimeManager").setAttribute("id","depTimeManager"))
+
+                    var middleSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"mdselect").setAttribute("id","mdselect"))
+
+                    var customPeriodDiv = middleSelect.add(new innovaphone.ui1.Node("div","display:none;",null,"customPeriod").setAttribute("id","customPeriod"))
                     // var depTimeManager = document.createElement('div');
                     // depTimeManager.id = 'depTimeManager';
                     // depTimeManager.className = 'depTimeManager'
-                    var select = new innovaphone.ui1.Node("div",null,null,"periodSelector").setAttribute("id","periodSelector")
+                    // var select = topSelect.add(new innovaphone.ui1.Node("div",null,null,"periodSelector").setAttribute("id","periodSelector"))
                     // var select = document.createElement('select');
                     // select.id = 'periodSelector';
                     // select.className = 'periodSelector';
+                    // var options = [
+                    //     'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
+                    // ];
+
+                    // options.forEach(function (optionText) {
+                    //     var option = document.createElement('option');
+                    //     option.value = optionText.toLowerCase().replace(/\s/g, '');
+                    //     option.textContent = optionText;
+                    //     select.add(option);
+                    // });
+                    // var customPeriodDiv = middleSelect.add(new innovaphone.ui1.Node("div","display:none;",null,"customPeriod").setAttribute("id","customPeriod"))
+    
+                    // var customPeriodDiv = document.createElement('div');
+                    // customPeriodDiv.id = 'customPeriod';
+                    // customPeriodDiv.className = 'customPeriod';
+                    // customPeriodDiv.style.display = 'none';
+                    var bottomSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"btselect").setAttribute("id","btselect"))
+
+                    var startDateLabel = customPeriodDiv.add(new innovaphone.ui1.Node("label",null,texts.text("labelInicio"),"startDateLabel"))
+
+                    // var startDateLabel = document.createElement('label');
+                    // startDateLabel.textContent = 'Início:';
+                    // startDateLabel.style.marginLeft = '10px';
+                    // startDateLabel.style.marginRight = '0px';
+                    // startDateLabel.style.fontSize = '18px';
+                    // startDateLabel.style.height = '20px';
+                    // startDateLabel.style.width = '145px';
+                    // startDateLabel.style.position = 'relative';
+                    // startDateLabel.style.left = '95px';
+                    var startDateInput = customPeriodDiv.add(new innovaphone.ui1.Input(null,null,null,null,"date","dateinput").setAttribute("id","data_start"));
+                    // var startDateInput = document.createElement('input');
+                    // startDateInput.type = 'date';
+                    // startDateInput.id = 'data_start';
+                    // startDateInput.className = 'dateinput';
+                    var endDateLabel = customPeriodDiv.add(new innovaphone.ui1.Node("label",null,texts.text("labelExpired"),"endDateLabel"))
+
+                    // var endDateLabel = document.createElement('label');
+                    // endDateLabel.textContent = 'Expiração:';
+                    // endDateLabel.style.marginLeft = '10px';
+                    // endDateLabel.style.marginRight = '0px';
+                    // endDateLabel.style.fontSize = '18px';
+                    // endDateLabel.style.height = '20px';
+                    // endDateLabel.style.width = '145px';
+                    // endDateLabel.style.position = 'relative';
+                    // endDateLabel.style.left = '61px';
+
+                    var endDateInput = customPeriodDiv.add(new innovaphone.ui1.Input(null,null,null,null,"date","dateinput").setAttribute("id","data_end"));
+
+                    // var endDateInput = document.createElement('input');
+                    // endDateInput.type = 'date';
+                    // endDateInput.id = 'data_end';
+                    // endDateInput.className = 'dateinput';
+
+                    var checkboxButtonLabel = bottomSelect.add(new innovaphone.ui1.Node("label","font-size:18px;",texts.text("labelExcluidos"),null))
+                     // var checkboxButtonLabel = document.createElement('label');
+                    // checkboxButtonLabel.textContent = 'Excluídos:';
+                    // checkboxButtonLabel.style.fontSize = '18px';
+                    var checkboxButton1 = bottomSelect.add(new innovaphone.ui1.Input("width:30px;height:25px;margin:0px 15px;","deleted",null,null,"checkbox",null).setAttribute("id","checkboxDeleted"))
+
+                    // var checkboxButton1 = document.createElement('input');
+                    // checkboxButton1.type = 'checkbox';
+                    // checkboxButton1.style.width = '30px'
+                    // checkboxButton1.style.height = '25px'
+                    // checkboxButton1.style.margin = '0px 15px';
+                    // checkboxButton1.name = 'checkboxDeleted';
+                    // checkboxButton1.value = 'deleted';
+
+                    var submitButton = bottomSelect.add(new innovaphone.ui1.Node("button","width: 46px; height: 25px; margin: 10px;",texts.text("btnOk")).setAttribute("id","submitButton"))
+
+                    // var submitButton = document.createElement('button');
+                    // submitButton.textContent = 'OK';
+                    // submitButton.id = 'submitButton';
+                    // submitButton.style.width = '46px';
+                    // submitButton.style.height = '25px';
+                    // submitButton.style.margin = '10px';
+
+                    var topSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"topselect").setAttribute("id","topselect"))
+
+                    // var topSelect = document.createElement('div');
+                    // topSelect.id = 'topselect'
+                    // topSelect.className = 'topselect'
+                    //var middleSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"mdselect").setAttribute("id","mdselect"))
+
+                    // var customPeriodDiv = middleSelect.add(new innovaphone.ui1.Node("div","display:none;",null,"customPeriod").setAttribute("id","customPeriod"))
+                    // var middleSelect = document.createElement('div');
+                    // middleSelect.id = 'mdselect'
+                    // middleSelect.className = 'mdselect'
+                    // var bottomSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"btselect").setAttribute("id","btselect"))
+                    // var bottomSelect = document.createElement('div');
+                    // bottomSelect.id = 'btselect'
+                    // bottomSelect.className = 'btselect'
+
+                    // depTimeManager.appendChild(topSelect);
+                    // depTimeManager.appendChild(middleSelect);
+                    // depTimeManager.appendChild(bottomSelect);
+
+                    // topSelect.appendChild(select);
+
+                    // customPeriodDiv.appendChild(startDateLabel);
+                    // customPeriodDiv.appendChild(startDateInput);
+                    // customPeriodDiv.appendChild(endDateLabel);
+                    // customPeriodDiv.appendChild(endDateInput);
+
+                   // middleSelect.appendChild(customPeriodDiv);
+
+                    // bottomSelect.appendChild(checkboxButtonLabel);
+                    // bottomSelect.appendChild(checkboxButton1);
+                    // bottomSelect.appendChild(submitButton);
+                    var select = topSelect.add(new innovaphone.ui1.Node("select",null,null,"periodSelector").setAttribute("id","periodSelector"))
+
                     var options = [
-                        'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
-                    ];
+                            'Hoje', 'Últimos 7 dias', 'Últimos 30 dias', 'Próximos 7 dias', 'Próximos 30 dias', 'Desde Sempre', 'Período Customizado'
+                         ];
+    
+                         options.forEach(function (optionText) {
+                            var option = select.add(new innovaphone.ui1.Node("option", null, optionText, null));
+                            var optionValue = optionText.toLowerCase().replace(/\s/g, ''); 
+                            option.setAttribute("id", "optvalue"); 
+                            option.setAttribute("value", optionValue);
+                            // select.add(option);
+                        });
 
-                    options.forEach(function (optionText) {
-                        var option = document.createElement('option');
-                        option.value = optionText.toLowerCase().replace(/\s/g, '');
-                        option.textContent = optionText;
-                        select.add(option);
-                    });
-
-                    var customPeriodDiv = document.createElement('div');
-                    customPeriodDiv.id = 'customPeriod';
-                    customPeriodDiv.className = 'customPeriod';
-                    customPeriodDiv.style.display = 'none';
-
-                    var startDateLabel = document.createElement('label');
-                    startDateLabel.textContent = 'Início:';
-                    startDateLabel.style.marginLeft = '10px';
-                    startDateLabel.style.marginRight = '0px';
-                    startDateLabel.style.fontSize = '18px';
-                    startDateLabel.style.height = '20px';
-                    startDateLabel.style.width = '145px';
-                    startDateLabel.style.position = 'relative';
-                    startDateLabel.style.left = '95px';
-                    var startDateInput = document.createElement('input');
-                    startDateInput.type = 'date';
-                    startDateInput.id = 'data_start';
-                    startDateInput.className = 'dateinput';
-
-                    var endDateLabel = document.createElement('label');
-                    endDateLabel.textContent = 'Expiração:';
-                    endDateLabel.style.marginLeft = '10px';
-                    endDateLabel.style.marginRight = '0px';
-                    endDateLabel.style.fontSize = '18px';
-                    endDateLabel.style.height = '20px';
-                    endDateLabel.style.width = '145px';
-                    endDateLabel.style.position = 'relative';
-                    endDateLabel.style.left = '61px';
-                    var endDateInput = document.createElement('input');
-                    endDateInput.type = 'date';
-                    endDateInput.id = 'data_end';
-                    endDateInput.className = 'dateinput';
-
-                    var checkboxButtonLabel = document.createElement('label');
-                    checkboxButtonLabel.textContent = 'Excluídos:';
-                    checkboxButtonLabel.style.fontSize = '18px';
-                    var checkboxButton1 = document.createElement('input');
-                    checkboxButton1.type = 'checkbox';
-                    checkboxButton1.style.width = '30px'
-                    checkboxButton1.style.height = '25px'
-                    checkboxButton1.style.margin = '0px 15px';
-                    checkboxButton1.name = 'checkboxDeleted';
-                    checkboxButton1.value = 'deleted';
-
-                    var submitButton = document.createElement('button');
-                    submitButton.textContent = 'OK';
-                    submitButton.id = 'submitButton';
-                    submitButton.style.width = '46px';
-                    submitButton.style.height = '25px';
-                    submitButton.style.margin = '10px';
-
-                    var topSelect = document.createElement('div');
-                    topSelect.id = 'topselect'
-                    topSelect.className = 'topselect'
-
-                    var middleSelect = document.createElement('div');
-                    middleSelect.id = 'mdselect'
-                    middleSelect.className = 'mdselect'
-
-                    var bottomSelect = document.createElement('div');
-                    bottomSelect.id = 'btselect'
-                    bottomSelect.className = 'btselect'
-
-                    depTimeManager.appendChild(topSelect);
-                    depTimeManager.appendChild(middleSelect);
-                    depTimeManager.appendChild(bottomSelect);
-
-                    topSelect.appendChild(select);
-
-                    customPeriodDiv.appendChild(startDateLabel);
-                    customPeriodDiv.appendChild(startDateInput);
-                    customPeriodDiv.appendChild(endDateLabel);
-                    customPeriodDiv.appendChild(endDateInput);
-
-                    middleSelect.appendChild(customPeriodDiv);
-
-                    bottomSelect.appendChild(checkboxButtonLabel);
-                    bottomSelect.appendChild(checkboxButton1);
-                    bottomSelect.appendChild(submitButton);
-
-
-                    select.addEventListener('change', function () {
+                    var selectPeriod = document.getElementById("periodSelector")
+                    selectPeriod.addEventListener('change', function () {
                         if (select.value === 'períodocustomizado') {
-                            customPeriodDiv.style.display = 'flex';
+                            document.getElementById("customPeriod").style.display = 'flex'
+                            // customPeriodDiv.style.display = 'flex';
                             depTimeManager.className = 'depTimeManagerPersonal';
-                            middleSelect.style.display = 'flex';
+                            document.getElementById("mdselect").style.display = 'flex';
+                            // middleSelect.style.display = 'flex';
                             select.className = 'periodSelectorPersonal';
                             topSelect.className = 'topselectPersonal';
                             bottomSelect.className = 'btselectPersonal';
                           //depTimeManager.style.transition = 'width 1s, height 1s';//
                         } else {
-                            customPeriodDiv.style.display = 'none';
+                            // customPeriodDiv.style.display = 'none';
+                            document.getElementById("customPeriod").style.display = 'none'
                             depTimeManager.className = 'depTimeManager';
-                            middleSelect.style.display = 'none';
+                            // middleSelect.style.display = 'none';
+                            document.getElementById("mdselect").style.display = 'none';
                             select.className = 'periodSelector';
                             topSelect.className = 'topselect';
                             bottomSelect.className = 'btselect';
                           //depTimeManager.style.transition = '';//
                         }
                     });
-
-
-
-                    submitButton.addEventListener('click', function () {
-                        var selectedValue = select.value;
+                    var submit = document.getElementById("submitButton")
+                    submit.addEventListener('click', function () {
+                        var selectedValue = document.getElementById("periodSelector").value
+                        console.log("SELECTED VALUE" + selectedValue)
+                        // var selectedValue = select.value;
                         var startDate, endDate;
                         var query = '';
-
-                        if (!checkboxButton1.checked) {
+                        var checkboxbtn = document.getElementById("checkboxDeleted")
+                        console.log(checkboxbtn + "CHECKBOX DELETED")
+                        if (!checkboxbtn.checked) {
                             query += " AND deleted IS NULL";
                         }
 
@@ -543,7 +599,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                         app.send({ api: "user", mt: "SelectPosts", department: parseInt(dep_id, 10), query: query });
                     });
 
-                    worktable.appendChild(depTimeManager);
+                    worktable.add(depTimeManager);
 
                     var animatedDiv = document.getElementById("depTimeManager");
                     setTimeout(function () {
@@ -769,6 +825,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var minutes = date.getMinutes();
         var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
+        document.getElementById("closedate").innerHTML = formattedDate
         //closeDateDiv.innerHTML = formattedDate;
 
         //footShowPost.appendChild(creatorPost);

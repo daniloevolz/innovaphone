@@ -259,6 +259,24 @@ td.checkbox {
     justify-items: center;
     align-content: flex-start;
 }
+.endDateLabel{
+    margin-left: 10px;
+    margin-right: 0px;
+    font-size: 18px;
+    height: 20px;
+    width: 145px;
+    position: relative;
+    left: 61px;
+}
+.startDateLabel{
+    margin-left: 10px;
+    margin-right: 0px;
+    font-size: 18px;
+    height: 20px;
+    width: 145px;
+    position: relative;
+    left: 95px;
+}
 .footbuttons {
     position: absolute;
     display: flex;
