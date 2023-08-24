@@ -13,6 +13,8 @@ Wecom.billboardTexts = {
         labelInicio: "Inicio: ",
         labelExpired : "Expiração: ",
         labelExcluidos: "Excluídos: ",
+        labelClose: "Fechar",
+        labelInsert: "Inserir",
         btnOk: "Ok",
         labelCfgUsers: "Usuários",
         labelCfgLicense: "Licenças",

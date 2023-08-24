@@ -180,8 +180,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             }
         }
     }
-
-
     function makeDivPosts(dep_id) {
 
         // Criar os elementos HTML
@@ -219,7 +217,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             
             })[0];
 
-            var headpost = postDiv.add(new innovaphone.ui1.Node("ul",null,null,null).setAttribute("id","headpost"))
+            var headpost = postDiv.add(new innovaphone.ui1.Node("ul",null,null,"headpost").setAttribute("id","headpost"))
             // postDiv.appendChild(headpost);
             // var headpost = document.createElement('ul');
             // headpost.id = 'headpost';
@@ -233,18 +231,19 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 var starDate = new Date(post.date_start);
                 var endDate = new Date(post.date_end);
                 var now = new Date();
+                console.log("Start Date" + starDate + "End Date" + endDate + "Now" + now)
 
-                var hdpost = document.querySelectorAll("#headpost");
+                var hdposts = document.querySelectorAll(".headpost");
 
-                    hdpost.forEach(function(hd) {
-                        if(starDate>now){
-                            hd.className ='futurepost';
-                        }
-                        if (post.deleted) {
-                            hd.className = 'deletedpost';
-                        }
-                    });
-
+                hdposts.forEach(function(hdpost) {
+                    if (post.deleted) {
+                        hdpost.className = 'deletedpost';
+                    }else if (starDate > now) {
+                        hdpost.className = 'futurepost';
+                    } else {
+                        hdpost.className = ''; 
+                    }
+                });
                 // if (starDate>now) {
                 //     headpost.className ='futurepost';
                 // }
@@ -258,12 +257,19 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 // footpost.id = 'footpost';
                 // footpost.className = "footpost";
 
-                var spanStart = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,null).setAttribute("id","dateS"))
-                document.getElementById("dateS").innerHTML = "Início: " + formatDate(starDate);
+                var spanStart = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,"dateS").setAttribute("id","dateS"))
+                //document.getElementById("dateS").innerHTML = "Início: " + formatDate(starDate);
+                // spanStart.textContent = "Início: " + formatDate(starDate);
                 
-                var spanEnd = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,null).setAttribute("id","dateE"))
-                document.getElementById("dateE").innerHTML = "Fim: " + formatDate(endDate);
-                
+                var spanEnd = footpost.add(new innovaphone.ui1.Node("span","font-size:10px;",null,"dateE").setAttribute("id","dateE"))
+               // document.getElementById("dateE").innerHTML = "Fim: " + formatDate(endDate);
+                // spanEnd.textContent = "Fim: " + formatDate(endDate);
+                var postid = document.getElementById(post.id)
+                var dateStartSpan = postid.querySelector(".dateS"); 
+                var dateEndSpan = postid.querySelector(".dateE"); 
+                dateStartSpan.textContent = "Início: " + formatDate(starDate);
+                dateEndSpan.textContent = "Fim: " + formatDate(endDate);
+
                 // var spanEnd = document.createElement('span');
                 // spanEnd.id = 'dateE';
                 // spanEnd.style.fontSize = '10px';
@@ -370,14 +376,20 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 var depTimeManager = document.getElementById('depTimeManager');
 
                 if (depTimeManager) {
-                    worktable1.remove(depTimeManager);
+                    worktable1.removeChild(depTimeManager)
+                    // worktable1.remove(depTimeManager);
+                    // console.log("Removido")
 
                 } else {
                     var depTimeManager = worktable.add(new innovaphone.ui1.Node("div",null,null,"depTimeManager").setAttribute("id","depTimeManager"))
 
+                    var topSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"topselect").setAttribute("id","topselect"))
+                    
                     var middleSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"mdselect").setAttribute("id","mdselect"))
 
                     var customPeriodDiv = middleSelect.add(new innovaphone.ui1.Node("div","display:none;",null,"customPeriod").setAttribute("id","customPeriod"))
+                    
+                    var bottomSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"btselect").setAttribute("id","btselect"))
                     // var depTimeManager = document.createElement('div');
                     // depTimeManager.id = 'depTimeManager';
                     // depTimeManager.className = 'depTimeManager'
@@ -401,7 +413,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     // customPeriodDiv.id = 'customPeriod';
                     // customPeriodDiv.className = 'customPeriod';
                     // customPeriodDiv.style.display = 'none';
-                    var bottomSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"btselect").setAttribute("id","btselect"))
+                    // var bottomSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"btselect").setAttribute("id","btselect"))
 
                     var startDateLabel = customPeriodDiv.add(new innovaphone.ui1.Node("label",null,texts.text("labelInicio"),"startDateLabel"))
 
@@ -461,7 +473,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     // submitButton.style.height = '25px';
                     // submitButton.style.margin = '10px';
 
-                    var topSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"topselect").setAttribute("id","topselect"))
+                    //var topSelect = depTimeManager.add(new innovaphone.ui1.Node("div",null,null,"topselect").setAttribute("id","topselect"))
 
                     // var topSelect = document.createElement('div');
                     // topSelect.id = 'topselect'
@@ -509,25 +521,33 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
                     var selectPeriod = document.getElementById("periodSelector")
                     selectPeriod.addEventListener('change', function () {
-                        if (select.value === 'períodocustomizado') {
+                        if (selectPeriod.value === 'períodocustomizado') {
+                            console.log("Periodo Customizado!")
                             document.getElementById("customPeriod").style.display = 'flex'
                             // customPeriodDiv.style.display = 'flex';
-                            depTimeManager.className = 'depTimeManagerPersonal';
+                            document.getElementById("depTimeManager").className = 'depTimeManagerPersonal'
+                           // depTimeManager.className = 'depTimeManagerPersonal';
                             document.getElementById("mdselect").style.display = 'flex';
                             // middleSelect.style.display = 'flex';
-                            select.className = 'periodSelectorPersonal';
-                            topSelect.className = 'topselectPersonal';
-                            bottomSelect.className = 'btselectPersonal';
+                            selectPeriod.className = 'periodSelectorPersonal';
+                            document.getElementById("topselect").className = 'topselectPersonal'
+                            // topSelect.className = 'topselectPersonal';
+                            document.getElementById("btselect").className = 'btselectPersonal'
+                            // bottomSelect.className = 'btselectPersonal';
+                            //document.getElementById("depTimeManager").style.transition = 'width 1s, height 1s'
                           //depTimeManager.style.transition = 'width 1s, height 1s';//
                         } else {
                             // customPeriodDiv.style.display = 'none';
                             document.getElementById("customPeriod").style.display = 'none'
-                            depTimeManager.className = 'depTimeManager';
+                            document.getElementById("depTimeManager").className = 'depTimeManager'
+                            //depTimeManager.className = 'depTimeManager';
                             // middleSelect.style.display = 'none';
                             document.getElementById("mdselect").style.display = 'none';
-                            select.className = 'periodSelector';
-                            topSelect.className = 'topselect';
-                            bottomSelect.className = 'btselect';
+                            selectPeriod.className = 'periodSelector';
+                            // topSelect.className = 'topselect';
+                            document.getElementById("topselect").className = 'topselect'
+                            document.getElementById("btselect").className = 'btselect';
+                            //document.getElementById("depTimeManager").style.transition = ''
                           //depTimeManager.style.transition = '';//
                         }
                     });
@@ -541,7 +561,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                         var checkboxbtn = document.getElementById("checkboxDeleted")
                         console.log(checkboxbtn + "CHECKBOX DELETED")
                         if (!checkboxbtn.checked) {
-                            query += " AND deleted IS NULL";
+                           // query += " AND deleted IS NULL";
+                           query += " AND deleted IS NULL";
                         }
 
                         switch (selectedValue) {
@@ -581,8 +602,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                                 query += ";";
                                 break;
                             case 'períodocustomizado':
-                                startDate = startDateInput.value;
-                                endDate = endDateInput.value;
+                                var startDateIpt = document.getElementById("data_start")
+                                var endDateIpt = document.getElementById("data_end")
+                                startDate = startDateIpt.value;
+                                endDate = endDateIpt.value;
                                 var startDateObj = new Date(startDate).toISOString()
                                 var endDateObj = new Date(endDate);
                                 endDateObj.setUTCHours(23,59,59)
@@ -641,7 +664,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         
     }
-    
     function makeDivPostMessage(id, dep_id, user) {
         //limpa a div BILlBOARD
         document.getElementById('billboard').innerHTML = '';
@@ -847,39 +869,40 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         //    insideDiv.appendChild(postMsgDiv);
 
     }
-
     function createPostForm(dep_id) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+        //var billboard = document.getElementById('billboard').innerHTML = '';
 
-        var postMsgDiv = document.createElement('div');
-        postMsgDiv.id = 'postmsg';
-        postMsgDiv.className = 'postmsg';
-        postMsgDiv.style.backgroundColor = '#0f243f';
+        var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
+        //insideDiv.className = 'insideDiv';
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", 'background-color:#0f243f;', null, 'postmsg').setAttribute("id", "postmsg"));
+        //postMsgDiv.id = 'postmsg';
+        //postMsgDiv.className = 'postmsg';
+        //postMsgDiv.style.backgroundColor = '#0f243f';
+        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
+        //nameBoxDiv.id = 'namebox';
+        //nameBoxDiv.className = 'namebox';
+        //nameBoxDiv.innerHTML = department.name;
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
+        //closeWindowDiv.id = 'closewindow';
+        var titleMsgDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'titlemsg').setAttribute("id", "titlemsg"));
+        var titleinput = titleMsgDiv.add(new innovaphone.ui1.Input('color: #ffff; background-color: rgb(93 126 131 / 36%);', null, "Título", 40, "text", 'titleinput').setAttribute("id", "titleevent"));
+        //titleMsgDiv.id = 'titlemsg';
+        //titleMsgDiv.className = 'titlemsg';
+        //titleMsgDiv.innerHTML = '<input id="titleevent" type="text" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
 
-        var nameBoxDiv = document.createElement('div');
-        nameBoxDiv.id = 'namebox';
-        nameBoxDiv.className = 'namebox';
-        nameBoxDiv.innerHTML = department.name;
+        var msgBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'msgbox').setAttribute("id", "msgbox"));
+        var msgBoxText = msgBoxDiv.add(new innovaphone.ui1.Node('textarea', null, null, '1000', 'msgevent').setAttribute("id", "msgevent"));
+        msgBoxText.setAttribute('placeHolder', 'Texto da Mensagem: ');
 
-        var closeWindowDiv = document.createElement('div');
-        closeWindowDiv.id = 'closewindow';
+        var p = msgBoxDiv.add(new innovaphone.ui1.Node('p', null, '1000', 'char-counter').setAttribute("id", "charCount"));
+        //msgBoxDiv.id = 'msgbox';
+        //msgBoxDiv.className = 'msgbox';
+        //msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>' + '<p class="char-counter"><span id="charCount">1000</span> /1000</p>';
 
-        var titleMsgDiv = document.createElement('div');
-        titleMsgDiv.id = 'titlemsg';
-        titleMsgDiv.className = 'titlemsg';
-        titleMsgDiv.innerHTML = '<input id="titleevent" type="text" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
-
-        var msgBoxDiv = document.createElement('div');
-        msgBoxDiv.id = 'msgbox';
-        msgBoxDiv.className = 'msgbox';
-        msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>' + '<p class="char-counter"><span id="charCount">1000</span> /1000</p>';
-
-        document.body.appendChild(msgBoxDiv);
-
-        var insideDiv = document.createElement('div');
-        insideDiv.className = 'insideDiv';
+        //document.body.appendChild(msgBoxDiv);
 
         var textarea = document.getElementById("msgevent");
         var charCountSpan = document.getElementById("charCount");
@@ -889,32 +912,38 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var remainingChars = maxChars - textarea.value.length;
             charCountSpan.textContent = remainingChars;
         });
+        var dateText = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'datetext').setAttribute("id", "datetext"));
+        var aTextStart = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Início: ', 'date').setAttribute("id", "date"));
+        var aTextEnd = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Fim: ', 'date').setAttribute("id", "date"));
 
+        var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
+        var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
+        var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        //dateDiv.id = 'date';
+        //dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
+        //dateDiv.style.fontSize = '12px';
+        //var dateInput = document.getElementById('date').innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
+        //dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
 
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        //buttonsDiv.className = 'buttons';
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        //buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
 
-        var dateDiv = document.createElement('div');
-        dateDiv.id = 'date';
-        dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
-        dateDiv.style.fontSize = '12px';
-        dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
+        //saveMsgDiv.id = 'savemsg';
+        //saveMsgDiv.className = 'saveclose';
+        //saveMsgDiv.textContent = 'Inserir';
 
-        var buttonsDiv = document.createElement('div');
-        buttonsDiv.className = 'buttons';
-        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
-
-        var saveMsgDiv = document.createElement('div');
-        saveMsgDiv.id = 'savemsg';
-        saveMsgDiv.className = 'saveclose';
-        saveMsgDiv.textContent = 'Inserir';
-
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
 
 
         // Adicionando o listener de clique
-        saveMsgDiv.addEventListener('click', function () {
+        var s = document.getElementById('savemsg');
+        s.addEventListener('click', function () {
 
             console.log("O elemento saveMsgDiv foi clicado!");
             var startPost = document.getElementById('startevent').value;
@@ -925,190 +954,61 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
             console.log("Data Start:", startPost);
             app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+            s.removeEventListener();
         });
 
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
+        //var closeMsgDiv = document.createElement('div');
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
 
         // Adicionando o listener de clique
-        closeMsgDiv.addEventListener('click', function () {
+        //closeMsgDiv.addEventListener('click', function () {
 
-            console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivPosts(dep_id);
-        });
-
-        // Adicionando o listener de clique
-        closeWindowDiv.addEventListener('click', function () {
-
+        //    console.log("O elemento closeMsgDiv foi clicado!");
+        //    makeDivPosts(dep_id);
+        //});
+        var q = document.getElementById('closewindow');
+        q.addEventListener('click', function (post) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(dep_id);
+            q.removeEventListener('click',q);          
         });
+        var w = document.getElementById('closemsg');
+        w.addEventListener('click', function () {
+            console.log("O elemento closemsg foi clicado!");
+            makeDivPosts(dep_id);
+            w.removeEventListener('click');
+        });
+        //// Adicionando o listener de clique
+        //closeWindowDiv.addEventListener('click', function () {
 
-
-        
-
-        buttonsDiv.appendChild(saveMsgDiv);
-        buttonsDiv.appendChild(closeMsgDiv);
-        postMsgDiv.appendChild(nameBoxDiv);
-        postMsgDiv.appendChild(closeWindowDiv);
-        postMsgDiv.appendChild(titleMsgDiv);
-        postMsgDiv.appendChild(msgBoxDiv);
-        postMsgDiv.appendChild(dateDiv);
-        postMsgDiv.appendChild(buttonsDiv);
-        insideDiv.appendChild(postMsgDiv);
-
-        // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
-            billboardDiv.appendChild(insideDiv);
-
-            var colorbox = document.getElementById("colorbox")
-            colorbox.addEventListener("change", function () {
-                postMsgDiv.style.backgroundColor = colorbox.value;
-            })
-            var palette = document.getElementById("palette")
-            palette.addEventListener("click", function () {
-                colorbox.click();
-            })
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
-
-
-    }
-    function editPostForm(id, dep_id) {
-        console.log("O elemento historyPostDiv foi clicado!", id);
-        var department = list_departments.filter(function (item) {
-            return item.id === parseInt(dep_id, 10);
-        })[0];
-
-        var post = list_posts.filter(function (item) {
-            return item.id === parseInt(id, 10);
-        })[0];
-        var maxChars = 1000;
-        var postMsgDiv = document.getElementById('postmsg');
-        postMsgDiv.innerHTML = '';
-        postMsgDiv.style.backgroundColor = post.color;
-
-        var nameBoxDiv = document.createElement('div');
-        nameBoxDiv.id = 'namebox';
-        nameBoxDiv.className = 'namebox';
-        nameBoxDiv.innerHTML = department.name;
-
-        var closeWindowDiv = document.createElement('div');
-        closeWindowDiv.id = 'closewindow';
-
-        var titleMsgDiv = document.createElement('div');
-        titleMsgDiv.id = 'titlemsg';
-        titleMsgDiv.className = 'titlemsg';
-        titleMsgDiv.innerHTML = '<input id="titleevent" type="text" value="'+post.title+'" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
-        var remainingChars = maxChars - post.description.length
-        var msgBoxDiv = document.createElement('div');
-        msgBoxDiv.id = 'msgbox';
-        msgBoxDiv.className = 'msgbox';
-        msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000">' + post.description + '</textarea>' + '<p class="char-counter"><span id="charCount">' + remainingChars +'</span> /'+ maxChars +'</p>';
-
-        //document.body.appendChild(msgBoxDiv);
-
-        //var textarea = document.getElementById("msgevent");
-        //var charCountSpan = document.getElementById("charCount");
-        //var maxChars = 1000;
-
-        //textarea.addEventListener("input", function () {
-        //    var remainingChars = maxChars - textarea.value.length;
-        //    charCountSpan.textContent = remainingChars;
+        //    console.log("O elemento closeWindowDiv foi clicado!");
+        //    makeDivPosts(dep_id);
         //});
 
+        //buttonsDiv.appendChild(saveMsgDiv);
+        //buttonsDiv.appendChild(closeMsgDiv);
+        //postMsgDiv.appendChild(nameBoxDiv);
+        //postMsgDiv.appendChild(closeWindowDiv);
+        //postMsgDiv.appendChild(titleMsgDiv);
+        //postMsgDiv.appendChild(msgBoxDiv);
+        //postMsgDiv.appendChild(dateDiv);
+        //postMsgDiv.appendChild(buttonsDiv);
+        //insideDiv.appendChild(postMsgDiv);
 
-
-        var dateDiv = document.createElement('div');
-        dateDiv.id = 'date';
-        dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
-        dateDiv.style.fontSize = '12px';
-        dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" value="'+post.date_start+'" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" value="'+post.date_end+'" class="dateinput">';
-
-        var buttonsDiv = document.createElement('div');
-        buttonsDiv.className = 'buttons';
-        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" value="'+post.color+'" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
-
-        var saveMsgDiv = document.createElement('div');
-        saveMsgDiv.id = 'savemsg';
-        saveMsgDiv.className = 'saveclose';
-        saveMsgDiv.textContent = 'Atualizar';
-
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
-
-
-        // Adicionando o listener de clique
-        saveMsgDiv.addEventListener('click', function () {
-
-            console.log("O elemento saveMsgDiv foi clicado!");
-            var startPost = document.getElementById('startevent').value;
-            var endPost = document.getElementById('endevent').value;
-            var msgPost = document.getElementById('msgevent').value;
-            var titlePost = document.getElementById('titleevent').value;
-            var colorPost = document.getElementById('colorbox').value;
-
-            console.log("Data Start:", startPost);
-            app.send({ api: "user", mt: "UpdatePost", id: parseInt(id,10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
-        });
-
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
-
-        // Adicionando o listener de clique
-        closeMsgDiv.addEventListener('click', function () {
-
-            console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivPosts(dep_id);
-        });
-
-        // Adicionando o listener de clique
-        closeWindowDiv.addEventListener('click', function () {
-
-            console.log("O elemento closeWindowDiv foi clicado!");
-            makeDivPosts(dep_id);
-        });
-
-
-
-        buttonsDiv.appendChild(saveMsgDiv);
-        buttonsDiv.appendChild(closeMsgDiv);
-        postMsgDiv.appendChild(nameBoxDiv);
-        postMsgDiv.appendChild(closeWindowDiv);
-        postMsgDiv.appendChild(titleMsgDiv);
-        postMsgDiv.appendChild(msgBoxDiv);
-        postMsgDiv.appendChild(dateDiv);
-        postMsgDiv.appendChild(buttonsDiv);
-
-        var textarea = document.getElementById("msgevent");
-        var charCountSpan = document.getElementById("charCount");
-        
-
-        textarea.addEventListener("input", function () {
-            var remainingChars = maxChars - textarea.value.length;
-            charCountSpan.textContent = remainingChars;
-        });
+        // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
         var colorbox = document.getElementById("colorbox")
         colorbox.addEventListener("change", function () {
-            postMsgDiv.style.backgroundColor = colorbox.value;
+            document.getElementById("postmsg").style.backgroundColor = colorbox.value;
         })
         var palette = document.getElementById("palette")
         palette.addEventListener("click", function () {
             colorbox.click();
         })
-
-        // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
         //var billboardDiv = document.getElementById('billboard');
         //if (billboardDiv) {
-        //    billboardDiv.appendChild(postMsgDiv);
+        //    //billboardDiv.appendChild(insideDiv);
 
         //    var colorbox = document.getElementById("colorbox")
         //    colorbox.addEventListener("change", function () {
@@ -1121,102 +1021,272 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         //} else {
         //    console.error("A div com o ID 'billboard' não foi encontrada.");
         //}
+
+
     }
-    function createDepartmentForm() {
-        var insideDiv = document.createElement('div');
-        insideDiv.className = 'insideDiv';
+    function editPostForm(id, dep_id) {
+        var department = list_departments.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
 
-        // Criar os elementos HTML
-        var postMsgDiv = document.createElement('div');
-        postMsgDiv.id = 'newdep';
-        postMsgDiv.className = 'newdep';
+        var post = list_posts.filter(function (item) {
+            return item.id === parseInt(id, 10);
+        })[0];
+        //var billboard = document.getElementById('billboard').innerHTML = '';
 
+        document.getElementById('insideDiv').innerHTML = '';
 
-        var closeWindowDiv = document.createElement('div');
-        closeWindowDiv.id = 'closewindow';
+        var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
+        //insideDiv.className = 'insideDiv';
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", null, null, 'postmsg').setAttribute("id", "postmsg"));
+        document.getElementById('postmsg').style.backgroundColor = post.color;
+
+        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
+        //nameBoxDiv.id = 'namebox';
+        //nameBoxDiv.className = 'namebox';
+        //nameBoxDiv.innerHTML = department.name;
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
+        //closeWindowDiv.id = 'closewindow';
+        var titleMsgDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'titlemsg').setAttribute("id", "titlemsg"));
+        var titleinput = titleMsgDiv.add(new innovaphone.ui1.Input('color: #ffff; background-color: rgb(93 126 131 / 36%);', post.title, "Título", 40, "text", 'titleinput').setAttribute("id", "titleevent"));
+        //titleMsgDiv.id = 'titlemsg';
+        //titleMsgDiv.className = 'titlemsg';
+        //titleMsgDiv.innerHTML = '<input id="titleevent" type="text" placeholder="Título" style="color: #ffff; background-color: rgb(93 126 131 / 36%);">';
+
+        var msgBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'msgbox').setAttribute("id", "msgbox"));
+        var msgBoxText = msgBoxDiv.add(new innovaphone.ui1.Node('textarea', null, post.description, 'msgevent').setAttribute("id", "msgevent"));
+        msgBoxText.setAttribute('placeHolder', 'Texto da Mensagem: ');
+        msgBoxText.setAttribute('maxLenght', '1000');
+
+        var p = msgBoxDiv.add(new innovaphone.ui1.Node('p', null, '1000', 'char-counter').setAttribute("id", "charCount"));
+        //msgBoxDiv.id = 'msgbox';
+        //msgBoxDiv.className = 'msgbox';
+        //msgBoxDiv.innerHTML = '<textarea name="" id="msgevent" cols="30" rows="80" placeholder="Texto da mensagem" maxlength="1000"></textarea>' + '<p class="char-counter"><span id="charCount">1000</span> /1000</p>';
+
+        //document.body.appendChild(msgBoxDiv);
+
+        var textarea = document.getElementById("msgevent");
+        var charCountSpan = document.getElementById("charCount");
+        var maxChars = 1000;
+
+        textarea.addEventListener("input", function () {
+            var remainingChars = maxChars - textarea.value.length;
+            charCountSpan.textContent = remainingChars;
+        });
+        var dateText = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'datetext').setAttribute("id", "datetext"));
+        var aTextStart = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Início: ', 'date').setAttribute("id", "date"));
+        var aTextEnd = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Fim: ', 'date').setAttribute("id", "date"));
+
+        var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
+        var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, post.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
+        var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, post.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        //dateDiv.id = 'date';
+        //dateDiv.style.backgroundColor = 'rgb(93 126 131 / 36%)';
+        //dateDiv.style.fontSize = '12px';
+        //var dateInput = document.getElementById('date').innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
+        //dateDiv.innerHTML = '<a>Data de Início: </a><input type="datetime-local" id="startevent" class="dateinput"> <a>Data de Fim: </a><input type="datetime-local" id="endevent" class="dateinput">';
+
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        //buttonsDiv.className = 'buttons';
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        //buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
+
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
+        //saveMsgDiv.id = 'savemsg';
+        //saveMsgDiv.className = 'saveclose';
+        //saveMsgDiv.textContent = 'Inserir';
+
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
+
 
         // Adicionando o listener de clique
-        closeWindowDiv.addEventListener('click', function () {
+        var s = document.getElementById('savemsg');
+        s.addEventListener('click', function () {
+
+            console.log("O elemento saveMsgDiv foi clicado!");
+            var startPost = document.getElementById('startevent').value;
+            var endPost = document.getElementById('endevent').value;
+            var msgPost = document.getElementById('msgevent').value;
+            var titlePost = document.getElementById('titleevent').value;
+            var colorPost = document.getElementById('colorbox').value;
+
+            console.log("Data Start:", startPost);
+            app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); s.removeEventListener();
+        });
+
+        //var closeMsgDiv = document.createElement('div');
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
+
+        // Adicionando o listener de clique
+        //closeMsgDiv.addEventListener('click', function () {
+
+        //    console.log("O elemento closeMsgDiv foi clicado!");
+        //    makeDivPosts(dep_id);
+        //});
+        var q = document.getElementById('closewindow');
+        q.addEventListener('click', function () {
+            console.log("O elemento closeWindowDiv foi clicado!");
+            makeDivPosts(dep_id);
+            q.removeEventListener('click', q);
+        });
+        var w = document.getElementById('closemsg');
+        w.addEventListener('click', function () {
+            console.log("O elemento closemsg foi clicado!");
+            makeDivPosts(dep_id);
+            w.removeEventListener('click',w);
+        });
+        //// Adicionando o listener de clique
+        //closeWindowDiv.addEventListener('click', function () {
+
+        //    console.log("O elemento closeWindowDiv foi clicado!");
+        //    makeDivPosts(dep_id);
+        //});
+
+        //buttonsDiv.appendChild(saveMsgDiv);
+        //buttonsDiv.appendChild(closeMsgDiv);
+        //postMsgDiv.appendChild(nameBoxDiv);
+        //postMsgDiv.appendChild(closeWindowDiv);
+        //postMsgDiv.appendChild(titleMsgDiv);
+        //postMsgDiv.appendChild(msgBoxDiv);
+        //postMsgDiv.appendChild(dateDiv);
+        //postMsgDiv.appendChild(buttonsDiv);
+        //insideDiv.appendChild(postMsgDiv);
+
+        // Exemplo de uso para adicionar os elementos criados à div com o ID 'billboard'
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            document.getElementById("postmsg").style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        })
+    }
+    function createDepartmentForm() {
+
+        // Adicionar os elementos criados � div com o ID 'billboard'
+    //     var billboardDiv = document.getElementById('billboard');
+    //     if (billboardDiv) {
+    //         buttonsDiv.appendChild(saveMsgDiv);
+    //         buttonsDiv.appendChild(closeMsgDiv);
+    //         postMsgDiv.appendChild(closeWindowDiv);
+    //         postMsgDiv.appendChild(nameDepDiv);
+    //         var userTable = createUsersDepartmentsGrid();
+    //         postMsgDiv.appendChild(userTable);
+    //         postMsgDiv.appendChild(buttonsDiv);
+    //         insideDiv.appendChild(postMsgDiv);
+    //         billboardDiv.appendChild(insideDiv);
+
+    //         var colorbox = document.getElementById("colorbox")
+    //         colorbox.addEventListener("change", function () {
+    //             postMsgDiv.style.backgroundColor = colorbox.value;
+    //         })
+    //         var palette = document.getElementById("palette")
+    //         palette.addEventListener("click", function () {
+    //             colorbox.click();
+    //         })
+
+    //     } else {
+    //         console.error("A div com o ID 'billboard' não foi encontrada.");
+    //     }
+    // }
+
+        var insideDiv = billboard.add(new innovaphone.ui1.Node("div",null,null,"insideDiv"))
+        // var insideDiv = document.createElement('div');
+        // insideDiv.className = 'insideDiv';
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div",null,null,"newdep").setAttribute("id","newdep"))
+        // Criar os elementos HTML
+        // var postMsgDiv = document.createElement('div');
+        // postMsgDiv.id = 'newdep';
+        // postMsgDiv.className = 'newdep';
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","closewindow"))
+        // var closeWindowDiv = document.createElement('div');
+        // closeWindowDiv.id = 'closewindow';
+        // Adicionando o listener de clique
+        var close = document.getElementById("closewindow")
+        close.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivDepartments();
         });
+        
 
-        var nameDepDiv = document.createElement('div');
-        nameDepDiv.id = 'nameDepDiv';
-        nameDepDiv.style.display = 'flex';
-        nameDepDiv.style.backgroundColor = '#ffffff33';
-        nameDepDiv.style.color = 'white';
-        nameDepDiv.style.width = '80%';
-        nameDepDiv.style.height = '8%';
-        nameDepDiv.style.marginBottom = '15px';
-        nameDepDiv.style.marginTop = '15px';
-        nameDepDiv.innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento" style="color: #ffff;">';
+        //var userTable = createUsersDepartmentsGrid();
+        //         postMsgDiv.appendChild(userTable);
 
-
-        var buttonsDiv = document.createElement('div');
-        buttonsDiv.className = 'buttons';
-        buttonsDiv.style.display = 'flex';
-        buttonsDiv.style.alignItems = 'center';
-        buttonsDiv.style.justifyContent = 'flex-start';
-        buttonsDiv.style.width = '80%';
-        buttonsDiv.style.color = '#FFFF';
-        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
-
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"nameDepDiv").setAttribute("id","nameDepDiv"))
+        document.getElementById("nameDepDiv").innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento " style="color: #ffff;">'
+        
+        
+        var userTable = createUsersDepartmentsGrid();
+        document.getElementById("newdep").appendChild(userTable);
+        // var nameDepDiv = document.createElement('div');
+        // nameDepDiv.id = 'nameDepDiv';
+        // nameDepDiv.style.display = 'flex';
+        // nameDepDiv.style.backgroundColor = '#ffffff33';
+        // nameDepDiv.style.color = 'white';
+        // nameDepDiv.style.width = '80%';
+        // nameDepDiv.style.height = '8%';
+        // nameDepDiv.style.marginBottom = '15px';
+        // nameDepDiv.style.marginTop = '15px';
+        // nameDepDiv.innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento" style="color: #ffff;">';
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"buttonsDiv").setAttribute("id","buttonsDiv"))
+        document.getElementById("buttonsDiv").innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'
+        // var buttonsDiv = document.createElement('div');
+        // buttonsDiv.className = 'buttons';
+        // buttonsDiv.style.display = 'flex';
+        // buttonsDiv.style.alignItems = 'center';
+        // buttonsDiv.style.justifyContent = 'flex-start';
+        // buttonsDiv.style.width = '80%';
+        // buttonsDiv.style.color = '#FFFF';
+        // buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelClose"),"saveclose").setAttribute("id","closemsg"))
+        // var closeMsgDiv = document.createElement('div');
+        // closeMsgDiv.id = 'closemsg';
+        // closeMsgDiv.className = 'saveclose';
+        // closeMsgDiv.textContent = 'Fechar';
         // Adicionando o listener de clique
-        closeMsgDiv.addEventListener('click', function () {
-
+        var closemsg = document.getElementById("closemsg")
+        closemsg.addEventListener('click', function () {
             console.log("O elemento closeMsgDiv foi clicado!");
             makeDivDepartments();
         });
 
-        var saveMsgDiv = document.createElement('div');
-        saveMsgDiv.id = 'savemsg';
-        saveMsgDiv.className = 'saveclose';
-        saveMsgDiv.textContent = 'Inserir';
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelInsert"),"saveclose").setAttribute("id","savemsg"))
+        // var saveMsgDiv = document.createElement('div');
+        // saveMsgDiv.id = 'savemsg';
+        // saveMsgDiv.className = 'saveclose';
+        // saveMsgDiv.textContent = 'Inserir';
         // Event listener de clique para o bot�o "Salvar"
-        saveMsgDiv.addEventListener('click', function () {
+        var savemsg = document.getElementById("savemsg")
+        savemsg.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
             var departmentName = document.getElementById("namedep").value;
             var departmentColor = document.getElementById("colorbox").value;
-            console.log("Salvar clicado!");
-            console.log("Nome do departamento:", departmentName);
-            console.log("Cor selecionada:", departmentColor);
+            // console.log("Salvar clicado!");
+            // console.log("Nome do departamento:", departmentName);
+            // console.log("Cor selecionada:", departmentColor);
             var editorDepartments = getSelectedUsersDepartments('editor');
             var viewerDepartments = getSelectedUsersDepartments('viewer');
-            console.log("Nome dos departamentos visiveis:", viewerDepartments);
-            console.log("Nome dos departamentos editaveis:", editorDepartments);
+            // console.log("Nome dos departamentos visiveis:", viewerDepartments);
+            // console.log("Nome dos departamentos editaveis:", editorDepartments);
             app.send({ api: "user", mt: "InsertDepartment", name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
         });
 
-        // Adicionar os elementos criados � div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
-            buttonsDiv.appendChild(saveMsgDiv);
-            buttonsDiv.appendChild(closeMsgDiv);
-            postMsgDiv.appendChild(closeWindowDiv);
-            postMsgDiv.appendChild(nameDepDiv);
-            var userTable = createUsersDepartmentsGrid();
-            postMsgDiv.appendChild(userTable);
-            postMsgDiv.appendChild(buttonsDiv);
-            insideDiv.appendChild(postMsgDiv);
-            billboardDiv.appendChild(insideDiv);
-
-            var colorbox = document.getElementById("colorbox")
-            colorbox.addEventListener("change", function () {
-                postMsgDiv.style.backgroundColor = colorbox.value;
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+                document.getElementById("newdep").style.backgroundColor = colorbox.value;
             })
             var palette = document.getElementById("palette")
             palette.addEventListener("click", function () {
-                colorbox.click();
+               colorbox.click();
             })
 
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
+
     }
 
     function createUsersDepartmentsGrid() {
@@ -1384,6 +1454,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         usersListDiv.appendChild(table);
         return usersListDiv;
     }
+    
     function getSelectedUsersDepartments(departmentType) {
         var checkboxes = document.getElementsByName(departmentType + 'Departments');
         var selectedUsers = Array.prototype.slice.call(checkboxes)
@@ -1477,72 +1548,101 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+        //document.getElementById('insideDiv').innerHTML = '';
 
-        var insideDiv = document.createElement('div');
-        insideDiv.className = 'insideDiv';
+        var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
+        //insideDiv.className = 'insideDiv';
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", null, null, 'postmsg').setAttribute("id", "postmsg"));
+        document.getElementById('postmsg').style.backgroundColor = department.color
+        //var insideDiv = document.createElement('div');
+        //insideDiv.className = 'insideDiv';
 
-        // Criar os elementos HTML
-        var postMsgDiv = document.createElement('div');
-        postMsgDiv.id = 'editdep';
-        postMsgDiv.className = 'editdep';
-        postMsgDiv.style.backgroundColor = department.color;
+        //// Criar os elementos HTML
+        //var postMsgDiv = document.createElement('div');
+        //postMsgDiv.id = 'editdep';
+        //postMsgDiv.className = 'editdep';
+        //postMsgDiv.style.backgroundColor = department.color;
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
 
-        var closeWindowDiv = document.createElement('div');
-        closeWindowDiv.id = 'closewindow';
-        var historyPostDiv = document.createElement('div');
-        historyPostDiv.id = 'historypost';
-        var editPostDiv = document.createElement('div');
-        editPostDiv.id = 'editpost';
-        var deletePostDiv = document.createElement('div');
-        deletePostDiv.id = 'deletepost';
+        //var closeWindowDiv = document.createElement('div');
+        //closeWindowDiv.id = 'closewindow';
+        //var historyPostDiv = document.createElement('div');
+        //historyPostDiv.id = 'historypost';
+        //var editPostDiv = document.createElement('div');
+        //editPostDiv.id = 'editpost';
+        //var deletePostDiv = document.createElement('div');
+        //deletePostDiv.id = 'deletepost';
 
         // Adicionando o listener de clique
-        closeWindowDiv.addEventListener('click', function () {
+        var c = document.getElementById('closewindow');
+        c.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(dep_id);
         });
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        //var nameDepDiv = document.createElement('div');
+        //nameDepDiv.id = 'nameDepDiv';
+        //nameDepDiv.style.display = 'flex';
+        //nameDepDiv.style.backgroundColor = '#ffffff33';
+        //nameDepDiv.style.color = 'white';
+        //nameDepDiv.style.width = '80%';
+        //nameDepDiv.style.height = '8%';
+        //nameDepDiv.style.marginBottom = '15px';
+        //nameDepDiv.style.marginTop = '15px';
+        //nameDepDiv.style.fontSize = '25px';
+        //nameDepDiv.style.justifyContent = 'center';
+        //nameDepDiv.style.alignItems = 'center';
+        //nameDepDiv.innerHTML = department.name;
+        var userTable = editUsersDepartmentsGrid();
+        document.getElementById("postmsg").appendChild(userTable);
 
-        var nameDepDiv = document.createElement('div');
-        nameDepDiv.id = 'nameDepDiv';
-        nameDepDiv.style.display = 'flex';
-        nameDepDiv.style.backgroundColor = '#ffffff33';
-        nameDepDiv.style.color = 'white';
-        nameDepDiv.style.width = '80%';
-        nameDepDiv.style.height = '8%';
-        nameDepDiv.style.marginBottom = '15px';
-        nameDepDiv.style.marginTop = '15px';
-        nameDepDiv.style.fontSize = '25px';
-        nameDepDiv.style.justifyContent = 'center';
-        nameDepDiv.style.alignItems = 'center';
-        nameDepDiv.innerHTML = department.name;
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        //buttonsDiv.className = 'buttons';
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        //buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'; //onclick="openColorPicker()" onchange="updateColor(event)
+
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Atualizar', 'saveclose').setAttribute("id", "savemsg"));
+        //saveMsgDiv.id = 'savemsg';
+        //saveMsgDiv.className = 'saveclose';
+        //saveMsgDiv.textContent = 'Inserir';
+
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
+
+        //var buttonsDiv = document.createElement('div');
+        //buttonsDiv.className = 'buttons';
+        //buttonsDiv.style.display = 'flex';
+        //buttonsDiv.style.alignItems = 'center';
+        //buttonsDiv.style.justifyContent = 'flex-start';
+        //buttonsDiv.style.width = '80%';
+        //buttonsDiv.style.color = '#FFFF';
+        //buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" value="' + department.color +'" id="colorbox" style="display: none;">';
+
+        //var closeMsgDiv = document.createElement('div');
+        //closeMsgDiv.id = 'closemsg';
+        //closeMsgDiv.className = 'saveclose';
+        //closeMsgDiv.textContent = 'Fechar';
 
 
-        var buttonsDiv = document.createElement('div');
-        buttonsDiv.className = 'buttons';
-        buttonsDiv.style.display = 'flex';
-        buttonsDiv.style.alignItems = 'center';
-        buttonsDiv.style.justifyContent = 'flex-start';
-        buttonsDiv.style.width = '80%';
-        buttonsDiv.style.color = '#FFFF';
-        buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" value="' + department.color +'" id="colorbox" style="display: none;">';
-
-        var closeMsgDiv = document.createElement('div');
-        closeMsgDiv.id = 'closemsg';
-        closeMsgDiv.className = 'saveclose';
-        closeMsgDiv.textContent = 'Fechar';
         // Adicionando o listener de clique
-        closeMsgDiv.addEventListener('click', function () {
+        var d = document.getElementById('closemsg')
+        d.addEventListener('click', function () {
 
             console.log("O elemento closeMsgDiv foi clicado!");
             makeDivPosts(dep_id);
         });
 
-        var saveMsgDiv = document.createElement('div');
-        saveMsgDiv.id = 'savemsg';
-        saveMsgDiv.className = 'saveclose';
-        saveMsgDiv.textContent = 'Atualizar';
+        //var saveMsgDiv = document.createElement('div');
+        //saveMsgDiv.id = 'savemsg';
+        //saveMsgDiv.className = 'saveclose';
+        //saveMsgDiv.textContent = 'Atualizar';
+
+
         // Event listener de clique para o bot�o "Salvar"
-        saveMsgDiv.addEventListener('click', function () {
+        var save = document.getElementById('savemsg');
+        save.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
             var departmentName = document.getElementById("nameDepDiv").innerHTML;
             var departmentColor = document.getElementById("colorbox").value;
@@ -1555,32 +1655,39 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log("Nome dos departamentos editaveis:", editorDepartments);
             app.send({ api: "user", mt: "UpdateDepartment", id: dep_id, name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
         });
-
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            postMsgDiv.style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        });
         // Adicionar os elementos criados � div com o ID 'billboard'
-        var billboardDiv = document.getElementById('billboard');
-        if (billboardDiv) {
-            buttonsDiv.appendChild(saveMsgDiv);
-            buttonsDiv.appendChild(closeMsgDiv);
-            postMsgDiv.appendChild(closeWindowDiv);
-            postMsgDiv.appendChild(nameDepDiv);
-            var userTable = editUsersDepartmentsGrid();
-            postMsgDiv.appendChild(userTable);
-            postMsgDiv.appendChild(buttonsDiv);
-            insideDiv.appendChild(postMsgDiv);
-            billboardDiv.appendChild(insideDiv);
+        //var billboardDiv = document.getElementById('billboard');
+        //if (billboardDiv) {
+        //    buttonsDiv.appendChild(saveMsgDiv);
+        //    buttonsDiv.appendChild(closeMsgDiv);
+        //    postMsgDiv.appendChild(closeWindowDiv);
+        //    postMsgDiv.appendChild(nameDepDiv);
+        //    var userTable = editUsersDepartmentsGrid();
+        //    postMsgDiv.appendChild(userTable);
+        //    postMsgDiv.appendChild(buttonsDiv);
+        //    insideDiv.appendChild(postMsgDiv);
+        //    billboardDiv.appendChild(insideDiv);
 
-            var colorbox = document.getElementById("colorbox")
-            colorbox.addEventListener("change", function () {
-                postMsgDiv.style.backgroundColor = colorbox.value;
-            })
-            var palette = document.getElementById("palette")
-            palette.addEventListener("click", function () {
-                colorbox.click();
-            })
+        //    var colorbox = document.getElementById("colorbox")
+        //    colorbox.addEventListener("change", function () {
+        //        postMsgDiv.style.backgroundColor = colorbox.value;
+        //    })
+        //    var palette = document.getElementById("palette")
+        //    palette.addEventListener("click", function () {
+        //        colorbox.click();
+        //    })
 
-        } else {
-            console.error("A div com o ID 'billboard' não foi encontrada.");
-        }
+        //} else {
+        //    console.error("A div com o ID 'billboard' não foi encontrada.");
+        //}
 
     }
     function createHistoryViewsPostGrid(views_post_history) {
