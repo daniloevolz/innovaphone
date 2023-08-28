@@ -383,12 +383,8 @@ td.checkbox {
 }
 .deletedpost {
     background-position: right;
-    display: flex;
-    position: relative;
     top: 1%;
-    /*left: 43%;*/
-    width: 25px;
-    height: 25px;
+    left: -3%;
     background-color: rgba(255, 255, 255, 0);
     justify-content: flex-start;
     background-image: url(./images/trash_post.png);
@@ -398,21 +394,30 @@ td.checkbox {
     margin: 0;
 }
 .futurepost {
-    background-position: center;
-    display: flex;
-    position: relative;
+    background-position: right;
     top: 1%;
-    /*left: 43%;*/
-    width: 25px;
-    height: 25px;
+    left: -3%;
     background-color: rgba(255, 255, 255, 0);
     justify-content: flex-start;
-    background-image: url(./images/timed_glass.png);
-    background-size: 20px;
+    background-image: url(./images/no_start.png);
+    background-size: 30px;
     background-repeat: no-repeat;
     padding: 0;
     margin: 0;
 }
+.expired {
+    background-position: right;
+    top: 1%;
+    left: -3%;
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    background-image: url(./images/expired.png);
+    background-size: 30px;
+    background-repeat: no-repeat;
+    padding: 0;
+    margin: 0;
+}
+
 .post {
     cursor: pointer;
     display: flex;
@@ -558,7 +563,6 @@ td.checkbox {
     width: 80%;
     height: 10%;
     justify-content: space-between;
-    background: #5d7e83ef;
 }
 
 .dateinput {
@@ -599,14 +603,17 @@ input[type="datetime-local" i] {
 
 }
 
-.nameDepDiv{
-    display:flex;
-    background-color:#ffffff33;
-    color:white;
-    width:80%;
-    height:8%;
-    margin-bottom:15px;
-    margin-top:15px;
+.nameDepDiv {
+    display: flex;
+    background-color: #ffffff33;
+    color: white;
+    width: 80%;
+    height: 8%;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    font-size: 25px;
+    justify-content: center;
+    align-items: center;
 }
 /* .nameDepDiv {
     display: flex;
@@ -714,10 +721,9 @@ input {
     align-self: start;
     align-items: center;
     color: #ffff;
-    background-color: #5d7e83ef;
-    border-color: black;
+    background-color: rgb(93 126 131 / 36%); border-color: black;
     border-radius: 2ch;
-    max-height:30px;
+    max-height: 30px;
 }
 
 .buttons {
@@ -730,6 +736,10 @@ input {
     align-items: center;
     justify-content: center;
     color: #ffff;
+}
+
+.buttons a{
+    width:100px;
 }
 
 #closewindow {
@@ -761,7 +771,6 @@ input {
     cursor: pointer;
 }
 #backDescription {
-
     position: absolute;
     top: 50px;
     right: 10px;
@@ -770,7 +779,7 @@ input {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url(./images/back.png);
+    background-image: url(./images/back_glass.png);
     background-size: 35px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -822,7 +831,6 @@ input {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 20px;
 }
 .newpost {
     display: flex;
