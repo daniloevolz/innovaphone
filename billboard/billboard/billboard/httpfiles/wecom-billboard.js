@@ -363,14 +363,20 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var del = document.getElementById("delDepDiv")
             del.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
-                var hasPosts = list_posts.filter(function (item) {
-                    return item.department === parseInt(dep_id, 10) && item.deleted == "";
-                });
-                if (hasPosts) {
-                    window.alert("ATENÇÃO!!!\n\nVocê deve excluir todos os Posts antes de excluir o Departamento.")
-                } else {
-                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
-                }
+                // var hasPosts = list_posts.filter(function (item) {
+                //     //console.log(item.)
+                //     return item.department === parseInt(dep_id, 10) && item.deleted == "";
+                    
+                // });
+                var hasPosts = list_posts.filter(function(item){
+                    return item.department
+                })
+                console.log("Has posts" + JSON.stringify(hasPosts))
+                    if(hasPosts.length > 0){
+                        window.alert("Favor excluir todos os posts primeiro")
+                    }else {
+                        app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+                    }
                 
             })
             var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div",null,null,"timedDepDiv").setAttribute("id","timeDepDiv"))
@@ -839,7 +845,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var isNew = views_history.filter(function (item) {
                 return item.id === parseInt(id, 10);
             })[0];
-            if (isNew) {
+            if (isNew) {    // mexer 29/08
                 console.log("Post NEW Visualizado:", post.id);
                 app.send({ api: "user", mt: "InsertViewHistory", post: post.id, src: parseInt(department.id, 10) });
 
@@ -958,30 +964,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
-            // Criar objetos de data a partir dos valores fornecidos
-            // var startPost = new Date(startPostValue + "T00:00:00");
-            // var endPost = new Date(endPostValue + "T00:00:00");
-            var currentDate = getDateNow();
-            // Opções de formatação
-            var options = { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
 
-            // Formatar a data no estilo "Aug 28 17:03"
-            var formattedDate = currentDate.toLocaleString('en-US', options);
-
-            console.log("Data Start:", startPostValue + "data atual" + currentDate);
-
-            if (msgPost === "" || titlePost === "" || startPostValue == "" || endPostValue == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
-            } else if (endPostValue < startPostValue) {
-                console.log("data inicio post" + startPostValue + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
-            } else if (startPostValue < currentDate) {
-                window.alert("A data de início do post não pode ser inferior à data atual");
-            } else {
-                // Aqui você pode continuar com o envio do post
-                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPostValue, date_end: endPostValue });
-            }
-            s.removeEventListener('click', s);
+            console.log("Data Start:", startPost);
+            app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+            s.removeEventListener();
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -1327,6 +1313,13 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var nameCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelUser"),"column"))
 
         var editorCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelEditor"),"column"))
+        // var editorCol = document.createElement('th');
+        // editorCol.classList.add('column');
+        // editorCol.textContent = 'Editor';
+        var viewerCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelViewer"),"column"))
+        // var viewerCol = document.createElement('th');
+        // viewerCol.classList.add('column');
+        // viewerCol.textContent = 'Visualizador';
 
         var viewerCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelViewer"),"column").setAttribute('id', 'viewertitle'))
 
@@ -1367,45 +1360,16 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 });
 
             });
-            
-            //viewerCheckbox.setAttribute("id","viewercheckbox_");
 
-            //document.getElementById("viewercheckbox").classList.add("viewercheckbox")
+            //var viewertitle = document.getElementById('viewertitle')
+            viewerColTitle.addEvent('click', function () {
+                console.log("Elemento viewerCol foi CLICADO")
+                var _clickViewer = document.querySelectorAll('.viewercheckbox')
+                _clickViewer.forEach(function (view) {
+                    view.checked = true
+                });
 
-                    // Aqui você pode executar outras ações específicas caso dese
-            //editorCheckbox.setAttribute("id","editorcheckbox_");
-
-            //document.getElementById("editorcheckbox").classList.add("editorcheckbox")
-
-            // var editorCheckbox = document.createElement('input');
-            // editorCheckbox.type = 'checkbox';
-            // editorCheckbox.name = 'editorDepartments';
-            // editorCheckbox.value = user.guid;
-            // editorCheckbox.className = 'checkbox'
-
-            
-            // var viewerCol = document.createElement('td');
-            // viewerCol.classList.add('column');
-            // var viewerCheckbox = document.createElement('input');
-            // viewerCheckbox.type = 'checkbox';
-
-            // viewerCheckbox.name = 'viewerDepartments';
-            // viewerCheckbox.value = user.guid;
-            // viewerCheckbox.className = 'checkbox'
-
-           // viewerCol.add(viewerCheckbox);
-            //editorCol.add(editorCheckbox);
-
-            // row.add(nameCol);
-            // row.add(editorCol);
-            // row.add(viewerCol);
-
-            // table.add(row);
-            
-                // document.getElementById("viewercheckbox").checked = document.getElementById("editorcheckbox").checked;
-                
-                
-                
+            });
         });
             
 
@@ -1424,35 +1388,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"));
 
         var viewerCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"));
-
-        //var usersListDiv = document.createElement('div');
-        //usersListDiv.id = 'userslist';
-        //usersListDiv.className = 'userlist';
-        //usersListDiv.innerHTML = '';
-
-        //var table = document.createElement('table');
-        //table.classList.add('table');
-        //// Criar a primeira linha para os cabeçalhos das colunas
-        //var headerRow = document.createElement('tr');
-        //headerRow.classList.add('row');
-
-        //var nameCol = document.createElement('th');
-        //nameCol.classList.add('column');
-        //nameCol.textContent = 'Usuário';
-
-        //var editorCol = document.createElement('th');
-        //editorCol.classList.add('column');
-        //editorCol.textContent = 'Editor';
-
-        //var viewerCol = document.createElement('th');
-        //viewerCol.classList.add('column');
-        //viewerCol.textContent = 'Visualizador';
-
-        //headerRow.appendChild(nameCol);
-        //headerRow.appendChild(editorCol);
-        //headerRow.appendChild(viewerCol);
-
-        //table.appendChild(headerRow);
 
         // Criar as demais linhas com os dados dos departamentos
         list_tableUsers.forEach(function (user) {
@@ -1475,74 +1410,27 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
             viewerCheckbox.setAttribute("name", "viewerDepartments");
             viewerCheckbox.setAttribute("value", user.guid);
-            if (userV) {
-                viewerCheckbox.checked = true;
-            }
-            console.log(userV)
+
             var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
             editorCheckbox.setAttribute("name", "editorDepartments");
             editorCheckbox.setAttribute("value", user.guid);
-            if (userE) {
-                editorCheckbox.checked = true;
-            }
-            console.log(userE)
+
             editorCheckbox.addEvent('click', function () {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
                 viewerCheckbox.checked = true
 
             });
-            //var row = document.createElement('tr');
-            //row.classList.add('row');
-
-            //var nameCol = document.createElement('td');
-            //nameCol.classList.add('column');
-            //nameCol.textContent = user.cn;
-
-            //var userV = list_viewers_departments.filter(function (item) {
-            //    return item.viewer_guid === user.guid;
-            //})[0];
-            //var userE = list_editors_departments.filter(function (item) {
-            //    return item.editor_guid === user.guid;
-            //})[0];
-
-            //var editorCol = document.createElement('td');
-            //editorCol.classList.add('column');
-            //var editorCheckbox = document.createElement('input');
-            //editorCheckbox.type = 'checkbox';
-            //if (userE) {
-            //    editorCheckbox.checked = 'true';
-            //}
-            //editorCheckbox.name = 'editorDepartments';
-            //editorCheckbox.value = user.guid;
-            //editorCheckbox.className = 'checkbox'
-
-            //editorCheckbox.addEventListener('change', function () {
-            //    if (editorCheckbox.checked) {
-            //        viewerCheckbox.checked = this.checked;
-            //    }
-            //});
-
-/*            editorCol.appendChild(editorCheckbox);*/
-
-            //var viewerCol = document.createElement('td');
-            //viewerCol.classList.add('column');
-            //var viewerCheckbox = document.createElement('input');
-            //viewerCheckbox.type = 'checkbox';
-            //if (userV) {
-            //    viewerCheckbox.checked = 'true';
-            //}
-            //viewerCheckbox.name = 'viewerDepartments';
-            //viewerCheckbox.value = user.guid;
-            //viewerCheckbox.className = 'checkbox'
-            //viewerCol.appendChild(viewerCheckbox);
-
-            //viewerCheckbox.checked = editorCheckbox.checked;
-
-            //row.appendChild(nameCol);
-            //row.appendChild(editorCol);
-            //row.appendChild(viewerCol);
-
-            //table.appendChild(row);
+            setTimeout(function(){
+                if (userV) {
+                    var viewCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                    viewCheckbox.checked = true;
+                }
+                if (userE) {
+                    var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                    editCheckbox.checked = true;
+                }
+            },500)
+            
         });
         //usersListDiv.appendChild(table);
         return usersListDiv;
