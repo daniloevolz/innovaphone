@@ -75,19 +75,18 @@ td.checkbox {
 
 }
 .newdep {
-    z-index: 99;
-    min-width: 350px;
-    min-height: 450px;
-    max-width: 700px;
-    max-height: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: absolute;
-    width: 40%;
-    height: 80%;
-    background-color: #0f243f;
-}
+        min-width: 350px;
+        min-height: 450px;
+        max-width: 700px;
+        max-height: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        width: 40%;
+        height: 80%;
+        background-color: #0f243f;
+    }
 #newdep input {
     font-size: 25px;
     background-color: #ffffff00;
@@ -236,16 +235,17 @@ td.checkbox {
 }
 
 .postmsg {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: absolute;
-    width: 45%;
-    height: 70%;
     min-width: 350px;
     min-height: 450px;
     max-width: 700px;
     max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 80%;
+    background-color: #0f243f;
 }
 .post-depart {
     position: absolute;
@@ -505,7 +505,8 @@ td.checkbox {
     height: 10%;
     justify-content: center;
  }
-.closedate {
+ .closedate {
+    min-width: 140px;
     width: 30%;
     height: 50%;
     padding: 0;
@@ -671,7 +672,7 @@ input[type="datetime-local" i] {
 .buttonsDiv{
     display: flex;
     align-items: center;
-    height: 15%;
+    height: 10%;
     justify-content: flex-start;
     width: 80%;
     color: #FFFF;
@@ -727,15 +728,12 @@ input {
 }
 
 .buttons {
-    cursor: pointer;
-    margin-top: 3%;
-    width: 80%;
-    height: 5%;
     display: flex;
-    position: relative;
     align-items: center;
-    justify-content: center;
-    color: #ffff;
+    height: 10%;
+    justify-content: flex-start;
+    width: 80%;
+    color: #FFFF;
 }
 
 .buttons a{
@@ -866,6 +864,7 @@ input {
     position: absolute;
 }
 .creatorPost {
+    min-width: 120px;
     width: 30%;
     height: 50%;
     padding: 0;
@@ -875,7 +874,6 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 .newDepPost {
     display: flex;
