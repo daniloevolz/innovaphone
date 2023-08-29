@@ -671,6 +671,7 @@ input[type="datetime-local" i] {
 .buttonsDiv{
     display: flex;
     align-items: center;
+    height: 15%;
     justify-content: flex-start;
     width: 80%;
     color: #FFFF;
@@ -718,7 +719,6 @@ input {
     display: flex;
     position: relative;
     justify-content: center;
-    align-self: start;
     align-items: center;
     color: #ffff;
     background-color: rgb(93 126 131 / 36%); border-color: black;
