@@ -943,37 +943,51 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         // Adicionando o listener de clique
         var s = document.getElementById('savemsg');
         s.addEventListener('click', function () {
+            function getDateNow() {
+                // Cria uma nova data com a data e hora atuais em UTC
+                var date = new Date();
+                // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+                date.setUTCHours(date.getUTCHours() - 3);
 
+                // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+                var dateString = date.toISOString();
+
+                // Substitui o caractere "T" por um espaço
+                //dateString = dateString.replace("T", " ");
+
+                // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+                return dateString.slice(0, -8);
+            }
             console.log("O elemento saveMsgDiv foi clicado!");
-            var startPostValue = document.getElementById('startevent').value;
-            var endPostValue = document.getElementById('endevent').value;
+            var startPost = document.getElementById('startevent').value;
+            var endPost = document.getElementById('endevent').value;
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
-               // Criar objetos de data a partir dos valores fornecidos
-                // var startPost = new Date(startPostValue + "T00:00:00");
-                // var endPost = new Date(endPostValue + "T00:00:00");
-                var currentDate = new Date();
-                                // Opções de formatação
-                var options = { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
+            // Criar objetos de data a partir dos valores fornecidos
+            // var startPost = new Date(startPostValue + "T00:00:00");
+            // var endPost = new Date(endPostValue + "T00:00:00");
+            var currentDate = getDateNow();
+            // Opções de formatação
+            var options = { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
 
-                // Formatar a data no estilo "Aug 28 17:03"
-                var formattedDate = currentDate.toLocaleString('en-US', options);
-                
-                console.log("Data Start:", startPostValue + "data atual" + formattedDate);
+            // Formatar a data no estilo "Aug 28 17:03"
+            var formattedDate = currentDate.toLocaleString('en-US', options);
 
-                if (msgPost === "" || titlePost === "" || startPostValue == "" || endPostValue == "") {
-                    window.alert("Favor preencher todos os campos corretamente para criação do post");
-                } else if (endPostValue < startPostValue) {
-                    console.log("data inicio post" + startPostValue + "data atual" + currentDate);
-                    window.alert("A Data de término do post não pode ser menor que a data de início");
-                } else if (startPostValue < formattedDate) {
-                    window.alert("A data de início do post não pode ser inferior à data atual");
-                } else {
-                    // Aqui você pode continuar com o envio do post
-                    app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPostValue, date_end: endPostValue });
-                }
-                s.removeEventListener('click', s);
+            console.log("Data Start:", startPost + "data atual" + currentDate);
+
+            if (msgPost === "" || titlePost === "" || startPost == "" || endPost == "") {
+                window.alert("Favor preencher todos os campos corretamente para criação do post");
+            } else if (endPost < startPost) {
+                console.log("data inicio post" + startPost + "data atual" + currentDate);
+                window.alert("A Data de término do post não pode ser menor que a data de início");
+            } else if (startPost < currentDate) {
+                window.alert("A data de início do post não pode ser inferior à data atual");
+            } else {
+                // Aqui você pode continuar com o envio do post
+                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPostValue, date_end: endPostValue });
+            }
+            s.removeEventListener('click', s);
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -991,7 +1005,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         q.addEventListener('click', function (post) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(dep_id);
-            q.removeEventListener('click',q);          
+            q.removeEventListener('click', q);
         });
         var w = document.getElementById('closemsg');
         w.addEventListener('click', function () {
@@ -1053,7 +1067,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         })[0];
         //var billboard = document.getElementById('billboard').innerHTML = '';
 
-        document.getElementById('insideDiv').innerHTML = '';
+        document.getElementById('insideDiv').remove();
 
         var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
         //insideDiv.className = 'insideDiv';
@@ -1124,6 +1138,21 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         // Adicionando o listener de clique
         var s = document.getElementById('savemsg');
         s.addEventListener('click', function () {
+            function getDateNow() {
+                // Cria uma nova data com a data e hora atuais em UTC
+                var date = new Date();
+                // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+                date.setUTCHours(date.getUTCHours() - 3);
+
+                // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+                var dateString = date.toISOString();
+
+                // Substitui o caractere "T" por um espaço
+                //dateString = dateString.replace("T", " ");
+
+                // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+                return dateString.slice(0, -8);
+            };
 
             console.log("O elemento saveMsgDiv foi clicado!");
             var startPost = document.getElementById('startevent').value;
@@ -1131,9 +1160,20 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
-
+            var currentDate = getDateNow()
             console.log("Data Start:", startPost);
-            app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); s.removeEventListener();
+            if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
+                window.alert("Favor preencher todos os campos corretamente para criação do post");
+            } else if (endPost < startPost) {
+                console.log("data inicio post" + startPost + "data atual" + currentDate);
+                window.alert("A Data de término do post não pode ser menor que a data de início");
+            } else if (startPost < currentDate) {
+                window.alert("A data atualizada não pode ser inferior a data atual.");
+            } else {
+                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); 
+                
+            };
+            s.removeEventListener('click',s);
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -1157,7 +1197,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         w.addEventListener('click', function () {
             console.log("O elemento closemsg foi clicado!");
             makeDivPosts(dep_id);
-            w.removeEventListener('click',w);
+            w.removeEventListener('click', w);
         });
         //// Adicionando o listener de clique
         //closeWindowDiv.addEventListener('click', function () {
