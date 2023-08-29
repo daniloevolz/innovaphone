@@ -964,7 +964,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
-<<<<<<< HEAD
             // Criar objetos de data a partir dos valores fornecidos
             // var startPost = new Date(startPostValue + "T00:00:00");
             // var endPost = new Date(endPostValue + "T00:00:00");
@@ -989,12 +988,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPostValue, date_end: endPostValue });
             }
             s.removeEventListener('click', s);
-=======
-
-            console.log("Data Start:", startPost);
-            app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
-            s.removeEventListener();
->>>>>>> f81837958e08fb04b6c0681ce0f05360d5bee50d
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -1177,15 +1170,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else if (startPost < currentDate) {
                 window.alert("A data atualizada não pode ser inferior a data atual.");
             } else {
-<<<<<<< HEAD
                 app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); 
                 
             };
             s.removeEventListener('click',s);
-=======
-                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); s.removeEventListener();
-            };
->>>>>>> f81837958e08fb04b6c0681ce0f05360d5bee50d
         });
 
         //var closeMsgDiv = document.createElement('div');
