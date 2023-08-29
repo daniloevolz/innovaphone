@@ -682,7 +682,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
 
         //limpa a div BILlBOARD
-        document.getElementById('billboard').innerHTML = '';
+        //document.getElementById('billboard').innerHTML = '';
 
         var post = list_posts.filter(function (item) {
             return item.id === parseInt(id, 10);
@@ -964,6 +964,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
+<<<<<<< HEAD
             // Criar objetos de data a partir dos valores fornecidos
             // var startPost = new Date(startPostValue + "T00:00:00");
             // var endPost = new Date(endPostValue + "T00:00:00");
@@ -988,6 +989,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPostValue, date_end: endPostValue });
             }
             s.removeEventListener('click', s);
+=======
+
+            console.log("Data Start:", startPost);
+            app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+            s.removeEventListener();
+>>>>>>> f81837958e08fb04b6c0681ce0f05360d5bee50d
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -1170,10 +1177,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else if (startPost < currentDate) {
                 window.alert("A data atualizada não pode ser inferior a data atual.");
             } else {
+<<<<<<< HEAD
                 app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); 
                 
             };
             s.removeEventListener('click',s);
+=======
+                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost }); s.removeEventListener();
+            };
+>>>>>>> f81837958e08fb04b6c0681ce0f05360d5bee50d
         });
 
         //var closeMsgDiv = document.createElement('div');
@@ -1279,42 +1291,18 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"nameDepDiv").setAttribute("id","nameDepDiv"))
         document.getElementById("nameDepDiv").innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento " style="color: #ffff;">'
-        
-        
+                
         var userTable = createUsersDepartmentsGrid();
-        // document.getElementById("newdep").appendChild(userTable);
+
         postMsgDiv.add(userTable)
-        // var nameDepDiv = document.createElement('div');
-        // nameDepDiv.id = 'nameDepDiv';
-        // nameDepDiv.style.display = 'flex';
-        // nameDepDiv.style.backgroundColor = '#ffffff33';
-        // nameDepDiv.style.color = 'white';
-        // nameDepDiv.style.width = '80%';
-        // nameDepDiv.style.height = '8%';
-        // nameDepDiv.style.marginBottom = '15px';
-        // nameDepDiv.style.marginTop = '15px';
-        // nameDepDiv.innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento" style="color: #ffff;">';
+ 
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"buttonsDiv").setAttribute("id","buttonsDiv"))
         document.getElementById("buttonsDiv").innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'
-        // var buttonsDiv = document.createElement('div');
-        // buttonsDiv.className = 'buttons';
-        // buttonsDiv.style.display = 'flex';
-        // buttonsDiv.style.alignItems = 'center';
-        // buttonsDiv.style.justifyContent = 'flex-start';
-        // buttonsDiv.style.width = '80%';
-        // buttonsDiv.style.color = '#FFFF';
-        // buttonsDiv.innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
-        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelInsert"),"saveclose").setAttribute("id","savemsg"))
-        // var saveMsgDiv = document.createElement('div');
-        // saveMsgDiv.id = 'savemsg';
-        // saveMsgDiv.className = 'saveclose';
-        // saveMsgDiv.textContent = 'Inserir';
-        // Event listener de clique para o bot�o "Salvar"
+
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div", null, texts.text("labelInsert"), "saveclose").setAttribute("id", "savemsg"))
+
         var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelClose"),"saveclose").setAttribute("id","closemsg"))
-        // var closeMsgDiv = document.createElement('div');
-        // closeMsgDiv.id = 'closemsg';
-        // closeMsgDiv.className = 'saveclose';
-        // closeMsgDiv.textContent = 'Fechar';
+
         // Adicionando o listener de clique
         var closemsg = document.getElementById("closemsg")
         closemsg.addEventListener('click', function () {
@@ -1351,37 +1339,24 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
     function createUsersDepartmentsGrid() {
         var usersListDiv = new innovaphone.ui1.Node("div",null,null,"userlist").setAttribute("id","userslist")
-        // document.getElementById("userslist").innerHTML = ''
-        // var usersListDiv = document.createElement('div');
-        // usersListDiv.id = 'userslist';
-        // usersListDiv.className = 'userlist';
-        // usersListDiv.innerHTML = '';
+
         var table = usersListDiv.add(new innovaphone.ui1.Node("table",null,null,"table"))
-        // var table = document.createElement('table');
-        // table.classList.add('table');
-        // Criar a primeira linha para os cabeçalhos das colunas
+
         var headerRow = table.add(new innovaphone.ui1.Node("tr",null,null,"row"))
-        // var headerRow = document.createElement('tr');
-        // headerRow.classList.add('row');
+
         var nameCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelUser"),"column"))
-        // var nameCol = document.createElement('th');
-        // nameCol.classList.add('column');
-        // nameCol.textContent = 'Usuário';
+
         var editorCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelEditor"),"column"))
         // var editorCol = document.createElement('th');
         // editorCol.classList.add('column');
         // editorCol.textContent = 'Editor';
-        var viewerColTitle = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelViewer"),"column").setAttribute("id","viewertitle"))
+        var viewerCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelViewer"),"column"))
         // var viewerCol = document.createElement('th');
         // viewerCol.classList.add('column');
         // viewerCol.textContent = 'Visualizador';
 
-        // headerRow.add(nameCol);
-        // headerRow.add(editorCol);
-        // headerRow.add(viewerCol);
+        var viewerCol = headerRow.add(new innovaphone.ui1.Node("th",null,texts.text("labelViewer"),"column").setAttribute('id', 'viewertitle'))
 
-        // table.add(headerRow);
-        // Criar as demais linhas com os dados dos departamentos
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr",null,null,"row"))
             // var row = document.createElement('tr');
@@ -1394,7 +1369,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             // var editorCol = document.createElement('td');
             // editorCol.classList.add('column');
             var viewerCol = row.add(new innovaphone.ui1.Node("td",null,null,"column"))
-        
+
 
             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null,null,null,null,"checkbox","checkbox viewercheckbox").setAttribute("id","viewercheckbox_" + user.guid));
             viewerCheckbox.setAttribute("name","viewerDepartments");
@@ -1409,6 +1384,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 viewerCheckbox.checked = true
                 //viewerCheckbox.checked = this.checked
  
+            });
+            var _viewerCol = document.getElementById('viewertitle')
+            _viewerCol.addEvent('click', function () {
+                console.log("Elemento viewerCol foi CLICADO")
+                var _clickViewer = document.querySelectorAll('.viewercheckbox')
+                _clickViewer.forEach(function (view) {
+                    view.checked = true
+                });
+
             });
 
             //var viewertitle = document.getElementById('viewertitle')
