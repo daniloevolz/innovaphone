@@ -807,22 +807,22 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         })
     }
     function createDepartmentForm() {
-        var insideDiv = billboard.add(new innovaphone.ui1.Node("div",null,null,"insideDiv"))
-        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div",null,null,"newdep").setAttribute("id","newdep"))
-        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","closewindow"))
+        var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, "insideDiv"))
+        var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "newdep").setAttribute("id", "newdep"))
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, null).setAttribute("id", "closewindow"))
         var close = document.getElementById("closewindow")
         close.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivDepartments();
         });
-        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"nameDepDiv").setAttribute("id","nameDepDiv"))
-        document.getElementById("nameDepDiv").innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento " style="color: #ffff;">'  
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "nameDepDiv").setAttribute("id", "nameDepDiv"))
+        document.getElementById("nameDepDiv").innerHTML = '<input id="namedep" type="text" placeholder=" Nome do departamento " style="color: #ffff;">'
         var userTable = createUsersDepartmentsGrid();
         postMsgDiv.add(userTable)
-        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div",null,null,"buttonsDiv").setAttribute("id","buttonsDiv"))
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "buttonsDiv").setAttribute("id", "buttonsDiv"))
         document.getElementById("buttonsDiv").innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">'
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div", null, texts.text("labelInsert"), "saveclose").setAttribute("id", "savemsg"))
-        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div",null,texts.text("labelClose"),"saveclose").setAttribute("id","closemsg"))
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node("div", null, texts.text("labelClose"), "saveclose").setAttribute("id", "closemsg"))
         // Adicionando o listener de clique
         var closemsg = document.getElementById("closemsg")
         closemsg.addEventListener('click', function () {
@@ -836,17 +836,23 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var departmentColor = document.getElementById("colorbox").value;
             var editorDepartments = getSelectedUsersDepartments('editor');
             var viewerDepartments = getSelectedUsersDepartments('viewer');
-            app.send({ api: "user", mt: "InsertDepartment", name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+
+            if (editorDepartments === 0 || editorDepartments.length === 0) {
+                window.alert("Você deve marcar pelo menos um editor para este departamento")
+            }
+            else {
+                app.send({ api: "user", mt: "InsertDepartment", name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+            }
         });
 
         var colorbox = document.getElementById("colorbox")
         colorbox.addEventListener("change", function () {
-                document.getElementById("newdep").style.backgroundColor = colorbox.value;
-            })
-            var palette = document.getElementById("palette")
-            palette.addEventListener("click", function () {
-               colorbox.click();
-            })
+            document.getElementById("newdep").style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        })
 
 
     }

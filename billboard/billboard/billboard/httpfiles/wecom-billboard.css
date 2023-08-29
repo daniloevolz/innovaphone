@@ -739,6 +739,9 @@ input {
 .buttons a{
     width:100px;
 }
+.buttonsDiv a{
+    width:100px;
+}
 
 #closewindow {
     position: absolute;
@@ -819,10 +822,10 @@ input {
 
 .palette {
     cursor: pointer;
-    background-image: url(./images/icons-palette.png);
+    background-image: url(./images/cores03.png);
     width: 40px;
-    height: 40px;
-    background-size: 40px;
+    height: 30px;
+    background-size: 32px;
     background-repeat: no-repeat;
     margin: 0;
     padding: 0;
