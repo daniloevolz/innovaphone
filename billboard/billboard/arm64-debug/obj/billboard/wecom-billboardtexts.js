@@ -2,6 +2,27 @@
 var Wecom = Wecom || {};
 Wecom.billboardTexts = {
     en: {
+        labelTituloAdmin: "Welcome to the Notice Board",
+        labelTituloLicense: "License Management",
+        labelAdmin: "Administration",
+        labelAdd: "Add+",
+        labelInicio: "Home: ",
+        labelExpired: "Expiration: ",
+        labelExcluidos: "Deleted: ",
+        labelUser: "User",
+        labelEditor: "Editor",
+        labelViewer: "Viewer",
+        labelClose: "Close",
+        labelInsert: "Insert",
+        btnOk: "Ok",
+        labelCfgUsers: "Users",
+        labelCfgLicense: "Licenses",
+        lblLicenseToken: "System Token:",
+        labelLicenseFile: "Your License Key:",
+        labelLicenseActive: "Active License:",
+        labelAppInstallDate: "Temporary License Expiration Date:",
+        labelLicenseInstallDate: "License Installation Date:",
+        labelLicenseUsed: "Licenses in Use:"
     },
     de: {
     },
