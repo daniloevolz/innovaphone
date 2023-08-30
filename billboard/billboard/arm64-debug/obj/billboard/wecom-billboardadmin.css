@@ -1,0 +1,109 @@
+.colunaesquerda {
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    background-color: #02163F;
+    color: white;
+    opacity: 0.9;
+}
+.button-inn {
+    position: absolute;
+    left: 82%;
+    width: 15%;
+    height: 25px;
+    top: 90%;
+    font-size: 12px;
+    text-align: center;
+    background-color: rgb(255, 255, 255, 50%);
+    border-radius: 30px;
+    cursor: pointer;
+}
+.colunadireita {
+    overflow-y:auto;
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    /* background-color: purple; */
+    left: 15%;
+    background-color: rgb(196, 196, 196,0.5);
+    color: darkblue;
+    font-size: 15px;
+}
+
+li {
+    padding: 10px;
+    list-style-type: none;
+    margin-left: 20px;
+    font-size: 13pt;
+}
+
+.liOptions:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.otherli {
+    margin-left: 10px;
+}
+
+.config {
+    margin-left: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+.scrolltable {
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+    position: absolute;
+    /* width: 100%; */
+    height: -webkit-fill-available;
+    top: 8%;
+}
+.list-box {
+    margin: 25px;
+    /* position: relative; */
+    width: 90%;
+    padding: 30px;
+    background: linear-gradient(rgb(20, 30, 48), rgb(36, 59, 85));
+    box-sizing: border-box;
+    box-shadow: 0 15px 25px rgba(0,0,0,.6);
+    border-radius: 10px;
+    color: white;
+}
+.table, th, td {
+    /* background-color: rgba(255, 255, 255, 0.60); */
+    border: 2px solid #2c333b;
+    border-collapse: collapse;
+}
+/* License Css */
+
+.DivLicenseTitle{
+    position:absolute; 
+    left:0px; 
+    width:100%; 
+    top:5%; 
+    font-size:25px; 
+    text-align:center
+}
+.DivLicenseTokenTitle{
+    position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;
+}
+.DivLicenseToken{
+    position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;
+}
+.DivLicenseKey{
+    position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;
+}
+@media (max-width: 1000px) {
+    p {
+        font-size: 1em;
+    }
+    .CfgUsers {
+        font-size: 1em;
+    }
+}

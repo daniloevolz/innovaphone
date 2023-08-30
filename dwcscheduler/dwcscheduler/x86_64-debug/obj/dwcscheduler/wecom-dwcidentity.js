@@ -142,23 +142,20 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
             case "Search":
                 if (obj.msg.search == "Extern Web") {
                     console.log("onSearchApiMessage:obj.msg.search == Extern Web");
-                    setTimeout(function () {
-                        searchApi.send({
-                            mt: "SearchInfo", type: "contact", dn: dwcCaller, cn: "Danilo",
-                            avatar: "extern-web", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3",
-                            link: "", contact: {
-                                givenname: "Danilo",
-                                sn: "Volz",
-                                company: "",
-                                sip: [
-                                    "extern-web@wecom.com.br"
-                                ]
-                            },
-                            pbx: "inn-lab-ipva", node: "root", template: "Config Admin", nodeprefix: ""
-                        }, obj.consumer, obj.src);
-                        searchApi.send({ mt: "SearchResult" }, obj.consumer, obj.src);
-                    }, 10000); // 10000 milissegundos = 10 segundos
-                    
+                    searchApi.send({
+                        mt: "SearchInfo", type: "contact", dn: dwcCaller, cn: dwcCaller,
+                        avatar: "extern-web", guid: "8e4b16d1-d798-40ba-9800-43ea0d9523a3",
+                        link: dwcLocation, contact: {
+                            givenname: dwcCaller,
+                            sn: "",
+                            company: "",
+                            sip: [
+                                "extern-web@wecom.com.br"
+                            ]
+                        },
+                        pbx: "inn-lab-ipva", node: "root", template: "Config Admin", nodeprefix: ""
+                    }, obj.consumer, obj.src);
+                    searchApi.send({ mt: "SearchResult" }, obj.consumer, obj.src); 
                 }
                 break;
         }

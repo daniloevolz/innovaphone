@@ -70,6 +70,12 @@ if (license != null && license.System==true) {
             }
         });
         WebServer.onrequest("get-agenda", function (req) {
+            if (req.method == "OPTIONS") {
+                log("get-agenda: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
+            }
             if (req.method == "GET") {
                 var uri = req.relativeUri;
                 log(uri);
@@ -103,6 +109,12 @@ if (license != null && license.System==true) {
             }
         });
         WebServer.onrequest("salvar-evento", function (req) {
+            if (req.method == "OPTIONS") {
+                log("salvar-evento: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
+            }
             if (req.method == "POST") {
                 var newValue = "";
                 var value = "";
@@ -441,6 +453,12 @@ if (license != null && license.System==true) {
                     .onsend(function (req) {
                         req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
                     });
+            }
+            if (req.method == "OPTIONS") {
+                log("put-caller: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
             }
         });
     }

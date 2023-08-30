@@ -70,6 +70,12 @@ if (license != null && license.System==true) {
             }
         });
         WebServer.onrequest("get-agenda", function (req) {
+            if (req.method == "OPTIONS") {
+                log("get-agenda: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
+            }
             if (req.method == "GET") {
                 var uri = req.relativeUri;
                 log(uri);
@@ -103,6 +109,12 @@ if (license != null && license.System==true) {
             }
         });
         WebServer.onrequest("salvar-evento", function (req) {
+            if (req.method == "OPTIONS") {
+                log("salvar-evento: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
+            }
             if (req.method == "POST") {
                 var newValue = "";
                 var value = "";
@@ -413,22 +425,24 @@ if (license != null && license.System==true) {
 
                 var sip = params['id']; // Obter o valor do parâmetro 'id'
                 var caller = params['caller']; // Obter o valor do parâmetro 'caller'
-                var x = params['x']; // Obter o valor do parâmetro 'id'
-                var y = params['y']; // Obter o valor do parâmetro 'caller'
+                var x = params['x']; // Obter o valor do parâmetro 'x'
+                var y = params['y']; // Obter o valor do parâmetro 'y'
                 var msg;
                 log("put-caller: received request to update Identity App");
 
                 connectionsIdentity.forEach(function (c) {
                     if (c.sip == sip) {
-                        log("put-caller:user connected notified caller=" + caller);
+                        log("put-caller:user connected="+ sip +" will be notified about call from caller=" + caller);
                         if (sendLocation && license.Location == true) {
                             //var mapbox = 'https://api.mapbox.com/styles/v1/mapbox/streets-v12.html?title=true&zoomwheel=false&access_token=' + google_api_key + '#15/' + x + '/' + y + '/70';
                             var google = "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15";
                             c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: google }));
                             log("put-caller: sendLocation true");
+                            log("put-caller:user connected=" + sip + " notified about call from caller=" + caller);
                         } else {
                             c.send(JSON.stringify({ api: "user", mt: "DWCCallRequest", caller: caller, location: "" }));
                             log("put-caller: sendLocation false");
+                            log("put-caller:user connected=" + sip + " notified about call from caller=" + caller);
                         }
                     }
                 })
@@ -439,6 +453,12 @@ if (license != null && license.System==true) {
                     .onsend(function (req) {
                         req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
                     });
+            }
+            if (req.method == "OPTIONS") {
+                log("put-caller: OPTIONS request");
+                req.responseHeader("Access-Control-Allow-Origin", "*");
+                req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+                req.sendResponse();
             }
         });
     }
