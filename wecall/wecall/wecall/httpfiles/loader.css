@@ -50,7 +50,7 @@ html {
 }
 
 div:after, ol:after, form:after, dl:after {
-    content: ".";
+    content: "";
     display: block;
     clear: both;
     visibility: hidden;

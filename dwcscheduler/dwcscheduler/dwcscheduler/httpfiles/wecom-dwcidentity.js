@@ -12,7 +12,6 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     var that = this;
 
 
-
     var phoneApi = start.consumeApi("com.innovaphone.phone");
     var calllistApi = start.consumeApi("com.innovaphone.calllist");
     calllistApi.send({ mt: "Subscribe", count: 1 }, "*");
@@ -42,8 +41,15 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
-    app.onclosed = waitConnection(that);
-    app.onerror = waitConnection(that);
+    app.onerror = function (error) {
+        console.error("DwcIdentity: Appwebsocket.Connection error: " + error);
+        changeState("Disconnected");
+    };
+    app.onclosed = function () {
+        console.error("DwcIdentity: Appwebsocket.Connection closed!");
+        changeState("Disconnected");
+    };
+    var currentState = "Loading";
     var _colDireita;
 
     var list_configs = [];
@@ -64,14 +70,27 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
         // we forward them directly to app service to keep it simple
 
         var response = { mt: "LookupInfo", dn: undefined, link: undefined, contact: {}, photourl: undefined, adjust: true }; //adjust number by a trunk prefix
-        response.dn = "Caralho de merda";
+        response.dn = "SSSSSSSSSSSS";
         console.log("phonelookup:obj " + JSON.stringify(response));
         sender.send(response, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // consumer and src must be returned to sender
         sender.send({ mt: "LookupResult" }, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // finishing LookupResult message
     });
 
+    function changeState(newState) {
+        if (newState == currentState) return;
+        if (newState == "Connected") {
+            currentState = newState;
+            console.info("DwcIdentity: Appwebsocket.Connection Connected: ");
+        }
+        if (newState == "Disconnected") {
+            console.error("DwcIdentity: Appwebsocket.Connection Disconnected: ");
+            currentState = "Disconnected";
+        }
+    }
+
 
     function app_connected(domain, user, dn, appdomain) {
+        changeState("Connected");
 
         app.send({ api: "user", mt: "UserSession" });
         searchApi = start.provideApi("com.innovaphone.search");
@@ -82,6 +101,18 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
         if (phoneApi) {
             phoneApi.onupdate.attach(onPhoneApiUpdate);
         }
+
+        setInterval(function () {
+            if (currentState == "Connected") {
+                var msg = { api: "user", mt: "Ping" };
+                app.send(msg);
+                console.log("Interval: Ping Sent " + JSON.stringify(msg));
+            } else {
+                changeState("Disconnected");
+                console.log("Interval: changeState Disconnected");
+            }
+            
+        }, 60000); // A cada 60 segundo
     }
 
     function app_message(obj) {
@@ -94,8 +125,12 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
             makeDivNoLicense(obj.result);
         }
         if (obj.api == "user" && obj.mt == "DWCCallRequest") {
+            console.log("DWCCallRequest: Received from= "+ obj.caller);
             dwcCaller = obj.caller;
             dwcLocation = obj.location;
+        }
+        if (obj.api == "user" && obj.mt == "Pong") {
+            console.log("Interval: Pong received!!!");
         }
     }
     
@@ -120,13 +155,17 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
             if (call.sip == "extern-web") {
                 if (dwcCaller.length > 1 && dwcLocation.length < 1) {
                     phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div>" });
+                    console.log("onPhoneApiUpdate: Softphone updated with caller="+ dwcCaller);
                 } else if (dwcCaller.length > 1 && dwcLocation.length > 1) {
                     phoneApi.send({ mt: "CallInfo", id: call.id, html: "<div style=' width: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'>Cliente: " + decodeURIComponent(dwcCaller) + "</div><div style='top:40px; width: 100%; height: 100%; left: 0%; text-align: center;;background:darkblue;color:white;font-size:20px'><iframe src='" + dwcLocation + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe></div>" });
+                    console.log("onPhoneApiUpdate: Softphone updated with caller=" + dwcCaller);
                 } else if (dwcCaller.length < 1 && dwcLocation.length < 1) {
                     phoneApi.send({ mt: "CallInfo", id: call.id, html: "" });
                 }
 
             } else {
+                dwcLocation = '';
+                dwcCaller = '';
                 phoneApi.send({ mt: "CallInfo", id: call.id, html: "" });
             }
             if (call.state == "Connected") {

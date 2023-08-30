@@ -145,7 +145,7 @@
         "cmd": "item",
         "name": "LeaveAllGroupsOnStatup",
         "type": "BOOL",
-        "default": true,
+        "default": false,
         "password": false
       },
       {
