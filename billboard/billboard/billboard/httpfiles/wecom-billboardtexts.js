@@ -22,7 +22,10 @@ Wecom.billboardTexts = {
         labelLicenseActive: "Active License:",
         labelAppInstallDate: "Temporary License Expiration Date:",
         labelLicenseInstallDate: "License Installation Date:",
-        labelLicenseUsed: "Licenses in Use:"
+        labelLicenseUsed: "Licenses in Use:",
+        labelPostExpired: "Expired",
+        labelPostFuture: "Future",
+        labelPostDeleted: "Deleted"
     },
     de: {
     },
@@ -47,6 +50,9 @@ Wecom.billboardTexts = {
         labelLicenseActive: "Licença ativa:",
         labelAppInstallDate: "Data Expiração Lic Temp:",
         labelLicenseInstallDate: "Data instalação da Licença:",
-        labelLicenseUsed: "Licenças em uso:"
+        labelLicenseUsed: "Licenças em uso:",
+        labelPostExpired: "Expirado",
+        labelPostFuture: "Futuro",
+        labelPostDeleted: "Deletado"
     }
 }

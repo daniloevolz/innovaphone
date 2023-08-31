@@ -221,13 +221,13 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 hdposts.forEach(function (hdpost) {
                     if (post.deleted) {
                         hdpost.className = 'deletedpost';
-                        hdpost.title = 'Deletado';
+                        hdpost.title = texts.text("labelPostDeleted");
                     } else if (starDate > now) {
                         hdpost.className = 'futurepost';
-                        hdpost.title = 'Futuro';
+                        hdpost.title = texts.text("labelPostFuture");
                     } else if (endDate < now) {
                         hdpost.className = 'expired';
-                        hdpost.title = 'Expirado';
+                        hdpost.title = texts.text("labelPostExpired");
                     } else {
                         hdpost.className = '';
                         hdpost.title = 'Ativo';
@@ -546,6 +546,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var scrollBox = msgBoxDiv.add(new innovaphone.ui1.Node('scrollbox', 'display: flex; color:white; width:100%; height:100%;', null, 'scrollbox').setAttribute('id', 'scrollbox'));
         var msgContent = scrollBox.add(new innovaphone.ui1.Node('div', 'overflow:auto;', post.description, 'msgcontent').setAttribute('id', 'msgcontent'));
 
+        if (document.getElementById('titlemsg')) {
+            console.log("CARREGOU O ELEMENTO")
+            // Verificar o comprimento do texto usando .textContent
+            if (document.getElementById('titlemsg').innerText.length > 20) {
+                // Aplicar o estilo com fontSize 20px
+                console.log("O ELEMENTO TEM MAIS DE 20 LETRAS")
+                var titleMsg = document.getElementById('titlemsg');
+                titleMsg.style.fontSize = '20px';
+            }
+        }
+        
         if (isEditor) {
             app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10), })
 
@@ -674,6 +685,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(post.department);
         });
+                         
 
     }
     function createPostForm(dep_id) {
