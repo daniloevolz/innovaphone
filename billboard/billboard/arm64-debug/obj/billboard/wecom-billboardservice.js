@@ -241,41 +241,67 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "InsertDepartment") {
-                    Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "')")
-                        .oncomplete(function () {
-                            log("InsertDepartment:result=success ");
+                    Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "') RETURNING id;")
+                        .oncomplete(function (id) {
+                            log("InsertDepartment:result=success " + JSON.stringify(id[0].id));
 
-                            Database.exec("SELECT id FROM tbl_departments where name ='" + obj.name + "';")
-                                .oncomplete(function (data) {
-                                    log("SelectDepartments:result=" + data[0].id);
-                                    var viewers = obj.viewers;
-                                    viewers.forEach(function (v) {
-                                        Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + parseInt(JSON.stringify(data[0].id), 10) + ",'" + v + "')")
-                                            .oncomplete(function () {
-                                                log("InsertDepartmentViewer:result=success");
+                            var viewers = obj.viewers;
+                            viewers.forEach(function (v) {
+                                Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + parseInt(JSON.stringify(id[0].id)) + ",'" + v + "')")
+                                    .oncomplete(function () {
+                                        log("InsertDepartmentViewer:result=success");
 
-                                            })
-                                            .onerror(function (error, errorText, dbErrorCode) {
-                                                log("InsertDepartmentViewer:result=Error " + String(errorText));
-                                            });
                                     })
-                                    var editors = obj.editors;
-                                    editors.forEach(function (e) {
-                                        Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES ('" + parseInt(JSON.stringify(data[0].id), 10) + "','" + e + "')")
-                                            .oncomplete(function () {
-                                                log("InsertDepartmentEditor:result=success");
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("InsertDepartmentViewer:result=Error " + String(errorText));
+                                    });
+                            })
+                            var editors = obj.editors;
+                            editors.forEach(function (e) {
+                                Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES ('" + parseInt(JSON.stringify(id[0].id)) + "','" + e + "')")
+                                    .oncomplete(function () {
+                                        log("InsertDepartmentEditor:result=success");
 
-                                            })
-                                            .onerror(function (error, errorText, dbErrorCode) {
-                                                log("InsertDepartmentEditor:result=Error " + String(errorText));
-                                            });
                                     })
-                                    conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("InsertDepartmentEditor:result=Error " + String(errorText));
+                                    });
+                            })
+                            conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
 
-                                })
-                                .onerror(function (error, errorText, dbErrorCode) {
 
-                                });
+
+                            //Database.exec("SELECT id FROM tbl_departments where name ='" + obj.name + "';")
+                            //    .oncomplete(function (data) {
+                            //        log("SelectDepartments:result=" + data[0].id);
+                            //        var viewers = obj.viewers;
+                            //        viewers.forEach(function (v) {
+                            //            Database.exec("INSERT INTO tbl_department_viewers (department_id, viewer_guid) VALUES (" + parseInt(JSON.stringify(data[0].id), 10) + ",'" + v + "')")
+                            //                .oncomplete(function () {
+                            //                    log("InsertDepartmentViewer:result=success");
+
+                            //                })
+                            //                .onerror(function (error, errorText, dbErrorCode) {
+                            //                    log("InsertDepartmentViewer:result=Error " + String(errorText));
+                            //                });
+                            //        })
+                            //        var editors = obj.editors;
+                            //        editors.forEach(function (e) {
+                            //            Database.exec("INSERT INTO tbl_department_editors (department_id, editor_guid) VALUES ('" + parseInt(JSON.stringify(data[0].id), 10) + "','" + e + "')")
+                            //                .oncomplete(function () {
+                            //                    log("InsertDepartmentEditor:result=success");
+
+                            //                })
+                            //                .onerror(function (error, errorText, dbErrorCode) {
+                            //                    log("InsertDepartmentEditor:result=Error " + String(errorText));
+                            //                });
+                            //        })
+                            //        conn.send(JSON.stringify({ api: "user", mt: "InsertDepartmentSuccess" }));
+
+                            //    })
+                            //    .onerror(function (error, errorText, dbErrorCode) {
+
+                            //    });
 
                         })
                         .onerror(function (error, errorText, dbErrorCode) {

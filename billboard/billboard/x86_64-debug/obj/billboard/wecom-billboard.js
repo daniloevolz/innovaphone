@@ -710,12 +710,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
         var s = document.getElementById('savemsg');
         s.addEventListener('click', function () {
-            function getDateNow() {
-                var date = new Date();
-                date.setUTCHours(date.getUTCHours() - 3);
-                var dateString = date.toISOString();
-                return dateString.slice(0, -8);
-            }
             console.log("O elemento saveMsgDiv foi clicado!");
             var startPost = document.getElementById('startevent').value;
             var endPost = document.getElementById('endevent').value;
@@ -730,7 +724,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else if (endPost < startPost) {
                 console.log("data inicio post" + startPost + "data atual" + currentDate);
                 window.alert("A Data de término do post não pode ser menor que a data de início");
-            } else if (startPost < currentDate) {
+            } else if (endPost < currentDate) {
                 window.alert("A data de início do post não pode ser inferior à data atual");
             } else {
                 app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
@@ -888,7 +882,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 window.alert("Você deve marcar pelo menos um editor para este departamento")
             }
             else {
+                console.log("InsertDepartment sending");
                 app.send({ api: "user", mt: "InsertDepartment", name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+                console.log("InsertDepartment sent")
             }
         });
 

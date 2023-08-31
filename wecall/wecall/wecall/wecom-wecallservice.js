@@ -1778,21 +1778,23 @@ function getURLLogin(sip, session) {
             foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
     }else{
         var msg = { user: sip, client: codClient };
-        log("danilo req : getURLLogin url" + urlSSO);
-        log("danilo req : getURLLogin msg" + JSON.stringify(msg));
+
+        log("danilo req : getURLLogin url " + urlSSO);
+        log("danilo req : getURLLogin msg " + JSON.stringify(msg));
 
         var responseData = "";
-        var req = HttpClient.request("POST", urlSSO);
-        req.header("X-Token", "danilo");
-        req.contentType("application/json");
-        req.onsend(function (req) {
-            req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        var reqLogin = HttpClient.request("POST", urlSSO);
+        reqLogin.header("X-Token", "danilo");
+        reqLogin.contentType("application/json");
+        reqLogin.contentLength(msg.length);
+        reqLogin.onsend(function (reqLogin) {
+            reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
         });
-        req.onrecv(function (req, data, last) {
+        reqLogin.onrecv(function (reqLogin, data, last) {
             responseData += new TextDecoder("utf-8").decode(data);
-            if (!last) req.recv();
+            if (!last) reqLogin.recv();
         }, 1024);
-        req.oncomplete(function (req, success) {
+        reqLogin.oncomplete(function (reqLogin, success) {
             log("danilo-req : getURLLogin complete");
             log("danilo-req : getURLLogin responseData " + responseData);
             try {
@@ -1856,6 +1858,8 @@ function getURLLogin(sip, session) {
         })
         .onerror(function (error) {
             log("danilo-req : getURLLogin error=" + error);
+            var url = Config.url;
+            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
         });
     } 
 }
