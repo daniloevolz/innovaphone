@@ -632,53 +632,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 console.log("O elemento deletePostDiv foi clicado!");
                 app.send({ api: "user", mt: "DeletePost", id: parseInt(id, 10), src: dep_id });
             });
+        };
+
+        var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
+        footShowPost.id = 'footShowPost';
+        footShowPost.className = 'footShowPost';
+
+        var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
+        //creatorPost.id = 'creatorPost';
+        //creatorPost.className = 'creatorPost';
+        //creatorPost.innerHTML = 'Criador: ' + user.cn;
+
+        //console.log('Quero saber: ', user.cn);
+
+        var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
+        //closeDateDiv.id = 'closedate';
+        //closeDateDiv.className = 'closedate';
+
+        var dateString = post.date_end;
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+        document.getElementById("closedate").innerHTML = formattedDate
 
 
-            var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
-            footShowPost.id = 'footShowPost';
-            footShowPost.className = 'footShowPost';
-
-            var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
-            //creatorPost.id = 'creatorPost';
-            //creatorPost.className = 'creatorPost';
-            //creatorPost.innerHTML = 'Criador: ' + user.cn;
-
-            //console.log('Quero saber: ', user.cn);
-
-            var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
-            //closeDateDiv.id = 'closedate';
-            //closeDateDiv.className = 'closedate';
-
-            var dateString = post.date_end;
-            var date = new Date(dateString);
-            var day = date.getDate();
-            var month = date.getMonth() + 1;
-            var year = date.getFullYear();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-            var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-
-            document.getElementById("closedate").innerHTML = formattedDate
-            //closeDateDiv.innerHTML = formattedDate;
-
-            //footShowPost.appendChild(creatorPost);
-            //footShowPost.appendChild(closeDateDiv);
-
-            // Adicionar os elementos criados � div com o ID 'billboard'
-            //var billboardDiv = document.getElementById('billboard');
-
-            //    //billboardDiv.innerHTML = '';
-            //    scrollBox.appendChild(msgContent);
-            //    msgBoxDiv.appendChild(scrollBox);
-            //    postMsgDiv.appendChild(closeWindowDiv);
-            //    postMsgDiv.appendChild(nameBoxDiv);
-            //    postMsgDiv.appendChild(titleMsgDiv);
-            //    postMsgDiv.appendChild(msgBoxDiv);
-            //    postMsgDiv.appendChild(footShowPost);
-
-            //    billboardDiv.appendChild(insideDiv);
-            //    insideDiv.appendChild(postMsgDiv);
-        }
         // Adicionando o listener de clique
         var a = document.getElementById('closewindow');
         a.addEventListener('click', function () {
