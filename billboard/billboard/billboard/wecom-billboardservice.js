@@ -33,7 +33,33 @@ Config.onchanged(function () {
     licenseInstallDate = Config.licenseInstallDate;
     appInstallDate =  Config.appInstallDate;
 })
+WebServer.onrequest("get-departments", function (req) {
+    if (req.method == "OPTIONS") {
+        log("get-departments: OPTIONS request");
+        req.responseHeader("Access-Control-Allow-Origin", "*");
+        req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+        req.sendResponse();
+    }
+    if (req.method == "GET") {
+        var querySelect = "SELECT * FROM tbl_departments"
+        Database.exec(querySelect)
+            .oncomplete(function (dataDepartments) {
+                log("SelectDepartments:result=" + JSON.stringify(dataDepartments, null, 4));
+                msg = { status: 200, data: JSON.stringify(dataDepartments) };
+                req.responseContentType("application/json")
+                    .sendResponse()
+                    .onsend(function (req) {
+                        req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                    });
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                // value does not exist, send 404 Not Found
+                req.cancel();
+            });    
+    }   
 
+    });
+    
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-billboard") {
         // log("connectionsUser: license.Users " + license.Users);
@@ -224,6 +250,7 @@ new JsonApi("user").onconnected(function (conn) {
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                         });
+
                     if (obj.deleted) {
                         var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
                     } else {
@@ -458,6 +485,20 @@ new JsonApi("admin").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
+            if (obj.mt == "SelectDepartments") {
+                Database.exec("SELECT * FROM tbl_departments")
+                //log("SelectDepartments:");
+                ////selectViewsHistory(conn.sip, conn);
+                //var queryViewer;
+                //Database.exec(queryViewer)
+                    .oncomplete(function (data) {
+                        log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            };
             
         });
     }

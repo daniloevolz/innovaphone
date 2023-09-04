@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billboard Publico</title>
+    <link rel="stylesheet" href="wecom-billboard.css" type="text/css" />
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+</head>
+<script>
+// var departments = [];
+var url = document.URL;
+var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
+var url = url.substring(0, penultimateSlashIndex);
+
+fetch(url+'/get-departments', {
+                method: 'GET',
+                headers: {}
+            }).then(function (response) {
+                if (response.status == 200) {
+
+                    response.json().then(function (data) {
+                        // var departments = JSON.parse(data);
+                        var departments = JSON.parse(data.data)
+                        console.log("get-departments result=" + JSON.stringify(departments));
+                        MakeDepartments(departments);
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert("Algo saiu errado:\n" + text);
+                    });
+                }
+            }); // final .then (response)
+
+function MakeDepartments(data){      
+
+var billboard = document.getElementById("billboard");
+billboard.innerHTML = '';
+
+var worktable = document.createElement("div");
+worktable.setAttribute("id", "worktable");
+
+var depcards = document.createElement("div");
+depcards.setAttribute("id", "depcards");
+depcards.className = "depcards"
+
+var logoWecom = document.createElement("div");
+logoWecom.setAttribute("id", "logowecom");
+logoWecom.className = "logo"
+
+depcards.innerHTML = '';
+
+//console.log("DEPART RESULT" + obj)
+
+data.forEach(function (department) {
+    var div = document.createElement("div");
+    div.setAttribute("id", department.id);
+    div.style.cssText = `display:flex;justify-content:center;align-items:center;border-radius:5px;margin:10px;background-color:${department.color};`;
+    div.className = "card"
+
+    // div.addEventListener('click', function () {
+    //     var clickedId = this.id;
+    //     console.log('ID do elemento div clicado:', clickedId);
+    //     app.send({ api: "user", mt: "SelectPosts", department: clickedId });
+    // });
+
+    // COMEÇAR POSTS 05/09/23
+    
+    var ulNew = document.createElement("ul");
+    ulNew.setAttribute("id", "newDepPost");
+
+    var aElement = document.createElement("a");
+    aElement.textContent = department.name;
+
+    div.appendChild(ulNew);
+    div.appendChild(aElement);
+    depcards.appendChild(div);
+});
+
+worktable.appendChild(depcards);
+worktable.appendChild(logoWecom);
+billboard.appendChild(worktable);
+
+}
+</script>
+<body>
+    <div id="billboard"></div>
+</body>
+</html>

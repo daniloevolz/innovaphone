@@ -1,4 +1,3 @@
-
 /// <reference path="../../web1/lib1/innovaphone.lib1.js" />
 /// <reference path="../../web1/appwebsocket/innovaphone.appwebsocket.Connection.js" />
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
@@ -88,6 +87,16 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             console.log("LIST ADMINS" + JSON.stringify(list_admins))
             makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
+        if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") {
+            list_department = JSON.parse(obj.result)
+            console.log("LIST DEPART " + JSON.stringify(list_department))
+            makeDivDepart(_colDireita, list_department);
+        }
+        if (obj.api == "admin" && obj.mt == "SelectPosts") {
+            list_post = JSON.parse(obj.result)
+            console.log("LIST POST " + JSON.stringify(list_post))
+            makeDivPost(_colDireita, list_post);
+        }
     }
     function constructor() {
         that.clear();
@@ -115,8 +124,10 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));
         var br = relatorios.add(new innovaphone.ui1.Node("br", null, null, null));
     
-        var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         // var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
 
         var Arelatorios1 = lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgUsers"), null));
@@ -125,6 +136,10 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         // Arelatorios2.setAttribute("id", "CfgGoogle");
         var Arelatorios2 = lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgLicense"), null));
         Arelatorios2.setAttribute("id", "CfgLicense");
+        var Arelatorios3 = lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgDepartment"), null));
+        Arelatorios3.setAttribute("id", "CfgDepartment");
+        var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgPost"), null));
+        Arelatorios4.setAttribute("id", "CfgPost");
 
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
@@ -138,14 +153,23 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         //Aconfig.setAttribute("href", "#");
 
         var a = document.getElementById("CfgUsers");
-    a.addEventListener("click", function () { 
-        ChangeView("CfgUsers", colDireita) 
-    })
+            a.addEventListener("click", function () { 
+            ChangeView("CfgUsers", colDireita) 
+            });
 
-    var a = document.getElementById("CfgLicense");
-    a.addEventListener("click", function () { 
-        ChangeView("CfgLicense", colDireita) 
-    })
+        var a = document.getElementById("CfgLicense");
+            a.addEventListener("click", function () { 
+            ChangeView("CfgLicense", colDireita) 
+            });
+        var a = document.getElementById("CfgDepartment");
+            a.addEventListener("click", function () { 
+            ChangeView("CfgDepartment", colDireita) 
+            });
+
+        var a = document.getElementById("CfgPost");
+            a.addEventListener("click", function () { 
+            ChangeView("CfgPost", colDireita) 
+            });
 
         _colDireita = colDireita;
     }
@@ -158,6 +182,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         }
         if (ex == "CfgLicense") {
             app.send({ api: "admin", mt: "ConfigLicense"});
+            //waitConnection(colDireita);
+        }
+        if (ex == "CfgDepartment") {
+            app.send({ api: "admin", mt: "SelectDepartments" });
+            //waitConnection(colDireita);
+        }
+        if (ex == "CfgPost") {
+            app.send({ api: "admin", mt: "SelectPostResult" });
             //waitConnection(colDireita);
         }
     }
@@ -195,7 +227,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             checkboxes.forEach(function (checkbox) {
             if (checkbox.checked) {
                 Users.push(checkbox.getAttribute("id"));
-            }
+                }
         });
           console.log("Enviados:" + Users)
           app.send({ api: "admin", mt: "InsertAdmins", users: Users  });
@@ -204,54 +236,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
    
 
-        }
+    }
         
-    // function makeDivLicense(t) {
-    //     t.clear();
-    //     //Título
-
-    //     // var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
-    //     // imgMenu.setAttribute("src","menu-icon.png");
-    //     // imgMenu.setAttribute("id","imgmenu");
-    //     //document.getElementById("imgmenu").addEventListener("click",openMenu);
-
-    //     t.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
-
-    //     t.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
-    //     t.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
-
-    //     t.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
-    //     t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
-    //     var lic = "Temporária";
-    //     if (licenseActive != "null") {
-    //         lic = licenseActive
-    //     }
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
-
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", appInstall, "DivAppDate"));
-
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
-
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
-    //     t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
-
-
-    //     // buttons
-    //     t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-    //         licenseFile = document.getElementById("InputLicenseFile").value;
-    //         if (licenseFile.length > 0) {
-    //             app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
-    //             //waitConnection(t);
-    //         } else {
-    //             window.alert("A chave de licença precisa ser informada!");
-    //         }
-            
-    //     });
-
-    // }
     function makeDivLicense(t) {
         t.clear();
         //Título
@@ -297,6 +283,53 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             }
             
         });
+
+    }
+    function makeDivDepart(t, depart) {
+        t.clear();
+        
+        var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Departamento", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Excluído?", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Editar", null));
+
+        var departGuids = depart.map(admin => depart.guid);
+        console.log("Admin Guids: " + departGuids);
+
+        depart.forEach(function (depart) {
+            var deleted = departGuids.includes(depart.guid) ? 'deleted' : '';
+            console.log("User:", depart.guid, "Deletado?:", deleted);
+            var html = `
+              <tr>
+                <td style="text-transform: capitalize; text-align: center;">${depart.id}</td>
+                <td style="background-color: ${depart.color}; text-transform: capitalize; text-align: center;">${depart.name}</td>
+                <td style="text-transform: capitalize; text-align: center;">${depart.deleted}</td>
+                <td style="text-align: center;"><input type="checkbox" id="${depart.id}" class="userCheckbox" ${deleted}></td>
+              </tr>
+            `;
+            document.getElementById("local-table").innerHTML += html;
+        });
+
+        scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+            console.log("Ok Funcionando")
+
+            var checkboxes = document.querySelectorAll(".userCheckbox");
+            // var btnSave = document.getElementById("btnSave");
+
+            var departments = [];
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    departments.push(checkbox.getAttribute("id"));
+                }
+            });
+            console.log("Departamentos:" + departments)
+            //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
+
+        })
+
+
 
     }
 }
