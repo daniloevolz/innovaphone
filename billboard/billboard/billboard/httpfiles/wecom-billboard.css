@@ -290,9 +290,9 @@ td.checkbox {
     justify-content: center;
     align-items: center;
     align-content: center;
-    opacity: 0.70;
+    /* opacity: 0.70;
     transform: translateY(70%);
-    transition: transform 0.3s, opacity 0.3s;
+    transition: transform 0.3s, opacity 0.3s; */
 }
 .footbuttons:hover {
     opacity: 1;
@@ -567,10 +567,14 @@ td.checkbox {
     align-items: center;
     color: white;
     width: 80%;
-    height: 10%;
+    height: 6%;
     justify-content: space-between;
 }
-
+.selectPublicPost{
+    border-radius: 20px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
 .dateinput {
     margin-left: 5px;
 }

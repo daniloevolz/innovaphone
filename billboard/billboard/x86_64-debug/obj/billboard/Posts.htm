@@ -39,7 +39,7 @@ fetch(url+'/get-departments', {
                 }
             }); // final .then (response)
 
-function MakeDepartments(data){      
+function MakeDepartments(data){   
 
 var billboard = document.getElementById("billboard");
 billboard.innerHTML = '';
@@ -57,22 +57,40 @@ logoWecom.className = "logo"
 
 depcards.innerHTML = '';
 
-//console.log("DEPART RESULT" + obj)
-
 data.forEach(function (department) {
     var div = document.createElement("div");
     div.setAttribute("id", department.id);
     div.style.cssText = `display:flex;justify-content:center;align-items:center;border-radius:5px;margin:10px;background-color:${department.color};`;
     div.className = "card"
 
-    // div.addEventListener('click', function () {
-    //     var clickedId = this.id;
-    //     console.log('ID do elemento div clicado:', clickedId);
-    //     app.send({ api: "user", mt: "SelectPosts", department: clickedId });
-    // });
+    div.addEventListener('click', function () {
+           var clickedId = this.id;
+           console.log('ID do elemento div clicado:', clickedId);
+           fetch(url+'/get-posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(clickedId)
+                }).then(function (response) {
+                if (response.status == 200) {
+                    response.json().then(function (data) {
+                        var posts = JSON.parse(data.data)
+                        console.log("get-posts result=" + JSON.stringify(posts));
+                        console.log(posts.department)
+                        MakePosts(posts.department , posts);
+                        //erro na req get-posts , revisar 
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert("Algo saiu errado:\n" + text);
+                    });
+                }
+            }); // final .then (response)
+     });
 
-    // COMEÇAR POSTS 05/09/23
-    
     var ulNew = document.createElement("ul");
     ulNew.setAttribute("id", "newDepPost");
 
@@ -88,6 +106,103 @@ worktable.appendChild(depcards);
 worktable.appendChild(logoWecom);
 billboard.appendChild(worktable);
 
+}
+
+function MakePosts(dep_id,posts) {
+    var billboard = document.getElementById("billboard");
+    billboard.innerHTML = '';
+
+    var worktable = document.createElement("div");
+    worktable.setAttribute("id", "worktable");
+    billboard.appendChild(worktable);
+
+    var postDepartDiv = document.createElement("div");
+    postDepartDiv.setAttribute("id", "post-depart");
+    postDepartDiv.className = "post-depart"
+    worktable.appendChild(postDepartDiv);
+
+    var logoWecom = document.createElement("div");
+    logoWecom.setAttribute("id", "logowecom");
+    logoWecom.className = "logo"
+    worktable.appendChild(logoWecom);
+
+    posts.forEach(function (post) {
+        var postDiv = document.createElement("div");
+        postDiv.setAttribute("id", post.id);
+        postDiv.setAttribute("class", "post");
+        postDiv.style.backgroundColor = post.color;
+        postDepartDiv.appendChild(postDiv); 
+
+
+        var headpost = document.createElement("ul");
+        headpost.setAttribute("id", "headpost");
+        headpost.className = "headpost";
+        postDiv.appendChild(headpost);
+
+        var a = document.createElement("a");
+        a.textContent = post.title;
+        a.setAttribute("id", "textpost");
+        postDiv.appendChild(a);
+
+        a.addEventListener('click', function () {
+            var clickedId = this.id;
+            console.log('ID do elemento div clicado:', clickedId);
+            // console.log(post);
+            // var user = post.user_guid;
+            // console.log(user);
+            // var user = list_tableUsers.filter(function (item) {
+            //     return item.guid == post.user_guid;
+            // })[0];
+            // console.log(user);
+            // makeDivPostMessage(clickedId, dep_id, user);
+        });
+
+        var footpost = document.createElement("ul");
+        footpost.setAttribute("id", "footpost");
+        footpost.className = "footpost"
+        postDiv.appendChild(footpost);
+
+        var spanStart = document.createElement("span");
+        spanStart.textContent = "Início: " + formatDate(new Date(post.date_start));
+        spanStart.setAttribute("id", "dateS");
+        spanStart.className = "dateS"
+        spanStart.style.fontSize = "10px";
+        footpost.appendChild(spanStart);
+
+        var spanEnd = document.createElement("span");
+        spanEnd.textContent = "Fim: " + formatDate(new Date(post.date_end));
+        spanEnd.setAttribute("id", "dateE");
+        spanStart.className = "dateE"
+        spanEnd.style.fontSize = "10px";
+        footpost.appendChild(spanEnd);
+    });
+
+    var footButtons = document.createElement("div");
+    footButtons.setAttribute("id", "footbuttons");
+    worktable.appendChild(footButtons);
+
+    var backDiv = document.createElement("div");
+    backDiv.setAttribute("id", "backDiv");
+    footButtons.appendChild(backDiv);
+
+    var back = document.createElement("div");
+    back.textContent = "Back";
+    back.addEventListener("click", function () {
+        document.getElementById("post-depart").style.display = 'none';
+        // makeDivDepartments();
+    });
+    backDiv.appendChild(back);
+
+    function formatDate(date) {
+        var day = date.getDate();
+        var month = date.getMonth() + 1; // Months are 0-indexed
+        var year = date.getFullYear();
+
+        if (day < 10) day = '0' + day;
+        if (month < 10) month = '0' + month;
+
+        return day + '/' + month + '/' + year;
+    }
 }
 </script>
 <body>

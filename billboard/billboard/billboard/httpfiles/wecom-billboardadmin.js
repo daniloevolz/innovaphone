@@ -9,6 +9,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     var list_tableUsers = [];
+    var list_departments = [];
+    var list_editors_departments = [];
+    var list_viewers_departments = [];
     var list_admins = [];
     var _colDireita;
     //license
@@ -97,6 +100,20 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             list_post = JSON.parse(obj.result)
             console.log("LIST POST " + JSON.stringify(list_post))
             makeDivPost(_colDireita, list_post);
+        }
+        if (obj.api == "admin" && obj.mt == "SelectDepartmentViewersResult") {
+            console.log(obj.result);
+            list_viewers_departments = JSON.parse(obj.result);
+        }
+        if (obj.api == "admin" && obj.mt == "SelectDepartmentEditorsResult") {
+            console.log(obj.result);
+            list_editors_departments = JSON.parse(obj.result);
+        }
+        if (obj.api == "admin" && obj.mt == "UpdateDepartmentSuccess") {
+            app.send({ api: "admin", mt: "SelectDepartments" });
+        }
+        if (obj.api == 'admin' && obj.mt == "SelectDepartments") {
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
         }
     }
     function constructor() {
@@ -286,7 +303,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         });
 
     }
-    function makeDivDepart(t, depart) {
+    function makeDivDepart(t, depart, tableUser) {
         t.clear();
 
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
@@ -297,62 +314,189 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         tableMain.add(new innovaphone.ui1.Node("th", null, "Excluído?", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Editar", null));
 
-        var departGuids = depart.map(admin => depart.guid);
-
         depart.forEach(function (depart) {
             var users = list_tableUsers.filter(function (user) {
                 return depart.creator_guid === user.guid;
             });
 
-            // Verifique se há correspondências e faça o que você precisa com elas
-            //if (users.length > 0) {
-            //    console.log("USERS0: " + users[0]);
-            //    console.log("USERS1: " + parseInt(users[0], 10));
-            //    console.log("USERS2: " + JSON.stringify(users[0]));
-            //}
-            
-            //console.log("USERS1: " + users[0]);
-            //console.log("USERS0: " + JSON.stringify(users[0]));
-            //console.log("USERS1: " + users[0].cn);
-            //console.log("USERS2: " + users.cn);
-
-            var deleted = departGuids.includes(depart.guid) ? 'deleted' : '';
             var userName = users.length > 0 ? users[0].cn : '';
-
+            var departDel = depart.deleted == null ? "Não" : depart.deleted;
             var html = `
                       <tr>
                         <td style="text-transform: capitalize; text-align: center;">${depart.id}</td>
                         <td style="background-color: ${depart.color}; text-transform: capitalize; text-align: center;">${depart.name}</td>
                         <td style="text-transform: capitalize; text-align: center;">${userName}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${depart.deleted}</td>
-                        <td style="text-align: center;"><input type="checkbox" id="${depart.id}" class="userCheckbox" ${deleted}></td>
+                        <td style="text-transform: capitalize; text-align: center;">${departDel}</td>
+                        <td style="display: flex; justify-content: center; align-items: center;"><div id="${depart.id}"  class="btnChgDpto" style="background-color: ${depart.color};"></div></td>
                       </tr>
                     `;
 
             document.getElementById("local-table").innerHTML += html;
            
         });
+        var divs = document.getElementsByClassName("btnChgDpto");
 
-        scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
-            console.log("Ok Funcionando")
+        for (var i = 0; i < divs.length; i++) {
+            divs[i].addEventListener("click", function (event) {
+                // Obtenha o ID da DIV clicada.
+                var idDaDivClicada = event.currentTarget.id;
+                editDepartmentForm(_colDireita, idDaDivClicada, list_department)
+                // Execute a ação desejada com base no ID da DIV clicada.
+                console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
 
-            var checkboxes = document.querySelectorAll(".userCheckbox");
-            // var btnSave = document.getElementById("btnSave");
-
-            var departments = [];
-            checkboxes.forEach(function (checkbox) {
-                if (checkbox.checked) {
-                    departments.push(checkbox.getAttribute("id"));
-                }
+                // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
+                // Por exemplo, você pode buscar os dados relacionados a esse ID e iniciar a edição.
             });
-            console.log("Departamentos:" + departments)
-            //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
+        }
 
-        })
+        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+        //    console.log("Ok Funcionando")
 
+        //    var checkboxes = document.querySelectorAll(".userCheckbox");
+        //    // var btnSave = document.getElementById("btnSave");
 
+        //    var departments = [];
+        //    checkboxes.forEach(function (checkbox) {
+        //        if (checkbox.checked) {
+        //            departments.push(checkbox.getAttribute("id"));
+        //        }
+        //    });
+        //    console.log("Departamentos:" + departments)
+        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
+
+        //})
 
     }
+    function editDepartmentForm(t, dep_id, department) {
+
+        var department = list_department.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+        t.clear()
+       
+        var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
+        worktable.setAttribute('id', 'worktable')
+        //insideDiv.className = 'insideDiv';
+        var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'newdep').setAttribute("id", "newdep"));
+        document.getElementById('newdep').style.backgroundColor = department.color
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
+        // Adicionando o listener de clique
+        var c = document.getElementById('closewindow');
+        c.addEventListener('click', function () {
+            console.log("O elemento closeWindowDiv foi clicado!");
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
+        });
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        var userTable = editUsersDepartmentsGrid();
+        postMsgDiv.add(userTable);
+
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Atualizar', 'saveclose').setAttribute("id", "savemsg"));
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        // Adicionando o listener de clique
+        var d = document.getElementById('closemsg')
+        d.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
+        });
+        var save = document.getElementById('savemsg');
+        save.addEventListener('click', function () {
+            // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
+            var departmentName = document.getElementById("nameDepDiv").innerHTML;
+            var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
+            console.log("Salvar clicado!");
+            console.log("Nome do departamento:", departmentName);
+            console.log("Cor selecionada:", departmentColor);
+            var editorDepartments = getSelectedUsersDepartments('editor');
+            var viewerDepartments = getSelectedUsersDepartments('viewer');
+            console.log("Nome dos departamentos visiveis:", viewerDepartments);
+            console.log("Nome dos departamentos editaveis:", editorDepartments);
+            app.send({ api: "admin", mt: "UpdateDepartment", id: dep_id, name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+        });
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            document.getElementById("newdep").style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        });
+
+    }
+    function editUsersDepartmentsGrid() {
+        var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
+
+        var table = usersListDiv.add(new innovaphone.ui1.Node("table", null, null, "table"));
+
+        var headerRow = table.add(new innovaphone.ui1.Node("tr", null, null, "row"));
+
+        var nameCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelUser"), "column"));
+
+        var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"));
+
+        var viewerCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"));
+
+        // Criar as demais linhas com os dados dos departamentos
+        list_tableUsers.forEach(function (user) {
+            var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
+
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+
+            var userV = list_viewers_departments.filter(function (item) {
+                return item.viewer_guid === user.guid;
+            })[0];
+            var userE = list_editors_departments.filter(function (item) {
+                return item.editor_guid === user.guid;
+            })[0];
+
+            var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+
+            var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+
+
+            var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+            viewerCheckbox.setAttribute("name", "viewerDepartments");
+            viewerCheckbox.setAttribute("value", user.guid);
+
+            var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+            editorCheckbox.setAttribute("name", "editorDepartments");
+            editorCheckbox.setAttribute("value", user.guid);
+
+            editorCheckbox.addEvent('click', function () {
+                var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                viewerCheckbox.checked = true
+
+            });
+            setTimeout(function () {
+                if (userV) {
+                    var viewCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                    viewCheckbox.checked = true;
+                }
+                if (userE) {
+                    var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                    editCheckbox.checked = true;
+                }
+            }, 500)
+
+        });
+        //usersListDiv.appendChild(table);
+        return usersListDiv;
+    }
+    function getSelectedUsersDepartments(departmentType) {
+        var checkboxes = document.getElementsByName(departmentType + 'Departments');
+        var selectedUsers = Array.prototype.slice.call(checkboxes)
+            .filter(function (checkbox) {
+                return checkbox.checked;
+            })
+            .map(function (checkbox) {
+                return checkbox.value;
+            });
+
+        return selectedUsers;
+    }
+    
 }
 
 Wecom.billboardAdmin.prototype = innovaphone.ui1.nodePrototype;

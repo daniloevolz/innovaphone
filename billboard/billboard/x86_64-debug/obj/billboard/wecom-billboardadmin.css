@@ -36,7 +36,187 @@ li {
     margin-left: 20px;
     font-size: 13pt;
 }
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #ffffff00;
+    max-height: 15px;
+}
+td {
+    text-align: center;
+    padding: 5px;
+}
 
+td.checkbox {
+        width: 15px;
+        text-align: center;
+}
+
+.checkbox {
+    text-align: center;
+    height: 20px;
+    cursor: pointer;
+}
+/*#worktable {
+    font-family: Montserrat;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Montserrat';
+}*/
+
+.newdep {
+    min-width: 350px;
+    min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 90%;
+    background-color: #0f243f;
+}
+#newdep input {
+    font-size: 25px;
+    background-color: #ffffff00;
+    width: 100%;
+}
+.editdep {
+    min-width: 350px;
+    min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 80%;
+}
+#closewindow {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./images/close.png);
+    background-size: 35px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.nameDepDiv {
+    display: flex;
+    background-color: #ffffff33;
+    color: white;
+    width: 80%;
+    height: 8%;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    font-size: 25px;
+    justify-content: center;
+    align-items: center;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+}
+
+    ::-webkit-scrollbar-track:hover {
+        box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.349);
+    }
+
+::-webkit-scrollbar-thumb {
+    background: #bebebeef;
+    border-radius: 10px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #ffffffef;
+    }
+.footbuttons {
+    z-index: 99;
+    position: absolute;
+    display: flex;
+    width: 250px;
+    height: 10%;
+    top: 90%;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+.buttons {
+    display: flex;
+    align-items: center;
+    height: 10%;
+    justify-content: flex-start;
+    width: 80%;
+    color: #FFFF;
+}
+
+.buttons a {
+    width: 100px;
+}
+
+.buttonsDiv a {
+    width: 100px;
+}
+#colorbox {
+    width: 5%;
+    padding: 0;
+    margin-top: 10px;
+}
+.palette {
+    cursor: pointer;
+    background-image: url(./images/cores03.png);
+    width: 40px;
+    height: 30px;
+    background-size: 32px;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.userlist {
+    display: flex;
+    font-size: 18px;
+    background: #ffffff33;
+    width: 80%;
+    height: 75%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.saveclose {
+    cursor: pointer;
+    width: 40%;
+    margin-right: 0%;
+    margin-left: 5%;
+    height: 100%;
+    font-size: 20px;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    color: #ffff;
+    background-color: rgb(93 126 131 / 36%);
+    border-color: black;
+    border-radius: 2ch;
+    max-height: 30px;
+}
 .liOptions:hover {
     background-color: rgba(255, 255, 255, 0.178);
     border-radius: 10px;
@@ -82,13 +262,23 @@ a {
 }
 /* License Css */
 
-.DivLicenseTitle{
-    position:absolute; 
-    left:0px; 
-    width:100%; 
-    top:5%; 
-    font-size:25px; 
-    text-align:center
+.btnChgDpto {
+    width: 20px;
+    height: 20px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+
+.DivLicenseTitle {
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    top: 5%;
+    font-size: 25px;
+    text-align: center;
+
 }
 .DivLicenseTokenTitle{
     position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;

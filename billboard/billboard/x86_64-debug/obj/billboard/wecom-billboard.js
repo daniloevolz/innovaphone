@@ -697,6 +697,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
         var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
         var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var PublicPostDiv = postMsgDiv.add(new innovaphone.ui1.Node("div","width: 80%;display: flex;align-items: center;",null,null))
+        var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div","color:white;",texts.text("labelTypePost"),null))
+        var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select",null,null,"selectPublicPost").setAttribute("id","selectTypePost"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPublic"),null).setAttribute("id","public"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPrivate"),null).setAttribute("id","private"))
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
@@ -710,6 +715,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
+            var typePostSelect = document.getElementById("selectTypePost");
+            var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
+
             var currentDate = getDateNow();
             console.log("Data Start:", startPost + "data atual" + currentDate);
 
@@ -721,7 +729,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else if (endPost < currentDate) {
                 window.alert("A data de início do post não pode ser inferior à data atual");
             } else {
-                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
             }
             s.removeEventListener('click', s);
         });
