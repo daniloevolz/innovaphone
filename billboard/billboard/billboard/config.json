@@ -50,6 +50,11 @@
             "cmd": "column",
             "name": "deleted_guid",
             "type": "VARCHAR(120)"
+          },
+          {
+            "cmd": "column",
+            "name": "creator_guid",
+            "type": "VARCHAR(120)"
           }
         ]
       },

@@ -90,7 +90,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") {
             list_department = JSON.parse(obj.result)
             console.log("LIST DEPART " + JSON.stringify(list_department))
-            makeDivDepart(_colDireita, list_department);
+
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectPosts") {
             list_post = JSON.parse(obj.result)
@@ -238,7 +239,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
     }
         
-    function makeDivLicense(t) {
+    function makeDivLicense(t, user) {
         t.clear();
         //Título
 
@@ -287,29 +288,49 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     }
     function makeDivDepart(t, depart) {
         t.clear();
-        
+
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
         var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
         tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Departamento", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Criador", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Excluído?", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Editar", null));
 
         var departGuids = depart.map(admin => depart.guid);
-        console.log("Admin Guids: " + departGuids);
 
         depart.forEach(function (depart) {
+            var users = list_tableUsers.filter(function (user) {
+                return depart.creator_guid === user.guid;
+            });
+
+            // Verifique se há correspondências e faça o que você precisa com elas
+            //if (users.length > 0) {
+            //    console.log("USERS0: " + users[0]);
+            //    console.log("USERS1: " + parseInt(users[0], 10));
+            //    console.log("USERS2: " + JSON.stringify(users[0]));
+            //}
+            
+            //console.log("USERS1: " + users[0]);
+            //console.log("USERS0: " + JSON.stringify(users[0]));
+            //console.log("USERS1: " + users[0].cn);
+            //console.log("USERS2: " + users.cn);
+
             var deleted = departGuids.includes(depart.guid) ? 'deleted' : '';
-            console.log("User:", depart.guid, "Deletado?:", deleted);
+            var userName = users.length > 0 ? users[0].cn : '';
+
             var html = `
-              <tr>
-                <td style="text-transform: capitalize; text-align: center;">${depart.id}</td>
-                <td style="background-color: ${depart.color}; text-transform: capitalize; text-align: center;">${depart.name}</td>
-                <td style="text-transform: capitalize; text-align: center;">${depart.deleted}</td>
-                <td style="text-align: center;"><input type="checkbox" id="${depart.id}" class="userCheckbox" ${deleted}></td>
-              </tr>
-            `;
+                      <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${depart.id}</td>
+                        <td style="background-color: ${depart.color}; text-transform: capitalize; text-align: center;">${depart.name}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${userName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${depart.deleted}</td>
+                        <td style="text-align: center;"><input type="checkbox" id="${depart.id}" class="userCheckbox" ${deleted}></td>
+                      </tr>
+                    `;
+
             document.getElementById("local-table").innerHTML += html;
+           
         });
 
         scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {

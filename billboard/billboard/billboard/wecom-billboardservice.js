@@ -268,7 +268,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "InsertDepartment") {
-                    Database.exec("INSERT INTO tbl_departments (name, color) VALUES ('" + obj.name + "','" + obj.color + "') RETURNING id;")
+                    Database.exec("INSERT INTO tbl_departments (name, color, creator_guid) VALUES ('" + obj.name + "','" + obj.color + "','" + conn.guid +"') RETURNING id;")
                         .oncomplete(function (id) {
                             log("InsertDepartment:result=success " + JSON.stringify(id[0].id));
 
