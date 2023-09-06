@@ -17,8 +17,11 @@
 var url = document.URL;
 var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
 var url = url.substring(0, penultimateSlashIndex);
+GetDepartments(url)
 
-fetch(url+'/get-departments', {
+// funções de requisição
+function GetDepartments(url){
+    fetch(url+'/get-departments', {
                 method: 'GET',
                 headers: {}
             }).then(function (response) {
@@ -39,6 +42,35 @@ fetch(url+'/get-departments', {
                 }
             }); // final .then (response)
 
+}
+
+function GetPosts(url,data){
+    fetch(url + '/get-posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:  JSON.stringify(data)
+                }).then(function (response) {
+                if (response.status == 200) {
+                    response.json().then(function (data) {
+                        var obj = JSON.parse(data.data)
+                        console.log("get-posts result=" + JSON.stringify(obj));
+                        //console.log(JSON.stringify(obj.department))
+                        MakePosts(obj);
+                        //erro na req get-posts , revisar 
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert("Algo saiu errado:\n" + text);
+                    });
+                }
+            }); // final .then (response)
+}
+
+// funções internas 
 function MakeDepartments(data){   
 
 var billboard = document.getElementById("billboard");
@@ -66,29 +98,8 @@ data.forEach(function (department) {
     div.addEventListener('click', function () {
            var clickedId = this.id;
            console.log('ID do elemento div clicado:', clickedId);
-           fetch(url+'/get-posts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(clickedId)
-                }).then(function (response) {
-                if (response.status == 200) {
-                    response.json().then(function (data) {
-                        var posts = JSON.parse(data.data)
-                        console.log("get-posts result=" + JSON.stringify(posts));
-                        console.log(posts.department)
-                        MakePosts(posts.department , posts);
-                        //erro na req get-posts , revisar 
-                    });
-                } 
-                // fim da resposta STATUS 200
-                else {
-                    response.text().then(function (text) {
-                        window.alert("Algo saiu errado:\n" + text);
-                    });
-                }
-            }); // final .then (response)
+           var requestBody = parseInt(clickedId);
+           GetPosts(url,requestBody)
      });
 
     var ulNew = document.createElement("ul");
@@ -108,7 +119,7 @@ billboard.appendChild(worktable);
 
 }
 
-function MakePosts(dep_id,posts) {
+function MakePosts(posts) {
     var billboard = document.getElementById("billboard");
     billboard.innerHTML = '';
 
@@ -179,19 +190,19 @@ function MakePosts(dep_id,posts) {
 
     var footButtons = document.createElement("div");
     footButtons.setAttribute("id", "footbuttons");
+    footButtons.className = 'footbuttons'
     worktable.appendChild(footButtons);
 
     var backDiv = document.createElement("div");
     backDiv.setAttribute("id", "backDiv");
+    backDiv.className = "backDiv";
     footButtons.appendChild(backDiv);
 
-    var back = document.createElement("div");
-    back.textContent = "Back";
-    back.addEventListener("click", function () {
-        document.getElementById("post-depart").style.display = 'none';
+    document.getElementById("backDiv").addEventListener("click", function () {
+        GetDepartments(url)
         // makeDivDepartments();
     });
-    backDiv.appendChild(back);
+    // backDiv.appendChild(back);
 
     function formatDate(date) {
         var day = date.getDate();

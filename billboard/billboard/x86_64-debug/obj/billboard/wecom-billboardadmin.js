@@ -10,6 +10,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var UIuser;
     var list_tableUsers = [];
     var list_departments = [];
+    var list_post = [];
     var list_editors_departments = [];
     var list_viewers_departments = [];
     var list_admins = [];
@@ -44,8 +45,29 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
+    app.onerror = function (error) {
+        console.error("DwcIdentity: Appwebsocket.Connection error: " + error);
+        changeState("Disconnected");
+    };
+    app.onclosed = function () {
+        console.error("DwcIdentity: Appwebsocket.Connection closed!");
+        changeState("Disconnected");
+    };
+    var currentState = "Loading";
+    function changeState(newState) {
+        if (newState == currentState) return;
+        if (newState == "Connected") {
+            currentState = newState;
+            console.info("DwcIdentity: Appwebsocket.Connection Connected: ");
+        }
+        if (newState == "Disconnected") {
+            console.error("DwcIdentity: Appwebsocket.Connection Disconnected: ");
+            currentState = "Disconnected";
+        }
+    }
 
     function app_connected(domain, user, dn, appdomain) {
+        changeState("Connected");
         avatar = new innovaphone.Avatar(start, user, domain);
         UIuserPicture = avatar.url(user, 80, dn);
         UIuser = dn
@@ -53,6 +75,18 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         app.send({ api: "admin", mt: "TableUsers" });
         app.send({ api: "admin", mt: "SelectAdmins" });
         constructor();
+        
+        setInterval(function () {
+            if (currentState == "Connected") {
+                var msg = { api: "user", mt: "Ping" };
+                app.send(msg);
+                console.log("Interval: Ping Sent " + JSON.stringify(msg));
+            } else {
+                changeState("Disconnected");
+                console.log("Interval: changeState Disconnected");
+            }
+
+        }, 60000); // A cada 60 segundo
     }
 
     function app_message(obj) {
@@ -96,10 +130,10 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
             makeDivDepart(_colDireita, list_department, list_tableUsers);
         }
-        if (obj.api == "admin" && obj.mt == "SelectPosts") {
+        if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
             list_post = JSON.parse(obj.result)
             console.log("LIST POST " + JSON.stringify(list_post))
-            makeDivPost(_colDireita, list_post);
+            makeDivPost(_colDireita, list_post, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentViewersResult") {
             console.log(obj.result);
@@ -207,7 +241,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             //waitConnection(colDireita);
         }
         if (ex == "CfgPost") {
-            app.send({ api: "admin", mt: "SelectPostResult" });
+            app.send({ api: "admin", mt: "SelectPosts" });
             //waitConnection(colDireita);
         }
     }
@@ -319,8 +353,24 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 return depart.creator_guid === user.guid;
             });
 
+
             var userName = users.length > 0 ? users[0].cn : '';
-            var departDel = depart.deleted == null ? "Não" : depart.deleted;
+
+            if (depart.deleted == null) {
+                var departDel = "Não"
+            } else {
+                var dateString = depart.deleted;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+                var departDel = formattedDate
+            }
+            //var departDel = depart.deleted == null ? "Não" : formatDate();
+
             var html = `
                       <tr>
                         <td style="text-transform: capitalize; text-align: center;">${depart.id}</td>
@@ -340,10 +390,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             divs[i].addEventListener("click", function (event) {
                 // Obtenha o ID da DIV clicada.
                 var idDaDivClicada = event.currentTarget.id;
+
                 editDepartmentForm(_colDireita, idDaDivClicada, list_department)
+
                 // Execute a ação desejada com base no ID da DIV clicada.
                 console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
-
                 // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
                 // Por exemplo, você pode buscar os dados relacionados a esse ID e iniciar a edição.
             });
@@ -367,62 +418,121 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         //})
 
     }
-    function editDepartmentForm(t, dep_id, department) {
+    function makeDivPost(t, post, tableUser) {
+        t.clear();
 
-        var department = list_department.filter(function (item) {
-            return item.id === parseInt(dep_id, 10);
-        })[0];
-        t.clear()
-       
-        var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
-        worktable.setAttribute('id', 'worktable')
-        //insideDiv.className = 'insideDiv';
-        var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'newdep').setAttribute("id", "newdep"));
-        document.getElementById('newdep').style.backgroundColor = department.color
-        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
-        // Adicionando o listener de clique
-        var c = document.getElementById('closewindow');
-        c.addEventListener('click', function () {
-            console.log("O elemento closeWindowDiv foi clicado!");
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
-        });
-        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
-        var userTable = editUsersDepartmentsGrid();
-        postMsgDiv.add(userTable);
+        var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelCfgPost"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateStart"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateEnd"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostCreator"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostStatus") + "?", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDeleted") + "?", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostEdit"), null));
 
-        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
-        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
-        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Atualizar', 'saveclose').setAttribute("id", "savemsg"));
-        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
-        // Adicionando o listener de clique
-        var d = document.getElementById('closemsg')
-        d.addEventListener('click', function () {
+        post.forEach(function (post) {
+            var users = list_tableUsers.filter(function (user) {
+                return post.user_guid === user.guid;
+            });
+            var starDate = new Date(post.date_start);
+            var endDate = new Date(post.date_end);
+            var now = new Date();
 
-            console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
+            var userName = users.length > 0 ? users[0].cn : '';
+
+            if (post.deleted == null) {
+                var postDel = "Não"
+            } else {
+                var dateString = post.deleted;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+                var postDel = formattedDate
+            }
+            //var departDel = depart.deleted == null ? "Não" : formatDate();
+            if (post.deleted) {
+                var statusPost = texts.text("labelPostDeleted");
+            } else if (starDate > now) {
+                var statusPost = texts.text("labelPostFuture");
+            } else if (endDate < now) {
+                var statusPost = texts.text("labelPostExpired");
+            } else {
+                var statusPost = texts.text("labelPostActive");
+            }
+            if (post.date_start) {
+                var dateString = post.date_start;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
+            if (post.date_end) {
+                var dateString = post.date_end;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
+            var html =`
+                      <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${post.id}</td>
+                        <td style="background-color: ${post.color}; text-transform: capitalize; text-align: center;">${post.title}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
+                          <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${userName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${statusPost}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${postDel}</td>
+                        <td style="display: flex; justify-content: center; align-items: center;"><div id="${post.id}"  class="btnChgDpto" style="background-color: ${post.color};"></div></td>
+                      </tr>
+                    `;
+
+            document.getElementById("local-table").innerHTML += html;
+
         });
-        var save = document.getElementById('savemsg');
-        save.addEventListener('click', function () {
-            // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
-            var departmentName = document.getElementById("nameDepDiv").innerHTML;
-            var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
-            console.log("Salvar clicado!");
-            console.log("Nome do departamento:", departmentName);
-            console.log("Cor selecionada:", departmentColor);
-            var editorDepartments = getSelectedUsersDepartments('editor');
-            var viewerDepartments = getSelectedUsersDepartments('viewer');
-            console.log("Nome dos departamentos visiveis:", viewerDepartments);
-            console.log("Nome dos departamentos editaveis:", editorDepartments);
-            app.send({ api: "admin", mt: "UpdateDepartment", id: dep_id, name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
-        });
-        var colorbox = document.getElementById("colorbox")
-        colorbox.addEventListener("change", function () {
-            document.getElementById("newdep").style.backgroundColor = colorbox.value;
-        })
-        var palette = document.getElementById("palette")
-        palette.addEventListener("click", function () {
-            colorbox.click();
-        });
+        var divs = document.getElementsByClassName("btnChgDpto");
+
+        for (var i = 0; i < divs.length; i++) {
+            divs[i].addEventListener("click", function (event) {
+                // Obtenha o ID da DIV clicada.
+                var idDaDivClicada = event.currentTarget.id;
+
+                editDepartmentForm(_colDireita, idDaDivClicada, list_department)
+
+                // Execute a ação desejada com base no ID da DIV clicada.
+                console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
+                // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
+                // Por exemplo, você pode buscar os dados relacionados a esse ID e iniciar a edição.
+            });
+        }
+
+        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+        //    console.log("Ok Funcionando")
+
+        //    var checkboxes = document.querySelectorAll(".userCheckbox");
+        //    // var btnSave = document.getElementById("btnSave");
+
+        //    var departments = [];
+        //    checkboxes.forEach(function (checkbox) {
+        //        if (checkbox.checked) {
+        //            departments.push(checkbox.getAttribute("id"));
+        //        }
+        //    });
+        //    console.log("Departamentos:" + departments)
+        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
+
+        //})
 
     }
     function editUsersDepartmentsGrid() {
@@ -484,6 +594,65 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         //usersListDiv.appendChild(table);
         return usersListDiv;
     }
+    function editDepartmentForm(t, dep_id, department) {
+
+        var department = list_department.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+        t.clear()
+       
+        var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
+        worktable.setAttribute('id', 'worktable')
+        //insideDiv.className = 'insideDiv';
+        var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'newdep').setAttribute("id", "newdep"));
+        document.getElementById('newdep').style.backgroundColor = department.color
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
+        // Adicionando o listener de clique
+        var c = document.getElementById('closewindow');
+        c.addEventListener('click', function () {
+            console.log("O elemento closeWindowDiv foi clicado!");
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
+        });
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        var userTable = editUsersDepartmentsGrid();
+        postMsgDiv.add(userTable);
+
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Atualizar', 'saveclose').setAttribute("id", "savemsg"));
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        // Adicionando o listener de clique
+        var d = document.getElementById('closemsg')
+        d.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivDepart(_colDireita, list_department, list_tableUsers);
+        });
+        var save = document.getElementById('savemsg');
+        save.addEventListener('click', function () {
+            // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
+            var departmentName = document.getElementById("nameDepDiv").innerHTML;
+            var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
+            console.log("Salvar clicado!");
+            console.log("Nome do departamento:", departmentName);
+            console.log("Cor selecionada:", departmentColor);
+            var editorDepartments = getSelectedUsersDepartments('editor');
+            var viewerDepartments = getSelectedUsersDepartments('viewer');
+            console.log("Nome dos departamentos visiveis:", viewerDepartments);
+            console.log("Nome dos departamentos editaveis:", editorDepartments);
+            app.send({ api: "admin", mt: "UpdateDepartment", id: dep_id, name: departmentName, color: departmentColor, viewers: viewerDepartments, editors: editorDepartments });
+        });
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            document.getElementById("newdep").style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        });
+
+    }
+    
     function getSelectedUsersDepartments(departmentType) {
         var checkboxes = document.getElementsByName(departmentType + 'Departments');
         var selectedUsers = Array.prototype.slice.call(checkboxes)

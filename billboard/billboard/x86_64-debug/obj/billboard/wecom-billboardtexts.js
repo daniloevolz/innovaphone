@@ -10,8 +10,8 @@ Wecom.billboardTexts = {
         labelExpired: "Expiration: ",
         labelExcluidos: "Deleted: ",
         labelUser: "User",
-        labelPublic: "Público",
-        labelPrivate: "Privado",
+        labelPublic: "Públic",
+        labelPrivate: "Private",
         labelTypePost: "Tipo de Post: ",
         labelEditor: "Editor",
         labelViewer: "Viewer",
@@ -30,7 +30,14 @@ Wecom.billboardTexts = {
         labelLicenseUsed: "Licenses in Use:",
         labelPostExpired: "Expired",
         labelPostFuture: "Future",
-        labelPostDeleted: "Deleted"
+        labelPostDeleted: "Deleted",
+        labelPostActive: "Active",
+        labelPostDateStart: "Date Start",
+        labelPostDateEnd: "Date End",
+        labelPostCreator: "Creator",
+        labelPostEdit: "Edit",
+        labelPostStatus: "Status",
+        
     },
     de: {
     },
@@ -60,6 +67,12 @@ Wecom.billboardTexts = {
         labelLicenseUsed: "Licenças em uso:",
         labelPostExpired: "Expirado",
         labelPostFuture: "Futuro",
-        labelPostDeleted: "Deletado"
+        labelPostDeleted: "Deletado",
+        labelPostActive: "Ativo",
+        labelPostDateStart: "Data Início",
+        labelPostDateEnd: "Data Fim",
+        labelPostCreator: "Criador",
+        labelPostEdit: "Editar",
+        labelPostStatus: "Status"
     }
 }
