@@ -271,6 +271,113 @@ a {
     text-transform: capitalize;
 }
 
+.postmsg {
+    min-width: 350px;
+    min-height: 450px;
+    max-width: 700px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 40%;
+    height: 80%;
+    background-color: #0f243f;
+}
+.titlemsg {
+    display: flex;
+    justify-content: center;
+    color: white;
+    width: 80%;
+    height: 8%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 30px;
+}
+
+#titlemsg input {
+    font-size: 25px;
+    background-color: #5d7e83ef;
+    color: white;
+    width: 100%;
+    height: 100%;
+}
+#msgbox textarea {
+    font-size: 15px;
+    background-color: rgb(93 126 131 / 36%);
+    color: white;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border-width: 0;
+}
+
+::placeholder {
+    color: #ffff;
+}
+
+.msgbox {
+    position: relative;
+    display: flex;
+    color: white;
+    width: 80%;
+    height: 55%;
+    font-size: 15px;
+}
+#msgbox textarea::-webkit-scrollbar {
+    font-size: 15px;
+    background: #616b63ef;
+    color: white;
+    width: 5px;
+    height: 10px;
+}
+.char-counter {
+    position: absolute;
+    bottom: 0px;
+    right: 10px;
+    opacity: 0.3;
+}
+#date {
+    display: flex;
+    align-items: center;
+    color: white;
+    width: 80%;
+    height: 8%;
+    /*justify-content: space-between;*/
+}
+
+#date a {
+    width: 25%;
+    display: flex;
+    align-content: flex-end;
+}
+
+.datetext {
+    display: flex;
+    align-items: center;
+    color: white;
+    width: 80%;
+    height: 2%;
+}
+
+#msgbox textarea {
+    font-size: 15px;
+    background-color: rgb(93 126 131 / 36%);
+    color: white;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border-width: 0;
+}
+
+.dateinput {
+    text-align: center;
+    position: relative;
+    width: 50%;
+    height: 30px;
+    font-size: 18px;
+    margin-left: 5px;
+}
 .DivLicenseTitle {
     position: absolute;
     left: 0px;
@@ -278,7 +385,6 @@ a {
     top: 5%;
     font-size: 25px;
     text-align: center;
-
 }
 .DivLicenseTokenTitle{
     position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;
