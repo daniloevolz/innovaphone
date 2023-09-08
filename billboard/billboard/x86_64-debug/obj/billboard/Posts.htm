@@ -13,7 +13,9 @@
     </style>
 </head>
 <script>
-// var departments = [];
+var list_departments = [];
+var list_posts = [];
+var requestBody;
 var url = document.URL;
 var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
 var url = url.substring(0, penultimateSlashIndex);
@@ -29,9 +31,9 @@ function GetDepartments(url){
 
                     response.json().then(function (data) {
                         // var departments = JSON.parse(data);
-                        var departments = JSON.parse(data.data)
-                        console.log("get-departments result=" + JSON.stringify(departments));
-                        MakeDepartments(departments);
+                        list_departments = JSON.parse(data.data)
+                        console.log("get-departments result=" + JSON.stringify(list_departments));
+                        MakeDepartments(list_departments);
                     });
                 } 
                 // fim da resposta STATUS 200
@@ -54,10 +56,10 @@ function GetPosts(url,data){
                 }).then(function (response) {
                 if (response.status == 200) {
                     response.json().then(function (data) {
-                        var obj = JSON.parse(data.data)
-                        console.log("get-posts result=" + JSON.stringify(obj));
+                        list_posts = JSON.parse(data.data)
+                        console.log("get-posts result=" + JSON.stringify(list_posts));
                         //console.log(JSON.stringify(obj.department))
-                        MakePosts(obj);
+                        MakePosts(list_posts);
                         //erro na req get-posts , revisar 
                     });
                 } 
@@ -98,7 +100,7 @@ data.forEach(function (department) {
     div.addEventListener('click', function () {
            var clickedId = this.id;
            console.log('ID do elemento div clicado:', clickedId);
-           var requestBody = parseInt(clickedId);
+           requestBody = parseInt(clickedId);
            GetPosts(url,requestBody)
      });
 
@@ -155,17 +157,11 @@ function MakePosts(posts) {
         a.setAttribute("id", "textpost");
         postDiv.appendChild(a);
 
-        a.addEventListener('click', function () {
+        document.getElementById(post.id).addEventListener('click', function () {
             var clickedId = this.id;
+            var id = parseInt(clickedId)
             console.log('ID do elemento div clicado:', clickedId);
-            // console.log(post);
-            // var user = post.user_guid;
-            // console.log(user);
-            // var user = list_tableUsers.filter(function (item) {
-            //     return item.guid == post.user_guid;
-            // })[0];
-            // console.log(user);
-            // makeDivPostMessage(clickedId, dep_id, user);
+            makeDivPostMessage(posts,clickedId);
         });
 
         var footpost = document.createElement("ul");
@@ -214,6 +210,101 @@ function MakePosts(posts) {
 
         return day + '/' + month + '/' + year;
     }
+}
+
+function makeDivPostMessage(posts,id){
+
+var post = posts.filter(function (item) {
+    return item.id === parseInt(id, 10);
+})[0];
+
+var department = list_departments.filter(function (item) {
+    return item.id === parseInt(post.department, 10);
+})[0];
+
+var insideDiv = document.createElement('div');
+insideDiv.className = 'insideDiv';
+insideDiv.id = 'insideDiv';
+
+var postMsgDiv = document.createElement('div');
+postMsgDiv.className = 'postmsg';
+postMsgDiv.style.backgroundColor = post.color;
+postMsgDiv.id = 'postmsg';
+
+var closeWindowDiv = document.createElement('div');
+closeWindowDiv.className = 'closewindow';
+closeWindowDiv.id = 'closewindow';
+
+var nameBoxDiv = document.createElement('div');
+nameBoxDiv.className = 'namebox';
+nameBoxDiv.textContent = department.name;
+nameBoxDiv.id = 'namebox';
+
+var titleMsgDiv = document.createElement('div');
+titleMsgDiv.className = 'titlemsg';
+titleMsgDiv.textContent = post.title;
+titleMsgDiv.id = 'titlemsg';
+
+var msgBoxDiv = document.createElement('div');
+msgBoxDiv.className = 'msgbox';
+msgBoxDiv.style.height = '75%';
+msgBoxDiv.id = 'msgbox';
+
+var scrollBox = document.createElement('div');
+scrollBox.className = 'scrollbox';
+scrollBox.style.display = 'flex';
+scrollBox.style.color = 'white';
+scrollBox.style.width = '100%';
+scrollBox.style.height = '100%';
+scrollBox.id = 'scrollbox';
+
+var msgContent = document.createElement('div');
+msgContent.className = 'msgcontent';
+msgContent.style.overflow = 'auto';
+msgContent.textContent = post.description;
+msgContent.id = 'msgcontent';
+
+if (titleMsgDiv) {
+    if (titleMsgDiv.innerText.length > 20) {
+        titleMsgDiv.style.fontSize = '20px';
+    }
+}
+
+var footShowPost = document.createElement('div');
+footShowPost.className = 'footShowPost';
+footShowPost.id = 'footShowPost';
+
+var closeDateDiv = document.createElement('div');
+closeDateDiv.className = 'closedate';
+closeDateDiv.style.width = '60%'
+closeDateDiv.style.height = '60%'
+var dateString = post.date_end;
+var date = new Date(dateString);
+var day = date.getDate();
+var month = date.getMonth() + 1;
+var year = date.getFullYear();
+var hours = date.getHours();
+var minutes = date.getMinutes();
+var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+closeDateDiv.textContent = formattedDate;
+closeDateDiv.id = 'closedate';
+
+closeWindowDiv.addEventListener('click', function () {
+    console.log("O elemento closeWindowDiv foi clicado!");
+    GetPosts(url,requestBody)
+});
+
+var billboard = document.getElementById("billboard")
+billboard.appendChild(insideDiv)
+insideDiv.appendChild(postMsgDiv)
+postMsgDiv.appendChild(closeWindowDiv);
+postMsgDiv.appendChild(nameBoxDiv);
+postMsgDiv.appendChild(titleMsgDiv);
+scrollBox.appendChild(msgContent);
+msgBoxDiv.appendChild(scrollBox);
+postMsgDiv.appendChild(msgBoxDiv);
+postMsgDiv.appendChild(footShowPost);
+footShowPost.appendChild(closeDateDiv);
 }
 </script>
 <body>
