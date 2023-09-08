@@ -133,7 +133,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
             list_post = JSON.parse(obj.result)
             console.log("LIST POST " + JSON.stringify(list_post))
-            makeDivPost(_colDireita, list_post, list_tableUsers);
+            makeDivPost(_colDireita, list_post, list_tableUsers, list_department);
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentViewersResult") {
             console.log(obj.result);
@@ -418,123 +418,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         //})
 
     }
-    function makeDivPost(t, post, tableUser) {
-        t.clear();
 
-        var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
-        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
-        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelCfgPost"), null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateStart"), null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateEnd"), null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostCreator"), null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostStatus") + "?", null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDeleted") + "?", null));
-        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostEdit"), null));
-
-        post.forEach(function (post) {
-            var users = list_tableUsers.filter(function (user) {
-                return post.user_guid === user.guid;
-            });
-            var starDate = new Date(post.date_start);
-            var endDate = new Date(post.date_end);
-            var now = new Date();
-
-            var userName = users.length > 0 ? users[0].cn : '';
-
-            if (post.deleted == null) {
-                var postDel = "Não"
-            } else {
-                var dateString = post.deleted;
-                var date = new Date(dateString);
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-                var postDel = formattedDate
-            }
-            //var departDel = depart.deleted == null ? "Não" : formatDate();
-            if (post.deleted) {
-                var statusPost = texts.text("labelPostDeleted");
-            } else if (starDate > now) {
-                var statusPost = texts.text("labelPostFuture");
-            } else if (endDate < now) {
-                var statusPost = texts.text("labelPostExpired");
-            } else {
-                var statusPost = texts.text("labelPostActive");
-            }
-            if (post.date_start) {
-                var dateString = post.date_start;
-                var date = new Date(dateString);
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-            }
-            if (post.date_end) {
-                var dateString = post.date_end;
-                var date = new Date(dateString);
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-            }
-            var html =`
-                      <tr>
-                        <td style="text-transform: capitalize; text-align: center;">${post.id}</td>
-                        <td style="background-color: ${post.color}; text-transform: capitalize; text-align: center;">${post.title}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
-                          <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${userName}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${statusPost}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${postDel}</td>
-                        <td style="display: flex; justify-content: center; align-items: center;"><div id="${post.id}"  class="btnChgDpto" style="background-color: ${post.color};"></div></td>
-                      </tr>
-                    `;
-
-            document.getElementById("local-table").innerHTML += html;
-
-        });
-        var divs = document.getElementsByClassName("btnChgDpto");
-
-        for (var i = 0; i < divs.length; i++) {
-            divs[i].addEventListener("click", function (event) {
-                // Obtenha o ID da DIV clicada.
-                var idDaDivClicada = event.currentTarget.id;
-
-                editDepartmentForm(_colDireita, idDaDivClicada, list_department)
-
-                // Execute a ação desejada com base no ID da DIV clicada.
-                console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
-                // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
-                // Por exemplo, você pode buscar os dados relacionados a esse ID e iniciar a edição.
-            });
-        }
-
-        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
-        //    console.log("Ok Funcionando")
-
-        //    var checkboxes = document.querySelectorAll(".userCheckbox");
-        //    // var btnSave = document.getElementById("btnSave");
-
-        //    var departments = [];
-        //    checkboxes.forEach(function (checkbox) {
-        //        if (checkbox.checked) {
-        //            departments.push(checkbox.getAttribute("id"));
-        //        }
-        //    });
-        //    console.log("Departamentos:" + departments)
-        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
-
-        //})
-
-    }
     function editUsersDepartmentsGrid() {
         var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
 
@@ -665,7 +549,226 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
         return selectedUsers;
     }
-    
+
+    function makeDivPost(t, post, tableUser, list_department) {
+        t.clear();
+
+        var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelCfgPost"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateStart"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateEnd"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostCreator"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostStatus") + "?", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDeleted") + "?", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostEdit"), null));
+
+        post.forEach(function (post) {
+            var users = list_tableUsers.filter(function (user) {
+                return post.user_guid === user.guid;
+            });
+            var starDate = new Date(post.date_start);
+            var endDate = new Date(post.date_end);
+            var now = new Date();
+
+            var userName = users.length > 0 ? users[0].cn : '';
+
+            if (post.deleted == null) {
+                var postDel = "Não"
+            } else {
+                var dateString = post.deleted;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+                var postDel = formattedDate
+            }
+            //var departDel = depart.deleted == null ? "Não" : formatDate();
+            if (post.deleted) {
+                var statusPost = texts.text("labelPostDeleted");
+            } else if (starDate > now) {
+                var statusPost = texts.text("labelPostFuture");
+            } else if (endDate < now) {
+                var statusPost = texts.text("labelPostExpired");
+            } else {
+                var statusPost = texts.text("labelPostActive");
+            }
+            if (post.date_start) {
+                var dateString = post.date_start;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
+            if (post.date_end) {
+                var dateString = post.date_end;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
+            var html = `
+                      <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${post.id}</td>
+                        <td style="background-color: ${post.color}; text-transform: capitalize; text-align: center;">${post.title}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
+                          <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${userName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${statusPost}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${postDel}</td>
+                        <td style="display: flex; justify-content: center; align-items: center;"><div id="${post.id}"  class="btnChgDpto" style="background-color: ${post.color};"></div></td>
+                      </tr>
+                    `;
+
+            document.getElementById("local-table").innerHTML += html;
+
+        });
+        var divs = document.getElementsByClassName("btnChgDpto");
+
+        for (var i = 0; i < divs.length; i++) {
+            divs[i].addEventListener("click", function (event) {
+                // Obtenha o ID da DIV clicada.
+                var idPostClick = event.currentTarget.id;
+
+                editPostForm(_colDireita, post, idPostClick, list_department)
+
+                // Execute a ação desejada com base no ID da DIV clicada.
+                console.log("A DIV com ID " + idPostClick + " foi clicada.");
+                // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
+                // Por exemplo, você pode buscar os dados relacionados a esse ID e iniciar a edição.
+            });
+        }
+
+        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+        //    console.log("Ok Funcionando")
+
+        //    var checkboxes = document.querySelectorAll(".userCheckbox");
+        //    // var btnSave = document.getElementById("btnSave");
+
+        //    var departments = [];
+        //    checkboxes.forEach(function (checkbox) {
+        //        if (checkbox.checked) {
+        //            departments.push(checkbox.getAttribute("id"));
+        //        }
+        //    });
+        //    console.log("Departamentos:" + departments)
+        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
+
+        //})
+
+    }
+    function editPostForm(t, post, dep_id, department) {
+        var department = list_department.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+
+        var post = list_post.filter(function (item) {
+            return item.id === parseInt(dep_id, 10);
+        })[0];
+
+        t.clear()
+
+        var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
+        worktable.setAttribute('id', 'worktable')
+
+        
+        var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'postmsg').setAttribute("id", "postmsg"));
+        document.getElementById('postmsg').style.backgroundColor = post.color;
+
+        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
+        var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
+        var titleMsgDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'titlemsg').setAttribute("id", "titlemsg"));
+        var titleinput = titleMsgDiv.add(new innovaphone.ui1.Input('color: #ffff; background-color: rgb(93 126 131 / 36%);', post.title, "Título", 40, "text", 'titleinput').setAttribute("id", "titleevent"));
+        var msgBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'msgbox').setAttribute("id", "msgbox"));
+        var msgBoxText = msgBoxDiv.add(new innovaphone.ui1.Node('textarea', null, post.description, 'msgevent').setAttribute("id", "msgevent"));
+        msgBoxText.setAttribute('placeHolder', 'Texto da Mensagem: ');
+        msgBoxText.setAttribute('maxLenght', '1000');
+
+        var p = msgBoxDiv.add(new innovaphone.ui1.Node('p', null, '1000', 'char-counter').setAttribute("id", "charCount"));
+        var textarea = document.getElementById("msgevent");
+        var charCountSpan = document.getElementById("charCount");
+        var maxChars = 1000;
+
+        textarea.addEventListener("input", function () {
+            var remainingChars = maxChars - textarea.value.length;
+            charCountSpan.textContent = remainingChars;
+        });
+        var dateText = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'datetext').setAttribute("id", "datetext"));
+        var aTextStart = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Início: ', 'date').setAttribute("id", "date"));
+        var aTextEnd = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Fim: ', 'date').setAttribute("id", "date"));
+
+        var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
+        var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, post.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
+        var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, post.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
+        var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
+        var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
+        var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        // Adicionando o listener de clique
+        var s = document.getElementById('savemsg');
+        s.addEventListener('click', function () {
+            function getDateNow() {
+                var date = new Date();
+                date.setUTCHours(date.getUTCHours() - 3);
+                var dateString = date.toISOString();
+                return dateString.slice(0, -8);
+            };
+
+            console.log("O elemento saveMsgDiv foi clicado!");
+            var startPost = document.getElementById('startevent').value;
+            var endPost = document.getElementById('endevent').value;
+            var msgPost = document.getElementById('msgevent').value;
+            var titlePost = document.getElementById('titleevent').value;
+            var colorPost = document.getElementById("postmsg").style.backgroundColor
+            var currentDate = getDateNow()
+            console.log("Data Start:", startPost);
+            if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
+                window.alert("Favor preencher todos os campos corretamente para criação do post");
+            } else if (endPost < startPost) {
+                console.log("data inicio post" + startPost + "data atual" + currentDate);
+                window.alert("A Data de término do post não pode ser menor que a data de início");
+            } else if (startPost < currentDate) {
+                window.alert("A data atualizada não pode ser inferior a data atual.");
+            } else {
+                app.send({ api: "admin", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+
+            };
+            s.removeEventListener('click', s);
+        });
+        var d = document.getElementById('closemsg')
+        d.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivPost(_colDireita, list_post, list_tableUsers);
+            d.removeEventListener('click', w);
+        });
+        var q = document.getElementById('closewindow');
+        q.addEventListener('click', function () {
+
+            console.log("O elemento closeMsgDiv foi clicado!");
+            makeDivPost(_colDireita, list_post, list_tableUsers);
+            q.removeEventListener('click', q);
+        });
+
+        var colorbox = document.getElementById("colorbox")
+        colorbox.addEventListener("change", function () {
+            document.getElementById("postmsg").style.backgroundColor = colorbox.value;
+        })
+        var palette = document.getElementById("palette")
+        palette.addEventListener("click", function () {
+            colorbox.click();
+        })
+    }
 }
 
 Wecom.billboardAdmin.prototype = innovaphone.ui1.nodePrototype;
