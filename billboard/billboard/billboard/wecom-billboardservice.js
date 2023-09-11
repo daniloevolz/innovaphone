@@ -165,7 +165,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "UpdatePost") {
-                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "' WHERE id = " + obj.id)
+                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
                         .oncomplete(function () {
                             log("UpdatePost:result=success");
 
@@ -636,6 +636,27 @@ new JsonApi("admin").onconnected(function (conn) {
                             .onerror(function (error, errorText, dbErrorCode) {
                                 log("DeleteDepartmentViewers:result=Error " + String(errorText));
                             });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "UpdatePost") {
+                Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
+                    .oncomplete(function () {
+                        log("UpdatePost:result=success");
+
+                        // Atualize os usuários sobre o post atualizado, se necessário
+                        for (var pbx in PbxSignalUsers) {
+                            if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                                var entry = PbxSignalUsers[pbx];
+                                entry.forEach(function (e) {
+                                    selectViewsHistory(e.sip);
+                                });
+                            }
+                        }
+
+                        conn.send(JSON.stringify({ api: "admin", mt: "UpdatePostSuccess", src: obj.department }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
