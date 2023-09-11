@@ -165,7 +165,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "UpdatePost") {
-                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "' WHERE id = " + obj.id)
+                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
                         .oncomplete(function () {
                             log("UpdatePost:result=success");
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billboard Publico</title>
+    <title>Billboard</title>
     <link rel="stylesheet" href="wecom-billboard.css" type="text/css" />
     <style>
     *{
@@ -61,7 +61,7 @@ function GetPosts(url,data){
                         console.log("get-posts result=" + JSON.stringify(list_posts));
                         //console.log(JSON.stringify(obj.department))
                         MakePosts(list_posts);
-                        //erro na req get-posts , revisar 
+                    
                     });
                 } 
                 // fim da resposta STATUS 200
@@ -236,6 +236,10 @@ var closeWindowDiv = document.createElement('div');
 closeWindowDiv.className = 'closewindow';
 closeWindowDiv.id = 'closewindow';
 
+var imgCloseWindow = document.createElement('img')
+imgCloseWindow.className = 'closewindow';
+imgCloseWindow.width = '100%';
+
 var nameBoxDiv = document.createElement('div');
 nameBoxDiv.className = 'namebox';
 nameBoxDiv.textContent = department.name;
@@ -299,6 +303,7 @@ var billboard = document.getElementById("billboard")
 billboard.appendChild(insideDiv)
 insideDiv.appendChild(postMsgDiv)
 postMsgDiv.appendChild(closeWindowDiv);
+closeWindowDiv.appendChild(imgCloseWindow)
 postMsgDiv.appendChild(nameBoxDiv);
 postMsgDiv.appendChild(titleMsgDiv);
 scrollBox.appendChild(msgContent);

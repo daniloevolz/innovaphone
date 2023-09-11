@@ -637,6 +637,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
+        
 
         var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
         //creatorPost.id = 'creatorPost';
@@ -793,6 +794,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
         var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, post.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
         var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, post.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var PublicPostDiv = postMsgDiv.add(new innovaphone.ui1.Node("div","width: 80%;display: flex;align-items: center;",null,null))
+        var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div","color:white;",texts.text("labelTypePost"),null))
+        var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select",null,null,"selectPublicPost").setAttribute("id","selectTypePost"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPublic"),null).setAttribute("id","public"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPrivate"),null).setAttribute("id","private"))
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
@@ -812,7 +818,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var endPost = document.getElementById('endevent').value;
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
-            var colorPost = document.getElementById("postmsg").style.backgroundColor
+            var colorPost = document.getElementById("postmsg").style.backgroundColor;
+            var typePostSelect = document.getElementById("selectTypePost");
+            var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
+
             var currentDate = getDateNow()
             console.log("Data Start:", startPost);
             if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
@@ -823,7 +832,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             } else if (startPost < currentDate) {
                 window.alert("A data atualizada não pode ser inferior a data atual.");
             } else {
-                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
 
             };
             s.removeEventListener('click', s);
