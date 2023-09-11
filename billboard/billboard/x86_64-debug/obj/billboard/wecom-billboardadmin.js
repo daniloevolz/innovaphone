@@ -125,15 +125,18 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") {
-            list_department = JSON.parse(obj.result)
-            console.log("LIST DEPART " + JSON.stringify(list_department))
+            list_departments = JSON.parse(obj.result)
+            console.log("LIST DEPART " + JSON.stringify(list_departments))
 
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
+            makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
             list_post = JSON.parse(obj.result)
             console.log("LIST POST " + JSON.stringify(list_post))
-            makeDivPost(_colDireita, list_post, list_tableUsers, list_department);
+            makeDivPost(_colDireita, list_post, list_tableUsers);
+        }
+        if (obj.api == "admin" && obj.mt == "UpdatePostSuccess") {
+            app.send({ api: "admin", mt: "SelectPosts" })
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentViewersResult") {
             console.log(obj.result);
@@ -147,8 +150,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             app.send({ api: "admin", mt: "SelectDepartments" });
         }
         if (obj.api == 'admin' && obj.mt == "SelectDepartments") {
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
+            makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
+
     }
     function constructor() {
         that.clear();
@@ -241,6 +245,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             //waitConnection(colDireita);
         }
         if (ex == "CfgPost") {
+            app.send({ api: "admin", mt: "SelectDepartments" });
             app.send({ api: "admin", mt: "SelectPosts" });
             //waitConnection(colDireita);
         }
@@ -391,7 +396,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 // Obtenha o ID da DIV clicada.
                 var idDaDivClicada = event.currentTarget.id;
 
-                editDepartmentForm(_colDireita, idDaDivClicada, list_department)
+                editDepartmentForm(_colDireita, idDaDivClicada, list_departments)
 
                 // Execute a ação desejada com base no ID da DIV clicada.
                 console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
@@ -480,7 +485,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     }
     function editDepartmentForm(t, dep_id, department) {
 
-        var department = list_department.filter(function (item) {
+        var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
         t.clear()
@@ -495,7 +500,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var c = document.getElementById('closewindow');
         c.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
+            makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
@@ -510,7 +515,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         d.addEventListener('click', function () {
 
             console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivDepart(_colDireita, list_department, list_tableUsers);
+            makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
         var save = document.getElementById('savemsg');
         save.addEventListener('click', function () {
@@ -640,7 +645,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 // Obtenha o ID da DIV clicada.
                 var idPostClick = event.currentTarget.id;
 
-                editPostForm(_colDireita, post, idPostClick, list_department)
+                editPostForm(_colDireita, post, idPostClick)
 
                 // Execute a ação desejada com base no ID da DIV clicada.
                 console.log("A DIV com ID " + idPostClick + " foi clicada.");
@@ -649,33 +654,27 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             });
         }
 
-        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
-        //    console.log("Ok Funcionando")
-
-        //    var checkboxes = document.querySelectorAll(".userCheckbox");
-        //    // var btnSave = document.getElementById("btnSave");
-
-        //    var departments = [];
-        //    checkboxes.forEach(function (checkbox) {
-        //        if (checkbox.checked) {
-        //            departments.push(checkbox.getAttribute("id"));
-        //        }
-        //    });
-        //    console.log("Departamentos:" + departments)
-        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
-
-        //})
-
     }
-    function editPostForm(t, post, dep_id, department) {
-        var department = list_department.filter(function (item) {
+    function editPostForm(t, post, dep_id) {
+        console.log('TODOS OS DEPART: ', list_departments);
+        console.log('DADOS POST: ', post)
+        console.log('DADOS DO DEP_ID: ', dep_id);
+
+        var clickedPost = list_post.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+        console.log('DADOS POST CLICADO: ', clickedPost)
 
-        var post = list_post.filter(function (item) {
-            return item.id === parseInt(dep_id, 10);
+        var departPost = clickedPost.department
+        console.log('DADOS ID DEPART DO POST CLICADO CLICADO: ', departPost)
+
+
+        var depart = list_departments.filter(function (department) {
+            return department.id == departPost;
         })[0];
 
+        console.log('DADOS DO FILTRO DO DEPART: ', depart);
+        console.log('DADO NAME DO DEPART: ', depart.name);
         t.clear()
 
         var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
@@ -683,14 +682,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
         
         var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'postmsg').setAttribute("id", "postmsg"));
-        document.getElementById('postmsg').style.backgroundColor = post.color;
+        document.getElementById('postmsg').style.backgroundColor = clickedPost.color;
 
-        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
+        var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, depart.name, 'namebox').setAttribute("id", "namebox"));
         var closeWindowDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'closewindow').setAttribute("id", "closewindow"));
         var titleMsgDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, 'titlemsg').setAttribute("id", "titlemsg"));
-        var titleinput = titleMsgDiv.add(new innovaphone.ui1.Input('color: #ffff; background-color: rgb(93 126 131 / 36%);', post.title, "Título", 40, "text", 'titleinput').setAttribute("id", "titleevent"));
+        var titleinput = titleMsgDiv.add(new innovaphone.ui1.Input('color: #ffff; background-color: rgb(93 126 131 / 36%);', clickedPost.title, "Título", 40, "text", 'titleinput').setAttribute("id", "titleevent"));
         var msgBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'msgbox').setAttribute("id", "msgbox"));
-        var msgBoxText = msgBoxDiv.add(new innovaphone.ui1.Node('textarea', null, post.description, 'msgevent').setAttribute("id", "msgevent"));
+        var msgBoxText = msgBoxDiv.add(new innovaphone.ui1.Node('textarea', null, clickedPost.description, 'msgevent').setAttribute("id", "msgevent"));
         msgBoxText.setAttribute('placeHolder', 'Texto da Mensagem: ');
         msgBoxText.setAttribute('maxLenght', '1000');
 
@@ -708,8 +707,17 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var aTextEnd = dateText.add(new innovaphone.ui1.Node('a', 'width: 100%; padding: 0px 0px 0 50px;', 'Data de Fim: ', 'date').setAttribute("id", "date"));
 
         var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
-        var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, post.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
-        var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, post.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, clickedPost.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
+        var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, clickedPost.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var PublicPostDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", "width: 80%;display: flex;align-items: center;", null, null))
+        var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div", "color:white;", texts.text("labelTypePost"), null))
+        console.log('TIPO DO POST:', clickedPost.type)
+
+        var postType = clickedPost.type == "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+
+        var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select", null, postType, "selectPublicPost").setAttribute("id", "selectTypePost"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option", null, texts.text("labelPublic"), null).setAttribute("id", "public"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option", null, texts.text("labelPrivate"), null).setAttribute("id", "private"))
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
@@ -729,6 +737,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var endPost = document.getElementById('endevent').value;
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
+            var typePostSelect = document.getElementById("selectTypePost");
+            var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
             var colorPost = document.getElementById("postmsg").style.backgroundColor
             var currentDate = getDateNow()
             console.log("Data Start:", startPost);
@@ -740,8 +750,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             } else if (startPost < currentDate) {
                 window.alert("A data atualizada não pode ser inferior a data atual.");
             } else {
-                app.send({ api: "admin", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
-
+                app.send({ api: "admin", mt: "UpdatePost", id: parseInt(dep_id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(departPost, 10), date_start: startPost, date_end: endPost, type: idSel });
             };
             s.removeEventListener('click', s);
         });
