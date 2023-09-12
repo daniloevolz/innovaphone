@@ -3,11 +3,7 @@
       Project output dirctory : x86_64-debug/billboard
       Temp directory          : x86_64-debug\obj\billboard
       Runtime binary          : jse/x86_64/generic
-<<<<<<< HEAD
-      Build Number            : 13C54
-=======
-      Build Number            : 13C3
->>>>>>> 071affc4d5f23b49e3d4e2684b7d3081101db27b
+      Build Number            : 13C16
   
   Removing old files from x86_64-debug\obj\billboard...
   Creating directories...

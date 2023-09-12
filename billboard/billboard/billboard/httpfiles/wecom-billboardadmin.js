@@ -138,21 +138,23 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "UpdatePostSuccess") {
             app.send({ api: "admin", mt: "SelectPosts" })
         }
-        if (obj.api == "admin" && obj.mt == "SelectDepartmentViewersResult") {
-            console.log(obj.result);
-            list_viewers_departments = JSON.parse(obj.result);
-        }
-        if (obj.api == "admin" && obj.mt == "SelectDepartmentEditorsResult") {
-            console.log(obj.result);
-            list_editors_departments = JSON.parse(obj.result);
-        }
         if (obj.api == "admin" && obj.mt == "UpdateDepartmentSuccess") {
             app.send({ api: "admin", mt: "SelectDepartments" });
         }
         if (obj.api == 'admin' && obj.mt == "SelectDepartments") {
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
-
+        if (obj.api == "admin" && obj.mt == "SelectAdminDepartmentViewersResult") {
+            console.log(obj.result);
+            list_viewers_departments = JSON.parse(obj.result);
+            console.log('list viwers:', list_viewers_departments);
+        }
+        if (obj.api == "admin" && obj.mt == "SelectAdminDepartmentEditorsResult") {
+            console.log(obj.result);
+            list_editors_departments = JSON.parse(obj.result);
+            console.log('list editors:', list_editors_departments);
+            editDepartmentForm(_colDireita, obj.src)
+        }
     }
     function constructor() {
         that.clear();
@@ -396,8 +398,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 // Obtenha o ID da DIV clicada.
                 var idDaDivClicada = event.currentTarget.id;
 
-                editDepartmentForm(_colDireita, idDaDivClicada, list_departments)
-
+                //editDepartmentForm(_colDireita, idDaDivClicada, list_departments);
+                app.send({ api: "admin", mt: "SelectDepartmentOnClick", department: parseInt(idDaDivClicada) })
                 // Execute a ação desejada com base no ID da DIV clicada.
                 console.log("A DIV com ID " + idDaDivClicada + " foi clicada.");
                 // Você pode usar idDaDivClicada para executar a ação específica para essa DIV.
@@ -405,22 +407,6 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             });
         }
 
-        //scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
-        //    console.log("Ok Funcionando")
-
-        //    var checkboxes = document.querySelectorAll(".userCheckbox");
-        //    // var btnSave = document.getElementById("btnSave");
-
-        //    var departments = [];
-        //    checkboxes.forEach(function (checkbox) {
-        //        if (checkbox.checked) {
-        //            departments.push(checkbox.getAttribute("id"));
-        //        }
-        //    });
-        //    console.log("Departamentos:" + departments)
-        //    //app.send({ api: "admin", mt: "DeleteDepartmentSuccess", users: Users });
-
-        //})
 
     }
 
@@ -441,8 +427,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
-
+             var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
             })[0];
@@ -450,18 +436,23 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 return item.editor_guid === user.guid;
             })[0];
 
-            var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            console.log("Visualizador:", list_viewers_departments);
+            console.log("Editor:", list_editors_departments);
 
-            var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            console.log("Filtro Visualizador:", userV);
+            console.log("Filtro Editor:", userE);
+             var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
 
+             var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            
 
-            var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
-            viewerCheckbox.setAttribute("name", "viewerDepartments");
-            viewerCheckbox.setAttribute("value", user.guid);
+             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+             viewerCheckbox.setAttribute("name", "viewerDepartments");
+             viewerCheckbox.setAttribute("value", user.guid);
 
-            var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
-            editorCheckbox.setAttribute("name", "editorDepartments");
-            editorCheckbox.setAttribute("value", user.guid);
+             var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+             editorCheckbox.setAttribute("name", "editorDepartments");
+             editorCheckbox.setAttribute("value", user.guid);
 
             editorCheckbox.addEvent('click', function () {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
@@ -477,7 +468,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                     var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
                     editCheckbox.checked = true;
                 }
-            }, 500)
+            }, 1000)
 
         });
         //usersListDiv.appendChild(table);

@@ -59,7 +59,7 @@ Wecom.billboardTexts = {
         btnOk: "Ok",
         labelCfgUsers: "Usuários",
         labelCfgLicense: "Licenças",
-        labelCfgDepartment: "Departmento",
+        labelCfgDepartment: "Departamentos",
         labelCfgPost: "Posts",
         lblLicenseToken: "Token do sistema:",
         labelLicenseFile: "Sua chave de licença:",

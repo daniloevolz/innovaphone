@@ -524,20 +524,20 @@ new JsonApi("admin").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
-            if (obj.mt == "SelectDepartments") {
-                Database.exec("SELECT * FROM tbl_departments")
-                //log("SelectDepartments:");
-                ////selectViewsHistory(conn.sip, conn);
-                //var queryViewer;
-                //Database.exec(queryViewer)
-                    .oncomplete(function (data) {
-                        log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
-                    });
-            };
+            //if (obj.mt == "SelectDepartments") {
+            //    Database.exec("SELECT * FROM tbl_departments")
+            //    //log("SelectDepartments:");
+            //    ////selectViewsHistory(conn.sip, conn);
+            //    //var queryViewer;
+            //    //Database.exec(queryViewer)
+            //        .oncomplete(function (data) {
+            //            log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
+            //            conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+            //        })
+            //        .onerror(function (error, errorText, dbErrorCode) {
+            //            conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+            //        });
+            //};
             if (obj.mt == "SelectPosts") {
                 Database.exec("SELECT * FROM tbl_posts")
                     //log("SelectDepartments:");
@@ -555,33 +555,37 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "SelectDepartments") {
                 log("SelectDepartments:");
                 selectViewsHistory(conn.sip, conn);
-                var queryViewer;
-                if (obj.deleted) {
-                    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "';";
-                } else {
-                    //Query para Departamentos Não Excluídos
-                    var queryViewer = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_viewers v ON d.id = v.department_id WHERE v.viewer_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
-                }
+                Database.exec("SELECT * FROM tbl_departments")
+                    //log("SelectDepartments:");
+                    ////selectViewsHistory(conn.sip, conn);
+                    //var queryViewer;
+                    //Database.exec(queryViewer)
+                    .oncomplete(function (data) {
+                        log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectDepartmentOnClick") {
+                var queryViewer = "SELECT * FROM tbl_department_viewers WHERE department_id =" + obj.department + ";"
+                
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectUserDepartmentsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectAdminDepartmentViewersResult", src: obj.department, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
 
-                if (obj.deleted) {
-                    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
-                } else {
-                    //Query para Departamentos Não Excluídos
-                    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
-                }
+                var queryEditor = "SELECT * FROM tbl_department_editors WHERE department_id = "+obj.department+";"
                 Database.exec(queryEditor)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
 
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectAdminDepartmentEditorsResult", src: obj.department, result: JSON.stringify(dataUsersViewer, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
