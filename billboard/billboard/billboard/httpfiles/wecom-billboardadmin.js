@@ -704,7 +704,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div", "color:white;", texts.text("labelTypePost"), null))
         console.log('TIPO DO POST:', clickedPost.type)
 
-        var postType = clickedPost.type == "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+        var postType = clickedPost.type === "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
 
         var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select", null, postType, "selectPublicPost").setAttribute("id", "selectTypePost"))
         publicPostSelect.add(new innovaphone.ui1.Node("option", null, texts.text("labelPublic"), null).setAttribute("id", "public"))
