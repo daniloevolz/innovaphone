@@ -58,10 +58,10 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (newState == currentState) return;
         if (newState == "Connected") {
             currentState = newState;
-            console.info("DwcIdentity: Appwebsocket.Connection Connected: ");
+            console.info("Billboard: Appwebsocket.Connection Connected: ");
         }
         if (newState == "Disconnected") {
-            console.error("DwcIdentity: Appwebsocket.Connection Disconnected: ");
+            console.error("Billboard: Appwebsocket.Connection Disconnected: ");
             currentState = "Disconnected";
         }
     }
@@ -468,7 +468,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                     var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
                     editCheckbox.checked = true;
                 }
-            }, 1000)
+            }, 500)
 
         });
         //usersListDiv.appendChild(table);

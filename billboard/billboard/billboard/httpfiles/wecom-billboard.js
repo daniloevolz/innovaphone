@@ -41,16 +41,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
-    app.onerror = waitConnection(that);
-    app.onclosed = waitConnection(that);
-
+    app.onerror = function (error) {
+        console.error("DwcIdentity: Appwebsocket.Connection error: " + error);
+        changeState("Disconnected");
+    };
+    app.onclosed = function () {
+        console.error("DwcIdentity: Appwebsocket.Connection closed!");
+        changeState("Disconnected");
+    };
+    var currentState = "Loading";
     waitConnection(that);
 
     function app_connected(domain, user, dn, appdomain) {
+        changeState("Connected");
         that.clear();
         billboard = that.add(new innovaphone.ui1.Div(null, null, "billboard").setAttribute("id", "billboard"))
         app.send({ api: "user", mt: "TableUsers" });
         app.send({ api: "user", mt: "SelectDepartments" });
+
+        setInterval(function () {
+            if (currentState == "Connected") {
+                var msg = { api: "user", mt: "Ping" };
+                app.send(msg);
+                console.log("Interval: Ping Sent " + JSON.stringify(msg));
+            } else {
+                changeState("Disconnected");
+                console.log("Interval: changeState Disconnected");
+            }
+            
+        }, 60000); // A cada 60 segundo
 
     }
 
@@ -131,7 +150,39 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log(obj.result);
             list_editors_departments = JSON.parse(obj.result);
         }
+        if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
+            console.log(obj.result);
+            list_posts = JSON.parse(obj.result)
+        }
     }
+    function makePopup(header, content, width, height) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+
+        if (popupOpen == false) {
+            }    
+            popup = _popup;
+            popupOpen = true;
+    }
+    // exemplo de uso
+    // makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.Sip +"</p>", 500, 200);
+    function changeState(newState) {
+        if (newState == currentState) return;
+        if (newState == "Connected") {
+            currentState = newState;
+            console.info("Billboard: Appwebsocket.Connection Connected: ");
+        }
+        if (newState == "Disconnected") {
+            console.error("Billboard: Appwebsocket.Connection Disconnected: ");
+            currentState = "Disconnected";
+        }
+    }
+
     function makeDivNoLicense(msg) {
         that.clear();
         //Titulo 
@@ -294,15 +345,19 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var del = document.getElementById("delDepDiv")
             del.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
-                var hasPosts = list_posts.filter(function (item) {
-                    return item.department
-                })
-                console.log("Has posts" + JSON.stringify(hasPosts))
-                if (hasPosts.length > 0) {
-                    window.alert("Favor excluir todos os posts primeiro")
-                } else {
-                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
-                }
+                app.send({ api: "user", mt: "SelectAllPosts", department: dep_id });
+                setTimeout(function(){
+                    var hasPosts = list_posts.filter(function (item) {
+                        return item.department
+                    })
+                    console.log("Has posts" + JSON.stringify(hasPosts))
+                    if (hasPosts.length > 0) {
+                        confirm("Favor excluir todos os posts primeiro")
+                    } else {
+                        app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+                    }
+                },1000)
+               
 
             })
             var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div", null, null, "timedDepDiv").setAttribute("id", "timeDepDiv"))
@@ -638,18 +693,14 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
         
+        var postType = (post.type = "private") ? 'Tipo: ' + texts.text("labelPrivate") : 'Tipo: ' + texts.text("labelPublic")
+        var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
+       
 
         var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
-        //creatorPost.id = 'creatorPost';
-        //creatorPost.className = 'creatorPost';
-        //creatorPost.innerHTML = 'Criador: ' + user.cn;
-
-        //console.log('Quero saber: ', user.cn);
 
         var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
-        //closeDateDiv.id = 'closedate';
-        //closeDateDiv.className = 'closedate';
-
+  
         var dateString = post.date_end;
         var date = new Date(dateString);
         var day = date.getDate();
