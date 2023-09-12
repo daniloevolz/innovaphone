@@ -42,11 +42,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
     app.onerror = function (error) {
-        console.error("DwcIdentity: Appwebsocket.Connection error: " + error);
+        console.error("Billboard: Appwebsocket.Connection error: " + error);
         changeState("Disconnected");
     };
     app.onclosed = function () {
-        console.error("DwcIdentity: Appwebsocket.Connection closed!");
+        console.error("Billboard: Appwebsocket.Connection closed!");
         changeState("Disconnected");
     };
     var currentState = "Loading";
@@ -153,6 +153,15 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
             console.log(obj.result);
             list_posts = JSON.parse(obj.result)
+                var hasPosts = list_posts.filter(function (item) {
+                    return item.department
+                })
+                console.log("Has posts" + JSON.stringify(hasPosts))
+                if (hasPosts.length > 0) {
+                    makePopup("ATENÇÃO","Favor excluir todos os posts primeiro", 500, 200);
+                } else {
+                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+                }
         }
     }
     function makePopup(header, content, width, height) {
@@ -164,10 +173,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         _popup.header.addText(header);
         _popup.content.addHTML(content);
 
-        if (popupOpen == false) {
-            }    
-            popup = _popup;
-            popupOpen = true;
+        // if (popupOpen == false) {
+        //     }    
+        //     popup = _popup;
+        //     popupOpen = true;
     }
     // exemplo de uso
     // makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.Sip +"</p>", 500, 200);
@@ -346,19 +355,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             del.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
                 app.send({ api: "user", mt: "SelectAllPosts", department: dep_id });
-                setTimeout(function(){
-                    var hasPosts = list_posts.filter(function (item) {
-                        return item.department
-                    })
-                    console.log("Has posts" + JSON.stringify(hasPosts))
-                    if (hasPosts.length > 0) {
-                        confirm("Favor excluir todos os posts primeiro")
-                    } else {
-                        app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
-                    }
-                },1000)
-               
-
             })
             var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div", null, null, "timedDepDiv").setAttribute("id", "timeDepDiv"))
             var time = document.getElementById("timeDepDiv")
