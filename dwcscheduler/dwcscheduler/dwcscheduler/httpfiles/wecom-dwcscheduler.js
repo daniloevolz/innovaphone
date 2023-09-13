@@ -149,7 +149,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 list_rooms = obj.rooms;
                 try {
                     if (list_rooms.length == 0) {
-                        window.alert("Atenção! Não há Salas disponíveis neste Objeto de Conferências")
+                        makePopup("ATENÇÃO","Não há Salas disponíveis neste Objeto de Conferências", 500, 200);
                     }
                     else {
                         key_conference = obj.key;
@@ -172,9 +172,23 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 
 
             } else {
-                window.alert("Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.")
+                makePopup("ATENÇÃO","Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.", 500, 200);
             }
         }
+    }
+    function makePopup(header, content, width, height) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+
+        // if (popupOpen == false) {
+        //     }    
+        //     popup = _popup;
+        //     popupOpen = true;
     }
     function constructor() {
         that.clear();

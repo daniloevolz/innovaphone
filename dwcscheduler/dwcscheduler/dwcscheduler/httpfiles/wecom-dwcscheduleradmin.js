@@ -81,22 +81,23 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             makeDivGeral(_colDireita);
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigMessageErro") {
-            window.alert("Erro ao atualizar as configurações, verifique os logs do serviço.");
+            makePopup("ATENÇÃO","Erro ao atualizar as configurações, verifique os logs do serviço.", 500, 200);
+            
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigMessageSuccess") {
             makeDivGeral(_colDireita);
-            window.alert("Configurações Atualizadas com suecesso!");
+            makePopup("ATENÇÃO","Configurações Atualizadas com suecesso!", 500, 200);
             
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigGoogleMessageSuccess") {
             makeDivGoogle(_colDireita);
-            window.alert("Configurações Atualizadas com suecesso!");
+            makePopup("ATENÇÃO","Configurações Atualizadas com suecesso!", 500, 200);
 
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigLicenseMessageSuccess") {
             app.send({ api: "admin", mt: "ConfigLicense" });
-            waitConnection(colDireita);
-            window.alert("Configurações Atualizadas com suecesso!");
+            waitConnection(_colDireita);
+            makePopup("ATENÇÃO","Configurações Atualizadas com suecesso!", 500, 200);
 
         }
         if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
@@ -112,6 +113,20 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             }
             makeDivLicense(_colDireita);
         }
+    }
+    function makePopup(header, content, width, height) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+
+        // if (popupOpen == false) {
+        //     }    
+        //     popup = _popup;
+        //     popupOpen = true;
     }
     function constructor() {
         that.clear();
@@ -315,7 +330,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
                 app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
                 waitConnection(t);
             } else {
-                window.alert("A chave de licença precisa ser informada!");
+                makePopup("ATENÇÃO","A chave de licença precisa ser informada!", 500, 200);
             }
             
         });
