@@ -125,7 +125,7 @@ public:
             <tr><td class="param">IIoMux * const <b>iomux</b></td><td>The iomux instance needed for socket communication.</td></tr>
             <tr><td class="param">ISocketProvider * const <b>tcpSocketProvider</b></td><td>A socket provider to create a TCP socket.</td></tr>
             <tr><td class="param">ISocketProvider * const <b>tlsSocketProvider</b></td><td>A socket provider to create a TLS socket.</td></tr>
-            <tr><td class="param">UHTTPClient * const <b>user</b></td><td>An UHTTPClient instance to receive the callbakcs from IHTTPClient.</td></tr>
+            <tr><td class="param">UHTTPClient * const <b>user</b></td><td>An UHTTPClient instance to receive the callbacks from IHTTPClient.</td></tr>
             <tr><td class="param">IInstanceLog * const <b>log</b></td><td>The log instance for logging.</td></tr>
             <tr><td class="param">IDns * const <b>dns</b></td><td>The optional dns instance for dns requests. If specified, the same DNS instance is used for DNS requests which saves performance.</td></tr>
             <tr><td class="param">ISocketContext * const <b>socketContext</b></td><td>An optional socketContext which can be used for the socket which is created by the httpclient. You can disable sending of a client certificate with this socketContext or send a specific own client certificate.</td></tr>
@@ -137,7 +137,7 @@ public:
 
     <div class="fnhead">Connect</div>
     <dd>
-        Connects to the given address (wich can be an IPv4 or IPv6 address, as well asn an URI). If the address is a URI and that URI starts with HTTPS,
+        Connects to the given address (which can be an IPv4 or IPv6 address, as well as an URI). If the address is a URI and that URI starts with HTTPS,
         an TLS connection will be established instead of the default TCP connection.
 
         <h4>Parameters</h4>
@@ -145,20 +145,20 @@ public:
             <tr><td class="param">const char * <b>address</b></td><td>The address to connect to. Can be an IPv4 / IPv6 address or an valid URI.</td></tr>
             <tr><td class="param">const char * <b>user</b></td><td><i>(Default: nullptr)</i> The user for authentication if requested by the server.</td></tr>
             <tr><td class="param">const char * <b>pwd</b></td><td><i>(Default: nullptr)</i> The password for authentication if requested by the server.</td></tr>
-            <tr><td class="param">int <b>authMethods</b></td><td><i>(Default: HTTP_AUTH_ALL)</i> The autentications to accept as bit field Can be a combination of HTTP_AUTH_BASIC, HTTP_AUTH_DIGEST and HTTP_AUTH_NTLM. Or HTTP_AUTH_ALL to accept all of them.</td></tr>
+            <tr><td class="param">int <b>authMethods</b></td><td><i>(Default: HTTP_AUTH_ALL)</i> The authentications to accept as bit field Can be a combination of HTTP_AUTH_BASIC, HTTP_AUTH_DIGEST and HTTP_AUTH_NTLM. Or HTTP_AUTH_ALL to accept all of them.</td></tr>
         </table>
 
         <h4>Callbacks</h4>
-        On success, UTHHPClient::HTTPClientConnectComplete() will be called. If an error occurres, the connection will be closed, which leads to a call to UHTTPClient::HTTPClientShutdown().
+        On success, UTHHPClient::HTTPClientConnectComplete() will be called. If an error occurs, the connection will be closed, which leads to a call to UHTTPClient::HTTPClientShutdown().
 
         <h4>Remarks</h4>
-        If using an URI to connect, an username and password for authentication can also be given wiht the URI itself ("http://user::pwd@mysite.com").
+        If using an URI to connect, an username and password for authentication can also be given with the URI itself ("http://user::pwd@mysite.com").
     </dd>
 
     <div class="fnhead">Recv</div>
     <dd>
         Let the HTTP Client receive data. Must be called after sending a GET request and receiving the callback, that the request is completed (which means, the response header
-        had ben read and interpreted). Recv() also should only be called after checking, if the request result actually delivers data.
+        had been read and interpreted). Recv() also should only be called after checking, if the request result actually delivers data.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -177,14 +177,14 @@ public:
         UHTTPClient::HTTPClientRecvResult() will be called after the data had been read or UHTTPClient::HTTPClientRecvCanceled(), if the Recv() call had been canceled for whatever reason.
 
         <h4>Remarks</h4>
-        Be careful with calling Recv() and readPartitial set to false. Because if the data received will be less than size, Recv() will never lead to a callback.
+        Be careful with calling Recv() and recvPartitial set to false. Because if the data received will be less than size, Recv() will never lead to a callback.
     </dd>
 
     <div class="fnhead">Send</div>
     <dd>
         Sends the request by building a correct header and sending that it. So Send() must be called even if there is no need to send additional data, too. If there is additional data,
         it can be given to Send() and will be send after the header. If the data to send is chunked encoded, Send() can be called multiple times until all of the data had been send.
-        To end a chunck encoded transfer, set the last flag to true.
+        To end a chunk encoded transfer, set the last flag to true.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -197,13 +197,13 @@ public:
         UHTTPClient::HTTPClientSendResult() will be called after the data had been send. After the request had been completed, UTHHPClient::HTTPClientRequestComplete() will be called.
 
         <h4>Remarks</h4>
-        To respect the flow control nescessary for the asynchronous kind of communication used by the IHTTPClient, continous send calles should be made after receiving a
+        To respect the flow control necessary for the asynchronous kind of communication used by the IHTTPClient, continuous send calls should be made after receiving a
         UHTTPClient::HTTPClientSendResult() callback.
     </dd>
 
     <div class="fnhead">Shutdown</div>
     <dd>
-        Closes the HTTP conenction. If there is data left inside the IHTTPClient that still must be send, it will be send first before closing the connection.
+        Closes the HTTP connection. If there is data left inside the IHTTPClient that still must be send, it will be send first before closing the connection.
 
         <h4>Callbacks</h4>
         After the connection had been closed, UHTTPClient::HTTPClientShutdown() will be called.
@@ -211,16 +211,16 @@ public:
 
     <div class="fnhead">Reconnect</div>
     <dd>
-        After the connection had been closed (because of a call to IHTTPConnection::Shutdown() or because of a close initiated by the server), it can be restablished by calling
-        Reconnect() using the same optiones (request type, server address, ...) as given for the first request.
+        After the connection had been closed (because of a call to IHTTPConnection::Shutdown() or because of a close initiated by the server), it can be reestablished by calling
+        Reconnect() using the same options (request type, server address, ...) as given for the first request.
 
         <h4>Callbacks</h4>
-        On success, UTHHPClient::HTTPClientConnectComplete() will be called. If an error occurres, the connection will be closed, which leads to a call to UHTTPClient::HTTPClientShutdown().
+        On success, UTHHPClient::HTTPClientConnectComplete() will be called. If an error occurs, the connection will be closed, which leads to a call to UHTTPClient::HTTPClientShutdown().
     </dd>
 
     <div class="fnhead">PassErrorToUser</div>
     <dd>
-        Generally an error leads to a shutdown of the IHTTPClient. But sometimes it it useful to not closed the error and pass it the the app instead. This can be activated with
+        Generally an error leads to a shutdown of the IHTTPClient. But sometimes it is useful to not close the error and pass it to the app instead. This can be activated with
         PassErrorToUser(). In case of an error that should be passed to the user, the error case will be redirected to a normal UHTTPClient::HTTPClientRequestComplete() callback.
         The UHTTPClient must than check the HTTP result by calling IHTTPClient::GetHTTPResult().
 
@@ -230,23 +230,23 @@ public:
         </table>
 
         <h4>Callbacks</h4>
-        In case of one of the given errors occurres, UHTTPClient::HTTPClientReqeustComplete() will be called anyway.
+        In case of one of the given errors occurs, UHTTPClient::HTTPClientReqeustComplete() will be called anyway.
 
         <h4>Remarks</h4>
-        Even if PassErrorToUser() can theoreticaly called multiple times, the better way will be to call it once giving a bit filed of flags, cobined using or.
-        Valid flags ar HTTP_CL_ERR_NOT_FOUND, HTTP_CL_ERR_BAD_REQUEST, HTTP_CL_ERR_INTERNAL_SERVER and HTTP_CL_ERR_REDIRECT. See the data type section below for details.
+        Even if PassErrorToUser() can theoretically called multiple times, the better way will be to call it once giving a bit filed of flags, combined using or.
+        Valid flags are HTTP_CL_ERR_NOT_FOUND, HTTP_CL_ERR_BAD_REQUEST, HTTP_CL_ERR_INTERNAL_SERVER and HTTP_CL_ERR_REDIRECT. See the data type section below for details.
     </dd>
 
     <div class="fnhead">SendContentForAuthentication</div>
     <dd>
-        When connecting to a server that needs authentication, the IHTTPClient at first sends a request without the conent (if a POST request need to be send). This
-        helps to prevend sending data that won't be needed. But it can be, that the server won't accept such a request. An example for that is the Microsoft Exchange
+        When connecting to a server that needs authentication, the IHTTPClient at first sends a request without the content (if a POST request need to be send). This
+        helps to prevent sending data that won't be needed. But it can be, that the server won't accept such a request. An example for that is the Microsoft Exchange
         365 server, which will respond with an bad request. For that case, SendContentFoprAuthentication() can be used, so that the data for the POST request will
         be send even if the HTTP client needs to authenticate first.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">bool <b>doSend</b></td><td>True, to send the request content for autnehtication, too.</td></tr>
+            <tr><td class="param">bool <b>doSend</b></td><td>True, to send the request content for authentication, too.</td></tr>
         </table>
 
         <h4>Remarks</h4>
@@ -255,9 +255,9 @@ public:
 
     <div class="fnhead">SetRequestType</div>
     <dd>
-        Befor sending the request, the application first needs to set the type of the request as well as the resourceName it wants to access. If the request is not a GET
-        request, data can be or need to send. In that case, the datatype (aka mime-type) must be defined as well as the content length. If the content length is unkown,
-        HTTP_CLIENT_CHUNKED_TRANSFER can be used to enabled chuncked transfer of the data.
+        Before sending the request, the application first needs to set the type of the request as well as the resourceName it wants to access. If the request is not a GET
+        request, data can be or need to send. In that case, the content type (aka mime-type) must be defined as well as the content length. If the content length is unknown,
+        HTTP_CLIENT_CHUNKED_TRANSFER can be used to enabled chunked transfer of the data.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -312,24 +312,24 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">bool &amp; <b>chunked</b></td><td>If the received data is chunk encoded, true will be stored to the chuncked variable.</td></tr>
+            <tr><td class="param">bool &amp; <b>chunked</b></td><td>If the received data is chunk encoded, true will be stored to the chunked variable.</td></tr>
         </table>
 
         <h4>Return Value</h4>
         The size of the content sent with the response or 0, if no data is available or if the received data is chunk encoded.
 
         <h4>Remarks</h4>
-        The return value must be intepreted as follows:
+        The return value must be interpreted as follows:
         <ul>
             <li>If the returned value is &gt; 0, the app must read that amount of data using Recv().</li>
-            <li>If the retunred value is 0 and the flag chunked is set, the app must read data until the end of the stream had been reached.</li>
+            <li>If the returned value is 0 and the flag chunked is set, the app must read data until the end of the stream had been reached.</li>
             <li>If the returned value is 0 and the flag chunked is not set, there is not data sent with the response.</li>
         </ul>
     </dd>
 
     <div class="fnhead">GetHeaderFieldValueCount</div>
     <dd>
-        A headerfield can be set more then once in the HTTP header. To get the number of occurrences, GetHeaderFieldValueCount() must be called.
+        A header field can be set more then once in the HTTP header. To get the number of occurrences, GetHeaderFieldValueCount() must be called.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -361,7 +361,8 @@ public:
     <div class="fnhead">Connected</div>
     <dd>
         <h4>Return Value</h4>
-        True, if the HTTP client is connected, else false.
+        True, if the HTTP client is connected, else false. This just reflects the socket connection state and does not mean, that there is not a socket connect already running!<br/>
+        You can use this function for debugging purposes but not for a state machine!
     </dd>
 
     <div class="fnhead">SetUser</div>
@@ -410,10 +411,12 @@ public:
             <tr><td class="param">http_shutdown_reason_t <b>reason</b></td><td>The reason for the shutdown. See the data types section below for details.</td></tr>
         </table>
     </dd>
+    <h4>Remarks</h4>
+    You can reuse the same IHTTPClient instance by calling Connect again after HTTPClientShutdown callback.
 
     <div class="fnhead">HTTPClientSendResult</div>
     <dd>
-        Will be called after the Send() had been completed, which means that the header and an eventuell given additional data to send had been send. If there is more data to send,
+        Will be called after the Send() had been completed, which means that the header and any additional data to send had been send. If there is more data to send,
         this will be the right place for sending the next part to respect the asynchronous flow control.
 
         <h4>Parameters</h4>
@@ -425,7 +428,7 @@ public:
     <div class="fnhead">HTTPClientRequestComplete</div>
     <dd>
         Will be called if the HTTP request has been successfully completed. A completed request means, that everything for the request had been send and the result header had been
-        received and interpreted. So this callback function will be the right place to check for data thay maybe available with the response and call IHTTPClient::Recv() to receive it.
+        received and interpreted. So this callback function will be the right place to check for data that maybe is available with the response and call IHTTPClient::Recv() to receive it.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -436,7 +439,7 @@ public:
     <div class="fnhead">HTTPClientRecvResult</div>
     <dd>
         Will be called after the application called IHTTPClient::Recv() and data had been received. The flag transferComplete indicates, if the data of the response
-        had been received completley or not (which counts for both, streamed and chunk encoded transfer). If false, additional Recv() calls must follow until the flag
+        had been received completely or not (which counts for both, streamed and chunk encoded transfer). If false, additional Recv() calls must follow until the flag
         is set to true.
 
         <h4>Parameters</h4>
@@ -447,6 +450,8 @@ public:
             <tr><td class="param">bool <b>transferComplete</b></td><td>true, if the transfer is completed (all data received), else false.</td></tr>
         </table>
     </dd>
+    <h4>Remarks</h4>
+    On transferComplete==true, you may call SetRequestType again to make a further request to the same server.
 
     <div class="fnhead">HTTPClientRecvCanceled</div>
     <dd>
@@ -512,7 +517,7 @@ public:
         <tr><td><b>HTTP_SHUTDOWN_NORMAL</b></td><td>A normal shutdown initiated by the application itself by calling IHTTPClient::Shutdown().</td></tr>
         <tr><td><b>HTTP_SOCKET_LOST</b></td><td>The socket had been lost.</td></tr>
         <tr><td><b>HTTP_ADDRESS_INVALID</b></td><td>The address given to IHTTPClient::Connect() was invalid.</td></tr>
-        <tr><td><b>HTTP_SOCKET_ERROR</b></td><td>An unexpected socket error occured.</td></tr>
+        <tr><td><b>HTTP_SOCKET_ERROR</b></td><td>An unexpected socket error occurred.</td></tr>
         <tr><td><b>HTTP_CONNECT_FAILED</b></td><td>Creating the connection failed.</td></tr>
         <tr><td><b>HTTP_BYTE_STREAM_BROKEN</b></td><td>There was an error inside the byte stream while authenticating or receiving data.</td></tr>
         <tr><td><b>HTTP_UNHANDLED_HTTP_RESULT</b></td><td>An not expected HTTP result had been returned by the server.</td></tr>
@@ -520,7 +525,7 @@ public:
         <tr><td><b>HTTP_AUTHENTICATION_FAILED</b></td><td>The authentication failed (e. G. because of wrong username / password or an unsupported authentication method).</td></tr>
         <tr><td><b>HTTP_NOT_FOUND</b></td><td>The requested resource for the request could not be found on the server.</td></tr>
         <tr><td><b>HTTP_BAD_REQUEST</b></td><td>The request was bad or malformed (e. g. a custom header field was wrong).</td></tr>
-        <tr><td><b>HTTP_INTERNAL_SERVER_ERROR</b></td><td>An internal error occured on the server side.</td></tr>
+        <tr><td><b>HTTP_INTERNAL_SERVER_ERROR</b></td><td>An internal error occurred on the server side.</td></tr>
         <tr><td><b>HTTP_CONNECTION_REFUSED</b></td><td>The server refused the connection.</td></tr>
         <tr><td><b>HTTP_SHUTDOWN_TIMEOUT</b></td><td>The timeout of SetTimeout triggered.</td></tr>
     </table>
@@ -558,7 +563,7 @@ public:
     <p>
         This enum defines the errors that should be passed to the UHTTPClient user. Instead of shutting down the IHTTPClient, the request will be accepted
         and UHTTPClient::HTTPClientRequestComplete() will be called. The user must check the error code (by calling IHTTPClient::GetHTTPResult()) and
-        handle it properly. The flags of http_error_t can be combined to a bitfield by a binary or operator. The following flags are supported:
+        handle it properly. The flags of http_error_t can be combined to a bit field by a binary or operator. The following flags are supported:
     </p>
     <table style="margin-left: 20px">
         <tr><td><b>HTTP_CL_ERR_NOT_FOUND</b></td><td>(HTTP 404)  requested resource could not be found on the server.</td></tr>

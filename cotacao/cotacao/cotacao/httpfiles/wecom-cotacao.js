@@ -78,6 +78,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         a.setAttribute("id","inicio")
         a2.setAttribute("id","todas")
         a3.setAttribute("id","b3")
+        var divWecom = colesquerda.add(new innovaphone.ui1.Node("div",null,null,"divWecomEsquerda").setAttribute("id","divWecomEsquerda"))
     }
     function colDireita(){
         var coldireita = that.add(new innovaphone.ui1.Div("display:block",null,"colunadireita"));
@@ -118,10 +119,9 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         // linha 2 - LOGO WECOM
         var wecom = linha2.add(new innovaphone.ui1.Div(null,null,null));
         wecom.setAttribute("id","logowecom");
-        var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
-        wecomA.setAttribute("href","https://wecom.com.br")
-        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-        imgwecom.setAttribute("src","logo.png")
+        // var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
+        // wecomA.setAttribute("href","https://wecom.com.br")
+        // imgwecom.setAttribute("src","wecom-white.png")
         //linha2b3 
 
         var linha2b3 = coldireita.add(new innovaphone.ui1.Div(null,null,"linha2b3"))
