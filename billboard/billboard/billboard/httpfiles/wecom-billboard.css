@@ -5,6 +5,8 @@
     /*z-index:10;
     display:none;*/
     background-color: rgba(131,131,131,0.1);
+    z-index: 5000 !important;
+    
 }
 
 .popup-header {
@@ -20,6 +22,7 @@
     text-align: center;
     vertical-align: central;
     font-size:20px;
+    z-index: 5000;
 }
 
 .popup-closer {

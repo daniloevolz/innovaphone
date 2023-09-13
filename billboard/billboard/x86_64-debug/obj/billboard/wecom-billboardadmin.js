@@ -98,7 +98,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "UpdateConfigLicenseMessageSuccess") {
             app.send({ api: "admin", mt: "ConfigLicense" });
            // waitConnection(colDireita);
-            window.alert("Configurações Atualizadas com suecesso!");
+            makePopup("ATENÇÃO","Configurações Atualizadas com suecesso!", 500, 200);
 
         }
         if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
@@ -117,7 +117,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivLicense(_colDireita);
         }
         if (obj.api == "admin" && obj.mt == "InsertAdminsSuccess"){
-            window.alert("Usuários Inseridos com sucesso!")
+            makePopup("ATENÇÃO","Usuários Inseridos com sucesso!", 500, 200);
         }
         if (obj.api == "admin" && obj.mt == "SelectAdminsResult"){
             list_admins = JSON.parse(obj.result)
@@ -155,6 +155,20 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             console.log('list editors:', list_editors_departments);
             editDepartmentForm(_colDireita, obj.src)
         }
+    }
+    function makePopup(header, content, width, height) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+
+        // if (popupOpen == false) {
+        //     }    
+        //     popup = _popup;
+        //     popupOpen = true;
     }
     function constructor() {
         that.clear();
@@ -338,7 +352,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
                 //waitConnection(t);
             } else {
-                window.alert("A chave de licença precisa ser informada!");
+                makePopup("ATENÇÃO","A chave de licença precisa ser informada!", 500, 200);
             }
             
         });
@@ -732,14 +746,12 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
             var colorPost = document.getElementById("postmsg").style.backgroundColor
             var currentDate = getDateNow()
-            console.log("Data Start:", startPost);
             if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
+                makePopup("ATENÇÃO","Favor preencher todos os campos corretamente para criação do post", 500, 200);
             } else if (endPost < startPost) {
-                console.log("data inicio post" + startPost + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
+                makePopup("ATENÇÃO","A Data de término do post não pode ser menor que a data de início", 500, 200);
             } else if (startPost < currentDate) {
-                window.alert("A data atualizada não pode ser inferior a data atual.");
+                makePopup("ATENÇÃO","A data atualizada não pode ser inferior a data atual.", 500, 200);
             } else {
                 app.send({ api: "admin", mt: "UpdatePost", id: parseInt(dep_id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(departPost, 10), date_start: startPost, date_end: endPost, type: idSel });
             };

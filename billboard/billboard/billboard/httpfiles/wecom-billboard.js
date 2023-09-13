@@ -770,12 +770,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log("Data Start:", startPost + "data atual" + currentDate);
 
             if (msgPost === "" || titlePost === "" || startPost == "" || endPost == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
+                makePopup("ATENÇÃO","Favor preencher todos os campos corretamente para criação do post", 500, 200);
             } else if (endPost < startPost) {
-                console.log("data inicio post" + startPost + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
+                makePopup("ATENÇÃO","A Data de término do post não pode ser menor que a data de início", 500, 200);
             } else if (endPost < currentDate) {
-                window.alert("A data de início do post não pode ser inferior à data atual");
+                makePopup("ATENÇÃO","A data de início do post não pode ser inferior à data atual", 500, 200);
             } else {
                 app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
             }
@@ -872,12 +871,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var currentDate = getDateNow()
             console.log("Data Start:", startPost);
             if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
+                makePopup("ATENÇÃO","Favor preencher todos os campos corretamente para criação do post", 500, 200);
             } else if (endPost < startPost) {
-                console.log("data inicio post" + startPost + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
+                makePopup("ATENÇÃO","A Data de término do post não pode ser menor que a data de início", 500, 200);
             } else if (startPost < currentDate) {
-                window.alert("A data atualizada não pode ser inferior a data atual.");
+                makePopup("ATENÇÃO","A data atualizada não pode ser inferior a data atual.", 500, 200);
             } else {
                 app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
 
@@ -937,7 +935,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var viewerDepartments = getSelectedUsersDepartments('viewer');
 
             if (editorDepartments === 0 || editorDepartments.length === 0) {
-                window.alert("Você deve marcar pelo menos um editor para este departamento")
+                makePopup("ATENÇÃO","Você deve marcar pelo menos um editor para este departamento", 500, 200);
+                
             }
             else {
                 console.log("InsertDepartment sending");
