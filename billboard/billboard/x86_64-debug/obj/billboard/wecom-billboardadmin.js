@@ -23,6 +23,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var licenseInstallDate = null;
     var licenseUsed = 0;
     var avatar = start.consumeApi("com.innovaphone.avatar");
+    var appUrl = start.originalUrl;
 
     var colorSchemes = {
         dark: {
@@ -181,16 +182,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         colEsquerda.setAttribute("id","colesquerda")
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
-        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
-     
-        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; color:white; margin : 5px;", appdn, null));
+        var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
+        var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
+
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
-        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
-        //imguser.setAttribute("src", UIuserPicture);
-        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 0.75rem; color:white; margin: 5px;", UIuser, null));
-        username.setAttribute("id", "user");
-        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; border-radius: 50%;", null, null));
+        var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; border-radius: 50%;", null, null));
         imguser.setAttribute("src", UIuserPicture);
+        var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
+        username.setAttribute("id", "user");
 
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
         var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));
@@ -200,6 +199,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
+        var lirelatorios5 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         // var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
 
         var Arelatorios1 = lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgUsers"), null));
@@ -212,6 +212,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         Arelatorios3.setAttribute("id", "CfgDepartment");
         var Arelatorios4 = lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgPost"), null));
         Arelatorios4.setAttribute("id", "CfgPost");
+        var Arelatorios5 = lirelatorios5.add(new innovaphone.ui1.Node("a", null, texts.text("labelCfgUrl"), null));
+        Arelatorios5.setAttribute("id", "CfgUrl");
 
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
@@ -242,7 +244,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             a.addEventListener("click", function () { 
             ChangeView("CfgPost", colDireita) 
             });
+        var a = document.getElementById("CfgUrl");
+        a.addEventListener("click", function () {
+            console.log(appUrl) 
+            var link = appUrl + '/Posts.htm';
+            console.log(link)
 
+            window.open(link, '_blank');
+            });
         _colDireita = colDireita;
     }
     function ChangeView(ex, colDireita) {
@@ -254,22 +263,40 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         }
         if (ex == "CfgLicense") {
             app.send({ api: "admin", mt: "ConfigLicense"});
-            //waitConnection(colDireita);
+
         }
         if (ex == "CfgDepartment") {
             app.send({ api: "admin", mt: "SelectDepartments" });
-            //waitConnection(colDireita);
+
         }
         if (ex == "CfgPost") {
             app.send({ api: "admin", mt: "SelectDepartments" });
             app.send({ api: "admin", mt: "SelectPosts" });
-            //waitConnection(colDireita);
+
         }
+
     }
     function makeDivUsers(t, users, admins) {
         t.clear();
         // app.send({ api: "admin", mt: "SelectAdmins" });
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
+        scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+            console.log("Ok Funcionando")
+
+            var checkboxes = document.querySelectorAll(".userCheckbox");
+            // var btnSave = document.getElementById("btnSave");
+
+            var Users = [];
+
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    Users.push(checkbox.getAttribute("id"));
+                }
+            });
+            console.log("Enviados:" + Users)
+            app.send({ api: "admin", mt: "InsertAdmins", users: Users });
+
+        })
         var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Nome", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Pode Criar Departamento", null));
@@ -289,23 +316,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             document.getElementById("local-table").innerHTML += html;
         });
 
-        scrollcontainer.add(new innovaphone.ui1.Node("div",null,"Salvar","button-inn").setAttribute("id","btnSave")).addEvent("click",function(){
-            console.log("Ok Funcionando")
 
-            var checkboxes = document.querySelectorAll(".userCheckbox");
-            // var btnSave = document.getElementById("btnSave");
-
-            var Users = [];
-
-            checkboxes.forEach(function (checkbox) {
-            if (checkbox.checked) {
-                Users.push(checkbox.getAttribute("id"));
-                }
-        });
-          console.log("Enviados:" + Users)
-          app.send({ api: "admin", mt: "InsertAdmins", users: Users  });
-
-        })
 
    
 

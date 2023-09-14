@@ -37,6 +37,7 @@ Wecom.billboardTexts = {
         labelPostCreator: "Creator",
         labelPostEdit: "Edit",
         labelPostStatus: "Status",
+        labelCfgUrl: "Public Post's",
         
     },
     de: {
@@ -75,6 +76,7 @@ Wecom.billboardTexts = {
         labelPostDateEnd: "Data Fim",
         labelPostCreator: "Criador",
         labelPostEdit: "Editar",
-        labelPostStatus: "Status"
+        labelPostStatus: "Status",
+        labelCfgUrl: "Postagens Públicas",
     }
 }
