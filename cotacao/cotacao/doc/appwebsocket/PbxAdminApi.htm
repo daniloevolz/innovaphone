@@ -73,6 +73,7 @@
         <li><a href="#GetGroup">GetGroup</a> - Read group members</li>
         <li><a href="#GetRPs">GetRPs</a> - Read configured RPs</li>
         <li><a href="#GetNodes">GetNodes</a> - Read all nodes and locations</li>
+        <li><a href="#GetLocation">GetLocation</a> - Read location infos for creation of a WebSocket connection</li>
         <li><a href="#GetConfigs">GetConfigs</a> - Read config templates</li>
         <li><a href="#GetFilters">GetFilters</a> - Read list of configured filters</li>
         <li><a href="#GetGroups">GetGroups</a> - Read availabe Groups</li>
@@ -475,7 +476,8 @@
     "api": "PbxAdminApi",
     "mt": "GetObject",
     "guid": string,
-    "cn": string
+    "cn": string,
+	"h323": string
 }</code></pre>
 
     <p>
@@ -488,7 +490,11 @@
         </dd>
         <dt>cn</dt>
         <dd>
-            If no guid is present, the cn can be used to identify the object.
+            If no guid is present, the cn (Long Name) can be used to identify the object
+        </dd>
+        <dt>h323</dt>
+        <dd>
+            If no guid and no cn is present, the h323-id (Name) can be used to identify the object
         </dd>
     </dl>
 
@@ -1061,6 +1067,71 @@
     <p>
         Returns an array of objects describing the nodes
     </p>
+
+    <h2><a name="GetLocation">GetLocation</a></h2>
+
+    <pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetLocation",
+    "loc": string
+}</code></pre>
+
+    <p>
+        Request infos for a specific location/PBX. The delivered infos can be used to compose an URI to be used to create a WebSocket connection for the specified PBX. In case no registration at the PBX object for a slave PBX is available, the DNS name and the IP-Address info of the current PBX is delivered.
+    </p>
+
+    <p>
+        The URI is composed by the following scheme: <code>[ws/wss]://[dns/addr] [:port]/[module]/APPS/websocket</code>
+    </p>
+
+    <p>
+        E.g. <code>wss://slave.example.com/PBX0/APPS/websocket</code>
+    </p>
+
+    <dl>
+        <dt>loc</dt>
+        <dd>
+            The PBX name/name (h323) of the PBX object the infos are requested from
+        </dd>
+    </dl>
+
+    <pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetLocationResult",
+    "loc": string,
+    "http": unsigned,
+    "https": unsigned,
+    "module": string,
+    "dns": string,
+    "addr": string
+}</code></pre>
+
+    <dl>
+        <dt>loc</dt>
+        <dd>
+            The PBX name/name (h323) of the PBX object the infos are requested from
+        </dd>
+       <dt>http</dt>
+        <dd>
+            The port number for the HTTP/WS connections
+        </dd>
+        <dt>https</dt>
+        <dd>
+            The port number for the HTTPS/WSS connections
+        </dd>
+        <dt>module</dt>
+        <dd>
+            Usually PBX0 for a non dynamic PBX
+        </dd>
+        <dt>dns</dt>
+        <dd>
+            The DNS name of the PBX
+        </dd>
+       <dt>addr</dt>
+        <dd>
+            The IP-Address of the PBX
+        </dd>
+    </dl>
 
     <h2><a name="GetConfigs">GetConfigs</a></h2>
 

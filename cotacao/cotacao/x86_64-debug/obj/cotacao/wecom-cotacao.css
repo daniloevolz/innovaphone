@@ -11,6 +11,7 @@ body {
     margin: 0px;
     overflow-x: hidden;
     overflow-y: hidden;
+    background-image: url('background.png');
 }
 
 div.button {
@@ -30,12 +31,31 @@ div.button {
 
 /*EdiÃ§Ã£o VersÃ£o Cesar*/
 div#logowecom {
-    position: fixed;
+    z-index: 0;
+    display: flex;
+    position: absolute;
+    bottom: 0;
     right: 20px;
-    bottom: 20px;
-    padding: 20px;
+    width: 300px;
+    height: 100px;
+    background-image: url('wecom-white.png');
+    background-repeat: no-repeat;
+    background-size: 300px;
+    opacity: 0.2;
 }
-
+#divWecomEsquerda {
+    z-index: 0;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    /* right: 20px; */
+    width: 100%;
+    top: 90%;
+    background-image: url(wecom-color.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    opacity: 0.7;
+}
 .colunadireita {
     width: 88%;
     height: 100%;
@@ -43,7 +63,7 @@ div#logowecom {
 }
 
 .colunaesquerda {
-    background-image: url("bg_lateral.png");
+    /* background-image: url("background.png"); */
     background-size: cover;
     margin-left: 0%;
     float: left;
@@ -53,6 +73,7 @@ div#logowecom {
     height:100%;
     top:0px;
     font-size:15px;
+    background-color: rgb(2, 22, 63);
     text-align:left;
 }
 
@@ -78,7 +99,7 @@ div#logowecom {
 
 .linha2 {
     order: 2;
-    background-image: url("bg.png");
+    background-image: url("background.png");
     background-size: cover;
     align-content: center;
     width: 100%;
@@ -160,13 +181,13 @@ li {
     height: 40px;;
 }
 a {
-    color: darkslategrey;
+    color: white;
     text-decoration: none;
     font-size: 16px;
 }
 
     a:hover {
-        color: darkslategrey;
+        color: white;
         font-weight: bold;
         font-size: 20px;
     }
@@ -214,7 +235,7 @@ a {
 label {
     width: 100%;
     display: block;
-    background-color: rgba(6,6,6,.1);
+    background-color: rgb(184 176 176 / 12%);
     color: darkslategrey;
     padding: 10px;
     border-radius: 20px;
@@ -222,6 +243,13 @@ label {
 }
 #item-dolar{
     margin-top: 0%;
+    color: white;
+}
+#item-euro{
+    color: white;
+}
+#item-libra{
+    color: white;
 }
 .div-dolar {
     margin-top: 1%;
@@ -232,11 +260,11 @@ label {
         max-width: 45%;
         max-height: 45%;
     }
-    div#logowecom {
+    /* div#logowecom {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
+    } */
     .div-libra {
         width: 300px;
         margin-top: 3px;
@@ -252,7 +280,7 @@ label {
         justify-content: center;
     }
     .colunaesquerda {
-        background-image: url(bg_lateral500px.png);
+        /* background-image: url('background.png'); */
         position: absolute;
         background-size: cover;
         height: 100%;
@@ -269,7 +297,7 @@ label {
   }
 }
 
-@media screen and (max-width: 400px)  {
+@media screen and (max-width: 500px)  {
     body{
         overflow: auto;
     }
@@ -298,7 +326,7 @@ label {
     }
 
     .colunaesquerda {
-        background-image: url("bg_lateral500px.png");
+        /* background-image: url("background.png"); */
         position: absolute;
         background-size: cover;
         height: 18%;
@@ -322,11 +350,11 @@ label {
         max-height: 50%;
     }
 
-    div#logowecom {
+    /* div#logowecom {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
+    } */
 
     .div-data {
         width: 300px;
