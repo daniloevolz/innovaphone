@@ -280,7 +280,21 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         t.clear();
         // app.send({ api: "admin", mt: "SelectAdmins" });
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
-        scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+
+        var iptSearch = scrollcontainer.add(new innovaphone.ui1.Input("position: absolute; height: 30px; width: 100px; top: 0.5%",null,texts.text("labelPesquisarUsers"),100,"text","iptSearch"))
+        
+        function displayUsers(filter) {
+            var filteredUsers = users.filter(function (user) {
+              console.log(user.name.toLowerCase().includes(filter.toLowerCase()))
+              return user.name.toLowerCase().includes(filter.toLowerCase());
+            });
+        }
+        // Ouvinte de evento para o campo de entrada
+        iptSearch.addEvent("input", function () {
+        console.log("Digitando")
+        displayUsers(this.value);
+        });
+            scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
             console.log("Ok Funcionando")
 
             var checkboxes = document.querySelectorAll(".userCheckbox");
@@ -315,13 +329,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             `;
             document.getElementById("local-table").innerHTML += html;
         });
-
-
-
-   
-
     }
-        
+
     function makeDivLicense(t, user) {
         t.clear();
         //Título

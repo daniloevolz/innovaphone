@@ -73,7 +73,8 @@ WebServer.onrequest("get-posts", function (req) {
                     //postID += JSON.parse(data)
                     req.recv();
                 }else{
-                    var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public' AND TO_TIMESTAMP(date_start, 'YYYY-MM-DD HH24:MI:SS') <= NOW() AND TO_TIMESTAMP(date_end, 'YYYY-MM-DD HH24:MI:SS') >= NOW()";
+                    var now = getDateNow();
+                    var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public' AND date_start <= '" + now + "' AND date_end >= '" + now + "'";
 
                     //var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public'";
                     //  var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department +
@@ -223,9 +224,10 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "SelectAllPosts") {
                     var now = getDateNow();
-                    Database.exec("SELECT * FROM tbl_posts WHERE department ='" + obj.department + "'")
+                    // Database.exec("SELECT * FROM tbl_posts WHERE department ='" + obj.department + "'")
+                    Database.exec("SELECT * FROM tbl_posts WHERE department = '" + obj.department + "' AND deleted IS NULL")
                         .oncomplete(function (data) {
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectAllPostsResult", src: obj.src, result: JSON.stringify(data) }));
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectAllPostsResult", src: obj.src, result: JSON.stringify(data), dep_id: obj.department }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));

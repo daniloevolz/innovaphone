@@ -153,6 +153,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
             console.log(obj.result);
             list_posts = JSON.parse(obj.result)
+            var dep_id = JSON.parse(obj.dep_id)
                 var hasPosts = list_posts.filter(function (item) {
                     return item.department
                 })
