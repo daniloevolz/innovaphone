@@ -797,14 +797,14 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         d.addEventListener('click', function () {
 
             console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivPost(_colDireita, list_post, list_tableUsers);
-            d.removeEventListener('click', w);
+            makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
+            d.removeEventListener('click', d);
         });
         var q = document.getElementById('closewindow');
         q.addEventListener('click', function () {
 
             console.log("O elemento closeMsgDiv foi clicado!");
-            makeDivPost(_colDireita, list_post, list_tableUsers);
+            makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
             q.removeEventListener('click', q);
         });
 
