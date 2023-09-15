@@ -42,12 +42,33 @@
     color: white;
     opacity: 0.9;
 }
-.button-inn {
+#iptSearch{
     position: absolute;
-    left: 82%;
+    height: 15px;
+    width: 150px;
+    top: 2.6%;
+    left: 16%;
+    border-radius: 5px;
+    border: 1px solid;
+    height: 17px;
+    text-transform: capitalize;
+}
+.divSearch{
+    position: absolute;
+    top: 2.6%;
+    left: 5%;
+    display: flex;
+}
+
+#local-table{
+    margin-top: 15px;
+}
+.button-inn {
+    position: fixed;
+    left: 76%;
     width: 15%;
     height: 25px;
-    top: 90%;
+    top: 13.5%;
     font-size: 12px;
     text-align: center;
     background-color: rgb(255, 255, 255, 50%);

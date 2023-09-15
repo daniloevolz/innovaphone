@@ -134,7 +134,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
             list_post = JSON.parse(obj.result)
             console.log("LIST POST " + JSON.stringify(list_post))
-            makeDivPost(_colDireita, list_post, list_tableUsers);
+            makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
         }
         if (obj.api == "admin" && obj.mt == "UpdatePostSuccess") {
             app.send({ api: "admin", mt: "SelectPosts" })
@@ -281,19 +281,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         // app.send({ api: "admin", mt: "SelectAdmins" });
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
 
-        var iptSearch = scrollcontainer.add(new innovaphone.ui1.Input("position: absolute; height: 30px; width: 100px; top: 0.5%",null,texts.text("labelPesquisarUsers"),100,"text","iptSearch"))
+        var divSearch = scrollcontainer.add(new innovaphone.ui1.Node("div","position:absolute;",texts.text("labelSearchUsers"),"divSearch"))
+        var iptSearch = scrollcontainer.add(new innovaphone.ui1.Input(null,null,texts.text("labelSearchUsers"),100,"text","iptSearch").setAttribute("id","iptSearch"))
         
-        function displayUsers(filter) {
-            var filteredUsers = users.filter(function (user) {
-              console.log(user.name.toLowerCase().includes(filter.toLowerCase()))
-              return user.name.toLowerCase().includes(filter.toLowerCase());
-            });
-        }
-        // Ouvinte de evento para o campo de entrada
-        iptSearch.addEvent("input", function () {
-        console.log("Digitando")
-        displayUsers(this.value);
-        });
             scrollcontainer.add(new innovaphone.ui1.Node("div", null, "Salvar", "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
             console.log("Ok Funcionando")
 
@@ -315,20 +305,28 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         tableMain.add(new innovaphone.ui1.Node("th", null, "Nome", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Pode Criar Departamento", null));
 
+       function updateTable(filter) {
         var adminGuids = admins.map(admin => admin.guid);
-        console.log("Admin Guids: " + adminGuids);
-        
+
+        document.getElementById("local-table").innerHTML = '';
+
         users.forEach(function (user) {
-            var isChecked = adminGuids.includes(user.guid) ? 'checked' : ''; 
-            console.log("User:", user.guid, "Is Checked:", isChecked);
-            var html = `
-              <tr>
-                <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
-                <td style="text-align: center;"><input type="checkbox" id="${user.guid}" class="userCheckbox" ${isChecked}></td>
-              </tr>
-            `;
-            document.getElementById("local-table").innerHTML += html;
+            if (user.cn.toLowerCase().includes(filter.toLowerCase())) {
+                var isChecked = adminGuids.includes(user.guid) ? 'checked' : '';
+                var html = `
+                  <tr>
+                    <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
+                    <td style="text-align: center;"><input type="checkbox" id="${user.guid}" class="userCheckbox" ${isChecked}></td>
+                  </tr>
+                `;
+                document.getElementById("local-table").innerHTML += html;
+            }
         });
+    }
+    document.getElementById("iptSearch").addEventListener("input", function () {
+        updateTable(this.value);
+    });
+    updateTable("");
     }
 
     function makeDivLicense(t, user) {
@@ -587,6 +585,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
         tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelCfgPost"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelCfgDepartment"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "Tipo" + "?", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateStart"), null));
         tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostDateEnd"), null));
         tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostCreator"), null));
@@ -595,12 +595,20 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelPostEdit"), null));
 
         post.forEach(function (post) {
-            var users = list_tableUsers.filter(function (user) {
+            var users = tableUser.filter(function (user) {
                 return post.user_guid === user.guid;
             });
+
+            var departments = list_department.filter(function(dep){
+                return post.department == dep.id
+            })
+            console.log("dep" + JSON.stringify(departments))
             var starDate = new Date(post.date_start);
             var endDate = new Date(post.date_end);
             var now = new Date();
+
+            var dep_name = departments[0].name
+            var dep_color = departments[0].color
 
             var userName = users.length > 0 ? users[0].cn : '';
 
@@ -651,6 +659,8 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                       <tr>
                         <td style="text-transform: capitalize; text-align: center;">${post.id}</td>
                         <td style="background-color: ${post.color}; text-transform: capitalize; text-align: center;">${post.title}</td>
+                        <td style="background-color: ${dep_color}; text-transform: capitalize; text-align: center;">${dep_name}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${post.type}</td>
                         <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
                           <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
                         <td style="text-transform: capitalize; text-align: center;">${userName}</td>
@@ -738,11 +748,17 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div", "color:white;", texts.text("labelTypePost"), null))
         console.log('TIPO DO POST:', clickedPost.type)
 
-        var postType = clickedPost.type === "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+        var postType = clickedPost.type == "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+
 
         var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select", null, postType, "selectPublicPost").setAttribute("id", "selectTypePost"))
         publicPostSelect.add(new innovaphone.ui1.Node("option", null, texts.text("labelPublic"), null).setAttribute("id", "public"))
         publicPostSelect.add(new innovaphone.ui1.Node("option", null, texts.text("labelPrivate"), null).setAttribute("id", "private"))
+
+
+        var selectElement = document.getElementById("selectTypePost");
+        selectElement.value = postType;
+
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));

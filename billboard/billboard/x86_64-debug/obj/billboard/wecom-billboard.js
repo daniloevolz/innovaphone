@@ -690,7 +690,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
         
-        var postType = (post.type = "private") ? 'Tipo: ' + texts.text("labelPrivate") : 'Tipo: ' + texts.text("labelPublic")
+        var postType = (post.type == "private") ? 'Tipo: ' + texts.text("labelPrivate") : 'Tipo: ' + texts.text("labelPublic")
         var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
        
 
@@ -723,6 +723,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+
+        
         var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
         var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", 'background-color:#0f243f;', null, 'postmsg').setAttribute("id", "postmsg"));
         var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
@@ -810,6 +812,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var post = list_posts.filter(function (item) {
             return item.id === parseInt(id, 10);
         })[0];
+
         document.getElementById('insideDiv').remove();
 
         var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
@@ -850,6 +853,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
         var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        
+        var postType = post.type == "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+
+        var selectElement = document.getElementById("selectTypePost");
+        selectElement.value = postType;
+
         // Adicionando o listener de clique
         var s = document.getElementById('savemsg');
         s.addEventListener('click', function () {
