@@ -41,7 +41,8 @@ WebServer.onrequest("get-departments", function (req) {
         req.sendResponse();
     }
     if (req.method == "GET") {
-        var querySelect = "SELECT DISTINCT d.id, d.name, d.color FROM tbl_departments AS d INNER JOIN tbl_posts AS p ON d.id::VARCHAR = p.department WHERE d.deleted IS NULL AND p.deleted IS NULL AND p.type = 'public'"
+        var now = getDateNow();
+        var querySelect = "SELECT DISTINCT d.id, d.name, d.color FROM tbl_departments AS d INNER JOIN tbl_posts AS p ON d.id::VARCHAR = p.department WHERE d.deleted IS NULL AND p.deleted IS NULL AND p.type = 'public' AND p.date_start <= '" + now + "' AND date_end >= '" + now + "'";
         Database.exec(querySelect)
             .oncomplete(function (dataDepartments) {
                 log("SelectDepartments:result=" + JSON.stringify(dataDepartments, null, 4));
