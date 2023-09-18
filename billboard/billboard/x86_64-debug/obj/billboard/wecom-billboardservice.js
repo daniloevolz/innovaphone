@@ -919,7 +919,7 @@ function decrypt(key,hash) {
     
     // Esta dando erro aqui 
     return JSON.parse(decrypted);
- }
+}
 
 //Internal supporters functions
 function selectViewsHistory(sip, connOld) {

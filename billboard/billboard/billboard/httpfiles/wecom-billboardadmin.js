@@ -643,7 +643,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 var year = date.getFullYear();
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
-                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
             }
             if (post.date_end) {
                 var dateString = post.date_end;
@@ -653,19 +653,19 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 var year = date.getFullYear();
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
-                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
             }
             var html = `
                       <tr>
                         <td style="text-transform: capitalize; text-align: center;">${post.id}</td>
-                        <td style="background-color: ${post.color}; text-transform: capitalize; text-align: center;">${post.title}</td>
-                        <td style="background-color: ${dep_color}; text-transform: capitalize; text-align: center;">${dep_name}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${post.type}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
-                          <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${userName}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${statusPost}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${postDel}</td>
+                        <td style="background-color: ${post.color}; text-align: center;">${post.title}</td>
+                        <td style="background-color: ${dep_color}; text-align: center;">${dep_name}</td>
+                        <td style=" text-align: center;">${post.type}</td>
+                        <td style=" text-align: center;">${formattedDateStart}</td>
+                          <td style="text-align: center;">${formattedDateEnd}</td>
+                        <td style=" text-align: center;">${userName}</td>
+                        <td style=" text-align: center;">${statusPost}</td>
+                        <td style=" text-align: center;">${postDel}</td>
                         <td style="display: flex; justify-content: center; align-items: center;"><div id="${post.id}"  class="btnChgDpto" style="background-color: ${post.color};"></div></td>
                       </tr>
                     `;
