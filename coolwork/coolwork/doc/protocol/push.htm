@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - push app protocol</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>Push app protocol</h1>
+
+    <p>
+        The protocol described in this article is used between the push object in the PBX and an external push service.
+        It's purpose is to trigger push notifications for smartphone apps on events inside the PBX. Currently those are the following:
+        <ul>
+            <li>Incoming calls</li>
+            <li>Chats</li>
+            <li>Two-factor authorization requests</li>
+        </ul>
+        The PBX triggers pushes for a user only if one or more push tokens are stored in sessions at the corresponding user object that have a flag that matches the event.
+	</p>
+    <p>
+        innovaphone uses that mechanism to send push notifications from customer PBXes to the innovaphone push service (services.innovaphone.com). The push service triggers actual push notifications for myPBX and myApps for iOS and Android.
+        However the same mechanism can be used to integrate third-party smartphone apps that need to be notified about events in the PBX.
+    </p>
+    <p>
+        The protocol is based on <a href="../../doc/appwebsocket/AppWebsocket.htm">AppWebsocket</a>. The push object establishes an outgoing appwebsocket connection to the configured URL and authenticates using the configured password.
+        The push service needs to implement the server side of the appwebsocket protocol including authentication.
+        This document only describes the push specific messages that are exchanged after authentication.
+    </p>
+
+    <h1>Protocol messages</h1>
+
+    <h2><a name="PushNotifyPost">PushNotifyPost</a></h2>
+    Sends a push notification for a user identified by his or her push token.
+    <pre><code class="json">{
+    "mt": "PushNotifyPost",
+    "token": string
+}</code></pre>
+	<dl>
+        <dt>token</dt>
+        <dd>The push token of the user</dd>
+    </dl>
+    Note that we currently don't send any payload. In the future we might add an event type and detailed payload data.
+
+    <h2><a name="PushNotifyPostResult">PushNotifyPostResult</a></h2>
+    Answer from the push service to a <a href="#PushNotifyPost">PushNotifyPost</a> message.
+    <pre><code class="json">{
+    "mt": "PushNotifyPostResult",
+    "err": string,
+    "info": string
+}</code></pre>
+    <dl>
+        <dt>err</dt>
+        <dd>
+            An error string that is only present if an error occurred. This innovaphone push service currently defines the following errors.
+            <ul>
+                <li>UnknownApp</li>
+                <li>Malformed</li>
+                <li>Uninstalled</li>
+                <li>DatabaseErr</li>
+                <li>ApnError</li>
+                <li>ApnUnresolved</li>
+                <li>ApnShutdown</li>
+                <li>ApnSocketLost</li>
+                <li>ApnSocketError</li>
+                <li>ApnConnectFailed</li>
+                <li>ApnConnectReject</li>
+                <li>ApnTlsHandshake</li>
+                <li>ApnProcessingErr</li>
+                <li>ApnMissingToken</li>
+                <li>ApnMissingTopic</li>
+                <li>ApnMissingPayload</li>
+                <li>ApnTokenSize</li>
+                <li>ApnTopicSize</li>
+                <li>ApnPayloadSize</li>
+                <li>ApnInvalidToken</li>
+                <li>ApnProtocolErr</li>
+                <li>ApnServiceDown</li>
+                <li>GcmError</li>
+                <li>GcmUnresolved</li>
+                <li>GcmShutdown</li>
+                <li>GcmSocketLost</li>
+                <li>GcmSocketError</li>
+                <li>GcmConnectFailed</li>
+                <li>GcmReject</li>
+                <li>GcmTlsHandshake</li>
+                <li>GcmStreamBroken</li>
+                <li>GcmUnhandledErr</li>
+                <li>GcmHttpFailed</li>
+                <li>GcmBadRequest</li>
+                <li>GcmAuthentication</li>
+                <li>GcmNotFound</li>
+                <li>GcmServerError</li>
+                <li>GcmHttpError</li>
+                <li>GcmMissingReg</li>
+                <li>GcmInvalidReg</li>
+                <li>GcmNotRegistered</li>
+                <li>GcmPackageName</li>
+                <li>GcmSenderId</li>
+                <li>GcmMessageTooBig</li>
+                <li>GcmInvalidKeyword</li>
+                <li>GcmInvalidTtl</li>
+                <li>GcmTimeour</li>
+                <li>GcmDeviceRate</li>
+                <li>GcmTopicsRate</li>
+                <li>GcmApnCredential</li>
+            </ul>
+            Note that the error string is only for debugging purposes. The innovaphone PBX does not interpret the individual strings.
+        </dd>
+        <dt>info</dt>
+        <dd>Additional debugging information, not interpreted by the PBX.</dd>
+    </dl>
+
+    <h1>Protocol example</h1>
+
+    <h2>Login procedure</h2>
+<pre>
+    {"mt":"AppChallenge"}
+
+    {"mt":"AppChallengeResult","challenge":"577fb2b83962c53a"}
+
+    {"mt":"AppLogin","sip":"push","guid":"13192b1d681c5e013aa40050569751d2","dn":"Push","digest":"909a756af923bfe2cd1acfc32a41a816b62ed4c435f5c505e112491b3f6de7de","domain":"pbx.example.com/master","app":"ws","info":{"appobj":"push","appurl":"https://services.innovaphone.com/push/ws","cn":"Push","unlicensed":true}}
+
+    {"mt":"AppLoginResult","ok":true}
+</pre>
+
+    <h2>Push notification</h2>
+<pre>
+    {"mt":"PushNotifyPost","src":"5","token":"xxxxxxxxx"}
+
+    {"mt":"PushNotifyPostResult","src":"5"}
+</pre>
+</body>
+</html>

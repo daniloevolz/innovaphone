@@ -266,12 +266,12 @@ new JsonApi("user").onconnected(function (conn) {
                                     var msg = { api: "RCC", mt: "UserInitialize", cn: String(conn.dn), src: conn.sip + "," + info.pbx };
                                     rcc.send(JSON.stringify(msg));
 
-                                    if (sendCallEvents) {
-                                        log("danilo-req : connectionUser:login:sendCallEvents=true");
-                                        var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
+                                    //if (sendCallEvents) {
+                                    //    log("danilo-req : connectionUser:login:sendCallEvents=true");
+                                    //    var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
                                 
-                                        httpClient(urlPhoneApiEvents, msg);
-                                    }
+                                    //    httpClient(urlPhoneApiEvents, msg);
+                                    //}
 
                                 }else{
                                     log("danilo req : User Connection conn.sip:temp already exists " + temp);
@@ -1718,9 +1718,9 @@ function pbxTableRequest(value) {
 }
 //Function to send HTTP messages do Wecall
 function httpClient(url, call) {
-    log("danilo-req : httpClient");
+    log("danilo-req : httpClient url "+url);
     var responseData = "";
-    log("danilo-req : httpClient : content" +JSON.stringify(call));
+    log("danilo-req : httpClient : content " +JSON.stringify(call));
     var req = HttpClient.request("PUT", url);
 
     req.header("X-Token", "danilo");
@@ -1733,11 +1733,11 @@ function httpClient(url, call) {
         if (!last) req.recv();
     },1024);
     req.oncomplete(function (req, success) {
-        log("danilo-req : HttpRequest complete");
-        log("danilo-req : HttpRequest responseData "+ responseData);
+        log("danilo-req : httpClient HttpRequest complete");
+        log("danilo-req : httpClient HttpRequest responseData " + responseData);
     })
         .onerror(function (error) {
-            log("danilo-req : HttpRequest error=" + error);
+            log("danilo-req : httpClient HttpRequest error=" + error);
         });
 
 }
@@ -1781,20 +1781,24 @@ function getURLLogin(sip, session) {
 
         log("danilo req : getURLLogin url " + urlSSO);
         log("danilo req : getURLLogin msg " + JSON.stringify(msg));
-
         var responseData = "";
-        var reqLogin = HttpClient.request("POST", urlSSO);
-        reqLogin.header("X-Token", "danilo");
-        reqLogin.contentType("application/json");
-        reqLogin.contentLength(msg.length);
-        reqLogin.onsend(function (reqLogin) {
-            reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-        });
-        reqLogin.onrecv(function (reqLogin, data, last) {
+        //Teste 15/09
+        var req = HttpClient.request("POST", urlSSO)
+        .header("X", "Wecom")
+        .contentType("application/json")
+            .timeout(5000)
+            .send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true)
+        .onsend(function (req) {
+            req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+            log("danilo-req : getURLLogin send " + JSON.stringify(msg));
+        })
+        .onrecv(function (req, data, last) {
+            log("danilo-req : getURLLogin data " + data);
             responseData += new TextDecoder("utf-8").decode(data);
-            if (!last) reqLogin.recv();
-        }, 1024);
-        reqLogin.oncomplete(function (reqLogin, success) {
+            if (!last) req.recv();
+        }, 1024)
+        .oncomplete(function (reqs, success) {
+            log(success ? "POST getURLLogin OK" : "POST getURLLogin ERROR");
             log("danilo-req : getURLLogin complete");
             log("danilo-req : getURLLogin responseData " + responseData);
             try {
@@ -1808,8 +1812,8 @@ function getURLLogin(sip, session) {
                             var urlAlt = conn["url"];
                             log("danilo req : getLoginResponse sip " + conn.sip);
                             if (urlAlt != "") {
-                                url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
-                                urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
+                                url = url + "/home/desktop/startup/" + conn.sip + "/" + urlAlt;
+                                urlM = urlM + "/mobile/startup/cel/" + conn.sip + "/" + urlAlt;
                                 log("danilo req : UserMessage url " + url);
 
                             }
@@ -1828,7 +1832,12 @@ function getURLLogin(sip, session) {
 
                     }
                     foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                        
+                    if (sendCallEvents) {
+                        log("danilo-req : connectionUser:login:sendCallEvents=true");
+                        var msg = { User: sip, Grupo: "", Callinnumber: "", Status: "login" };
+                        httpClient(urlPhoneApiEvents, msg);
+                    }
+
                     // connectionsUser.forEach(function (conn) {
                     //     if (conn.sip == sip) {
                     //         var url = Config.url;
@@ -1847,7 +1856,7 @@ function getURLLogin(sip, session) {
                 log("danilo req : getLoginResponse Erro " + e);
                 var url = Config.url;
                 foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    
+
                 // connectionsUser.forEach(function (conn) {
                 //     if (conn.sip == sip) {
                 //         var url = Config.url;
@@ -1857,10 +1866,97 @@ function getURLLogin(sip, session) {
             }
         })
         .onerror(function (error) {
-            log("danilo-req : getURLLogin error=" + error);
-            var url = Config.url;
-            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-        });
+                log("danilo-req : getURLLogin error=" + error);
+                var url = Config.url;
+                foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+            });
+        //Teste 15/09
+
+
+
+
+        
+        //var reqLogin = HttpClient.request("POST", urlSSO);
+        //reqLogin.header("X-Token", "danilo");
+        //reqLogin.contentType("application/json");
+        //reqLogin.contentLength(msg.length);
+        //reqLogin.onsend(function (reqLogin) {
+        //    reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        //    log("danilo-req : getURLLogin onsend to wecall " + JSON.stringify(msg));
+
+        //});
+        //reqLogin.onrecv(function (reqLogin, data, last) {
+        //    log("danilo-req : getURLLogin data " + data);
+        //    responseData += new TextDecoder("utf-8").decode(data);
+        //    if (!last) reqLogin.recv();
+        //}, 1024);
+        //reqLogin.oncomplete(function (reqLogin, success) {
+        //    log("danilo-req : getURLLogin complete");
+        //    log("danilo-req : getURLLogin responseData " + responseData);
+        //    try {
+        //        var obj = JSON.parse(responseData);
+        //        if (obj.status == "success") {
+        //            connectionsUser.forEach(function (conn) {
+        //                if (conn.sip == sip) {
+        //                    conn["url"] = obj.token;
+        //                    var url = Config.url;
+        //                    var urlM = Config.url;
+        //                    var urlAlt = conn["url"];
+        //                    log("danilo req : getLoginResponse sip " + conn.sip);
+        //                    if (urlAlt != "") {
+        //                        url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
+        //                        urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
+        //                        log("danilo req : UserMessage url " + url);
+
+        //                    }
+        //                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
+        //                }
+        //            })
+
+        //        } else {
+        //            log("danilo req : getLoginResponse " + obj.msg);
+        //            var url = Config.url;
+        //            var urlAlt = "";
+        //            log("danilo req : getLoginResponse sip " + sip);
+        //            if (urlAlt != "") {
+        //                url = url + sip + "/" + urlAlt;
+        //                log("danilo req : UserMessage url " + url);
+
+        //            }
+        //            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                        
+        //            // connectionsUser.forEach(function (conn) {
+        //            //     if (conn.sip == sip) {
+        //            //         var url = Config.url;
+        //            //         var urlAlt = "";
+        //            //         log("danilo req : getLoginResponse sip " + conn.sip);
+        //            //         if (urlAlt != "") {
+        //            //             url = url + conn.sip + "/" + urlAlt;
+        //            //             log("danilo req : UserMessage url " + url);
+
+        //            //         }
+        //            //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //            //     }
+        //            // })
+        //        }
+        //    } catch (e) {
+        //        log("danilo req : getLoginResponse Erro " + e);
+        //        var url = Config.url;
+        //        foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    
+        //        // connectionsUser.forEach(function (conn) {
+        //        //     if (conn.sip == sip) {
+        //        //         var url = Config.url;
+        //        //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //        //     }
+        //        // })
+        //    }
+        //})
+        //.onerror(function (error) {
+        //    log("danilo-req : getURLLogin error=" + error);
+        //    var url = Config.url;
+        //    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //});
     } 
 }
 
@@ -1900,7 +1996,7 @@ function getQueueGroups() {
         }
         
     })
-        .onerror(function (error) {
+    req.onerror(function (error) {
             log("danilo-req : getGroups error=" + error);
         });
 
