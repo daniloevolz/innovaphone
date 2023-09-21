@@ -35,7 +35,7 @@
     <br/>
     <h2><a name="getting_started">Getting started</a></h2>
     <p>
-        To start developing apps using innovaphone SDK, we highly recommend to use Visual Studio 2017 or newer. While you can use what ever IDE or environment you want to use,
+        To start developing apps using innovaphone SDK, we highly recommend to use Visual Studio 2017 or 2019 (2022 is and will be not supported). The community edition is also supported. While you can use whatever IDE or environment you want to use,
         the benefit of using Visual Studio is our integration. The innovaphone SDK comes with a Visual Studio extension to integrate everything you need into the IDE. So managing
         connections to the PBX or the AppPlatform itself will be handled by the extension. It also offers a template which can be used as an example or as basis for your own app.<br/>
         <br/>
@@ -377,6 +377,9 @@
         <br/>
         Q: When I try to run the app, it take a long time trying to upload the binary and finally I get an error message.<br/>
         A: Make sure the AppPlatform is available. Also the <i>developer mode</i> must be enabled. To check this, open the AppPlatform Admin (using the innovaphone SDK menu in Visual Studio - the default password is pwd), go to Settings - General and check, if 'Enable developer mode' and 'Disable App security' are checked (note that 'Disable App security is only available, until 'Enable developer mode' has been enabled and the change had been saved).<br/>
+        <br/>
+        Q: While trying to add a new connection in the "Add App Platform connection" dialogue i get an error message: "innovaphone SDK - Add App Platform connection, Mismatched App Platform Type. You've entered an address for an App Platform of type x64. However, this operation requires an App Platform of type ARM. Please provide a valid address for the correct type of App Platform." <br/>
+        A: The architecture (ARM, ARM64, x86) of the App Platform that is being added does not match the architecture of solution platform selected for the debugging in the Visual Studio. Cancel the process of adding a new App Platform connection, set the SolutionS Platform according to the architecture of the App Platform that will be added (e.g. "x86" for Hyper-V/VMWare, "ARM" for IP811, "ARM64" for IP6013) and try to add the App Platform connection again.<br/>
         <br/>
         Q: I run the app, but in myApps on my developer PBX, the app is not available.<br/>
         A: Maybe the app is not connected to the PBX or not assigned to the PBX user you use for development. Open the PBX Admin (using the innovaphone SDK menu in Visual Studio), go to PBX - Objects and click on show. Click on the user you're using for development, select Apps and make sure, that the app you're want to use is selected. If not, click on OK (maybe you need to scroll down a little). Note: If you're opening the PBX Admin and there is the install UI, select on manual configuration and click on continue.<br/>

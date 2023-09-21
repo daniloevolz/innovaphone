@@ -20,6 +20,8 @@ endif
 
 ifeq ($(DEBUG), 1)
     CFLAGS += -g3 -O0 -DDEBUG
+#    CFLAGS += -fsanitize=address -fsanitize=leak
+#    LFLAGS += -fsanitize=address -fsanitize=leak -static-libasan
 else
     CFLAGS += -g -O3
 endif

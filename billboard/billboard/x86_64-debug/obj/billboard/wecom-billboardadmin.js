@@ -246,12 +246,18 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             });
         var a = document.getElementById("CfgUrl");
         a.addEventListener("click", function () {
-            console.log(appUrl) 
             var link = appUrl + '/Posts.htm';
-            console.log(link)
 
+            var popup =  `<div style="position:absolute; left:82%; width:15%; top:70%; font-size:12px; text-align:center;" id="popupbtn" class= "button-inn";>Ver Site</div>.`
+            
+            makePopup("Link da URK", link + popup, 800, 200);
+
+            var b = document.getElementById("popupbtn")
+            b.addEventListener("click", function () {
             window.open(link, '_blank');
+            removeEventListener("click", b);
             });
+        });
         _colDireita = colDireita;
     }
     function ChangeView(ex, colDireita) {
