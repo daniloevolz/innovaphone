@@ -93,6 +93,8 @@ new JsonApi("user").onconnected(function(conn) {
             var obj = JSON.parse(msg);
             if (obj.mt == "UserMessage") {
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
+            }if (obj.mt == "AttachHome") {
+                conn.send(JSON.stringify({ api:"user" ,mt: "SetAttachedToHome", reference: "coolwork-user", attached: false }));
             }
         });
     }

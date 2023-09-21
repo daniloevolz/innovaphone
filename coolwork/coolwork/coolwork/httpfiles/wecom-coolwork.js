@@ -215,6 +215,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         linkPrivate.setAttribute("href", file.url);
         linkPrivate.setAttribute("target", "_blank");
 
+        var iframetest = fileList.add(new innovaphone.ui1.Node("iframe","position:absolute; width: 50% ; height: 40%",null,null))
+        iframetest.setAttribute("src",file.url)
         // share file download link, avilable via URL
         var linkcontainerPublic = entry.add(new innovaphone.ui1.Div("", "", "public"));
         var linkPublic = linkcontainerPublic.add(new innovaphone.ui1.Node("a", "", "", "").addText("Public Link"));

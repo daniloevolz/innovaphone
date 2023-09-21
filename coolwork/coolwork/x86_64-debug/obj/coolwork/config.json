@@ -1,5 +1,4 @@
 {
-    "$schema": "runtime-config.schema.json",
     "database": {
         "init": [
             {

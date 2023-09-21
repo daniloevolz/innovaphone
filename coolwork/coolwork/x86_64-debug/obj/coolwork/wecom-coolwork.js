@@ -20,6 +20,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             "--text-standard": "#4a4a49",
         }
     };
+
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
     start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
 
@@ -32,6 +33,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     app.onmessage = app_message;
 
     var filesToUpload = [];
+
+    var btnSend = this.add(new innovaphone.ui1.Node("button","position:absolute;height: 50px; width: 50px","Enviar",null).addEvent("click",function(){
+        app.send({ api: "user", mt: "AttachHome" });
+        // { mt: "SetAttachedToHome", reference: "coolwork", attached: false }
+    }))
 
     var dialog = this.add(new innovaphone.ui1.Node("dialog", "", "", ""));
     dialog.add(new innovaphone.ui1.Node("span", "", "Processing...", ""));
