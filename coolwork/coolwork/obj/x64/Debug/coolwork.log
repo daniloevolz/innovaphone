@@ -1,0 +1,25 @@
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/coolwork" -temp "x86_64-debug/obj/" -project "coolwork" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-coolworkservice.js," -copyRTM 1
+  Building project ...
+      Project output dirctory : x86_64-debug/coolwork
+      Temp directory          : x86_64-debug\obj\coolwork
+      Runtime binary          : jse/x86_64/generic
+      Build Number            : 13C134
+  
+  Removing old files from x86_64-debug\obj\coolwork...
+  Creating directories...
+  Checking for new items to add...
+      .\coolwork\..\web1\appwebsocket\innovaphone.appwebsocket.Connection.js => x86_64-debug\obj\coolwork\web1\appwebsocket
+      .\coolwork\..\web1\lib1\*.js => x86_64-debug\obj\coolwork\web1\lib1
+      .\coolwork\..\web1\lib1\*.css => x86_64-debug\obj\coolwork\web1\lib1
+      .\coolwork\..\web1\ui1.lib\*.js => x86_64-debug\obj\coolwork\web1\ui1.lib
+      .\coolwork\..\web1\ui1.svg\*.js => x86_64-debug\obj\coolwork\web1\ui1.svg
+      .\coolwork\..\web1\fonts\*.ttf => x86_64-debug\obj\coolwork\web1\fonts
+      .\coolwork\httpfiles\* => x86_64-debug\obj\coolwork
+      .\coolwork\build.txt => x86_64-debug\obj\coolwork
+      .\coolwork\label.txt => x86_64-debug\obj\coolwork
+      .\coolwork\config.json => x86_64-debug\obj\coolwork
+      .\coolwork\plugins.json => x86_64-debug\obj\coolwork
+      .\coolwork\wecom-coolworkservice.js => x86_64-debug\obj\coolwork
+  
+  Compressing files to x86_64-debug\coolwork\httpfiles.zip...
+  Comando de build remoto não configurado, ignorando.

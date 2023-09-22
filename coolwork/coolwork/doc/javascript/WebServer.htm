@@ -130,7 +130,7 @@
     <a name="url"><div class="fnhead" style="margin-top:5px">url</div></a>
     <dd>
         A string containing the absolute base URL that can be used to access the web server.
-        The app service learns the URL from the incoming websocket connection from the app object on the PBX. So it only contains a valid URL, if the "Websocket" checkmark is set on the app object and the connection is up.
+        The app service learns the URL from the incoming WebSocket connection from the app object on the PBX. So it only contains a valid URL, if the "Websocket" checkmark is set on the app object and the connection is up.
         Otherwise <a href="#url">url</a> will point to localhost. Use <a href="#onurlchanged">onurlchanged</a> to get notified when the actual URL is available after the app service is started.
     </dd>
 
@@ -179,7 +179,7 @@ WebServer.onurlchanged(function(newUrl) {
 
     <a name="onwebsocket"><div class="fnhead" style="margin-top:5px">onwebsocket</div></a>
     <dd>
-        Registers a relative URI on the web server and a callback function that is invoked on incoming websocket connections on that URI.
+        Registers a relative URI on the web server and a callback function that is invoked on incoming WebSocket connections on that URI.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">string <b>relativeUri</b></td><td>A URL relative to WebServer.url. Do not prepend "/", "./".</td></tr>
@@ -423,7 +423,8 @@ req.onrecv(function(req, data) {
         or <a href="#responseFileName">responseFileName</a>.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">uint <b>code</b></td><td>Optional. The HTTP response code to be sent to the client. Defaulting to 200, if not specified. Supported values are <ul><li>200</li><li>201</li><li>204</li><li>207</li><li>403</li><li>405</li><li>409</li><li>412</li><li>423</li><li>502</li><li>507</li></ul>.</td></tr>
+            <tr><td class="param">uint <b>code</b></td><td>Optional. The HTTP response code to be sent to the client. Defaulting to 200, if not specified. Supported values are 100-999.</td></tr>
+            <tr><td class="param">string <b>text</b></td><td>Optional. The HTTP response text to be sent to the client. Defaulting to the standard value for the given code.</td></tr>
         </table>
         <h4>Return value</h4>
         <table style="margin-left:-12px">
@@ -432,6 +433,9 @@ req.onrecv(function(req, data) {
     </dd>
     <dd>
         <pre><code class="JS">req.sendResponse(200);</code></pre>
+    </dd>
+    <dd>
+        <pre><code class="JS">req.sendResponse(418, "I'm a teapot");</code></pre>
     </dd>
 
     <a name="responseHeader"><div class="fnhead" style="margin-top:5px">responseHeader</div></a>
@@ -580,11 +584,11 @@ req.onrecv(function(req, data) {
     </dd>
 
     <h2><a name="WebServerWebsocket">WebServerWebsocket</a></h2>
-    The WebServerWebsocket object is passed to the application with the onmessage callback and can be used to handle incoming Websocket connections.
+    The WebServerWebsocket object is passed to the application with the onmessage callback and can be used to handle incoming WebSocket connections.
 
     <a name="ws-host"><div class="fnhead" style="margin-top:5px">host</div></a>
     <dd>
-        The host name that came in the header fields of the Websocket connection.
+        The host name that came in the header fields of the WebSocket connection.
     </dd>
 
     <a name="ws-relativeUri"><div class="fnhead" style="margin-top:5px">relativeUri</div></a>
@@ -615,7 +619,7 @@ req.onrecv(function(req, data) {
         Sends a websocket message.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">string/Uint8Array <b>message</b></td><td>The message to be sent. If a string is given, a Websocket text message will be sent. If a Uint8Array is given, a Websocket binary message will be sent.</td></tr>
+            <tr><td class="param">string/Uint8Array <b>message</b></td><td>The message to be sent. If a string is given, a WebSocket text message will be sent. If a Uint8Array is given, a WebSocket binary message will be sent.</td></tr>
         </table>
         <h4>Return value</h4>
         <table style="margin-left:-12px">
@@ -631,7 +635,7 @@ req.onrecv(function(req, data) {
 
     <a name="ws-onmessage"><div class="fnhead" style="margin-top:5px">onmessage</div></a>
     <dd>
-        Sets a callback function that is invoked when a websocket message is received.
+        Sets a callback function that is invoked when a WebSocket message is received.
         Optional.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -658,7 +662,7 @@ req.onrecv(function(req, data) {
 
     <a name="ws-onclose"><div class="fnhead" style="margin-top:5px">onclose</div></a>
     <dd>
-        Sets a callback function that is invoked when the Websocket connection is closed.
+        Sets a callback function that is invoked when the WebSocket connection is closed.
         Optional.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -677,7 +681,7 @@ req.onrecv(function(req, data) {
 
     <a name="ws-onerror"><div class="fnhead" style="margin-top:5px">onerror</div></a>
     <dd>
-        Sets a callback function that is invoked when an error on the Websocket connection occurred.
+        Sets a callback function that is invoked when an error on the WebSocket connection occurred.
         Optional.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -696,7 +700,7 @@ req.onrecv(function(req, data) {
 
     <a name="ws-setFlowControl"><div class="fnhead" style="margin-top:5px">setFlowControl</div></a>
     <dd>
-        Enables flow control for the Websocket connection. That means that after receiving a message with the <a href="#ws-onmessage">onmessage</a> callback, the <a href="#WebServerWebsocket">WebServerWebsocket</a>
+        Enables flow control for the WebSocket connection. That means that after receiving a message with the <a href="#ws-onmessage">onmessage</a> callback, the <a href="#WebServerWebsocket">WebServerWebsocket</a>
         waits for the application to call <a href="ws-messageComplete">messageComplete</a> before receiving more messages.
         Optional.
         <h4>Parameters</h4>
@@ -722,7 +726,7 @@ req.onrecv(function(req, data) {
 
     <a name="ws-messageComplete"><div class="fnhead" style="margin-top:5px">messageComplete</div></a>
     <dd>
-        Tells the library to receive the next websocket message.
+        Tells the library to receive the next WebSocket message.
         See <a href="#setFlowControl">setFlowControl</a> for details.
         <h4>Return value</h4>
         <table style="margin-left:-12px">
