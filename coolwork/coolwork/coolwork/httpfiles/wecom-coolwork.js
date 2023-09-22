@@ -86,8 +86,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         // console.log("domain" + dnz)
         // console.log( "foto usuario" + UsersPictures)
         obj.forEach(function (phone) {
-            var UsersPictures = avatar.url(obj.sip ,80)
-            console.log("SIP DO CARA" + obj.sip)
+            var UsersPictures = avatar.url(phone.sip ,80)
+            console.log("SIP DO CARA" + phone.sip)
             var phoneHTML = `
             <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwId}">
             <img src ="${UsersPictures}">
