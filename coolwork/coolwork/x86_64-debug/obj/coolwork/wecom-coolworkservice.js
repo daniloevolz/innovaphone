@@ -1,3 +1,4 @@
+﻿
 function pbxTableRequest(value) {
     //var value = {sip:"danilo.volz", hw:"00556a524",mode:"Login/Logout"}
     log("danilo-req pbxTableRequest:value " + String(obj.sip));
@@ -100,13 +101,47 @@ function pbxTableRequest(value) {
     }
 }
 
+function filterObjectsByDevice(objects, mac) {
+    var filteredObjects = [];
+
+    for (var i = 0; i < objects.length; i++) {
+        var object = objects[i];
+        var devices = object.columns.devices;
+
+        for (var j = 0; j < devices.length; j++) {
+            if (devices[j].hw == mac) {
+                filteredObjects.push(object);
+                log("filterObjectsByDevice: filteredObjects " + JSON.stringify(filteredObjects));
+                return filteredObjects; 
+            }
+        }
+    }
+
+    return filteredObjects;
+}
 
 new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-coolwork") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
-            if (obj.mt == "UserMessage") {
-                conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
+            if (obj.mt == "PhoneList") {
+
+                var devices = [];
+                devices = obj.devices;
+                log("PhoneList: devices " + JSON.stringify(devices));
+                devices.forEach(function (dev) {
+                    log("PhoneList: dev" + JSON.stringify(dev))
+                    var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
+                    log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
+                    if (filteredObject.length > 0) {
+                        log("PhoneList: filteredObject>0")
+                        dev.sip = filteredObject[0].columns.h323;
+                        dev.cn = filteredObject[0].columns.cn;
+                        dev.guid = filteredObject[0].columns.guid;
+                    }
+                })
+                log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
+                conn.send(JSON.stringify({ api: "user", mt: "PhoneListResult", result: devices, src: obj.src }));
             }
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }

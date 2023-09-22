@@ -31,13 +31,33 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     app.onconnected = app_connected;
     app.onmessage = app_message;
 
+    
     function app_connected(domain, user, dn, appdomain) {
+
+        var devicesApi = start.consumeApi("com.innovaphone.devices");
+        devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
+        devicesApi.send({ mt: "GetPhones" });
         
     }
 
+    function devicesApi_onmessage(conn, obj) {
+        console.log("devicesApi_onmessage: " + JSON.stringify(obj));
+        if (obj.msg.mt == "GetPhonesResult") {
+            var devices = obj.msg.phones;
+            console.log("devicesApi_onmessage:GetPhonesResult " + JSON.stringify(devices));
+            app.send({api:"user", mt:"PhoneList", devices: devices})
+        }
+        
+    }
+
+    function populateGridPhones(obj) {
+        console.log("populateGridPhones:GetPhonesResult " + JSON.stringify(obj));
+    }
+
     function app_message(obj) {
-        if (obj.api === "user" && obj.mt === "UserMessageResult") {
+        if (obj.api === "user" && obj.mt === "PhoneListResult") {
             // placeholder for JsonApi handling
+            console.log("app_message:PhoneListResult " + JSON.stringify(obj));
         }
     }
     var divmain = that.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null))
