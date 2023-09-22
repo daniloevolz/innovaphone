@@ -24,7 +24,20 @@ div.button1 {
     text-align:center;
     cursor:pointer;
 }
-
+.StatusPhonetrue{
+    background-color: green;
+}
+.StatusPhonefalse{
+    background-color: red;
+}
+.phoneButtons {
+    height: 60px;
+    text-align: center;
+    width: 150px;
+    /* align-items: center; */
+    /* display: flex; */
+    justify-content: center;
+}
 div.button {
     box-sizing: border-box;
     width: fit-content;

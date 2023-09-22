@@ -7,6 +7,9 @@ var Wecom = Wecom || {};
 Wecom.coolwork = Wecom.coolwork || function (start, args) {
     this.createNode("body");
     var that = this;
+    var phone_list = [];
+    var avatar = start.consumeApi("com.innovaphone.avatar");
+    var dnz; 
 
     var colorSchemes = {
         dark: {
@@ -33,7 +36,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     
     function app_connected(domain, user, dn, appdomain) {
-
+        dnz = domain
         var devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" });
@@ -57,10 +60,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function app_message(obj) {
         if (obj.api === "user" && obj.mt === "PhoneListResult") {
             // placeholder for JsonApi handling
-            console.log("app_message:PhoneListResult " + JSON.stringify(obj));
+            console.log("app_message:PhoneListResult " + JSON.stringify(obj.result));
+            phone_list = obj.result
+            makePhoneButtons(phone_list)
         }
+
     }
-    var divmain = that.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null))
+
+    var divmain = that.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","mainDiv"))
     divmain.add(new innovaphone.ui1.Node("span", "", "MAC do Telefone:", ""));
 
     var inputHW = divmain.add(new innovaphone.ui1.Node("input", "", "", ""));
@@ -72,6 +79,27 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var logoutButton = divmain.add(new innovaphone.ui1.Div(null, null, "button")
         .addText("Logout")
         .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: inputHW.value });}, logoutButton));
+
+    function makePhoneButtons(obj){
+
+        avatar = new innovaphone.Avatar(start, obj.sip, dnz);
+        // console.log("domain" + dnz)
+        // console.log( "foto usuario" + UsersPictures)
+        obj.forEach(function (phone) {
+            var UsersPictures = avatar.url(obj.sip ,80)
+            console.log("SIP DO CARA" + obj.sip)
+            var phoneHTML = `
+            <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwId}">
+            <img src ="${UsersPictures}">
+            <div>${phone.cn}</div>
+            <span style = "font-weight:bold" >${phone.product}</span>
+            </div>
+            `;
+            console.log("work");
+            document.getElementById("mainDiv").innerHTML += phoneHTML;
+        });
+    }
+   
 
 }
 
