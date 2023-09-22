@@ -20,7 +20,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             "--text-standard": "#4a4a49",
         }
     };
-
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
     start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
 
@@ -33,11 +32,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     app.onmessage = app_message;
 
     var filesToUpload = [];
-
-    var btnSend = this.add(new innovaphone.ui1.Node("button","position:absolute;height: 50px; width: 50px","Enviar",null).addEvent("click",function(){
-        app.send({ api: "user", mt: "AttachHome" });
-        // { mt: "SetAttachedToHome", reference: "coolwork", attached: false }
-    }))
 
     var dialog = this.add(new innovaphone.ui1.Node("dialog", "", "", ""));
     dialog.add(new innovaphone.ui1.Node("span", "", "Processing...", ""));
@@ -93,6 +87,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var fileList = this.add(new innovaphone.ui1.Div("", "", "filelist"));
 
     var folder = null;
+
+
+    this.add(new innovaphone.ui1.Node("span", "", "MAC do Telefone:", ""));
+
+    var inputHW = this.add(new innovaphone.ui1.Node("input", "", "", ""));
+    inputHW.setAttribute("id", "hwinput").setAttribute("type", "text");
+
+    var loginButton = this.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Login")
+        .addEvent("click", function () { app.send({ api: "user", mt: "LoginPhone", hw: inputHW.value }); }, loginButton));
+    var logoutButton = this.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Logout")
+        .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: inputHW.value });}, logoutButton));
 
     function app_connected(domain, user, dn, appdomain) {
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" } }, folderAdded);
@@ -221,6 +228,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         linkPrivate.setAttribute("href", file.url);
         linkPrivate.setAttribute("target", "_blank");
 
+        var iframetest = fileList.add(new innovaphone.ui1.Node("iframe","position:absolute; width: 50% ; height: 40%",null,null))
+        iframetest.setAttribute("src",file.url)
         // share file download link, avilable via URL
         var linkcontainerPublic = entry.add(new innovaphone.ui1.Div("", "", "public"));
         var linkPublic = linkcontainerPublic.add(new innovaphone.ui1.Node("a", "", "", "").addText("Public Link"));

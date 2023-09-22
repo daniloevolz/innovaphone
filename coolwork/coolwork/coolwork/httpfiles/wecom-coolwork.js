@@ -88,6 +88,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     var folder = null;
 
+
+    this.add(new innovaphone.ui1.Node("span", "", "MAC do Telefone:", ""));
+
+    var inputHW = this.add(new innovaphone.ui1.Node("input", "", "", ""));
+    inputHW.setAttribute("id", "hwinput").setAttribute("type", "text");
+
+    var loginButton = this.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Login")
+        .addEvent("click", function () { app.send({ api: "user", mt: "LoginPhone", hw: inputHW.value }); }, loginButton));
+    var logoutButton = this.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Logout")
+        .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: inputHW.value });}, logoutButton));
+
     function app_connected(domain, user, dn, appdomain) {
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" } }, folderAdded);
     }
