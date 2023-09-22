@@ -3,7 +3,7 @@
       Project output dirctory : arm64-debug/wecall
       Temp directory          : arm64-debug\obj\wecall
       Runtime binary          : jse/arm64/generic
-      Build Number            : 13B795
+      Build Number            : 13B804
   
   Removing old files from arm64-debug\obj\wecall...
   Creating directories...

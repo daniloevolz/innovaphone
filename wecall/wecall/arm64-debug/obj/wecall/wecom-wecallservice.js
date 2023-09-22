@@ -187,6 +187,8 @@ if (license != null && license.System == true) {
             req.cancel();
         }
     });
+
+
     var msg = { user: "", client: "" };
     httpClient(urlGetGroups, "POST", msg, function(responseData) {
 
@@ -203,46 +205,7 @@ if (license != null && license.System == true) {
         } catch (e) {
             log("danilo req : getGroupsResponse Erro" + e);
         }
-
-        //var msg = { user: "", client: "" };
-        //log("danilo req : getGroups url" + urlGetGroups);
-        //log("danilo req : getGroups msg" + JSON.stringify(msg));
-
-        //var responseData = "";
-        //var req = HttpClient.request("POST", urlGetGroups);
-        //req.header("X-Token", "danilo");
-        //req.contentType("application/json");
-        //req.onsend(function (req) {
-        //    req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-        //});
-        //req.onrecv(function (req, data, last) {
-        //    responseData += new TextDecoder("utf-8").decode(data);
-        //    if (!last) req.recv();
-        //}, 1024);
-        //req.oncomplete(function (req, success) {
-        //    log("danilo-req : getGroups complete");
-        //    log("danilo-req : getGroups responseData " + responseData);
-        //    try {
-        //        var obj = JSON.parse(responseData);
-        //        if (obj.status == "success") {
-        //            //Atualiza connections 
-        //            queues = JSON.parse(obj.msg)
-        //            initializeQueues(queues);
-
-        //        } else {
-        //            log("danilo req : getGroupsResponse " + obj.msg);
-        //        }
-        //    } catch (e) {
-        //        log("danilo req : getGroupsResponse Erro" + e);
-        //    }
-
-        //})
-        //req.onerror(function (error) {
-        //        log("danilo-req : getGroups error=" + error);
-        //    });
-
     });
-    //getQueueGroups();
 }
 
 //JSON APIS
@@ -724,81 +687,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.splice(pbxTable.indexOf(conn), 1);
     });
 });
-//new PbxApi("PbxSignal").onconnected(function (conn) {
-//    log("PbxSignal: connected conn " + JSON.stringify(conn));
-    
-//    // for each PBX API connection an own call array is maintained
-//    PbxSignal.push(conn);
-//    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
 
-//    // register to the PBX in order to acceppt incoming presence calls
-//    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" ,"src": conn.pbx}));
-
-//    conn.onmessage(function (msg) {
-//        var obj = JSON.parse(msg);
-//        log(msg);
-
-//        if (obj.mt === "RegisterResult") {
-//            log("PBXSignal: registration result " + JSON.stringify(obj));
-//        }
-
-//        // handle incoming presence_subscribe call setup messages
-//        // the callid "obj.call" required later for sending badge notifications
-//        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
-
-//            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
-
-//            // connect call
-//            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
-
-//            //Update signals
-//            var src = obj.src;
-//            var myArray = src.split(",");
-//            var pbx = myArray[0];
-//            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-//            PbxSignal.forEach(function (signal) {
-//                if (signal.pbx == pbx) {
-//                    signal[obj.sig.cg.sip] = obj.call;
-//                }
-//            })
-//            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
-//            var name = "";
-//            var myArray = obj.sig.fty;
-//            myArray.forEach(function (fty) {
-//                if (fty.name) {
-//                    name = fty.name;
-//                }
-//            })
-            
-//            // send notification with badge count first time the user has connected
-//            updateBadge(conn, obj.call, count);
-//        }
-
-//        // handle incoming call release messages
-//        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-//            //Remove signals
-//            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-//            var src = obj.src;
-//            var myArray = src.split(",");
-//            var sip = "";
-//            var pbx = myArray[0];
-//            PbxSignal.forEach(function (signal) {
-//                if (signal.pbx == pbx) {
-//                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-//                    delete signal[sip];
-                    
-//                }
-//            })
-//            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
-//        }
-//    });
-
-//    conn.onclose(function () {
-//        log("PbxSignal: disconnected");
-//        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
-//        //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
-//    });
-//});
 
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
@@ -1535,93 +1424,6 @@ function rccRequest(value) {
         })
     }
 }
-/*
-function callRCC(ws, user, mode, num, src) {
-    var myArray = src.split(",");
-    var sip = myArray[0];
-    var pbx = myArray[1];
-
-    var userT = pbxTableUsers.filter(function (userT) { return userT.columns.h323 === sip });
-    var userC = connectionsUser.filter(function (userC) { return userC.sip === sip });
-    if (mode == "UserInitialize") {
-        var msg = { api: "RCC", mt: "UserInitialize", cn: user, src: src };
-        ws.send(JSON.stringify(msg));
-    }
-    else if (mode == "Device") {
-        var msg = { api: "RCC", mt: "Devices", cn: user, src: src };
-        ws.send(JSON.stringify(msg));
-    }
-    else if (mode == "UserCall") {
-        log("danilo-req UserCall:sip " + sip);
-        //var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, src: src };
-        //log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
-        //ws.send(JSON.stringify(msg));
-        var msg = { api: "user", mt: "MakeCall", num: num, src: sip };
-        userC[0].send(JSON.stringify(msg));
-    }
-    else if (mode == "UserClear") {
-        calls.forEach(function (call) {
-            log("danilo-req UserClear:sip " + sip);
-            log("danilo-req UserClear:call " + JSON.stringify(call));
-            log("danilo-req UserClear:call.callid " + JSON.stringify(call.callid));
-            log("danilo-req UserClear:call.sip " + JSON.stringify(call.sip));
-            if (call.sip == sip) {
-
-                //var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
-                //log("danilo req callRCC: UserClear sent rcc msg " + JSON.stringify(msg));
-                //ws.send(JSON.stringify(msg));
-                var msg = { api: "user", mt: "DisconnectCall", src: sip };
-                userC[0].send(JSON.stringify(msg));
-            }
-            
-
-        })
-    }
-    else if (mode == "UserHold") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserHold", call: call.callid, remote: true, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserRetrieve") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                //var msg = { api: "RCC", mt: "UserRetrieve", hw: userC[0].hw, call: call.callid, src: call.sip };
-                var msg = { api: "RCC", mt: "UserRetrieve", call: call.callid, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserRedirect") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserRedirect",  call: call.callid, e164: num, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserConnect") {
-        calls.forEach(function (call) {
-            log("danilo-req UserConnect:sip " + sip);
-            log("danilo-req UserConnect:call " + JSON.stringify(call));
-            log("danilo-req UserConnect:call.callid " + JSON.stringify(call.callid));
-            log("danilo-req UserConnect:call.sip " + JSON.stringify(call.sip));
-            if (call.sip == sip) {
-                //var msg = { api: "user", mt: "UserConnect", call: call.callid, src: call.sip };
-                //ws.send(JSON.stringify(msg));
-                var msg = { api: "user", mt: "ConnectCall", call: call.callid, src: call.sip };
-                userC[0].send(JSON.stringify(msg));
-            }
-
-        })
-    }
-}
-*/
 //Function called by WebServer.onrequest("pbxTable")
 function pbxTableRequest(value) {
     log("danilo-req pbxTableRequest:value " + String(value));
@@ -1820,44 +1622,34 @@ function executeNextRequest() {
 
 function httpClient(url, method, msg, callback) {
     log("danilo-req : httpClient msg "+JSON.stringify(msg));
-    // Adiciona a requisição à fila
-    //httpRequestQueue.push({ url: url, method: method, msg: msg, callback: callback });
-    // Verifica se uma requisição está em andamento ou não
-    //if (!httpBusy) {
-    //    log("danilo-req : httpClient httpBusy is false calling executeNextRequest ");
-    //    executeNextRequest();  // Inicia a próxima requisição
-    //}
     var responseData = "";
     log("danilo-req : httpClient url " + url);
-    var client = HttpClient.request(method, url);
-    client.header("X-Token", "danilo");
-    //client.timeout(3000);
-    client.contentType("application/json");
-    client.onsend(function (req) {
+    HttpClient.request(method, url)
+    .header("X", "Wecom")
+    .contentType("application/json")
+    .onsend(function (req) {
         req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-    });
-    client.onrecv(function (req, data, last) {
+    })
+    .onrecv(function (req, data, last) {
         log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
         responseData += new TextDecoder("utf-8").decode(data);
         if (!last) req.recv();
-    }, 1024);
-    client.oncomplete(function (req, success) {
-        client.close();
-        //httpBusy = false;  // Libera para uso
-        log("danilo-req : httpClient HttpRequest complete " + JSON.stringify(req));
-        log("danilo-req : httpClient HttpRequest responseData " + responseData);
-        if (callback) {
-            callback(responseData);
+    }, 1024)
+    .oncomplete(function (req, success) {
+        log(success ? url+" httpClient OK" : url+" httpClient ERROR");
+        if (success) {
+            log("danilo-req : httpClient HttpRequest complete " + JSON.stringify(req));
+            log("danilo-req : httpClient HttpRequest responseData " + responseData);
+            if (callback) {
+                callback(responseData);
+            }
         }
-        //executeNextRequest();  // Chama a próxima requisição na fila
-    });
-    client.onerror(function (error) {
-            //httpBusy = false;  // Libera para uso
+    })
+    .onerror(function (error) {
             log("danilo-req : httpClient HttpRequest error=" + error);
             if (callback) {
                 callback();
             }
-            //executeNextRequest();  // Chama a próxima requisição na fila
         });
 }
 
@@ -1900,86 +1692,21 @@ function getURLLogin(sip, session) {
 
         log("danilo req : getURLLogin url " + urlSSO);
         log("danilo req : getURLLogin msg " + JSON.stringify(msg));
-        /*
-        httpClient(urlSSO, "POST", msg, function(responseData) {
-            try {
-                var obj = JSON.parse(responseData);
-                if (obj.status == "success") {
-                    connectionsUser.forEach(function (conn) {
-                        if (conn.sip == sip) {
-                            conn["url"] = obj.token;
-                            var url = Config.url;
-                            var urlM = Config.url;
-                            var urlAlt = conn["url"];
-                            log("danilo req : getLoginResponse sip " + conn.sip);
-                            if (urlAlt != "") {
-                                url = url + "/home/desktop/startup/" + conn.sip + "/" + urlAlt;
-                                urlM = urlM + "/mobile/startup/cel/" + conn.sip + "/" + urlAlt;
-                                log("danilo req : UserMessage url " + url);
-
-                            }
-                            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
-                        }
-                    })
-
-                } else {
-                    log("danilo req : getLoginResponse " + obj.msg);
-                    var url = Config.url;
-                    var urlAlt = "";
-                    log("danilo req : getLoginResponse sip " + sip);
-                    if (urlAlt != "") {
-                        url = url + sip + "/" + urlAlt;
-                        log("danilo req : UserMessage url " + url);
-
-                    }
-                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-
-
-                    // connectionsUser.forEach(function (conn) {
-                    //     if (conn.sip == sip) {
-                    //         var url = Config.url;
-                    //         var urlAlt = "";
-                    //         log("danilo req : getLoginResponse sip " + conn.sip);
-                    //         if (urlAlt != "") {
-                    //             url = url + conn.sip + "/" + urlAlt;
-                    //             log("danilo req : UserMessage url " + url);
-
-                    //         }
-                    //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    //     }
-                    // })
-                }
-            } catch (e) {
-                log("danilo req : getLoginResponse Erro " + e);
-                var url = Config.url;
-                foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-
-                // connectionsUser.forEach(function (conn) {
-                //     if (conn.sip == sip) {
-                //         var url = Config.url;
-                //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                //     }
-                // })
-            }
-
-        });
-
-        */
         var responseData = "";
         //Teste 15/09
-        var req1 = HttpClient.request("POST", urlSSO);
-        req1.header("X", "Wecom");
-        req1.contentType("application/json");
-        req1.onsend(function (req2) {
-            req2.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        HttpClient.request("POST", urlSSO)
+        .header("X", "Wecom")
+        .contentType("application/json")
+        .onsend(function (req) {
+            req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
             log("danilo-req : getURLLogin send " + JSON.stringify(msg));
-        });
-        req1.onrecv(function (req3, data, last) {
+        })
+        .onrecv(function (req, data, last) {
             log("danilo-req : getURLLogin data " + data);
             responseData += new TextDecoder("utf-8").decode(data);
-            if (!last) req3.recv();
-        }, 1024);
-        req1.oncomplete(function (req4, success) {
+            if (!last) req.recv();
+        }, 1024)
+        .oncomplete(function (req, success) {
             log(success ? "POST getURLLogin OK" : "POST getURLLogin ERROR");
             log("danilo-req : getURLLogin complete");
             log("danilo-req : getURLLogin responseData " + responseData);
@@ -2014,127 +1741,19 @@ function getURLLogin(sip, session) {
 
                     }
                     foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    
-
-                    // connectionsUser.forEach(function (conn) {
-                    //     if (conn.sip == sip) {
-                    //         var url = Config.url;
-                    //         var urlAlt = "";
-                    //         log("danilo req : getLoginResponse sip " + conn.sip);
-                    //         if (urlAlt != "") {
-                    //             url = url + conn.sip + "/" + urlAlt;
-                    //             log("danilo req : UserMessage url " + url);
-
-                    //         }
-                    //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    //     }
-                    // })
                 }
             } catch (e) {
                 log("danilo req : getLoginResponse Erro " + e);
                 var url = Config.url;
                 foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-
-                // connectionsUser.forEach(function (conn) {
-                //     if (conn.sip == sip) {
-                //         var url = Config.url;
-                //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                //     }
-                // })
             }
-        });
-        req1.onerror(function (error) {
+        })
+        .onerror(function (error) {
                 log("danilo-req : getURLLogin error=" + error);
                 var url = Config.url;
                 foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
             });
         //Teste 15/09
-
-
-
-
-        
-        //var reqLogin = HttpClient.request("POST", urlSSO);
-        //reqLogin.header("X-Token", "danilo");
-        //reqLogin.contentType("application/json");
-        //reqLogin.contentLength(msg.length);
-        //reqLogin.onsend(function (reqLogin) {
-        //    reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-        //    log("danilo-req : getURLLogin onsend to wecall " + JSON.stringify(msg));
-
-        //});
-        //reqLogin.onrecv(function (reqLogin, data, last) {
-        //    log("danilo-req : getURLLogin data " + data);
-        //    responseData += new TextDecoder("utf-8").decode(data);
-        //    if (!last) reqLogin.recv();
-        //}, 1024);
-        //reqLogin.oncomplete(function (reqLogin, success) {
-        //    log("danilo-req : getURLLogin complete");
-        //    log("danilo-req : getURLLogin responseData " + responseData);
-        //    try {
-        //        var obj = JSON.parse(responseData);
-        //        if (obj.status == "success") {
-        //            connectionsUser.forEach(function (conn) {
-        //                if (conn.sip == sip) {
-        //                    conn["url"] = obj.token;
-        //                    var url = Config.url;
-        //                    var urlM = Config.url;
-        //                    var urlAlt = conn["url"];
-        //                    log("danilo req : getLoginResponse sip " + conn.sip);
-        //                    if (urlAlt != "") {
-        //                        url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
-        //                        urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
-        //                        log("danilo req : UserMessage url " + url);
-
-        //                    }
-        //                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
-        //                }
-        //            })
-
-        //        } else {
-        //            log("danilo req : getLoginResponse " + obj.msg);
-        //            var url = Config.url;
-        //            var urlAlt = "";
-        //            log("danilo req : getLoginResponse sip " + sip);
-        //            if (urlAlt != "") {
-        //                url = url + sip + "/" + urlAlt;
-        //                log("danilo req : UserMessage url " + url);
-
-        //            }
-        //            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                        
-        //            // connectionsUser.forEach(function (conn) {
-        //            //     if (conn.sip == sip) {
-        //            //         var url = Config.url;
-        //            //         var urlAlt = "";
-        //            //         log("danilo req : getLoginResponse sip " + conn.sip);
-        //            //         if (urlAlt != "") {
-        //            //             url = url + conn.sip + "/" + urlAlt;
-        //            //             log("danilo req : UserMessage url " + url);
-
-        //            //         }
-        //            //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-        //            //     }
-        //            // })
-        //        }
-        //    } catch (e) {
-        //        log("danilo req : getLoginResponse Erro " + e);
-        //        var url = Config.url;
-        //        foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    
-        //        // connectionsUser.forEach(function (conn) {
-        //        //     if (conn.sip == sip) {
-        //        //         var url = Config.url;
-        //        //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-        //        //     }
-        //        // })
-        //    }
-        //})
-        //.onerror(function (error) {
-        //    log("danilo-req : getURLLogin error=" + error);
-        //    var url = Config.url;
-        //    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-        //});
     } 
 }
 
