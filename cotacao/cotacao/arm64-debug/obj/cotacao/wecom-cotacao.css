@@ -1,0 +1,436 @@
+
+
+body {
+    background-color: var(--bg);
+    color: var(--text-standard);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+    background-size: 100%;
+    margin: 0px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-image: url('background.png');
+}
+
+div.button {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+}
+
+/*EdiÃ§Ã£o VersÃ£o Cesar*/
+div#logowecom {
+    z-index: 0;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 20px;
+    width: 300px;
+    height: 100px;
+    background-image: url('wecom-white.png');
+    background-repeat: no-repeat;
+    background-size: 300px;
+    opacity: 0.2;
+}
+#divWecomEsquerda {
+    z-index: 0;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    /* right: 20px; */
+    width: 100%;
+    top: 90%;
+    background-image: url(wecom-color.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    opacity: 0.7;
+}
+.colunadireita {
+    width: 88%;
+    height: 100%;
+    float: right;
+}
+
+.colunaesquerda {
+    /* background-image: url("background.png"); */
+    background-size: cover;
+    margin-left: 0%;
+    float: left;
+    position:absolute;
+    left:0px;
+    width:12%;
+    height:100%;
+    top:0px;
+    font-size:15px;
+    background-color: rgb(2, 22, 63);
+    text-align:left;
+}
+
+/* .linha1 {
+    order: 1;
+    background-image: url("money_header.png");
+    background-size: cover;
+    height: 20%;
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0px;
+    font-size:15px;
+    text-align:left;
+
+} */
+.logo-inn{
+    width: 18%;
+    height: auto;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.linha2 {
+    order: 2;
+    background-image: url("background.png");
+    background-size: cover;
+    align-content: center;
+    width: 100%;
+    height: 100%;
+    top: 00%;
+    align-items: flex-start;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.linha2b3 {
+    order: 2;
+    background-size: cover;
+    align-content: center;
+    height: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0px;
+    font-size:15px;
+    text-align:left;
+    display: none;
+
+}
+
+.linha2todas {
+    order: 2;
+    background-size: cover;
+    /*align-content: center;*/
+    width: 100%;
+    height: 100%;
+    top: 0%;
+    /*align-items: flex-start;*/
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    display: flex;
+    /*flex-direction: column;*/
+   /* flex-wrap: wrap ;*/
+    justify-content: center;
+    position: absolute;
+    display:none;
+    position:absolute;
+    left:12%;
+    width:88%;
+    top:0%; 
+    font-size: 15px;
+    text-align: center;
+
+}
+
+.item-data {
+    color: darkslategrey;
+}
+
+li {
+    padding: 5px;
+    background-color: none;
+    color: black;
+    font-size: 15px;
+    font-weight: bold;
+}
+.nav1{
+    background-color: none;
+}
+.allbtn{
+    width: 100px;
+    height: 40px;;
+}
+a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+    a:hover {
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+.div-dolar {
+    width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.div-euro {
+    width: 300px;
+    margin-top: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.div-libra {
+    width: 300px;
+    margin-top: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.div-data {
+    width: 300px;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img-item {
+    width: 90px;
+    height: 90px;
+}
+#img-itemdol{               
+   margin-top: 0;
+   
+}
+
+label {
+    width: 100%;
+    display: block;
+    background-color: rgb(184 176 176 / 12%);
+    color: darkslategrey;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 16px;
+}
+#item-dolar{
+    margin-top: 0%;
+    color: white;
+}
+#item-euro{
+    color: white;
+}
+#item-libra{
+    color: white;
+}
+.div-dolar {
+    margin-top: 1%;
+}
+
+@media only screen and (max-width: 900px) and (orientation: landscape) {
+    .imglogo {
+        max-width: 45%;
+        max-height: 45%;
+    }
+    /* div#logowecom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } */
+    .div-libra {
+        width: 300px;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .div-data {
+        width: 300px;
+        margin-top: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .colunaesquerda {
+        /* background-image: url('background.png'); */
+        position: absolute;
+        background-size: cover;
+        height: 100%;
+        width: 17%;
+        margin-left: 0%;
+        display: flex;
+        position: absolute;
+        float: left;
+        font-size: 15px;
+        text-align: left;
+  }
+  li{
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 500px)  {
+    body{
+        overflow: auto;
+    }
+    /* .linha1 {
+        position: absolute;
+        float: right;
+        width: 100%;
+        margin-top: 0%;
+        height: 18%;
+        left: 0%;
+    } */
+    ul{
+        margin-top: 0%;
+        margin: 0px;
+    }
+    .linha2 {
+        width: 100%;
+        height: 82%;
+        position: absolute;
+        top: 18%;
+    }
+
+    .colunadireita {
+        width: 100%;
+        height: 80%;
+    }
+
+    .colunaesquerda {
+        /* background-image: url("background.png"); */
+        position: absolute;
+        background-size: cover;
+        height: 18%;
+        width: 100%;
+        margin-left: 0%;
+        display: flex;
+        position: absolute;
+        float: left;
+        font-size: 15px;
+        text-align:left;
+    }
+
+    .img-item {
+        width: 50px;
+        height: 50px;
+    }
+
+    .imglogo {
+        max-width: 50%;
+        max-height: 50%;
+    }
+
+    /* div#logowecom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } */
+
+    .div-data {
+        width: 300px;
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-inn {
+        width: 30%;
+        height: auto;
+        padding-top: 30px;
+        padding-left: 30px;
+    }
+
+    .item-dolar {
+        font-size: 17px;
+    }
+
+    .item-euro {
+        font-size: 17px;
+    }
+
+    .item-libra {
+        font-size: 17px;
+    }
+
+    .linha2todas {
+        order: 2;
+        background-size: cover;
+        /*align-content: center;*/
+        width: 100%;
+        height: 100%;
+        top: 0%;
+        /*align-items: flex-start;*/
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        display: flex;
+        /*flex-direction: column;*/
+       /* flex-wrap: wrap ;*/
+        justify-content: center;
+        margin-top:0%;
+        position: absolute;
+        display:none;
+        position:absolute;
+        left: 0%;
+        width: 100%;
+        top:18%; 
+        font-size: 15px;
+        text-align: center;
+
+    }
+
+    .linha2b3 {
+        order: 2;
+        background-size: cover;
+        align-content: center;
+        height: 100%;
+        align-items: flex-start;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0%; /*teste aqui*/
+        position:absolute;
+        left: 0%;
+        width: 100%;
+        top: 18%;
+        font-size:15px;
+        text-align:left;
+        display: none;
+    }
+
+}
+
+
+

@@ -35,6 +35,8 @@ var calls = [];
 
 var queues = [];
 
+var httpRequestQueue = [];  // Fila de requisições
+var httpBusy = false;  // Variável de controle para verificar se uma requisição está em andamento
 
 //Services APIS
 Config.onchanged(function () {
@@ -185,8 +187,62 @@ if (license != null && license.System == true) {
             req.cancel();
         }
     });
+    var msg = { user: "", client: "" };
+    httpClient(urlGetGroups, "POST", msg, function(responseData) {
 
-    getQueueGroups();
+        try {
+            var obj = JSON.parse(responseData);
+            if (obj.status == "success") {
+                //Atualiza connections 
+                queues = JSON.parse(obj.msg)
+                initializeQueues(queues);
+
+            } else {
+                log("danilo req : getGroupsResponse " + obj.msg);
+            }
+        } catch (e) {
+            log("danilo req : getGroupsResponse Erro" + e);
+        }
+
+        //var msg = { user: "", client: "" };
+        //log("danilo req : getGroups url" + urlGetGroups);
+        //log("danilo req : getGroups msg" + JSON.stringify(msg));
+
+        //var responseData = "";
+        //var req = HttpClient.request("POST", urlGetGroups);
+        //req.header("X-Token", "danilo");
+        //req.contentType("application/json");
+        //req.onsend(function (req) {
+        //    req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        //});
+        //req.onrecv(function (req, data, last) {
+        //    responseData += new TextDecoder("utf-8").decode(data);
+        //    if (!last) req.recv();
+        //}, 1024);
+        //req.oncomplete(function (req, success) {
+        //    log("danilo-req : getGroups complete");
+        //    log("danilo-req : getGroups responseData " + responseData);
+        //    try {
+        //        var obj = JSON.parse(responseData);
+        //        if (obj.status == "success") {
+        //            //Atualiza connections 
+        //            queues = JSON.parse(obj.msg)
+        //            initializeQueues(queues);
+
+        //        } else {
+        //            log("danilo req : getGroupsResponse " + obj.msg);
+        //        }
+        //    } catch (e) {
+        //        log("danilo req : getGroupsResponse Erro" + e);
+        //    }
+
+        //})
+        //req.onerror(function (error) {
+        //        log("danilo-req : getGroups error=" + error);
+        //    });
+
+    });
+    //getQueueGroups();
 }
 
 //JSON APIS
@@ -212,7 +268,7 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo-req : CallHistoryEvent");
                     if (sendCallHistory) {
                         log("danilo-req : CallHistoryEvent=true");
-                        httpClient(urlCallHistory, obj.obj);
+                        httpClient(urlCallHistory,"PUT", obj.obj, null);
                     }
                 }
                 if (obj.mt == "DeviceSelected") {
@@ -270,7 +326,7 @@ new JsonApi("user").onconnected(function (conn) {
                                         log("danilo-req : connectionUser:login:sendCallEvents=true");
                                         var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "login" };
                                 
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, false);
                                     }
 
                                 }else{
@@ -321,7 +377,7 @@ new JsonApi("user").onconnected(function (conn) {
             if (sendCallEvents) {
                 log("danilo-req : connectionUser:logout:sendCallEvents=true");
                 var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "logout" };
-                httpClient(urlPhoneApiEvents, msg);
+                httpClient(urlPhoneApiEvents, "PUT", msg, null);
             }
         }
     });
@@ -596,13 +652,13 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                             case "out":
                                                 if (sendCallEvents) {
                                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
-                                                    httpClient(urlPhoneApiEvents, msg);
+                                                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                                 }
                                                 break;
                                             case "in":
                                                 if (sendCallEvents) {
                                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
-                                                    httpClient(urlPhoneApiEvents, msg);
+                                                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                                 }
                                                 break;
                                         }
@@ -614,7 +670,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                             log("ReplicateUpdate= user " + obj.columns.h323 + " received from pbx has no grups at this moment and group presence changed to out for all!!!");
                             log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed to OUT for group " + grps1[j].name);
                             var msg = { User: obj.columns.h323, Grupo: grps1[j].name, Callinnumber: "", Status: "grp_logout" };
-                            httpClient(urlPhoneApiEvents, msg);
+                            httpClient(urlPhoneApiEvents, "PUT", msg, null);
                         }
                     }
                     catch (e) {
@@ -633,13 +689,13 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                             case "out":
                                 if (sendCallEvents) {
                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_logout" };
-                                    httpClient(urlPhoneApiEvents, msg);
+                                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                 }
                                 break;
                             case "in":
                                 if (sendCallEvents) {
                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
-                                    httpClient(urlPhoneApiEvents, msg);
+                                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                 }
                                 break;
                         }
@@ -966,7 +1022,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "out" };
                                     // }
                                 }
-                                httpClient(urlPhoneApiEvents, msg);
+                                httpClient(urlPhoneApiEvents, "PUT", msg, null);
                             }
                             break;
                         case 132:
@@ -989,7 +1045,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "inc" };
                                     // }
                                 }
-                                httpClient(urlPhoneApiEvents, msg);
+                                httpClient(urlPhoneApiEvents, "PUT", msg, null);
                             }
                             break;
                     }
@@ -1032,7 +1088,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "out" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                     }
                                     break;
                                 case 132:
@@ -1055,7 +1111,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "inc" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                     }
                                     break;
                                 case 5:
@@ -1079,7 +1135,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "ans" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                     }
                                     break;
                                 case 133:
@@ -1102,7 +1158,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "ans" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                     }
                                     break;
                                 case 6:
@@ -1126,7 +1182,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
@@ -1153,7 +1209,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg,null);
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
@@ -1183,7 +1239,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                                 //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
                                                 // }
                                             }
-                                            httpClient(urlPhoneApiEvents, msg);
+                                            httpClient(urlPhoneApiEvents, "PUT", msg,null);
                                         }
                                         //Remove
                                         log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
@@ -1213,7 +1269,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                             //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "del" };
                                             // }
                                         }
-                                        httpClient(urlPhoneApiEvents, msg);
+                                        httpClient(urlPhoneApiEvents, "PUT", msg,null);
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
@@ -1290,7 +1346,6 @@ function updateConfigUsers() {
         connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: sendCallHistory, sP: sendCallEvents, urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory), urlD: String(urlDashboard), urlSSO: String(urlSSO), CodCli: String(codClient), url: String(url), urlG: String(urlGetGroups), urlM: String(urlMobile), CodLeave: String(codLeaveAllGroups), sLS: leaveAllGroupsOnStatup}));
     });
 }
-
 //Function called by WebServer.onrequest("badge")
 function badgeRequest2(value) {
 
@@ -1716,30 +1771,94 @@ function pbxTableRequest(value) {
     //    })
     //}
 }
-//Function to send HTTP messages do Wecall
-function httpClient(url, call) {
-    log("danilo-req : httpClient url "+url);
-    var responseData = "";
-    log("danilo-req : httpClient : content " +JSON.stringify(call));
-    var req = HttpClient.request("PUT", url);
 
-    req.header("X-Token", "danilo");
-    req.contentType("application/json");
-    req.onsend(function (req) {
-        req.send(new TextEncoder("utf-8").encode(JSON.stringify(call)), true);
+function executeNextRequest() {
+    if (httpRequestQueue.length > 0 && !httpBusy) {
+        var nextRequest = httpRequestQueue.shift();  // Pega a próxima requisição da fila
+        httpBusy = true;  // Define como ocupado
+
+        var url = nextRequest.url;
+        var method = nextRequest.method;
+        var msg = nextRequest.msg;
+        var callback = nextRequest.callback;
+
+        var responseData = "";
+        log("danilo-req : httpClient url " + url);
+        
+        var client = new HttpClient.request(method, url)
+            .header("X-Token", "danilo")
+            .contentType("application/json")
+            .timeout(3000)
+            .onsend(function (req) {
+                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+            })
+            .onrecv(function (req, data, last) {
+                log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
+                responseData += new TextDecoder("utf-8").decode(data);
+                if (!last) req.recv();
+            }, 1024)
+            .oncomplete(function (req, success) {
+                client.close();
+                httpBusy = false;  // Libera para uso
+                log("danilo-req : httpClient HttpRequest complete "+JSON.stringify(req));
+                log("danilo-req : httpClient HttpRequest responseData " + responseData);
+                if (callback) {
+                    callback(responseData);
+                }
+                executeNextRequest();  // Chama a próxima requisição na fila
+        })
+            .onerror(function (error) {
+                httpBusy = false;  // Libera para uso
+                log("danilo-req : httpClient HttpRequest error=" + error);
+                if (callback) {
+                    callback();
+                }
+                executeNextRequest();  // Chama a próxima requisição na fila
+        });
+    }
+}
+
+function httpClient(url, method, msg, callback) {
+    log("danilo-req : httpClient msg "+JSON.stringify(msg));
+    // Adiciona a requisição à fila
+    //httpRequestQueue.push({ url: url, method: method, msg: msg, callback: callback });
+    // Verifica se uma requisição está em andamento ou não
+    //if (!httpBusy) {
+    //    log("danilo-req : httpClient httpBusy is false calling executeNextRequest ");
+    //    executeNextRequest();  // Inicia a próxima requisição
+    //}
+    var responseData = "";
+    log("danilo-req : httpClient url " + url);
+    var client = HttpClient.request(method, url);
+    client.header("X-Token", "danilo");
+    //client.timeout(3000);
+    client.contentType("application/json");
+    client.onsend(function (req) {
+        req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
     });
-    req.onrecv(function (req, data, last) {
+    client.onrecv(function (req, data, last) {
+        log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
         responseData += new TextDecoder("utf-8").decode(data);
         if (!last) req.recv();
-    },1024);
-    req.oncomplete(function (req, success) {
-        log("danilo-req : httpClient HttpRequest complete");
-        log("danilo-req : httpClient HttpRequest responseData "+ responseData);
-    })
-        .onerror(function (error) {
+    }, 1024);
+    client.oncomplete(function (req, success) {
+        client.close();
+        //httpBusy = false;  // Libera para uso
+        log("danilo-req : httpClient HttpRequest complete " + JSON.stringify(req));
+        log("danilo-req : httpClient HttpRequest responseData " + responseData);
+        if (callback) {
+            callback(responseData);
+        }
+        //executeNextRequest();  // Chama a próxima requisição na fila
+    });
+    client.onerror(function (error) {
+            //httpBusy = false;  // Libera para uso
             log("danilo-req : httpClient HttpRequest error=" + error);
+            if (callback) {
+                callback();
+            }
+            //executeNextRequest();  // Chama a próxima requisição na fila
         });
-
 }
 
 //Functions to delete objects from Arrays
@@ -1781,22 +1900,8 @@ function getURLLogin(sip, session) {
 
         log("danilo req : getURLLogin url " + urlSSO);
         log("danilo req : getURLLogin msg " + JSON.stringify(msg));
-
-        var responseData = "";
-        var reqLogin = HttpClient.request("POST", urlSSO);
-        reqLogin.header("X-Token", "danilo");
-        reqLogin.contentType("application/json");
-        reqLogin.contentLength(msg.length);
-        reqLogin.onsend(function (reqLogin) {
-            reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-        });
-        reqLogin.onrecv(function (reqLogin, data, last) {
-            responseData += new TextDecoder("utf-8").decode(data);
-            if (!last) reqLogin.recv();
-        }, 1024);
-        reqLogin.oncomplete(function (reqLogin, success) {
-            log("danilo-req : getURLLogin complete");
-            log("danilo-req : getURLLogin responseData " + responseData);
+        /*
+        httpClient(urlSSO, "POST", msg, function(responseData) {
             try {
                 var obj = JSON.parse(responseData);
                 if (obj.status == "success") {
@@ -1808,8 +1913,8 @@ function getURLLogin(sip, session) {
                             var urlAlt = conn["url"];
                             log("danilo req : getLoginResponse sip " + conn.sip);
                             if (urlAlt != "") {
-                                url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
-                                urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
+                                url = url + "/home/desktop/startup/" + conn.sip + "/" + urlAlt;
+                                urlM = urlM + "/mobile/startup/cel/" + conn.sip + "/" + urlAlt;
                                 log("danilo req : UserMessage url " + url);
 
                             }
@@ -1828,7 +1933,8 @@ function getURLLogin(sip, session) {
 
                     }
                     foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                        
+
+
                     // connectionsUser.forEach(function (conn) {
                     //     if (conn.sip == sip) {
                     //         var url = Config.url;
@@ -1847,7 +1953,7 @@ function getURLLogin(sip, session) {
                 log("danilo req : getLoginResponse Erro " + e);
                 var url = Config.url;
                 foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
-                    
+
                 // connectionsUser.forEach(function (conn) {
                 //     if (conn.sip == sip) {
                 //         var url = Config.url;
@@ -1855,56 +1961,184 @@ function getURLLogin(sip, session) {
                 //     }
                 // })
             }
-        })
-        .onerror(function (error) {
-            log("danilo-req : getURLLogin error=" + error);
-            var url = Config.url;
-            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+
         });
+
+        */
+        var responseData = "";
+        //Teste 15/09
+        var req1 = HttpClient.request("POST", urlSSO);
+        req1.header("X", "Wecom");
+        req1.contentType("application/json");
+        req1.onsend(function (req2) {
+            req2.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+            log("danilo-req : getURLLogin send " + JSON.stringify(msg));
+        });
+        req1.onrecv(function (req3, data, last) {
+            log("danilo-req : getURLLogin data " + data);
+            responseData += new TextDecoder("utf-8").decode(data);
+            if (!last) req3.recv();
+        }, 1024);
+        req1.oncomplete(function (req4, success) {
+            log(success ? "POST getURLLogin OK" : "POST getURLLogin ERROR");
+            log("danilo-req : getURLLogin complete");
+            log("danilo-req : getURLLogin responseData " + responseData);
+            try {
+                var obj = JSON.parse(responseData);
+                if (obj.status == "success") {
+                    connectionsUser.forEach(function (conn) {
+                        if (conn.sip == sip) {
+                            conn["url"] = obj.token;
+                            var url = Config.url;
+                            var urlM = Config.url;
+                            var urlAlt = conn["url"];
+                            log("danilo req : getLoginResponse sip " + conn.sip);
+                            if (urlAlt != "") {
+                                url = url + "/home/desktop/startup/" + conn.sip + "/" + urlAlt;
+                                urlM = urlM + "/mobile/startup/cel/" + conn.sip + "/" + urlAlt;
+                                log("danilo req : UserMessage url " + url);
+
+                            }
+                            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
+                        }
+                    })
+
+                } else {
+                    log("danilo req : getLoginResponse " + obj.msg);
+                    var url = Config.url;
+                    var urlAlt = "";
+                    log("danilo req : getLoginResponse sip " + sip);
+                    if (urlAlt != "") {
+                        url = url + sip + "/" + urlAlt;
+                        log("danilo req : UserMessage url " + url);
+
+                    }
+                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    
+
+                    // connectionsUser.forEach(function (conn) {
+                    //     if (conn.sip == sip) {
+                    //         var url = Config.url;
+                    //         var urlAlt = "";
+                    //         log("danilo req : getLoginResponse sip " + conn.sip);
+                    //         if (urlAlt != "") {
+                    //             url = url + conn.sip + "/" + urlAlt;
+                    //             log("danilo req : UserMessage url " + url);
+
+                    //         }
+                    //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    //     }
+                    // })
+                }
+            } catch (e) {
+                log("danilo req : getLoginResponse Erro " + e);
+                var url = Config.url;
+                foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+
+                // connectionsUser.forEach(function (conn) {
+                //     if (conn.sip == sip) {
+                //         var url = Config.url;
+                //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                //     }
+                // })
+            }
+        });
+        req1.onerror(function (error) {
+                log("danilo-req : getURLLogin error=" + error);
+                var url = Config.url;
+                foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+            });
+        //Teste 15/09
+
+
+
+
+        
+        //var reqLogin = HttpClient.request("POST", urlSSO);
+        //reqLogin.header("X-Token", "danilo");
+        //reqLogin.contentType("application/json");
+        //reqLogin.contentLength(msg.length);
+        //reqLogin.onsend(function (reqLogin) {
+        //    reqLogin.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+        //    log("danilo-req : getURLLogin onsend to wecall " + JSON.stringify(msg));
+
+        //});
+        //reqLogin.onrecv(function (reqLogin, data, last) {
+        //    log("danilo-req : getURLLogin data " + data);
+        //    responseData += new TextDecoder("utf-8").decode(data);
+        //    if (!last) reqLogin.recv();
+        //}, 1024);
+        //reqLogin.oncomplete(function (reqLogin, success) {
+        //    log("danilo-req : getURLLogin complete");
+        //    log("danilo-req : getURLLogin responseData " + responseData);
+        //    try {
+        //        var obj = JSON.parse(responseData);
+        //        if (obj.status == "success") {
+        //            connectionsUser.forEach(function (conn) {
+        //                if (conn.sip == sip) {
+        //                    conn["url"] = obj.token;
+        //                    var url = Config.url;
+        //                    var urlM = Config.url;
+        //                    var urlAlt = conn["url"];
+        //                    log("danilo req : getLoginResponse sip " + conn.sip);
+        //                    if (urlAlt != "") {
+        //                        url = url + "/home/desktop/startup/"+ conn.sip + "/" + urlAlt;
+        //                        urlM = urlM + "/mobile/startup/cel/"+conn.sip+"/"+ urlAlt;
+        //                        log("danilo req : UserMessage url " + url);
+
+        //                    }
+        //                    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url, urlM: urlM }));
+        //                }
+        //            })
+
+        //        } else {
+        //            log("danilo req : getLoginResponse " + obj.msg);
+        //            var url = Config.url;
+        //            var urlAlt = "";
+        //            log("danilo req : getLoginResponse sip " + sip);
+        //            if (urlAlt != "") {
+        //                url = url + sip + "/" + urlAlt;
+        //                log("danilo req : UserMessage url " + url);
+
+        //            }
+        //            foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                        
+        //            // connectionsUser.forEach(function (conn) {
+        //            //     if (conn.sip == sip) {
+        //            //         var url = Config.url;
+        //            //         var urlAlt = "";
+        //            //         log("danilo req : getLoginResponse sip " + conn.sip);
+        //            //         if (urlAlt != "") {
+        //            //             url = url + conn.sip + "/" + urlAlt;
+        //            //             log("danilo req : UserMessage url " + url);
+
+        //            //         }
+        //            //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //            //     }
+        //            // })
+        //        }
+        //    } catch (e) {
+        //        log("danilo req : getLoginResponse Erro " + e);
+        //        var url = Config.url;
+        //        foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+                    
+        //        // connectionsUser.forEach(function (conn) {
+        //        //     if (conn.sip == sip) {
+        //        //         var url = Config.url;
+        //        //         foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //        //     }
+        //        // })
+        //    }
+        //})
+        //.onerror(function (error) {
+        //    log("danilo-req : getURLLogin error=" + error);
+        //    var url = Config.url;
+        //    foundSession[0].send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: url }));
+        //});
     } 
 }
 
 //Functions to Initialize monitor of Queues from Wecall
-function getQueueGroups() {
-
-    var msg = { user: "", client: "" };
-    log("danilo req : getGroups url" + urlGetGroups);
-    log("danilo req : getGroups msg" + JSON.stringify(msg));
-
-    var responseData = "";
-    var req = HttpClient.request("POST", urlGetGroups);
-    req.header("X-Token", "danilo");
-    req.contentType("application/json");
-    req.onsend(function (req) {
-        req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-    });
-    req.onrecv(function (req, data, last) {
-        responseData += new TextDecoder("utf-8").decode(data);
-        if (!last) req.recv();
-    }, 1024);
-    req.oncomplete(function (req, success) {
-        log("danilo-req : getGroups complete");
-        log("danilo-req : getGroups responseData " + responseData);
-        try {
-            var obj = JSON.parse(responseData);
-            if (obj.status == "success") {
-                //Atualiza connections 
-                queues = JSON.parse(obj.msg)
-                initializeQueues(queues);
-
-            } else {
-                log("danilo req : getGroupsResponse " + obj.msg);
-            }
-        } catch (e) {
-            log("danilo req : getGroupsResponse Erro" + e);
-        }
-        
-    })
-        .onerror(function (error) {
-            log("danilo-req : getGroups error=" + error);
-        });
-
-}
 function initializeQueues() {
     log("danilo-req : initializeQueues:: queues");
     //queues = JSON.parse(msg)
