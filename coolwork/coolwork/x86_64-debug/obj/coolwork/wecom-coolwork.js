@@ -9,7 +9,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var that = this;
     var phone_list = [];
     var avatar = start.consumeApi("com.innovaphone.avatar");
-    var dnz; 
+
 
     var colorSchemes = {
         dark: {
@@ -35,11 +35,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     app.onmessage = app_message;
 
     
+    
     function app_connected(domain, user, dn, appdomain) {
-        dnz = domain
         var devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" });
+        avatar = new innovaphone.Avatar(start, user, domain);
         
     }
 
@@ -82,15 +83,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     function makePhoneButtons(obj){
 
-        avatar = new innovaphone.Avatar(start, obj.sip, dnz);
+        
         // console.log("domain" + dnz)
         // console.log( "foto usuario" + UsersPictures)
         obj.forEach(function (phone) {
-            var UsersPictures = avatar.url(obj.sip ,80)
-            console.log("SIP DO CARA" + obj.sip)
+            var userPicture = avatar.url(phone.sip ,80)
+            console.log("SIP DO CARA" + phone.sip)
             var phoneHTML = `
             <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwId}">
-            <img src ="${UsersPictures}">
+            <img class="imgProfile" src ="${userPicture}">
             <div>${phone.cn}</div>
             <span style = "font-weight:bold" >${phone.product}</span>
             </div>

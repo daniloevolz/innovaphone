@@ -9,29 +9,34 @@ a {
     color: var(--text-standard);
     text-decoration: underline;
 }
+.imgProfile{
+    width:60px;
+    height:60px;
+}
 
 div.button1 {
-    position:absolute;
-    left:10px;
-    top:10px;
-    box-sizing:border-box;
-    width:calc(100% - 20px);
-    height:40px;
-    padding:10px;
-    background-color:var(--button);
-    color:var(--text-standard);
-    font-size:14px;
-    text-align:center;
-    cursor:pointer;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 20px);
+    height: 40px;
+    padding: 10px;
+    background-color: var(--button);
+    color: var(--text-standard);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
 }
 .StatusPhonetrue{
     background-color: green;
 }
 .StatusPhonefalse{
-    background-color: red;
+    background-color: gray;
 }
 .phoneButtons {
-    height: 60px;
+    height: 100px;
+    margin: 10px;
     text-align: center;
     width: 150px;
     /* align-items: center; */

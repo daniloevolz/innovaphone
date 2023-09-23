@@ -250,7 +250,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
             var popup =  `<div style="position:absolute; left:82%; width:15%; top:70%; font-size:12px; text-align:center;" id="popupbtn" class= "button-inn";>Ver Site</div>.`
             
-            makePopup("Link da URK", link + popup, 800, 200);
+            makePopup("URL", link + popup, 800, 200);
 
             var b = document.getElementById("popupbtn")
             b.addEventListener("click", function () {

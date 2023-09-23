@@ -41,16 +41,35 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     app.checkBuild = true;
     app.onconnected = app_connected;
     app.onmessage = app_message;
-    app.onerror = waitConnection(that);
-    app.onclosed = waitConnection(that);
-
+    app.onerror = function (error) {
+        console.error("Billboard: Appwebsocket.Connection error: " + error);
+        changeState("Disconnected");
+    };
+    app.onclosed = function () {
+        console.error("Billboard: Appwebsocket.Connection closed!");
+        changeState("Disconnected");
+    };
+    var currentState = "Loading";
     waitConnection(that);
 
     function app_connected(domain, user, dn, appdomain) {
+        changeState("Connected");
         that.clear();
         billboard = that.add(new innovaphone.ui1.Div(null, null, "billboard").setAttribute("id", "billboard"))
         app.send({ api: "user", mt: "TableUsers" });
         app.send({ api: "user", mt: "SelectDepartments" });
+
+        setInterval(function () {
+            if (currentState == "Connected") {
+                var msg = { api: "user", mt: "Ping" };
+                app.send(msg);
+                console.log("Interval: Ping Sent " + JSON.stringify(msg));
+            } else {
+                changeState("Disconnected");
+                console.log("Interval: changeState Disconnected");
+            }
+            
+        }, 60000); // A cada 60 segundo
 
     }
 
@@ -131,7 +150,49 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log(obj.result);
             list_editors_departments = JSON.parse(obj.result);
         }
+        if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
+            console.log(obj.result);
+            list_posts = JSON.parse(obj.result)
+            var dep_id = JSON.parse(obj.dep_id)
+                var hasPosts = list_posts.filter(function (item) {
+                    return item.department
+                })
+                console.log("Has posts" + JSON.stringify(hasPosts))
+                if (hasPosts.length > 0) {
+                    makePopup("ATENÇÃO","Favor excluir todos os posts primeiro", 500, 200);
+                } else {
+                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+                }
+        }
     }
+    function makePopup(header, content, width, height) {
+        console.log("makePopup");
+        var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
+        var h = [20];
+
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        _popup.header.addText(header);
+        _popup.content.addHTML(content);
+
+        // if (popupOpen == false) {
+        //     }    
+        //     popup = _popup;
+        //     popupOpen = true;
+    }
+    // exemplo de uso
+    // makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.Sip +"</p>", 500, 200);
+    function changeState(newState) {
+        if (newState == currentState) return;
+        if (newState == "Connected") {
+            currentState = newState;
+            console.info("Billboard: Appwebsocket.Connection Connected: ");
+        }
+        if (newState == "Disconnected") {
+            console.error("Billboard: Appwebsocket.Connection Disconnected: ");
+            currentState = "Disconnected";
+        }
+    }
+
     function makeDivNoLicense(msg) {
         that.clear();
         //Titulo 
@@ -221,13 +282,13 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 hdposts.forEach(function (hdpost) {
                     if (post.deleted) {
                         hdpost.className = 'deletedpost';
-                        hdpost.title = 'Deletado';
+                        hdpost.title = texts.text("labelPostDeleted");
                     } else if (starDate > now) {
                         hdpost.className = 'futurepost';
-                        hdpost.title = 'Futuro';
+                        hdpost.title = texts.text("labelPostFuture");
                     } else if (endDate < now) {
                         hdpost.className = 'expired';
-                        hdpost.title = 'Expirado';
+                        hdpost.title = texts.text("labelPostExpired");
                     } else {
                         hdpost.className = '';
                         hdpost.title = 'Ativo';
@@ -294,16 +355,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var del = document.getElementById("delDepDiv")
             del.addEventListener("click", function (isEditor) {
                 console.log("CLICK BOTÃO DELETAR")
-                var hasPosts = list_posts.filter(function (item) {
-                    return item.department
-                })
-                console.log("Has posts" + JSON.stringify(hasPosts))
-                if (hasPosts.length > 0) {
-                    window.alert("Favor excluir todos os posts primeiro")
-                } else {
-                    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
-                }
-
+                app.send({ api: "user", mt: "SelectAllPosts", department: dep_id });
             })
             var timedDepDiv = footButtons.add(new innovaphone.ui1.Node("div", null, null, "timedDepDiv").setAttribute("id", "timeDepDiv"))
             var time = document.getElementById("timeDepDiv")
@@ -546,6 +598,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var scrollBox = msgBoxDiv.add(new innovaphone.ui1.Node('scrollbox', 'display: flex; color:white; width:100%; height:100%;', null, 'scrollbox').setAttribute('id', 'scrollbox'));
         var msgContent = scrollBox.add(new innovaphone.ui1.Node('div', 'overflow:auto;', post.description, 'msgcontent').setAttribute('id', 'msgcontent'));
 
+        if (document.getElementById('titlemsg')) {
+            console.log("CARREGOU O ELEMENTO")
+            // Verificar o comprimento do texto usando .textContent
+            if (document.getElementById('titlemsg').innerText.length > 20) {
+                // Aplicar o estilo com fontSize 20px
+                console.log("O ELEMENTO TEM MAIS DE 20 LETRAS")
+                var titleMsg = document.getElementById('titlemsg');
+                titleMsg.style.fontSize = '20px';
+            }
+        }
+        
         if (isEditor) {
             app.send({ api: "user", mt: "SelectHistoryByPost", post: parseInt(id, 10), })
 
@@ -621,65 +684,47 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 console.log("O elemento deletePostDiv foi clicado!");
                 app.send({ api: "user", mt: "DeletePost", id: parseInt(id, 10), src: dep_id });
             });
+        };
+
+        var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
+        footShowPost.id = 'footShowPost';
+        footShowPost.className = 'footShowPost';
+        
+        var postType = (post.type == "private") ? 'Tipo: ' + texts.text("labelPrivate") : 'Tipo: ' + texts.text("labelPublic")
+        var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
+       
+
+        var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
+
+        var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
+  
+        var dateString = post.date_end;
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+        document.getElementById("closedate").innerHTML = formattedDate
 
 
-            var footShowPost = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'footShowPost').setAttribute('id', 'footShowPost'));
-            footShowPost.id = 'footShowPost';
-            footShowPost.className = 'footShowPost';
-
-            var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, 'Criador: ' + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
-            //creatorPost.id = 'creatorPost';
-            //creatorPost.className = 'creatorPost';
-            //creatorPost.innerHTML = 'Criador: ' + user.cn;
-
-            //console.log('Quero saber: ', user.cn);
-
-            var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
-            //closeDateDiv.id = 'closedate';
-            //closeDateDiv.className = 'closedate';
-
-            var dateString = post.date_end;
-            var date = new Date(dateString);
-            var day = date.getDate();
-            var month = date.getMonth() + 1;
-            var year = date.getFullYear();
-            var hours = date.getHours();
-            var minutes = date.getMinutes();
-            var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-
-            document.getElementById("closedate").innerHTML = formattedDate
-            //closeDateDiv.innerHTML = formattedDate;
-
-            //footShowPost.appendChild(creatorPost);
-            //footShowPost.appendChild(closeDateDiv);
-
-            // Adicionar os elementos criados � div com o ID 'billboard'
-            //var billboardDiv = document.getElementById('billboard');
-
-            //    //billboardDiv.innerHTML = '';
-            //    scrollBox.appendChild(msgContent);
-            //    msgBoxDiv.appendChild(scrollBox);
-            //    postMsgDiv.appendChild(closeWindowDiv);
-            //    postMsgDiv.appendChild(nameBoxDiv);
-            //    postMsgDiv.appendChild(titleMsgDiv);
-            //    postMsgDiv.appendChild(msgBoxDiv);
-            //    postMsgDiv.appendChild(footShowPost);
-
-            //    billboardDiv.appendChild(insideDiv);
-            //    insideDiv.appendChild(postMsgDiv);
-        }
         // Adicionando o listener de clique
         var a = document.getElementById('closewindow');
         a.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(post.department);
         });
+                         
 
     }
     function createPostForm(dep_id) {
         var department = list_departments.filter(function (item) {
             return item.id === parseInt(dep_id, 10);
         })[0];
+
+        
         var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
         var postMsgDiv = insideDiv.add(new innovaphone.ui1.Node("div", 'background-color:#0f243f;', null, 'postmsg').setAttribute("id", "postmsg"));
         var nameBoxDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'namebox').setAttribute("id", "namebox"));
@@ -703,6 +748,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
         var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
         var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var PublicPostDiv = postMsgDiv.add(new innovaphone.ui1.Node("div","width: 80%;display: flex;align-items: center;",null,null))
+        var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div","color:white;",texts.text("labelTypePost"),null))
+        var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select",null,null,"selectPublicPost").setAttribute("id","selectTypePost"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPublic"),null).setAttribute("id","public"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPrivate"),null).setAttribute("id","private"))
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
@@ -716,18 +766,20 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
             var colorPost = document.getElementById('colorbox').value;
+            var typePostSelect = document.getElementById("selectTypePost");
+            var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
+
             var currentDate = getDateNow();
             console.log("Data Start:", startPost + "data atual" + currentDate);
 
             if (msgPost === "" || titlePost === "" || startPost == "" || endPost == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
+                makePopup("ATENÇÃO","Favor preencher todos os campos corretamente para criação do post", 500, 200);
             } else if (endPost < startPost) {
-                console.log("data inicio post" + startPost + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
+                makePopup("ATENÇÃO","A Data de término do post não pode ser menor que a data de início", 500, 200);
             } else if (endPost < currentDate) {
-                window.alert("A data de início do post não pode ser inferior à data atual");
+                makePopup("ATENÇÃO","A data de início do post não pode ser inferior à data atual", 500, 200);
             } else {
-                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+                app.send({ api: "user", mt: "InsertPost", title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
             }
             s.removeEventListener('click', s);
         });
@@ -760,6 +812,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var post = list_posts.filter(function (item) {
             return item.id === parseInt(id, 10);
         })[0];
+
         document.getElementById('insideDiv').remove();
 
         var insideDiv = billboard.add(new innovaphone.ui1.Node("div", null, null, 'insideDiv').setAttribute("id", "insideDiv"));
@@ -791,10 +844,21 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var dateDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', 'color: #ffff; background-color: rgb(93 126 131 / 36%);', null, 'date').setAttribute("id", "date"));
         var dateStart = dateDiv.add(new innovaphone.ui1.Input(null, post.date_start, null, null, 'datetime-local', 'dateinput').setAttribute("id", "startevent"));
         var dateEnd = dateDiv.add(new innovaphone.ui1.Input(null, post.date_end, null, null, 'datetime-local', 'dateinput').setAttribute("id", "endevent"));
+        var PublicPostDiv = postMsgDiv.add(new innovaphone.ui1.Node("div","width: 80%;display: flex;align-items: center;",null,null))
+        var TypePost = PublicPostDiv.add(new innovaphone.ui1.Node("div","color:white;",texts.text("labelTypePost"),null))
+        var publicPostSelect = PublicPostDiv.add(new innovaphone.ui1.Node("select",null,null,"selectPublicPost").setAttribute("id","selectTypePost"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPublic"),null).setAttribute("id","public"))
+        publicPostSelect.add(new innovaphone.ui1.Node("option",null,texts.text("labelPrivate"),null).setAttribute("id","private"))
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node('div', null, null, 'buttons').setAttribute("id", "buttons"));
         var paletteColor = document.getElementById('buttons').innerHTML = '<a>Selecione a cor:</a><ul id="palette" class="palette"></ul><input type="color" id="colorbox" style="display: none;">';
         var saveMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Inserir', 'saveclose').setAttribute("id", "savemsg"));
         var closeMsgDiv = buttonsDiv.add(new innovaphone.ui1.Node('div', null, 'Fechar', 'saveclose').setAttribute("id", "closemsg"));
+        
+        var postType = post.type == "public" ? texts.text("labelPublic") : texts.text("labelPrivate");
+
+        var selectElement = document.getElementById("selectTypePost");
+        selectElement.value = postType;
+
         // Adicionando o listener de clique
         var s = document.getElementById('savemsg');
         s.addEventListener('click', function () {
@@ -810,18 +874,20 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var endPost = document.getElementById('endevent').value;
             var msgPost = document.getElementById('msgevent').value;
             var titlePost = document.getElementById('titleevent').value;
-            var colorPost = document.getElementById("postmsg").style.backgroundColor
+            var colorPost = document.getElementById("postmsg").style.backgroundColor;
+            var typePostSelect = document.getElementById("selectTypePost");
+            var idSel = typePostSelect.options[typePostSelect.selectedIndex].id;
+
             var currentDate = getDateNow()
             console.log("Data Start:", startPost);
             if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
-                window.alert("Favor preencher todos os campos corretamente para criação do post");
+                makePopup("ATENÇÃO","Favor preencher todos os campos corretamente para criação do post", 500, 200);
             } else if (endPost < startPost) {
-                console.log("data inicio post" + startPost + "data atual" + currentDate);
-                window.alert("A Data de término do post não pode ser menor que a data de início");
+                makePopup("ATENÇÃO","A Data de término do post não pode ser menor que a data de início", 500, 200);
             } else if (startPost < currentDate) {
-                window.alert("A data atualizada não pode ser inferior a data atual.");
+                makePopup("ATENÇÃO","A data atualizada não pode ser inferior a data atual.", 500, 200);
             } else {
-                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost });
+                app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
 
             };
             s.removeEventListener('click', s);
@@ -879,7 +945,8 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var viewerDepartments = getSelectedUsersDepartments('viewer');
 
             if (editorDepartments === 0 || editorDepartments.length === 0) {
-                window.alert("Você deve marcar pelo menos um editor para este departamento")
+                makePopup("ATENÇÃO","Você deve marcar pelo menos um editor para este departamento", 500, 200);
+                
             }
             else {
                 console.log("InsertDepartment sending");

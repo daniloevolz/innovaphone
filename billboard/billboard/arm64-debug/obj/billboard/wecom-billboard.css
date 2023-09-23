@@ -1,4 +1,39 @@
 /*Tabela dos usu�rios*/
+
+/*Pop Up*/
+.popup-background {
+    /*z-index:10;
+    display:none;*/
+    background-color: rgba(131,131,131,0.1);
+    z-index: 5000 !important;
+    
+}
+
+.popup-header {
+    /*background-image: url("novaalert.png");*/
+    color: #fdb901;
+}
+
+.popup-main {
+    background-color: rgba(131,131,131,0.7);
+    color: var(--text-standard);
+    box-shadow: 0 0 10px black;
+    border: 4px solid transparent;
+    text-align: center;
+    vertical-align: central;
+    font-size:20px;
+    z-index: 5000;
+}
+
+.popup-closer {
+    background-image: url(./images/closePopUp.png);
+    top: 0px;
+    right: -30px;
+    height: 60px;
+    width: 60px;
+    background-repeat: no-repeat;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -290,9 +325,9 @@ td.checkbox {
     justify-content: center;
     align-items: center;
     align-content: center;
-    opacity: 0.70;
+    /* opacity: 0.70;
     transform: translateY(70%);
-    transition: transform 0.3s, opacity 0.3s;
+    transition: transform 0.3s, opacity 0.3s; */
 }
 .footbuttons:hover {
     opacity: 1;
@@ -567,10 +602,14 @@ td.checkbox {
     align-items: center;
     color: white;
     width: 80%;
-    height: 10%;
+    height: 6%;
     justify-content: space-between;
 }
-
+.selectPublicPost{
+    border-radius: 20px;
+    margin-top: 5px;
+    margin-left: 12px;
+}
 .dateinput {
     margin-left: 5px;
 }

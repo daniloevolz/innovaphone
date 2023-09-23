@@ -1040,11 +1040,16 @@ function deleteBySip(sip) {
 }
 
 function removeObjectByCall(arr, pbx, callToRemove) {
-    for (var i = 0; i < arr.length; i++) {
-        var pbxEntry = arr[i][pbx];
+    //console.log("removeObjectByCall+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx].length));
+    for (var i = 0; i < arr[pbx].length; i++) {
+        var pbxEntry = arr[pbx];
+        //console.log("arr[i][pbx]+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx]));
         if (pbxEntry) {
+            //console.log("pbxEntry+++++++++++++++++++++++++++++++" + JSON.stringify(pbxEntry.length));
             for (var j = 0; j < pbxEntry.length; j++) {
-                if (pbxEntry[j].call === callToRemove) {
+                //console.log("pbxEntry[j].call+++++++++++++++++++++++++++++++" + pbxEntry[j].call);
+                if (pbxEntry[j].call == callToRemove) {
+                    log("pbxEntry[j].call == callToRemove:" + pbxEntry[j].call + " == " + callToRemove);
                     pbxEntry.splice(j, 1);
                     break;
                 }
