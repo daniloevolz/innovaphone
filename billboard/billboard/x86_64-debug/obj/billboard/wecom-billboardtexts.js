@@ -2,17 +2,41 @@
 var Wecom = Wecom || {};
 Wecom.billboardTexts = {
     en: {
+        labelSite: "Go to Site",
+        labelToday: "Today",
+        labelTemporary: "Temporary",
+        labelLast7Days: "Last 7 days",
+        labelLast30Days: "Last 30 days",
+        labelNext7Days: "Next 7 days",
+        labelNext30Days: "Next 30 days",
+        labelSinceAlways: "Since Always",
+        labelCustomPeriod : "Custom Period",
+        labelTitle: "Title:",
+        labelUpdate: "Update",
+        labelInsert: "Insert",
+        labelSave: "Save",
+        labelClose: "Close",
+        labelType: "Type: ",
+        labelCreator: "Creator: ",
+        labelStart: "Start ",
+        labelDateStart: "Date of Begin",
+        labelDateEnd: "Date of End",
+        labelEnd: "End ",
+        labelNameDepart: "Name of the Department",
+        labelSelectColor: "Select a Color",
+        labelTypePost: "Type of the Post",
         labelTituloAdmin: "Welcome to the Notice Board",
         labelTituloLicense: "License Management",
         labelAdmin: "Administration",
+        labelPublic: "External",
+        labelPrivate: "Internal",
         labelAdd: "Add+",
-        labelInicio: "Home: ",
+        labelSearchUsers: "Search Users",
+        labelInicio: "Start: ",
         labelExpired: "Expiration: ",
         labelExcluidos: "Deleted: ",
         labelUser: "User",
-        labelPublic: "Intern",
-        labelPrivate: "Extern",
-        labelTypePost: "Tipo de Post: ",
+        labelData: "Date",
         labelEditor: "Editor",
         labelViewer: "Viewer",
         labelClose: "Close",
@@ -20,8 +44,8 @@ Wecom.billboardTexts = {
         btnOk: "Ok",
         labelCfgUsers: "Users",
         labelCfgLicense: "Licenses",
-        labelCfgDepartment: "Department",
-        labelCfgPost: "Post",
+        labelCfgDepartment: "Departments",
+        labelCfgPost: "Posts",
         lblLicenseToken: "System Token:",
         labelLicenseFile: "Your License Key:",
         labelLicenseActive: "Active License:",
@@ -29,56 +53,52 @@ Wecom.billboardTexts = {
         labelLicenseInstallDate: "License Installation Date:",
         labelLicenseUsed: "Licenses in Use:",
         labelPostExpired: "Expired",
-        labelSearchUsers: "Search Users",
         labelPostFuture: "Future",
         labelPostDeleted: "Deleted",
         labelPostActive: "Active",
-        labelPostDateStart: "Date Start",
-        labelPostDateEnd: "Date End",
+        labelPostDateStart: "Start Date",
+        labelPostDateEnd: "End Date",
         labelPostCreator: "Creator",
         labelPostEdit: "Edit",
         labelPostStatus: "Status",
-        labelCfgUrl: "Public Post's",
+        labelCfgUrl: "Public Posts",
+        labelAlert: "ATTENTION",
+        labelDelAllPosts: "Please delete all posts first",
+        labelCompletePostFormAlert: "Please fill in all fields correctly to create the post",
+        labelFullAllPosts: "Please fill in all fields correctly to create the post",
+        labelDataEndPostAlert: "The end date of the post cannot be earlier than the start date",
+        labelDataStartPostAlert: "The start date of the post cannot be earlier than the current date",
+        labelUpdateDateAlert: "The updated date cannot be earlier than the current date",
+        labelUpdateEditorAlert: "You must select at least one editor for this department",
+        labelConfigSaveSuccess: "Settings Updated Successfully!",
+        labelUsersInsertAlert: "Users Inserted Successfully!",
+        labelLicenseKeyAlert: "The license key needs to be provided!"
         
     },
-    de: {
-    },
-    pt: {
-        labelTituloAdmin: "Bem vindo ao Quadro de Avisos",
-        labelTituloLicense: "Gerenciamento de Licenças",
-        labelAdmin: "Administração",
-        labelPublic: "Externo",
-        labelPrivate: "Interno",
-        labelAdd: "adicionar+",
-        labelSearchUsers: "Pesquisar Usuários",
-        labelInicio: "Inicio: ",
-        labelExpired : "Expiração: ",
-        labelExcluidos: "Excluídos: ",
-        labelUser: "Usuário",
-        labelEditor: "Editor",
-        labelViewer: "Visualizador",
-        labelClose: "Fechar",
-        labelInsert: "Inserir",
-        btnOk: "Ok",
-        labelCfgUsers: "Usuários",
-        labelCfgLicense: "Licenças",
-        labelCfgDepartment: "Departamentos",
-        labelCfgPost: "Posts",
-        lblLicenseToken: "Token do sistema:",
-        labelLicenseFile: "Sua chave de licença:",
-        labelLicenseActive: "Licença ativa:",
-        labelAppInstallDate: "Data Expiração Lic Temp:",
-        labelLicenseInstallDate: "Data instalação da Licença:",
-        labelLicenseUsed: "Licenças em uso:",
-        labelPostExpired: "Expirado",
-        labelPostFuture: "Futuro",
-        labelPostDeleted: "Deletado",
-        labelPostActive: "Ativo",
-        labelPostDateStart: "Data Início",
-        labelPostDateEnd: "Data Fim",
-        labelPostCreator: "Criador",
-        labelPostEdit: "Editar",
-        labelPostStatus: "Status",
-        labelCfgUrl: "Postagens Públicas",
-    }
+
+
+    
+   
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+  
+
+    
+    
+    
+    
+    
+    
+
+    
+
 }

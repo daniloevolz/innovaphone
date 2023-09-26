@@ -380,6 +380,7 @@ a {
     width: 80%;
     height: 55%;
     font-size: 15px;
+    overflow-y: auto;
 }
 #msgbox textarea::-webkit-scrollbar {
     font-size: 15px;
