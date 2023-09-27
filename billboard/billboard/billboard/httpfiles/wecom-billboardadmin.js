@@ -376,7 +376,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var userName = users.length > 0 ? users[0].cn : '';
 
             if (depart.deleted == null) {
-                var departDel = "Não"
+                var departDel = texts.text("labelNo")
             } else {
                 var dateString = depart.deleted;
                 var date = new Date(dateString);
@@ -593,7 +593,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var userName = users.length > 0 ? users[0].cn : '';
 
             if (post.deleted == null) {
-                var postDel = "Não"
+                var postDel = texts.text("labelNo")
             } else {
                 var dateString = post.deleted;
                 var date = new Date(dateString);
