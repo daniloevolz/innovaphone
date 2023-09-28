@@ -219,6 +219,11 @@ function filterObjectsByDevice(objects, mac) {
 
 new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-coolwork") {
+    }
+});
+
+new JsonApi("admin").onconnected(function(conn) {
+    if (conn.app == "wecom-coolworkadmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             log("Message:" + JSON.stringify(obj))
@@ -239,7 +244,7 @@ new JsonApi("user").onconnected(function(conn) {
                     }
                 })
                 log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
-                conn.send(JSON.stringify({ api: "user", mt: "PhoneListResult", result: devices, src: obj.src }));
+                conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
             }
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }
@@ -248,17 +253,6 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Logout" }
                 pbxTableRequest(value);
-            }
-        });
-    }
-});
-
-new JsonApi("admin").onconnected(function(conn) {
-    if (conn.app == "wecom-coolworkadmin") {
-        conn.onmessage(function(msg) {
-            var obj = JSON.parse(msg);
-            if (obj.mt == "AdminMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src }));
             }
         });
     }
