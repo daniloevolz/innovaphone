@@ -879,7 +879,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             log("ReplicateUpdate= user " + obj.columns.h323);
             try {
                 pbxTableUsers.forEach(function (user) {
-                    if (user.columns.h323 == obj.columns.h323) {
+                    if (user.columns.guid == obj.columns.guid) {
                         found = true;
                         try {
                             const grps1 = user.columns.grps;

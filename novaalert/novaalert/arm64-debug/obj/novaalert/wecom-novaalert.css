@@ -1597,7 +1597,8 @@ width: 100%;
     color:darkred;
 }
 body {
-    /*background-image: var(--bg);*/
+    /* background-image: var(--bg); */
+    background-image: url(bg.png);
     background-size: cover;
     background-repeat: no-repeat;
     color: var(--text-standard);
