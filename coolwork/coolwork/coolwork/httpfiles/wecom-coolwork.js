@@ -8,7 +8,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     this.createNode("body");
     var that = this;
     var phone_list = [];
-    var filesToUpload = [];
+
     
     var colorSchemes = {
         dark: {
