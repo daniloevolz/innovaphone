@@ -236,15 +236,43 @@ new JsonApi("admin").onconnected(function(conn) {
                     log("PhoneList: dev" + JSON.stringify(dev))
                     var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
                     log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
+                    log("hw id" + dev.hwId)
                     if (filteredObject.length > 0) {
                         log("PhoneList: filteredObject>0")
                         dev.sip = filteredObject[0].columns.h323;
                         dev.cn = filteredObject[0].columns.cn;
                         dev.guid = filteredObject[0].columns.guid;
-                    }
+                        Database.exec("DELETE FROM tbl_devices") 
+                        .oncomplete(function () {
+                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) VALUES ('" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online +  "','" + dev.product +  "','" + dev.sip +  "','" + dev.cn +  "','" + dev.guid + "')")
+                        .oncomplete(function (data) {
+                        log("InsertSuccess" + JSON.stringify(data))
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                                log("InsertDepartmentViewer:result=Error " + String(errorText));
+                        });
+
+                    })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                });
+      
+                // log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
+                // conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
+            }
+            
+        })
+    }
+            if (obj.mt == "SelectDevices") {
+                Database.exec("SELECT * FROM tbl_devices")
+                .oncomplete(function (data) {
+                log("SelectSuccess" + JSON.stringify(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectDevicesResult", result: JSON.stringify(data), src: data.src }));
                 })
-                log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
-                conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("InsertDepartmentViewer:result=Error " + String(errorText));
+                });
             }
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }

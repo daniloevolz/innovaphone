@@ -13,6 +13,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var input; // db files variaveis
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
+    var phone_list = []
     var colDireita;
     var UIuserPicture;
     var avatar = start.consumeApi("com.innovaphone.avatar");
@@ -47,6 +48,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" });
         avatar = new innovaphone.Avatar(start, user, domain);
+        constructor()
     }
 
     function devicesApi_onmessage(conn, obj) {
@@ -59,17 +61,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
     }
     function app_message(obj) {
-        if (obj.api === "admin" && obj.mt === "PhoneListResult") {
-            // placeholder for JsonApi handling
-            console.log("app_message:PhoneListResult " + JSON.stringify(obj.result));
-            var phone_list = obj.result
-            //makePhoneButtons(phone_list)
-            constructor(phone_list)
+        if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
+            phone_list = JSON.parse(obj.result)
+            makeDivCreateRoom(phone_list) 
         }
 
     }
 
-    function constructor(phone){
+    function constructor(){
 
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         colEsquerda.setAttribute("id","colesquerda")
@@ -86,7 +85,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c",texts.text("labelCreateRoom"),null))
         itens.addEvent("click",function(){
-           makeDivCreateRoom(phone)
+            app.send({api:"admin", mt:"SelectDevices"})
         })
         // col direita fora do list - box 
         colDireita = that.add(new innovaphone.ui1.Div(null,null,"colDireita"));
@@ -115,7 +114,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             var fileList = divmain.add(new innovaphone.ui1.Div("", "", "filelist"));
             
     }
-    function makeDivCreateRoom(phone){
+    function makeDivCreateRoom(obj){
         listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
         listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
         listbox.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
@@ -127,11 +126,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         var divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 50%;display: flex;align-items: center;left: 3%; justify-content: center;top: 40%;",null,null).setAttribute("id","divPhones"))
         imgBD = listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 50%;left: 50%;display: flex;align-items: center; justify-content: center;top: 40%;",null,null).setAttribute("id","imgBD"))
-        makePhoneButtons(phone)
+        makePhoneButtons(obj)
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" } }, folderAdded);
         
         document.getElementById("closewindow").addEventListener("click",function(){
             colDireita.rem(listbox)
+            listbox.clear()
         })
 
     var phoneElements = document.querySelectorAll(".phoneButtons");
@@ -154,10 +154,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         ev.preventDefault();
         var data = ev.dataTransfer.getData("text");
         var draggedElement = document.getElementById(data);
-        
-        // Atualize a posição do elemento arrastado para as coordenadas do evento de soltura
-        draggedElement.style.left = (ev.clientX - document.getElementById("imgBD").offsetLeft) + "px";
-        draggedElement.style.top = (ev.clientY - document.getElementById("imgBD").offsetTop) + "px";
+    
+        // Obtenha as coordenadas do cursor do mouse no momento do evento de soltura
+        var mouseX = ev.clientX;
+        var mouseY = ev.clientY;
+    
+        // Obtenha as coordenadas da div "imgBD"
+        var imgBD = document.getElementById("imgBD");
+        var imgBDBounds = imgBD.getBoundingClientRect();
+    
+        // Obtenha as coordenadas do elemento arrastado em relação à div "imgBD"
+        var draggedElementBounds = draggedElement.getBoundingClientRect();
+    
+        // Calcule as coordenadas finais onde o elemento deve ser posicionado
+        var leftOffset = mouseX - (imgBDBounds.left + draggedElementBounds.width / 2);
+        var topOffset = mouseY - (imgBDBounds.top + draggedElementBounds.height / 2);
+    
+        // Atualize a posição do elemento arrastado
+        draggedElement.style.left = leftOffset + "px";
+        draggedElement.style.top = topOffset + "px";
     
         // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
         draggedElement.style.zIndex = "2000";
@@ -166,8 +181,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         draggedElement.style.position = "absolute";
     
         // Anexe o elemento à div "imgBD"
-        document.getElementById("imgBD").appendChild(draggedElement);
+        imgBD.appendChild(draggedElement);
     }
+    
       function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
         ev.dataTransfer.dropEffect = 'copy';
@@ -179,7 +195,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             var userPicture = avatar.url(phone.sip ,80)
             // console.log("SIP DO CARA" + phone.sip)
             var phoneHTML = `
-            <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwId}">
+            <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwid}">
             <div class="user-info">
                 <img class="imgProfile" src="${userPicture}">
                 <div class="user-name">${phone.cn}</div>
