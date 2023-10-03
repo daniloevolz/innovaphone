@@ -242,7 +242,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         dev.sip = filteredObject[0].columns.h323;
                         dev.cn = filteredObject[0].columns.cn;
                         dev.guid = filteredObject[0].columns.guid;
-                        Database.exec("DELETE FROM tbl_devices")
+                        Database.exec("DELETE FROM tbl_devices") 
                         .oncomplete(function () {
                         Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) VALUES ('" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online +  "','" + dev.product +  "','" + dev.sip +  "','" + dev.cn +  "','" + dev.guid + "')")
                         .oncomplete(function (data) {
@@ -250,7 +250,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDepartmentViewer:result=Error " + String(errorText));
+                                log("InsertDevicesResult:result=Error " + String(errorText));
                         });
 
                     })
@@ -271,7 +271,27 @@ new JsonApi("admin").onconnected(function(conn) {
                 conn.send(JSON.stringify({ api: "admin", mt: "SelectDevicesResult", result: JSON.stringify(data), src: data.src }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
-                        log("InsertDepartmentViewer:result=Error " + String(errorText));
+                        log("SelectDevicesResult:result=Error " + String(errorText));
+                });
+            }
+            if(obj.mt == "InsertRoom"){
+                Database.exec("INSERT INTO tbl_room (name , img ) VALUES ('" + obj.name + "','" + obj.img + "')")
+                        .oncomplete(function (data) {
+                            //revisar isso
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                                log("InsertRoomResult:result=Error " + String(errorText));
+                        });
+            }
+            if (obj.mt == "SelectRoom") { // revisar 04/10
+                Database.exec("SELECT * FROM tbl_room")
+                .oncomplete(function (data) {
+                log("SelectSuccess" + JSON.stringify(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(data), src: data.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomResult:result=Error " + String(errorText));
                 });
             }
             if (obj.mt == "LoginPhone") {
@@ -282,8 +302,8 @@ new JsonApi("admin").onconnected(function(conn) {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Logout" }
                 pbxTableRequest(value);
             }
-        });
-    }
+    })
+}
 });
 
 
