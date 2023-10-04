@@ -10,12 +10,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     //var divPhones;  //db files variáveis
+    var filesID = []
     var imgBD; // db files variaveis
+    var controlDB = false ; // db files variaveis
     var input; // db files variaveis
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
     var phone_list = []
     var room_list = []
+    var listID_room = []
     var colDireita;
     var UIuserPicture;
     var avatar = start.consumeApi("com.innovaphone.avatar");
@@ -43,13 +46,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     app.onmessage = app_message;
 
     function app_connected(domain, user, dn, appdomain) {
+        controlDB = false
         UIuser = dn
         avatar = new innovaphone.Avatar(start, user, domain);
         UIuserPicture = avatar.url(user, 80, dn);
         var devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" });
-        app.send({api:"admin", mt:"SelectRoom"}) // revisar 04/10
+        app.send({api:"admin", mt:"SelectAllRoom"})
+        app.send({api:"admin", mt:"SelectDevices"}) // revisar 04/10
         avatar = new innovaphone.Avatar(start, user, domain);
     }
 
@@ -65,18 +70,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
             phone_list = JSON.parse(obj.result)
-            makeDivCreateRoom(phone_list) 
         }
-        if (obj.api === "admin" && obj.mt === "SelectRoomResult") {
+        if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             that.clear()
             room_list = JSON.parse(obj.result)
             constructor()
         }
-
+        if (obj.api === "admin" && obj.mt === "DeleteRoomSuccess") {
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        }
+        if (obj.api === "admin" && obj.mt === "InsertRoomResult") {
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        }
+        if (obj.api === "admin" && obj.mt === "SelectRoomResult") {
+            listID_room = JSON.parse(obj.result)
+            makeDivRoom(obj.department);
+            
+        }
     }
 
     function constructor(){
-
+        controlDB = false
+        that.clear()
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
         colEsquerda.setAttribute("id","colesquerda")
     
@@ -92,13 +107,26 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c",texts.text("labelCreateRoom"),null))
         itens.addEvent("click",function(){
-            app.send({api:"admin", mt:"SelectDevices"})
+            makeDivCreateRoom() 
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Div("font-weight:bold;position: absolute; height: 55%; top: 40%; width: 100%;display: flex; justify-content:center; overflow-x:hidden; overflow-y: auto",null,null).setAttribute("id","roomList"))
-        room_list.forEach(function(room){  // revisar 04/10
-            document.getElementById("roomList").innerHTML += room.name
-        })
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 55%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        // parte de exibição das salas
+        room_list.forEach(function(room) {
+            var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
+                var clickedElement = document.getElementById(room.id)
+                var clickedId = clickedElement.getAttribute("id")
+                console.log('ID do elemento div clicado:', clickedId);
+                app.send({ api: "admin", mt: "SelectRoom", id: clickedId });
+            }));
+            var imgRoom = liRoom.add(new innovaphone.ui1.Node("img", "width: 50px; height: 50px; margin-right: 10px;", null, null));
+            imgRoom.setAttribute("src", room.img);
+            liRoom.add(new innovaphone.ui1.Node("span", "font-weight: bold;", room.name, null));
+            liRoom.add(new innovaphone.ui1.Node("div", "font-weight: bold;", "🗑", "button").addEvent("click",function(){
+                app.send({api: "admin" , mt: "DeleteRoom", id: room.id })
+            }));
+        });
+        
         // col direita fora do list - box 
         colDireita = that.add(new innovaphone.ui1.Div(null,null,"colDireita"));
         var divmain = colDireita.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","mainDiv"));
@@ -114,7 +142,34 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: iptHW.value });}, logoutButton));
             
     }
-    function makeDivCreateRoom(obj){
+    function makeDivRoom(room_id){
+        listID_room.forEach(function(room){
+            listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
+            listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
+            listbox.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
+            divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+            makePhoneButtons(phone_list);
+           var imgRoom =  listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
+           imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
+           var phoneElements = document.querySelectorAll(".phoneButtons");
+           phoneElements.forEach(function (phoneElement) {
+               phoneElement.draggable = true;
+       
+               phoneElement.addEventListener("dragstart",drag,true)
+           });
+           document.getElementById("closewindow").addEventListener("click",function(){
+            colDireita.rem(listbox)
+            controlDB = false
+            listbox.clear()
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        })
+            document.getElementById("divPhones").addEventListener("dragover",allowDrop,true)
+            document.getElementById("divPhones").addEventListener("drop",resetPhonesDrop,true)
+            document.getElementById("imgBD").addEventListener("dragover",allowDrop,true)
+            document.getElementById("imgBD").addEventListener("drop",drop,true)
+        })
+    }
+    function makeDivCreateRoom(){
         listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
         listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
         listbox.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
@@ -124,10 +179,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         input.setAttribute("accept", "image/*");
         input.container.addEventListener('change', onSelectFile, false);
         
-        divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%;left: 40%;display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
-        makePhoneButtons(obj)
-        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" } }, folderAdded);
+        // divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+        imgBD = listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
+        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
         var btnSave = listbox.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:90%;left:80%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
@@ -137,20 +191,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }))
         document.getElementById("closewindow").addEventListener("click",function(){
             colDireita.rem(listbox)
+            controlDB = false
             listbox.clear()
-            app.send({api:"admin", mt:"SelectRoom"})
+            app.send({api:"admin", mt:"SelectAllRoom"})
         })
-
-    var phoneElements = document.querySelectorAll(".phoneButtons");
-    phoneElements.forEach(function (phoneElement) {
-        phoneElement.draggable = true;
-
-        phoneElement.addEventListener("dragstart",drag,true)
-    });
-    document.getElementById("divPhones").addEventListener("dragover",allowDrop,true)
-    document.getElementById("divPhones").addEventListener("drop",resetPhonesDrop,true)
-    document.getElementById("imgBD").addEventListener("dragover",allowDrop,true)
-    document.getElementById("imgBD").addEventListener("drop",drop,true)
     }
    
 
@@ -233,6 +277,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var folder = null;
 
     function onSelectFile() {
+        console.log("Evento do Input File")
+        controlDB = true
         postFile(input.container.files[0]);
     }
 
@@ -281,6 +327,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     }
 
     function deleteFile(id) {
+        controlDB = false
         if (!id) return;
        // dialog.container.showModal();
         sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
@@ -333,36 +380,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     }
 
     function addFileToFileList(file) {
-        
-        var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
-        imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
+        filesID = file.id
 
-         var delButton = new innovaphone.ui1.Div(null, null, "button")
-             .addText("\uD83D\uDDD1")
-             .addEvent("click", function () { deleteFile(file.id) }, delButton);
-        //listbox.add(delButton)
+        if(controlDB){
+            document.getElementById("imgBD").innerHTML = ''
+            var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
+            imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
+            var delButton = new innovaphone.ui1.Div(null, null, "button")
+            .addText("\uD83D\uDDD1")
+            .addEvent("click", function () { deleteFile(file.id) }, delButton);
         imgBD.add(delButton)
-        // var entry = fileList.add(new innovaphone.ui1.Div("", "", "fileentry"));
-        // entry.add(new innovaphone.ui1.Div("", "", "fileid").addText(file.id));
-
-        // var nameContainer = entry.add(new innovaphone.ui1.Div("", "", "filename"));
-        // nameContainer.add(new innovaphone.ui1.Node("span", "", file.name, ""));
-
-        // var sizeContainer = entry.add(new innovaphone.ui1.Div("", "", "filesize"));
-        // sizeContainer.add(new innovaphone.ui1.Node("span", "", formatBytes(file.size), ""));
-
-        // in-session download link, available only as long the user is logged in
-        // var linkcontainerPrivate = entry.add(new innovaphone.ui1.Div("", "", "private"));
-        // var linkPrivate = linkcontainerPrivate.add(new innovaphone.ui1.Node("a", "", "", "").addText("Private Link"));
-        // linkPrivate.setAttribute("href", file.url);
-        // linkPrivate.setAttribute("target", "_blank");
-
-        // share file download link, avilable via URL
-        // var linkcontainerPublic = entry.add(new innovaphone.ui1.Div("", "", "public"));
-        // var linkPublic = linkcontainerPublic.add(new innovaphone.ui1.Node("a", "", "", "").addText("Public Link"));
-        // linkPublic.setAttribute("href", start.originalUrl + "/files/" + file.id);
-        // linkPublic.setAttribute("target", "_blank");
-
+        }else{
+            document.getElementById("imgBD").innerHTML = ''
+        }
     }
         
 

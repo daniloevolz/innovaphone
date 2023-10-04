@@ -33,7 +33,7 @@ function streamFileData(req, fileId, fileName, fileDataIds) {
     log("streamFileData: fileId=" + fileId + ", fileName=" + fileName + ", fileDataIds=" + JSON.stringify(fileDataIds));
     //var headerContentDisposition = 'attachment; filename="' + fileName + '"';
     var headerContentDisposition = 'inline'
-    req.responseContentType("image/jpeg")
+    req.responseContentType("image/*")
         .responseHeader("Content-Disposition", headerContentDisposition)
         .sendResponse()
         .onsend(function (req) {
@@ -284,8 +284,19 @@ new JsonApi("admin").onconnected(function(conn) {
                                 log("InsertRoomResult:result=Error " + String(errorText));
                         });
             }
-            if (obj.mt == "SelectRoom") { // revisar 04/10
+            if (obj.mt == "SelectAllRoom") { // revisar 04/10
                 Database.exec("SELECT * FROM tbl_room")
+                .oncomplete(function (data) {
+                log("SelectSuccess" + JSON.stringify(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectAllRoomResult", result: JSON.stringify(data), src: data.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectAllRoomResult:result=Error " + String(errorText));
+                });
+            }
+            if(obj.mt == "SelectRoom"){
+                var querySelect = "SELECT * FROM tbl_room WHERE id =" + obj.id + ";"
+                Database.exec(querySelect)
                 .oncomplete(function (data) {
                 log("SelectSuccess" + JSON.stringify(data))
                 conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(data), src: data.src }));
@@ -293,6 +304,16 @@ new JsonApi("admin").onconnected(function(conn) {
                 .onerror(function (error, errorText, dbErrorCode) {
                         log("SelectRoomResult:result=Error " + String(errorText));
                 });
+            }
+            if (obj.mt == "DeleteRoom"){
+                Database.exec("DELETE FROM tbl_room WHERE id = " + obj.id)
+                .oncomplete(function (data) {
+                    log("DeleteSuccess" + JSON.stringify(data))
+                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                            log("DeleteRoomResult:result=Error " + String(errorText));
+                    });
             }
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }
