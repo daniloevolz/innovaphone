@@ -265,7 +265,7 @@ new JsonApi("admin").onconnected(function(conn) {
         })
     }
             if (obj.mt == "SelectDevices") {
-                Database.exec("SELECT * FROM tbl_devices")
+                Database.exec("SELECT * FROM tbl_devices WHERE room_id IS NULL")
                 .oncomplete(function (data) {
                 log("SelectSuccess" + JSON.stringify(data))
                 conn.send(JSON.stringify({ api: "admin", mt: "SelectDevicesResult", result: JSON.stringify(data), src: data.src }));
@@ -294,26 +294,67 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("SelectAllRoomResult:result=Error " + String(errorText));
                 });
             }
-            if(obj.mt == "SelectRoom"){
-                var querySelect = "SELECT * FROM tbl_room WHERE id =" + obj.id + ";"
-                Database.exec(querySelect)
-                .oncomplete(function (data) {
-                log("SelectSuccess" + JSON.stringify(data))
-                conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(data), src: data.src }));
-                })
-                .onerror(function (error, errorText, dbErrorCode) {
-                        log("SelectRoomResult:result=Error " + String(errorText));
-                });
-            }
-            if (obj.mt == "DeleteRoom"){
-                Database.exec("DELETE FROM tbl_room WHERE id = " + obj.id)
-                .oncomplete(function (data) {
-                    log("DeleteSuccess" + JSON.stringify(data))
-                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomSuccess" }));
+            if (obj.mt == "SelectRoom") {
+                var roomId = obj.id;
+            
+                var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
+                var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
+            
+                Database.exec(querySelectRoom)
+                    .oncomplete(function (roomData) {
+                        Database.exec(querySelectDevices)
+                            .oncomplete(function (deviceData) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(roomData) , dev: JSON.stringify(deviceData) }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("SelectRoomResult: Error ao selecionar dispositivos: " + String(errorText));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                            log("DeleteRoomResult:result=Error " + String(errorText));
+                        log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
                     });
+            }
+            if (obj.mt == "DeleteRoom") {
+                var roomId = obj.id;
+                var queryUpdateDevices = "UPDATE tbl_devices SET room_id = NULL WHERE room_id = " + roomId + ";";
+                Database.exec(queryUpdateDevices)
+                    .oncomplete(function (updateResult) {
+                        if (updateResult.src) {
+                            Database.exec("DELETE FROM tbl_room WHERE id = " + roomId)
+                                .oncomplete(function (deleteResult) {
+                                    log("DeleteRoom: Sala excluída com sucesso");
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomSuccess" }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    log("DeleteRoom: Erro ao excluir a sala: " + String(errorText));
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
+                                });
+                        } else {
+                            log("DeleteRoom: Erro ao atualizar dispositivos: " + String(updateResult.errorText));
+                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(updateResult.errorText) }));
+                        }
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("DeleteRoom: Erro ao atualizar dispositivos: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
+                    });
+            }
+            
+            if (obj.mt == "UpdateDeviceRoom") {
+                var devices = [];
+                devices = obj.devices;
+                devices.forEach(function (dev) {
+                    var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";
+                    
+                    Database.exec(sql)
+                        .oncomplete(function (data) {
+                            log("UpdateSuccess" + JSON.stringify(data));
+                            conn.send(JSON.stringify({ api: "admin", mt: "UpdateDevicesResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("UpdateDevicesResult:result=Error " + String(errorText));
+                        });
+                });
             }
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }

@@ -10,15 +10,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     //var divPhones;  //db files variáveis
-    var filesID = []
+    var filesID = [];
+    var ativos = [];  // vaiavel para controle dos devices de cada sala
+
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
     var input; // db files variaveis
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
-    var phone_list = []
-    var room_list = []
-    var listID_room = []
+    var phone_list = [] // todos os devices
+    var listDeviceRoom; 
+    var list_AllRoom = []
+    var list_room = []
     var colDireita;
     var UIuserPicture;
     var avatar = start.consumeApi("com.innovaphone.avatar");
@@ -54,7 +57,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" });
         app.send({api:"admin", mt:"SelectAllRoom"})
-        app.send({api:"admin", mt:"SelectDevices"}) // revisar 04/10
+         // revisar 04/10
         avatar = new innovaphone.Avatar(start, user, domain);
     }
 
@@ -73,7 +76,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             that.clear()
-            room_list = JSON.parse(obj.result)
+            list_AllRoom = JSON.parse(obj.result)
             constructor()
         }
         if (obj.api === "admin" && obj.mt === "DeleteRoomSuccess") {
@@ -83,9 +86,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
         if (obj.api === "admin" && obj.mt === "SelectRoomResult") {
-            listID_room = JSON.parse(obj.result)
+            list_room = JSON.parse(obj.result)
+            listDeviceRoom = JSON.parse(obj.dev)
             makeDivRoom(obj.department);
             
+        }
+        if (obj.api === "admin" && obj.mt === "UpdateDevicesResult") {
+            app.send({api:"admin", mt:"SelectAllRoom"})
         }
     }
 
@@ -112,11 +119,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
         var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 55%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
-        room_list.forEach(function(room) {
+         list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
                 var clickedElement = document.getElementById(room.id)
                 var clickedId = clickedElement.getAttribute("id")
                 console.log('ID do elemento div clicado:', clickedId);
+                app.send({api:"admin", mt:"SelectDevices"})
                 app.send({ api: "admin", mt: "SelectRoom", id: clickedId });
             }));
             var imgRoom = liRoom.add(new innovaphone.ui1.Node("img", "width: 50px; height: 50px; margin-right: 10px;", null, null));
@@ -143,31 +151,114 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             
     }
     function makeDivRoom(room_id){
-        listID_room.forEach(function(room){
-            listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
+        list_room.forEach(function(room){
+            listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
             listbox.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
             divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-            makePhoneButtons(phone_list);
            var imgRoom =  listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
            imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
+           makePhoneButtons(phone_list);
+
+           if(listDeviceRoom.length > 0){
+            listDeviceRoom.forEach(function(dev){
+                var userPicture = avatar.url(dev.sip ,80)
+                var html = `<div style = "top: ${dev.topoffset + "px"}; left: ${dev.leftoffset + "px"}; position:absolute;" class="StatusPhone${dev.online} phoneButtons" id="${dev.hwid}">
+                <div class="user-info">
+                    <img class="imgProfile" src="${userPicture}">
+                    <div class="user-name">${dev.cn}</div>
+                </div>
+                <div class="product-name">${dev.product}</div>
+                 </div>    `
+                
+                 document.getElementById("imgBD").innerHTML += html
+           })
+           }
            var phoneElements = document.querySelectorAll(".phoneButtons");
            phoneElements.forEach(function (phoneElement) {
                phoneElement.draggable = true;
        
                phoneElement.addEventListener("dragstart",drag,true)
            });
-           document.getElementById("closewindow").addEventListener("click",function(){
+           document.getElementById("closewindow").addEventListener("click",function(){  // close 
             colDireita.rem(listbox)
             controlDB = false
             listbox.clear()
             app.send({api:"admin", mt:"SelectAllRoom"})
         })
+        listbox.add(new innovaphone.ui1.Node("button", "position:absolute;top:90%;height:30px;width:90px;text-align:center;font-weight:bold;left:80%", "Salvar", null).addEvent("click", function () {
+            console.log("Salvando");
+
+            var activeDevices = document.querySelectorAll(".DeviceActive");
+            var updatedDevices = [];
+        
+           
+            activeDevices.forEach(function (dev) {
+                updatedDevices.push({
+                    hwId: dev.id, 
+                    room_id: room.id, 
+                    top: parseFloat(dev.style.top), 
+                    left: parseFloat(dev.style.left) 
+                });
+            });
+            console.log("updated" + JSON.stringify(updatedDevices));
+            app.send({ api: "admin", mt: "UpdateDeviceRoom", devices: updatedDevices });
+        }));
+    })      // listeners dentro ou fora do forEach()???
             document.getElementById("divPhones").addEventListener("dragover",allowDrop,true)
             document.getElementById("divPhones").addEventListener("drop",resetPhonesDrop,true)
             document.getElementById("imgBD").addEventListener("dragover",allowDrop,true)
-            document.getElementById("imgBD").addEventListener("drop",drop,true)
-        })
+         document.getElementById("imgBD").addEventListener("drop", function(ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var draggedElement = document.getElementById(data);
+    
+        // Obtenha as coordenadas do cursor do mouse no momento do evento de soltura
+        var mouseX = ev.clientX;
+        var mouseY = ev.clientY;
+    
+        // Obtenha as coordenadas da div "imgBD"
+        var imgBD = document.getElementById("imgBD");
+        var imgBDBounds = imgBD.getBoundingClientRect();
+    
+        // Obtenha as coordenadas do elemento arrastado em relação à div "imgBD"
+        var draggedElementBounds = draggedElement.getBoundingClientRect();
+
+        // Calcule as coordenadas finais onde o elemento deve ser posicionado
+        var leftOffset = mouseX - (imgBDBounds.left + draggedElementBounds.width / 2);
+        var topOffset = mouseY - (imgBDBounds.top + draggedElementBounds.height / 2);
+    
+        // Atualize a posição do elemento arrastado
+        draggedElement.style.left = leftOffset + "px";
+        draggedElement.style.top = topOffset + "px";
+        
+        draggedElement.classList.add("DeviceActive")
+        
+        // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
+        draggedElement.style.zIndex = "2000";
+    
+        // Defina a posição como absoluta para garantir o posicionamento correto
+        draggedElement.style.position = "absolute";
+            
+        ativos = [];
+
+        var activeDevices = document.querySelectorAll(".DeviceActive");
+        
+        if (activeDevices) {
+            activeDevices.forEach(function(dev){
+                var dispositivosAtivos = phone_list.filter(function (item) {
+                    return item.hwid == dev.id;
+                });
+                ativos = ativos.concat(dispositivosAtivos);
+            });
+        
+            console.log("ativos" + JSON.stringify(ativos));
+        }
+        // Anexe o elemento à div "imgBD"
+        //draggedElement.setAttribute("id",room.id)
+        imgBD.appendChild(draggedElement);
+    })
     }
     function makeDivCreateRoom(){
         listbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
@@ -212,50 +303,35 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         document.getElementById("imgBD").removeChild(draggedElement)
         draggedElement.style.position = 'static'
+        draggedElement.name = '';
+        draggedElement.classList.remove("DeviceActive")
+        
+        // Remova o dispositivo da lista de dispositivos ativos
+    var deviceId = draggedElement.id; // Supondo que o ID do dispositivo corresponda ao ID na lista de dispositivos ativos
+    var indexToRemove = -1;
+
+    for (var i = 0; i < ativos.length; i++) {
+        if (ativos[i].hwid === deviceId) {
+            indexToRemove = i;
+            break;
+        }
+    }
+
+    if (indexToRemove >= 0) {
+        ativos.splice(indexToRemove, 1);
+    }
+        console.log("ativos after reset " + JSON.stringify(ativos))
         divPhones.appendChild(draggedElement);
+
+
     }
-    function drop(ev) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        var draggedElement = document.getElementById(data);
-    
-        // Obtenha as coordenadas do cursor do mouse no momento do evento de soltura
-        var mouseX = ev.clientX;
-        var mouseY = ev.clientY;
-    
-        // Obtenha as coordenadas da div "imgBD"
-        var imgBD = document.getElementById("imgBD");
-        var imgBDBounds = imgBD.getBoundingClientRect();
-    
-        // Obtenha as coordenadas do elemento arrastado em relação à div "imgBD"
-        var draggedElementBounds = draggedElement.getBoundingClientRect();
-    
-        // Calcule as coordenadas finais onde o elemento deve ser posicionado
-        var leftOffset = mouseX - (imgBDBounds.left + draggedElementBounds.width / 2);
-        var topOffset = mouseY - (imgBDBounds.top + draggedElementBounds.height / 2);
-    
-        // Atualize a posição do elemento arrastado
-        draggedElement.style.left = leftOffset + "px";
-        draggedElement.style.top = topOffset + "px";
-    
-        // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
-        draggedElement.style.zIndex = "2000";
-    
-        // Defina a posição como absoluta para garantir o posicionamento correto
-        draggedElement.style.position = "absolute";
-    
-        // Anexe o elemento à div "imgBD"
-        imgBD.appendChild(draggedElement);
-    }
-    
       function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
         ev.dataTransfer.dropEffect = 'copy';
     }
 
     function makePhoneButtons(obj){
-
+        
         obj.forEach(function (phone) {
             var userPicture = avatar.url(phone.sip ,80)
             // console.log("SIP DO CARA" + phone.sip)

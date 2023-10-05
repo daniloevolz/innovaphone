@@ -85,12 +85,12 @@
                   },
                   {
                     "cmd": "column",
-                    "name": "leftOffset",
+                    "name": "leftoffset",
                     "type": "TEXT"
                   },
                   {
                     "cmd": "column",
-                    "name": "topOffset",
+                    "name": "topoffset",
                     "type": "TEXT"
                   },
                   {
