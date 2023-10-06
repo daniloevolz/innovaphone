@@ -242,9 +242,9 @@ new JsonApi("admin").onconnected(function(conn) {
                         dev.sip = filteredObject[0].columns.h323;
                         dev.cn = filteredObject[0].columns.cn;
                         dev.guid = filteredObject[0].columns.guid;
-                        Database.exec("DELETE FROM tbl_devices") 
+                        Database.exec("DELETE FROM tbl_devices WHERE room_id IS NULL") 
                         .oncomplete(function () {
-                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) VALUES ('" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online +  "','" + dev.product +  "','" + dev.sip +  "','" + dev.cn +  "','" + dev.guid + "')")
+                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.sip + "','" + dev.cn + "','" + dev.guid + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
                         .oncomplete(function (data) {
                         log("InsertSuccess" + JSON.stringify(data))
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
@@ -319,7 +319,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 var queryUpdateDevices = "UPDATE tbl_devices SET room_id = NULL WHERE room_id = " + roomId + ";";
                 Database.exec(queryUpdateDevices)
                     .oncomplete(function (updateResult) {
-                        if (updateResult.src) {
+                        if (updateResult) {
                             Database.exec("DELETE FROM tbl_room WHERE id = " + roomId)
                                 .oncomplete(function (deleteResult) {
                                     log("DeleteRoom: Sala excluída com sucesso");
@@ -330,8 +330,8 @@ new JsonApi("admin").onconnected(function(conn) {
                                     conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                                 });
                         } else {
-                            log("DeleteRoom: Erro ao atualizar dispositivos: " + String(updateResult.errorText));
-                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(updateResult.errorText) }));
+                            //log("DeleteRoom: Erro ao atualizar dispositivos: " + String(updateResult.errorText));
+                           // conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(updateResult.errorText) }));
                         }
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
