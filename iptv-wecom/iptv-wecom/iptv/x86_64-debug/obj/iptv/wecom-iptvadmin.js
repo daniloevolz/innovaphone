@@ -61,7 +61,7 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
             makeDivAdmin();
             makePopup("Atenção", "Canal criado com sucesso!");
         }
-        if (obj.api == "admin" && obj.mt == "DeleteMessageSuccess") {
+        if (obj.api == "channel" && obj.mt == "DeleteMessageSuccess") {
             that.clear();
             app.send({ api: "channel", mt: "SelectChannelMessage" });
             makeDivAdmin();
@@ -165,8 +165,8 @@ Wecom.iptvAdmin = Wecom.iptvAdmin || function (start, args) {
         // wecom.setAttribute("id","logowecom");
         var wecomA = wecom.add(new innovaphone.ui1.Node("a",null,null,null))
         wecomA.setAttribute("href","https://wecom.com.br")
-        var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
-        imgwecom.setAttribute("src","./images/wecom-white.svg")
+        //var imgwecom = wecomA.add(new innovaphone.ui1.Node("img",null,null,"imglogo"));
+        //imgwecom.setAttribute("src","./images/wecom-white.svg")
         // titulo
         var labelTitulo = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTitle")));
     }

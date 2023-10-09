@@ -72,7 +72,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
     }
     setInterval(function(){
-        devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e melhorar
+        devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e fazer melhorias 
     },5000)
 
     function app_message(obj) {
