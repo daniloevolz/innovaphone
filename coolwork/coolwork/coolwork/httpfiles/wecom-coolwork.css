@@ -13,10 +13,28 @@ a {
 .colDireita{
     position:absolute;width:85%;left:15%;height:100%;
 }
+.insideDiv {
+    margin: auto;
+    width: 100%;
+    position: absolute;
+    /* font-size: 0px; */
+    /* top: 10%; */
+    z-index: 5000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: rgba(85, 151, 226, 0.548);
+    /* opacity: 0.2; */
+}
+.DeviceActive{
+    width: 100px !important;
+}
 .list-box {
     margin: 25px;
     /* position: relative; */
-    width: 95%;
+    width: 80%;
+    left: 15%;
     padding: 30px;
     background: linear-gradient(rgb(20, 30, 48), rgb(36, 59, 85));
     box-sizing: border-box;
