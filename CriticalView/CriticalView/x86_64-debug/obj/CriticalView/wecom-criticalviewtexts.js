@@ -2,7 +2,7 @@
 var Wecom = Wecom || {};
 Wecom.CriticalViewTexts = {
     pt:{
-        labelTitle: "Painel Admin CriticalView",
+        labelTitle: "Painel Admin Câmera View",
         AddVideo: "Adicionar Vídeo",
         RemoveVideo: "Apagar Vídeo",
         labelName: "Nome do Video:",
