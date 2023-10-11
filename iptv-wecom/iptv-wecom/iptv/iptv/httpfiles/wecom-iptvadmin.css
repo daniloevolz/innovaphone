@@ -3,7 +3,7 @@ body {
     /* background-color: var(--bg); */
     color: var(--text-standard);
     font-family: arial;
-    background-image: var(--bg);
+    background-image: url(./images/background.jpg)
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
