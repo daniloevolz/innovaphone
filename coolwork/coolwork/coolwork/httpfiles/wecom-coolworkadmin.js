@@ -24,6 +24,17 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var colDireita;
     var UIuserPicture;
     var avatar = start.consumeApi("com.innovaphone.avatar");
+    // var websocket = null
+
+    // function send(obj) {
+    //     if (obj && websocket) {
+    //         var msg = JSON.stringify(obj);
+    //         console.log("send to pbx (" + websocket.readyState + "): " + msg);
+    //         websocket.send(msg);
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     var colorSchemes = {
         dark: {
@@ -143,7 +154,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         // col direita fora do list - box 
         colDireita = that.add(new innovaphone.ui1.Div(null,null,"colDireita"));
-        var divmain = colDireita.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","mainDiv"));
+        var divmain = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","mainDiv"));
         divmain.add(new innovaphone.ui1.Node("span", "", "MAC do Telefone:", ""));
         var inputHW = divmain.add(new innovaphone.ui1.Node("input", "", "", ""));
         inputHW.setAttribute("id", "hwinput").setAttribute("type", "text");
@@ -154,8 +165,21 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var logoutButton = divmain.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Logout")
             .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: iptHW.value });}, logoutButton));
-            
-    }
+        var divPresence = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","userPresence"));
+        divPresence.add(new innovaphone.ui1.Node("span", "", "Presence PBX:", ""));
+        var inputPresence = divPresence.add(new innovaphone.ui1.Node("input", "", "", ""));
+        inputPresence.setAttribute("id", "pcinput").setAttribute("type", "text");
+        var pcInput = document.getElementById("pcinput")
+        var pcButton = divPresence.add(new innovaphone.ui1.Div(null, null, "button")
+            .addText("Set Presence")
+            .addEvent("click", function () { app.send({api: "PbxApi", mt: "SetOwnPresence", activity: "away",note: pcInput.value})}, pcButton));
+            // var obj = { 
+            // mt: "PresenceUpdated",
+            // activity: "away", 
+            // note: pcInput.value}; 
+            // }, app.send(obj))
+            // );
+}
     function makeDivRoom(t){
         list_room.forEach(function(room){
             var insideDiv = t.add(new innovaphone.ui1.Div(null,null,"insideDiv"))

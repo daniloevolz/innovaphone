@@ -367,7 +367,17 @@ new JsonApi("admin").onconnected(function(conn) {
     })
 }
 });
-
+new PbxApi("PbxApi").onconnected(function(conn) {
+    conn.setFlowControl(true)
+        .onmessage(function(msg) {
+        log("ERICK SET PbxApi:",JSON.stringify(conn))
+            var obj = JSON.parse(msg);
+            if (obj.mt == "SubscribePresenceResult") {
+                // do something
+            }
+            conn.messageComplete();
+        });
+});
 
 var pbxTable = [];
 var pbxTableUsers = [];

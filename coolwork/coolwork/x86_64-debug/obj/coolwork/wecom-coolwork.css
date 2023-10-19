@@ -10,8 +10,11 @@ a {
     color: var(--text-standard);
     text-decoration: underline;
 }
-.colDireita{
-    position:absolute;width:85%;left:15%;height:100%;
+.colDireita {
+    position: absolute;
+    width: 85%;
+    left: 15%; 
+    /*height:100%;*/
 }
 .insideDiv {
     margin: auto;
