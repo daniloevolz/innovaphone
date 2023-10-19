@@ -1,4 +1,6 @@
 ﻿// inicio db files
+
+
 WebServer.onrequest("files", function (req) {
     log("request URI=" + req.relativeUri);
     if (req.method === "GET") {
@@ -221,14 +223,13 @@ new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-coolwork") {
     }
 });
-
+var notePresence = [];
 new JsonApi("admin").onconnected(function(conn) {
     if (conn.app == "wecom-coolworkadmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
-            log("Message:" + JSON.stringify(obj))
+            log("Message OBJ:" + JSON.stringify(obj))
             if (obj.mt == "PhoneList") {
-
                 var devices = [];
                 devices = obj.devices;
                 log("PhoneList: devices " + JSON.stringify(devices));
@@ -338,14 +339,12 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("DeleteRoom: Erro ao atualizar dispositivos: " + String(errorText));
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                     });
-            }
-            
+            }           
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];
                 devices = obj.devices;
                 devices.forEach(function (dev) {
-                    var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";
-                    
+                    var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";           
                     Database.exec(sql)
                         .oncomplete(function (data) {
                             log("UpdateSuccess" + JSON.stringify(data));
@@ -355,7 +354,17 @@ new JsonApi("admin").onconnected(function(conn) {
                             log("UpdateDevicesResult:result=Error " + String(errorText));
                         });
                 });
+            } 
+            if(obj.mt == "UpdatePresence"){
+                 notePresence = []
+                 notePresence = obj.note
+                 log("NotePresence" + notePresence)
+                 log("NotePresence" + JSON.stringify(notePresence))
+                 log("SIP DO CARA" + conn.sip)
+                 //log("HW DO CARA" + conn.hw)
+                 // HW 
             }
+
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }
                 pbxTableRequest(value);
@@ -368,16 +377,24 @@ new JsonApi("admin").onconnected(function(conn) {
 }
 });
 new PbxApi("PbxApi").onconnected(function(conn) {
-    conn.setFlowControl(true)
-        .onmessage(function(msg) {
-        log("ERICK SET PbxApi:",JSON.stringify(conn))
-            var obj = JSON.parse(msg);
-            if (obj.mt == "SubscribePresenceResult") {
-                // do something
-            }
-            conn.messageComplete();
-        });
-});
+    log("PbxApi conectada")
+        conn.send(JSON.stringify({
+            "api": "PbxApi",
+            "mt": "SetPresence",
+            "sip": "Erick",
+            "activity" : "busy",
+            "note": "FUNCIONANDO"
+        }));
+    })
+    // conn.setFlowControl(true)
+    //     .onmessage(function(msg) {
+    //     log("ERICK SET PbxApi:",JSON.stringify(conn))
+    //         var obj = JSON.parse(msg);
+    //         if (obj.mt == "SubscribePresenceResult") {
+    //             // do something
+    //         }
+    //         conn.messageComplete();
+    //     });
 
 var pbxTable = [];
 var pbxTableUsers = [];
@@ -390,7 +407,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
         conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
-
     }
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);

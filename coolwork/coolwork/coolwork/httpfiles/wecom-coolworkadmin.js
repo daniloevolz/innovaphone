@@ -82,9 +82,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         
     }
-    setInterval(function(){
-        devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e fazer melhorias 
-    },5000)
+    // setInterval(function(){
+    //     devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e fazer melhorias 
+    // },5000)
 
     function app_message(obj) {
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
@@ -172,7 +172,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var pcInput = document.getElementById("pcinput")
         var pcButton = divPresence.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Set Presence")
-            .addEvent("click", function () { app.send({api: "PbxApi", mt: "SetOwnPresence", activity: "away",note: pcInput.value})}, pcButton));
+            .addEvent("click", function () { app.send({api: "PbxApi", mt: "UpdatePresence", note: pcInput.value})}, pcButton));
             // var obj = { 
             // mt: "PresenceUpdated",
             // activity: "away", 
