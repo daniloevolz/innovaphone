@@ -223,7 +223,7 @@ new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-coolwork") {
     }
 });
-var notePresence = [];
+
 new JsonApi("admin").onconnected(function(conn) {
     PbxApi = conn
     if (conn.app == "wecom-coolworkadmin") {
@@ -231,7 +231,7 @@ new JsonApi("admin").onconnected(function(conn) {
             var obj = JSON.parse(msg);
             log("Message OBJ:" + JSON.stringify(obj))
             if (obj.mt == "SetPresence") {
-                handleSetPresenceMessage(conn.sip, obj.note)
+                handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
 
             if (obj.mt == "PhoneList") {
@@ -382,29 +382,40 @@ new JsonApi("admin").onconnected(function(conn) {
 }
 });
 
-function handleSetPresenceMessage(sip, note) {
-        log("handle LOG - SET PRESENCE MSG:", sip , note)
-        // Enviar a mensagem para a conexão PbxApi
-        PbxApi.send(JSON.stringify({
-                "api": "PbxApi",
-                "mt": "SetOwnPresence",
-                "sip": sip,
-                "activity": "away",
-                "note": note
-            }));
 
-    }
-var PbxApi = {}
-// new PbxApi("PbxApi").onconnected(function(conn) {
-//     log("PbxApi conectada", conn)
-//     PbxApi = conn
-//     // conn.send(JSON.stringify({
-//     //         "api": "PbxApi",
-//     //         "mt": "SetPresence",
-//     //         "sip": "Erick",
-//     //         "activity" : "",
-//     //         "note": "ON START"
-//     // }));
+var pbxApi = {}
+new PbxApi("PbxApi").onconnected(function (conn) {
+    log("PbxApi conectada", conn)
+    pbxApi = conn
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+        log("PbxApi msg: " + msg);
+    })
+
+    conn.onclose(function () {
+        pbxApi = {}
+        log("PbxApi: disconnected");
+    });
+});
+function handleSetPresenceMessage(sip, note, activity) {
+    log("handle LOG - SET PRESENCE MSG:", sip, note)
+    // Enviar a mensagem para a conexão PbxApi
+    pbxApi.send(JSON.stringify({
+        "api": "PbxApi",
+        "mt": "SetPresence",
+        "sip": sip,
+        "activity": activity,
+        "note": note
+    }));
+
+}
+     //conn.send(json.stringify({
+     //         "api": "pbxapi",
+     //         "mt": "setpresence",
+     //         "sip": "erick",
+     //         "activity" : "",
+     //         "note": "on start"
+     //}));
 
 //     // if (conn.app == "wecom-coolworkadmin") {
 //     //     conn.onmessage(function(msg) {

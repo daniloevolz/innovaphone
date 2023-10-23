@@ -172,7 +172,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var pcInput = document.getElementById("pcinput")
         var pcButton = divPresence.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Set Presence")
-            .addEvent("click", function () { app.send({api: "PbxApi", mt: "SetPresence",sip: "Erick", activity:"busy", note: pcInput.value})}, pcButton));
+            .addEvent("click", function () { app.send({api: "admin", mt: "SetPresence", activity:"busy", note: pcInput.value})}, pcButton));
             // var obj = { 
             // mt: "PresenceUpdated",
             // activity: "away", 
