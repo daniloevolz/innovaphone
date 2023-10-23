@@ -225,10 +225,15 @@ new JsonApi("user").onconnected(function(conn) {
 });
 var notePresence = [];
 new JsonApi("admin").onconnected(function(conn) {
+    PbxApi = conn
     if (conn.app == "wecom-coolworkadmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             log("Message OBJ:" + JSON.stringify(obj))
+            if (obj.mt == "SetPresence") {
+                handleSetPresenceMessage(conn.sip, obj.note)
+            };
+
             if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
@@ -376,16 +381,62 @@ new JsonApi("admin").onconnected(function(conn) {
     })
 }
 });
-new PbxApi("PbxApi").onconnected(function(conn) {
-    log("PbxApi conectada")
-        conn.send(JSON.stringify({
-            "api": "PbxApi",
-            "mt": "SetPresence",
-            "sip": "Erick",
-            "activity" : "busy",
-            "note": "FUNCIONANDO"
-        }));
-    })
+
+function handleSetPresenceMessage(sip, note) {
+        log("handle LOG - SET PRESENCE MSG:", sip , note)
+        // Enviar a mensagem para a conexão PbxApi
+        PbxApi.send(JSON.stringify({
+                "api": "PbxApi",
+                "mt": "SetOwnPresence",
+                "sip": sip,
+                "activity": "away",
+                "note": note
+            }));
+
+    }
+var PbxApi = {}
+// new PbxApi("PbxApi").onconnected(function(conn) {
+//     log("PbxApi conectada", conn)
+//     PbxApi = conn
+//     // conn.send(JSON.stringify({
+//     //         "api": "PbxApi",
+//     //         "mt": "SetPresence",
+//     //         "sip": "Erick",
+//     //         "activity" : "",
+//     //         "note": "ON START"
+//     // }));
+
+//     // if (conn.app == "wecom-coolworkadmin") {
+//     //     conn.onmessage(function(msg) {
+//     //         var obj = JSON.parse(msg);
+//     //         log("Message OBJ:" + JSON.stringify(obj))
+//     //         if (obj.mt == "SetPresence") {
+//     //             console.log("ADMIN SET PRESENCE OBJ:",obj)
+//     //             console.log("ADMIN SET PRESENCE MSG:", msg)
+//     //             log("ADMIN LOG - SET PRESENCE OBJ:",obj)
+//     //             log("ADMIN LOG - SET PRESENCE MSG:", msg)
+//     //             conn.send(JSON.stringify({
+//     //                 "api": "PbxApi",
+//     //                 "mt": "SetPresence",
+//     //                 "sip": "Erick",
+//     //                 "activity" : "busy",
+//     //                 "note": "CONN API"
+//     //             }));
+                
+//     //         };
+//     //     });
+//     //     if (presence.length != '' ){
+//     //         conn.send(JSON.stringify({
+//     //             "api": "PbxApi",
+//     //             "mt": "SetPresence",
+//     //             "sip": "Erick",
+//     //             "activity" : "busy",
+//     //             "note": "PRESENCE-UPDATE"
+//     //         }));
+//     //     }
+//     // }
+
+// })
     // conn.setFlowControl(true)
     //     .onmessage(function(msg) {
     //     log("ERICK SET PbxApi:",JSON.stringify(conn))
