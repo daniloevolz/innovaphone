@@ -217,8 +217,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     app.send({ api: "user", mt: "SelectPosts", department: clickedId });
                 })
             })
+            var nameDepartment = department.name
+            if(nameDepartment.length >= "20"){
+                document.getElementById(department.id).style.fontSize = "20px"
+            }
             var ulNew = div.add(new innovaphone.ui1.Node("ul", null, null, null).setAttribute("id", "newDepPost"))
-            var aElement = div.add(new innovaphone.ui1.Node("a", null, department.name, null))
+            var aElement = div.add(new innovaphone.ui1.Node("a", null, nameDepartment, null))
         });
 
         if (createDepartment == true) {
