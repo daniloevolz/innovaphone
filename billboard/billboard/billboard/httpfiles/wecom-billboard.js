@@ -217,6 +217,10 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     app.send({ api: "user", mt: "SelectPosts", department: clickedId });
                 })
             })
+            var nameDepartment = department.name
+            if(nameDepartment.length >= "20"){
+                document.getElementById()
+            }
             var ulNew = div.add(new innovaphone.ui1.Node("ul", null, null, null).setAttribute("id", "newDepPost"))
             var aElement = div.add(new innovaphone.ui1.Node("a", null, department.name, null))
         });
@@ -1201,7 +1205,9 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(dep_id);
         });
-        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, "nameDepDiv").setAttribute("id", "nameDepDiv"))
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #ffff;">`
+        //var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
         postMsgDiv.add(userTable);
 
@@ -1219,7 +1225,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var save = document.getElementById('savemsg');
         save.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
-            var departmentName = document.getElementById("nameDepDiv").innerHTML;
+            var departmentName = document.getElementById("namedep").value;
             var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
             console.log("Salvar clicado!");
             console.log("Nome do departamento:", departmentName);

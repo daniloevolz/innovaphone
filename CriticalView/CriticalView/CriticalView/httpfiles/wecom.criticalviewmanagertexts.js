@@ -2,9 +2,9 @@
 var wecom = wecom || {};
 wecom.criticalviewmanagertexts = {
     en: {
-        pluginTitle: "CriticalView",
-        criticalview: "CriticalView",
-        criticalviewadmin: "CriticalView Admin",
+        pluginTitle: "CâmeraView",
+        criticalview: "CâmeraView",
+        criticalviewadmin: "CâmeraView Admin",
         title: "Name",
         sip: "SIP",
         url: "URL",
@@ -15,9 +15,9 @@ wecom.criticalviewmanagertexts = {
         editapp: "Edit the App",
     },
     de: {
-        pluginTitle: "CriticalView",
-        criticalview: "CriticalView",
-        criticalviewadmin: "CriticalView Admin",
+        pluginTitle: "CâmeraView",
+        criticalview: "CâmeraView",
+        criticalviewadmin: "CâmeraView Admin",
         title: "Name",
         sip: "SIP",
         url: "URL",

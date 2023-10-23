@@ -18,6 +18,92 @@
                 ]
             },
             {
+                "cmd": "table",
+                "name": "tbl_room",
+                "init": [
+                  {
+                    "cmd": "column",
+                    "name": "id",
+                    "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "name",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "img",
+                    "type": "TEXT"
+                  }
+
+                ]
+              },
+            {
+                "cmd": "table",
+                "name": "tbl_devices",
+                "init": [
+                  {
+                    "cmd": "column",
+                    "name": "id",
+                    "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "hwid",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "pbxactive",
+                    "type": "BOOLEAN"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "online",
+                    "type": "BOOLEAN"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "product",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "sip",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "cn",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "guid",
+                    "type": "VARCHAR(120) NOT NULL"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "leftoffset",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "topoffset",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd": "column",
+                    "name": "room_id",
+                    "type": "BIGINT REFERENCES tbl_room(id) ON DELETE CASCADE"
+                  }
+
+
+                ]
+              },
+             
+            {
                 "cmd": "statement",
                 "name": "insert-folder",
                 "query": "INSERT INTO folders (name) VALUES (%s) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id",

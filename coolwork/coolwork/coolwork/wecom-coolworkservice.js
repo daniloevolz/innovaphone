@@ -1,4 +1,6 @@
 ﻿// inicio db files
+
+
 WebServer.onrequest("files", function (req) {
     log("request URI=" + req.relativeUri);
     if (req.method === "GET") {
@@ -33,7 +35,7 @@ function streamFileData(req, fileId, fileName, fileDataIds) {
     log("streamFileData: fileId=" + fileId + ", fileName=" + fileName + ", fileDataIds=" + JSON.stringify(fileDataIds));
     //var headerContentDisposition = 'attachment; filename="' + fileName + '"';
     var headerContentDisposition = 'inline'
-    req.responseContentType("image/jpeg")
+    req.responseContentType("image/*")
         .responseHeader("Content-Disposition", headerContentDisposition)
         .sendResponse()
         .onsend(function (req) {
@@ -221,14 +223,18 @@ new JsonApi("user").onconnected(function(conn) {
     if (conn.app == "wecom-coolwork") {
     }
 });
-
+var notePresence = [];
 new JsonApi("admin").onconnected(function(conn) {
+    PbxApi = conn
     if (conn.app == "wecom-coolworkadmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
-            log("Message:" + JSON.stringify(obj))
-            if (obj.mt == "PhoneList") {
+            log("Message OBJ:" + JSON.stringify(obj))
+            if (obj.mt == "SetPresence") {
+                handleSetPresenceMessage(conn.sip, obj.note)
+            };
 
+            if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
                 log("PhoneList: devices " + JSON.stringify(devices));
@@ -236,16 +242,134 @@ new JsonApi("admin").onconnected(function(conn) {
                     log("PhoneList: dev" + JSON.stringify(dev))
                     var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
                     log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
+                    log("hw id" + dev.hwId)
                     if (filteredObject.length > 0) {
                         log("PhoneList: filteredObject>0")
                         dev.sip = filteredObject[0].columns.h323;
                         dev.cn = filteredObject[0].columns.cn;
                         dev.guid = filteredObject[0].columns.guid;
-                    }
-                })
-                log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
-                conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
+                        Database.exec("DELETE FROM tbl_devices WHERE room_id IS NULL") 
+                        .oncomplete(function () {
+                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.sip + "','" + dev.cn + "','" + dev.guid + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
+                        .oncomplete(function (data) {
+                        log("InsertSuccess" + JSON.stringify(data))
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                                log("InsertDevicesResult:result=Error " + String(errorText));
+                        });
+
+                    })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                });
+      
+                // log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
+                // conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
             }
+            
+        })
+    }
+            if (obj.mt == "SelectDevices") {
+                Database.exec("SELECT * FROM tbl_devices WHERE room_id IS NULL")
+                .oncomplete(function (data) {
+                log("SelectSuccess" + JSON.stringify(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectDevicesResult", result: JSON.stringify(data), src: data.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectDevicesResult:result=Error " + String(errorText));
+                });
+            }
+            if(obj.mt == "InsertRoom"){
+                Database.exec("INSERT INTO tbl_room (name , img ) VALUES ('" + obj.name + "','" + obj.img + "')")
+                        .oncomplete(function (data) {
+                            //revisar isso
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                                log("InsertRoomResult:result=Error " + String(errorText));
+                        });
+            }
+            if (obj.mt == "SelectAllRoom") { // revisar 04/10
+                Database.exec("SELECT * FROM tbl_room")
+                .oncomplete(function (data) {
+                log("SelectSuccess" + JSON.stringify(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "SelectAllRoomResult", result: JSON.stringify(data), src: data.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectAllRoomResult:result=Error " + String(errorText));
+                });
+            }
+            if (obj.mt == "SelectRoom") {
+                var roomId = obj.id;
+            
+                var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
+                var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
+            
+                Database.exec(querySelectRoom)
+                    .oncomplete(function (roomData) {
+                        Database.exec(querySelectDevices)
+                            .oncomplete(function (deviceData) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(roomData) , dev: JSON.stringify(deviceData) }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("SelectRoomResult: Error ao selecionar dispositivos: " + String(errorText));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
+                    });
+            }
+            if (obj.mt == "DeleteRoom") {
+                var roomId = obj.id;
+                var queryUpdateDevices = "UPDATE tbl_devices SET room_id = NULL WHERE room_id = " + roomId + ";";
+                Database.exec(queryUpdateDevices)
+                    .oncomplete(function (updateResult) {
+                        if (updateResult) {
+                            Database.exec("DELETE FROM tbl_room WHERE id = " + roomId)
+                                .oncomplete(function (deleteResult) {
+                                    log("DeleteRoom: Sala excluída com sucesso");
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomSuccess" }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    log("DeleteRoom: Erro ao excluir a sala: " + String(errorText));
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
+                                });
+                        } else {
+                            //log("DeleteRoom: Erro ao atualizar dispositivos: " + String(updateResult.errorText));
+                           // conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(updateResult.errorText) }));
+                        }
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("DeleteRoom: Erro ao atualizar dispositivos: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
+                    });
+            }           
+            if (obj.mt == "UpdateDeviceRoom") {
+                var devices = [];
+                devices = obj.devices;
+                devices.forEach(function (dev) {
+                    var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";           
+                    Database.exec(sql)
+                        .oncomplete(function (data) {
+                            log("UpdateSuccess" + JSON.stringify(data));
+                            conn.send(JSON.stringify({ api: "admin", mt: "UpdateDevicesResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("UpdateDevicesResult:result=Error " + String(errorText));
+                        });
+                });
+            } 
+            if(obj.mt == "UpdatePresence"){
+                 notePresence = []
+                 notePresence = obj.note
+                 log("NotePresence" + notePresence)
+                 log("NotePresence" + JSON.stringify(notePresence))
+                 log("SIP DO CARA" + conn.sip)
+                 //log("HW DO CARA" + conn.hw)
+                 // HW 
+            }
+
             if (obj.mt == "LoginPhone") {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Login" }
                 pbxTableRequest(value);
@@ -254,10 +378,74 @@ new JsonApi("admin").onconnected(function(conn) {
                 var value = { sip: conn.sip, hw: obj.hw, mode: "Logout" }
                 pbxTableRequest(value);
             }
-        });
-    }
+    })
+}
 });
 
+function handleSetPresenceMessage(sip, note) {
+        log("handle LOG - SET PRESENCE MSG:", sip , note)
+        // Enviar a mensagem para a conexão PbxApi
+        PbxApi.send(JSON.stringify({
+                "api": "PbxApi",
+                "mt": "SetOwnPresence",
+                "sip": sip,
+                "activity": "away",
+                "note": note
+            }));
+
+    }
+var PbxApi = {}
+// new PbxApi("PbxApi").onconnected(function(conn) {
+//     log("PbxApi conectada", conn)
+//     PbxApi = conn
+//     // conn.send(JSON.stringify({
+//     //         "api": "PbxApi",
+//     //         "mt": "SetPresence",
+//     //         "sip": "Erick",
+//     //         "activity" : "",
+//     //         "note": "ON START"
+//     // }));
+
+//     // if (conn.app == "wecom-coolworkadmin") {
+//     //     conn.onmessage(function(msg) {
+//     //         var obj = JSON.parse(msg);
+//     //         log("Message OBJ:" + JSON.stringify(obj))
+//     //         if (obj.mt == "SetPresence") {
+//     //             console.log("ADMIN SET PRESENCE OBJ:",obj)
+//     //             console.log("ADMIN SET PRESENCE MSG:", msg)
+//     //             log("ADMIN LOG - SET PRESENCE OBJ:",obj)
+//     //             log("ADMIN LOG - SET PRESENCE MSG:", msg)
+//     //             conn.send(JSON.stringify({
+//     //                 "api": "PbxApi",
+//     //                 "mt": "SetPresence",
+//     //                 "sip": "Erick",
+//     //                 "activity" : "busy",
+//     //                 "note": "CONN API"
+//     //             }));
+                
+//     //         };
+//     //     });
+//     //     if (presence.length != '' ){
+//     //         conn.send(JSON.stringify({
+//     //             "api": "PbxApi",
+//     //             "mt": "SetPresence",
+//     //             "sip": "Erick",
+//     //             "activity" : "busy",
+//     //             "note": "PRESENCE-UPDATE"
+//     //         }));
+//     //     }
+//     // }
+
+// })
+    // conn.setFlowControl(true)
+    //     .onmessage(function(msg) {
+    //     log("ERICK SET PbxApi:",JSON.stringify(conn))
+    //         var obj = JSON.parse(msg);
+    //         if (obj.mt == "SubscribePresenceResult") {
+    //             // do something
+    //         }
+    //         conn.messageComplete();
+    //     });
 
 var pbxTable = [];
 var pbxTableUsers = [];
@@ -270,7 +458,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
         conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
-
     }
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);

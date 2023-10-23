@@ -119,7 +119,7 @@ a {
     text-align: left;
 }
 .container {
-    background-image: var(--bg);
+    background-image: url(./images/background.jpg)
 }
 
 .logo{

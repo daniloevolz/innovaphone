@@ -1,9 +1,9 @@
 
 body {
     /* background-color: var(--bg); */
-    color: var(--text-standard);
+    color: white;
     overflow: hidden;
-    background-image: url(bg.png);
+    background-image: url('./images/background.jpg');
 }
 
 .vjs-modal-dialog-content {
@@ -52,7 +52,7 @@ body {
 /* COLUNA ESQUERDA NA VERTICAL - TESTES */
 
 .colunaesquerda {
-    background-image: url(bg_lateral.png);
+    background-image: url('./images/background.jpg');
     background-size: cover;
     margin-left: 0%;
     float: left;
@@ -137,14 +137,14 @@ a {
     text-decoration: none;
     display: flex;
     padding: 15px;
-    color: #1a7768;
+    color: white;
     font-family: 'Arial';
  /*COR ORIGINAL DO MENU:*/   /*color: #b60c3f;*/
     width: 100%;
     
 }
  a:focus{
-    color: #0f6e5f;
+    color: white;
     font-weight: bold;
 } 
 .logo{

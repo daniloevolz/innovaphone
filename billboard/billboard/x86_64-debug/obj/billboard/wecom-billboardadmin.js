@@ -505,7 +505,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
-        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, "nameDepDiv").setAttribute("id", "nameDepDiv"))
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #ffff;">`
+        //var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
         postMsgDiv.add(userTable);
 
@@ -523,7 +525,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var save = document.getElementById('savemsg');
         save.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
-            var departmentName = document.getElementById("nameDepDiv").innerHTML;
+            var departmentName = document.getElementById("namedep").value;
             var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
             console.log("Salvar clicado!");
             console.log("Nome do departamento:", departmentName);

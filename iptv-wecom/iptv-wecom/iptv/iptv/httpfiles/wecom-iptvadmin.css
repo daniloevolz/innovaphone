@@ -3,7 +3,7 @@ body {
     /* background-color: var(--bg); */
     color: var(--text-standard);
     font-family: arial;
-    background-image: var(--bg);
+    background-image: url(./images/background.jpg)
 }
 /*Edição danilo*/
 .vjs-modal-dialog-content {
@@ -188,7 +188,7 @@ table {
 }
 
     table td {
-        border: 1px solid #02163F;
+        /* border: 1px solid #02163F; */
         width: -webkit-fill-available;
         padding: 10px;
         height: 50px
