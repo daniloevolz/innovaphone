@@ -233,7 +233,14 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "SetPresence") {
                 handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
-
+            if (obj.mt == "TableUsers") {
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
+                })
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+            }
             if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
@@ -344,6 +351,16 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("DeleteRoom: Erro ao atualizar dispositivos: " + String(errorText));
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                     });
+            }
+            if(obj.mt == "DeleteDeviceFromRoom"){
+                var sql = "UPDATE tbl_devices SET room_id = null WHERE hwid = '" + obj.hwid + "'";
+                Database.exec(sql)
+                .oncomplete(function (updatereulst) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteDeviceFromRoomSuccess" }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteDeviceFromRoomError", error: String(errorText) }));
+                });
             }           
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];
@@ -362,7 +379,7 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 } else {
                     devices.forEach(function (dev) {
-                        var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";
+                        var sql = "UPDATE tbl_devices SET topoffset = " + dev.topoffset + ", leftoffset = " + dev.leftoffset + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwid + "'";
                         Database.exec(sql)
                             .oncomplete(function (data) {
                                 log("UpdateSuccess" + JSON.stringify(data));
@@ -374,6 +391,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
                 }   
             } 
+
             if(obj.mt == "UpdatePresence"){
                  notePresence = []
                  notePresence = obj.note

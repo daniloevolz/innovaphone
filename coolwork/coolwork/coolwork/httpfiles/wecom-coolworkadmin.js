@@ -10,7 +10,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     //var divPhones;  //db files variáveis
-    var filesID = [];
+    var filesID;
     var ativos = [];  // vaiavel para controle dos devices de cada sala
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
@@ -18,10 +18,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
     var phone_list = [] // todos os devices
-    var listDeviceRoom; 
+    var listDeviceRoom = []; 
     var list_AllRoom = []
     var list_room = []
     var colDireita;
+    var list_tableUsers = []
     var UIuserPicture;
     var avatar = start.consumeApi("com.innovaphone.avatar");
     // var websocket = null
@@ -61,6 +62,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var devicesApi; // revisar - importante 
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({ api: "admin", mt: "TableUsers" });
         controlDB = false
         UIuser = dn
         avatar = new innovaphone.Avatar(start, user, domain);
@@ -110,6 +112,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api === "admin" && obj.mt === "UpdateDevicesResult") {
             app.send({api:"admin", mt:"SelectAllRoom"})
+        }
+        if (obj.api == "admin" && obj.mt == "TableUsersResult") {
+            list_tableUsers = JSON.parse(obj.result);
+            
         }
     }
 
@@ -212,10 +218,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                phoneElement.addEventListener("dragstart",drag,true)
            });
            document.getElementById("closewindow").addEventListener("click",function(){  // close 
-            colDireita.rem(insideDiv)
-            controlDB = false
-            insideDiv.clear()
-            app.send({api:"admin", mt:"SelectAllRoom"})
+                colDireita.rem(insideDiv)
+                controlDB = false
+                insideDiv.clear()
+                app.send({api:"admin", mt:"SelectAllRoom"})
+
         })
         listbox.add(new innovaphone.ui1.Node("button", "position:absolute;top:90%;height:30px;width:90px;text-align:center;font-weight:bold;left:80%", "Salvar", null).addEvent("click", function () {
             console.log("Salvando");
@@ -225,12 +232,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             activeDevices.forEach(function (dev) {
                 updatedDevices.push({
-                    hwId: dev.id, 
+                    hwid: dev.id, 
                     room_id: room.id, 
-                    top: parseFloat(dev.style.top), 
-                    left: parseFloat(dev.style.left) 
+                    topoffset: parseFloat(dev.style.top), 
+                    leftoffset: parseFloat(dev.style.left) 
                 });
             });
+            updatedDevices = updatedDevices.concat(listDeviceRoom)
             console.log("updated" + JSON.stringify(updatedDevices));
             app.send({ api: "admin", mt: "UpdateDeviceRoom", room: room.id, devices: updatedDevices });
         }));
@@ -282,7 +290,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 });
                 ativos = ativos.concat(dispositivosAtivos);
             });
-        
+
             console.log("ativos" + JSON.stringify(ativos));
         }
         // Anexe o elemento à div "imgBD"
@@ -291,20 +299,27 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     })
     }
     function makeDivCreateRoom(t){
+
         var insideDiv = t.add(new innovaphone.ui1.Div(null,null,"insideDiv"))
-        listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id","list-box"))
-        listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
-        listbox.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
-        listbox.add(new innovaphone.ui1.Input("height: 13.5px ; width: 130px;margin-right:100px;margin-left:10px;",null,null,100,"text",null).setAttribute("id","iptRoomName"))
-        input = listbox.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
+        
+        leftbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "left-box scrolltable").setAttribute("id","left-box"))
+        
+        leftbox.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
+        leftbox.add(new innovaphone.ui1.Input("height: 13.5px ; width: 130px;margin-right:100px;margin-left:10px;",null,null,100,"text",null).setAttribute("id","iptRoomName"))
+        input = leftbox.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
         input.setAttribute("id", "fileinput").setAttribute("type", "file");
         input.setAttribute("accept", "image/*");
         input.container.addEventListener('change', onSelectFile, false);
-        
-        // divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
+
+        // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+        imgBD = leftbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
-        var btnSave = listbox.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:90%;left:80%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
+
+        var rightDiv = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable").setAttribute("id","list-box"))
+        var userTable = createUsersDepartmentsGrid();
+        rightDiv.add(userTable)
+        rightDiv.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
+        var btnSave = rightDiv.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:90%;left:80%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
             var srcDaImagem = imagem.src;
@@ -312,11 +327,91 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, })
         }))
         document.getElementById("closewindow").addEventListener("click",function(){
-            colDireita.rem(insideDiv)
+            if(filesID ){
+                deleteFile(filesID)
+            }
+            setTimeout(function(){
+                colDireita.rem(insideDiv)
             controlDB = false // controle da DB files
             insideDiv.clear()
             app.send({api:"admin", mt:"SelectAllRoom"})
+            },500) // arrumar para carregar isso apos o termino da requisição 
+            
         })
+        
+
+
+    }
+    function createUsersDepartmentsGrid() {
+        var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist")
+
+        var table = usersListDiv.add(new innovaphone.ui1.Node("table", null, null, "table"))
+
+        var headerRow = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
+
+        var nameCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelUser"), "column"))
+
+        var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"))
+
+        var viewerColTitle = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"))
+
+        list_tableUsers.forEach(function (user) {
+
+            // var userV = list_viewers_departments.filter(function (item) {
+            //     return item.viewer_guid === user.guid;
+            // })[0];
+            // var userE = list_editors_departments.filter(function (item) {
+            //     return item.editor_guid === user.guid;
+            // })[0];
+
+            var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
+
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+
+            var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+
+            var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+
+
+            var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+            viewerCheckbox.setAttribute("name", "viewerDepartments");
+            viewerCheckbox.setAttribute("value", user.guid)
+
+            var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+            editorCheckbox.setAttribute("name", "editorDepartments");
+            editorCheckbox.setAttribute("value", user.guid)
+
+            editorCheckbox.addEvent('click', function () {
+                var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                viewerCheckbox.checked = true
+
+
+            });
+            var marked = false
+            viewerColTitle.addEvent('click', function () {
+                //  console.log("Elemento viewerCol foi CLICADO")
+                if (!marked) {
+                    var _clickViewer = document.querySelectorAll('.viewercheckbox')
+                    _clickViewer.forEach(function (view) {
+                        view.checked = true
+                    });
+                    marked = true
+                } else {
+                    var _clickViewer = document.querySelectorAll('.viewercheckbox')
+                    _clickViewer.forEach(function (view) {
+                        view.checked = false
+                    });
+                    marked = false
+                }
+
+
+            });
+
+        });
+
+
+        //usersListDiv.add(table);
+        return usersListDiv;
     }
    
 
@@ -336,6 +431,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         draggedElement.style.position = 'static'
         draggedElement.name = '';
         draggedElement.classList.remove("DeviceActive")
+        draggedElement.classList.add("DeviceRemoved")
         
         // Remova o dispositivo da lista de dispositivos ativos
     var deviceId = draggedElement.id; // Supondo que o ID do dispositivo corresponda ao ID na lista de dispositivos ativos
@@ -351,9 +447,22 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     if (indexToRemove >= 0) {
         ativos.splice(indexToRemove, 1);
     }
+
+    for (var i = 0; i < listDeviceRoom.length; i++) {
+        if (listDeviceRoom[i].hwid === deviceId) {
+            indexToRemove = i;
+            break;
+        }
+    }
+
+    if (indexToRemove >= 0) {
+        listDeviceRoom.splice(indexToRemove, 1);
+    }
+    app.send({api:"admin", mt:"DeleteDeviceFromRoom" , hwid: String(deviceId)})
+
+    console.log("DEVICES QUE ESTÃO ATIVOS" + JSON.stringify(listDeviceRoom))
         console.log("ativos after reset " + JSON.stringify(ativos))
         divPhones.appendChild(draggedElement);
-
 
     }
       function drag(ev) {
@@ -384,9 +493,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var folder = null;
 
     function onSelectFile() {
-        console.log("Evento do Input File")
-        controlDB = true
-        postFile(input.container.files[0]);
+        // if(filesID){
+        //     deleteFile(filesID)
+        // }
+            console.log("Evento do Input File")
+            controlDB = true
+            postFile(input.container.files[0]);
+        
+       
     }
 
     function startfileUpload() {

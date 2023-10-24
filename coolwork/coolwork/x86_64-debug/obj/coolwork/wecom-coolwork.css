@@ -16,6 +16,80 @@ a {
     left: 15%; 
     /*height:100%;*/
 }
+.left-box {
+    margin: 25px 5px 25px 0;
+    position: relative;
+    width: 55%;
+    left: 6%;
+    padding: 30px;
+    background: linear-gradient(rgb(20, 30, 48), rgb(36, 59, 85));
+    box-sizing: border-box;
+    box-shadow: 0 15px 25px rgba(0,0,0,.6);
+    border-radius: 10px;
+    color: white;
+}
+.right-box {
+    margin: 25px 5px 25px 0;
+    position: relative;
+    width: 35%;
+    left: 64%;
+    padding: 30px;
+    background: linear-gradient(rgb(20, 30, 48), rgb(36, 59, 85));
+    box-sizing: border-box;
+    box-shadow: 0 15px 25px rgba(0,0,0,.6);
+    border-radius: 10px;
+    color: white;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #ffffff00;
+    max-height: 15px;
+}
+th {
+    text-align: center;
+    padding: 5px;
+}
+
+td {
+    text-align: center;
+    padding: 5px;
+}
+.userlist {
+    display: flex;
+    font-size: 18px;
+    width: 80%;
+    height: 80%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+::placeholder {
+    color: #ffff;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+}
+
+::-webkit-scrollbar-track:hover {
+    box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.349);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bebebeef;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffffffef;
+}
 .insideDiv {
     margin: auto;
     width: 100%;
