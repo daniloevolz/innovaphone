@@ -232,7 +232,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 });
             });
             console.log("updated" + JSON.stringify(updatedDevices));
-            app.send({ api: "admin", mt: "UpdateDeviceRoom", devices: updatedDevices });
+            app.send({ api: "admin", mt: "UpdateDeviceRoom", room: room.id, devices: updatedDevices });
         }));
     })      // listeners dentro ou fora do forEach()???
             document.getElementById("divPhones").addEventListener("dragover",allowDrop,true)

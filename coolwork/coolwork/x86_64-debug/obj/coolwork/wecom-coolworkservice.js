@@ -348,8 +348,9 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];
                 devices = obj.devices;
-                devices.forEach(function (dev) {
-                    var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";           
+
+                if (devices.length == 0) {
+                    var sql = "UPDATE tbl_devices SET topoffset = null, leftoffset = null, room_id = null WHERE room_id = " + obj.room;
                     Database.exec(sql)
                         .oncomplete(function (data) {
                             log("UpdateSuccess" + JSON.stringify(data));
@@ -358,7 +359,20 @@ new JsonApi("admin").onconnected(function(conn) {
                         .onerror(function (error, errorText, dbErrorCode) {
                             log("UpdateDevicesResult:result=Error " + String(errorText));
                         });
-                });
+
+                } else {
+                    devices.forEach(function (dev) {
+                        var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";
+                        Database.exec(sql)
+                            .oncomplete(function (data) {
+                                log("UpdateSuccess" + JSON.stringify(data));
+                                conn.send(JSON.stringify({ api: "admin", mt: "UpdateDevicesResult", src: data.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("UpdateDevicesResult:result=Error " + String(errorText));
+                            });
+                    });
+                }   
             } 
             if(obj.mt == "UpdatePresence"){
                  notePresence = []
