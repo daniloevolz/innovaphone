@@ -413,7 +413,57 @@ new JsonApi("admin").onconnected(function(conn) {
     })
 }
 });
+178311715
 
+
+function checkAppointments() {
+    log("CHECKAPOOINTMENTS")
+    setInterval(function () {
+      var now = getDateNow();
+      Database.exec("SELECT * FROM tbl_device_schedule")
+
+      log("APPOINTMENT")
+      .oncomplete(function (data) {
+      log("AppointmentsSuccess" + JSON.stringify(data))
+        //   var sip = row.sip;
+        //   var dateEnd = new Date(row.date_end);
+        //   var note = ''; // Note might be empty based on your requirements
+        //   var activity = 'available';
+        const sip = "Erick";
+        const dateEnd = "2023-10-25T17:50";
+        const note = 'Appointments'; // Note might be empty based on your requirements
+        const activity = 'available';
+
+        // Call the handleSetPresenceMessage function
+        handleSetPresenceMessage(sip, note, activity);
+
+        // Check if dateEnd is within 30, 15, or 5 minutes
+        checkTimeRemaining(sip, dateEnd);
+      })
+      .onerror(function (error, errorText, dbErrorCode) {
+              log("SelectAllRoomResult:result=Error " + String(errorText));
+      });
+
+
+
+    }, 60000); // 60000 milliseconds = 1 minute
+  }
+  
+  // Function to check time remaining
+  function checkTimeRemaining(sip, dateEnd) {
+    var now = new Date(getDateNow());
+    var timeRemaining = dateEnd - now;
+    var minutesRemaining = Math.ceil(timeRemaining / 60000); // Convert milliseconds to minutes
+  
+    if (minutesRemaining === 30 || minutesRemaining === 15 || minutesRemaining === 5) {
+      var note = 'Last ' + minutesRemaining + ' minutes';
+      var activity = 'away';
+      handleSetPresenceMessage(sip, note, activity);
+    }
+  }
+  
+  // Example of how to use the function
+  checkAppointments();
 
 var pbxApi = {}
 new PbxApi("PbxApi").onconnected(function (conn) {
