@@ -9,5 +9,8 @@ Wecom.coolworkTexts = {
         labelCreateRoom: "Criar Sala",
         labelRooms: "Salas",
         labelName: "Nome da Sala",
+        labelGeral: "Geral",
+        labelUsers: "Usuários",
+        labelSchedule: "Agendamentos"
     }
 }
