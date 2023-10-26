@@ -72,13 +72,13 @@ a {
     border-radius: 10px;
     color: white;
 }
-table {
+/* table {
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
     border: 1px solid #ffffff00;
     max-height: 15px;
-}
+} */
 th {
     text-align: center;
     padding: 5px;

@@ -315,7 +315,126 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
     }
     function makedivSchedule(divinputs){
-        // full calendar
+        divinputs.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","calendar"))
+        $(document).ready(function () {
+            $.fullCalendar.locale('pt-br');
+            // var id = $.urlParam('id');
+           $('#calendar').fullCalendar({
+            
+                header: {
+                    left: 'today',
+                   center: 'title , month,agendaDay', //agendaWeek,
+                    right: 'prev,next'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro'
+  ],
+                defaultView: 'month',
+                slotDuration: '01:00:00', 
+                minTime: '00:00:00',
+                maxTime: '24:00:00',
+                selectable: true,
+                selectLongPressDelay: 0,
+
+                selectHelper: true,
+                select: function (start, end, jsEvent, view) {
+                    selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
+                    selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
+                    
+                    if (view.name === 'month') {
+                        console.log("View: Month");
+                        var clickedElement = jsEvent.target
+                        
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                        $('#calendar').fullCalendar('gotoDate', start);
+
+                        // var teste = false;
+                       
+                        // if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                        $('#calendar').fullCalendar('unselect'); 
+                    }
+                    else if (view.name === 'agendaWeek') {
+                        console.log("View: " + "Week");
+
+                        var clickedElement = jsEvent.target
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+                        var teste = false;
+                     
+                    } 
+                    else {
+                        console.log("View: " + "day");
+                        // data inicio em iso string 
+                        var dateStart = new Date(start);
+                        console.log("data de início " + dateStart.toISOString())
+                        // data fim 
+                        var dateEnd = new Date(end);
+                        console.log("data de término " + dateEnd.toISOString())
+
+                    
+                    }
+                },
+                editable: false,
+                eventLimit: true,
+                events: [],
+                eventRender: function (event, element) {},
+
+                viewRender: function(view, element) {
+                    
+                    if (view.name === 'month') {
+                        console.log('View: Modo mês');
+                    } 
+                    else if(view.name === 'agendaWeek') {
+                        console.log("View Modo Semana")
+                    }
+                    else{
+                        dayName = view.title
+                        console.log("View title result = " + dayName)
+                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                        // Obtém os valores do dia, mês e ano
+                        var day = String(dateParts[0]).padStart(2, '0');
+                        var month = getMonthIndex(dateParts[1]);
+                        var year = dateParts[2];
+
+                        // Função auxiliar para obter o índice do mês com base no nome do mês
+                        function getMonthIndex(monthName) {
+                            var months = [
+                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                            ];
+                            var index = months.indexOf(monthName) + 1;
+
+                            return String(index).padStart(2, '0');
+                        }
+                        // setTimeout(function() {
+                        //    UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
+                        // }, 100);
+                    }
+    },
+            });
+        
+        });
     }
     function makedivGeral(divinputs){
         
