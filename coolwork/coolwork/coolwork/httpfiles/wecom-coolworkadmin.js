@@ -10,7 +10,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var appdn = start.title;
     var UIuser;
     var leftbox;
+    var dateStart; //agendamentos 
+    var dateEnd;  // agendamentos 
+
     //var divPhones;  //db files variáveis
+
     var filesID;
     var ativos = [];  // vaiavel para controle dos devices de cada sala
     var imgBD; // db files variaveis
@@ -21,7 +25,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var phone_list = [] // todos os devices
     var listDeviceRoom = []; 
     var list_AllRoom = []
-    var list_room = []
+    var list_room = [];
+    var list_RoomSchedule = []
     var colDireita;
     var list_tableUsers = []
     var UIuserPicture;
@@ -107,8 +112,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
         if (obj.api === "admin" && obj.mt === "SelectRoomResult") {
-            list_room = JSON.parse(obj.result)
-            listDeviceRoom = JSON.parse(obj.dev)
+            list_room = JSON.parse(obj.rooms)
+            list_RoomSchedule = JSON.parse(obj.schedules)
+            listDeviceRoom = obj.dev
             makeDivRoom(that);
             
         }
@@ -188,12 +194,33 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             // }, app.send(obj))
             // );
 }
+function formatDate(inputDate) {
+    const date = new Date(inputDate);
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    
+    return formattedDate;
+  }
+
     function makeDivRoom(t){
         list_room.forEach(function(room){
             var insideDiv = t.add(new innovaphone.ui1.Div(null,null,"insideDiv"))
             listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
             listbox.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
+            list_RoomSchedule.forEach(function(schedule){    // revisar isso na segunda 30/10
+                var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;",null,null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateStart") + formatDate(schedule.data_start) ,null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateEnd") + formatDate(schedule.data_end),null))
+            })
+            
             divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
            var imgRoom =  listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
            imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
@@ -315,7 +342,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
     }
     function makedivSchedule(divinputs){
-        divinputs.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","calendar"))
+        divinputs.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             // var id = $.urlParam('id');
@@ -386,10 +413,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     else {
                         console.log("View: " + "day");
                         // data inicio em iso string 
-                        var dateStart = new Date(start);
+                        dateStart = "";
+                        dateStart = new Date(start);
                         console.log("data de início " + dateStart.toISOString())
-                        // data fim 
-                        var dateEnd = new Date(end);
+                        // data fim
+                        dateEnd = "";
+                        dateEnd = new Date(end);
                         console.log("data de término " + dateEnd.toISOString())
 
                     
@@ -453,7 +482,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function makedivUsers(divinputs){
 
        // divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:15%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
-        var rightDiv = divinputs.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable").setAttribute("id","list-box"))
+        var rightDiv = divinputs.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
         var userTable = createUsersDepartmentsGrid();
         rightDiv.add(userTable)
        
@@ -471,7 +500,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         topBottons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelUsers"),null).setAttribute("id","list-users"))
         topBottons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedule"),null).setAttribute("id","list-schedule"))
 
-        divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:15%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
+        divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
         divinputs.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
         divinputs.add(new innovaphone.ui1.Input("height: 13.5px ; width: 130px;margin-right:100px;margin-left:10px;",null,null,100,"text",null).setAttribute("id","iptRoomName"))
         input = divinputs.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
@@ -483,12 +512,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         imgBD = divinputs.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:80%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
 
-        var btnSave = leftbox.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:90%;left:80%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
+        var btnSave = leftbox.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:12%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
+           
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
             var srcDaImagem = imagem.src;
 
-            app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, })
+            if(nameRoom === "" || dateStart === "" || dateEnd === ""){
+                console.log("Favor Completar todos os campos")
+            }else{
+                app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: "a definir", schedule: "a definir"  })
+            }
+            
         }))
 
         

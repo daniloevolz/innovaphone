@@ -16,6 +16,17 @@ a {
     left: 15%; 
     /*height:100%;*/
 }
+.tableusers{
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+    /* left: 25%; */
+    position: absolute;
+    /* width: 100%; */
+    height: -webkit-fill-available;
+    /* top: 8%;*/
+}
+
 #top-bottons {
     display: flex;
     align-items: center;
@@ -155,7 +166,7 @@ td {
     display: flex;
     justify-content: center;
     overflow-y: auto;
-    left: 25%;
+    /* left: 25%; */
     position: absolute;
     /* width: 100%; */
     height: -webkit-fill-available;

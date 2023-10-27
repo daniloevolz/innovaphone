@@ -11,6 +11,8 @@ Wecom.coolworkTexts = {
         labelName: "Nome da Sala",
         labelGeral: "Geral",
         labelUsers: "Usuários",
-        labelSchedule: "Agendamentos"
+        labelSchedule: "Agendamentos",
+        labelDateStart : " Data de Início",
+        labelDateEnd : " Data de Término"
     }
 }
