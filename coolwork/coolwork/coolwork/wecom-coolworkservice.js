@@ -233,7 +233,14 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "SetPresence") {
                 handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
-
+            if (obj.mt == "TableUsers") {
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
+                })
+                conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+            }
             if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
@@ -280,16 +287,24 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("SelectDevicesResult:result=Error " + String(errorText));
                 });
             }
-            if(obj.mt == "InsertRoom"){
-                Database.exec("INSERT INTO tbl_room (name , img ) VALUES ('" + obj.name + "','" + obj.img + "')")
-                        .oncomplete(function (data) {
-                            //revisar isso
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: data.src }));
-                        })
-                        .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertRoomResult:result=Error " + String(errorText));
-                        });
+            if (obj.mt == "InsertRoom") {
+                Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
+                    .oncomplete(function (roomData) {
+                        var roomID = roomData[0].id; 
+            
+                        Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, room_id) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + roomID + "')")
+                            .oncomplete(function (scheduleData) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: scheduleData.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("Erro ao inserir na tbl_room_schedule: " + String(errorText));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("Erro ao inserir na tbl_room: " + String(errorText));
+                    });
             }
+            
             if (obj.mt == "SelectAllRoom") { // revisar 04/10
                 Database.exec("SELECT * FROM tbl_room")
                 .oncomplete(function (data) {
@@ -305,21 +320,28 @@ new JsonApi("admin").onconnected(function(conn) {
             
                 var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
                 var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
-            
+                var querySelectRoomSchedule = "SELECT * FROM tbl_room_schedule WHERE room_id =" + roomId + ";"; 
                 Database.exec(querySelectRoom)
                     .oncomplete(function (roomData) {
                         Database.exec(querySelectDevices)
                             .oncomplete(function (deviceData) {
-                                conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", result: JSON.stringify(roomData) , dev: JSON.stringify(deviceData) }));
+                                Database.exec(querySelectRoomSchedule)
+                                    .oncomplete(function (roomScheduleData) {
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", rooms: JSON.stringify(roomData), dev: deviceData, schedules: JSON.stringify(roomScheduleData)  }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("SelectRoomResult: Error ao selecionar tabela tbl_room_schedule: " + String(errorText));
+                                    });
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
-                                log("SelectRoomResult: Error ao selecionar dispositivos: " + String(errorText));
+                                log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));
                             });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
                     });
             }
+            
             if (obj.mt == "DeleteRoom") {
                 var roomId = obj.id;
                 var queryUpdateDevices = "UPDATE tbl_devices SET room_id = NULL WHERE room_id = " + roomId + ";";
@@ -344,6 +366,16 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("DeleteRoom: Erro ao atualizar dispositivos: " + String(errorText));
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                     });
+            }
+            if(obj.mt == "DeleteDeviceFromRoom"){
+                var sql = "UPDATE tbl_devices SET room_id = null WHERE hwid = '" + obj.hwid + "'";
+                Database.exec(sql)
+                .oncomplete(function (updatereulst) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteDeviceFromRoomSuccess" }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteDeviceFromRoomError", error: String(errorText) }));
+                });
             }           
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];
@@ -362,7 +394,7 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 } else {
                     devices.forEach(function (dev) {
-                        var sql = "UPDATE tbl_devices SET topoffset = " + dev.top + ", leftoffset = " + dev.left + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwId + "'";
+                        var sql = "UPDATE tbl_devices SET topoffset = " + dev.topoffset + ", leftoffset = " + dev.leftoffset + ", room_id = " + dev.room_id + " WHERE hwid = '" + dev.hwid + "'";
                         Database.exec(sql)
                             .oncomplete(function (data) {
                                 log("UpdateSuccess" + JSON.stringify(data));
@@ -374,6 +406,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
                 }   
             } 
+
             if(obj.mt == "UpdatePresence"){
                  notePresence = []
                  notePresence = obj.note
@@ -395,7 +428,71 @@ new JsonApi("admin").onconnected(function(conn) {
     })
 }
 });
+function getDateNow() {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date();
+    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+    date.setUTCHours(date.getUTCHours() - 3);
 
+    // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+    var dateString = date.toISOString();
+
+    // Substitui o caractere "T" por um espaço
+    //dateString = dateString.replace("T", " ");
+
+    // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+    return dateString.slice(0, -5);
+}
+
+
+function checkAppointments() {
+    log("CHECKAPOOINTMENTS")
+    setInterval(function () {
+      var now = getDateNow();
+      Database.exec("SELECT * FROM tbl_device_schedule")
+
+      log("APPOINTMENT")
+      .oncomplete(function (data) {
+      log("AppointmentsSuccess" + JSON.stringify(data))
+        //   var sip = row.sip;
+        //   var dateEnd = new Date(row.date_end);
+        //   var note = ''; // Note might be empty based on your requirements
+        //   var activity = 'available';
+        const sip = "Erick";
+        const dateEnd = "2023-10-25T17:50";
+        const note = 'Appointments'; // Note might be empty based on your requirements
+        const activity = 'available';
+
+        // Call the handleSetPresenceMessage function
+        handleSetPresenceMessage(sip, note, activity);
+
+        // Check if dateEnd is within 30, 15, or 5 minutes
+        checkTimeRemaining(sip, dateEnd);
+      })
+      .onerror(function (error, errorText, dbErrorCode) {
+              log("SelectAllRoomResult:result=Error " + String(errorText));
+      });
+
+
+
+    }, 60000); // 60000 milliseconds = 1 minute
+  }
+  
+  // Function to check time remaining
+  function checkTimeRemaining(sip, dateEnd) {
+    var now = new Date(getDateNow());
+    var timeRemaining = dateEnd - now;
+    var minutesRemaining = Math.ceil(timeRemaining / 60000); // Convert milliseconds to minutes
+  
+    if (minutesRemaining === 30 || minutesRemaining === 15 || minutesRemaining === 5) {
+      var note = 'Last ' + minutesRemaining + ' minutes';
+      var activity = 'away';
+      handleSetPresenceMessage(sip, note, activity);
+    }
+  }
+  
+  // Example of how to use the function
+  checkAppointments();
 
 var pbxApi = {}
 new PbxApi("PbxApi").onconnected(function (conn) {
