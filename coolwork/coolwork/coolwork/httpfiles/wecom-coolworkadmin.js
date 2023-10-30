@@ -327,22 +327,11 @@ function formatDate(inputDate) {
         imgBD.appendChild(draggedElement);
     })
     }
-    function ChangeView(ex, divinputs) {
 
-        if (ex == "list-geral") {
-            divinputs.clear()
-            makedivGeral(divinputs)
-        }
-        if (ex == "list-users") {
-            divinputs.clear()
-            makedivUsers(divinputs)
-        }
-        if (ex == "list-schedule") {
-            makedivSchedule(divinputs)
-        }
-    }
     function makedivSchedule(divinputs){
-        divinputs.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+        var divSchedule = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+        var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:12%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom"))
+        divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             // var id = $.urlParam('id');
@@ -476,7 +465,7 @@ function formatDate(inputDate) {
         input.container.addEventListener('change', onSelectFile, false);
 
         // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divinputs.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:80%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
+        imgBD = divinputs.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:60%; display: flex;align-items: center; justify-content: center;top: 35%;",null,null).setAttribute("id","imgBD"))
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
     }
     function makedivUsers(divinputs){
@@ -488,31 +477,83 @@ function formatDate(inputDate) {
        
     }
     function makeDivCreateRoom(t){
-        t.clear()
-        var insideDiv = t.add(new innovaphone.ui1.Div(null,null,"insideDiv"))
-        
-        leftbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "left-box scrolltable").setAttribute("id","left-box"))
-        
-        leftbox.add(new innovaphone.ui1.Div(null,null,null).setAttribute("id","closewindow"))
+        t.clear();
+        filesID = "";  // para não excluir os arquivos corretos da DB files ; 
+    
+        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
+    
+        leftbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "left-box scrolltable").setAttribute("id", "left-box"));
+    
+        leftbox.add(new innovaphone.ui1.Div(null, null, null).setAttribute("id", "closewindow"));
+    
+        var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
+        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
+        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
+        topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedule"),null).setAttribute("id","list-schedule"))
 
-        var topBottons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;",null,null).setAttribute("id","top-bottons"));
-        topBottons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelGeral"),null).setAttribute("id","list-geral"))
-        topBottons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelUsers"),null).setAttribute("id","list-users"))
-        topBottons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedule"),null).setAttribute("id","list-schedule"))
-
-        divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
-        divinputs.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
-        divinputs.add(new innovaphone.ui1.Input("height: 13.5px ; width: 130px;margin-right:100px;margin-left:10px;",null,null,100,"text",null).setAttribute("id","iptRoomName"))
-        input = divinputs.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
+        divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
+        var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; justify-content: center; ", null, null).setAttribute("id", "div-geral"));
+        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
+        divGeral.add(new innovaphone.ui1.Input("height: 13.5px; width: 130px; margin-right:100px; margin-left:10px;", null, null, 100, "text", null).setAttribute("id", "iptRoomName"));
+        input = divGeral.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
         input.setAttribute("id", "fileinput").setAttribute("type", "file");
         input.setAttribute("accept", "image/*");
         input.container.addEventListener('change', onSelectFile, false);
 
+        divGeral.add(new innovaphone.ui1.Div(null,texts.text("labelModuleRoom"),null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px",null,null))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Recorrente",null))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null))
+        
+        divGeral.add(new innovaphone.ui1.Div(null,texts.text("labelTypeRoom"),null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px",null,null))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Hora",null))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Dia",null))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null))
+
         // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divinputs.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:80%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
+        imgBD = divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:60%; display: flex;align-items: center; justify-content: center;top: 30%;",null,null).setAttribute("id","imgBD"))
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
 
-        var btnSave = leftbox.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:12%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).addEvent("click",function(){
+        
+
+        var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
+        var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
+        var userTable = createUsersDepartmentsGrid();
+        rightDiv.add(userTable)
+        
+        makedivSchedule(divinputs)
+        
+                
+        var divGeral = document.getElementById("div-geral");
+        var divUsers = document.getElementById("div-users");
+        var divSchedule = document.getElementById("div-schedule");
+
+        document.getElementById("list-geral").addEventListener("click", function () {
+        
+            divGeral.style.display = "flex";
+            divUsers.style.display = "none";
+            divSchedule.style.display = "none";
+        });
+
+        document.getElementById("list-users").addEventListener("click", function () {
+            
+            divGeral.style.display = "none";
+            divUsers.style.display = "flex";
+            divSchedule.style.display = "none";
+        });
+
+        var a = document.getElementById("list-schedule");
+        a.addEventListener("click", function () { 
+            divGeral.style.display = "none";
+            divUsers.style.display = "none";
+            divSchedule.style.display = "block";
+           
+        })
+
+
+
+        document.getElementById("btnSaveRoom").addEventListener("click",function(){
            
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
@@ -524,7 +565,7 @@ function formatDate(inputDate) {
                 app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: "a definir", schedule: "a definir"  })
             }
             
-        }))
+        })
 
         
         document.getElementById("closewindow").addEventListener("click",function(){
@@ -539,25 +580,7 @@ function formatDate(inputDate) {
             },500) // arrumar para carregar isso apos o termino da requisição 
             
         })
-        
-        
-        var a = document.getElementById("list-geral");
-        a.addEventListener("click", function () { 
-            divinputs.clear()
-            ChangeView("list-geral", divinputs)
-        })
-
-        var a = document.getElementById("list-users");
-        a.addEventListener("click", function () { 
-            divinputs.clear()
-            ChangeView("list-users", divinputs)
-        })
-
-        var a = document.getElementById("list-schedule");
-        a.addEventListener("click", function () { 
-            divinputs.clear()
-            ChangeView("list-schedule", divinputs)
-        })
+    
 
 
     }

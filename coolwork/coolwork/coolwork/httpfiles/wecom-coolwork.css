@@ -16,6 +16,16 @@ a {
     left: 15%; 
     /*height:100%;*/
 }
+/* Classe para exibir o elemento */
+.mostrar {
+    display: block;
+}
+
+/* Classe para ocultar o elemento */
+.ocultar {
+    display: none;
+}
+
 .tableusers{
     display: flex;
     justify-content: center;
