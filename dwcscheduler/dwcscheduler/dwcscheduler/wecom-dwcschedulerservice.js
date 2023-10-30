@@ -212,40 +212,7 @@ if (license != null && license.System==true) {
                                             //Update Badge
                                             try {
                                                 var count = 0;
-                                                //PbxSignal.forEach(function (signal) {
-                                                //    log("danilo-req salvar-evento: signal" + JSON.stringify(signal));
-                                                //    //var call = signal[obj.sip];
-                                                //    //Teste Danilo 20/07:
-                                                //    var foundCalls = [];
-                                                //    for (var key in signal) {
-                                                //        if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] === obj.sip) {
-                                                //            foundCalls.push(key);
-                                                //        }
-                                                //    }
-                                                //    //
-                                                //    log("pietro-log: call = " + foundCalls);
-                                                //    if (foundCalls.length >0) {
-                                                //        log("danilo-req salvar-evento call " + foundCalls + ", will call updateBadge");
-                                                //        try {
-                                                //            pbxTableUsers.forEach(function (user) {
-                                                //                if (user.columns.h323 == obj.sip) {
-                                                //                    var old_badge = user.badge;
-                                                //                    user.badge += 1;
-                                                //                    log("danilo-req salvar-evento: Updating the Badge for object user " + user.columns.h323 + " the old Badge value is " + old_badge + " and new value is " + user.badge);
-                                                //                    count = user.badge;
-                                                //                }
-                                                //            })
-                                                //            foundCalls.forEach(function (call) {
-                                                //                updateBadge(signal, parseInt(call,10), count);
-                                                //            })
-                                                            
-                                                //        } catch (e) {
-                                                //            log("danilo-req salvar-evento: User " + obj.columns.h323 + " Erro " + e)
-                                                //        }
-                                                //    }
-
-                                                //})
-
+                                                
                                                 //Teste Danilo 22/08:
                                                 pbxTableUsers.forEach(function (user) {
                                                     if (user.columns.h323 == obj.sip) {
@@ -478,8 +445,6 @@ if (license != null && license.System==true) {
             }
         });
     }
-    
-    
 }
 
 function getLicense() {
@@ -993,106 +958,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 });
 
 
-/*
-new PbxApi("PbxSignal").onconnected(function (conn) {
-    log("PbxSignal: connected conn " + JSON.stringify(conn));
 
-    // for each PBX API connection an own call array is maintained
-    var signalFound = PbxSignal.filter(function (signal) { return signal.pbx === conn.pbx });
-    if (signalFound.length == 0) {
-        PbxSignal.push(conn);
-        log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
-
-        // register to the PBX in order to acceppt incoming presence calls
-        conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
-    }
-    //PbxSignal.push(conn);
-    // register to the PBX in order to acceppt incoming presence calls
-    //conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
-
-    conn.onmessage(function (msg) {
-        var obj = JSON.parse(msg);
-        log(msg);
-
-        if (obj.mt === "RegisterResult") {
-            log("PBXSignal: registration result " + JSON.stringify(obj));
-        }
-
-        // handle incoming presence_subscribe call setup messages
-        // the callid "obj.call" required later for sending badge notifications
-        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
-
-            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
-
-            // connect call
-            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
-
-            //Update signals
-            var src = obj.src;
-            var myArray = src.split(",");
-            var pbx = myArray[0];
-            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    var call = obj.call.toString();
-                    signal[call] = obj.sig.cg.sip;
-                }
-            })
-            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        signal[obj.sig.cg.sip] = obj.call;
-            //    }
-            //})
-            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
-            var name = "";
-            var myArray = obj.sig.fty;
-            myArray.forEach(function (fty) {
-                if (fty.name) {
-                    name = fty.name;
-                }
-            })
-
-
-            
-            // send notification with badge count first time the user has connected
-            var count = 0;
-            try {
-                count = pbxTableUsers.filter(findBySip(obj.sig.cg.sip))[0].badge;
-            } finally {
-                updateBadge(conn, obj.call, count);
-            }
-        }
-
-        // handle incoming call release messages
-        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-            //Remove signals
-            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-            var src = obj.src;
-            var myArray = src.split(",");
-            var sip = "";
-            var pbx = myArray[0];
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[sip];
-
-                }
-            })
-            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
-        }
-    });
-
-    conn.onclose(function () {
-        //Remove cennection from array
-        PbxSignal = PbxSignal.filter(function (c) { return c.pbx != conn.pbx });
-        log("PbxSignal: disconnected");
-        //PbxSignal.splice(PbxSignal.indexOf(conn), 1);
-        //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
-    });
-});
-*/
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
     log("PbxTableUsers: connected " + JSON.stringify(conn));
 
@@ -1130,7 +996,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             log("ReplicateUpdate= user " + obj.columns.h323);
             try {
                 pbxTableUsers.forEach(function (user) {
-                    if (user.columns.h323 == obj.columns.h323) {
+                    if (user.columns.guid == obj.columns.guid) {
                         obj.badge = user.badge;
                         log("ReplicateUpdate: Updating the object for user " + obj.columns.h323 + " and current Badge is " + user.badge);
                         Object.assign(user, obj);
@@ -1175,19 +1041,7 @@ function decrypt(key,hash) {
 
     return JSON.parse(decrypted);
  }
-/*
-function updateBadge(ws, call, count) {
-    var msg = {
-        "api": "PbxSignal", "mt": "Signaling", "call": call, "src": "badge",
-        "sig": {
-            "type": "facility",
-            "fty": [{ "type": "presence_notify", "status": "open", "note": "#badge:" + count, "contact": "app:" }]
-        }
-    };
-    log("danilo-req updateBadge:msg " + JSON.stringify(msg));
-    ws.send(JSON.stringify(msg));
-}
-*/
+
 
 function updateBadge(sip, count) {
     //Update Badge

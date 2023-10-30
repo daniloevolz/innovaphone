@@ -596,7 +596,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             pbxTableUsers.push(obj);
         }
         if (obj.mt == "ReplicateUpdate") {
-            var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.h323 === obj.columns.h323 });
+            var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
             log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
             var grps1 = foundTableUser[0].columns.grps;
             var grps2 = obj.columns.grps;
@@ -669,7 +669,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             
             var found;
             pbxTableUsers.forEach(function (user) {
-                if (user.columns.h323 == obj.columns.h323) {
+                if (user.columns.guid == obj.columns.guid) {
                     log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
                     Object.assign(user, obj)
                     found = true;
@@ -680,6 +680,10 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 pbxTableUsers.push(obj);
             }
 
+        }
+
+        if (obj.mt == "ReplicateDel") {
+            pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
         }
     });
 
@@ -1242,7 +1246,7 @@ function badgeRequest2(value) {
         //Update Badge
         
         try {
-            updateBadge2(user.user, user.num)
+            updateBadge(user.user, user.num)
             // var count = 0;
 
             // PbxSignal.forEach(function (signal) {
@@ -1277,7 +1281,7 @@ function badgeRequest2(value) {
         }
     });
 }
-function updateBadge(ws, call, count) {
+function updateBadge2(ws, call, count) {
     var msg = {
         "api": "PbxSignal", "mt": "Signaling", "call": call, "src": "badge",
         "sig": {
@@ -1288,7 +1292,7 @@ function updateBadge(ws, call, count) {
     log("danilo-req updateBadge:msg " + JSON.stringify(msg));
     ws.send(JSON.stringify(msg));
 }
-function updateBadge2(sip, count) {
+function updateBadge(sip, count) {
     //Update Badge
     try {
         for (var pbx in PbxSignalUsers) {

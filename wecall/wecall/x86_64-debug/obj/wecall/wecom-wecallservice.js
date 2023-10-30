@@ -28,6 +28,7 @@ var connectionsAdmin = [];
 var connectionsDash = [];
 var RCC = [];
 var PbxSignal = [];
+var PbxSignalUsers = [];
 var pbxTable = [];
 var pbxTableUsers = [];
 
@@ -187,6 +188,8 @@ if (license != null && license.System == true) {
             req.cancel();
         }
     });
+
+
     var msg = { user: "", client: "" };
     httpClient(urlGetGroups, "POST", msg, function(responseData) {
 
@@ -203,46 +206,7 @@ if (license != null && license.System == true) {
         } catch (e) {
             log("danilo req : getGroupsResponse Erro" + e);
         }
-
-        //var msg = { user: "", client: "" };
-        //log("danilo req : getGroups url" + urlGetGroups);
-        //log("danilo req : getGroups msg" + JSON.stringify(msg));
-
-        //var responseData = "";
-        //var req = HttpClient.request("POST", urlGetGroups);
-        //req.header("X-Token", "danilo");
-        //req.contentType("application/json");
-        //req.onsend(function (req) {
-        //    req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-        //});
-        //req.onrecv(function (req, data, last) {
-        //    responseData += new TextDecoder("utf-8").decode(data);
-        //    if (!last) req.recv();
-        //}, 1024);
-        //req.oncomplete(function (req, success) {
-        //    log("danilo-req : getGroups complete");
-        //    log("danilo-req : getGroups responseData " + responseData);
-        //    try {
-        //        var obj = JSON.parse(responseData);
-        //        if (obj.status == "success") {
-        //            //Atualiza connections 
-        //            queues = JSON.parse(obj.msg)
-        //            initializeQueues(queues);
-
-        //        } else {
-        //            log("danilo req : getGroupsResponse " + obj.msg);
-        //        }
-        //    } catch (e) {
-        //        log("danilo req : getGroupsResponse Erro" + e);
-        //    }
-
-        //})
-        //req.onerror(function (error) {
-        //        log("danilo-req : getGroups error=" + error);
-        //    });
-
     });
-    //getQueueGroups();
 }
 
 //JSON APIS
@@ -594,7 +558,7 @@ new JsonApi("dash").onconnected(function (conn) {
             });
         conn.onclose(function () {
             log("connectionsDash: disconnected");
-            connectionsDash = connectionsDash.filter(deleteCallsBySrc(conn.sip));
+            connectionsDash = connectionsDash.filter(removeObjectBySip(conn.sip));
             log("connectionsDash: after delete conn " + JSON.stringify(connectionsDash));
             
         });
@@ -632,7 +596,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             pbxTableUsers.push(obj);
         }
         if (obj.mt == "ReplicateUpdate") {
-            var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.h323 === obj.columns.h323 });
+            var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
             log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
             var grps1 = foundTableUser[0].columns.grps;
             var grps2 = obj.columns.grps;
@@ -705,7 +669,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             
             var found;
             pbxTableUsers.forEach(function (user) {
-                if (user.columns.h323 == obj.columns.h323) {
+                if (user.columns.guid == obj.columns.guid) {
                     log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
                     Object.assign(user, obj)
                     found = true;
@@ -717,6 +681,10 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             }
 
         }
+
+        if (obj.mt == "ReplicateDel") {
+            pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+        }
     });
 
     conn.onclose(function () {
@@ -724,81 +692,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         pbxTable.splice(pbxTable.indexOf(conn), 1);
     });
 });
-//new PbxApi("PbxSignal").onconnected(function (conn) {
-//    log("PbxSignal: connected conn " + JSON.stringify(conn));
-    
-//    // for each PBX API connection an own call array is maintained
-//    PbxSignal.push(conn);
-//    log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
-
-//    // register to the PBX in order to acceppt incoming presence calls
-//    conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL" ,"src": conn.pbx}));
-
-//    conn.onmessage(function (msg) {
-//        var obj = JSON.parse(msg);
-//        log(msg);
-
-//        if (obj.mt === "RegisterResult") {
-//            log("PBXSignal: registration result " + JSON.stringify(obj));
-//        }
-
-//        // handle incoming presence_subscribe call setup messages
-//        // the callid "obj.call" required later for sending badge notifications
-//        if (obj.mt === "Signaling" && obj.sig.type === "setup" && obj.sig.fty.some(function (v) { return v.type === "presence_subscribe" })) {
-
-//            log("PbxSignal: incoming presence subscription for user " + obj.sig.cg.sip);
-
-//            // connect call
-//            conn.send(JSON.stringify({ "mt": "Signaling", "api": "PbxSignal", "call": obj.call, "src": obj.sig.cg.sip + "," + obj.src, "sig": { "type": "conn" } }));
-
-//            //Update signals
-//            var src = obj.src;
-//            var myArray = src.split(",");
-//            var pbx = myArray[0];
-//            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-//            PbxSignal.forEach(function (signal) {
-//                if (signal.pbx == pbx) {
-//                    signal[obj.sig.cg.sip] = obj.call;
-//                }
-//            })
-//            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
-//            var name = "";
-//            var myArray = obj.sig.fty;
-//            myArray.forEach(function (fty) {
-//                if (fty.name) {
-//                    name = fty.name;
-//                }
-//            })
-            
-//            // send notification with badge count first time the user has connected
-//            updateBadge(conn, obj.call, count);
-//        }
-
-//        // handle incoming call release messages
-//        if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-//            //Remove signals
-//            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-//            var src = obj.src;
-//            var myArray = src.split(",");
-//            var sip = "";
-//            var pbx = myArray[0];
-//            PbxSignal.forEach(function (signal) {
-//                if (signal.pbx == pbx) {
-//                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-//                    delete signal[sip];
-                    
-//                }
-//            })
-//            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
-//        }
-//    });
-
-//    conn.onclose(function () {
-//        log("PbxSignal: disconnected");
-//        PbxSignal.splice(PbxSignal.indexOf(conn), 1);
-//        //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
-//    });
-//});
 
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
@@ -810,17 +703,11 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
         log("PbxSignal: connected PbxSignal " + JSON.stringify(PbxSignal));
         // register to the PBX in order to acceppt incoming presence calls
         conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
-        
     }
     
-
-    //PbxSignal.push(conn);
-    // register to the PBX in order to acceppt incoming presence calls
-    //conn.send(JSON.stringify({ "api": "PbxSignal", "mt": "Register", "flags": "NO_MEDIA_CALL", "src": conn.pbx }));
-
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
-        log(msg);
+        log("PbxSignal msg: " + msg);
 
         if (obj.mt === "RegisterResult") {
             log("PBXSignal: registration result " + JSON.stringify(obj));
@@ -839,21 +726,21 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var src = obj.src;
             var myArray = src.split(",");
             var pbx = myArray[0];
-            log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    var call = obj.call.toString();
-                    signal[call] = obj.sig.cg.sip;
-                }
-            })
-            //Teste Danilo 20/07: armazenar o conteúdo call no parâmetro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        signal[obj.sig.cg.sip] = obj.call;
-            //    }
-            //})
-            log("PbxSignal: after add new userclient " + JSON.stringify(PbxSignal));
+            
+            //Teste Danilo 05/08: armazenar o conteudo call em nova lista
+            var sip = obj.sig.cg.sip;
+            var call = obj.call;
+            var callData = { call, sip };
+            //Adiciona o PBX2 no objeto caso ele não exista
+            if (!PbxSignalUsers[pbx]) {
+                PbxSignalUsers[pbx] = [];
+                PbxSignalUsers[pbx].push(callData);
+            } else {
+                PbxSignalUsers[pbx].push(callData);
+            }
+            //Teste Danilo 05/08: armazenar o conteudo call em nova lista
+
+            log("PbxSignalUsers: after add new userclient " + JSON.stringify(PbxSignalUsers));
             var name = "";
             var myArray = obj.sig.fty;
             myArray.forEach(function (fty) {
@@ -861,24 +748,27 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                     name = fty.name;
                 }
             })
+            // send notification with badge count first time the user has connected
+            log("PbxSignal:pbxTable=" + JSON.stringify(pbxTable));
+            var user = pbxTableUsers.filter(function (item) {
+                return item.columns.h323 === obj.sig.cg.sip;
+            })[0];
+            log("PbxSignal:connUser=" + JSON.stringify(user));
+            //We can update the initial value, but we ignor it, wecall update every 20s...
+            //updateBadge2(obj.sig.cg.sip, dataPosts.length)
         }
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
             //Remove signals
-            log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
+            //log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
             var src = obj.src;
             var myArray = src.split(",");
             var sip = "";
             var pbx = myArray[0];
-            PbxSignal.forEach(function (signal) {
-                if (signal.pbx == pbx) {
-                    sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-                    delete signal[sip];
+            removeObjectByCall(PbxSignalUsers, pbx, obj.call);
 
-                }
-            })
-            log("PBXSignal: connections after delete result " + JSON.stringify(PbxSignal));
+            log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
         }
     });
 
@@ -1186,7 +1076,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(sip));
+                                    calls = calls.filter(removeObjectBySip(sip));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     break;
                                 case 7:
@@ -1213,7 +1103,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(sip));
+                                    calls = calls.filter(removeObjectBySip(sip));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     break;
                                 case 134:
@@ -1243,7 +1133,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                         }
                                         //Remove
                                         log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                        calls = calls.filter(deleteCallsBySrc(sip));
+                                        calls = calls.filter(removeObjectBySip(sip));
                                         log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     }
                                     break;
@@ -1273,7 +1163,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(deleteCallsBySrc(sip));
+                                    calls = calls.filter(removeObjectBySip(sip));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     //if (del == true) {
 
@@ -1354,52 +1244,44 @@ function badgeRequest2(value) {
 
     obj.listuser.forEach(function (user) {
         //Update Badge
+        
         try {
-            var count = 0;
+            updateBadge(user.user, user.num)
+            // var count = 0;
 
-            PbxSignal.forEach(function (signal) {
-                log("danilo-req badge2: signal" + JSON.stringify(signal));
-                //var call = signal[obj.sip];
-                //Teste Danilo 20/07:
-                var foundCalls = [];
-                for (var key in signal) {
-                    if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] == user.user) {
-                        foundCalls.push(key);
-                    }
-                }
-                //
-                log("danilo-req: badge2:call = " + foundCalls);
-                if (foundCalls.length > 0) {
-                    log("danilo-req badge2 call " + foundCalls + ", will call updateBadge");
-                    try {
-                        foundCalls.forEach(function (call) {
-                            updateBadge(signal, parseInt(call, 10), user.num);
-                        })
+            // PbxSignal.forEach(function (signal) {
+            //     log("danilo-req badge2: signal" + JSON.stringify(signal));
+            //     //var call = signal[obj.sip];
+            //     //Teste Danilo 20/07:
+            //     var foundCalls = [];
+            //     for (var key in signal) {
+            //         if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] == user.user) {
+            //             foundCalls.push(key);
+            //         }
+            //     }
+            //     //
+            //     log("danilo-req: badge2:call = " + foundCalls);
+            //     if (foundCalls.length > 0) {
+            //         log("danilo-req badge2 call " + foundCalls + ", will call updateBadge");
+            //         try {
+            //             foundCalls.forEach(function (call) {
+            //                 updateBadge(signal, parseInt(call, 10), user.num);
+            //             })
 
-                    } catch (e) {
-                        log("danilo-req badge2: User " + user.user + " Erro " + e)
-                    }
-                }
+            //         } catch (e) {
+            //             log("danilo-req badge2: User " + user.user + " Erro " + e)
+            //         }
+            //     }
 
-            })
+            // })
 
         }
         catch (e) {
             log("danilo req: erro send badge: " + e);
         }
-
-        //PbxSignal.forEach(function (signal) {
-        //    log("danilo-req badge2:PbxSignal " + JSON.stringify(signal));
-        //    var call = signal[user.user];
-        //    if (call != null) {
-        //        log("danilo-req badge2:call " + String(call)+", will call updateBadge");
-        //        updateBadge(signal, call, user.num);
-        //    }
-            
-        //})
     });
 }
-function updateBadge(ws, call, count) {
+function updateBadge2(ws, call, count) {
     var msg = {
         "api": "PbxSignal", "mt": "Signaling", "call": call, "src": "badge",
         "sig": {
@@ -1409,6 +1291,38 @@ function updateBadge(ws, call, count) {
     };
     log("danilo-req updateBadge:msg " + JSON.stringify(msg));
     ws.send(JSON.stringify(msg));
+}
+function updateBadge(sip, count) {
+    //Update Badge
+    try {
+        for (var pbx in PbxSignalUsers) {
+            if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                var entry = PbxSignalUsers[pbx];
+                entry.forEach(function (e) {
+                    if (e.sip == sip) {
+                        log('danilo-req updateBadge: PBX:', pbx, ', Call:', e.call, ', Sip:', e.sip);
+                        var signal = PbxSignal.filter(function (item) {
+                            return item.pbx === pbx;
+                        })[0];
+                        var msg = {
+                            "api": "PbxSignal", "mt": "Signaling", "call": parseInt(e.call, 10), "src": "badge",
+                            "sig": {
+                                "type": "facility",
+                                "fty": [{ "type": "presence_notify", "status": "open", "note": "#badge:" + count, "contact": "app:" }]
+                            }
+                        };
+                        if (signal) {
+                            log("danilo-req updateBadge:msg " + JSON.stringify(msg));
+                            signal.send(JSON.stringify(msg));
+                        }
+                    }
+                })
+            }
+        }
+    }
+    catch (e) {
+        log("danilo req: erro send badge: " + e);
+    }
 }
 //Function called by WebServer.onrequest("rcc")
 function rccRequest(value) {
@@ -1434,7 +1348,7 @@ function rccRequest(value) {
         if (foundQueue.length > 0) {
 
             log("danilo-req rccRequest:Grp_Del before END Queue " + obj.user);
-            queues = queues.filter(deleteCallsBySrc(obj.user));
+            queues = queues.filter(removeObjectBySip(obj.user));
             log("danilo-req rccRequest:Grp_Del after END Queue " + obj.user);
 
             RCC.forEach(function (rcc) {
@@ -1535,93 +1449,6 @@ function rccRequest(value) {
         })
     }
 }
-/*
-function callRCC(ws, user, mode, num, src) {
-    var myArray = src.split(",");
-    var sip = myArray[0];
-    var pbx = myArray[1];
-
-    var userT = pbxTableUsers.filter(function (userT) { return userT.columns.h323 === sip });
-    var userC = connectionsUser.filter(function (userC) { return userC.sip === sip });
-    if (mode == "UserInitialize") {
-        var msg = { api: "RCC", mt: "UserInitialize", cn: user, src: src };
-        ws.send(JSON.stringify(msg));
-    }
-    else if (mode == "Device") {
-        var msg = { api: "RCC", mt: "Devices", cn: user, src: src };
-        ws.send(JSON.stringify(msg));
-    }
-    else if (mode == "UserCall") {
-        log("danilo-req UserCall:sip " + sip);
-        //var msg = { api: "RCC", mt: "UserCall", user: user, e164: num, src: src };
-        //log("danilo req callRCC: UserCall sent rcc msg " + JSON.stringify(msg));
-        //ws.send(JSON.stringify(msg));
-        var msg = { api: "user", mt: "MakeCall", num: num, src: sip };
-        userC[0].send(JSON.stringify(msg));
-    }
-    else if (mode == "UserClear") {
-        calls.forEach(function (call) {
-            log("danilo-req UserClear:sip " + sip);
-            log("danilo-req UserClear:call " + JSON.stringify(call));
-            log("danilo-req UserClear:call.callid " + JSON.stringify(call.callid));
-            log("danilo-req UserClear:call.sip " + JSON.stringify(call.sip));
-            if (call.sip == sip) {
-
-                //var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
-                //log("danilo req callRCC: UserClear sent rcc msg " + JSON.stringify(msg));
-                //ws.send(JSON.stringify(msg));
-                var msg = { api: "user", mt: "DisconnectCall", src: sip };
-                userC[0].send(JSON.stringify(msg));
-            }
-            
-
-        })
-    }
-    else if (mode == "UserHold") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserHold", call: call.callid, remote: true, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserRetrieve") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                //var msg = { api: "RCC", mt: "UserRetrieve", hw: userC[0].hw, call: call.callid, src: call.sip };
-                var msg = { api: "RCC", mt: "UserRetrieve", call: call.callid, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserRedirect") {
-        calls.forEach(function (call) {
-            if (call.sip == sip) {
-                var msg = { api: "RCC", mt: "UserRedirect",  call: call.callid, e164: num, src: call.sip };
-                ws.send(JSON.stringify(msg));
-            }
-
-        })
-    }
-    else if (mode == "UserConnect") {
-        calls.forEach(function (call) {
-            log("danilo-req UserConnect:sip " + sip);
-            log("danilo-req UserConnect:call " + JSON.stringify(call));
-            log("danilo-req UserConnect:call.callid " + JSON.stringify(call.callid));
-            log("danilo-req UserConnect:call.sip " + JSON.stringify(call.sip));
-            if (call.sip == sip) {
-                //var msg = { api: "user", mt: "UserConnect", call: call.callid, src: call.sip };
-                //ws.send(JSON.stringify(msg));
-                var msg = { api: "user", mt: "ConnectCall", call: call.callid, src: call.sip };
-                userC[0].send(JSON.stringify(msg));
-            }
-
-        })
-    }
-}
-*/
 //Function called by WebServer.onrequest("pbxTable")
 function pbxTableRequest(value) {
     log("danilo-req pbxTableRequest:value " + String(value));
@@ -1772,70 +1599,23 @@ function pbxTableRequest(value) {
     //}
 }
 
-function executeNextRequest() {
-    if (httpRequestQueue.length > 0 && !httpBusy) {
-        var nextRequest = httpRequestQueue.shift();  // Pega a próxima requisição da fila
-        httpBusy = true;  // Define como ocupado
-
-        var url = nextRequest.url;
-        var method = nextRequest.method;
-        var msg = nextRequest.msg;
-        var callback = nextRequest.callback;
-
-        var responseData = "";
-        log("danilo-req : httpClient url " + url);
-        
-        var client = new HttpClient.request(method, url)
-            .header("X-Token", "danilo")
-            .contentType("application/json")
-            .timeout(3000)
-            .onsend(function (req) {
-                req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
-            })
-            .onrecv(function (req, data, last) {
-                log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
-                responseData += new TextDecoder("utf-8").decode(data);
-                if (!last) req.recv();
-            }, 1024)
-            .oncomplete(function (req, success) {
-                client.close();
-                httpBusy = false;  // Libera para uso
-                log("danilo-req : httpClient HttpRequest complete "+JSON.stringify(req));
-                log("danilo-req : httpClient HttpRequest responseData " + responseData);
-                if (callback) {
-                    callback(responseData);
-                }
-                executeNextRequest();  // Chama a próxima requisição na fila
-        })
-            .onerror(function (error) {
-                httpBusy = false;  // Libera para uso
-                log("danilo-req : httpClient HttpRequest error=" + error);
-                if (callback) {
-                    callback();
-                }
-                executeNextRequest();  // Chama a próxima requisição na fila
-        });
-    }
-}
-
 function httpClient(url, method, msg, callback) {
     log("danilo-req : httpClient msg "+JSON.stringify(msg));
     var responseData = "";
     log("danilo-req : httpClient url " + url);
     HttpClient.request(method, url)
     .header("X", "Wecom")
-    .timeout(3000)
     .contentType("application/json")
     .onsend(function (req) {
         req.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
     })
-    client.onrecv(function (req, data, last) {
+    .onrecv(function (req, data, last) {
         log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
         responseData += new TextDecoder("utf-8").decode(data);
         if (!last) req.recv();
     }, 1024)
     .oncomplete(function (req, success) {
-        log(success ? "POST httpClient OK" : "POST httpClient ERROR");
+        log(success ? url+" httpClient OK" : url+" httpClient ERROR");
         if (success) {
             log("danilo-req : httpClient HttpRequest complete " + JSON.stringify(req));
             log("danilo-req : httpClient HttpRequest responseData " + responseData);
@@ -1853,18 +1633,9 @@ function httpClient(url, method, msg, callback) {
 }
 
 //Functions to delete objects from Arrays
-function deleteCallsBySrc(src) {
+function removeObjectBySip(sip) {
     return function (value) {
-        if (value.sip != src) {
-            return true;
-        }
-        //countInvalidEntries++
-        return false;
-    }
-}
-function delConnectionsByCall(call) {
-    return function (value) {
-        if (value.call != call) {
+        if (value.sip != sip) {
             return true;
         }
         //countInvalidEntries++
@@ -1872,6 +1643,24 @@ function delConnectionsByCall(call) {
     }
 }
 
+function removeObjectByCall(arr, pbx, callToRemove) {
+    //console.log("removeObjectByCall+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx].length));
+    for (var i = 0; i < arr[pbx].length; i++) {
+        var pbxEntry = arr[pbx];
+        //console.log("arr[i][pbx]+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx]));
+        if (pbxEntry) {
+            //console.log("pbxEntry+++++++++++++++++++++++++++++++" + JSON.stringify(pbxEntry.length));
+            for (var j = 0; j < pbxEntry.length; j++) {
+                //console.log("pbxEntry[j].call+++++++++++++++++++++++++++++++" + pbxEntry[j].call);
+                if (pbxEntry[j].call == callToRemove) {
+                    log("pbxEntry[j].call == callToRemove:" + pbxEntry[j].call + " == " + callToRemove);
+                    pbxEntry.splice(j, 1);
+                    break;
+                }
+            }
+        }
+    }
+}
 //function to get User Login URL from Wecall
 function getURLLogin(sip, session) {
 
