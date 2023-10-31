@@ -330,7 +330,7 @@ function formatDate(inputDate) {
 
     function makedivSchedule(divinputs){
         var divSchedule = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
-        var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:12%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom"))
+        var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom"))
         divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
@@ -434,7 +434,7 @@ function formatDate(inputDate) {
                         var day = String(dateParts[0]).padStart(2, '0');
                         var month = getMonthIndex(dateParts[1]);
                         var year = dateParts[2];
-
+ 
                         // Função auxiliar para obter o índice do mês com base no nome do mês
                         function getMonthIndex(monthName) {
                             var months = [
@@ -454,28 +454,6 @@ function formatDate(inputDate) {
         
         });
     }
-    function makedivGeral(divinputs){
-        
-        //divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:15%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
-        divinputs.add(new innovaphone.ui1.Div(null,texts.text("labelName"),null))
-        divinputs.add(new innovaphone.ui1.Input("height: 13.5px ; width: 130px;margin-right:100px;margin-left:10px;",null,null,100,"text",null).setAttribute("id","iptRoomName"))
-        input = divinputs.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
-        input.setAttribute("id", "fileinput").setAttribute("type", "file");
-        input.setAttribute("accept", "image/*");
-        input.container.addEventListener('change', onSelectFile, false);
-
-        // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divinputs.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:60%; display: flex;align-items: center; justify-content: center;top: 35%;",null,null).setAttribute("id","imgBD"))
-        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
-    }
-    function makedivUsers(divinputs){
-
-       // divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:15%;width:100%; height:80%; display: flex; justify-content: center;",null,null))
-        var rightDiv = divinputs.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
-        var userTable = createUsersDepartmentsGrid();
-        rightDiv.add(userTable)
-       
-    }
     function makeDivCreateRoom(t){
         t.clear();
         filesID = "";  // para não excluir os arquivos corretos da DB files ; 
@@ -492,7 +470,7 @@ function formatDate(inputDate) {
         topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedule"),null).setAttribute("id","list-schedule"))
 
         divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
-        var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; justify-content: center; ", null, null).setAttribute("id", "div-geral"));
+        var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; flex-direction: column; ", null, null).setAttribute("id", "div-geral"));
         divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
         divGeral.add(new innovaphone.ui1.Input("height: 13.5px; width: 130px; margin-right:100px; margin-left:10px;", null, null, 100, "text", null).setAttribute("id", "iptRoomName"));
         input = divGeral.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
@@ -501,21 +479,19 @@ function formatDate(inputDate) {
         input.container.addEventListener('change', onSelectFile, false);
 
         divGeral.add(new innovaphone.ui1.Div(null,texts.text("labelModuleRoom"),null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px",null,null))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Recorrente",null))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectType"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Recorrente",null).setAttribute("id","recorrenteType"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null).setAttribute("id","periodoType"))
         
         divGeral.add(new innovaphone.ui1.Div(null,texts.text("labelTypeRoom"),null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px",null,null))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Hora",null))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Dia",null))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Hora",null).setAttribute("id","hourModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Dia",null).setAttribute("id","dayModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option",null,"Período",null).setAttribute("id","periodoModule"))
 
         // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:60%; display: flex;align-items: center; justify-content: center;top: 30%;",null,null).setAttribute("id","imgBD"))
+        imgBD = divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:47%; display: flex;align-items: center; justify-content: center; top: 50%;",null,null).setAttribute("id","imgBD"))
         app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
-
-        
 
         var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
         var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
@@ -548,13 +524,17 @@ function formatDate(inputDate) {
             divGeral.style.display = "none";
             divUsers.style.display = "none";
             divSchedule.style.display = "block";
-           
+            
         })
 
-
-
         document.getElementById("btnSaveRoom").addEventListener("click",function(){
-           
+            var editor = [];
+            var viewer = [];
+            var selectType = document.getElementById("selectType");
+            var optType = selectType.options[selectType.selectedIndex].id;
+            var selectModule = document.getElementById("selectModule")
+            var optModule = selectModule.options[selectModule.selectedIndex].id;
+
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
             var srcDaImagem = imagem.src;
@@ -562,12 +542,28 @@ function formatDate(inputDate) {
             if(nameRoom === "" || dateStart === "" || dateEnd === ""){
                 console.log("Favor Completar todos os campos")
             }else{
-                app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: "a definir", schedule: "a definir"  })
+                editor = [] ;
+                viewer = [] ;
+            
+                list_tableUsers.forEach(function (user) {
+                    var editorCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                    var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+            
+                    if (editorCheckbox.checked) {
+                        editor.push(user.guid);
+                    }
+            
+                    if (viewerCheckbox.checked) {
+                        viewer.push(user.guid);
+                    }
+                });
+
+                app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: optType, schedule: optModule, editor: String(editor) , viewer: String(viewer)  });
+                
             }
             
         })
 
-        
         document.getElementById("closewindow").addEventListener("click",function(){
             if(filesID ){
                 deleteFile(filesID)
@@ -656,7 +652,6 @@ function formatDate(inputDate) {
         return usersListDiv;
     }
    
-
     function allowDrop(ev) {
         ev.stopPropagation();
         ev.preventDefault();
@@ -826,7 +821,12 @@ function formatDate(inputDate) {
                 }
             });
     }
+    function insertRoom(msg){
+        console.log("InsertRoom" + msg)
+        app.send({api: "admin" , mt: "InsertRoomSchedule" })
+    }
     function folderAdded(msg) {
+        console.log("FOLDER" + msg)
         folder = msg.id;
         listFolder(folder);
     }

@@ -290,21 +290,22 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "InsertRoom") {
                 Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
                     .oncomplete(function (roomData) {
-                        var roomID = roomData[0].id; 
-            
+                        var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
                         Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, room_id) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + roomID + "')")
                             .oncomplete(function (scheduleData) {
-                                conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: scheduleData.src }));
+                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
+                                .oncomplete(function (editorsData) { 
+                                    Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
+                                .oncomplete(function (viewersData){
+                                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: scheduleData.src }));
+                                })
                             })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                log("Erro ao inserir na tbl_room_schedule: " + String(errorText));
-                            });
+                            })
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("Erro ao inserir na tbl_room: " + String(errorText));
                     });
             }
-            
             if (obj.mt == "SelectAllRoom") { // revisar 04/10
                 Database.exec("SELECT * FROM tbl_room")
                 .oncomplete(function (data) {

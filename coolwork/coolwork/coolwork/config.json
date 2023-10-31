@@ -102,33 +102,6 @@
 
                 ]
               },
-                           {
-                "cmd": "table",
-                "name": "pbt_table",
-                "init": [
-                  {
-                    "cmd": "column",
-                    "name": "guid",
-                    "type": "BIGSERIAL PRIMARY KEY NOT NULL"
-                  },
-                  {
-                    "cmd": "column",
-                    "name": "sip",
-                    "type": "VARCHAR(100) NOT NULL"
-                  },
-                  {
-                    "cmd": "column",
-                    "name": "dn",
-                    "type": "VARCHAR(45)"
-                  },
-                   {
-                    "cmd": "column",
-                    "name": "device",
-                    "type": "VARCHAR(45)"
-                  }
-
-                ]
-              },
                {
                 "cmd": "table",
                 "name": "tbl_room_schedule",
@@ -205,7 +178,7 @@
                                     {
                     "cmd": "column",
                     "name": "user_guid",
-                    "type": "BIGINT REFERENCES pbt_table(guid) ON DELETE CASCADE"
+                    "type": "TEXT"
                   }
       
 
@@ -218,7 +191,7 @@
                  {
                     "cmd": "column",
                     "name": "editor_guid",
-                    "type": "BIGINT REFERENCES pbt_table(guid) ON DELETE CASCADE"
+                    "type": "TEXT"
                   },
                                     {
                     "cmd": "column",
@@ -236,7 +209,7 @@
                  {
                     "cmd": "column",
                     "name": "viewer_guid",
-                    "type": "BIGINT REFERENCES pbt_table(guid) ON DELETE CASCADE"
+                    "type": "TEXT"
                   },
                                     {
                     "cmd": "column",
