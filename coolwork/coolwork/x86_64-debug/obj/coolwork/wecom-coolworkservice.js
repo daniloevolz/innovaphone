@@ -250,33 +250,36 @@ new JsonApi("admin").onconnected(function(conn) {
                     var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
                     log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
                     log("hw id" + dev.hwId)
-                    if (filteredObject.length > 0) {
-                        log("PhoneList: filteredObject>0")
-                        dev.sip = filteredObject[0].columns.h323;
-                        dev.cn = filteredObject[0].columns.cn;
-                        dev.guid = filteredObject[0].columns.guid;
-                        Database.exec("DELETE FROM tbl_devices WHERE room_id IS NULL") 
-                        .oncomplete(function () {
-                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.sip + "','" + dev.cn + "','" + dev.guid + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
-                        .oncomplete(function (data) {
-                        log("InsertSuccess" + JSON.stringify(data))
+                    Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
+                    .oncomplete(function (data) {
+                    log("InsertSuccess" + JSON.stringify(data))
+                        if (filteredObject.length > 0) {
+                            log("PhoneList: filteredObject>0")
+                            dev.sip = filteredObject[0].columns.h323;
+                            dev.cn = filteredObject[0].columns.cn;
+                            dev.guid = filteredObject[0].columns.guid;
+                            var sql = "UPDATE tbl_devices SET sip = '" + dev.sip + "', cn = '" + dev.cn + "', guid = '" + dev.guid + "' WHERE hwid = '" + dev.hwId + "'"; 
+                            Database.exec(sql)
+                            .oncomplete(function (data) {
+                            log("UpdateSuccess" + JSON.stringify(data))
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                    log("UpdateDevicesResult:result=Error " + String(errorText));
+                            });
+                        }
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
-                        })
-                        .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDevicesResult:result=Error " + String(errorText));
-                        });
-
                     })
-                .onerror(function (error, errorText, dbErrorCode) {
-                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
-                });
+                    .onerror(function (error, errorText, dbErrorCode) {
+                            log("InsertDevicesResult:result=Error " + String(errorText));
+                            conn.send(JSON.stringify({api: "admin", mt: "Error", src: errorText}))
+                    });
+
+                 });
       
-                // log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
-                // conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
+                log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
+                conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
             }
             
-        })
-    }
             if (obj.mt == "SelectDevices") {
                 Database.exec("SELECT * FROM tbl_devices WHERE room_id IS NULL")
                 .oncomplete(function (data) {
@@ -290,18 +293,31 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "InsertRoom") {
                 Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
                     .oncomplete(function (roomData) {
-                        var roomID = roomData[0].id;
+                        var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
+
                         Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, room_id) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + roomID + "')")
                             .oncomplete(function (scheduleData) {
-                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
-                                .oncomplete(function (editorsData) { 
-                                    Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
+
+                            var viewers = obj.viewer
+                            viewers.forEach(function(v){
+                                Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + v + "','" + roomID + "')")
                                 .oncomplete(function (viewersData){
-                                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: scheduleData.src }));
+                                    log("InsertViewers Success")
                                 })
                             })
+
+                            var editors = obj.editor
+                            editors.forEach(function(e){
+                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + roomID + "')")
+                                .oncomplete(function (editorsData) { 
+                                    log("InsertEditors Success")
                             })
+                        })
+                    
                     })
+                    conn.send(JSON.stringify({api: "admin" , mt: "InsertRoomResult"}))
+                })
+
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("Erro ao inserir na tbl_room: " + String(errorText));
                     });

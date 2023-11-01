@@ -241,6 +241,58 @@ new JsonApi("admin").onconnected(function(conn) {
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
+            if (obj.mt == "SetPresence") {
+                handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
+            };
+            if (obj.mt == "InsertAppointment"){
+                Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.device + "'," + obj.deviceRoom + ",'" + conn.guid + "')")
+                .oncomplete(function (data) {
+                    //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "InsertAppointmentResult", result: JSON.stringify(data) }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("InsertAppointmentResult:result=Error " + String(errorText));
+                });
+            }
+            if (obj.mt == "CheckAppointment") {
+
+                Database.exec("SELECT * FROM tbl_device_schedule")
+                    .oncomplete(function (data) {
+                        // Os dados retornados pela consulta podem não estar em formato JSON diretamente.
+                        // Você precisa processar os dados e estruturá-los em um objeto JSON.
+            
+                        // Suponhamos que os dados sejam um array de objetos.
+                        // Você pode ajustar essa estrutura de acordo com a estrutura real dos dados retornados.
+                        log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data))
+                        var results = [];
+            
+                        for (var i = 0; i < data.length; i++) {
+                            var row = data[i];
+                            var resultObj = {
+                                id: row.id,
+                                type: row.type,
+                                data_start: row.data_start,
+                                data_end: row.data_end,
+                                device_id: row.device_id,
+                                device_room_id: row.device_room_id,
+                                user_guid: row.user_guid
+                            };
+                            results.push(resultObj);
+                        }
+            
+                        // Agora, você pode converter os resultados em JSON.
+                        var jsonResult = JSON.stringify(results);
+            
+                        log("DATA DEVICE_SCHEDULE", jsonResult);
+            
+                        // Envie o resultado em formato JSON.
+                        conn.send(JSON.stringify({ api: "admin", mt: "CheckAppointmentResult", result: jsonResult }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("checkAppointmentResult:result=Error " + String(errorText));
+                    });
+            }
+
             if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
@@ -250,33 +302,36 @@ new JsonApi("admin").onconnected(function(conn) {
                     var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
                     log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
                     log("hw id" + dev.hwId)
-                    if (filteredObject.length > 0) {
-                        log("PhoneList: filteredObject>0")
-                        dev.sip = filteredObject[0].columns.h323;
-                        dev.cn = filteredObject[0].columns.cn;
-                        dev.guid = filteredObject[0].columns.guid;
-                        Database.exec("DELETE FROM tbl_devices WHERE room_id IS NULL") 
-                        .oncomplete(function () {
-                        Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, sip, cn, guid) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.sip + "','" + dev.cn + "','" + dev.guid + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
-                        .oncomplete(function (data) {
-                        log("InsertSuccess" + JSON.stringify(data))
+                    Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
+                    .oncomplete(function (data) {
+                    log("InsertSuccess" + JSON.stringify(data))
+                        if (filteredObject.length > 0) {
+                            log("PhoneList: filteredObject>0")
+                            dev.sip = filteredObject[0].columns.h323;
+                            dev.cn = filteredObject[0].columns.cn;
+                            dev.guid = filteredObject[0].columns.guid;
+                            var sql = "UPDATE tbl_devices SET sip = '" + dev.sip + "', cn = '" + dev.cn + "', guid = '" + dev.guid + "' WHERE hwid = '" + dev.hwId + "'"; 
+                            Database.exec(sql)
+                            .oncomplete(function (data) {
+                            log("UpdateSuccess" + JSON.stringify(data))
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                    log("UpdateDevicesResult:result=Error " + String(errorText));
+                            });
+                        }
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
-                        })
-                        .onerror(function (error, errorText, dbErrorCode) {
-                                log("InsertDevicesResult:result=Error " + String(errorText));
-                        });
-
                     })
-                .onerror(function (error, errorText, dbErrorCode) {
-                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
-                });
+                    .onerror(function (error, errorText, dbErrorCode) {
+                            log("InsertDevicesResult:result=Error " + String(errorText));
+                            conn.send(JSON.stringify({api: "admin", mt: "Error", src: errorText}))
+                    });
+
+                 });
       
-                // log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
-                // conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
+                log("PhoneList: PhoneListResult devices " + JSON.stringify(devices))
+                conn.send(JSON.stringify({ api: "admin", mt: "PhoneListResult", result: devices, src: obj.src }));
             }
             
-        })
-    }
             if (obj.mt == "SelectDevices") {
                 Database.exec("SELECT * FROM tbl_devices WHERE room_id IS NULL")
                 .oncomplete(function (data) {
@@ -291,17 +346,30 @@ new JsonApi("admin").onconnected(function(conn) {
                 Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
                     .oncomplete(function (roomData) {
                         var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
+
                         Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, room_id) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + roomID + "')")
                             .oncomplete(function (scheduleData) {
-                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
-                                .oncomplete(function (editorsData) { 
-                                    Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + obj.editor + "','" + roomID + "')")
+
+                            var viewers = obj.viewer
+                            viewers.forEach(function(v){
+                                Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + v + "','" + roomID + "')")
                                 .oncomplete(function (viewersData){
-                                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", src: scheduleData.src }));
+                                    log("InsertViewers Success")
                                 })
                             })
+
+                            var editors = obj.editor
+                            editors.forEach(function(e){
+                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + roomID + "')")
+                                .oncomplete(function (editorsData) { 
+                                    log("InsertEditors Success")
                             })
+                        })
+                    
                     })
+                    conn.send(JSON.stringify({api: "admin" , mt: "InsertRoomResult"}))
+                })
+
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("Erro ao inserir na tbl_room: " + String(errorText));
                     });
@@ -521,54 +589,73 @@ function handleSetPresenceMessage(sip, note, activity) {
     }));
 
 }
-     //conn.send(json.stringify({
-     //         "api": "pbxapi",
-     //         "mt": "setpresence",
-     //         "sip": "erick",
-     //         "activity" : "",
-     //         "note": "on start"
-     //}));
+var i = Timers.setInterval(function() {
+    var now = getDateNow();
+    log("getDateNow",now)
+    Database.exec("SELECT * FROM tbl_device_schedule WHERE data_start ='"+ now +"'")
+        .oncomplete(function (data) {
+        log("AGENDAMENTOS string: ", JSON.stringify(data))
+        // Seu código de verificação aqui
+        log("Verificação concluída!")
+        if(data.length > 0 ){
 
-//     // if (conn.app == "wecom-coolworkadmin") {
-//     //     conn.onmessage(function(msg) {
-//     //         var obj = JSON.parse(msg);
-//     //         log("Message OBJ:" + JSON.stringify(obj))
-//     //         if (obj.mt == "SetPresence") {
-//     //             console.log("ADMIN SET PRESENCE OBJ:",obj)
-//     //             console.log("ADMIN SET PRESENCE MSG:", msg)
-//     //             log("ADMIN LOG - SET PRESENCE OBJ:",obj)
-//     //             log("ADMIN LOG - SET PRESENCE MSG:", msg)
-//     //             conn.send(JSON.stringify({
-//     //                 "api": "PbxApi",
-//     //                 "mt": "SetPresence",
-//     //                 "sip": "Erick",
-//     //                 "activity" : "busy",
-//     //                 "note": "CONN API"
-//     //             }));
-                
-//     //         };
-//     //     });
-//     //     if (presence.length != '' ){
-//     //         conn.send(JSON.stringify({
-//     //             "api": "PbxApi",
-//     //             "mt": "SetPresence",
-//     //             "sip": "Erick",
-//     //             "activity" : "busy",
-//     //             "note": "PRESENCE-UPDATE"
-//     //         }));
-//     //     }
-//     // }
+            data.forEach(function(data){
+                var sipGuid = pbxTableUsers.filter(function(item){
+                    
+                    return item.columns.guid == data.user_guid
+                })[0];
+            pbxTableInsertDevice(data.device_id, sipGuid)   
+            handleSetPresenceMessage(sipGuid.columns.h323, sipGuid.columns.cn, "busy")
+            })
+        }
+        })
+}, 60000);
+var o = Timers.setInterval(function() {
+    var now = getDateNow();
+    log("getDateNow",now)
+    Database.exec("SELECT * FROM tbl_device_schedule WHERE data_end ='"+ now +"'")
+        .oncomplete(function (data) {
+        log("ENCERRAMENTOS string: ", JSON.stringify(data))
+        // Seu código de verificação aqui
+        log("Verificação concluída!")
+        if(data.length > 0 ){
 
-// })
-    // conn.setFlowControl(true)
-    //     .onmessage(function(msg) {
-    //     log("ERICK SET PbxApi:",JSON.stringify(conn))
-    //         var obj = JSON.parse(msg);
-    //         if (obj.mt == "SubscribePresenceResult") {
-    //             // do something
-    //         }
-    //         conn.messageComplete();
-    //     });
+            data.forEach(function(data){
+                var sipGuid = pbxTableUsers.filter(function(item){
+                    
+                    return item.columns.guid == data.user_guid
+                })[0];
+                pbxTableRemoveDevice(data.device_id, sipGuid)   
+            
+            })
+        }
+        })
+}, 61000);
+
+function pbxTableInsertDevice(hwId, user){
+    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+    .oncomplete(function(data){
+        user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
+        pbxTable.forEach(function(conn){
+            if(user.src == conn.pbx){
+                user.mt = "ReplicateUpdate"
+                conn.send(JSON.stringify(user))
+            }
+        })
+    })
+}
+function pbxTableRemoveDevice(hwId, user){
+    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+    .oncomplete(function(data){
+        user.columns.devices.push({hw:'', text:'', app: "phone", tls: true, trusted: true})
+        pbxTable.forEach(function(conn){
+            if(user.src == conn.pbx){
+                user.mt = "ReplicateUpdate"
+                conn.send(JSON.stringify(user))
+            }
+        })
+    })
+}
 
 var pbxTable = [];
 var pbxTableUsers = [];

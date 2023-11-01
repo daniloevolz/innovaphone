@@ -15,7 +15,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     //var divPhones;  //db files variáveis
 
-    var filesID;
+    var filesID = [];
     var ativos = [];  // vaiavel para controle dos devices de cada sala
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
@@ -239,12 +239,15 @@ function formatDate(inputDate) {
                 
                  document.getElementById("imgBD").innerHTML += html
            })
+           
            }
            var phoneElements = document.querySelectorAll(".phoneButtons");
            phoneElements.forEach(function (phoneElement) {
                phoneElement.draggable = true;
-       
+            
                phoneElement.addEventListener("dragstart",drag,true)
+
+               
            });
            document.getElementById("closewindow").addEventListener("click",function(){  // close 
                 colDireita.rem(insideDiv)
@@ -434,7 +437,7 @@ function formatDate(inputDate) {
                         var day = String(dateParts[0]).padStart(2, '0');
                         var month = getMonthIndex(dateParts[1]);
                         var year = dateParts[2];
-
+ 
                         // Função auxiliar para obter o índice do mês com base no nome do mês
                         function getMonthIndex(monthName) {
                             var months = [
@@ -456,8 +459,8 @@ function formatDate(inputDate) {
     }
     function makeDivCreateRoom(t){
         t.clear();
-        filesID = "";  // para não excluir os arquivos corretos da DB files ; 
-    
+        filesID = [];  // para não excluir os arquivos corretos da DB files ; 
+        console.log("FILES ID "  + filesID)
         var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
     
         leftbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "left-box scrolltable").setAttribute("id", "left-box"));
@@ -558,16 +561,21 @@ function formatDate(inputDate) {
                     }
                 });
 
-                app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: optType, schedule: optModule, editor: String(editor) , viewer: String(viewer)  });
+                app.send({api:"admin", mt:"InsertRoom", name : nameRoom, img : srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: optType, schedule: optModule, editor: editor , viewer: viewer });
                 
             }
             
         })
-
+        // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
+        //     filesID = [];                      // setTimeout muito coisa de Junior 
+        //     filesID = "vazio";   
+        // },2000)
         document.getElementById("closewindow").addEventListener("click",function(){
-            if(filesID ){
-                deleteFile(filesID)
-            }
+            // console.log("FILES ID "  + filesID)
+            // if(filesID ){                                      
+            //     console.log("FILES ID "  + filesID)
+            //    deleteFile(filesID)
+            // }
             setTimeout(function(){
                 colDireita.rem(insideDiv)
             controlDB = false // controle da DB files

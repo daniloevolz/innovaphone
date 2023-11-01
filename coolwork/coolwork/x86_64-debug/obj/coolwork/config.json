@@ -71,17 +71,17 @@
                   {
                     "cmd": "column",
                     "name": "sip",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",
                     "name": "cn",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",
                     "name": "guid",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",

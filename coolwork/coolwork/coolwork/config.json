@@ -71,17 +71,17 @@
                   {
                     "cmd": "column",
                     "name": "sip",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",
                     "name": "cn",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",
                     "name": "guid",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120)"
                   },
                   {
                     "cmd": "column",
@@ -167,7 +167,7 @@
                    {
                     "cmd": "column",
                     "name": "device_id",
-                    "type": "BIGINT REFERENCES tbl_devices(id) ON DELETE CASCADE"
+                    "type": "VARCHAR(120) REFERENCES tbl_devices(hwid) ON DELETE CASCADE"
                   },
                   {
                     "cmd": "column",
