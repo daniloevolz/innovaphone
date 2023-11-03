@@ -274,7 +274,7 @@ new JsonApi("user").onconnected(function(conn) {
                             .oncomplete(function (deviceData) {
                                 Database.exec(querySelectRoomSchedule)
                                     .oncomplete(function (roomScheduleData) {
-                                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomResult", room: JSON.stringify(roomData), dev: deviceData, schedules: JSON.stringify(roomScheduleData) }));
+                                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomResult", room: JSON.stringify(roomData[0]), dev: deviceData, schedules: JSON.stringify(roomScheduleData) }));
                                     })
                                     .onerror(function (error, errorText, dbErrorCode) {
                                         log("SelectRoomResult: Error ao selecionar tabela tbl_room_schedule: " + String(errorText));
