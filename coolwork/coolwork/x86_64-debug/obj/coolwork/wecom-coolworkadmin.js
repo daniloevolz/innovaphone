@@ -178,7 +178,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         //     .addText("Set Presence")
         //     .addEvent("click", function () { app.send({api: "admin", mt: "SetPresence", activity:"busy", note: pcInput.value})}, pcButton));
         ///////////////// END SET PRESENCE ON INSERT //////////////////////////
-
+        colDireita = that.add(new innovaphone.ui1.Div(null, null, "colDireita"));
         var divAppointment = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;flex-direction: column; align-items:center",null,null).setAttribute("id","userPresence"));
         divAppointment.add(new innovaphone.ui1.Node("span", "", "ID DA SALA:", ""));
         var inputRoom = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
@@ -338,18 +338,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     })
     }
 
-    function makedivSchedule(divinputs){
-        var divSchedule = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
-        var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom"))
-        divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+    function makeSchedule(optType){        
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             // var id = $.urlParam('id');
+            $('#calendar').fullCalendar('destroy');
            $('#calendar').fullCalendar({
             
                 header: {
                     left: 'today',
-                   center: 'title , month,agendaDay', //agendaWeek,
+                   center: 'title , month', //agendaWeek,
                     right: 'prev,next'
                 },
                 buttonText: {
@@ -386,19 +384,58 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     
                     if (view.name === 'month') {
                         console.log("View: Month");
-                        var clickedElement = jsEvent.target
+                        var clickedElement = jsEvent.target;
                         
                         console.log(" Elemento clicado " + clickedElement);
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
-                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                        $('#calendar').fullCalendar('gotoDate', start);
+                        
+                        var startHour = document.getElementById("startIpt").value;
+                        var endHour = document.getElementById("endIpt").value;
 
-                        // var teste = false;
-                       
-                        // if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                        var startHourParts = startHour.split(':');
+                        var endHourParts = endHour.split(':');
+                        
+                        // Divida a hora em horas e minutos
+                        var startHourParts = startHour.split(':');
+                        var endHourParts = endHour.split(':');
+                        
+                        // Remova os segundos e o "Z" da data clicada
+                        var clickedDateWithoutSeconds = clickedDate.replace(/:00:00Z$/, '');
+                        
+                        // Crie objetos de data para a data clicada
+                        var dateStartISO = new Date(clickedDateWithoutSeconds);
+                        
+                        // Defina as horas e minutos apropriados
+                        dateStartISO.setHours(parseInt(startHourParts[0], 10));
+                        dateStartISO.setMinutes(parseInt(startHourParts[1], 10));
+                        
+                        var dateEndISO = new Date(clickedDateWithoutSeconds);
+                        
+                        // Defina as horas e minutos apropriados
+                        dateEndISO.setHours(parseInt(endHourParts[0], 10));
+                        dateEndISO.setMinutes(parseInt(endHourParts[1], 10));
+                        
+                        // Converta as datas para strings no formato ISO
+                        var dateStartISOString = dateStartISO.toISOString();
+                        var dateEndISOString = dateEndISO.toISOString();
+                        
+                        
+                        console.log("dateStart" + dateStartISOString  + "dateEnd" + dateEndISOString);
+
+                        // Divida a hora em horas e minutos
+
+
+                        // if (optType == "dayModule") {
+                        //    
+                        // } else {
+                        //     $('#calendar').fullCalendar('changeView', 'agendaDay');
+                        //     $('#calendar').fullCalendar('gotoDate', start);
+                        // }
+                    
                         $('#calendar').fullCalendar('unselect'); 
                     }
+                    
                     else if (view.name === 'agendaWeek') {
                         console.log("View: " + "Week");
 
@@ -508,9 +545,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var userTable = createUsersDepartmentsGrid();
         rightDiv.add(userTable)
         
-        makedivSchedule(divinputs)
-        
-                
+        var divSchedule = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+        var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
+        var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
+        var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
+        var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
+        var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
+        divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+
         var divGeral = document.getElementById("div-geral");
         var divUsers = document.getElementById("div-users");
         var divSchedule = document.getElementById("div-schedule");
@@ -530,12 +572,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         });
 
         var a = document.getElementById("list-schedule");
-        a.addEventListener("click", function () { 
+        a.addEventListener("click", function () {
             divGeral.style.display = "none";
             divUsers.style.display = "none";
             divSchedule.style.display = "block";
-            
-        })
+    
+            var selectModule = document.getElementById("selectModule");
+            var optModule = selectModule.options[selectModule.selectedIndex].id;
+            // set checkbox conforme oq for selecionado
+            makeSchedule(optModule);
+        });
 
         document.getElementById("btnSaveRoom").addEventListener("click",function(){
             var editor = [];

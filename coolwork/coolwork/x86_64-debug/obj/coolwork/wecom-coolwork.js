@@ -207,7 +207,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         
         document.getElementById("closewindow").addEventListener("click", function () {  // close 
-            app.send({ api: "admin", mt: "SelectMyRooms" })
+            app.send({ api: "user", mt: "SelectMyRooms" })
 
         })
     }
