@@ -167,34 +167,41 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         });
         
         // col direita fora do list - box 
-        colDireita = that.add(new innovaphone.ui1.Div(null,null,"colDireita"));
-        var divmain = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","mainDiv"));
-        divmain.add(new innovaphone.ui1.Node("span", "", "MAC do Telefone:", ""));
-        var inputHW = divmain.add(new innovaphone.ui1.Node("input", "", "", ""));
-        inputHW.setAttribute("id", "hwinput").setAttribute("type", "text");
-        var iptHW = document.getElementById("hwinput")
-        var loginButton = divmain.add(new innovaphone.ui1.Div(null, null, "button")
-            .addText("Login")
-            .addEvent("click", function () { app.send({ api: "user", mt: "LoginPhone", hw: iptHW.value }); }, loginButton));
-        var logoutButton = divmain.add(new innovaphone.ui1.Div(null, null, "button")
-            .addText("Logout")
-            .addEvent("click", function () { app.send({ api: "user", mt: "LogoutPhone", hw: iptHW.value });}, logoutButton));
-        var divPresence = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","userPresence"));
-        divPresence.add(new innovaphone.ui1.Node("span", "", "Presence PBX:", ""));
-        var inputPresence = divPresence.add(new innovaphone.ui1.Node("input", "", "", ""));
-        inputPresence.setAttribute("id", "pcinput").setAttribute("type", "text");
-        var pcInput = document.getElementById("pcinput")
-        var pcButton = divPresence.add(new innovaphone.ui1.Div(null, null, "button")
+
+          ///////////////  SET PRESENCE ON INSERT  ///////////////////////////////
+        //var divPresence = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;align-items:center",null,null).setAttribute("id","userPresence"));
+        // divPresence.add(new innovaphone.ui1.Node("span", "", "Presence PBX:", ""));
+        // var inputPresence = divPresence.add(new innovaphone.ui1.Node("input", "", "", ""));
+        // inputPresence.setAttribute("id", "pcinput").setAttribute("type", "text");
+        // var pcInput = document.getElementById("pcinput")
+        // var pcButton = divPresence.add(new innovaphone.ui1.Div(null, null, "button")
+        //     .addText("Set Presence")
+        //     .addEvent("click", function () { app.send({api: "admin", mt: "SetPresence", activity:"busy", note: pcInput.value})}, pcButton));
+        ///////////////// END SET PRESENCE ON INSERT //////////////////////////
+
+        var divAppointment = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;flex-direction: column; align-items:center",null,null).setAttribute("id","userPresence"));
+        divAppointment.add(new innovaphone.ui1.Node("span", "", "ID DA SALA:", ""));
+        var inputRoom = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
+        inputRoom.setAttribute("id", "inputRoom").setAttribute("type", "text");
+        var roomInput = document.getElementById("inputRoom");
+        divAppointment.add(new innovaphone.ui1.Node("span", "", "HWID PHONE", ""));
+        var inputPhone = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
+        inputPhone.setAttribute("id", "inputphone").setAttribute("type", "text");
+        var phoneInput = document.getElementById("inputphone");
+        divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE START", ""));
+        var inputDateStart = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
+        inputDateStart.setAttribute("id", "inputDateStart").setAttribute("type", "text");
+        var dateStartInput = document.getElementById("inputDateStart")
+        divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE END", ""));
+        var inputDateEnd = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
+        inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
+        var dateEndInput = document.getElementById("inputDateEnd")
+
+        var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Set Presence")
-            .addEvent("click", function () { app.send({api: "admin", mt: "SetPresence", activity:"busy", note: pcInput.value})}, pcButton));
-            // var obj = { 
-            // mt: "PresenceUpdated",
-            // activity: "away", 
-            // note: pcInput.value}; 
-            // }, app.send(obj))
-            // );
-}
-function formatDate(inputDate) {
+            .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
+    }
+    function formatDate(inputDate) {
     const date = new Date(inputDate);
     
     const day = String(date.getDate()).padStart(2, '0');
@@ -710,7 +717,7 @@ function formatDate(inputDate) {
         divPhones.appendChild(draggedElement);
 
     }
-      function drag(ev) {
+    function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
         ev.dataTransfer.dropEffect = 'copy';
     }
@@ -732,7 +739,7 @@ function formatDate(inputDate) {
              document.getElementById("divPhones").innerHTML += phoneHTML;
         });
     }
-        // construtor 
+    // construtor 
     // db files
 
     var folder = null;

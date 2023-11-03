@@ -13,6 +13,11 @@ Wecom.coolworkTexts = {
         labelUsers: "Usuários",
         labelSchedule: "Agendamentos",
         labelDateStart : " Data de Início",
-        labelDateEnd : " Data de Término"
+        labelDateEnd: " Data de Término",
+        labelUser: "Usuário",
+        labelEditor: "Editor",
+        labelViewer: "Visualizador",
+        labelType: "Tipo",
+        labelSchedueModule: "Modelo"
     }
 }

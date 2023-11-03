@@ -200,8 +200,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Set Presence")
             .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
-}
-function formatDate(inputDate) {
+    }
+    function formatDate(inputDate) {
     const date = new Date(inputDate);
     
     const day = String(date.getDate()).padStart(2, '0');
@@ -717,7 +717,7 @@ function formatDate(inputDate) {
         divPhones.appendChild(draggedElement);
 
     }
-      function drag(ev) {
+    function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
         ev.dataTransfer.dropEffect = 'copy';
     }
@@ -739,7 +739,7 @@ function formatDate(inputDate) {
              document.getElementById("divPhones").innerHTML += phoneHTML;
         });
     }
-        // construtor 
+    // construtor 
     // db files
 
     var folder = null;
