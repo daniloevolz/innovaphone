@@ -10,6 +10,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var phone_list = [];
     var UIuser;
     var avatar;
+    var appdn = start.title;
     var UIuserPicture;
     var devicesApi;
     var list_MyRooms = [];
@@ -173,8 +174,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     //Função para criar div de visualização da sala
     function makeDivRoom(t, room, schedules, devices) {
-        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
-        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", room.id))
+        t.clear();
+        var listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", room.id))
         listbox.add(new innovaphone.ui1.Div(null, null, null).setAttribute("id", "closewindow"))
         listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", room.name))
 
@@ -206,8 +207,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         
         document.getElementById("closewindow").addEventListener("click", function () {  // close 
-            insideDiv.clear()
-            t.rem(insideDiv)
             app.send({ api: "admin", mt: "SelectMyRooms" })
 
         })
@@ -220,9 +219,24 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             console.info("WECOM-LOG: Appwebsocket.Connection Connected: ");
         }
         if (newState == "Disconnected") {
+            waitConnection(that);
             console.error("WECOM-LOG: Appwebsocket.Connection Disconnected: ");
             currentState = "Disconnected";
         }
+    }
+    function formatDate(inputDate) {
+        const date = new Date(inputDate);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+
+        return formattedDate;
     }
 
     //Função para apresentar Loader, chamado quando o App está desconectado ou aguardando algum processo.
