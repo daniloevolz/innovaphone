@@ -176,7 +176,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeDivRoom(t, room, schedules, devices) {
         t.clear();
         var listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", room.id))
-        listbox.add(new innovaphone.ui1.Div(null, null, null).setAttribute("id", "closewindow"))
+        listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"))
         listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", room.name))
 
         var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
@@ -210,6 +210,160 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             app.send({ api: "user", mt: "SelectMyRooms" })
 
         })
+
+        // Obtém todos os elementos com a classe "phoneButtons"
+        var phoneButtons = document.getElementsByClassName("phoneButtons");
+
+        // Adiciona um evento de clique a cada elemento
+        for (var i = 0; i < phoneButtons.length; i++) {
+            phoneButtons[i].addEventListener("click", function (event) {
+                //var elementoClicado = event.target;
+                var elementoClicado = event.target;
+                var id = event.currentTarget.id
+                //var ip = elementoClicado.getAttribute("data-ip"); // Suponha que o IP seja armazenado no atributo "data-ip"
+                console.log("ID do elemento clicado: " + id);
+                var d = devices.filter(function (dev) { return dev.hwid == id })[0]
+                makeDivPhoneProprieties(t,room,schedules, d)
+            });
+        }
+
+    }
+    function makeDivPhoneProprieties(t, room, schedules, device) {
+        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
+        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
+        listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
+        listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", device.product))
+
+        var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
+        document.getElementById("closeDevWindow").addEventListener("click", function () {  // close 
+            t.rem(insideDiv);
+
+        })
+        //var divSchedule = listbox.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:block").setAttribute("id", "div-schedule"))
+        //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
+        listbox.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
+        $(document).ready(function () {
+            $.fullCalendar.locale('pt-br');
+            // var id = $.urlParam('id');
+            $('#calendar').fullCalendar({
+
+                header: {
+                    left: 'today',
+                    center: 'title , month,agendaDay', //agendaWeek,
+                    right: 'prev,next'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                    'Janeiro',
+                    'Fevereiro',
+                    'Março',
+                    'Abril',
+                    'Maio',
+                    'Junho',
+                    'Julho',
+                    'Agosto',
+                    'Setembro',
+                    'Outubro',
+                    'Novembro',
+                    'Dezembro'
+                ],
+                defaultView: 'month',
+                slotDuration: '01:00:00',
+                minTime: '00:00:00',
+                maxTime: '24:00:00',
+                selectable: true,
+                selectLongPressDelay: 0,
+
+                selectHelper: true,
+                select: function (start, end, jsEvent, view) {
+                    selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
+                    selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
+
+                    if (view.name === 'month') {
+                        console.log("View: Month");
+                        var clickedElement = jsEvent.target
+
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                        $('#calendar').fullCalendar('gotoDate', start);
+
+                        // var teste = false;
+
+                        // if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                        $('#calendar').fullCalendar('unselect');
+                    }
+                    else if (view.name === 'agendaWeek') {
+                        console.log("View: " + "Week");
+
+                        var clickedElement = jsEvent.target
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+                        var teste = false;
+
+                    }
+                    else {
+                        console.log("View: " + "day");
+                        // data inicio em iso string 
+                        dateStart = "";
+                        dateStart = new Date(start);
+                        console.log("data de início " + dateStart.toISOString())
+                        // data fim
+                        dateEnd = "";
+                        dateEnd = new Date(end);
+                        console.log("data de término " + dateEnd.toISOString())
+
+
+                    }
+                },
+                editable: false,
+                eventLimit: true,
+                events: [],
+                eventRender: function (event, element) { },
+
+                viewRender: function (view, element) {
+
+                    if (view.name === 'month') {
+                        console.log('View: Modo mês');
+                    }
+                    else if (view.name === 'agendaWeek') {
+                        console.log("View Modo Semana")
+                    }
+                    else {
+                        dayName = view.title
+                        console.log("View title result = " + dayName)
+                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                        // Obtém os valores do dia, mês e ano
+                        var day = String(dateParts[0]).padStart(2, '0');
+                        var month = getMonthIndex(dateParts[1]);
+                        var year = dateParts[2];
+
+                        // Função auxiliar para obter o índice do mês com base no nome do mês
+                        function getMonthIndex(monthName) {
+                            var months = [
+                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                            ];
+                            var index = months.indexOf(monthName) + 1;
+
+                            return String(index).padStart(2, '0');
+                        }
+                    }
+                },
+            });
+
+        });
+
+        UpdateAvailability(schedules, []);
+        
+
     }
     //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
@@ -248,6 +402,150 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+    }
+
+    function UpdateAvailability(availability, schedules) {
+        var tds = document.querySelectorAll('.fc-day', '.fc-highlight');
+        if (availability.length === 0) {
+            tds.forEach(function (td) {
+                td.classList.add('unavailable');
+            });
+        }
+        else {
+            availability.forEach(function (dates) {
+                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
+                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+                tds.forEach(function (td) {
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                    var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
+                    var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
+                    hourAvail -= hourBusy;
+                    console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
+                    if (dataDate >= datastart && dataDate <= dataend) {
+                        if (hourAvail <= 6) {
+                            td.classList.remove('unavailable');
+                            td.classList.add('parcialavailable');
+                        } else {
+                            td.classList.remove('unavailable');
+                            td.classList.add('available');
+                        }
+
+                    } else {
+                        td.classList.add('unavailable');
+                    }
+                });
+            })
+        }
+        console.log("UpdateAvailability Result Success");
+    }
+    function countTotalHoursAvailability(dataString, array) {
+        var targetDate = moment(dataString);
+        var totalHours = 0;
+
+        array.forEach(function (obj) {
+            var start = moment(obj.time_start);
+            var end = moment(obj.time_end);
+
+            if (targetDate.isSame(start, 'day')) {
+                if (targetDate.isSame(end, 'day')) {
+                    totalHours += end.diff(start, 'hours');
+                } else {
+                    var endOfDay = moment(targetDate).endOf('day');
+                    totalHours += endOfDay.diff(start, 'hours');
+                }
+            } else if (targetDate.isAfter(start, 'day') && targetDate.isBefore(end, 'day')) {
+                //var startOfDay = moment(targetDate).startOf('day');
+                //totalHours += end.diff(startOfDay, 'hours');
+                totalHours = 24;
+            } else if (targetDate.isSame(end, 'day')) {
+                var startOfDay = moment(targetDate).startOf('day');
+                totalHours += end.diff(startOfDay, 'hours');
+            }
+        });
+
+        return totalHours;
+    }
+
+    function countTotalHoursBusy(dataString, array) {
+        var targetDate = moment(dataString);
+        var count = 0;
+
+        array.forEach(function (obj) {
+            var start = moment(obj.time_start);
+
+            if (targetDate.isSame(start, 'day')) {
+                count++;
+            }
+        });
+
+        return count;
+    }
+
+    function UpdateDayAvailability(datastart, dataend, availability, schedules, day, month, year) {
+        // var tds = document.querySelectorAll('.fc-widget-content');
+        var trs = document.querySelectorAll('.fc-slats tr');
+        if (availability.length === 0) {
+            trs.forEach(function (tr) {
+                console.log("Availability: 0");
+                tr.classList.remove('available');
+                tr.classList.add('unavailable');
+            });
+        }
+        else {
+
+
+            //Deixa tudo indisponível
+            trs.forEach(function (tr) {
+                tr.classList.remove('available');
+                tr.classList.add('unavailable');
+            });
+            console.log("UpdateDayAvailability");
+
+            availability.forEach(function (dates) {
+                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                trs.forEach(function (tr) {
+
+                    var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                    // Obtém os valores do dia, mês e ano
+                    var hour = moment(dataTime).format('HH');
+                    var minute = moment(dataTime).format('mm');
+                    var second = moment(dataTime).format('ss');
+                    var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                    // Cria o objeto de data
+                    var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                    //console.log(dateView);
+
+                    if (dateView >= datastart && dateView <= dataend) {
+                        tr.classList.remove('unavailable');
+                        tr.classList.add('available');
+                    }
+                });
+            });
+            console.log("UpdateDayAvailabilitySuccess");
+            if (schedules.length > 0) {
+                schedules.forEach(function (dates) {
+                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                    trs.forEach(function (tr) {
+                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                        var hour = moment(dataTime).format('HH');
+                        var minute = moment(dataTime).format('mm');
+                        var second = moment(dataTime).format('ss');
+                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        // Cria o objeto de data
+                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                        if (dateView == datastart) {
+                            tr.classList.remove('available');
+                            tr.classList.add('unavailable');
+                        }
+                    });
+                });
+            }
+            console.log("UpdateDaySchedulesSuccess");
+        }
     }
 }
 
