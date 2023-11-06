@@ -27,7 +27,14 @@ Wecom.coolworkTexts = {
         dayModule: "Dia Inteiro",
         hourModule: "Horário Definido",
         divStartHour: "Hora de Abertura",
-        divEndHour:"Hora de Fechamento"
+        divEndHour: "Hora de Fechamento",
+        labelMondayDiv: "Segunda-feira",
+        labeltuesdayDiv: "Terça-feira",
+        labelwednesdayDiv: "Quarta-feira",
+        labeltursdayDiv: "Quinta-feira",
+        labelfridayDiv: "Sexta-feira",
+        labelsaturdayDiv: "Sábado",
+        labelsundayDiv: "Domingo"
 
     }
 }
