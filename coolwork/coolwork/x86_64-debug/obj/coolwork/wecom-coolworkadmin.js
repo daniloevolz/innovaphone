@@ -27,6 +27,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var list_AllRoom = []
     var list_room = [];
     var list_RoomSchedule = []
+    //var appointments = []
     var colDireita;
     var list_tableUsers = []
     var UIuserPicture;
@@ -70,6 +71,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
+        app.send({ api: "admin", mt: "CheckAppointment" });
         controlDB = false
         UIuser = dn
         avatar = new innovaphone.Avatar(start, user, domain);
@@ -124,8 +126,26 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             list_tableUsers = JSON.parse(obj.result);
             
         }
+        if (obj.api == "admin" && obj.mt == "CheckAppointmentResult") {
+            appointments = obj.result;
+            console.log("CHECK APPOINT", JSON.parse(obj.result))
+        }
     }
-
+    function getDateNow() {
+        // Cria uma nova data com a data e hora atuais em UTC
+        var date = new Date();
+        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        date.setUTCHours(date.getUTCHours() - 3);
+    
+        // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+        var dateString = date.toISOString();
+    
+        // Substitui o caractere "T" por um espaço
+        //dateString = dateString.replace("T", " ");
+    
+        // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+        return dateString.slice(0, -5);
+    }
     function constructor(t){
         controlDB = false
         t.clear()
@@ -139,22 +159,27 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
 
     
-        var divList = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
-        var imglogo = divList.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
-        var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
-    
+        var divList = colEsquerda.add(new innovaphone.ui1.Div(null, null, "divList"));
+        var imglogo = divList.add(new innovaphone.ui1.Node("img", null, null, "logoimg").setAttribute("src", "./images/logo-wecom.png"));
+        var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", "WECOM", null));
+        
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; border-radius: 50%;", null, null));
         imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
+        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
+        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
+        appointments.addEvent("click", function(){
+            tableAppointments(colDireita)
+        })
 
         var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c",texts.text("labelCreateRoom"),null))
         itens.addEvent("click",function(){
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 55%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 20%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
          list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
@@ -207,6 +232,98 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
 
         _colDireita = colDireita;
+    }
+    function tableAppointments(cRight){
+        cRight.clear()
+        var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
+        scrollcontainer.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow")).addEvent("click",function(){  // close 
+            //t.rem(listbox)
+            //waitConnection(that);
+            //controlDB = false
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        });
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelRoomName"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("periodType"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateStart"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateEnd"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleUser"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelDevice"), null));
+
+        console.log("FOREACH TABLE" + JSON.stringify(appointments))
+
+
+        appointments.forEach(function (table) {
+            console.log("dep" + JSON.stringify(table))
+
+            var starDate = table.data_start;
+            var endDate = table.data_end;
+            var now = getDateNow();
+
+            var roomName = table.name
+            var typeRoom = table.type
+
+            var html = `
+                        <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${table.id}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${roomName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${typeRoom}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${starDate}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${endDate}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${table.user_guid}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${table.device_id}</td>
+                        </tr>
+                    `;
+
+            document.getElementById("local-table").innerHTML += html;
+            // var userName = users.length > 0 ? users[0].cn : '';
+
+            // if (post.deleted == null) {
+            //     var postDel = texts.text("labelNo")
+            // } else {
+            //     var dateString = post.deleted;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            //     var postDel = formattedDate
+            // }
+            // //var departDel = depart.deleted == null ? "Não" : formatDate();
+            // if (post.deleted) {
+            //     var statusPost = texts.text("labelPostDeleted");
+            // } else if (starDate > now) {
+            //     var statusPost = texts.text("labelPostFuture");
+            // } else if (endDate < now) {
+            //     var statusPost = texts.text("labelPostExpired");
+            // } else {
+            //     var statusPost = texts.text("labelPostActive");
+            // }
+            // if (post.date_start) {
+            //     var dateString = post.date_start;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            // }
+            // if (post.date_end) {
+            //     var dateString = post.date_end;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            // }
+        });
+  
     }
     function formatDate(inputDate) {
         const date = new Date(inputDate);
