@@ -291,8 +291,24 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         console.log(" Elemento clicado " + clickedElement);
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
-                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                        $('#calendar').fullCalendar('gotoDate', start);
+
+                        var s = schedules.filter(function (b) {
+                            return clickedDate >= b.data_start && clickedDate <= b.data_end;
+                        });
+
+                        if (s.schedule_module == "hourModule") {
+                            $('#calendar').fullCalendar('changeView', 'agendaDay');
+                            $('#calendar').fullCalendar('gotoDate', start);
+                        } else if (s.schedule_module == "dayModule") {
+                            console.log("Abrir modal para confirmar o dia inteiro.")
+
+                        } else if (s.schedule_module == "periodoModule") {
+
+                            console.log("Abrir modal para perguntar se será manhã ou tarde.")
+
+                        }
+
+                        
 
                         // var teste = false;
 
@@ -314,11 +330,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         // data inicio em iso string 
                         dateStart = "";
                         dateStart = new Date(start);
-                        console.log("data de início " + dateStart.toISOString())
+                        console.log("data de início " + formatDate(dateStart.toISOString()))
                         // data fim
                         dateEnd = "";
                         dateEnd = new Date(end);
-                        console.log("data de término " + dateEnd.toISOString())
+                        console.log("data de término " + formatDate(dateEnd.toISOString()))
+
 
 
                     }
@@ -413,8 +430,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         else {
             availability.forEach(function (dates) {
-                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD');
                 tds.forEach(function (td) {
                     var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
                     var hourAvail = countTotalHoursAvailability(String(dataDate), availability);

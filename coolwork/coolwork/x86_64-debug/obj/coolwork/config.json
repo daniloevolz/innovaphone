@@ -189,14 +189,11 @@
                     "name": "device_room_id",
                     "type": "BIGINT REFERENCES tbl_room(id) ON DELETE CASCADE"
                   },
-                  
-                                    {
+                  {
                     "cmd": "column",
                     "name": "user_guid",
                     "type": "TEXT"
                   }
-      
-
                 ]
               },
                {
