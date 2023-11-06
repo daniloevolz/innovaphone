@@ -16,6 +16,20 @@ a {
     left: 15%; 
     /*height:100%;*/
 }
+.recurrentCalendar{
+
+}
+.dayDiv {
+    display: flex;
+    padding: 10px;
+}
+.day {
+    min-width: 100px;
+    padding: 10px;
+}
+.columnRecurrentTimeDiv {
+    column-count: 2;
+}
 /* Classe para exibir o elemento */
 .mostrar {
     display: block;

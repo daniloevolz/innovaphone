@@ -469,7 +469,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var btnSave = t.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
 
         if (optType == "periodType") {
-            
+            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+
             t.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
             $(document).ready(function () {
                 $.fullCalendar.locale('pt-br');
@@ -637,67 +644,102 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if (optType == "recurrentType") {
             var recurrentCalendar = t.add(new innovaphone.ui1.Div(null, null, "recurrentCalendar"));
             //Segundas feiras
-            recurrentCalendar.add(new innovaphone.ui1.Div(null, texts.text("labelMonday"), null))
-            var mondayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "mondayDiv"))
+            var mondayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            mondayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelMondayDiv"), "day"))
+            var columnRecurrentTimeDiv = mondayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
             
-            var divStartHour = mondayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = mondayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = mondayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = mondayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var mondayChk = mondayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "mondayChk").setAttribute("id", "mondayChk"))
 
             //Terças feiras
-            var tuesdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "tuesdayDiv"))
-            tuesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labeltuesdayDiv"), null))
-            var divStartHour = tuesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = tuesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = tuesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = tuesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var tuesdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            tuesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labeltuesdayDiv"), "day"))
+            var columnRecurrentTimeDiv = tuesdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var tuesdayChk = tuesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "tuesdayChk").setAttribute("id", "tuesdayChk"))
 
             //Quartas feiras
-            var wednesdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "wednesdayDiv"))
-            wednesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelwednesdayDiv"), null))
-            var divStartHour = wednesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = wednesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = wednesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = wednesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var wednesdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            wednesdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelwednesdayDiv"), "day"))
+            var columnRecurrentTimeDiv = wednesdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var wednesdayChk = wednesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "wednesdayChk").setAttribute("id", "wednesdayChk"))
 
             //Quintas feiras
-            var tursdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "tursdayDiv"))
-            tursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labeltursdayDiv"), null))
-            var divStartHour = tursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = tursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = tursdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = tursdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var tursdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            tursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labeltursdayDiv"), "day"))
+            var columnRecurrentTimeDiv = tursdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var tursdayChk = tursdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "tursdayChk").setAttribute("id", "tursdayChk"))
 
             //Sextas feiras
-            var fridayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "fridayDiv"))
-            fridayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelfridayDiv"), null))
-            var divStartHour = fridayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = fridayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = fridayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = fridayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var fridayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            fridayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelfridayDiv"), "day"))
+            var columnRecurrentTimeDiv = fridayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var fridayChk = fridayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "fridayChk").setAttribute("id", "fridayChk"))
 
             //Sabados
-            var saturdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "saturdayDiv"))
-            saturdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelsaturdayDiv"), null))
-            var divStartHour = saturdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = saturdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = saturdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = saturdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var saturdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            saturdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelsaturdayDiv"), "day"))
+            var columnRecurrentTimeDiv = saturdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var saturdayChk = saturdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "saturdayChk").setAttribute("id", "saturdayChk"))
 
             //Domingos
-            var sundayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "sundayDiv"))
-            sundayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelsundayDiv"), null))
-            var divStartHour = sundayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourOpening"), "divStartHour"))
-            var divEndHour = sundayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelHourClosing"), "divEndHour"))
-            var hourStart = sundayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-            var hourEnd = sundayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var sundayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            sundayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelsundayDiv"), "day"))
+            var columnRecurrentTimeDiv = sundayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
             //var sundayChk = sundayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "sundayChk").setAttribute("id", "sundayChk"))
         }
         document.getElementById("btnSaveRoom").addEventListener("click", function () {

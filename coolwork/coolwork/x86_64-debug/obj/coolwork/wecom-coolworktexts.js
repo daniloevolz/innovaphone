@@ -27,12 +27,7 @@ Wecom.coolworkTexts = {
         dayModule: "Dia Inteiro",
         hourModule: "Horário Definido",
         divStartHour: "Hora de Abertura",
-        divEndHour:"Hora de Fechamento",
-        labelRoomName: "Sala",
-        labelScheduleDateStart: "Início do Agendamento",
-        labelScheduleDateEnd: "Final do Agendamento",
-        labelScheduleUser: "Usuário",
-        labelDevice: "Telefone",
+        divEndHour:"Hora de Fechamento"
 
     }
 }
