@@ -31,7 +31,7 @@ Wecom.coolworkTexts = {
         labelMondayDiv: "Segunda-feira",
         labeltuesdayDiv: "Terça-feira",
         labelwednesdayDiv: "Quarta-feira",
-        labeltursdayDiv: "Quinta-feira",
+        labelthursdayDiv: "Quinta-feira",
         labelfridayDiv: "Sexta-feira",
         labelsaturdayDiv: "Sábado",
         labelsundayDiv: "Domingo"

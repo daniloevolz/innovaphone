@@ -28,6 +28,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var list_room = [];
     var list_RoomSchedule = []
     var colDireita;
+    var appointments = []
     var list_tableUsers = []
     var UIuserPicture;
     var divinputs; 
@@ -70,6 +71,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
+        app.send({ api: "admin", mt: "CheckAppointment" });
         controlDB = false
         UIuser = dn
         avatar = new innovaphone.Avatar(start, user, domain);
@@ -124,6 +126,24 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             list_tableUsers = JSON.parse(obj.result);
             
         }
+        if (obj.api == "admin" && obj.mt == "CheckAppointmentResult") {
+            appointments = obj.result;
+        }
+    }   
+    function getDateNow() {
+        // Cria uma nova data com a data e hora atuais em UTC
+        var date = new Date();
+        // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
+        date.setUTCHours(date.getUTCHours() - 3);
+
+        // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+        var dateString = date.toISOString();
+
+        // Substitui o caractere "T" por um espaço
+        //dateString = dateString.replace("T", " ");
+
+        // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+        return dateString.slice(0, -5);
     }
 
     function constructor(t){
@@ -138,10 +158,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         colDireita.setAttribute("id", "coldireita")
 
 
-    
-        var divList = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
-        var imglogo = divList.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
-        var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
+        var divList = colEsquerda.add(new innovaphone.ui1.Div(null, null, "divList"));
+        var imglogo = divList.add(new innovaphone.ui1.Node("img", null, null, "logoimg").setAttribute("src", "./images/logo-wecom.png"));
+        var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", "WECOM", null));
+        
     
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; border-radius: 50%;", null, null));
@@ -149,12 +169,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
 
+        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
+        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
+        appointments.addEvent("click", function(){
+            tableAppointments(colDireita)
+        })
+
         var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c",texts.text("labelCreateRoom"),null))
         itens.addEvent("click",function(){
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 55%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 20%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
          list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
@@ -208,6 +234,100 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         _colDireita = colDireita;
     }
+
+    function tableAppointments(cRight){
+        cRight.clear()
+        var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
+        scrollcontainer.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow")).addEvent("click",function(){  // close 
+            //t.rem(listbox)
+            //waitConnection(that);
+            //controlDB = false
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        });
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelRoomName"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("periodType"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateStart"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateEnd"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleUser"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelDevice"), null));
+
+        console.log("FOREACH TABLE" + JSON.stringify(appointments))
+
+
+        appointments.forEach(function (table) {
+            console.log("dep" + JSON.stringify(table))
+
+            var starDate = table.data_start;
+            var endDate = table.data_end;
+            var now = getDateNow();
+
+            var roomName = table.name
+            var typeRoom = table.type
+
+            var html = `
+                        <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${table.id}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${roomName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${typeRoom}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${starDate}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${endDate}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${table.user_guid}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${table.device_id}</td>
+                        </tr>
+                    `;
+
+            document.getElementById("local-table").innerHTML += html;
+            // var userName = users.length > 0 ? users[0].cn : '';
+
+            // if (post.deleted == null) {
+            //     var postDel = texts.text("labelNo")
+            // } else {
+            //     var dateString = post.deleted;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            //     var postDel = formattedDate
+            // }
+            // //var departDel = depart.deleted == null ? "Não" : formatDate();
+            // if (post.deleted) {
+            //     var statusPost = texts.text("labelPostDeleted");
+            // } else if (starDate > now) {
+            //     var statusPost = texts.text("labelPostFuture");
+            // } else if (endDate < now) {
+            //     var statusPost = texts.text("labelPostExpired");
+            // } else {
+            //     var statusPost = texts.text("labelPostActive");
+            // }
+            // if (post.date_start) {
+            //     var dateString = post.date_start;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            // }
+            // if (post.date_end) {
+            //     var dateString = post.date_end;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            // }
+        });
+
+    }
+
     function formatDate(inputDate) {
         const date = new Date(inputDate);
     
@@ -225,17 +345,26 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     function makeDivRoom(t) {
         t.clear();
+        // se o type for Recurrent - mudar a visualização da sala e se for period tbm 
         list_room.forEach(function(room){
-            //var insideDiv = t.add(new innovaphone.ui1.Div(null,null,"insideDiv"))
+        
             listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow"))
             listbox.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
-            list_RoomSchedule.forEach(function(schedule){    // revisar isso na segunda 30/10
+        
+        list_RoomSchedule.forEach(function(schedule){ 
+            if(schedule.type == "periodoType"){
                 var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;",null,null))
                 divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateStart") + formatDate(schedule.data_start) ,null))
-                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateEnd") + formatDate(schedule.data_end),null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateEnd") + formatDate(schedule.data_end),null))   
+            }
+            if(schedule.type == "recurrentType"){
+                var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;",null,null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelMondayDiv") + schedule.timestart_monday ,null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;",texts.text("labelDateEnd") + schedule.timeend_monday ,null))
+            }
+
             })
-            
             divPhones = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
            var imgRoom =  listbox.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
            imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
@@ -352,11 +481,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var btnSave = t.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
 
         if (optType == "periodType") {
-            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentPeriodDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
             var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
-
-            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
             var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
 
@@ -406,54 +533,31 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
                         if (view.name === 'month') {
                             console.log("View: Month");
-                            var clickedElement = jsEvent.target;
+                            // var clickedElement = jsEvent.target;
 
-                            console.log(" Elemento clicado " + clickedElement);
-                            var clickedDate = start.format('YYYY-MM-DD');
-                            console.log("Data do elemento clicado:", clickedDate);
-
+                            // console.log(" Elemento clicado " + clickedElement);
+                            // var clickedDate = start.format('YYYY-MM-DD');
+                            // console.log("Data do elemento clicado:", clickedDate);
+                        
                             var startHour = document.getElementById("startIpt").value;
                             var endHour = document.getElementById("endIpt").value;
 
-                            var startHourParts = startHour.split(':');
-                            var endHourParts = endHour.split(':');
+                            var startDate = new Date(start);
+                            var endDate = new Date(end);
+                            console.log("Data do elemento SELECIONADO - start:" + startDate + "end:" + endDate)
 
+                            var startDateString = startDate.toISOString().substring(0, 10); 
+                            var endDateString = endDate.toISOString().substring(0, 10);   
 
-                            var startHourParts = startHour.split(':');
-                            var endHourParts = endHour.split(':');
+                            var startDateTimeString = startDateString + "T" + startHour;
+                            var endDateTimeString = endDateString + "T" + endHour;
 
+                            dateStart = startDateTimeString
+                            dateEnd = endDateTimeString
 
-                            var clickedDateWithoutSeconds = clickedDate.replace(/:00:00Z$/, '');
+                            console.log("Data de início concatenada: " + startDateTimeString);
+                            console.log("Data de término concatenada: " + endDateTimeString);
 
-
-                            var dateStartISO = new Date(clickedDateWithoutSeconds);
-
-
-                            dateStartISO.setHours(parseInt(startHourParts[0], 10));
-                            dateStartISO.setMinutes(parseInt(startHourParts[1], 10));
-
-                            var dateEndISO = new Date(clickedDateWithoutSeconds);
-
-
-                            dateEndISO.setHours(parseInt(endHourParts[0], 10));
-                            dateEndISO.setMinutes(parseInt(endHourParts[1], 10));
-
-
-                            var dateStartISOString = dateStartISO.toISOString();
-                            var dateEndISOString = dateEndISO.toISOString();
-
-                            // REVISAR FORMATAÇÃO DE DATA
-                            console.log("dateStart" + dateStartISOString + "dateEnd" + dateEndISOString);
-
-
-
-
-                            // if (optType == "dayModule") {
-                            //    
-                            // } else {
-                            //     $('#calendar').fullCalendar('changeView', 'agendaDay');
-                            //     $('#calendar').fullCalendar('gotoDate', start);
-                            // }
 
                             $('#calendar').fullCalendar('unselect');
                         }
@@ -533,11 +637,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartMonday"))
             
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndMonday"))
             //var mondayChk = mondayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "mondayChk").setAttribute("id", "mondayChk"))
 
             //Terças feiras
@@ -547,11 +651,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartTuesday"))
             
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndTuesday"))
             //var tuesdayChk = tuesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "tuesdayChk").setAttribute("id", "tuesdayChk"))
 
             //Quartas feiras
@@ -561,25 +665,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartWednesday"))
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndWednesday"))
             //var wednesdayChk = wednesdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "wednesdayChk").setAttribute("id", "wednesdayChk"))
 
             //Quintas feiras
-            var tursdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
-            tursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labeltursdayDiv"), "day"))
-            var columnRecurrentTimeDiv = tursdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
+            var thursdayDiv = recurrentCalendar.add(new innovaphone.ui1.Div(null, null, "dayDiv"))
+            thursdayDiv.add(new innovaphone.ui1.Div(null, texts.text("labelthursdayDiv"), "day"))
+            var columnRecurrentTimeDiv = thursdayDiv.add(new innovaphone.ui1.Div(null, null, "columnRecurrentTimeDiv"))
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartThursday"))
             
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndThursday"))
             //var tursdayChk = tursdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "tursdayChk").setAttribute("id", "tursdayChk"))
 
             //Sextas feiras
@@ -589,11 +693,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartFriday"))
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndFriday"))
             //var fridayChk = fridayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "fridayChk").setAttribute("id", "fridayChk"))
 
             //Sabados
@@ -603,12 +707,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartSaturday"))
 
             
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndSaturday"))
             //var saturdayChk = saturdayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "saturdayChk").setAttribute("id", "saturdayChk"))
 
             //Domingos
@@ -618,11 +722,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
-            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "timeStartSunday"))
 
             var recurrentTimeDiv = columnRecurrentTimeDiv.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
             var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
-            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "timeEndSunday"))
             //var sundayChk = sundayDiv.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "sundayChk").setAttribute("id", "sundayChk"))
         }
         document.getElementById("btnSaveRoom").addEventListener("click", function () {
@@ -632,32 +736,87 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             var optType = selectType.options[selectType.selectedIndex].id;
             var selectModule = document.getElementById("selectModule")
             var optModule = selectModule.options[selectModule.selectedIndex].id;
+            var fileInput = document.getElementById("fileinput")
 
             var nameRoom = document.getElementById("iptRoomName").value
             var imagem = document.getElementById('imgBDFile')
             var srcDaImagem = imagem.src;
 
-            if (nameRoom === "" || dateStart === "" || dateEnd === "") {
+            editor = [];
+            viewer = [];
+
+            list_tableUsers.forEach(function (user) {
+                var editorCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+
+                if (editorCheckbox.checked) {
+                    editor.push(user.guid);
+                }
+
+                if (viewerCheckbox.checked) {
+                    viewer.push(user.guid);
+                }
+            });
+
+            if (nameRoom === "" || fileInput.files.length == 0  ) {
                 console.log("Favor Completar todos os campos")
-            } else {
-                editor = [];
-                viewer = [];
+            }else if(optType == "recurrentType"){
+                var startMonday = document.getElementById("timeStartMonday").value
+                var endMonday = document.getElementById("timeEndMonday").value
+                var startTuesday = document.getElementById("timeStartTuesday").value;
+                var endTuesday = document.getElementById("timeEndTuesday").value;
+                var startWednesday = document.getElementById("timeStartWednesday").value;
+                var endWednseday = document.getElementById("timeEndWednesday").value;
+                var startThursday = document.getElementById("timeStartThursday").value;
+                var endThursday = document.getElementById("timeEndThursday").value;
+                var startFriday = document.getElementById("timeStartFriday").value;
+                var endFriday = document.getElementById("timeEndFriday").value;
+                var startSaturday = document.getElementById("timeStartSaturday").value;
+                var endSaturday = document.getElementById("timeEndSaturday").value;
+                var startSunday = document.getElementById("timeStartSunday").value;
+                var endSunday = document.getElementById("timeEndSunday").value;
 
-                list_tableUsers.forEach(function (user) {
-                    var editorCheckbox = document.getElementById("editcheckbox_" + user.guid);
-                    var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-
-                    if (editorCheckbox.checked) {
-                        editor.push(user.guid);
-                    }
-
-                    if (viewerCheckbox.checked) {
-                        viewer.push(user.guid);
-                    }
+                app.send({ 
+                    api: "admin", mt: "InsertRoom", 
+                    name: nameRoom, 
+                    img: srcDaImagem, 
+                    dateStart: "", 
+                    dateEnd: "", 
+                    type: optType, 
+                    schedule: optModule, 
+                    editor: editor, 
+                    viewer: viewer,
+                    startMonday : startMonday, // começo segunda
+                    endMonday : endMonday, // fim segunda
+                    startTuesday : startTuesday,// começo terça
+                    endTuesday : endTuesday, // fim terça
+                    startWednesday : startWednesday, // começo quarta
+                    endWednseday : endWednseday, // fim quarta
+                    startThursday : startThursday, // começo quinta
+                    endThursday : endThursday, // fim quinta
+                    startFriday : startFriday, // começo sexta
+                    endFriday : endFriday, // fim sexta
+                    startSaturday : startSaturday, // começo sab
+                    endSaturday : endSaturday, // fim sab
+                    startSunday : startSunday, // começo dom
+                    endSunday : endSunday, // fim dom
                 });
+            }
+            else if(optType == "periodType") {
 
-                app.send({ api: "admin", mt: "InsertRoom", name: nameRoom, img: srcDaImagem, dateStart: dateStart, dateEnd: dateEnd, type: optType, schedule: optModule, editor: editor, viewer: viewer });
-
+                if(document.getElementById("startIpt").value == "" || document.getElementById("endIpt").value == "" ){
+                    console.log("Favor Selecionar uma Data")
+                }else{
+                    app.send({ api: "admin", mt: "InsertRoom", 
+                    name: nameRoom, 
+                    img: srcDaImagem, 
+                    dateStart: dateStart, 
+                    dateEnd: dateEnd, 
+                    type: optType, 
+                    schedule: optModule, 
+                    editor: editor, 
+                    viewer: viewer });
+                }
             }
 
         })
