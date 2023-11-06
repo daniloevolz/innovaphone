@@ -352,7 +352,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var btnSave = t.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
 
         if (optType == "periodType") {
-            
+            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divStartHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divStartHour"), "divStartHour"))
+            var hourStart = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "startIpt").setAttribute("id", "startIpt"))
+
+            var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentTimeDiv"))
+            var divEndHour = recurrentTimeDiv.add(new innovaphone.ui1.Div(null, texts.text("divEndHour"), "divEndHour"))
+            var hourEnd = recurrentTimeDiv.add(new innovaphone.ui1.Input(null, null, null, null, "time", "endIpt").setAttribute("id", "endIpt"))
+
             t.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
             $(document).ready(function () {
                 $.fullCalendar.locale('pt-br');
