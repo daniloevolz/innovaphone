@@ -316,8 +316,13 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "InsertAppointment"){
                 Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.device + "'," + obj.deviceRoom + ",'" + conn.guid + "')")
                 .oncomplete(function (data) {
+<<<<<<< HEAD
                     //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
                 conn.send(JSON.stringify({ api: "admin", mt: "InsertAppointmentResult", result: data }));
+=======
+                    log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
+                conn.send(JSON.stringify({ api: "admin", mt: "InsertAppointmentResult", result: JSON.stringify(data) }));
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
                         log("InsertAppointmentResult:result=Error " + String(errorText));
@@ -327,7 +332,13 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 Database.exec("SELECT tbl_device_schedule.*, tbl_room.name FROM tbl_device_schedule INNER JOIN tbl_room ON tbl_device_schedule.device_room_id = tbl_room.id;")
                     .oncomplete(function (data) {
+<<<<<<< HEAD
                         // Envie o resultado em formato JSON.
+=======
+
+                        //log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data))
+
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
                         conn.send(JSON.stringify({ api: "admin", mt: "CheckAppointmentResult", result: data}));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {

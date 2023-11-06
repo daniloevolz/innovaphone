@@ -27,6 +27,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var list_AllRoom = []
     var list_room = [];
     var list_RoomSchedule = []
+    //var appointments = []
     var colDireita;
     var appointments = []
     var list_tableUsers = []
@@ -128,13 +129,20 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "CheckAppointmentResult") {
             appointments = obj.result;
+<<<<<<< HEAD
         }
     }   
+=======
+            console.log("CHECK APPOINT", JSON.parse(obj.result))
+        }
+    }
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
     function getDateNow() {
         // Cria uma nova data com a data e hora atuais em UTC
         var date = new Date();
         // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
         date.setUTCHours(date.getUTCHours() - 3);
+<<<<<<< HEAD
 
         // Formata a data e hora em uma string ISO 8601 com o caractere "T"
         var dateString = date.toISOString();
@@ -142,10 +150,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         // Substitui o caractere "T" por um espaço
         //dateString = dateString.replace("T", " ");
 
+=======
+    
+        // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+        var dateString = date.toISOString();
+    
+        // Substitui o caractere "T" por um espaço
+        //dateString = dateString.replace("T", " ");
+    
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
         // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
         return dateString.slice(0, -5);
     }
-
     function constructor(t){
         controlDB = false
         t.clear()
@@ -158,16 +174,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         colDireita.setAttribute("id", "coldireita")
 
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
         var divList = colEsquerda.add(new innovaphone.ui1.Div(null, null, "divList"));
         var imglogo = divList.add(new innovaphone.ui1.Node("img", null, null, "logoimg").setAttribute("src", "./images/logo-wecom.png"));
         var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", "WECOM", null));
         
+<<<<<<< HEAD
     
+=======
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
         var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
         var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; border-radius: 50%;", null, null));
         imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
+        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
+        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
+        appointments.addEvent("click", function(){
+            tableAppointments(colDireita)
+        })
 
         var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
         var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
@@ -234,7 +262,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         _colDireita = colDireita;
     }
-
     function tableAppointments(cRight){
         cRight.clear()
         var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
@@ -325,9 +352,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             //     var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
             // }
         });
+<<<<<<< HEAD
 
     }
 
+=======
+  
+    }
+>>>>>>> 57f5fc4ebeb3d9600c11119e5ce17c974f9e4dc0
     function formatDate(inputDate) {
         const date = new Date(inputDate);
     

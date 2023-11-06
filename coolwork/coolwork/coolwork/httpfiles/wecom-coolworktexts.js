@@ -34,7 +34,11 @@ Wecom.coolworkTexts = {
         labelthursdayDiv: "Quinta-feira",
         labelfridayDiv: "Sexta-feira",
         labelsaturdayDiv: "Sábado",
-        labelsundayDiv: "Domingo"
-
+        labelsundayDiv: "Domingo",
+        labelRoomName: "Sala",
+        labelScheduleDateStart: "Início do Agendamento",
+        labelScheduleDateEnd: "Final do Agendamento",
+        labelScheduleUser: "Usuário",
+        labelDevice: "Telefone",
     }
 }
