@@ -116,8 +116,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             list_room = JSON.parse(obj.rooms)
             list_RoomSchedule = JSON.parse(obj.schedules)
             listDeviceRoom = obj.dev
-            makeDivRoom(_colDireita);
-            
+            makeDivRoom(_colDireita);            
         }
         if (obj.api === "admin" && obj.mt === "UpdateDevicesResult") {
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -128,7 +127,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "CheckAppointmentResult") {
             appointments = obj.result;
-            console.log("CHECK APPOINT", JSON.parse(obj.result))
+        }
+        if (obj.api == "admin" && obj.mt == "InsertAppointmentResult") {
+            console.log("AGENDADO", JSON.parse(obj.result))
         }
     }
     function getDateNow() {
@@ -176,6 +177,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c",texts.text("labelCreateRoom"),null))
         itens.addEvent("click",function(){
+            
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
@@ -228,8 +230,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var dateEndInput = document.getElementById("inputDateEnd")
 
         var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
-            .addText("Set Presence")
+            .addText("Agendamento")
             .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
+        var rvButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Remove Telefone")
+        .addEvent("click", function () { app.send({api: "admin", mt:"ReplicateUpdate"})}, rvButton));
 
         _colDireita = colDireita;
     }
@@ -241,6 +246,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             //waitConnection(that);
             //controlDB = false
             app.send({api:"admin", mt:"SelectAllRoom"})
+            app.send({ api: "admin", mt: "CheckAppointment" });
         });
         var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
         tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
@@ -255,6 +261,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
 
         appointments.forEach(function (table) {
+            var users = list_tableUsers.filter(function (user) {
+                return table.user_guid === user.guid;
+            })[0];
             console.log("dep" + JSON.stringify(table))
 
             var starDate = table.data_start;
@@ -271,7 +280,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                         <td style="text-transform: capitalize; text-align: center;">${typeRoom}</td>
                         <td style="text-transform: capitalize; text-align: center;">${starDate}</td>
                         <td style="text-transform: capitalize; text-align: center;">${endDate}</td>
-                        <td style="text-transform: capitalize; text-align: center;">${table.user_guid}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${users.cn}</td>
                         <td style="text-transform: capitalize; text-align: center;">${table.device_id}</td>
                         </tr>
                     `;

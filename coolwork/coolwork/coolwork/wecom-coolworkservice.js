@@ -314,14 +314,37 @@ new JsonApi("admin").onconnected(function(conn) {
                 handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
             if (obj.mt == "InsertAppointment"){
+                // var cod = 2
+                // var hwId = "0090334c66da"
+                // var sipGuid = "6419b9ffeb446501ab45000c297dc696"
+
+                // pbxTableUpdateDevice(cod, hwId, sipGuid)
+
+                // var user = {mt:"ReplicateUpdate",src:"inn-lab-ipva",api:"PbxTableUsers",columns:{guid:"6419b9ffeb446501ab45000c297dc696",dn:"Erick",cn:"Erick Cardoso",h323:"Erick-LAB",e164:"1015",node:"root",devices:[{"hw":"Erick-LAB"}]}}
+                // pbxTable.forEach(function(conn){
+                //     if(user.src == conn.pbx){
+                //         user.mt = "ReplicateUpdate"
+                //         conn.send(JSON.stringify(user))
+                //     }
+                // })
+
                 Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.device + "'," + obj.deviceRoom + ",'" + conn.guid + "')")
                 .oncomplete(function (data) {
-                    log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
+                    //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
                 conn.send(JSON.stringify({ api: "admin", mt: "InsertAppointmentResult", result: JSON.stringify(data) }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
                         log("InsertAppointmentResult:result=Error " + String(errorText));
                 });
+            }
+            if (obj.mt == "ReplicateUpdate") {
+                var user = {mt:"ReplicateUpdate",src:"inn-lab-ipva",api:"PbxTableUsers",columns:{guid:"6419b9ffeb446501ab45000c297dc696",dn:"Erick",cn:"Erick Cardoso",h323:"Erick-LAB",e164:"1015",node:"root",devices:[{"hw":"Erick-LAB"}]}}
+                pbxTable.forEach(function(conn){
+                    if(user.src == conn.pbx){
+                        user.mt = "ReplicateUpdate"
+                        conn.send(JSON.stringify(user))
+                    }
+                })
             }
             if (obj.mt == "CheckAppointment") {
 
@@ -554,7 +577,7 @@ function getDateNow() {
     //dateString = dateString.replace("T", " ");
 
     // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
-    return dateString.slice(0, -5);
+    return dateString.slice(0, -8);
 }
 
 
@@ -636,27 +659,6 @@ function handleSetPresenceMessage(sip, note, activity) {
 var i = Timers.setInterval(function() {
     var now = getDateNow();
     log("getDateNow",now)
-    Database.exec("SELECT * FROM tbl_device_schedule WHERE data_start ='"+ now +"'")
-        .oncomplete(function (data) {
-        log("AGENDAMENTOS string: ", JSON.stringify(data))
-        // Seu código de verificação aqui
-        log("Verificação concluída!")
-        if(data.length > 0 ){
-
-            data.forEach(function(data){
-                var sipGuid = pbxTableUsers.filter(function(item){
-                    
-                    return item.columns.guid == data.user_guid
-                })[0];
-            pbxTableInsertDevice(data.device_id, sipGuid)   
-            handleSetPresenceMessage(sipGuid.columns.h323, sipGuid.columns.cn, "busy")
-            })
-        }
-        })
-}, 60000);
-var o = Timers.setInterval(function() {
-    var now = getDateNow();
-    log("getDateNow",now)
     Database.exec("SELECT * FROM tbl_device_schedule WHERE data_end ='"+ now +"'")
         .oncomplete(function (data) {
         log("ENCERRAMENTOS string: ", JSON.stringify(data))
@@ -669,37 +671,114 @@ var o = Timers.setInterval(function() {
                     
                     return item.columns.guid == data.user_guid
                 })[0];
-                pbxTableRemoveDevice(data.device_id, sipGuid)   
-            
+                var cod = 2
+                pbxTableUpdateDevice(cod, data.device_id, sipGuid)   
+                log("ENCERRANDO ESSE USUÁRIO: ", JSON.stringify(sipGuid))
             })
+            
         }
-        })
-}, 61000);
+        Database.exec("SELECT * FROM tbl_device_schedule WHERE data_start ='"+ now +"'")
+        .oncomplete(function (data) {
+        log("AGENDAMENTOS string: ", JSON.stringify(data))
+        // Seu código de verificação aqui
+        log("Verificação concluída!")
+            if(data.length > 0 ){
 
-function pbxTableInsertDevice(hwId, user){
-    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-    .oncomplete(function(data){
-        user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
+                data.forEach(function(data){
+                    var sipGuid = pbxTableUsers.filter(function(item){
+                        
+                        return item.columns.guid == data.user_guid
+                    })[0];
+                    var cod = 1
+                    pbxTableUpdateDevice(cod, data.device_id, sipGuid)   
+                    handleSetPresenceMessage(sipGuid.columns.h323, sipGuid.columns.cn, "busy")
+                })
+            }
+        })
+    })    
+}, 60000);
+// var o = Timers.setInterval(function() {
+//     var now = getDateNow();
+//     log("getDateNow",now)
+//     Database.exec("SELECT * FROM tbl_device_schedule WHERE data_end ='"+ now +"'")
+//         .oncomplete(function (data) {
+//         log("ENCERRAMENTOS string: ", JSON.stringify(data))
+//         // Seu código de verificação aqui
+//         log("Verificação concluída!")
+//         if(data.length > 0 ){
+
+//             data.forEach(function(data){
+//                 var sipGuid = pbxTableUsers.filter(function(item){
+                    
+//                     return item.columns.guid == data.user_guid
+//                 })[0];
+//                 pbxTableRemoveDevice(data.device_id, sipGuid)   
+            
+//             })
+//         }
+//         })
+// }, 59000);
+
+function pbxTableUpdateDevice(cod, hwId, user){
+    // Add phone user
+    if (cod == 1){
+        Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+        .oncomplete(function(data){
+            user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
+            pbxTable.forEach(function(conn){
+                if(user.src == conn.pbx){
+                    user.mt = "ReplicateUpdate"
+                    conn.send(JSON.stringify(user))
+                }
+            })
+        })
+    }
+    //Remove phone User
+    if (cod == 2){
+        log("REPLICATE UPDATE COD = 2")
+        // var user = {mt:"ReplicateUpdate",src:"inn-lab-ipva",api:"PbxTableUsers",columns:{guid:"6419b9ffeb446501ab45000c297dc696",dn:"Erick",cn:"Erick Cardoso",h323:"Erick-LAB",e164:"1015",node:"root",devices:[{"hw":"Erick-LAB"}]}}
+        // pbxTable.forEach(function(conn){
+        //     log("REPLICATE UPDATE CONN:", JSON.stringify(conn))
+        //     if(user.src == conn.pbx){
+        //         user.mt = "ReplicateUpdate"
+        //         conn.send(JSON.stringify(user))
+        //         log("REPLICATE UPDATE SEND:", JSON.stringify(user))
+        //     }
+        // })
+
+        var devices = user.columns.devices
+
+        var devicesUpdated = devices.filter(function(device){
+            return device.hw != hwId
+        })
+        user.columns.devices = devicesUpdated
+        delete user.badge;
+        log("ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
         pbxTable.forEach(function(conn){
             if(user.src == conn.pbx){
                 user.mt = "ReplicateUpdate"
+                log("ENVIADO AO PBX:>", JSON.stringify(user))
                 conn.send(JSON.stringify(user))
+
             }
         })
-    })
+    }
 }
-function pbxTableRemoveDevice(hwId, user){
-    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-    .oncomplete(function(data){
-        user.columns.devices.push({hw:'', text:'', app: "phone", tls: true, trusted: true})
-        pbxTable.forEach(function(conn){
-            if(user.src == conn.pbx){
-                user.mt = "ReplicateUpdate"
-                conn.send(JSON.stringify(user))
-            }
-        })
-    })
-}
+// function pbxTableRemoveDevice(hwId, user){
+//     user.columns.devices.filter(function(device){
+//         return device.hw != hwId
+//     })
+//     pbxTable.forEach(function(conn){
+//         if(user.src == conn.pbx){
+//             user.mt = "ReplicateUpdate"
+//             conn.send(JSON.stringify(user))
+//         }
+//     })
+//     Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+//     .oncomplete(function(data){
+        
+//     })
+// }
 
 var pbxTable = [];
 var pbxTableUsers = [];
@@ -762,3 +841,4 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         log("PbxTableUsers: disconnected");
     });
 });
+
