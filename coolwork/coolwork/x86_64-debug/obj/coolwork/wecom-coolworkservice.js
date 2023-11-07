@@ -350,9 +350,34 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 Database.exec("SELECT tbl_device_schedule.*, tbl_room.name FROM tbl_device_schedule INNER JOIN tbl_room ON tbl_device_schedule.device_room_id = tbl_room.id;")
                     .oncomplete(function (data) {
-
-                        //log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data))
-
+                        // Os dados retornados pela consulta podem não estar em formato JSON diretamente.
+                        // Você precisa processar os dados e estruturá-los em um objeto JSON.
+            
+                        // Suponhamos que os dados sejam um array de objetos.
+                        // Você pode ajustar essa estrutura de acordo com a estrutura real dos dados retornados.
+                        log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data))
+                        // var results = [];
+            
+                        // for (var i = 0; i < data.length; i++) {
+                        //     var row = data[i];
+                        //     var resultObj = {
+                        //         id: row.id,
+                        //         type: row.type,
+                        //         data_start: row.data_start,
+                        //         data_end: row.data_end,
+                        //         device_id: row.device_id,
+                        //         device_room_id: row.device_room_id,
+                        //         user_guid: row.user_guid
+                        //     };
+                        //     results.push(resultObj);
+                        // }
+            
+                        // // Agora, você pode converter os resultados em JSON.
+                        // var jsonResult = JSON.stringify(results);
+            
+                        // log("DATA DEVICE_SCHEDULE", jsonResult);
+            
+                        // Envie o resultado em formato JSON.
                         conn.send(JSON.stringify({ api: "admin", mt: "CheckAppointmentResult", result: data}));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -414,7 +439,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     .oncomplete(function (roomData) {
                         var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
 
-                        Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, room_id) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + roomID + "')")
+                        Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, timestart_monday, timeend_monday, timestart_tuesday ,timeend_tuesday, timestart_wednesday, timeend_wednesday, timestart_thursday, timeend_thursday, timestart_friday, timeend_friday, timestart_saturday, timeend_saturday, timestart_sunday, timeend_sunday , room_id ) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + obj.startMonday + "','" + obj.endMonday + "','" + obj.startTuesday + "','" + obj.endTuesday + "','" + obj.startWednesday + "','" +  obj.endWednesday + "','" + obj.startThursday + "','" + obj.endThursday + "','"  + obj.startFriday + "','" + obj.endFriday + "','" + obj.startSaturday + "','" +  obj.endSaturday + "','" + obj.startSunday + "','" + obj.endSunday + "','" + roomID + "')")
                             .oncomplete(function (scheduleData) {
 
                             var viewers = obj.viewer
@@ -695,65 +720,24 @@ var i = Timers.setInterval(function() {
                 })
             }
         })
-    })    
-}, 60000);
-// var o = Timers.setInterval(function() {
-//     var now = getDateNow();
-//     log("getDateNow",now)
-//     Database.exec("SELECT * FROM tbl_device_schedule WHERE data_end ='"+ now +"'")
-//         .oncomplete(function (data) {
-//         log("ENCERRAMENTOS string: ", JSON.stringify(data))
-//         // Seu código de verificação aqui
-//         log("Verificação concluída!")
-//         if(data.length > 0 ){
+}, 61000);
 
-//             data.forEach(function(data){
-//                 var sipGuid = pbxTableUsers.filter(function(item){
-                    
-//                     return item.columns.guid == data.user_guid
-//                 })[0];
-//                 pbxTableRemoveDevice(data.device_id, sipGuid)   
-            
-//             })
-//         }
-//         })
-// }, 59000);
-
-function pbxTableUpdateDevice(cod, hwId, user){
-    // Add phone user
-    if (cod == 1){
-        Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-        .oncomplete(function(data){
-            user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
-            pbxTable.forEach(function(conn){
-                if(user.src == conn.pbx){
-                    user.mt = "ReplicateUpdate"
-                    conn.send(JSON.stringify(user))
-                }
-            })
+function pbxTableInsertDevice(hwId, user){
+    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+    .oncomplete(function(data){
+        user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
+        pbxTable.forEach(function(conn){
+            if(user.src == conn.pbx){
+                user.mt = "ReplicateUpdate"
+                conn.send(JSON.stringify(user))
+            }
         })
-    }
-    //Remove phone User
-    if (cod == 2){
-        log("REPLICATE UPDATE COD = 2")
-        // var user = {mt:"ReplicateUpdate",src:"inn-lab-ipva",api:"PbxTableUsers",columns:{guid:"6419b9ffeb446501ab45000c297dc696",dn:"Erick",cn:"Erick Cardoso",h323:"Erick-LAB",e164:"1015",node:"root",devices:[{"hw":"Erick-LAB"}]}}
-        // pbxTable.forEach(function(conn){
-        //     log("REPLICATE UPDATE CONN:", JSON.stringify(conn))
-        //     if(user.src == conn.pbx){
-        //         user.mt = "ReplicateUpdate"
-        //         conn.send(JSON.stringify(user))
-        //         log("REPLICATE UPDATE SEND:", JSON.stringify(user))
-        //     }
-        // })
-
-        var devices = user.columns.devices
-
-        var devicesUpdated = devices.filter(function(device){
-            return device.hw != hwId
-        })
-        user.columns.devices = devicesUpdated
-        delete user.badge;
-        log("ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
+    })
+}
+function pbxTableRemoveDevice(hwId, user){
+    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+    .oncomplete(function(data){
+        user.columns.devices.push({hw:'', text:'', app: "phone", tls: true, trusted: true})
         pbxTable.forEach(function(conn){
             if(user.src == conn.pbx){
                 user.mt = "ReplicateUpdate"
@@ -762,23 +746,8 @@ function pbxTableUpdateDevice(cod, hwId, user){
 
             }
         })
-    }
+    })
 }
-// function pbxTableRemoveDevice(hwId, user){
-//     user.columns.devices.filter(function(device){
-//         return device.hw != hwId
-//     })
-//     pbxTable.forEach(function(conn){
-//         if(user.src == conn.pbx){
-//             user.mt = "ReplicateUpdate"
-//             conn.send(JSON.stringify(user))
-//         }
-//     })
-//     Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-//     .oncomplete(function(data){
-        
-//     })
-// }
 
 var pbxTable = [];
 var pbxTableUsers = [];
