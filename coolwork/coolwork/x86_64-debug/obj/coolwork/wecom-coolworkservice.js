@@ -350,34 +350,10 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 Database.exec("SELECT tbl_device_schedule.*, tbl_room.name FROM tbl_device_schedule INNER JOIN tbl_room ON tbl_device_schedule.device_room_id = tbl_room.id;")
                     .oncomplete(function (data) {
-                        // Os dados retornados pela consulta podem não estar em formato JSON diretamente.
-                        // Você precisa processar os dados e estruturá-los em um objeto JSON.
-            
-                        // Suponhamos que os dados sejam um array de objetos.
-                        // Você pode ajustar essa estrutura de acordo com a estrutura real dos dados retornados.
-                        log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data))
-                        // var results = [];
-            
-                        // for (var i = 0; i < data.length; i++) {
-                        //     var row = data[i];
-                        //     var resultObj = {
-                        //         id: row.id,
-                        //         type: row.type,
-                        //         data_start: row.data_start,
-                        //         data_end: row.data_end,
-                        //         device_id: row.device_id,
-                        //         device_room_id: row.device_room_id,
-                        //         user_guid: row.user_guid
-                        //     };
-                        //     results.push(resultObj);
-                        // }
-            
-                        // // Agora, você pode converter os resultados em JSON.
-                        // var jsonResult = JSON.stringify(results);
-            
-                        // log("DATA DEVICE_SCHEDULE", jsonResult);
-            
                         // Envie o resultado em formato JSON.
+
+
+                        //log("DATA TABELA DEVICE_SCHEDULE", JSON.stringify(data)
                         conn.send(JSON.stringify({ api: "admin", mt: "CheckAppointmentResult", result: data}));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -720,6 +696,7 @@ var i = Timers.setInterval(function() {
                 })
             }
         })
+})
 }, 61000);
 
 function pbxTableInsertDevice(hwId, user){
