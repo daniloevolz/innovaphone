@@ -458,17 +458,25 @@ new JsonApi("admin").onconnected(function(conn) {
                 var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
                 var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
                 var querySelectRoomSchedule = "SELECT * FROM tbl_room_schedule WHERE room_id =" + roomId + ";"; 
+                var queryEditorsRoom = "SELECT * FROM tbl_room_editors WHERE room_id =" + roomId + ";"; 
+                var queryViewersRoom = "SELECT * FROM tbl_room_viewers WHERE room_id =" + roomId + ";"; 
                 Database.exec(querySelectRoom)
                     .oncomplete(function (roomData) {
                         Database.exec(querySelectDevices)
                             .oncomplete(function (deviceData) {
-                                Database.exec(querySelectRoomSchedule)
+                                Database.exec(queryEditorsRoom)
+                                .oncomplete(function (editors) {
+                                    Database.exec(queryViewersRoom)
+                                .oncomplete(function (viewers) {
+                                    Database.exec(querySelectRoomSchedule)
                                     .oncomplete(function (roomScheduleData) {
-                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", rooms: JSON.stringify(roomData), dev: deviceData, schedules: JSON.stringify(roomScheduleData)  }));
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", rooms: JSON.stringify(roomData), dev: deviceData, schedules: JSON.stringify(roomScheduleData), editors: JSON.stringify(editors), viewers: JSON.stringify(viewers)  }));
                                     })
                                     .onerror(function (error, errorText, dbErrorCode) {
                                         log("SelectRoomResult: Error ao selecionar tabela tbl_room_schedule: " + String(errorText));
                                     });
+                                })
+                                })
                             })
                             .onerror(function (error, errorText, dbErrorCode) {
                                 log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));

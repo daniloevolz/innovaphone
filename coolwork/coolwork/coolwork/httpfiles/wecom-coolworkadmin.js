@@ -86,6 +86,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
          // revisar 04/10
         avatar = new innovaphone.Avatar(start, user, domain);
     }
+    var sip = "administrator";
+
+		
+		
+that.add(new innovaphone.ui1.Div(null, null, "button")
+    .addText("Código de Provisionamento")
+    .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
 
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
@@ -94,6 +101,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             console.log("devicesApi_onmessage:GetPhonesResult " + JSON.stringify(devices));
             app.send({api:"admin", mt:"PhoneList", devices: devices})
         }
+        if (obj.msg.mt == "GetProvisioningCodeResult") {
+            var code = obj.msg.code;
+            console.log("devicesApi_onmessage:GetProvisioningCodeResult " + JSON.stringify(code));
+            that.add(new innovaphone.ui1.Node("span", "", code, ""));
+}
         
     }
     // setInterval(function(){
@@ -240,6 +252,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var inputDateEnd = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
         inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
         var dateEndInput = document.getElementById("inputDateEnd")
+
+        colDireita.add(new innovaphone.ui1.Div(null, null, "button")
+    .addText("Código de Provisionamento")
+    .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
+
 
         var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
             .addText("Agendamento")
@@ -449,22 +466,215 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         list_RoomSchedule.forEach(function(schedule){ 
             if(schedule.type == "periodType"){
-                document.getElementById("div-schedule").innerHTML += `
-            <table>
-        <tr>
-            <th>${texts.text("labelSchedule")}</th>
-            <th>${texts.text("labelDateStart")}</th>
-            <th>${texts.text("labelDateStart")}</th>
-        </tr>
-        <tr>
-            <td>${texts.text("periodType")}</td>
-            <td>${schedule.data_start}</td>
-            <td>${schedule.data_end}</td>
-        </tr>
-        </table>
-        `
+                $(document).ready(function () {
+                    $.fullCalendar.locale('pt-br');
+                    // var id = $.urlParam('id');
+                    $('#div-schedule').fullCalendar('destroy');
+                    $('#div-schedule').fullCalendar({
+    
+                        header: {
+                            left: 'today',
+                            center: 'title , month', //agendaWeek,
+                            right: 'prev,next'
+                        },
+                        buttonText: {
+                            today: 'Hoje',
+                            month: 'Mês',
+                            week: 'Semana',
+                            day: 'Dia'
+                        },
+                        monthNames: [
+                            'Janeiro',
+                            'Fevereiro',
+                            'Março',
+                            'Abril',
+                            'Maio',
+                            'Junho',
+                            'Julho',
+                            'Agosto',
+                            'Setembro',
+                            'Outubro',
+                            'Novembro',
+                            'Dezembro'
+                        ],
+                        defaultView: 'month',
+                        slotDuration: '01:00:00',
+                        minTime: '00:00:00',
+                        maxTime: '24:00:00',
+                        selectable: true,
+                        selectLongPressDelay: 0,
+    
+                        selectHelper: true,
+                        select: function (start, end, jsEvent, view) {
+                            selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
+                            selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
+                            
+                            if (view.name === 'month') {
+                                console.log("View: Month");
+                                var clickedElement = jsEvent.target
+                                
+                                console.log(" Elemento clicado " + clickedElement);
+                                var clickedDate = start.format('YYYY-MM-DD');
+                                console.log("Data do elemento clicado:", clickedDate);
+                                var teste = false;
+                                
+                                        var datastart = moment(schedule.data_start).format('YYYY-MM-DD');
+                                        var dataend = moment(schedule.data_end).format('YYYY-MM-DD');
+                                        if (clickedDate >= datastart && clickedDate <= dataend ) {
+                                                console.log("Elemento clicado está disponível");
+                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                $('#calendar').fullCalendar('gotoDate', start);
+                                                teste = true;      
+                                    } 
+                        
+                                if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                                $('#calendar').fullCalendar('unselect'); 
+                            }
+                            else {
+                                // desenvolver na quinta 9/11 
+                                var valid = false;
+                                if(dataavailability.length>0){
+                                    dataavailability.forEach(function (dates) {
+                                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                        console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
+        
+                                        // Obtém os valores do ano, mês e ano
+                                        var year = moment(start).format('YYYY');
+                                        var month = moment(start).format('MM');
+                                        var day = moment(start).format('DD');
+                                        // Obtém os valores do hora, minuto e segundos
+                                        var hour = moment(start).format('HH');
+                                        var minute = moment(start).format('mm');
+                                        var second = moment(start).format('ss');
+                                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                        // Cria o objeto de data
+                                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+        
+                                        console.log(dateView);
+        
+                                        if (dateView >= datastart && dateView <= dataend) {
+                                            valid = true;
+                                        }
+                                    });
+                                }
+                                if(dataschedules.length>0){
+                                    dataschedules.forEach(function (dates) {
+                                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+        
+                                        console.log("Agendamento: \n"+datastart + "\n" + dataend);
+                                        // Obtém os valores do ano, mês e ano
+                                        var year = moment(start).format('YYYY');
+                                        var month = moment(start).format('MM');
+                                        var day = moment(start).format('DD');
+                                        // Obtém os valores do hora, minuto e segundos
+                                        var hour = moment(start).format('HH');
+                                        var minute = moment(start).format('mm');
+                                        var second = moment(start).format('ss');
+                                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                        // Cria o objeto de data
+                                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+        
+                                        console.log(dateView);
+        
+                                        if (dateView == datastart) {
+                                            valid = false;
+                                        }
+                                    });
+                                }
+        
+                                var year = moment(start).format('YYYY');
+                                var month = moment(start).format('MM');
+                                var day = moment(start).format('DD');
+                                // Obtém os valores do hora, minuto e segundos
+                                var hour = moment(start).format('HH');
+                                var minute = moment(start).format('mm');
+                                var second = moment(start).format('ss');
+                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                // Cria o objeto de data
+                                var datastart = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+        
+                                var now = moment().format("YYYY-MM-DDTHH:mm:ss");
+                                if (datastart < now) {
+                                    console.warn("Data selecionada está no passado.");
+                                    valid = false;
+                                }
+        
+                                if (valid) {
+                                    dayName = view.title;
+                                    var clickedTime = start.format('HH:mm:ss');
+                                    console.log("Dia do elemento clicado:" + dayName)
+                                    console.log("Hora do elemento clicado:", clickedTime);
+                                    makeModal(dayName, clickedTime);
+                                    $('#calendar').fullCalendar('unselect');
+        
+                                } else {
+                                    window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
+                                    $('#calendar').fullCalendar('unselect');
+                                }
+                                ///
+                            }
+                        },
+                        editable: false,
+                        eventLimit: true,
+                        events: [],
+                        eventRender: function (event, element) {},
+        
+                        viewRender: function(view, element) {
+                            
+                            if (view.name === 'month') {
+                                setTimeout(function() {
+                                    UpdateAvailability(listDeviceRoom, listDeviceRoom)
+                                }, 100);
+                                console.log('View: Modo mês');
+                            } 
+                            // else if(view.name === 'agendaWeek') {
+                            //     console.log("View Modo Semana")
+                            // }
+                            else{
+                                dayName = view.title
+                                console.log("View title result = " + dayName)
+                                var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                                // Obtém os valores do dia, mês e ano
+                                var day = String(dateParts[0]).padStart(2, '0');
+                                var month = getMonthIndex(dateParts[1]);
+                                var year = dateParts[2];
+        
+                                // Função auxiliar para obter o índice do mês com base no nome do mês
+                                function getMonthIndex(monthName) {
+                                    var months = [
+                                        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                                    ];
+                                    var index = months.indexOf(monthName) + 1;
+        
+                                    return String(index).padStart(2, '0');
+                                }
+                                setTimeout(function() {
+                                   UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
+                                }, 100);
+                            }
+            },
+                    });
+                });
+        //         document.getElementById("div-schedule").innerHTML += `
+        //     <table>
+        // <tr>
+        //     <th>${texts.text("labelSchedule")}</th>
+        //     <th>${texts.text("labelDateStart")}</th>
+        //     <th>${texts.text("labelDateEnd")}</th>
+        // </tr>
+        // <tr>
+        //     <td>${texts.text("periodType")}</td>
+        //     <td>${schedule.data_start}</td>
+        //     <td>${schedule.data_end}</td>
+        // </tr>
+        // </table>
+        // `
         }
             if(schedule.type == "recurrentType"){
+               
                 document.getElementById("div-schedule").innerHTML += `
                 <table>
                 <tr>
@@ -510,7 +720,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             </table>
 
                 `
-            }
+             }
 
             
             })
@@ -594,6 +804,109 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         //draggedElement.setAttribute("id",room.id)
         imgBD.appendChild(draggedElement);
     })
+    }
+    // continuar na quinta 
+    function UpdateAvailability(availability, schedules){
+        var tds = document.querySelectorAll('.fc-day','.fc-highlight');
+        if (availability.length === 0) {
+            tds.forEach(function(td) {
+                td.classList.add('unavailable');  
+            });
+        } 
+        else {
+            availability.forEach(function(dates){
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD');
+                tds.forEach(function(td) {
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                    var hourAvail = countTotalHoursAvailability(String(dataDate),availability);
+                    var hourBusy = countTotalHoursBusy(String(dataDate),schedules);
+                    hourAvail -=hourBusy;
+                    console.log("Horas disponivies " + hourAvail+ " em " + String(dataDate))
+                    if (dataDate >= datastart && dataDate <= dataend) {
+                        if(hourAvail<=6){
+                            td.classList.remove('unavailable');
+                            td.classList.add('parcialavailable');
+                        }else{
+                            td.classList.remove('unavailable');
+                            td.classList.add('available');
+                        }
+                        
+                    } else {
+                        td.classList.add('unavailable');                 
+                    }
+                });
+            })
+        }
+        console.log("UpdateAvailability Result Success");                             
+    }
+
+    // ajustar na quinta feira 
+    function UpdateDayAvailability(datastart,dataend,availability, schedules,day, month, year){
+        // var tds = document.querySelectorAll('.fc-widget-content');
+        var trs = document.querySelectorAll('.fc-slats tr');
+        if (availability.length === 0) {
+            trs.forEach(function(tr) {
+                console.log("Availability: 0");
+                tr.classList.remove('available');
+                tr.classList.add('unavailable');  
+            });
+        } 
+        else {
+            
+
+            //Deixa tudo indisponível
+            trs.forEach(function (tr) {
+                tr.classList.remove('available');
+                tr.classList.add('unavailable');
+            });
+            console.log("UpdateDayAvailability");
+
+            availability.forEach(function(dates) {
+                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                trs.forEach(function(tr) {
+                    
+                    var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                    // Obtém os valores do dia, mês e ano
+                    var hour = moment(dataTime).format('HH');
+                    var minute = moment(dataTime).format('mm');
+                    var second = moment(dataTime).format('ss');
+                    var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                    // Cria o objeto de data
+                    var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                    //console.log(dateView);
+
+                    if (dateView>=datastart && dateView<=dataend) {
+                        tr.classList.remove('unavailable');
+                        tr.classList.add('available');
+                    }
+                });
+            });
+            console.log("UpdateDayAvailabilitySuccess");
+            if(schedules.length >0){
+                schedules.forEach(function (dates) {
+                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                    
+                    trs.forEach(function (tr) {
+                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+                        var hour = moment(dataTime).format('HH');
+                        var minute = moment(dataTime).format('mm');
+                        var second = moment(dataTime).format('ss');
+                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        // Cria o objeto de data
+                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                        if (dateView == datastart) {
+                            tr.classList.remove('available');
+                            tr.classList.add('unavailable');
+                        }
+                    });
+                });
+            }
+            console.log("UpdateDaySchedulesSuccess");         
+        }
     }
 
     function makeSchedule(t, optType) {
