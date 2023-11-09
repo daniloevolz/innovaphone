@@ -223,12 +223,21 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 //var ip = elementoClicado.getAttribute("data-ip"); // Suponha que o IP seja armazenado no atributo "data-ip"
                 console.log("ID do elemento clicado: " + id);
                 var d = devices.filter(function (dev) { return dev.hwid == id })[0]
-                makeDivPhoneProprieties(t,room,schedules, d)
+
+                app.sendSrc({ api: "user", mt: "GetDeviceSchedules", room: room.id, dev: id, src: id},
+                    function (resultMsg) { // this function is called when response to sendSrc arrives 
+
+                        console.log(JSON.stringify(resultMsg.schedules))
+                        makeDivPhoneProprieties(t, room, schedules, d, resultMsg.schedules)
+                    }
+                );
+
+                
             });
         }
 
     }
-    function makeDivPhoneProprieties(t, room, schedules, device) {
+    function makeDivPhoneProprieties(t, room, schedules, device, dev_schedules) {
         var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
         var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
         listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
@@ -293,20 +302,25 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         console.log("Data do elemento clicado:", clickedDate);
 
                         var s = schedules.filter(function (b) {
-                            return clickedDate >= b.data_start && clickedDate <= b.data_end;
+                            return clickedDate >= b.data_start.split("T")[0] && clickedDate <= b.data_end.split("T")[0];
                         });
+                        if (s.length > 0) {
+                            if (s[0].schedule_module == "hourModule") {
+                                $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                $('#calendar').fullCalendar('gotoDate', start);
+                            } else if (s[0].schedule_module == "dayModule") {
+                                console.log("Abrir modal para confirmar o dia inteiro.")
 
-                        if (s.schedule_module == "hourModule") {
-                            $('#calendar').fullCalendar('changeView', 'agendaDay');
-                            $('#calendar').fullCalendar('gotoDate', start);
-                        } else if (s.schedule_module == "dayModule") {
-                            console.log("Abrir modal para confirmar o dia inteiro.")
+                            } else if (s[0].schedule_module == "periodoModule") {
 
-                        } else if (s.schedule_module == "periodoModule") {
+                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
 
-                            console.log("Abrir modal para perguntar se será manhã ou tarde.")
-
+                            }
+                        } else {
+                            //Implementar mensagem de Data indisponível aqui. Toast
+                            console.log("WECOM LOG: Data indisponível!!!")
                         }
+                        
 
                         
 
@@ -349,6 +363,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
                     if (view.name === 'month') {
                         console.log('View: Modo mês');
+                        UpdateAvailability(schedules, dev_schedules);
                     }
                     else if (view.name === 'agendaWeek') {
                         console.log("View Modo Semana")
@@ -378,7 +393,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         });
 
-        UpdateAvailability(schedules, []);
+        
         
 
     }

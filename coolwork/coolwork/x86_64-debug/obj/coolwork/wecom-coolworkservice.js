@@ -288,6 +288,22 @@ new JsonApi("user").onconnected(function(conn) {
                         log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
                     });
             }
+            if (obj.mt == "GetDeviceSchedules") {
+                var roomId = obj.room;
+                var hwId = obj.dev;
+                var now = getDateNow();
+
+                Database.exec("SELECT * FROM tbl_device_schedule WHERE device_id ='" + hwId +"' AND device_room_id ='"+roomId+"' AND data_start >='" + now + "'")
+                    .oncomplete(function (data) {
+                        log("WECOM LOG:GetDeviceSchedules: ", JSON.stringify(data))
+                        conn.send(JSON.stringify({ api: "user", mt: "GetDeviceSchedulesResult", room: obj.room, dev: obj.dev, schedules: JSON.stringify(data), src: obj.src }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("WECOM LOG:GetDeviceSchedules: ", JSON.stringify(errorText))
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: errorText }));
+                    });
+
+            }
 
         })
     }
