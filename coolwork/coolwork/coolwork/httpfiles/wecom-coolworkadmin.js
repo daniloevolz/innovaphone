@@ -430,7 +430,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         `
         })
         //div schedule
-        var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+        var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:50%;height:100%;display:none").setAttribute("id","div-schedule"))
 
            var phoneElements = document.querySelectorAll(".phoneButtons");
            phoneElements.forEach(function (phoneElement) {
@@ -474,7 +474,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     
                         header: {
                             left: 'today',
-                            center: 'title , month', //agendaWeek,
+                            center: 'title , month, agendaDay',
                             right: 'prev,next'
                         },
                         buttonText: {
@@ -520,15 +520,16 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                                 
                                         var datastart = moment(schedule.data_start).format('YYYY-MM-DD');
                                         var dataend = moment(schedule.data_end).format('YYYY-MM-DD');
+                                        console.log("Data inicio " + datastart + "Data fim " + dataend)
                                         if (clickedDate >= datastart && clickedDate <= dataend ) {
                                                 console.log("Elemento clicado está disponível");
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
+                                                $('#div-schedule').fullCalendar('changeView', 'agendaDay');
+                                                $('#div-schedule').fullCalendar('gotoDate', start);
                                                 teste = true;      
                                     } 
                         
                                 if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
-                                $('#calendar').fullCalendar('unselect'); 
+                                $('#div-schedule').fullCalendar('unselect'); 
                             }
                             else {
                                 // desenvolver na quinta 9/11 
@@ -607,11 +608,11 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                                     console.log("Dia do elemento clicado:" + dayName)
                                     console.log("Hora do elemento clicado:", clickedTime);
                                     makeModal(dayName, clickedTime);
-                                    $('#calendar').fullCalendar('unselect');
+                                    $('#div-schedule').fullCalendar('unselect');
         
                                 } else {
                                     window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
-                                    $('#calendar').fullCalendar('unselect');
+                                    $('#div-schedule').fullCalendar('unselect');
                                 }
                                 ///
                             }
@@ -625,7 +626,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                             
                             if (view.name === 'month') {
                                 setTimeout(function() {
-                                    UpdateAvailability(listDeviceRoom, listDeviceRoom)
+                                    UpdateAvailability(list_RoomSchedule)
                                 }, 100);
                                 console.log('View: Modo mês');
                             } 
@@ -652,7 +653,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                                     return String(index).padStart(2, '0');
                                 }
                                 setTimeout(function() {
-                                   UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
+                                   UpdateDayAvailability(list_RoomSchedule, day, month, year)
                                 }, 100);
                             }
             },
@@ -806,7 +807,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     })
     }
     // continuar na quinta 
-    function UpdateAvailability(availability, schedules){
+    function UpdateAvailability(availability){
+        console.log("Availability" + JSON.stringify(availability))
         var tds = document.querySelectorAll('.fc-day','.fc-highlight');
         if (availability.length === 0) {
             tds.forEach(function(td) {
@@ -815,23 +817,14 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         } 
         else {
             availability.forEach(function(dates){
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD');
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD HH:mm:ss');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD HH:mm:ss');
                 tds.forEach(function(td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                    var hourAvail = countTotalHoursAvailability(String(dataDate),availability);
-                    var hourBusy = countTotalHoursBusy(String(dataDate),schedules);
-                    hourAvail -=hourBusy;
-                    console.log("Horas disponivies " + hourAvail+ " em " + String(dataDate))
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD HH:mm:ss');
+                    console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
                     if (dataDate >= datastart && dataDate <= dataend) {
-                        if(hourAvail<=6){
-                            td.classList.remove('unavailable');
-                            td.classList.add('parcialavailable');
-                        }else{
                             td.classList.remove('unavailable');
                             td.classList.add('available');
-                        }
-                        
                     } else {
                         td.classList.add('unavailable');                 
                     }
@@ -842,7 +835,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     }
 
     // ajustar na quinta feira 
-    function UpdateDayAvailability(datastart,dataend,availability, schedules,day, month, year){
+    function UpdateDayAvailability(availability, day, month, year){
         // var tds = document.querySelectorAll('.fc-widget-content');
         var trs = document.querySelectorAll('.fc-slats tr');
         if (availability.length === 0) {
@@ -863,8 +856,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             console.log("UpdateDayAvailability");
 
             availability.forEach(function(dates) {
-                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                var dataend = moment(dates.data_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                 trs.forEach(function(tr) {
                     
                     var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
@@ -885,9 +878,9 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                 });
             });
             console.log("UpdateDayAvailabilitySuccess");
-            if(schedules.length >0){
-                schedules.forEach(function (dates) {
-                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+            if(availability.length >0){
+                availability.forEach(function (dates) {
+                    var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                     
                     trs.forEach(function (tr) {
                         var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
@@ -983,8 +976,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                             var startDateString = startDate.toISOString().substring(0, 10); 
                             var endDateString = endDate.toISOString().substring(0, 10);   
 
-                            var startDateTimeString = startDateString + "T" + startHour;
-                            var endDateTimeString = endDateString + "T" + endHour;
+                            var startDateTimeString = startDateString + " " + startHour;
+                            var endDateTimeString = endDateString + " " + endHour;
 
                             dateStart = startDateTimeString
                             dateEnd = endDateTimeString
@@ -1256,6 +1249,49 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         })
         
     }
+     function countTotalHoursAvailability(dataString, array) {
+            var targetDate = moment(dataString);
+            var totalHours = 0;
+            
+            array.forEach(function(obj) {
+                var start = moment(obj.time_start);
+                var end = moment(obj.time_end);
+                
+                if (targetDate.isSame(start, 'day')) {
+                    if (targetDate.isSame(end, 'day')) {
+                        totalHours += end.diff(start, 'hours');
+                    } else {
+                        var endOfDay = moment(targetDate).endOf('day');
+                        totalHours += endOfDay.diff(start, 'hours');
+                    }
+                } else if (targetDate.isAfter(start, 'day') && targetDate.isBefore(end, 'day')) {
+                    //var startOfDay = moment(targetDate).startOf('day');
+                    //totalHours += end.diff(startOfDay, 'hours');
+                    totalHours = 24;
+                } else if (targetDate.isSame(end, 'day')) {
+                var startOfDay = moment(targetDate).startOf('day');
+                totalHours += end.diff(startOfDay, 'hours');
+                }
+            });
+            
+            return totalHours;
+    }
+    
+        function countTotalHoursBusy(dataString, array) {
+            var targetDate = moment(dataString);
+            var count = 0;
+            
+            array.forEach(function(obj) {
+                var start = moment(obj.time_start);
+                
+                if (targetDate.isSame(start, 'day')) {
+                count++;
+                }
+            });
+            
+            return count;
+        }
+    
     function makeDivCreateRoom(t){
         t.clear();
         filesID = [];  // para não excluir os arquivos corretos da DB files ; 

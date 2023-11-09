@@ -217,12 +217,12 @@ visibility: hidden;
 .fc-agenda-view .fc-day-grid .fc-row {
 min-height: 0em;
 }
+.fc-bg table, .fc-row .fc-bgevent-skeleton table, .fc-row .fc-highlight-skeleton table {
+    height: 100%;
+}
 #calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable 
 > div > div.fc-bg > table > tbody > tr > td.fc-axis.fc-widget-content{
 display: none;
-}
-.fc-widget-content{
-    background-color: rgb(212, 66, 66);
 }
 .unavailable{
 background-color: #f89598
