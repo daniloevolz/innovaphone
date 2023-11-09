@@ -63,8 +63,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         
         devicesApi = start.consumeApi("com.innovaphone.devices");
-        devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
-        devicesApi.send({ mt: "GetPhones" }); // phonelist
+        devicesApi.onmessage.attach(devicesApi_onmessage); //onmessage is called for responses from the API
+        devicesApi.send({ mt: "GetPhones" }); //phonelist
 
         setInterval(function () {
             if (currentState == "Connected") {
@@ -76,7 +76,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 console.log("WECOM-LOG:Interval: changeState Disconnected");
             }
 
-        }, 60000); // A cada 60 segundo
+        }, 60000); //A cada 60 segundo
     }
     function devicesApi_onmessage(conn, obj) {
         console.log("WECOM-LOG:devicesApi_onmessage: " + JSON.stringify(obj));
@@ -188,7 +188,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateEnd") + formatDate(schedule.data_end), null))
         })
 
-        listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;", null, null).setAttribute("id", "divPhones"))
+        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
         var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
         imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
 
