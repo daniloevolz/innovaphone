@@ -11,7 +11,8 @@ Wecom.coolworkTexts = {
         labelName: "Nome da Sala",
         labelGeral: "Geral",
         labelUsers: "Usuários",
-        labelSchedule: "Agendamentos",
+        labelSchedules: "Agendamentos",
+        labelSchedule : "Agendamento",
         labelDateStart : " Data de Início",
         labelDateEnd: " Data de Término",
         labelUser: "Usuário",
@@ -27,7 +28,19 @@ Wecom.coolworkTexts = {
         dayModule: "Dia Inteiro",
         hourModule: "Horário Definido",
         divStartHour: "Hora de Abertura",
-        divEndHour:"Hora de Fechamento"
-
+        divEndHour: "Hora de Fechamento",
+        labelMondayDiv: "Segunda-feira",
+        labeltuesdayDiv: "Terça-feira",
+        labelwednesdayDiv: "Quarta-feira",
+        labelthursdayDiv: "Quinta-feira",
+        labelfridayDiv: "Sexta-feira",
+        labelsaturdayDiv: "Sábado",
+        labelsundayDiv: "Domingo",
+        labelRoomName: "Sala",
+        labelScheduleDateStart: "Início do Agendamento",
+        labelScheduleDateEnd: "Final do Agendamento",
+        labelScheduleUser: "Usuário",
+        labelDevice: "Telefone",
+        labelDayWeek: "Dia da semana"
     }
 }

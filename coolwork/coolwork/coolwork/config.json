@@ -29,7 +29,7 @@
                 {
                   "cmd": "column",
                   "name": "name",
-                  "type": "VARCHAR(120) NOT NULL"
+                  "type": "VARCHAR(120)  "
                 },
                 {
                   "cmd": "column",
@@ -66,7 +66,7 @@
                   {
                     "cmd": "column",
                     "name": "hwid",
-                    "type": "VARCHAR(120) NOT NULL"
+                    "type": "VARCHAR(120) UNIQUE NOT NULL"
                   },
                   {
                     "cmd": "column",
@@ -147,12 +147,81 @@
                     "type": "VARCHAR(45)"
                   },
                   {
+                    "cmd":  "column",
+                    "name": "timestart_monday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_monday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_tuesday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_tuesday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_wednesday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_wednesday",
+                    "type": "TEXT"
+                  },                 
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_thursday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_thursday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_friday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_friday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_saturday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_saturday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timestart_sunday",
+                    "type": "TEXT"
+                  },
+                  {
+                    "cmd":  "column",
+                    "name": "timeend_sunday",
+                    "type": "TEXT"
+                  },
+                  {
                     "cmd": "column",
                     "name": "room_id",
                     "type": "BIGINT REFERENCES tbl_room(id) ON DELETE CASCADE"
                   }
-      
-
+                 
                 ]
               },
                {
