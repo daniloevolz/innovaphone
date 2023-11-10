@@ -1022,6 +1022,12 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
 
                         if (view.name === 'month') {
                             console.log('View: Modo mês');
+                            setTimeout(function(){
+                                var tds = document.querySelectorAll('.fc-day','.fc-highlight');
+                                tds.forEach(function(td) {
+                                    td.classList.add('unavailable');  
+                                }); 
+                            },300)
                         }
                         else if (view.name === 'agendaWeek') {
                             console.log("View Modo Semana")
