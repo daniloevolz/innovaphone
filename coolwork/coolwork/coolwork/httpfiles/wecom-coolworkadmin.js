@@ -119,7 +119,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             list_AllRoom = JSON.parse(obj.result)
             constructor(that)
-
+            UpdateRoomResult
+        }
+        if (obj.api === "admin" && obj.mt === "UpdateRoomResult") {
+            app.send({api:"admin", mt:"SelectAllRoom"})
         }
         if (obj.api === "admin" && obj.mt === "DeleteRoomSuccess") {
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -397,6 +400,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             var divPhones = divGeral.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
             var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
             imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
+           
             makePhoneButtons(phone_list);
 
             if(listDeviceRoom.length > 0){
@@ -417,22 +421,12 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         
         // div users   
         var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
-        list_tableUsers.forEach(function(user){
-        var userV = list_viewers.filter(function (item) {
-            return item.viewer_guid === user.guid;
-        })[0];
-        var userE = list_editors.filter(function (item) {
-            return item.editor_guid === user.guid;
-        })[0];
-
-        document.getElementById("div-users").innerHTML += `
-        
-        `
-        })
+        var usersGrid = editUsersDepartmentsGrid()
+        divUsers.add(usersGrid)
         //div schedule
         var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:50%;height:100%;display:none").setAttribute("id","div-schedule"))
-
-           var phoneElements = document.querySelectorAll(".phoneButtons");
+       
+        var phoneElements = document.querySelectorAll(".phoneButtons");
            phoneElements.forEach(function (phoneElement) {
                phoneElement.draggable = true;
                phoneElement.addEventListener("dragstart",drag,true)
@@ -465,214 +459,29 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         }));
         
         list_RoomSchedule.forEach(function(schedule){ 
-            if(schedule.type == "periodType"){
-                $(document).ready(function () {
-                    $.fullCalendar.locale('pt-br');
-                    // var id = $.urlParam('id');
-                    $('#div-schedule').fullCalendar('destroy');
-                    $('#div-schedule').fullCalendar({
-    
-                        header: {
-                            left: 'today',
-                            center: 'title , month, agendaDay',
-                            right: 'prev,next'
-                        },
-                        buttonText: {
-                            today: 'Hoje',
-                            month: 'Mês',
-                            week: 'Semana',
-                            day: 'Dia'
-                        },
-                        monthNames: [
-                            'Janeiro',
-                            'Fevereiro',
-                            'Março',
-                            'Abril',
-                            'Maio',
-                            'Junho',
-                            'Julho',
-                            'Agosto',
-                            'Setembro',
-                            'Outubro',
-                            'Novembro',
-                            'Dezembro'
-                        ],
-                        defaultView: 'month',
-                        slotDuration: '01:00:00',
-                        minTime: '00:00:00',
-                        maxTime: '24:00:00',
-                        selectable: true,
-                        selectLongPressDelay: 0,
-    
-                        selectHelper: true,
-                        select: function (start, end, jsEvent, view) {
-                            selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
-                            selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
-                            
-                            if (view.name === 'month') {
-                                console.log("View: Month");
-                                var clickedElement = jsEvent.target
-                                
-                                console.log(" Elemento clicado " + clickedElement);
-                                var clickedDate = start.format('YYYY-MM-DD');
-                                console.log("Data do elemento clicado:", clickedDate);
-                                var teste = false;
-                                
-                                        var datastart = moment(schedule.data_start).format('YYYY-MM-DD');
-                                        var dataend = moment(schedule.data_end).format('YYYY-MM-DD');
-                                        console.log("Data inicio " + datastart + "Data fim " + dataend)
-                                        if (clickedDate >= datastart && clickedDate <= dataend ) {
-                                                console.log("Elemento clicado está disponível");
-                                                $('#div-schedule').fullCalendar('changeView', 'agendaDay');
-                                                $('#div-schedule').fullCalendar('gotoDate', start);
-                                                teste = true;      
-                                    } 
+            var imgEdit = divScheduleInn.add(new innovaphone.ui1.Node("img","width: 40px; height: 40px;",null,null ).setAttribute("src","./images/edit-icon.png"))
+           
+            imgEdit.addEvent("click",function(){
+                console.log("Clickable")
+                if(schedule.type == "periodType"){
+                    divScheduleInn.clear()
+                    makeSchedule(divScheduleInn,schedule.type)
+                    document.querySelectorAll(".btnSaveRoom").forEach(function(btn){
+                        btn.removeEventListener("click",btn)
+                        btn.id = "UpdateRoom"
+                        btn.textContent = "Atualizar Sala"
                         
-                                if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
-                                $('#div-schedule').fullCalendar('unselect'); 
-                            }
-                            else {
-                                // desenvolver na quinta 9/11 
-                                var valid = false;
-                                if(dataavailability.length>0){
-                                    dataavailability.forEach(function (dates) {
-                                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                        console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
-        
-                                        // Obtém os valores do ano, mês e ano
-                                        var year = moment(start).format('YYYY');
-                                        var month = moment(start).format('MM');
-                                        var day = moment(start).format('DD');
-                                        // Obtém os valores do hora, minuto e segundos
-                                        var hour = moment(start).format('HH');
-                                        var minute = moment(start).format('mm');
-                                        var second = moment(start).format('ss');
-                                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                                        // Cria o objeto de data
-                                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-        
-                                        console.log(dateView);
-        
-                                        if (dateView >= datastart && dateView <= dataend) {
-                                            valid = true;
-                                        }
-                                    });
-                                }
-                                if(dataschedules.length>0){
-                                    dataschedules.forEach(function (dates) {
-                                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                        var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-        
-                                        console.log("Agendamento: \n"+datastart + "\n" + dataend);
-                                        // Obtém os valores do ano, mês e ano
-                                        var year = moment(start).format('YYYY');
-                                        var month = moment(start).format('MM');
-                                        var day = moment(start).format('DD');
-                                        // Obtém os valores do hora, minuto e segundos
-                                        var hour = moment(start).format('HH');
-                                        var minute = moment(start).format('mm');
-                                        var second = moment(start).format('ss');
-                                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                                        // Cria o objeto de data
-                                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-        
-                                        console.log(dateView);
-        
-                                        if (dateView == datastart) {
-                                            valid = false;
-                                        }
-                                    });
-                                }
-        
-                                var year = moment(start).format('YYYY');
-                                var month = moment(start).format('MM');
-                                var day = moment(start).format('DD');
-                                // Obtém os valores do hora, minuto e segundos
-                                var hour = moment(start).format('HH');
-                                var minute = moment(start).format('mm');
-                                var second = moment(start).format('ss');
-                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                                // Cria o objeto de data
-                                var datastart = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-        
-                                var now = moment().format("YYYY-MM-DDTHH:mm:ss");
-                                if (datastart < now) {
-                                    console.warn("Data selecionada está no passado.");
-                                    valid = false;
-                                }
-        
-                                if (valid) {
-                                    dayName = view.title;
-                                    var clickedTime = start.format('HH:mm:ss');
-                                    console.log("Dia do elemento clicado:" + dayName)
-                                    console.log("Hora do elemento clicado:", clickedTime);
-                                    makeModal(dayName, clickedTime);
-                                    $('#div-schedule').fullCalendar('unselect');
-        
-                                } else {
-                                    window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
-                                    $('#div-schedule').fullCalendar('unselect');
-                                }
-                                ///
-                            }
-                        },
-                        editable: false,
-                        eventLimit: true,
-                        events: [],
-                        eventRender: function (event, element) {},
-        
-                        viewRender: function(view, element) {
-                            
-                            if (view.name === 'month') {
-                                setTimeout(function() {
-                                    UpdateAvailability(list_RoomSchedule)
-                                }, 100);
-                                console.log('View: Modo mês');
-                            } 
-                            // else if(view.name === 'agendaWeek') {
-                            //     console.log("View Modo Semana")
-                            // }
-                            else{
-                                dayName = view.title
-                                console.log("View title result = " + dayName)
-                                var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
-                                // Obtém os valores do dia, mês e ano
-                                var day = String(dateParts[0]).padStart(2, '0');
-                                var month = getMonthIndex(dateParts[1]);
-                                var year = dateParts[2];
-        
-                                // Função auxiliar para obter o índice do mês com base no nome do mês
-                                function getMonthIndex(monthName) {
-                                    var months = [
-                                        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                                    ];
-                                    var index = months.indexOf(monthName) + 1;
-        
-                                    return String(index).padStart(2, '0');
-                                }
-                                setTimeout(function() {
-                                   UpdateDayAvailability(list_RoomSchedule, day, month, year)
-                                }, 100);
-                            }
-            },
-                    });
-                });
-        //         document.getElementById("div-schedule").innerHTML += `
-        //     <table>
-        // <tr>
-        //     <th>${texts.text("labelSchedule")}</th>
-        //     <th>${texts.text("labelDateStart")}</th>
-        //     <th>${texts.text("labelDateEnd")}</th>
-        // </tr>
-        // <tr>
-        //     <td>${texts.text("periodType")}</td>
-        //     <td>${schedule.data_start}</td>
-        //     <td>${schedule.data_end}</td>
-        // </tr>
-        // </table>
-        // `
+                    })
+                    document.getElementById("UpdateRoom").addEventListener("click",function(){
+                        
+                        app.send({ 
+                            api: "admin", mt: "UpdateRoom",  datastart: dateStart , dataend: dateEnd, roomID : schedule.room_id
+                        });
+                    })
+                }
+            })
+            if(schedule.type == "periodType"){
+                makePeriodSchedule()
         }
             if(schedule.type == "recurrentType"){
                
@@ -901,11 +710,205 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             console.log("UpdateDaySchedulesSuccess");         
         }
     }
+    function makePeriodSchedule(){
+        $(document).ready(function () {
+            $.fullCalendar.locale('pt-br');
+            // var id = $.urlParam('id');
+            $('#div-schedule').fullCalendar('destroy');
+            $('#div-schedule').fullCalendar({
 
+                header: {
+                    left: 'today',
+                    center: 'title , month, agendaDay',
+                    right: 'prev,next'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                    'Janeiro',
+                    'Fevereiro',
+                    'Março',
+                    'Abril',
+                    'Maio',
+                    'Junho',
+                    'Julho',
+                    'Agosto',
+                    'Setembro',
+                    'Outubro',
+                    'Novembro',
+                    'Dezembro'
+                ],
+                defaultView: 'month',
+                slotDuration: '01:00:00',
+                minTime: '00:00:00',
+                maxTime: '24:00:00',
+                selectable: true,
+                selectLongPressDelay: 0,
+
+                selectHelper: true,
+                select: function (start, end, jsEvent, view) {
+                    selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
+                    selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
+                    
+                    if (view.name === 'month') {
+                        console.log("View: Month");
+                        var clickedElement = jsEvent.target
+                        
+                        console.log(" Elemento clicado " + clickedElement);
+                        var clickedDate = start.format('YYYY-MM-DD');
+                        console.log("Data do elemento clicado:", clickedDate);
+                        var teste = false;
+                        
+                                var datastart = moment(schedule.data_start).format('YYYY-MM-DD');
+                                var dataend = moment(schedule.data_end).format('YYYY-MM-DD');
+                                console.log("Data inicio " + datastart + "Data fim " + dataend)
+                                if (clickedDate >= datastart && clickedDate <= dataend ) {
+                                        console.log("Elemento clicado está disponível");
+                                        $('#div-schedule').fullCalendar('changeView', 'agendaDay');
+                                        $('#div-schedule').fullCalendar('gotoDate', start);
+                                        teste = true;      
+                            } 
+                
+                        if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                        $('#div-schedule').fullCalendar('unselect'); 
+                    }
+                    else {
+                        // desenvolver na quinta 9/11 
+                        var valid = false;
+                        if(dataavailability.length>0){
+                            dataavailability.forEach(function (dates) {
+                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
+
+                                // Obtém os valores do ano, mês e ano
+                                var year = moment(start).format('YYYY');
+                                var month = moment(start).format('MM');
+                                var day = moment(start).format('DD');
+                                // Obtém os valores do hora, minuto e segundos
+                                var hour = moment(start).format('HH');
+                                var minute = moment(start).format('mm');
+                                var second = moment(start).format('ss');
+                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                // Cria o objeto de data
+                                var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                                console.log(dateView);
+
+                                if (dateView >= datastart && dateView <= dataend) {
+                                    valid = true;
+                                }
+                            });
+                        }
+                        if(dataschedules.length>0){
+                            dataschedules.forEach(function (dates) {
+                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                                console.log("Agendamento: \n"+datastart + "\n" + dataend);
+                                // Obtém os valores do ano, mês e ano
+                                var year = moment(start).format('YYYY');
+                                var month = moment(start).format('MM');
+                                var day = moment(start).format('DD');
+                                // Obtém os valores do hora, minuto e segundos
+                                var hour = moment(start).format('HH');
+                                var minute = moment(start).format('mm');
+                                var second = moment(start).format('ss');
+                                var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                                // Cria o objeto de data
+                                var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                                console.log(dateView);
+
+                                if (dateView == datastart) {
+                                    valid = false;
+                                }
+                            });
+                        }
+
+                        var year = moment(start).format('YYYY');
+                        var month = moment(start).format('MM');
+                        var day = moment(start).format('DD');
+                        // Obtém os valores do hora, minuto e segundos
+                        var hour = moment(start).format('HH');
+                        var minute = moment(start).format('mm');
+                        var second = moment(start).format('ss');
+                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        // Cria o objeto de data
+                        var datastart = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                        var now = moment().format("YYYY-MM-DDTHH:mm:ss");
+                        if (datastart < now) {
+                            console.warn("Data selecionada está no passado.");
+                            valid = false;
+                        }
+
+                        if (valid) {
+                            dayName = view.title;
+                            var clickedTime = start.format('HH:mm:ss');
+                            console.log("Dia do elemento clicado:" + dayName)
+                            console.log("Hora do elemento clicado:", clickedTime);
+                            makeModal(dayName, clickedTime);
+                            $('#div-schedule').fullCalendar('unselect');
+
+                        } else {
+                            window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
+                            $('#div-schedule').fullCalendar('unselect');
+                        }
+                        ///
+                    }
+                },
+                editable: false,
+                eventLimit: true,
+                events: [],
+                eventRender: function (event, element) {},
+
+                viewRender: function(view, element) {
+                    
+                    if (view.name === 'month') {
+                        setTimeout(function() {
+                            UpdateAvailability(list_RoomSchedule)
+                        }, 100);
+                        console.log('View: Modo mês');
+                    } 
+                    // else if(view.name === 'agendaWeek') {
+                    //     console.log("View Modo Semana")
+                    // }
+                    else{
+                        dayName = view.title
+                        console.log("View title result = " + dayName)
+                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                        // Obtém os valores do dia, mês e ano
+                        var day = String(dateParts[0]).padStart(2, '0');
+                        var month = getMonthIndex(dateParts[1]);
+                        var year = dateParts[2];
+
+                        // Função auxiliar para obter o índice do mês com base no nome do mês
+                        function getMonthIndex(monthName) {
+                            var months = [
+                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                            ];
+                            var index = months.indexOf(monthName) + 1;
+
+                            return String(index).padStart(2, '0');
+                        }
+                        setTimeout(function() {
+                           UpdateDayAvailability(list_RoomSchedule, day, month, year)
+                        }, 100);
+                    }
+    },
+            });
+        });
+    }
     function makeSchedule(t, optType) {
         t.clear();
         
-        var btnSave = t.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
+        var btnSave = t.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), "btnSaveRoom").setAttribute("id", "btnSaveRoom"))
 
         if (optType == "periodType") {
             var recurrentTimeDiv = t.add(new innovaphone.ui1.Div(null, null, "recurrentPeriodDiv"))
@@ -1199,7 +1202,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                 var startTuesday = document.getElementById("timeStartTuesday").value;
                 var endTuesday = document.getElementById("timeEndTuesday").value;
                 var startWednesday = document.getElementById("timeStartWednesday").value;
-                var endWednseday = document.getElementById("timeEndWednesday").value;
+                var endWednesday = document.getElementById("timeEndWednesday").value;
                 var startThursday = document.getElementById("timeStartThursday").value;
                 var endThursday = document.getElementById("timeEndThursday").value;
                 var startFriday = document.getElementById("timeStartFriday").value;
@@ -1224,7 +1227,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     startTuesday : startTuesday,// começo terça
                     endTuesday : endTuesday, // fim terça
                     startWednesday : startWednesday, // começo quarta
-                    endWednseday : endWednseday, // fim quarta
+                    endWednesday : endWednesday, // fim quartaendWednesday
                     startThursday : startThursday, // começo quinta
                     endThursday : endThursday, // fim quinta
                     startFriday : startFriday, // começo sexta
@@ -1297,7 +1300,68 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             
             return count;
         }
+        function editUsersDepartmentsGrid() {
+            var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
     
+            var table = usersListDiv.add(new innovaphone.ui1.Node("table", null, null, "table"));
+    
+            var headerRow = table.add(new innovaphone.ui1.Node("tr", null, null, "row"));
+    
+            var nameCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelUser"), "column"));
+    
+            var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"));
+    
+            var viewerCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"));
+    
+       
+            list_tableUsers.forEach(function (user) {
+                var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
+    
+                 var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+                
+                var userV = list_viewers.filter(function (item) {
+                    return item.viewer_guid === user.guid;
+                })[0];
+                var userE = list_editors.filter(function (item) {
+                    return item.editor_guid === user.guid;
+                })[0];
+    
+                console.log("Filtro Visualizador:", userV);
+                console.log("Filtro Editor:", userE);
+                 var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+    
+                 var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+                
+    
+                 var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+                 viewerCheckbox.setAttribute("name", "viewerDepartments");
+                 viewerCheckbox.setAttribute("value", user.guid);
+    
+                 var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+                 editorCheckbox.setAttribute("name", "editorDepartments");
+                 editorCheckbox.setAttribute("value", user.guid);
+    
+                editorCheckbox.addEvent('click', function () {
+                    var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                    viewerCheckbox.checked = true
+    
+                });
+                setTimeout(function () {
+                    if (userV) {
+                        var viewCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                        viewCheckbox.checked = true;
+                    }
+                    if (userE) {
+                        var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                        editCheckbox.checked = true;
+                    }
+                }, 500)
+    
+            });
+            //usersListDiv.appendChild(table);
+            return usersListDiv;
+        }
+
     function makeDivCreateRoom(t){
         t.clear();
         filesID = [];  // para não excluir os arquivos corretos da DB files ; 

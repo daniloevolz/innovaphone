@@ -528,6 +528,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                     });
             }
+            
             if(obj.mt == "DeleteDeviceFromRoom"){
                 var sql = "UPDATE tbl_devices SET room_id = null WHERE hwid = '" + obj.hwid + "'";
                 Database.exec(sql)
@@ -537,7 +538,19 @@ new JsonApi("admin").onconnected(function(conn) {
                 .onerror(function (error, errorText, dbErrorCode) {
                     conn.send(JSON.stringify({ api: "admin", mt: "DeleteDeviceFromRoomError", error: String(errorText) }));
                 });
-            }           
+            }
+            if(obj.mt == "UpdateRoom"){
+                // var sql = "UPDATE tbl_room_schedule SET data_start = " + obj.datastart + ", data_end = " + obj.dataend + " WHERE room_id = '" + obj.roomID + "'";
+                var sql = "UPDATE tbl_room_schedule SET data_start = " + obj.datastart + ", data_end = " + obj.dataend + " WHERE room_id = '" + obj.roomID + "'";
+                Database.exec(sql)
+                .oncomplete(function (data) {
+                    log("UpdateSuccess" + JSON.stringify(data));
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomResult", src: data.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("UpdateRoomResult:result=Error " + String(errorText));
+                });
+            }        
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];
                 devices = obj.devices;
