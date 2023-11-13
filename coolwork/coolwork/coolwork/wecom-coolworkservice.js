@@ -612,7 +612,7 @@ function getDateNow() {
     var dateString = date.toISOString();
 
     // Substitui o caractere "T" por um espaço
-    //dateString = dateString.replace("T", " ");
+    dateString = dateString.replace("T", " ");
 
     // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
     return dateString.slice(0, -8);
