@@ -290,8 +290,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
                 selectHelper: true,
                 select: function (start, end, jsEvent, view) {
-                    selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
-                    selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
+                    selectstart = start.format('YYYY-MM-DD[ ]HH:mm:ss');
+                    selectend = end.format('YYYY-MM-DD[ ]HH:mm:ss');
 
                     if (view.name === 'month') {
                         console.log("View: Month");
@@ -301,32 +301,30 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
 
-                        var s = schedules.filter(function (b) {
-                            return clickedDate >= b.data_start.split("T")[0] && clickedDate <= b.data_end.split("T")[0];
-                        });
-                        if (s.length > 0) {
-                            if (s[0].schedule_module == "hourModule") {
-                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                $('#calendar').fullCalendar('gotoDate', start);
-                            } else if (s[0].schedule_module == "dayModule") {
-                                console.log("Abrir modal para confirmar o dia inteiro.")
-
-                            } else if (s[0].schedule_module == "periodoModule") {
-
-                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-
+                        schedules.forEach(function (s) {
+                            if (s.type == "recurrentType") {
+                                var dayOfWeek = findDayOfWeek(clickedElement.classList);
                             }
-                        } else {
-                            //Implementar mensagem de Data indisponível aqui. Toast
-                            console.log("WECOM LOG: Data indisponível!!!")
-                        }
-                        
+                            if (s.type == "periodType") {
+                                if (clickedDate >= s.data_start.split(" ")[0] && clickedDate <= s.data_end.split(" ")[0]) {
+                                    if (s.schedule_module == "hourModule") {
+                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                        $('#calendar').fullCalendar('gotoDate', start);
+                                    } else if (s.schedule_module == "dayModule") {
+                                        console.log("Abrir modal para confirmar o dia inteiro.")
 
-                        
+                                    } else if (s.schedule_module == "periodoModule") {
 
-                        // var teste = false;
+                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
 
-                        // if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                                    }
+                                    return
+                                } else {
+                                    //Implementar mensagem de Data indisponível aqui. Toast
+                                    console.log("WECOM LOG: Data indisponível!!!")
+                                }
+                            }
+                        })
                         $('#calendar').fullCalendar('unselect');
                     }
                     else if (view.name === 'agendaWeek') {
@@ -369,6 +367,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         console.log("View Modo Semana")
                     }
                     else {
+                        console.log('View: Modo dias');
+                        UpdateDayAvailability(schedules, dev_schedules);
+
                         dayName = view.title
                         console.log("View title result = " + dayName)
                         var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
@@ -392,10 +393,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             });
 
         });
-
-        
-        
-
     }
     //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
@@ -444,28 +441,161 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             });
         }
         else {
-            availability.forEach(function (dates) {
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD');
-                tds.forEach(function (td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                    var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
-                    var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
-                    hourAvail -= hourBusy;
-                    console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
-                    if (dataDate >= datastart && dataDate <= dataend) {
-                        if (hourAvail <= 6) {
-                            td.classList.remove('unavailable');
-                            td.classList.add('parcialavailable');
-                        } else {
-                            td.classList.remove('unavailable');
-                            td.classList.add('available');
-                        }
 
-                    } else {
-                        td.classList.add('unavailable');
-                    }
-                });
+            availability.forEach(function (dates) {
+                if (dates.type == "recurrentType") {
+                    tds.forEach(function (td) {
+                        var dayOfWeek = findDayOfWeek(td.classList);
+                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                        //var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
+                        //var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
+                        
+                        switch (dayOfWeek) {
+                            case "monday":
+                                if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
+                                    var start = moment(dates.timestart_monday);
+                                    var end = moment(dates.timeend_monday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "tuesday":
+                                if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
+                                    var start = moment(dates.timestart_tuesday);
+                                    var end = moment(dates.timeend_tuesday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "wednesday":
+                                if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
+                                    var start = moment(dates.timestart_wednesday);
+                                    var end = moment(dates.timeend_wednesday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "thursday":
+                                if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
+                                    var start = moment(dates.timestart_thursday);
+                                    var end = moment(dates.timeend_thursday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "friday":
+                                if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
+                                    var start = moment(dates.timestart_friday);
+                                    var end = moment(dates.timeend_friday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "saturday":
+                                if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
+                                    var start = moment(dates.timestart_saturday);
+                                    var end = moment(dates.timeend_saturday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+                            case "sunday":
+                                if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
+                                    var start = moment(dates.timestart_sunday);
+                                    var end = moment(dates.timeend_sunday);
+                                    var totalHours = 0;
+                                    totalHours += end.diff(start, 'hours');
+                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+
+                                    if (totalHours <= 6) {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('parcialavailable');
+                                    } else {
+                                        td.classList.remove('unavailable');
+                                        td.classList.add('available');
+                                    }
+                                }
+
+                            default:
+                                td.classList.add('unavailable');
+                                
+                        }
+                    });
+
+                } else if (dates.type == "periodType"){
+                    var datastart = moment(dates.data_start).format('YYYY-MM-DD');
+                    var dataend = moment(dates.data_end).format('YYYY-MM-DD');
+                    tds.forEach(function (td) {
+                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                        var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
+                        var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
+                        hourAvail -= hourBusy;
+                        console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
+                        if (dataDate >= datastart && dataDate <= dataend) {
+                            if (hourAvail <= 6) {
+                                td.classList.remove('unavailable');
+                                td.classList.add('parcialavailable');
+                            } else {
+                                td.classList.remove('unavailable');
+                                td.classList.add('available');
+                            }
+
+                        } else {
+                            td.classList.add('unavailable');
+                        }
+                    });
+                }
+
+
+                
             })
         }
         console.log("UpdateAvailability Result Success");
@@ -578,6 +708,31 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             }
             console.log("UpdateDaySchedulesSuccess");
         }
+    }
+
+    // Função para encontrar o nome do dia da semana a partir das classes
+    function findDayOfWeek(classes) {
+        for (var j = 0; j < classes.length; j++) {
+            switch (classes[j]) {
+                case "fc-mon":
+                    return "monday";
+                case "fc-tue":
+                    return "tuesday";
+                case "fc-wed":
+                    return "wednesday";
+                case "fc-thu":
+                    return "thursday";
+                case "fc-fri":
+                    return "friday";
+                case "fc-sat":
+                    return "saturday";
+                case "fc-sun":
+                    return "sunday";
+            }
+                
+            
+        }
+        return null; // Retorna null se não encontrar o nome do dia
     }
 }
 

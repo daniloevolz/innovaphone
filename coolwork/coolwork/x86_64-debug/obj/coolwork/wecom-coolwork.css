@@ -122,7 +122,66 @@ a {
 #top-bottons ul a:hover {
     background-color: #284975;
 }
+.userlist {
+    display: flex;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.right-box {
+    margin: 5px 5px 25px 0;
+    position: relative;
+    width: 100%;
+    border-radius: 10px;
+    color: white;
+}
 
+#imgBD{
+    position: relative;
+    display: flex;
+    max-width: 400px;
+    max-height: 400px;
+    align-items: center;
+    justify-content: center;
+    top: 10%;
+}
+.divInputs{
+    position: absolute;
+    top: 15%;
+    width: 80%;
+    align-items: center;
+    height: 80%;
+    display: flex;
+    padding: 10px;
+    background: rgba(0,0,0,.5);
+    box-sizing: border-box;
+    box-shadow: 0 15px 25px rgba(0,0,0,.6);
+    border-radius: 10px;
+    letter-spacing: 1px;
+    justify-content: center;
+    font-size: 14px;
+}
+.divGeral{
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.divInputs select{
+    height: 20px;
+    width: 270px;
+    margin: 10px 0;
+    text-align: center;
+}
+.iptRoomName{
+    height: 20px;
+    width: 270px;
+    margin: 10px 0;
+}
 .left-box {
     margin: 25px 5px 25px 0;
     position: relative;
@@ -135,18 +194,7 @@ a {
     border-radius: 10px;
     color: white;
 }
-.right-box {
-    margin: 5px 5px 25px 0;
-    position: relative;
-    width: 96%;
-    /* left: 64%; */
-    /* padding: 30px; */
-    background: linear-gradient(rgb(20, 30, 48), rgb(36, 59, 85));
-    box-sizing: border-box;
-    box-shadow: 0 15px 25px rgba(0,0,0,.6);
-    border-radius: 10px;
-    color: white;
-}
+
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 
@@ -184,8 +232,7 @@ table {
     border-collapse: collapse !important;
     border-spacing: 0;
     width: 100%;
-    border: 1px solid #ffffff00;
-    /* max-height: 15px; */
+    max-height: 15px;
 }
 th {
     text-align: center;
@@ -195,14 +242,6 @@ th {
 td {
     text-align: center;
     padding: 5px;
-}
-.userlist {
-    display: flex;
-    font-size: 18px;
-    width: 80%;
-    height: 80%;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 ::placeholder {
@@ -329,11 +368,11 @@ td {
 }
 
 .phoneButtons {
-    height: 70px;
+    height: 80px;
     margin: 10px;
     border-radius: 15px;
     text-align: center;
-    width: 25%;
+    width: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -345,8 +384,8 @@ td {
 }
 
 .imgProfile {
-    width: 35px;
-    height: 35px;
+    width: 70px;
+    height: 50px;
     border-radius: 10px;
 }
 

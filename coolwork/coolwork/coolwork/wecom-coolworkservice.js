@@ -721,37 +721,86 @@ var i = Timers.setInterval(function() {
         // Seu código de verificação aqui
         log("Verificação concluída!")
             if(data.length > 0 ){
-
+                var sipGuid = ""
                 data.forEach(function(data){
-                    var sipGuid = pbxTableUsers.filter(function(item){
+                    sipGuid = pbxTableUsers.filter(function(item){
                         
                         return item.columns.guid == data.user_guid
                     })[0];
-                    var cod = 1
-                    pbxTableUpdateDevice(cod, data.device_id, sipGuid)   
-                    handleSetPresenceMessage(sipGuid.columns.h323, sipGuid.columns.cn, "busy")
+                    deviceAnalise(data.device_id, sipGuid)
                 })
-            }
-        })
-})
-}, 61000);
+                
 
-function pbxTableInsertDevice(hwId, user){
-    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-    .oncomplete(function(data){
-        user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
-        pbxTable.forEach(function(conn){
-            if(user.src == conn.pbx){
-                user.mt = "ReplicateUpdate"
-                conn.send(JSON.stringify(user))
             }
         })
-    })
+})}, 60000);    
+
+function deviceAnalise(deviceId, sipGuid) {
+    var deviceFound = false;
+    var sipOnPhone = ""
+    log("TABLE USERS COLUMNS", JSON.stringify(pbxTableUsers));
+    pbxTableUsers.forEach(function (u) {
+        log("TABLE USER - U", JSON.stringify(u));
+
+        // Certifique-se de verificar se u.columns.devices existe
+        if (u.columns && u.columns.devices && Array.isArray(u.columns.devices)) {
+            var deviceArray = u.columns.devices;
+            
+            deviceArray.forEach(function (d) {
+                log("DEVICE FOR EACH", JSON.stringify(d))
+                if (d.hwid == deviceId) {
+                    log("DEVICE found", deviceFound)
+                    deviceFound = true;
+                    sipOnPhone = u.columns.h323
+                    return;
+                }
+            });
+        }
+    });
+
+    if (deviceFound == true) {
+        cod = 2;
+        pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
+        var l = Timers.setInterval(function () {
+            cod = 1;
+            pbxTableUpdateDevice(cod, deviceId, sipGuid);
+            log(" TELEFONE REMOVIDO", deviceId);
+        
+        }, 1000);
+        Timers.clearTimeout(l);
+    } else {
+        cod = 1;
+        pbxTableUpdateDevice(cod, deviceId, sipGuid);
+    }
 }
-function pbxTableRemoveDevice(hwId, user){
-    Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-    .oncomplete(function(data){
-        user.columns.devices.push({hw:'', text:'', app: "phone", tls: true, trusted: true})
+
+function pbxTableUpdateDevice(cod, hwId, user){
+    // Add phone user
+    //VERIFICAR COM UM FOREACH OS USUÁRIOS, SE O TELEFONE JÁ NÃO ATRIBUIDO A UM USUÁRIO
+    if (cod == 1){
+        log("Ligando o telefone", hwId)
+        Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
+        .oncomplete(function(data){
+            user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
+            pbxTable.forEach(function(conn){
+                if(user.src == conn.pbx){
+                    user.mt = "ReplicateUpdate"
+                    conn.send(JSON.stringify(user))
+                }
+            })
+        })
+    }
+    
+    //Remove phone User
+    if (cod == 2){
+        var devices = user.columns.devices
+        log("Removendo o telefone", hwId)
+        var devicesUpdated = devices.filter(function(device){
+            return device.hw != hwId
+        })
+        user.columns.devices = devicesUpdated
+        delete user.badge;
+        log("ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
         pbxTable.forEach(function(conn){
             if(user.src == conn.pbx){
                 user.mt = "ReplicateUpdate"
@@ -760,7 +809,8 @@ function pbxTableRemoveDevice(hwId, user){
 
             }
         })
-    })
+    }
+    
 }
 
 var pbxTable = [];

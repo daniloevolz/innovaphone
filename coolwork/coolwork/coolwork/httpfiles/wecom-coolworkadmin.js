@@ -74,7 +74,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
-        //app.send({ api: "admin", mt: "CheckAppointment" });
+        app.send({ api: "admin", mt: "CheckAppointment" });
         controlDB = false
         UIuser = dn
         avatar = new innovaphone.Avatar(start, user, domain);
@@ -245,128 +245,276 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         var roomInput = document.getElementById("inputRoom");
         divAppointment.add(new innovaphone.ui1.Node("span", "", "HWID PHONE", ""));
         var inputPhone = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
+
+
+
+        
         inputPhone.setAttribute("id", "inputphone").setAttribute("type", "text");
         var phoneInput = document.getElementById("inputphone");
         divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE START", ""));
-        var inputDateStart = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-        inputDateStart.setAttribute("id", "inputDateStart").setAttribute("type", "text");
-        var dateStartInput = document.getElementById("inputDateStart")
-        divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE END", ""));
-        var inputDateEnd = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-        inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
-        var dateEndInput = document.getElementById("inputDateEnd")
+        var dateStart = divAppointment.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "inputDateStart"));
 
+        var dateStartInput = document.getElementById("inputDateStart").value
+        var dateStartISOString = dateStartInput + ":00";
+        var dateStart = new Date(dateStartISOString);
+        if (!isNaN(dateStart.getTime())) {
+            // Formata a data como "YYYY-MM-DD HH:mm"
+            var formattedDateStart = dateStart.toISOString().replace("T", " ").substr(0, 16);
+            console.log(formattedDateStart);
+        } else {
+            console.error("Data inválida");
+        }
+
+        divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE END", ""));
+        var dateEnd = divAppointment.add(new innovaphone.ui1.Input(null, null, null, '1000', 'datetime-local', 'dateinput').setAttribute("id", "inputDateEnd"));
+
+        // var dateEndInput = document.getElementById("inputDateEnd").value;
+        // var dateEnd = new Date(dateEndInput);
+        // var dateEndString = dateEnd.toISOString().replace("T", " ").substr(0, 16);
+        // Supondo que você tenha selecionado uma data e hora usando a entrada datetime-local
+        var dateEndInputValue = document.getElementById("inputDateEnd").value;
+
+        // Adiciona ":00" ao final para criar o formato "YYYY-MM-DDTHH:mm:ss"
+        var dateEndISOString = dateEndInputValue + ":00";
+
+        // Cria um objeto Date
+        var dateEnd = new Date(dateEndISOString);
+
+        // Verifica se a data é válida antes de prosseguir
+        if (!isNaN(dateEnd.getTime())) {
+            // Formata a data como "YYYY-MM-DD HH:mm"
+            var formattedDateEnd = dateEnd.toISOString().replace("T", " ").substr(0, 16);
+            console.log(formattedDateEnd);
+        } else {
+            console.error("Data inválida");
+        }
+    
         colDireita.add(new innovaphone.ui1.Div(null, null, "button")
-    .addText("Código de Provisionamento")
-    .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
+                .addText("Código de Provisionamento")
+                .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
 
 
         var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
-            .addText("Agendamento")
-            .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
+                .addText("Agendamento")
+                .addEvent("click", function () { 
+                    //console.log(dataFormatada);
+                    console.log(dateEndInputValue);
+                    app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: formattedDateStart, dateEnd: formattedDateEnd, device: phoneInput.value, deviceRoom: roomInput.value})},
+                    pcButton));
         var rvButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
-        .addText("Remove Telefone")
-        .addEvent("click", function () { app.send({api: "admin", mt:"ReplicateUpdate"})}, rvButton));
+                .addText("Remove Telefone")
+                .addEvent("click", function () { app.send({api: "admin", mt:"ReplicateUpdate"})}, rvButton));
 
         _colDireita = colDireita;
     }
-    // function tableAppointments(cRight){
-    //     cRight.clear()
-    //     var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
-    //     scrollcontainer.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow")).addEvent("click",function(){  // close 
-    //         //t.rem(listbox)
-    //         //waitConnection(that);
-    //         //controlDB = false
-    //         app.send({api:"admin", mt:"SelectAllRoom"})
-    //         app.send({ api: "admin", mt: "CheckAppointment" });
-    //     });
-    //     var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelRoomName"), null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("periodType"), null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateStart"), null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateEnd"), null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleUser"), null));
-    //     tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelDevice"), null));
+    function tableAppointments(cRight){
+        cRight.clear()
+        var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
+        scrollcontainer.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow")).addEvent("click",function(){  // close 
+            //t.rem(listbox)
+            //waitConnection(that);
+            //controlDB = false
+            app.send({api:"admin", mt:"SelectAllRoom"})
+            app.send({ api: "admin", mt: "CheckAppointment" });
+        });
+        var tableMain = scrollcontainer.add(new innovaphone.ui1.Node("table", null, null, "table").setAttribute("id", "local-table"));
+        tableMain.add(new innovaphone.ui1.Node("th", null, "ID", null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelRoomName"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("periodType"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateStart"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleDateEnd"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelScheduleUser"), null));
+        tableMain.add(new innovaphone.ui1.Node("th", null, texts.text("labelDevice"), null));
 
-    //     console.log("FOREACH TABLE" + JSON.stringify(appointments))
+        console.log("FOREACH TABLE" + JSON.stringify(appointments))
+        
 
+        appointments.forEach(function (table) {
+            var users = list_tableUsers.filter(function (user) {
+                return table.user_guid === user.guid;
+            })[0];
+            console.log("dep" + JSON.stringify(table))
 
-    //     appointments.forEach(function (table) {
-    //         var users = list_tableUsers.filter(function (user) {
-    //             return table.user_guid === user.guid;
-    //         })[0];
-    //         console.log("dep" + JSON.stringify(table))
+            var starDate = table.data_start;
+            var endDate = table.data_end;
+            if (table.data_start) {
+                var dateString = table.data_start;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
+            if (table.data_end) {
+                var dateString = table.data_end;
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            }
 
-    //         var starDate = table.data_start;
-    //         var endDate = table.data_end;
-    //         var now = getDateNow();
+            var roomName = table.name
+            var typeRoom = table.type
 
-    //         var roomName = table.name
-    //         var typeRoom = table.type
+            var html = `
+                        <tr>
+                        <td style="text-transform: capitalize; text-align: center;">${table.id}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${roomName}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${typeRoom}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${formattedDateStart}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${formattedDateEnd}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${users.cn}</td>
+                        <td style="text-transform: capitalize; text-align: center;">${table.device_id}</td>
+                        </tr>
+                    `;
 
-    //         var html = `
-    //                     <tr>
-    //                     <td style="text-transform: capitalize; text-align: center;">${table.id}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${roomName}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${typeRoom}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${starDate}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${endDate}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${users.cn}</td>
-    //                     <td style="text-transform: capitalize; text-align: center;">${table.device_id}</td>
-    //                     </tr>
-    //                 `;
+            document.getElementById("local-table").innerHTML += html;
+            // var userName = users.length > 0 ? users[0].cn : '';
 
-    //         document.getElementById("local-table").innerHTML += html;
-    //         // var userName = users.length > 0 ? users[0].cn : '';
+            // if (post.deleted == null) {
+            //     var postDel = texts.text("labelNo")
+            // } else {
+            //     var dateString = post.deleted;
+            //     var date = new Date(dateString);
+            //     var day = date.getDate();
+            //     var month = date.getMonth() + 1;
+            //     var year = date.getFullYear();
+            //     var hours = date.getHours();
+            //     var minutes = date.getMinutes();
+            //     var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+            //     var postDel = formattedDate
+            // }
+            // //var departDel = depart.deleted == null ? "Não" : formatDate();
+            // if (post.deleted) {
+            //     var statusPost = texts.text("labelPostDeleted");
+            // } else if (starDate > now) {
+            //     var statusPost = texts.text("labelPostFuture");
+            // } else if (endDate < now) {
+            //     var statusPost = texts.text("labelPostExpired");
+            // } else {
+            //     var statusPost = texts.text("labelPostActive");
+            // }
 
-    //         // if (post.deleted == null) {
-    //         //     var postDel = texts.text("labelNo")
-    //         // } else {
-    //         //     var dateString = post.deleted;
-    //         //     var date = new Date(dateString);
-    //         //     var day = date.getDate();
-    //         //     var month = date.getMonth() + 1;
-    //         //     var year = date.getFullYear();
-    //         //     var hours = date.getHours();
-    //         //     var minutes = date.getMinutes();
-    //         //     var formattedDate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-    //         //     var postDel = formattedDate
-    //         // }
-    //         // //var departDel = depart.deleted == null ? "Não" : formatDate();
-    //         // if (post.deleted) {
-    //         //     var statusPost = texts.text("labelPostDeleted");
-    //         // } else if (starDate > now) {
-    //         //     var statusPost = texts.text("labelPostFuture");
-    //         // } else if (endDate < now) {
-    //         //     var statusPost = texts.text("labelPostExpired");
-    //         // } else {
-    //         //     var statusPost = texts.text("labelPostActive");
-    //         // }
-    //         // if (post.date_start) {
-    //         //     var dateString = post.date_start;
-    //         //     var date = new Date(dateString);
-    //         //     var day = date.getDate();
-    //         //     var month = date.getMonth() + 1;
-    //         //     var year = date.getFullYear();
-    //         //     var hours = date.getHours();
-    //         //     var minutes = date.getMinutes();
-    //         //     var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-    //         // }
-    //         // if (post.date_end) {
-    //         //     var dateString = post.date_end;
-    //         //     var date = new Date(dateString);
-    //         //     var day = date.getDate();
-    //         //     var month = date.getMonth() + 1;
-    //         //     var year = date.getFullYear();
-    //         //     var hours = date.getHours();
-    //         //     var minutes = date.getMinutes();
-    //         //     var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-    //         // }
-    //     });
+        });
   
-    // }
+    }
 
+    function makeDivCreateRoom(t){
+        t.clear();
+        filesID = [];  // para não excluir os arquivos corretos da DB files ; 
+        console.log("FILES ID "  + filesID)
+        //var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
+    
+        var leftbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
+    
+        leftbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"));
+    
+        var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
+        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
+        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
+        topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
+
+        divinputs = leftbox.add(new innovaphone.ui1.Div(null, null, "divInputs"));
+        var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral"));
+        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
+        divGeral.add(new innovaphone.ui1.Input(null, null, null, 100, "text", "iptRoomName").setAttribute("id", "iptRoomName"));
+        input = divGeral.add(new innovaphone.ui1.Node("input", null, "", ""));
+        input.setAttribute("id", "fileinput").setAttribute("type", "file");
+        input.setAttribute("accept", "image/*");
+        input.container.addEventListener('change', onSelectFile, false);
+
+        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelTypeRoom"), null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectType"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("recurrentType"),null).setAttribute("id","recurrentType"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodType"),null).setAttribute("id","periodType"))
+        
+        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelModuleRoom"), null))
+        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("hourModule"),null).setAttribute("id","hourModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("dayModule"),null).setAttribute("id","dayModule"))
+        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodModule"),null).setAttribute("id","periodModule"))
+
+        // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+        imgBD = divGeral.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","imgBD"))
+        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
+
+        var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
+        var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
+        var userTable = createUsersDepartmentsGrid();
+        rightDiv.add(userTable)
+        
+        var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+        //var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
+        //var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
+        //var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
+        //var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
+        //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
+        //divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+
+        var divGeral = document.getElementById("div-geral");
+        var divUsers = document.getElementById("div-users");
+        var divSchedule = document.getElementById("div-schedule");
+
+        document.getElementById("list-geral").addEventListener("click", function () {
+        
+            divGeral.style.display = "flex";
+            divUsers.style.display = "none";
+            divSchedule.style.display = "none";
+        });
+
+        document.getElementById("list-users").addEventListener("click", function () {
+            
+            divGeral.style.display = "none";
+            divUsers.style.display = "flex";
+            divSchedule.style.display = "none";
+        });
+
+        var a = document.getElementById("list-schedule");
+        a.addEventListener("click", function () {
+            divGeral.style.display = "none";
+            divUsers.style.display = "none";
+            divSchedule.style.display = "block";
+    
+            var selectType = document.getElementById("selectType");
+            var optType = selectType.options[selectType.selectedIndex].id;
+            // set checkbox conforme oq for selecionado
+            makeSchedule(divScheduleInn, optType);
+        });
+
+        
+        // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
+        //     filesID = [];                      // setTimeout muito coisa de Junior 
+        //     filesID = "vazio";   
+        // },2000)
+        document.getElementById("closewindow").addEventListener("click",function(){
+            // console.log("FILES ID "  + filesID)
+            // if(filesID ){                                      
+            //     console.log("FILES ID "  + filesID)
+            //    deleteFile(filesID)
+            // }
+            setTimeout(function () {
+                //insideDiv.clear()
+                //t.rem(insideDiv)
+                //controlDB = false // controle da DB files
+            
+                //app.send({ api: "admin", mt: "SelectAllRoom" })
+            },500) // arrumar para carregar isso apos o termino da requisição 
+            leftbox.clear()
+            t.rem(leftbox)
+            controlDB = false // controle da DB files
+
+            app.send({ api: "admin", mt: "SelectAllRoom" })
+            waitConnection(that);
+        })
+    
+
+
+    }
     function formatDate(inputDate) {
         const date = new Date(inputDate);
     
@@ -394,7 +542,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
     
             divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
-            var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; ", null, null).setAttribute("id", "div-geral")); 
+            var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
             divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
             var divPhones = divGeral.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
@@ -408,8 +556,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     var userPicture = avatar.url(dev.sip ,80)
                     var html = `<div style = "top: ${dev.topoffset + "px"}; left: ${dev.leftoffset + "px"}; position:absolute;" class="StatusPhone${dev.online} phoneButtons" id="${dev.hwid}">
                     <div class="user-info">
-                        <img class="imgProfile" src="${userPicture}">
-                        <div class="user-name">${dev.cn}</div>
+                        <img class="imgProfile" src="../images/IP112-Innovaphone.png">
+                    
                     </div>
                     <div class="product-name">${dev.product}</div>
                      </div>    `
@@ -1362,117 +1510,117 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             return usersListDiv;
         }
 
-    function makeDivCreateRoom(t){
-        t.clear();
-        filesID = [];  // para não excluir os arquivos corretos da DB files ; 
-        console.log("FILES ID "  + filesID)
-        //var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
+    // function makeDivCreateRoom(t){
+    //     t.clear();
+    //     filesID = [];  // para não excluir os arquivos corretos da DB files ; 
+    //     console.log("FILES ID "  + filesID)
+    //     //var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
     
-        var leftbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
+    //     var leftbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
     
-        leftbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"));
+    //     leftbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"));
     
-        var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
-        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
-        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
-        topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
+    //     var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
 
-        divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
-        var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; flex-direction: column; ", null, null).setAttribute("id", "div-geral"));
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
-        divGeral.add(new innovaphone.ui1.Input("height: 13.5px; width: 130px; margin-right:100px; margin-left:10px;", null, null, 100, "text", null).setAttribute("id", "iptRoomName"));
-        input = divGeral.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
-        input.setAttribute("id", "fileinput").setAttribute("type", "file");
-        input.setAttribute("accept", "image/*");
-        input.container.addEventListener('change', onSelectFile, false);
+    //     divinputs = leftbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
+    //     var divGeral = divinputs.add(new innovaphone.ui1.Div("position: absolute; width:100%;height:100%; display: flex; flex-direction: column; ", null, null).setAttribute("id", "div-geral"));
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
+    //     divGeral.add(new innovaphone.ui1.Input("height: 13.5px; width: 130px; margin-right:100px; margin-left:10px;", null, null, 100, "text", null).setAttribute("id", "iptRoomName"));
+    //     input = divGeral.add(new innovaphone.ui1.Node("input", "height:25px;", "", ""));
+    //     input.setAttribute("id", "fileinput").setAttribute("type", "file");
+    //     input.setAttribute("accept", "image/*");
+    //     input.container.addEventListener('change', onSelectFile, false);
 
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelTypeRoom"), null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectType"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("recurrentType"),null).setAttribute("id","recurrentType"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodType"),null).setAttribute("id","periodType"))
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelTypeRoom"), null))
+    //     var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectType"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("recurrentType"),null).setAttribute("id","recurrentType"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodType"),null).setAttribute("id","periodType"))
         
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelModuleRoom"), null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("hourModule"),null).setAttribute("id","hourModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("dayModule"),null).setAttribute("id","dayModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodModule"),null).setAttribute("id","periodModule"))
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelModuleRoom"), null))
+    //     var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select","height:50px; width: 100px;",null,null).setAttribute("id","selectModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("hourModule"),null).setAttribute("id","hourModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("dayModule"),null).setAttribute("id","dayModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodModule"),null).setAttribute("id","periodModule"))
 
-        // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:47%; display: flex;align-items: center; justify-content: center; top: 50%;",null,null).setAttribute("id","imgBD"))
-        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
+    //     // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+    //     imgBD = divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 90%; height:47%; display: flex;align-items: center; justify-content: center; top: 50%;",null,null).setAttribute("id","imgBD"))
+    //     app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
 
-        var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
-        var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
-        var userTable = createUsersDepartmentsGrid();
-        rightDiv.add(userTable)
+    //     var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
+    //     var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
+    //     var userTable = createUsersDepartmentsGrid();
+    //     rightDiv.add(userTable)
         
-        var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
-        //var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
-        //var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
-        //var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
-        //var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
-        //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
-        //divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+    //     var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+    //     //var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
+    //     //var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
+    //     //var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
+    //     //var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
+    //     //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
+    //     //divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
 
-        var divGeral = document.getElementById("div-geral");
-        var divUsers = document.getElementById("div-users");
-        var divSchedule = document.getElementById("div-schedule");
+    //     var divGeral = document.getElementById("div-geral");
+    //     var divUsers = document.getElementById("div-users");
+    //     var divSchedule = document.getElementById("div-schedule");
 
-        document.getElementById("list-geral").addEventListener("click", function () {
+    //     document.getElementById("list-geral").addEventListener("click", function () {
         
-            divGeral.style.display = "flex";
-            divUsers.style.display = "none";
-            divSchedule.style.display = "none";
-        });
+    //         divGeral.style.display = "flex";
+    //         divUsers.style.display = "none";
+    //         divSchedule.style.display = "none";
+    //     });
 
-        document.getElementById("list-users").addEventListener("click", function () {
+    //     document.getElementById("list-users").addEventListener("click", function () {
             
-            divGeral.style.display = "none";
-            divUsers.style.display = "flex";
-            divSchedule.style.display = "none";
-        });
+    //         divGeral.style.display = "none";
+    //         divUsers.style.display = "flex";
+    //         divSchedule.style.display = "none";
+    //     });
 
-        var a = document.getElementById("list-schedule");
-        a.addEventListener("click", function () {
-            divGeral.style.display = "none";
-            divUsers.style.display = "none";
-            divSchedule.style.display = "block";
+    //     var a = document.getElementById("list-schedule");
+    //     a.addEventListener("click", function () {
+    //         divGeral.style.display = "none";
+    //         divUsers.style.display = "none";
+    //         divSchedule.style.display = "block";
     
-            var selectType = document.getElementById("selectType");
-            var optType = selectType.options[selectType.selectedIndex].id;
-            // set checkbox conforme oq for selecionado
-            makeSchedule(divScheduleInn, optType);
-        });
+    //         var selectType = document.getElementById("selectType");
+    //         var optType = selectType.options[selectType.selectedIndex].id;
+    //         // set checkbox conforme oq for selecionado
+    //         makeSchedule(divScheduleInn, optType);
+    //     });
 
         
-        // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
-        //     filesID = [];                      // setTimeout muito coisa de Junior 
-        //     filesID = "vazio";   
-        // },2000)
-        document.getElementById("closewindow").addEventListener("click",function(){
-            // console.log("FILES ID "  + filesID)
-            // if(filesID ){                                      
-            //     console.log("FILES ID "  + filesID)
-            //    deleteFile(filesID)
-            // }
-            setTimeout(function () {
-                //insideDiv.clear()
-                //t.rem(insideDiv)
-                //controlDB = false // controle da DB files
+    //     // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
+    //     //     filesID = [];                      // setTimeout muito coisa de Junior 
+    //     //     filesID = "vazio";   
+    //     // },2000)
+    //     document.getElementById("closewindow").addEventListener("click",function(){
+    //         // console.log("FILES ID "  + filesID)
+    //         // if(filesID ){                                      
+    //         //     console.log("FILES ID "  + filesID)
+    //         //    deleteFile(filesID)
+    //         // }
+    //         setTimeout(function () {
+    //             //insideDiv.clear()
+    //             //t.rem(insideDiv)
+    //             //controlDB = false // controle da DB files
             
-                //app.send({ api: "admin", mt: "SelectAllRoom" })
-            },500) // arrumar para carregar isso apos o termino da requisição 
-            leftbox.clear()
-            t.rem(leftbox)
-            controlDB = false // controle da DB files
+    //             //app.send({ api: "admin", mt: "SelectAllRoom" })
+    //         },500) // arrumar para carregar isso apos o termino da requisição 
+    //         leftbox.clear()
+    //         t.rem(leftbox)
+    //         controlDB = false // controle da DB files
 
-            app.send({ api: "admin", mt: "SelectAllRoom" })
-            waitConnection(that);
-        })
+    //         app.send({ api: "admin", mt: "SelectAllRoom" })
+    //         waitConnection(that);
+    //     })
     
 
 
-    }
+    // }
     function createUsersDepartmentsGrid() {
         var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist")
 
