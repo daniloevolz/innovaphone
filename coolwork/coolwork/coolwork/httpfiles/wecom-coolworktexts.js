@@ -41,6 +41,8 @@ Wecom.coolworkTexts = {
         labelScheduleDateEnd: "Final do Agendamento",
         labelScheduleUser: "Usuário",
         labelDevice: "Telefone",
-        labelDayWeek: "Dia da semana"
+        labelDayWeek: "Dia da semana",
+        labelScheduleModule: "Modelo de Agendamento",
+        
     }
 }
