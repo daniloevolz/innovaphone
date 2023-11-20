@@ -329,6 +329,12 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "SetPresence") {
                 handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
+            if (obj.mt == "GetPhone") {
+                var cod = 1
+                var hwId = conn.hw
+                var user = conn.sip
+                pbxTableUpdateDevice(cod, hwId, user)
+            };
             if (obj.mt == "InsertAppointment"){
                 // var cod = 2
                 // var hwId = "0090334c66da"
@@ -612,7 +618,7 @@ function getDateNow() {
     var dateString = date.toISOString();
 
     // Substitui o caractere "T" por um espaço
-    dateString = dateString.replace("T", " ");
+    //dateString = dateString.replace("T", " ");
 
     // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
     return dateString.slice(0, -8);
