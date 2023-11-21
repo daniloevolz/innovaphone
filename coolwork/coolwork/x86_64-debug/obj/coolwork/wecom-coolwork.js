@@ -116,7 +116,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         var colDireita = t.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
         colDireita.setAttribute("id", "coldireita")
 
-
         var divList = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
         var imglogo = divList.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
         var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
@@ -179,17 +178,27 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"))
         listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", room.name))
 
-        var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
+        var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; top: 2%; justify-content: space-evenly;", null, null))
 
         schedules.forEach(function (schedule) {    // revisar isso na segunda 30/10
-            divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + formatDate(schedule.schedule_module), null))
-            divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + formatDate(schedule.type), null))
+            if(schedule.schedule_module == "periodModule"){
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("periodModule"), null))
+            }else if(schedule.schedule_module == "dayModule"){
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("dayModule"), null))
+            }else{
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("hourModule"), null))
+            }
+            if(schedule.type == "periodType"){
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("periodType"), null))
+            }else{
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("recurrentType"), null))
+            }
             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateStart") + formatDate(schedule.data_start), null))
             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateEnd") + formatDate(schedule.data_end), null))
         })
 
-        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
-        var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
+        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:40%;left: 2%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
+        var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
         imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
 
         if (devices.length > 0) {
@@ -238,23 +247,23 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     }
     function makeDivPhoneProprieties(t, room, schedules, device, dev_schedules) {
-        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
-        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
-        listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
-        listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", device.product))
+        // var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
+        // var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
+        // listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
+        // listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:0%; text-align:center", device.product))
 
-        var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
-        document.getElementById("closeDevWindow").addEventListener("click", function () {  // close 
-            t.rem(insideDiv);
+        // var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
+        // document.getElementById("closeDevWindow").addEventListener("click", function () {  // close 
+        //     t.rem(insideDiv);
 
-        })
+        // })
         //var divSchedule = listbox.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:block").setAttribute("id", "div-schedule"))
         //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
-        listbox.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
+        // listbox.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
             // var id = $.urlParam('id');
-            $('#calendar').fullCalendar({
+            $('#proprietiesDiv').fullCalendar({
 
                 header: {
                     left: 'today',
@@ -308,8 +317,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             if (s.type == "periodType") {
                                 if (clickedDate >= s.data_start.split(" ")[0] && clickedDate <= s.data_end.split(" ")[0]) {
                                     if (s.schedule_module == "hourModule") {
-                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                        $('#calendar').fullCalendar('gotoDate', start);
+                                        $('#proprietiesDiv').fullCalendar('changeView', 'agendaDay');
+                                        $('#proprietiesDiv').fullCalendar('gotoDate', start);
                                     } else if (s.schedule_module == "dayModule") {
                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
@@ -325,7 +334,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 }
                             }
                         })
-                        $('#calendar').fullCalendar('unselect');
+                        $('#proprietiesDiv').fullCalendar('unselect');
                     }
                     else if (view.name === 'agendaWeek') {
                         console.log("View: " + "Week");
