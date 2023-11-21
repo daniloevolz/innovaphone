@@ -378,6 +378,7 @@ td {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    padding: 5px 0 5px 0;
 }
 .scroll-container{
     position: absolute;

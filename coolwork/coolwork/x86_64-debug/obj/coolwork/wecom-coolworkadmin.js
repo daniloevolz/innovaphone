@@ -751,10 +751,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     })
     }
     
-
-
-
-
     function clickedPhone(id, colDireita){
         console.log("Clicked Phone", id)
         var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, id, "phoneinfo").setAttribute("id", id))
@@ -797,33 +793,58 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                             ]
                     }
         }
+        //var selectUser = document.getElementById("select-users")
+        var selectType = document.getElementById("select-users");
+
+        var userSelect;
+
+        selectType.addEventListener("change", function(){
+            var optType = selectType.options[selectType.selectedIndex].value;
+            console.log("OPT-TYPE ", optType);
+            userSelect = list_tableUsers.filter(function(list_tableUser){
+                console.log("OPT FILTER ", optType);
+                return list_tableUser.cn == optType;
+            })[0]
+            console.log("USER SELECTED", userSelect);
+        
+
+        });
+        var removeUserOnPhone = listDeviceRoom.filter(function(room){
+            
+            return room.hwid == id
+        })[0];
+
+        console.log("Remove this user on PHONE", removeUserOnPhone)
+
         var setUserBtt = phoneInfo.add(new innovaphone.ui1.Div(null, null, "button")
                 .addText("Assumir Telefone")
-                .addEvent("click", function () {        
-                    var selectUser = document.getElementById("select-users")
+                .addEvent("click", function () {    
 
-                    selectUser.addEventListener("change", function(){
-                        var selectValue = selectUser.value
-                        console.log(selectValue)
-                        var userSelect = list_tableUsers.filter(function(user){
-                                return user.cn === selectValue
-                            })
-                        console.log(userSelect)
-                    })
-                    
                     var getPhone = {
                         api: "admin",
                         mt: "GetPhone",
-                        hwId: user.hw,
-                        user: user.sip
+                        hwId: id,
+                        user: userSelect.guid
                     }
+
                     console.log("GETPHONE:",JSON.stringify(getPhone))
-                    //app.send(getPhone)
+                    app.send(getPhone)
                 }, setUserBtt));
+
+                
 
         var rvButton = phoneInfo.add(new innovaphone.ui1.Div(null, null, "button")
                 .addText("Remover Usuário")
-                .addEvent("click", function () { app.send(user)}, rvButton));
+                .addEvent("click", function () { 
+                    var removeUser={
+                        api: "admin",
+                        mt: "RemoveUserPhone",
+                        hwId: id,
+                        user: removeUserOnPhone.guid
+                    }
+                    console.log("Remove USER JSON:",JSON.stringify(removeUser))
+                    app.send(removeUser)
+                    }, rvButton));
     }
 
 
@@ -1503,81 +1524,81 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             return totalHours;
     }
     
-        function countTotalHoursBusy(dataString, array) {
-            var targetDate = moment(dataString);
-            var count = 0;
+    function countTotalHoursBusy(dataString, array) {
+        var targetDate = moment(dataString);
+        var count = 0;
+        
+        array.forEach(function(obj) {
+            var start = moment(obj.time_start);
             
-            array.forEach(function(obj) {
-                var start = moment(obj.time_start);
-                
-                if (targetDate.isSame(start, 'day')) {
-                count++;
+            if (targetDate.isSame(start, 'day')) {
+            count++;
+            }
+        });
+        
+        return count;
+    }
+    function editUsersDepartmentsGrid() {
+        var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
+
+        var table = usersListDiv.add(new innovaphone.ui1.Node("table", null, null, "table"));
+
+        var headerRow = table.add(new innovaphone.ui1.Node("tr", null, null, "row"));
+
+        var nameCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelUser"), "column"));
+
+        var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"));
+
+        var viewerCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"));
+
+    
+        list_tableUsers.forEach(function (user) {
+            var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
+
+                var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            
+            var userV = list_viewers.filter(function (item) {
+                return item.viewer_guid === user.guid;
+            })[0];
+            var userE = list_editors.filter(function (item) {
+                return item.editor_guid === user.guid;
+            })[0];
+
+            console.log("Filtro Visualizador:", userV);
+            console.log("Filtro Editor:", userE);
+                var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+
+                var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            
+
+                var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+                viewerCheckbox.setAttribute("name", "viewerDepartments");
+                viewerCheckbox.setAttribute("value", user.guid);
+
+                var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+                editorCheckbox.setAttribute("name", "editorDepartments");
+                editorCheckbox.setAttribute("value", user.guid);
+
+            editorCheckbox.addEvent('click', function () {
+                var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                viewerCheckbox.checked = true
+
+            });
+            setTimeout(function () {
+                if (userV) {
+                    var viewCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                    viewCheckbox.checked = true;
                 }
-            });
-            
-            return count;
-        }
-        function editUsersDepartmentsGrid() {
-            var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
-    
-            var table = usersListDiv.add(new innovaphone.ui1.Node("table", null, null, "table"));
-    
-            var headerRow = table.add(new innovaphone.ui1.Node("tr", null, null, "row"));
-    
-            var nameCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelUser"), "column"));
-    
-            var editorCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelEditor"), "column"));
-    
-            var viewerCol = headerRow.add(new innovaphone.ui1.Node("th", null, texts.text("labelViewer"), "column"));
-    
-       
-            list_tableUsers.forEach(function (user) {
-                var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
-    
-                 var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
-                
-                var userV = list_viewers.filter(function (item) {
-                    return item.viewer_guid === user.guid;
-                })[0];
-                var userE = list_editors.filter(function (item) {
-                    return item.editor_guid === user.guid;
-                })[0];
-    
-                console.log("Filtro Visualizador:", userV);
-                console.log("Filtro Editor:", userE);
-                 var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
-    
-                 var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
-                
-    
-                 var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
-                 viewerCheckbox.setAttribute("name", "viewerDepartments");
-                 viewerCheckbox.setAttribute("value", user.guid);
-    
-                 var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
-                 editorCheckbox.setAttribute("name", "editorDepartments");
-                 editorCheckbox.setAttribute("value", user.guid);
-    
-                editorCheckbox.addEvent('click', function () {
-                    var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-                    viewerCheckbox.checked = true
-    
-                });
-                setTimeout(function () {
-                    if (userV) {
-                        var viewCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-                        viewCheckbox.checked = true;
-                    }
-                    if (userE) {
-                        var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
-                        editCheckbox.checked = true;
-                    }
-                }, 500)
-    
-            });
-            //usersListDiv.appendChild(table);
-            return usersListDiv;
-        }
+                if (userE) {
+                    var editCheckbox = document.getElementById("editcheckbox_" + user.guid);
+                    editCheckbox.checked = true;
+                }
+            }, 500)
+
+        });
+        //usersListDiv.appendChild(table);
+        return usersListDiv;
+    }
 
     // function makeDivCreateRoom(t){
     //     t.clear();

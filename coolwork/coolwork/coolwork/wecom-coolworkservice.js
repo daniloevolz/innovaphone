@@ -330,10 +330,23 @@ new JsonApi("admin").onconnected(function(conn) {
                 handleSetPresenceMessage(conn.sip, obj.note, obj.activity)
             };
             if (obj.mt == "GetPhone") {
-                var cod = 1
-                var hwId = conn.hw
-                var user = conn.sip
-                pbxTableUpdateDevice(cod, hwId, user)
+                log("GET PHONES",JSON.stringify(obj))
+                
+                var user = pbxTableUsers.filter(function(u){
+                        
+                    return u.columns.guid == obj.user
+                })[0];
+
+                pbxTableUpdateDevice("1", obj.hwId, user)
+            };
+            if (obj.mt == "RemoveUserPhone") {
+               
+                var user = pbxTableUsers.filter(function(p){
+                        
+                    return p.columns.guid == obj.user
+                })[0];
+                log("SENT REMOVE", obj.hwId, user )
+                pbxTableUpdateDevice("2", obj.hwId, user)
             };
             if (obj.mt == "InsertAppointment"){
                 // var cod = 2
@@ -800,7 +813,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
     //Remove phone User
     if (cod == 2){
         var devices = user.columns.devices
-        log("Removendo o telefone", hwId)
+        log("Removendo do telefone", hwId)
         var devicesUpdated = devices.filter(function(device){
             return device.hw != hwId
         })
