@@ -304,6 +304,16 @@ new JsonApi("user").onconnected(function(conn) {
                     });
 
             }
+            if (obj.mt == "makePhoneSchedule") {
+                Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.data_start + "','" + obj.data_end + "','" + obj.device + "'," + obj.room + ",'" + conn.guid + "')")
+                .oncomplete(function (data) {
+                    //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
+                conn.send(JSON.stringify({ api: "user", mt: "PhoneScheduleSuccess", result: JSON.stringify(data) }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                        log("PhoneScheduleError:result=Error " + String(errorText));
+                });
+            }
 
         })
     }

@@ -42,12 +42,8 @@ Wecom.coolworkTexts = {
         labelScheduleUser: "Usuário",
         labelDevice: "Telefone",
         labelDayWeek: "Dia da semana",
-<<<<<<< Updated upstream
         labelScheduleModule: "Modelo de Agendamento",
+        makePhoneSceduleButton: "Agendar"
         
-=======
-        makePhoneSceduleLabel: "Agendar!",
-        whenLabel:"Agendamento solicitado para"
->>>>>>> Stashed changes
     }
 }
