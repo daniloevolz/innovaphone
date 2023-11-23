@@ -345,7 +345,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         
                     return p.columns.guid == obj.user
                 })[0];
-                log("SENT REMOVE", obj.hwId, user )
+                log("SEND REMOVE", JSON.stringify(obj.hwId), JSON.stringify(user) )
                 pbxTableUpdateDevice("2", obj.hwId, user)
             };
             if (obj.mt == "InsertAppointment"){

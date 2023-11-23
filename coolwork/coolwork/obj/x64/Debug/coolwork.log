@@ -3,11 +3,7 @@
       Project output dirctory : x86_64-debug/coolwork
       Temp directory          : x86_64-debug\obj\coolwork
       Runtime binary          : jse/x86_64/generic
-<<<<<<< HEAD
-      Build Number            : 13C197
-=======
-      Build Number            : 13C181
->>>>>>> 9fa41babf9e0922e26cbc39c4f605edcd0c7f43e
+      Build Number            : 13C29
   
   Removing old files from x86_64-debug\obj\coolwork...
   Creating directories...

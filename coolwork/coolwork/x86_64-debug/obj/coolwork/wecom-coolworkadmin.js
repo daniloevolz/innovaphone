@@ -543,9 +543,9 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                 // Adicionando evento de clique a todos os elementos com a classe 'phoneButtons'
                 var elements = document.querySelectorAll('.phoneButtons');
                 elements.forEach(function (element) {
-                    element.addEventListener("click", function () {
+                    element.addEventListener("click", function (e) {
                         var clickedId = this.id;
-                        clickedPhone(clickedId, _colDireita);
+                        clickedPhone(clickedId, _colDireita, e);
                         app.send({ api: "admin", mt: "TableUsers" });
                     });
                 });
@@ -751,11 +751,43 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     })
     }
     
-    function clickedPhone(id, colDireita){
+    function clickedPhone(id, colDireita, e){
         console.log("Clicked Phone", id)
-        var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, id, "phoneinfo").setAttribute("id", id))
-        //var leftbox = colDireita.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
-    
+        var x = e.clientX;
+        var y = e.clientY;
+        var windWidth = window.innerWidth;
+        var windHeight = window.innerHeight;
+        var divWidth = 250;
+        var divHeight = 200;
+        
+        // Verificando se a div ultrapassa os limites da janela
+        if (x + divWidth > windWidth) {
+            x = windWidth - divWidth; // reposiciona no lado oposto
+        }
+        if (y + divHeight > windHeight) {
+            y = windHeight - divHeight; // reposiciona no lado oposto
+        }
+        var wallblock = colDireita.add(new innovaphone.ui1.Node('div', null, null, "wallblock").setAttribute("id", "wallblock")
+                .addEvent("click", function(){
+                    var elements = document.getElementsByClassName("list-box");
+
+                    for (var i = 0; i < elements.length; i++) {
+                        var id = elements[i].id;
+                        console.log("ID da div:", id);
+                        // Aqui você pode fazer algo com o ID, como armazená-lo em uma variável ou realizar alguma ação com base nele
+                    }
+            
+                    app.send({ api: "admin", mt: "SelectRoom", id: id });
+                }))
+        var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, id, "phoneinfo").setAttribute("id", id));
+        
+
+        phoneInfo.setStyle("left", x + "px");
+        phoneInfo.setStyle("top", y + "px");
+        phoneInfo.setStyle("width", divWidth + "px");
+        phoneInfo.setStyle("height", divHeight + "px");
+        
+
         phoneInfo.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "clsLittleWindow"))
         var lists = phoneInfo.add(new innovaphone.ui1.Node('div', null, null, "list-info").setAttribute("id", "list-info"))
         var select_list = lists.add(new innovaphone.ui1.Node('select', null, null, null).setAttribute("id", "select-users"))
@@ -846,11 +878,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     app.send(removeUser)
                     }, rvButton));
     }
-
-
-
-
-
 
 
     // continuar na quinta 
