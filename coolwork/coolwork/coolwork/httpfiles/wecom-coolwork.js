@@ -15,6 +15,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var devicesApi;
     var list_MyRooms = [];
     var _colDireita;
+    var schedules = []
 
     
     var colorSchemes = {
@@ -99,7 +100,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         if (obj.api === "user" && obj.mt === "SelectRoomResult") {
             var room = JSON.parse(obj.room);
-            var schedules = JSON.parse(obj.schedules);
+            schedules = JSON.parse(obj.schedules);
             var devices = obj.dev;
             makeDivRoom(_colDireita, room, schedules, devices);
         }
@@ -190,14 +191,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             }
             if(schedule.type == "periodType"){
                 divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("periodType"), null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateStart") + formatDate(schedule.data_start), null))
+                divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateEnd") + formatDate(schedule.data_end), null))
             }else{
                 divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("recurrentType"), null))
             }
-            divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateStart") + formatDate(schedule.data_start), null))
-            divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateEnd") + formatDate(schedule.data_end), null))
         })
 
-        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:40%;left: 2%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
+        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 2%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
         var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
         imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
 
@@ -237,7 +238,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
                         console.log(JSON.stringify(resultMsg.schedules))
-                        makeDivPhoneProprieties(t, room, schedules, d, resultMsg.schedules)
+                        makeDivPhoneProprieties(proprietiesDiv, room, schedules, d, resultMsg.schedules)
                     }
                 );
 
@@ -527,7 +528,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         dateEnd = "";
                         dateEnd = new Date(end);
                         console.log("data de término " + formatDate(dateEnd.toISOString()))
-                        makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
+                        makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, schedules, start);
 
 
                     }
@@ -576,8 +577,22 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
 
     function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start) {
-        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
-        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
+        var start;
+        var end;
+
+        schedules.forEach(function(s){
+            switch (s.schedule_module) {
+                case "dayModule":
+                    start = start + "" + s.time_start // ajustar
+                    end = start +" "+ s.
+                    return
+                case "hourModule":
+                    return
+            }
+        })
+
+        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
+        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
         listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
             t.rem(insideDiv);
 
@@ -585,23 +600,17 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
         listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
         listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
-        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + formatDate(start)))
-        var start;
-        var end;
-        switch (s.schedule_module) {
-            case "dayModule":
-                start = start + "" + s.time_start
-                end = start +" "+ s.
-                return
-            case "hourModule":
-                return
-        }
+        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
 
-        listbox.add(new innovaphone.ui1.Div(null, null, "button").addTranslation(texts, "makePhoneSceduleButton").addEvent("click", function () {
+        listbox.add(new innovaphone.ui1.Div("width:50px; height: 50px; color: black; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
             app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
 
             });
         }))
+
+
+
+  
     }
     //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {

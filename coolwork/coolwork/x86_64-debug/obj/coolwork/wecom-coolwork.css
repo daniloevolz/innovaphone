@@ -323,19 +323,29 @@ td {
     color: white;
     opacity: 0.9;
 }
-.insideDiv {
+.insideDivConfirm {
     margin: auto;
     width: 100%;
     position: absolute;
     /* font-size: 0px; */
     /* top: 10%; */
     z-index: 4000;
+    top: 0%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     background-color: rgba(85, 151, 226, 0.548);
     /* opacity: 0.2; */
+}
+.confirmDiv{
+    left: 0%;
+    width: 100%;
+    padding: 30px;
+    margin: 15px;
+    font-size: 10px;
+    display: block;
+
 }
 .newroom{
     min-width: 350px;
