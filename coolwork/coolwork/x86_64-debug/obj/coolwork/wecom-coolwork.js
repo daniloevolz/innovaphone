@@ -679,45 +679,41 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             });
     }
 
-    function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
-        // var start;
-        // var end;
-        console.log("Start para Envio:" + start )
-        console.log("End para Envio:" + end )
-        // schedules.forEach(function(s){
-        //     switch (s.schedule_module) {
-        //         case "dayModule":
-        //             start = start + "" + s.time_start // ajustar
-        //             end = start +" "+ s.
-        //             return
-        //         case "hourModule":
-        //             return
-        //     }
-        // })
-        var today = new Date();
-        var dataHoje = today.toISOString().split('T')[0];
+    function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start) {
+        var start;
+        var end;
 
-        if(start < dataHoje){
-            console.log("Escolha uma data maior superior a data de hoje!!!")
-        }else{
-            var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
-            var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
-            listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
-                t.rem(insideDiv);
-    
-            }))
-            listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
-            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
-            listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
-            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
-    
-            listbox.add(new innovaphone.ui1.Div("width:80px; height: 50px; color: white; border-radius: 40px; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
-                app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
-    
-                });
-            }))
-        }
+        schedules.forEach(function(s){
+            switch (s.schedule_module) {
+                case "dayModule":
+                    start = start + "" + s.time_start // ajustar
+                    end = start +" "+ s.
+                    return
+                case "hourModule":
+                    return
+            }
+        })
 
+        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
+        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
+        listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
+            t.rem(insideDiv);
+
+        }))
+        listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
+        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
+        listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
+        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
+
+        listbox.add(new innovaphone.ui1.Div("width:50px; height: 50px; color: black; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
+            app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
+
+            });
+        }))
+
+
+
+  
     }
     //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
