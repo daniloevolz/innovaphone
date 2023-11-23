@@ -104,6 +104,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             var devices = obj.dev;
             makeDivRoom(_colDireita, room, schedules, devices);
         }
+        if(obj.api === "user" && obj.mt === "PhoneScheduleSuccess"){
+            app.send({ api: "user", mt: "SelectMyRooms" })
+        }
     }
 
     //Função para construção da GUI...
@@ -198,7 +201,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             }
         })
 
-        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 2%; justify-content: center;top: 20%;", null, null).setAttribute("id", "proprietiesDiv"))
+        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 2%; justify-content: center;top: 16%;", null, null).setAttribute("id", "proprietiesDiv"))
         var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
         imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
 
@@ -237,7 +240,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 app.sendSrc({ api: "user", mt: "GetDeviceSchedules", room: room.id, dev: id, src: id},
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
-                        console.log(JSON.stringify(resultMsg.schedules))
+                        console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
                         makeDivPhoneProprieties(proprietiesDiv, room, schedules, d, resultMsg.schedules)
                     }
                 );
@@ -248,6 +251,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     }
     function makeDivPhoneProprieties(t, room, schedules, device, dev_schedules) {
+       
         // var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
         // var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
         // listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
@@ -261,356 +265,459 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //var divSchedule = listbox.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:block").setAttribute("id", "div-schedule"))
         //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
         // listbox.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
-        $(document).ready(function () {
-            $.fullCalendar.locale('pt-br');
-            // var id = $.urlParam('id');
-            $('#proprietiesDiv').fullCalendar({
+        var dev_schedulesList = JSON.parse(dev_schedules)
 
-                header: {
-                    left: 'today',
-                    center: 'title , month,agendaDay', //agendaWeek,
-                    right: 'prev,next'
-                },
-                buttonText: {
-                    today: 'Hoje',
-                    month: 'Mês',
-                    week: 'Semana',
-                    day: 'Dia'
-                },
-                monthNames: [
-                    'Janeiro',
-                    'Fevereiro',
-                    'Março',
-                    'Abril',
-                    'Maio',
-                    'Junho',
-                    'Julho',
-                    'Agosto',
-                    'Setembro',
-                    'Outubro',
-                    'Novembro',
-                    'Dezembro'
-                ],
-                defaultView: 'month',
-                slotDuration: '01:00:00',
-                minTime: '00:00:00',
-                maxTime: '24:00:00',
-                selectable: true,
-                selectLongPressDelay: 0,
-
-                selectHelper: true,
-                select: function (start, end, jsEvent, view) {
-                    var selectstart = start.format('YYYY-MM-DD[ ]HH:mm:ss');
-                    var selectend = end.format('YYYY-MM-DD[ ]HH:mm:ss');
-                    var dayOfWeek = start.format('dddd');
-
-                    if (view.name === 'month') {
-                        console.log("View: Month");
-                        var clickedElement = jsEvent.target
-
-                        console.log(" Elemento clicado " + clickedElement);
-                        var clickedDate = start.format('YYYY-MM-DD');
-                        console.log("Data do elemento clicado:", clickedDate);
-
-                        schedules.forEach(function (s) {
-                            if (s.type == "recurrentType") {
-                                //var dayOfWeek = findDayOfWeek(clickedElement.classList)
-                                switch (dayOfWeek) {
-                                    case "segunda-feira":
-                                        if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
-                                            var start = moment(s.timestart_monday);
-                                            var end = moment(s.timeend_monday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(listtbox, room);
-
+            $(document).ready(function () {
+                $.fullCalendar.locale('pt-br');
+                // var id = $.urlParam('id');
+                $('#proprietiesDiv').fullCalendar('destroy'); // recriar o calendario quando clicar em outro fone 
+                $('#proprietiesDiv').fullCalendar({
+    
+                    header: {
+                        left: 'today',
+                        center: 'title , month,agendaDay', //agendaWeek,
+                        right: 'prev,next'
+                    },
+                    buttonText: {
+                        today: 'Hoje',
+                        month: 'Mês',
+                        week: 'Semana',
+                        day: 'Dia'
+                    },
+                    monthNames: [
+                        'Janeiro',
+                        'Fevereiro',
+                        'Março',
+                        'Abril',
+                        'Maio',
+                        'Junho',
+                        'Julho',
+                        'Agosto',
+                        'Setembro',
+                        'Outubro',
+                        'Novembro',
+                        'Dezembro'
+                    ],
+                    defaultView: 'month',
+                    slotDuration: '01:00:00',
+                    minTime: '00:00:00',
+                    maxTime: '24:00:00',
+                    selectable: true,
+                    selectLongPressDelay: 0,
+    
+                    selectHelper: true,
+                    select: function (start, end, jsEvent, view) {
+                        var selectstart = start.format('YYYY-MM-DD[ ]HH:mm:ss');
+                        var selectend = end.format('YYYY-MM-DD[ ]HH:mm:ss');
+                        var dayOfWeek = start.format('dddd');
+    
+                        if (view.name === 'month') {
+                            console.log("View: Month");
+                            var clickedElement = jsEvent.target
+    
+                            console.log(" Elemento clicado " + clickedElement);
+                            // var clickedDate = start.format('YYYY-MM-DD');
+                            // console.log("Data do elemento clicado:", clickedDate);
+    
+                            var clickedDateStart = start.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateStart);
+    
+                            var clickedDateEnd = end.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateEnd);
+    
+                            schedules.forEach(function (s) {
+                                if (s.type == "recurrentType") {
+                                    //var dayOfWeek = findDayOfWeek(clickedElement.classList)
+                                    switch (dayOfWeek) {
+                                        case "segunda-feira":
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+                                            if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
+                                                var start = moment(s.timestart_monday);
+                                                var end = moment(s.timeend_monday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room);
+    
+                                                }
+                                                return
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
                                             }
+                                        }
                                             return
-                                        } else {
+                                        case "terça-feira":
+                                        
+                                        var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                            return dateS.data_start === clickedDateStart;
+                                        });
+    
+                                        if (dateOccupied) {
+                                            // se tiver ocupado acaba aqui - Pietro
+                                            console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                            return;
+                                        }else{
+                                            // se nao , continua a função aqui - Pietro
+                                            if (s.timestart_tuesday < s.timeend_tuesday && s.timestart_tuesday != "" && s.timeend_tuesday != "") {
+                                                var start = moment(s.timestart_tuesday);
+                                                var end = moment(s.timeend_tuesday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+        
+                                                } else if (s.schedule_module == "periodoModule") {
+        
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+        
+                                                }
+                                                return
+                                            }
+                                            else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+                                        case "quarta-feira":
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+    
+                                            if (s.timestart_wednesday < s.timeend_wednesday && s.timestart_wednesday != "" && s.timeend_wednesday != "") {
+                                                var start = moment(s.timestart_wednesday);
+                                                var end = moment(s.timeend_wednesday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+    
+                                                }
+                                                return
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+                                        case "quinta-feira":
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+    
+                                            if (s.timestart_thursday < s.timeend_thursday && s.timestart_thursday != "" && s.timeend_thursday != "") {
+                                                var start = moment(s.timestart_thursday);
+                                                var end = moment(s.timeend_thursday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+    
+                                                }
+                                                return
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+                                        case "sexta-feira":
+    
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+    
+                                            if (s.timestart_friday < s.timeend_friday && s.timestart_friday != "" && s.timeend_friday != "") {
+                                                var start = moment(s.timestart_friday);
+                                                var end = moment(s.timeend_friday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+    
+                                                }
+                                                return
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+                                        case "sábado":
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+                                            if (s.timestart_saturday < s.timeend_saturday && s.timestart_saturday != "" && s.timeend_saturday != "") {
+                                                var start = moment(s.timestart_saturday);
+                                                var end = moment(s.timeend_saturday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
+    
+                                                }
+                                                return
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+                                        case "domingo":
+                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                                return dateS.data_start === clickedDateStart;
+                                            });
+        
+                                            if (dateOccupied) {
+                                                // se tiver ocupado acaba aqui - Pietro
+                                                console.log("WECOM LOG: Telefone ocupado nesta data!!!");
+                                                return;
+                                            }else{
+                                            if (s.timestart_sunday < s.timeend_sunday && s.timestart_sunday != "" && s.timeend_sunday != "") {
+                                                var start = moment(s.timestart_sunday);
+                                                var end = moment(s.timeend_sunday);
+                                                if (s.schedule_module == "hourModule") {
+                                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                                    $('#calendar').fullCalendar('gotoDate', start);
+                                                } else if (s.schedule_module == "dayModule") {
+                                                    console.log("Abrir modal para confirmar o dia inteiro.")
+        
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+    
+                                                } else if (s.schedule_module == "periodoModule") {
+    
+                                                    console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
+    
+                                                }
+                                                return
+                                                
+                                            } else {
+                                                //Implementar mensagem de Data indisponível aqui. Toast
+                                                console.log("WECOM LOG: Data indisponível!!!")
+                                            }
+                                        }
+                                            return
+    
+                                        default:
                                             //Implementar mensagem de Data indisponível aqui. Toast
                                             console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-                                    case "terça-feira":
-                                        if (s.timestart_tuesday < s.timeend_tuesday && s.timestart_tuesday != "" && s.timeend_tuesday != "") {
-                                            var start = moment(s.timestart_tuesday);
-                                            var end = moment(s.timeend_tuesday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
-                                            }
                                             return
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
+    
+                                    } 
+                                }
+                                if (s.type == "periodType") {
+                                    if (clickedDate >= s.data_start.split(" ")[0] && clickedDate <= s.data_end.split(" ")[0]) {
+                                        if (s.schedule_module == "hourModule") {
+                                            $('#proprietiesDiv').fullCalendar('changeView', 'agendaDay');
+                                            $('#proprietiesDiv').fullCalendar('gotoDate', start);
+                                        } else if (s.schedule_module == "dayModule") {
+                                            console.log("Abrir modal para confirmar o dia inteiro.")
+                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+    
+                                        } else if (s.schedule_module == "periodoModule") {
+    
+                                            console.log("Abrir modal para perguntar se será manhã ou tarde.")
+                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+    
                                         }
                                         return
-                                    case "quarta-feira":
-                                        if (s.timestart_wednesday < s.timeend_wednesday && s.timestart_wednesday != "" && s.timeend_wednesday != "") {
-                                            var start = moment(s.timestart_wednesday);
-                                            var end = moment(s.timeend_wednesday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-
-                                            }
-                                            return
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-                                    case "quinta-feira":
-                                        if (s.timestart_thursday < s.timeend_thursday && s.timestart_thursday != "" && s.timeend_thursday != "") {
-                                            var start = moment(s.timestart_thursday);
-                                            var end = moment(s.timeend_thursday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
-
-                                            }
-                                            return
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-                                    case "sexta-feira":
-                                        if (s.timestart_friday < s.timeend_friday && s.timestart_friday != "" && s.timeend_friday != "") {
-                                            var start = moment(s.timestart_friday);
-                                            var end = moment(s.timeend_friday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
-
-                                            }
-                                            return
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-                                    case "sábado":
-                                        if (s.timestart_saturday < s.timeend_saturday && s.timestart_saturday != "" && s.timeend_saturday != "") {
-                                            var start = moment(s.timestart_saturday);
-                                            var end = moment(s.timeend_saturday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
-
-                                            }
-                                            return
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-                                    case "domingo":
-                                        if (s.timestart_sunday < s.timeend_sunday && s.timestart_sunday != "" && s.timeend_sunday != "") {
-                                            var start = moment(s.timestart_sunday);
-                                            var end = moment(s.timeend_sunday);
-                                            if (s.schedule_module == "hourModule") {
-                                                $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                $('#calendar').fullCalendar('gotoDate', start);
-                                            } else if (s.schedule_module == "dayModule") {
-                                                console.log("Abrir modal para confirmar o dia inteiro.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
-
-                                            } else if (s.schedule_module == "periodoModule") {
-
-                                                console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
-
-                                            }
-                                            return
-                                            
-                                        } else {
-                                            //Implementar mensagem de Data indisponível aqui. Toast
-                                            console.log("WECOM LOG: Data indisponível!!!")
-                                        }
-                                        return
-
-                                    default:
+                                    } else {
                                         //Implementar mensagem de Data indisponível aqui. Toast
                                         console.log("WECOM LOG: Data indisponível!!!")
-                                        return
-
-                                } 
-                            }
-                            if (s.type == "periodType") {
-                                if (clickedDate >= s.data_start.split(" ")[0] && clickedDate <= s.data_end.split(" ")[0]) {
-                                    if (s.schedule_module == "hourModule") {
-                                        $('#proprietiesDiv').fullCalendar('changeView', 'agendaDay');
-                                        $('#proprietiesDiv').fullCalendar('gotoDate', start);
-                                    } else if (s.schedule_module == "dayModule") {
-                                        console.log("Abrir modal para confirmar o dia inteiro.")
-                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
-                                    } else if (s.schedule_module == "periodoModule") {
-
-                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
                                     }
-                                    return
-                                } else {
-                                    //Implementar mensagem de Data indisponível aqui. Toast
-                                    console.log("WECOM LOG: Data indisponível!!!")
                                 }
-                            }
-                        })
-                        $('#proprietiesDiv').fullCalendar('unselect');
-                    }
-                    else if (view.name === 'agendaWeek') {
-                        console.log("View: " + "Week");
-
-                        var clickedElement = jsEvent.target
-                        console.log(" Elemento clicado " + clickedElement);
-                        var clickedDate = start.format('YYYY-MM-DD');
-                        console.log("Data do elemento clicado:", clickedDate);
-                        var teste = false;
-
-                    }
-                    else {
-                        console.log("View: " + "day");
-                        // data inicio em iso string 
-                        dateStart = "";
-                        dateStart = new Date(start);
-                        console.log("data de início " + formatDate(dateStart.toISOString()))
-                        // data fim
-                        dateEnd = "";
-                        dateEnd = new Date(end);
-                        console.log("data de término " + formatDate(dateEnd.toISOString()))
-                        makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, schedules, start);
-
-
-                    }
-                },
-                editable: false,
-                eventLimit: true,
-                events: [],
-                eventRender: function (event, element) { },
-
-                viewRender: function (view, element) {
-
-                    if (view.name === 'month') {
-                        console.log('View: Modo mês');
-                        UpdateAvailability(schedules, dev_schedules);
-                    }
-                    else if (view.name === 'agendaWeek') {
-                        console.log("View Modo Semana")
-                    }
-                    else {
-                        console.log('View: Modo dias');
-                        UpdateDayAvailability(schedules, dev_schedules);
-
-                        dayName = view.title
-                        console.log("View title result = " + dayName)
-                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
-                        // Obtém os valores do dia, mês e ano
-                        var day = String(dateParts[0]).padStart(2, '0');
-                        var month = getMonthIndex(dateParts[1]);
-                        var year = dateParts[2];
-
-                        // Função auxiliar para obter o índice do mês com base no nome do mês
-                        function getMonthIndex(monthName) {
-                            var months = [
-                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                            ];
-                            var index = months.indexOf(monthName) + 1;
-
-                            return String(index).padStart(2, '0');
+                            })
+                            $('#proprietiesDiv').fullCalendar('unselect');
                         }
-                    }
-                },
+                        else if (view.name === 'agendaWeek') {
+                            console.log("View: " + "Week");
+    
+                            var clickedElement = jsEvent.target
+                            console.log(" Elemento clicado " + clickedElement);
+                            var clickedDate = start.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado:", clickedDate);
+                            var teste = false;
+    
+                        }
+                        else {
+                            console.log("View: " + "day");
+                            // data inicio em iso string 
+                            dateStart = "";
+                            dateStart = new Date(start);
+                            console.log("data de início " + formatDate(dateStart.toISOString()))
+                            // data fim
+                            dateEnd = "";
+                            dateEnd = new Date(end);
+                            console.log("data de término " + formatDate(dateEnd.toISOString()))
+                            makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, schedules, start);
+    
+    
+                        }
+                    },
+                    editable: false,
+                    eventLimit: true,
+                    events: [],
+                    eventRender: function (event, element) { },
+    
+                    viewRender: function (view, element) {
+    
+                        if (view.name === 'month') {
+                            console.log('View: Modo mês');
+                            console.log("DEV SCHEDULES" + dev_schedules)
+                            // var dev_schedulesList = JSON.parse(dev_schedules)
+                            UpdateAvailability(schedules, dev_schedulesList);
+                            
+                            // os agendamentos só vao aparecer se forem maior do que
+                            // a data de hoje 
+                        }
+                        else if (view.name === 'agendaWeek') {
+                            console.log("View Modo Semana")
+                        }
+                        else {
+                            console.log('View: Modo dias');
+                            UpdateDayAvailability(schedules, dev_schedules);
+    
+                            dayName = view.title
+                            console.log("View title result = " + dayName)
+                            var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                            // Obtém os valores do dia, mês e ano
+                            var day = String(dateParts[0]).padStart(2, '0');
+                            var month = getMonthIndex(dateParts[1]);
+                            var year = dateParts[2];
+    
+                            // Função auxiliar para obter o índice do mês com base no nome do mês
+                            function getMonthIndex(monthName) {
+                                var months = [
+                                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                                ];
+                                var index = months.indexOf(monthName) + 1;
+    
+                                return String(index).padStart(2, '0');
+                            }
+                        }
+                    },
+                });
+    
             });
-
-        });
     }
 
-    function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start) {
-        var start;
-        var end;
+    function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
+        // var start;
+        // var end;
+        console.log("Start para Envio:" + start )
+        console.log("End para Envio:" + end )
+        // schedules.forEach(function(s){
+        //     switch (s.schedule_module) {
+        //         case "dayModule":
+        //             start = start + "" + s.time_start // ajustar
+        //             end = start +" "+ s.
+        //             return
+        //         case "hourModule":
+        //             return
+        //     }
+        // })
+        var today = new Date();
+        var dataHoje = today.toISOString().split('T')[0];
 
-        schedules.forEach(function(s){
-            switch (s.schedule_module) {
-                case "dayModule":
-                    start = start + "" + s.time_start // ajustar
-                    end = start +" "+ s.
-                    return
-                case "hourModule":
-                    return
-            }
-        })
+        if(start < dataHoje){
+            console.log("Escolha uma data maior superior a data de hoje!!!")
+        }else{
+            var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
+            var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
+            listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
+                t.rem(insideDiv);
+    
+            }))
+            listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
+            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
+            listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
+            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
+    
+            listbox.add(new innovaphone.ui1.Div("width:80px; height: 50px; color: white; border-radius: 40px; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
+                app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
+    
+                });
+            }))
+        }
 
-        var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
-        var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
-        listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
-            t.rem(insideDiv);
-
-        }))
-        listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
-        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
-        listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
-        listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
-
-        listbox.add(new innovaphone.ui1.Div("width:50px; height: 50px; color: black; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
-            app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
-
-            });
-        }))
-
-
-
-  
     }
     //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
@@ -687,6 +794,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
                             case "tuesday":
                                 if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
@@ -706,6 +820,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
+                                
                                 return
                             case "wednesday":
                                 if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
@@ -725,6 +847,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
                             case "thursday":
                                 if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
@@ -744,6 +873,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
                             case "friday":
                                 if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
@@ -763,6 +899,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
                             case "saturday":
                                 if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
@@ -782,6 +925,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
                             case "sunday":
                                 if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
@@ -801,6 +951,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
+                                console.log("Schedules:" +  schedules)
+                                schedules.forEach(function(dateS){
+                                    if(dataDate == dateS.data_start ){
+                                        td.classList.remove('parcialavailable');
+                                        td.classList.add('unavailable')
+                                    }
+                                })
                                 return
 
                             default:

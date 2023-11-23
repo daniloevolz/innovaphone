@@ -43,7 +43,8 @@ Wecom.coolworkTexts = {
         labelDevice: "Telefone",
         labelDayWeek: "Dia da semana",
         labelScheduleModule: "Modelo de Agendamento",
-        makePhoneSceduleButton: "Agendar"
+        makePhoneSceduleButton: "Agendar",
+        whenLabel: "Quando:"
         
     }
 }
