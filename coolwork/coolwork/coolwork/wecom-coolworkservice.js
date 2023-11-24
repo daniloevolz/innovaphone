@@ -808,6 +808,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
     //VERIFICAR COM UM FOREACH OS USUÁRIOS, SE O TELEFONE JÁ NÃO ATRIBUIDO A UM USUÁRIO
     if (cod == 1){
         log("Ligando o telefone", hwId)
+        // fazer uma consulta da tbl
         Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
         .oncomplete(function(data){
             user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})

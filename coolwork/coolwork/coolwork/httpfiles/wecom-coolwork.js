@@ -340,14 +340,20 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 return;
                                             }else{
                                             if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
-                                                var start = moment(s.timestart_monday);
-                                                var end = moment(s.timeend_monday);
+                                                var start = moment(s.timestart_monday, 'HH:mm');
+                                                var end = moment(s.timeend_monday, 'HH:mm');
+                                                var clickedDateStartMoment = moment(clickedDateStart);
+                                                var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                                var clickedDateEndMoment = moment(clickedDateEnd);
+                                                var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+
                                                 if (s.schedule_module == "hourModule") {
                                                     $('#calendar').fullCalendar('changeView', 'agendaDay');
                                                     $('#calendar').fullCalendar('gotoDate', start);
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -796,7 +802,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 }
                                 console.log("Schedules:" +  schedules)
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split" + dataSplit)
+                                    console.log("Data S" + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
