@@ -330,29 +330,36 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     //var dayOfWeek = findDayOfWeek(clickedElement.classList)
                                     switch (dayOfWeek) {
                                         case "segunda-feira":
+          
+                                            var start = moment(s.timestart_monday, 'HH:mm');
+                                            var end = moment(s.timeend_monday, 'HH:mm');
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+                                        //continuar aqui 28/11 
+                                        // fazer esse ajuste para todos os CASE
+                                        // ~ pietro 
+
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
+                                                return dateS.data_start === combinedDateTimeStart;
                                             });
-        
+                                            
+
                                             if (dateOccupied) {
                                                 // se tiver ocupado acaba aqui - Pietro
                                                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
                                                 return;
                                             }else{
                                             if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
-                                                var start = moment(s.timestart_monday, 'HH:mm');
-                                                var end = moment(s.timeend_monday, 'HH:mm');
-                                                var clickedDateStartMoment = moment(clickedDateStart);
-                                                var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
-
-                                                var clickedDateEndMoment = moment(clickedDateEnd);
-                                                var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
 
                                                 if (s.schedule_module == "hourModule") {
                                                     $('#calendar').fullCalendar('changeView', 'agendaDay');
                                                     $('#calendar').fullCalendar('gotoDate', start);
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
+                                                    console.log("CombinedDateTimeStart")
                                                     makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
@@ -1005,7 +1012,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         td.classList.add('unavailable')
                                     }
                                 })
-                                
+
                                 return
 
                             default:

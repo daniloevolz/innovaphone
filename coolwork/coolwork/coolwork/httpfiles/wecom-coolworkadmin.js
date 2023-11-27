@@ -1170,6 +1170,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             });
         });
     }
+
     function makeSchedule(t, optType) {
         t.clear();
         

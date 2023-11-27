@@ -746,6 +746,7 @@ var i = Timers.setInterval(function() {
         }
         Database.exec("SELECT * FROM tbl_device_schedule WHERE data_start ='"+ now +"'")
         .oncomplete(function (data) {
+        log("DATA ATUAL" + now)
         log("AGENDAMENTOS string: ", JSON.stringify(data))
         // Seu código de verificação aqui
         log("Verificação concluída!")
@@ -774,33 +775,58 @@ function deviceAnalise(deviceId, sipGuid) { // verificar se tem usuario e remove
         // Certifique-se de verificar se u.columns.devices existe
         if (u.columns && u.columns.devices && Array.isArray(u.columns.devices)) {
             var deviceArray = u.columns.devices;
+           log("Passou no IF u.coumns")
             
             deviceArray.forEach(function (d) {
                 log("DEVICE FOR EACH", JSON.stringify(d))
+                log("DEVICE ID" + JSON.stringify(deviceId))
+                log("DEVICE ARRAY" + deviceArray) // seguir aqui 28/11 terça ~pietro
                 if (d.hwid == deviceId) {
-                    log("DEVICE found", deviceFound)
-                    deviceFound = true;
-                    sipOnPhone = u.columns.h323
-                    return;
+                      deviceFound = true;
+                      sipOnPhone = u.columns.h323
+                        log("deviceFound dentro do foreach =  " + deviceFound)
+                    // return;
+                    // if (deviceFound == true) {
+                    //     cod = 2;
+                    //     log("SIP ON PHONE " + sipOnPhone)
+                    //     pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
+                    //     var l = Timers.setInterval(function () {
+                    //         cod = 1;
+                    //         console.log("Sip Guid " + JSON.stringify(sipGuid))
+                    //         pbxTableUpdateDevice(cod, deviceId, sipGuid);
+                    //         log(" TELEFONE REMOVIDO", deviceId);
+                        
+                    //     }, 1200);
+                    //     Timers.clearTimeout(l);
+                    // } else {
+                    //     cod = 1;
+                    //     pbxTableUpdateDevice(cod, deviceId, sipGuid);
+                    // }
+
+                    //descomentar isso 
+
                 }
             });
         }
-    });
 
-    if (deviceFound == true) {
-        cod = 2;
-        pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
-        var l = Timers.setInterval(function () {
-            cod = 1;
-            pbxTableUpdateDevice(cod, deviceId, sipGuid);
-            log(" TELEFONE REMOVIDO", deviceId);
+    });
         
-        }, 1000);
-        Timers.clearTimeout(l);
-    } else {
-        cod = 1;
-        pbxTableUpdateDevice(cod, deviceId, sipGuid);
-    }
+    // if (deviceFound == true) {
+    //     cod = 2;
+    //     log("SIP ON PHONE " + sipOnPhone)
+    //     pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
+    //     var l = Timers.setInterval(function () {
+    //         cod = 1;
+    //         console.log("Sip Guid " + JSON.stringify(sipGuid))
+    //         pbxTableUpdateDevice(cod, deviceId, sipGuid);
+    //         log(" TELEFONE REMOVIDO", deviceId);
+        
+    //     }, 1200);
+    //     Timers.clearTimeout(l);
+    // } else {
+    //     cod = 1;
+    //     pbxTableUpdateDevice(cod, deviceId, sipGuid);
+    // }
 }
 
 function pbxTableUpdateDevice(cod, hwId, user){
