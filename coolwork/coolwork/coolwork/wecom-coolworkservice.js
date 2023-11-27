@@ -764,7 +764,7 @@ var i = Timers.setInterval(function() {
         })
 })}, 60000);    
 
-function deviceAnalise(deviceId, sipGuid) {
+function deviceAnalise(deviceId, sipGuid) { // verificar se tem usuario e remove para depois agendar 
     var deviceFound = false;
     var sipOnPhone = ""
     log("TABLE USERS COLUMNS", JSON.stringify(pbxTableUsers));
@@ -818,10 +818,15 @@ function pbxTableUpdateDevice(cod, hwId, user){
                     conn.send(JSON.stringify(user))
                 }
             })
+            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "' WHERE hwid = '" + hwId + "'"; 
+            Database.exec(sql)
+            .oncomplete(function(data){ 
+                log("UPDATED DEVICE AFTER RESET" + data)
+            })
         })
     }
     
-    //Remove phone User
+    //Remove phone User  
     if (cod == 2){
         var devices = user.columns.devices
         log("Removendo do telefone", hwId)
@@ -829,7 +834,6 @@ function pbxTableUpdateDevice(cod, hwId, user){
             return device.hw != hwId
         })
         user.columns.devices = devicesUpdated
-        delete user.badge;
         log("ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
         pbxTable.forEach(function(conn){
             if(user.src == conn.pbx){
@@ -838,6 +842,11 @@ function pbxTableUpdateDevice(cod, hwId, user){
                 conn.send(JSON.stringify(user))
 
             }
+        })
+        var sql = "UPDATE tbl_devices SET sip = '" + null + "', cn = '" + null + "', guid = '" + null + "' WHERE hwid = '" + hwId + "'"; 
+        Database.exec(sql)
+        .oncomplete(function(data){ 
+            log("UPDATED DEVICE AFTER RESET" + data)
         })
     }
     

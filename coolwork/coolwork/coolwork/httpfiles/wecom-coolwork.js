@@ -832,8 +832,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
+
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
@@ -859,12 +865,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
+
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
                                 })
+
                                 return
                             case "thursday":
                                 if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
@@ -885,8 +898,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
+
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
@@ -912,7 +931,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 }
                                 console.log("Schedules:" +  schedules)
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
@@ -937,8 +961,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
+
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
@@ -963,12 +993,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
+                               
                                 schedules.forEach(function(dateS){
-                                    if(dataDate == dateS.data_start ){
+                                    var dataSplit = dateS.data_start
+                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data S " + dataS)
+
+                                    if(dataDate == dataS ){
                                         td.classList.remove('parcialavailable');
                                         td.classList.add('unavailable')
                                     }
                                 })
+                                
                                 return
 
                             default:

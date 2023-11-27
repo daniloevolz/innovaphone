@@ -120,7 +120,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             list_AllRoom = JSON.parse(obj.result)
             constructor(that)
-            UpdateRoomResult
+            // UpdateRoomResult
         }
         if (obj.api === "admin" && obj.mt === "UpdateRoomResult") {
             app.send({api:"admin", mt:"SelectAllRoom"})
