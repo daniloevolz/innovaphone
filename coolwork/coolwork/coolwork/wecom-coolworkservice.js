@@ -775,37 +775,41 @@ function deviceAnalise(deviceId, sipGuid) { // verificar se tem usuario e remove
         // Certifique-se de verificar se u.columns.devices existe
         if (u.columns && u.columns.devices && Array.isArray(u.columns.devices)) {
             var deviceArray = u.columns.devices;
-           log("Passou no IF u.coumns")
+           log("Passou no IF u.columns")
             
             deviceArray.forEach(function (d) {
-                log("DEVICE FOR EACH", JSON.stringify(d))
+                log("DEVICE ID FOR EACH", JSON.stringify(d.hw))
                 log("DEVICE ID" + JSON.stringify(deviceId))
-                log("DEVICE ARRAY" + deviceArray) // seguir aqui 28/11 terça ~pietro
-                if (d.hwid == deviceId) {
+                log("DEVICE ARRAY" + JSON.stringify(deviceArray)) // seguir aqui 28/11 terça ~pietro
+                if (d.hw == deviceId) {
                       deviceFound = true;
-                      sipOnPhone = u.columns.h323
+
+                      sipOnPhone = pbxTableUsers.filter(function(pbx){
+                            return d.hw == deviceId // ~ pietro
+                      })
                         log("deviceFound dentro do foreach =  " + deviceFound)
-                    // return;
-                    // if (deviceFound == true) {
-                    //     cod = 2;
-                    //     log("SIP ON PHONE " + sipOnPhone)
-                    //     pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
-                    //     var l = Timers.setInterval(function () {
-                    //         cod = 1;
-                    //         console.log("Sip Guid " + JSON.stringify(sipGuid))
-                    //         pbxTableUpdateDevice(cod, deviceId, sipGuid);
-                    //         log(" TELEFONE REMOVIDO", deviceId);
-                        
-                    //     }, 1200);
-                    //     Timers.clearTimeout(l);
-                    // } else {
-                    //     cod = 1;
-                    //     pbxTableUpdateDevice(cod, deviceId, sipGuid);
-                    // }
-
-                    //descomentar isso 
-
+                                return;
                 }
+
+                if (deviceFound == true) {
+                        cod = 2;
+                        log("SIP ON PHONE " + JSON.stringify(sipOnPhone)) //~pietro continuar 29/11
+                        pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
+                        var l = Timers.setInterval(function () {
+                            cod = 1;
+                            console.log("Sip Guid " + JSON.stringify(sipGuid))
+                            pbxTableUpdateDevice(cod, deviceId, sipGuid);
+                            log(" TELEFONE REMOVIDO", deviceId);
+                        
+                        }, 1500);
+                        Timers.clearTimeout(l);
+                    } else {
+                        cod = 1;
+                        pbxTableUpdateDevice(cod, deviceId, sipGuid);
+                    }
+
+                    
+
             });
         }
 
@@ -854,6 +858,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
     
     //Remove phone User  
     if (cod == 2){
+        log("USER para ser removido: " + user) //~pietro continuar quarta 29/11
         var devices = user.columns.devices
         log("Removendo do telefone", hwId)
         var devicesUpdated = devices.filter(function(device){
@@ -867,9 +872,9 @@ function pbxTableUpdateDevice(cod, hwId, user){
                 log("ENVIADO AO PBX:>", JSON.stringify(user))
                 conn.send(JSON.stringify(user))
 
-            }
+            }   
         })
-        var sql = "UPDATE tbl_devices SET sip = '" + null + "', cn = '" + null + "', guid = '" + null + "' WHERE hwid = '" + hwId + "'"; 
+        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' WHERE hwid = '" + hwId + "'"; 
         Database.exec(sql)
         .oncomplete(function(data){ 
             log("UPDATED DEVICE AFTER RESET" + data)

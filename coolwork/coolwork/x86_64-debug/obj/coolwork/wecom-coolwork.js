@@ -331,16 +331,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     switch (dayOfWeek) {
                                         case "segunda-feira":
           
-                                            var start = moment(s.timestart_monday, 'HH:mm');
-                                            var end = moment(s.timeend_monday, 'HH:mm');
+                                            var start = moment(s.timestart_monday, 'HH:mm',true);
+                                            var end = moment(s.timeend_monday, 'HH:mm',true);
                                             var clickedDateStartMoment = moment(clickedDateStart);
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
-                                        //continuar aqui 28/11 
-                                        // fazer esse ajuste para todos os CASE
-                                        // ~ pietro 
 
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === combinedDateTimeStart;
@@ -376,9 +373,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         }
                                             return
                                         case "terça-feira":
+
+                                        var start = moment(s.timestart_tuesday, 'HH:mm',true);
+                                            var end = moment(s.timeend_tuesday, 'HH:mm',true);
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
                                         
                                         var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                            return dateS.data_start === clickedDateStart;
+                                            return dateS.data_start === combinedDateTimeStart;  
+                                            // adicionar isso nos outros case , verificar todos que faltam essa var dateOccupied atualizada
+                                            // ~pietro
                                         });
     
                                         if (dateOccupied) {
@@ -397,7 +404,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
         
                                                 } else if (s.schedule_module == "periodoModule") {
         
@@ -414,6 +421,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         }
                                             return
                                         case "quarta-feira":
+
+                                        var start = moment(s.timestart_wednesday, 'HH:mm');
+                                            var end = moment(s.timeend_wednesday, 'HH:mm');
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === clickedDateStart;
                                             });
@@ -433,7 +449,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -448,6 +464,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         }
                                             return
                                         case "quinta-feira":
+
+                                        var start = moment(s.timestart_thursday, 'HH:mm');
+                                            var end = moment(s.timeend_thursday, 'HH:mm');
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === clickedDateStart;
                                             });
@@ -467,7 +492,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -482,7 +507,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             }
                                         }
                                             return
-                                        case "sexta-feira":
+                                        case "sexta-feira": 
+
+                                        var start = moment(s.timestart_friday, 'HH:mm');
+                                        var end = moment(s.timeend_friday, 'HH:mm');
+                                        var clickedDateStartMoment = moment(clickedDateStart);
+                                        var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                        var clickedDateEndMoment = moment(clickedDateEnd);
+                                        var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
     
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === clickedDateStart;
@@ -503,7 +536,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -519,6 +552,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         }
                                             return
                                         case "sábado":
+
+                                            var start = moment(s.timestart_saturday, 'HH:mm');
+                                            var end = moment(s.timeend_saturday, 'HH:mm');
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === clickedDateStart;
                                             });
@@ -537,7 +579,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -553,6 +595,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         }
                                             return
                                         case "domingo":
+
+                                            var start = moment(s.timestart_sunday, 'HH:mm');
+                                            var end = moment(s.timeend_sunday, 'HH:mm');
+                                            var clickedDateStartMoment = moment(clickedDateStart);
+                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
+
+                                            var clickedDateEndMoment = moment(clickedDateEnd);
+                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
+
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === clickedDateStart;
                                             });
@@ -571,7 +622,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 } else if (s.schedule_module == "dayModule") {
                                                     console.log("Abrir modal para confirmar o dia inteiro.")
         
-                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, clickedDateStart, clickedDateEnd);
+                                                    makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                                 } else if (s.schedule_module == "periodoModule") {
     
@@ -602,7 +653,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             $('#proprietiesDiv').fullCalendar('gotoDate', start);
                                         } else if (s.schedule_module == "dayModule") {
                                             console.log("Abrir modal para confirmar o dia inteiro.")
-                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
+                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
                                         } else if (s.schedule_module == "periodoModule") {
     
