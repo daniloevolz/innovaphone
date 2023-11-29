@@ -342,6 +342,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
                                                 return dateS.data_start === combinedDateTimeStart;
                                             });
+
+                                    
                                             
 
                                             if (dateOccupied) {
@@ -384,8 +386,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         
                                         var dateOccupied = dev_schedulesList.some(function(dateS) {
                                             return dateS.data_start === combinedDateTimeStart;  
-                                            // adicionar isso nos outros case , verificar todos que faltam essa var dateOccupied atualizada
-                                            // ~pietro
+                                           
                                         });
     
                                         if (dateOccupied) {
@@ -431,9 +432,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
+                                                return dateS.data_start === combinedDateTimeStart;  
                                             });
-        
+
                                             if (dateOccupied) {
                                                 // se tiver ocupado acaba aqui - Pietro
                                                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
@@ -474,7 +475,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
+                                                return dateS.data_start === combinedDateTimeStart;  
                                             });
         
                                             if (dateOccupied) {
@@ -517,9 +518,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                         var clickedDateEndMoment = moment(clickedDateEnd);
                                         var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
     
-                                            var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
-                                            });
+                                        var dateOccupied = dev_schedulesList.some(function(dateS) {
+                                            return dateS.data_start === combinedDateTimeStart;  
+                                        });
         
                                             if (dateOccupied) {
                                                 // se tiver ocupado acaba aqui - Pietro
@@ -562,7 +563,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
+                                                return dateS.data_start === combinedDateTimeStart;  
                                             });
         
                                             if (dateOccupied) {
@@ -605,7 +606,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + end.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function(dateS) {
-                                                return dateS.data_start === clickedDateStart;
+                                                return dateS.data_start === combinedDateTimeStart;  
                                             });
         
                                             if (dateOccupied) {
@@ -773,7 +774,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
             listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
             listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
-            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + start))
+            listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + formatDate(start)))
     
             listbox.add(new innovaphone.ui1.Div("width:80px; height: 50px; color: white; border-radius: 40px; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
                 app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
@@ -894,7 +895,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 schedules.forEach(function(dateS){
                                     var dataSplit = dateS.data_start
                                     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data Split " + GetDeviceSchedulesResult)
                                     console.log("Data S " + dataS)
 
                                     if(dataDate == dataS ){

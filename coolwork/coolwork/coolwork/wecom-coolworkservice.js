@@ -294,6 +294,7 @@ new JsonApi("user").onconnected(function(conn) {
                 var now = getDateNow();
 
                 Database.exec("SELECT * FROM tbl_device_schedule WHERE device_id ='" + hwId +"' AND device_room_id ='"+roomId+"' AND data_start >='" + now + "'")
+                // tentar sem o data_start  ~pietro continuar 29/11
                     .oncomplete(function (data) {
                         log("WECOM LOG:GetDeviceSchedules: ", JSON.stringify(data))
                         conn.send(JSON.stringify({ api: "user", mt: "GetDeviceSchedulesResult", room: obj.room, dev: obj.dev, schedules: JSON.stringify(data), src: obj.src }));
@@ -347,7 +348,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     return u.columns.guid == obj.user
                 })[0];
 
-                pbxTableUpdateDevice("1", obj.hwId, user)
+                pbxTableUpdateDevice(1, obj.hwId, user)
             };
             if (obj.mt == "RemoveUserPhone") {
                
@@ -356,7 +357,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     return p.columns.guid == obj.user
                 })[0];
                 log("SEND REMOVE", JSON.stringify(obj.hwId), JSON.stringify(user) )
-                pbxTableUpdateDevice("2", obj.hwId, user)
+                pbxTableUpdateDevice(2, obj.hwId, user)
             };
             if (obj.mt == "InsertAppointment"){
                 // var cod = 2
@@ -751,13 +752,13 @@ var i = Timers.setInterval(function() {
         // Seu código de verificação aqui
         log("Verificação concluída!")
             if(data.length > 0 ){
-                var sipGuid = ""
+                
                 data.forEach(function(data){
-                    sipGuid = pbxTableUsers.filter(function(item){
+                    var userObj = pbxTableUsers.filter(function(item){
                         
                         return item.columns.guid == data.user_guid
                     })[0];
-                    deviceAnalise(data.device_id, sipGuid)
+                    deviceAnalise(data.device_id, userObj)
                 })
                 
 
@@ -765,9 +766,7 @@ var i = Timers.setInterval(function() {
         })
 })}, 60000);    
 
-function deviceAnalise(deviceId, sipGuid) { // verificar se tem usuario e remove para depois agendar 
-    var deviceFound = false;
-    var sipOnPhone = ""
+function deviceAnalise(deviceId, userObj) { // verificar se tem usuario e remove para depois agendar 
     log("TABLE USERS COLUMNS", JSON.stringify(pbxTableUsers));
     pbxTableUsers.forEach(function (u) {
         log("TABLE USER - U", JSON.stringify(u));
@@ -775,72 +774,38 @@ function deviceAnalise(deviceId, sipGuid) { // verificar se tem usuario e remove
         // Certifique-se de verificar se u.columns.devices existe
         if (u.columns && u.columns.devices && Array.isArray(u.columns.devices)) {
             var deviceArray = u.columns.devices;
-           log("Passou no IF u.columns")
-            
+            log("Passou no IF u.columns") 
             deviceArray.forEach(function (d) {
                 log("DEVICE ID FOR EACH", JSON.stringify(d.hw))
                 log("DEVICE ID" + JSON.stringify(deviceId))
-                log("DEVICE ARRAY" + JSON.stringify(deviceArray)) // seguir aqui 28/11 terça ~pietro
+                log("DEVICE ARRAY" + JSON.stringify(deviceArray)) 
                 if (d.hw == deviceId) {
-                      deviceFound = true;
-
-                      sipOnPhone = pbxTableUsers.filter(function(pbx){
-                            return d.hw == deviceId // ~ pietro
-                      })
+                        // remover usuario do telefone que esta atualmente
+                        log("User Obj on phone" + JSON.stringify(u)) 
+                        pbxTableUpdateDevice(2, deviceId, u);
                         log("deviceFound dentro do foreach =  " + deviceFound)
-                                return;
+                        return;
                 }
-
-                if (deviceFound == true) {
-                        cod = 2;
-                        log("SIP ON PHONE " + JSON.stringify(sipOnPhone)) //~pietro continuar 29/11
-                        pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
-                        var l = Timers.setInterval(function () {
-                            cod = 1;
-                            console.log("Sip Guid " + JSON.stringify(sipGuid))
-                            pbxTableUpdateDevice(cod, deviceId, sipGuid);
-                            log(" TELEFONE REMOVIDO", deviceId);
-                        
-                        }, 1500);
-                        Timers.clearTimeout(l);
-                    } else {
-                        cod = 1;
-                        pbxTableUpdateDevice(cod, deviceId, sipGuid);
-                    }
-
-                    
-
             });
         }
 
     });
-        
-    // if (deviceFound == true) {
-    //     cod = 2;
-    //     log("SIP ON PHONE " + sipOnPhone)
-    //     pbxTableUpdateDevice(cod, deviceId, sipOnPhone);
-    //     var l = Timers.setInterval(function () {
-    //         cod = 1;
-    //         console.log("Sip Guid " + JSON.stringify(sipGuid))
-    //         pbxTableUpdateDevice(cod, deviceId, sipGuid);
-    //         log(" TELEFONE REMOVIDO", deviceId);
-        
-    //     }, 1200);
-    //     Timers.clearTimeout(l);
-    // } else {
-    //     cod = 1;
-    //     pbxTableUpdateDevice(cod, deviceId, sipGuid);
-    // }
+    // função para atribuir telefone ao usuario 
+    pbxTableUpdateDevice(1, deviceId, userObj);
 }
 
 function pbxTableUpdateDevice(cod, hwId, user){
     // Add phone user
     //VERIFICAR COM UM FOREACH OS USUÁRIOS, SE O TELEFONE JÁ NÃO ATRIBUIDO A UM USUÁRIO
     if (cod == 1){
-        log("Ligando o telefone", hwId)
+        log("Ligando o telefone", hwId , JSON.stringify(user))
         // fazer uma consulta da tbl
         Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
         .oncomplete(function(data){
+            log("Select Result" + JSON.stringify(data))
+            if(!user.columns.devices){
+                user.columns["devices"] = []
+            }
             user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
             pbxTable.forEach(function(conn){
                 if(user.src == conn.pbx){
@@ -858,7 +823,10 @@ function pbxTableUpdateDevice(cod, hwId, user){
     
     //Remove phone User  
     if (cod == 2){
-        log("USER para ser removido: " + user) //~pietro continuar quarta 29/11
+        log("USER para ser removido: " + JSON.stringify(user) + "FIM DO USER : ") //~pietro continuar quarta 29/11
+
+        if (user.columns && user.columns.devices && Array.isArray(user.columns.devices)) {
+
         var devices = user.columns.devices
         log("Removendo do telefone", hwId)
         var devicesUpdated = devices.filter(function(device){
@@ -879,6 +847,9 @@ function pbxTableUpdateDevice(cod, hwId, user){
         .oncomplete(function(data){ 
             log("UPDATED DEVICE AFTER RESET" + data)
         })
+
+        }
+        
     }
     
 }
