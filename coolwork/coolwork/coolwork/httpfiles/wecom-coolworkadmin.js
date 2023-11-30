@@ -525,7 +525,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             console.log("Lista de telefones:", phone_list)
             makePhoneButtons(phone_list);
 
-            
             if (listDeviceRoom.length > 0) {
                 listDeviceRoom.forEach(function (dev) {
                     console.log("List Dev ROOM:",JSON.stringify(dev));
@@ -572,6 +571,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                         this.style.backgroundColor = ''; // Volta à cor original
                         this.removeAttribute('title'); // Remove o texto do hover
                     });
+                });
+            }
             
             
 
@@ -772,9 +773,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         imgBD.appendChild(draggedElement);
     })
     }
-    
-})
-    }
     function clickedPhone(hwId, colDireita, e){
         console.log("Clicked Phone", hwId)
         var x = e.clientX;
@@ -939,10 +937,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         } 
         else {
             availability.forEach(function(dates){
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD HH:mm:ss');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD HH:mm:ss');
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD[T]HH:mm:ss');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD[T]HH:mm:ss');
                 tds.forEach(function(td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD HH:mm:ss');
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD[T]HH:mm:ss');
                     console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
                     if (dataDate >= datastart && dataDate <= dataend) {
                             td.classList.remove('unavailable');
@@ -1286,19 +1284,27 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                             var startHour = document.getElementById("startIpt").value;
                             var endHour = document.getElementById("endIpt").value;
 
-                            var startDate = new Date(start);
-                            var endDate = new Date(end);
+                            var clickedDateStart = start.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateStart);
+    
+                            var clickedDateEnd = end.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateEnd);
+
+                            var clickedDateStartMoment = moment(clickedDateStart);
+
+                            var clickedDateEndMoment = moment(clickedDateEnd);
+
+                            var startMoment = moment(startHour, 'HH:mm',true);
+                            var endMoment = moment(endHour, 'HH:mm',true);
+
+                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startMoment.format('HH:mm');
+                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endMoment.format('HH:mm');
+
+                            dateStart = combinedDateTimeStart
+                            dateEnd = combinedDateTimeEnd
                             
-                             
-                            var start = moment(startHour, 'HH:mm',true);
-                            var end = moment(endHour, 'HH:mm',true);
-                            var dateStartMoment = moment(clickedDateStart);
-                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
-
-                            dateStart = startDateTimeString
-                            dateEnd = endDateTimeString
-
-
+                            console.log(" Data inicio concatenada "  + dateStart) 
+                            console.log(" Data Fim concatenada " + dateEnd) 
 
                             $('#calendar').fullCalendar('unselect');
                         }
@@ -1527,8 +1533,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     api: "admin", mt: "InsertRoom", 
                     name: nameRoom, 
                     img: srcDaImagem, 
-                    dateStart: "", 
-                    dateEnd: "", 
+                    dateStart: dateStart, 
+                    dateEnd: dateEnd, 
                     type: optType, 
                     schedule: optModule, 
                     editor: editor, 
