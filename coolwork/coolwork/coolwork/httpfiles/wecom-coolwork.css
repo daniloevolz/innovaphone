@@ -19,6 +19,22 @@ a {
     /*height:100%;*/
 }
 
+.true{
+    background-color: green;
+}
+.false{
+    background-color: orange;
+}
+.phnCalendar {
+    left: 15%;
+    position: absolute;
+    top: 10%;
+    width: 550px;
+    height: 500px;
+    z-index: 1015;
+    background-color: rgb(90, 90, 55);
+}
+
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 

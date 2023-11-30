@@ -813,7 +813,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
                     conn.send(JSON.stringify(user))
                 }
             })
-            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "' WHERE hwid = '" + hwId + "'"; 
+            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "', pbxactive = '" + true + "' WHERE hwid = '" + hwId + "'"; 
             Database.exec(sql)
             .oncomplete(function(data){ 
                 log("UPDATED DEVICE AFTER RESET" + data)
@@ -842,7 +842,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
 
             }   
         })
-        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' WHERE hwid = '" + hwId + "'"; 
+        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "', pbxactive = '" + false + "' WHERE hwid = '" + hwId + "'";
         Database.exec(sql)
         .oncomplete(function(data){ 
             log("UPDATED DEVICE AFTER RESET" + data)
