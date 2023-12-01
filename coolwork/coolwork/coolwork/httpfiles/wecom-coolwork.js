@@ -180,7 +180,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         t.clear();
         var listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", room.id))
         listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"))
-        listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:5%; text-align:center", room.name))
+        listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:50%;top:5%; text-align:center", room.name))
 
         var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; top: 2%; justify-content: space-evenly;", null, null))
 
@@ -200,9 +200,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("recurrentType"), null))
             }
         })
-
-        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 2%; justify-content: center;top: 16%;", null, null).setAttribute("id", "proprietiesDiv"))
-        var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 60%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
+       
+        var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 1%; justify-content: center;top: 20;", null, null).setAttribute("id", "proprietiesDiv"))
+        var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 50%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
         imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
 
         if (devices.length > 0) {

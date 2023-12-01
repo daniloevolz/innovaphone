@@ -191,13 +191,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
         var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
-        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
-        appointments.addEvent("click", function(){
-            tableAppointments(colDireita)
-        })
-
-        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
-        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
+        var appointments = liTables.add(new innovaphone.ui1.Node("li","height: 10%; top: 30%; width: 100%;", "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
         appointments.addEvent("click", function(){
             tableAppointments(colDireita)
         })
@@ -208,7 +202,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 20%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 40%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
          list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
@@ -509,16 +503,19 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         list_room.forEach(function(room){
             listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow"))
+
             
             var topButtons = listbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelRoomName"), null).setAttribute("id", "list-room"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
             topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
     
-            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
+            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:12%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
-            divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
+            divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:1%; text-align:center",room.name))
+            divGeral.add(new innovaphone.ui1.Node("h2", "position:absolute;width:50%;top:5%; text-align:center", texts.text("labelAvailablePhones")))
+
             var divPhones = divGeral.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
             var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
             imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
