@@ -90,7 +90,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var sip = "administrator";
 
 		
-		
 that.add(new innovaphone.ui1.Div(null, null, "button")
     .addText("Código de Provisionamento")
     .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
@@ -191,11 +190,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
-        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
-        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
-        appointments.addEvent("click", function(){
-            tableAppointments(colDireita)
-        })
 
         var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
         var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
@@ -393,7 +387,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
         topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
         topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
-
+        
         divinputs = leftbox.add(new innovaphone.ui1.Div(null, null, "divInputs"));
         var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral"));
         divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
@@ -520,23 +514,26 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
             divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
-            var divPhones = divGeral.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
+            var phones = divGeral.add(new innovaphone.ui1.Div(null,null,"phones").setAttribute("id","Phones"))
+            var labelPhones = phones.add(new innovaphone.ui1.Div(null,"Telefones Disponíveis","lablephones").setAttribute("id","lablephones"))
+            var divPhones = phones.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
             var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
             imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
             console.log("Lista de telefones:", phone_list)
             makePhoneButtons(phone_list);
 
+            
             if (listDeviceRoom.length > 0) {
                 listDeviceRoom.forEach(function (dev) {
-                    var userPicture = avatar.url(dev.sip, 80);
+                    console.log("List Dev ROOM:",JSON.stringify(dev));
                     var html = `
-                    <div style="top: ${dev.topoffset}px; left: ${dev.leftoffset}px; cursor: pointer; position: absolute;" class="StatusPhone${dev.online} phoneButtons" id="${dev.hwid}">
+                    <div style="top: ${dev.topoffset}px; left: ${dev.leftoffset}px; cursor: pointer; position: absolute;" class="StatusPhone ${dev.pbxactive} phoneButtons" id="${dev.hwid}">
                         <div class="user-info">
-                            <img class="imgProfile" src="../images/IP112-Innovaphone.png">
+                            <img class="imgProfile" src="../images/${dev.product}.png">
                         </div>
                         <div class="product-name">${dev.product}</div>
                     </div>`;
-            
+                    
                     document.getElementById("imgBD").innerHTML += html;
                 });
             
@@ -548,8 +545,30 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                         clickedPhone(clickedId, _colDireita, e);
                         app.send({ api: "admin", mt: "TableUsers" });
                     });
-                });
-            }
+            
+                    // Adicionar evento de hover
+                    element.addEventListener("mouseover", function (event) {
+                        var hoveredId = event.target.id; // Obtém o ID da div que o mouse está sobrevoando
+                        var hoveredDev = listDeviceRoom.find(dev => dev.hwid === hoveredId); // Encontra o objeto correspondente na lista
+                    
+                        if (hoveredDev) {
+                            // Aqui você pode definir as alterações no hover
+                            this.style.backgroundColor = 'lightgray';
+                            if (hoveredDev.cn == "null") {
+                                this.setAttribute('title', 'Sem Usuário');
+                            } else {
+                                this.setAttribute('title', hoveredDev.cn); // Define o texto do hover usando a propriedade correspondente, por exemplo, dev.cn
+                            }
+                        }
+                    });
+                    
+                    
+            
+                    element.addEventListener("mouseout", function () {
+                        // Quando o mouse sai do elemento, remova as alterações feitas no hover
+                        this.style.backgroundColor = ''; // Volta à cor original
+                        this.removeAttribute('title'); // Remove o texto do hover
+                    });
             
             
 
@@ -751,8 +770,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     })
     }
     
-    function clickedPhone(id, colDireita, e){
-        console.log("Clicked Phone", id)
+})
+    }
+    function clickedPhone(hwId, colDireita, e){
+        console.log("Clicked Phone", hwId)
         var x = e.clientX;
         var y = e.clientY;
         var windWidth = window.innerWidth;
@@ -774,12 +795,17 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     for (var i = 0; i < elements.length; i++) {
                         var id = elements[i].id;
                         console.log("ID da div:", id);
-                        // Aqui você pode fazer algo com o ID, como armazená-lo em uma variável ou realizar alguma ação com base nele
                     }
             
                     app.send({ api: "admin", mt: "SelectRoom", id: id });
                 }))
-        var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, id, "phoneinfo").setAttribute("id", id));
+
+        var nameUserPhone = listDeviceRoom.filter(function(device){
+            return device.hwid == hwId;
+        })[0]
+        var namePhone = nameUserPhone.cn == "null" ? nameUserPhone.hwid : nameUserPhone.cn;
+
+        var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, namePhone, "phoneinfo").setAttribute("id", hwId));
         
 
         phoneInfo.setStyle("left", x + "px");
@@ -791,7 +817,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         phoneInfo.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "clsLittleWindow"))
         var lists = phoneInfo.add(new innovaphone.ui1.Node('div', null, null, "list-info").setAttribute("id", "list-info"))
         var select_list = lists.add(new innovaphone.ui1.Node('select', null, null, null).setAttribute("id", "select-users"))
-       
+        select_list.add(new innovaphone.ui1.Node('option', null, texts.text("lableSelect"), null))
+
         console.log("LIST TABLE USERS", list_tableUsers)
         list_tableUsers.forEach(function (users){
             select_list.add(new innovaphone.ui1.Node('option', null, users.cn, null))
@@ -802,30 +829,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             for (var i = 0; i < elements.length; i++) {
                 var id = elements[i].id;
                 console.log("ID da div:", id);
-                // Aqui você pode fazer algo com o ID, como armazená-lo em uma variável ou realizar alguma ação com base nele
             }
             
             app.send({ api: "admin", mt: "SelectRoom", id: id });
         })
-
-        var user = {
-                mt:"ReplicateUpdate",
-                src:"inn-lab-ipva",
-                api:"PbxTableUsers",
-                columns:
-                    {
-                        guid:"6419b9ffeb446501ab45000c297dc696",
-                        dn:"Erick",
-                        cn:"Erick Cardoso",
-                        h323:"Erick-LAB",
-                        e164:"1015",
-                        node:"root",
-                            devices:[
-                                {"hw":"Erick-LAB"}
-                            ]
-                    }
-        }
-        //var selectUser = document.getElementById("select-users")
         var selectType = document.getElementById("select-users");
 
         var userSelect;
@@ -841,9 +848,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         
 
         });
+
         var removeUserOnPhone = listDeviceRoom.filter(function(room){
             
-            return room.hwid == id
+            return room.hwid == hwId
         })[0];
 
         console.log("Remove this user on PHONE", removeUserOnPhone)
@@ -855,15 +863,42 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     var getPhone = {
                         api: "admin",
                         mt: "GetPhone",
-                        hwId: id,
+                        hwId: hwId,
                         user: userSelect.guid
                     }
 
                     console.log("GETPHONE:",JSON.stringify(getPhone))
                     app.send(getPhone)
+                    
+                    var elements = document.getElementsByClassName("list-box");
+
+                    for (var i = 0; i < elements.length; i++) {
+                        var id = elements[i].id;
+                        console.log("ID da div:", id);
+                    }
+                    
+                    app.send({ api: "admin", mt: "SelectRoom", id: id });
                 }, setUserBtt));
 
-                
+        var setAppontBtt = phoneInfo.add(new innovaphone.ui1.Div(null, null, "button")
+        .addText("Agendar Telefone")
+        .addEvent("click", function () {
+
+            var calendar = colDireita.add(new innovaphone.ui1.Node('div', null, null, "phnCalendar").setAttribute("id", "phnCalendar"))
+            var elements = document.getElementsByClassName("list-box");
+
+            for (var i = 0; i < elements.length; i++) {
+                var id = elements[i].id;
+                console.log("ID da div:", id);
+            }
+            var roomfilter = list_RoomSchedule.filter(function(room){
+                return room.id == id
+            })[0]
+            
+            makePhoneSchedule(calendar, roomfilter.type)
+            console.log("LIST DEVICES",listDeviceRoom)
+
+        }, setAppontBtt));
 
         var rvButton = phoneInfo.add(new innovaphone.ui1.Div(null, null, "button")
                 .addText("Remover Usuário")
@@ -871,14 +906,24 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     var removeUser={
                         api: "admin",
                         mt: "RemoveUserPhone",
-                        hwId: id,
+                        hwId: hwId,
                         user: removeUserOnPhone.guid
                     }
                     console.log("Remove USER JSON:",JSON.stringify(removeUser))
                     app.send(removeUser)
+
+                    var elements = document.getElementsByClassName("list-box");
+
+                    for (var i = 0; i < elements.length; i++) {
+                        var id = elements[i].id;
+                        console.log("ID da div:", id);
+                    }
+                    
+                    app.send({ api: "admin", mt: "SelectRoom", id: id });
+                    waitConnection(_colDireita);
+
                     }, rvButton));
     }
-
 
     // continuar na quinta 
     function UpdateAvailability(availability){
@@ -1240,19 +1285,16 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
 
                             var startDate = new Date(start);
                             var endDate = new Date(end);
-                            console.log("Data do elemento SELECIONADO - start:" + startDate + "end:" + endDate)
-
-                            var startDateString = startDate.toISOString().substring(0, 10); 
-                            var endDateString = endDate.toISOString().substring(0, 10);   
-
-                            var startDateTimeString = startDateString + " " + startHour;
-                            var endDateTimeString = endDateString + " " + endHour;
+                            
+                             
+                            var start = moment(startHour, 'HH:mm',true);
+                            var end = moment(endHour, 'HH:mm',true);
+                            var dateStartMoment = moment(clickedDateStart);
+                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
 
                             dateStart = startDateTimeString
                             dateEnd = endDateTimeString
 
-                            console.log("Data de início concatenada: " + startDateTimeString);
-                            console.log("Data de término concatenada: " + endDateTimeString);
 
 
                             $('#calendar').fullCalendar('unselect');
@@ -1869,18 +1911,16 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
     function makePhoneButtons(obj){
         
         obj.forEach(function (phone) {
-            var userPicture = avatar.url(phone.sip ,80)
-            // console.log("SIP DO CARA" + phone.sip)
+
             var phoneHTML = `
-            <div class="StatusPhone${phone.online} phoneButtons" id="${phone.hwid}">
+            <div class="StatusPhone ${phone.online} phoneButtons" id="${phone.hwid}">
             <div class="user-info">
-                <img class="imgProfile" src="${userPicture}">
-                <div class="user-name">${phone.cn}</div>
+                <img class="imgProfile" src="../images/${phone.product}.png">
             </div>
             <div class="product-name">${phone.product}</div>
              </div>
             `;
-             document.getElementById("divPhones").innerHTML += phoneHTML;
+            document.getElementById("divPhones").innerHTML += phoneHTML;
         });
     }
     // construtor 

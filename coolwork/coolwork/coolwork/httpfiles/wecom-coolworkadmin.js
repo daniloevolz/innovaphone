@@ -190,11 +190,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         imguser.setAttribute("src", UIuserPicture);
         var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
         username.setAttribute("id", "user");
-        var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
-        var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
-        appointments.addEvent("click", function(){
-            tableAppointments(colDireita)
-        })
 
         var liTables = colEsquerda.add(new innovaphone.ui1.Node("li",null, "Tabelas", "liTables").setAttribute("id", "liTables"));
         var appointments = liTables.add(new innovaphone.ui1.Node("li",null, "Tabela Agendamentos", "tableAppoint").setAttribute("id", "tableAppoint"));
@@ -392,7 +387,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
         topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
         topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
-
+        
         divinputs = leftbox.add(new innovaphone.ui1.Div(null, null, "divInputs"));
         var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral"));
         divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
@@ -519,7 +514,9 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
             divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
-            var divPhones = divGeral.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
+            var phones = divGeral.add(new innovaphone.ui1.Div(null,null,"phones").setAttribute("id","Phones"))
+            var labelPhones = phones.add(new innovaphone.ui1.Div(null,"Telefones Disponíveis","lablephones").setAttribute("id","lablephones"))
+            var divPhones = phones.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
             var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
             imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
             console.log("Lista de telefones:", phone_list)
@@ -532,7 +529,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     var html = `
                     <div style="top: ${dev.topoffset}px; left: ${dev.leftoffset}px; cursor: pointer; position: absolute;" class="StatusPhone ${dev.pbxactive} phoneButtons" id="${dev.hwid}">
                         <div class="user-info">
-                            <img class="imgProfile" src="../images/IP112-Innovaphone.png">
+                            <img class="imgProfile" src="../images/${dev.product}.png">
                         </div>
                         <div class="product-name">${dev.product}</div>
                     </div>`;
@@ -1918,7 +1915,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             var phoneHTML = `
             <div class="StatusPhone ${phone.online} phoneButtons" id="${phone.hwid}">
             <div class="user-info">
-                <img class="imgProfile" src="../images/IP112-Innovaphone.png">
+                <img class="imgProfile" src="../images/${phone.product}.png">
             </div>
             <div class="product-name">${phone.product}</div>
              </div>

@@ -330,7 +330,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     //var dayOfWeek = findDayOfWeek(clickedElement.classList)
                                     switch (dayOfWeek) {
                                         case "segunda-feira":
-          
+                                        
+                                        // ~pietro 
                                             var start = moment(s.timestart_monday, 'HH:mm',true);
                                             var end = moment(s.timeend_monday, 'HH:mm',true);
                                             var clickedDateStartMoment = moment(clickedDateStart);
@@ -895,7 +896,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 schedules.forEach(function(dateS){
                                     var dataSplit = dateS.data_start
                                     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
+                                    console.log("Data Split " + GetDeviceSchedulesResult)
                                     console.log("Data S " + dataS)
 
                                     if(dataDate == dataS ){

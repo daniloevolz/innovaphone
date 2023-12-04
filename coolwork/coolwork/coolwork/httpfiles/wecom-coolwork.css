@@ -16,6 +16,7 @@ a {
     position: absolute;
     width: 85%;
     left: 15%; 
+    font-size: 15px;
     /*height:100%;*/
 }
 
@@ -210,14 +211,24 @@ a {
     border-radius: 10px;
     color: white;
 }
-.divPhones{
+.phones {
     position: absolute;
     width: 20%;
     height: 90%;
     display: flex;
     left: 3%;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
 }
+.lablephones{
+    font-size: 15px;
+}
+.divPhones{
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 

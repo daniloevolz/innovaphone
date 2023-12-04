@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteTarget>-808207115;10.10.20.42 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteDebuggerCommandArguments>--app-name=coolwork --app-domain=wecom.com.br --app-password=pwd --webserver-path=coolwork --db-name=coolwork --db-user=coolwork --db-password=coolwork --service-id=coolwork</RemoteDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>

@@ -16,7 +16,24 @@ a {
     position: absolute;
     width: 85%;
     left: 15%; 
+    font-size: 15px;
     /*height:100%;*/
+}
+
+.true{
+    background-color: green;
+}
+.false{
+    background-color: orange;
+}
+.phnCalendar {
+    left: 15%;
+    position: absolute;
+    top: 10%;
+    width: 550px;
+    height: 500px;
+    z-index: 1015;
+    background-color: rgb(90, 90, 55);
 }
 
 .divList{
@@ -194,14 +211,24 @@ a {
     border-radius: 10px;
     color: white;
 }
-.divPhones{
+.phones {
     position: absolute;
     width: 20%;
     height: 90%;
     display: flex;
     left: 3%;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
 }
+.lablephones{
+    font-size: 15px;
+}
+.divPhones{
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 
