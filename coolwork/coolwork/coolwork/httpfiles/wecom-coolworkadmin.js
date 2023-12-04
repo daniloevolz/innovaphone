@@ -510,16 +510,18 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelRoomName"), null).setAttribute("id", "list-room"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
             topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
-    
+            listbox.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:10%; text-align:center",room.name))
             divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:12%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
-            divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
+
             var phones = divGeral.add(new innovaphone.ui1.Div(null,null,"phones").setAttribute("id","Phones"))
             var labelPhones = phones.add(new innovaphone.ui1.Div(null,"Telefones Disponíveis","lablephones").setAttribute("id","lablephones"))
             var divPhones = phones.add(new innovaphone.ui1.Div(null,null,"divPhones").setAttribute("id","divPhones"))
-            var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div","position: absolute;width: 60%; left:40%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;",null,null).setAttribute("id","imgBD"))
-            imgRoom.add(new innovaphone.ui1.Node("img","position:absolute;width:100%;height:100%").setAttribute("src",room.img))
+            var imgRoom =  divGeral.add(new innovaphone.ui1.Node("div",null,null,"layoutRoom").setAttribute("id","imgBD"))
+            var labelRoomPhones = imgRoom.add(new innovaphone.ui1.Div(null,"Telefones em Uso","lablephones").setAttribute("id","lableRoomPhones"))
+
+            imgRoom.add(new innovaphone.ui1.Node("img","position:absolute; width:100%; height:95%; top:7%").setAttribute("src",room.img))
             console.log("Lista de telefones:", phone_list)
             makePhoneButtons(phone_list);
 
@@ -594,7 +596,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                 app.send({api:"admin", mt:"SelectAllRoom"})
 
             })
-            divGeral.add(new innovaphone.ui1.Node("button", "position:absolute;top:90%;height:30px;width:90px;text-align:center;font-weight:bold;left:80%", "Salvar", null).addEvent("click", function () {
+            divGeral.add(new innovaphone.ui1.Node("button", null, "Salvar", "saveBttn").addEvent("click", function () {
             console.log("Salvando");
 
             var activeDevices = document.querySelectorAll(".DeviceActive");

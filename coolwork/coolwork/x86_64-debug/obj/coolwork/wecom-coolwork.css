@@ -36,22 +36,6 @@ a {
     background-color: rgb(90, 90, 55);
 }
 
-.true{
-    background-color: green;
-}
-.false{
-    background-color: orange;
-}
-.phnCalendar {
-    left: 15%;
-    position: absolute;
-    top: 10%;
-    width: 550px;
-    height: 500px;
-    z-index: 1015;
-    background-color: rgb(90, 90, 55);
-}
-
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 
@@ -172,15 +156,15 @@ a {
     color: white;
 }
 
-#imgBD{
+/* #imgBD{
     position: relative;
     display: flex;
-    /* max-width: 400px;
-    max-height: 400px; */
+    max-width: 400px;
+    max-height: 400px;
     align-items: center;
     justify-content: center;
     top: 10%;
-}
+} */
 .divInputs{
     position: absolute;
     top: 15%;
@@ -231,9 +215,9 @@ a {
 }
 .phones {
     position: absolute;
-    width: 20%;
-    top: 20%;
-    height: 80%;
+    width: 35%;
+    top: 10%;
+    height: 86%;
     display: flex;
     left: 3%;
     justify-content: flex-start;
@@ -243,11 +227,31 @@ a {
 .lablephones{
     font-size: 15px;
 }
-.divPhones{
+.divPhones {
     display: flex;
     flex-wrap: wrap;
+    height: 95%;
+    width: 100%;
+    justify-content: center;
 }
-
+.layoutRoom{
+    position: absolute;
+    width: 60%;
+    left: 39%;
+    height: 90%;
+    display: flex;
+    top: 10%;
+    justify-content: center;
+}
+.saveBttn{
+    position: absolute;
+    top: 5%;
+    height: 30px;
+    width: 90px;
+    text-align: center;
+    font-weight: bold;
+    left: 91%;
+}
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 

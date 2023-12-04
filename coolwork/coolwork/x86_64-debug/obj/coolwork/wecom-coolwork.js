@@ -896,7 +896,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     var dataSplit = dateS.data_start
                                     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
                                     console.log("Data Split " + GetDeviceSchedulesResult)
-                                    console.log("Data Split " + GetDeviceSchedulesResult)
                                     console.log("Data S " + dataS)
 
                                     if(dataDate == dataS ){
