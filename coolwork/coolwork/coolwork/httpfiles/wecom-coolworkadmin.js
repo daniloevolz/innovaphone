@@ -203,7 +203,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 20%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 40%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
          list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
@@ -504,13 +504,14 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         list_room.forEach(function(room){
             listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow"))
+
             
             var topButtons = listbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelRoomName"), null).setAttribute("id", "list-room"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
             topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
     
-            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
+            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:12%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
             divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
@@ -522,7 +523,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             console.log("Lista de telefones:", phone_list)
             makePhoneButtons(phone_list);
 
-            
             if (listDeviceRoom.length > 0) {
                 listDeviceRoom.forEach(function (dev) {
                     console.log("List Dev ROOM:",JSON.stringify(dev));
@@ -569,6 +569,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                         this.style.backgroundColor = ''; // Volta à cor original
                         this.removeAttribute('title'); // Remove o texto do hover
                     });
+                });
+            }
             
             
 
@@ -769,9 +771,6 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         imgBD.appendChild(draggedElement);
     })
     }
-    
-})
-    }
     function clickedPhone(hwId, colDireita, e){
         console.log("Clicked Phone", hwId)
         var x = e.clientX;
@@ -936,10 +935,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         } 
         else {
             availability.forEach(function(dates){
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD HH:mm:ss');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD HH:mm:ss');
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD[T]HH:mm:ss');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD[T]HH:mm:ss');
                 tds.forEach(function(td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD HH:mm:ss');
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD[T]HH:mm:ss');
                     console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
                     if (dataDate >= datastart && dataDate <= dataend) {
                             td.classList.remove('unavailable');
@@ -1283,19 +1282,27 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                             var startHour = document.getElementById("startIpt").value;
                             var endHour = document.getElementById("endIpt").value;
 
-                            var startDate = new Date(start);
-                            var endDate = new Date(end);
+                            var clickedDateStart = start.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateStart);
+    
+                            var clickedDateEnd = end.format('YYYY-MM-DD');
+                            console.log("Data do elemento clicado Inicio:", clickedDateEnd);
+
+                            var clickedDateStartMoment = moment(clickedDateStart);
+
+                            var clickedDateEndMoment = moment(clickedDateEnd);
+
+                            var startMoment = moment(startHour, 'HH:mm',true);
+                            var endMoment = moment(endHour, 'HH:mm',true);
+
+                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startMoment.format('HH:mm');
+                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endMoment.format('HH:mm');
+
+                            dateStart = combinedDateTimeStart
+                            dateEnd = combinedDateTimeEnd
                             
-                             
-                            var start = moment(startHour, 'HH:mm',true);
-                            var end = moment(endHour, 'HH:mm',true);
-                            var dateStartMoment = moment(clickedDateStart);
-                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + start.format('HH:mm');
-
-                            dateStart = startDateTimeString
-                            dateEnd = endDateTimeString
-
-
+                            console.log(" Data inicio concatenada "  + dateStart) 
+                            console.log(" Data Fim concatenada " + dateEnd) 
 
                             $('#calendar').fullCalendar('unselect');
                         }
@@ -1524,8 +1531,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     api: "admin", mt: "InsertRoom", 
                     name: nameRoom, 
                     img: srcDaImagem, 
-                    dateStart: "", 
-                    dateEnd: "", 
+                    dateStart: dateStart, 
+                    dateEnd: dateEnd, 
                     type: optType, 
                     schedule: optModule, 
                     editor: editor, 

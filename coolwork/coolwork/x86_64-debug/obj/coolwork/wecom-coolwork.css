@@ -36,6 +36,22 @@ a {
     background-color: rgb(90, 90, 55);
 }
 
+.true{
+    background-color: green;
+}
+.false{
+    background-color: orange;
+}
+.phnCalendar {
+    left: 15%;
+    position: absolute;
+    top: 10%;
+    width: 550px;
+    height: 500px;
+    z-index: 1015;
+    background-color: rgb(90, 90, 55);
+}
+
 .divList{
     position: absolute;
     border-bottom: 1px solid #4b545c; 
@@ -62,13 +78,14 @@ a {
 .liTables{
     position: absolute;
     height: 10%;
-    top: 65%;
+    top: 85%;
     font-size: 15px;
     width: 100%;
     align-items: center;
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     flex-direction: column;
+    border-top: 1px solid #4b545c;
 
 }
 .tableAppoint{
@@ -158,8 +175,8 @@ a {
 #imgBD{
     position: relative;
     display: flex;
-    max-width: 400px;
-    max-height: 400px;
+    /* max-width: 400px;
+    max-height: 400px; */
     align-items: center;
     justify-content: center;
     top: 10%;
@@ -199,6 +216,7 @@ a {
     width: 270px;
     margin: 10px 0;
 }
+
 .left-box {
     margin: 25px 5px 25px 0;
     position: relative;
@@ -214,7 +232,8 @@ a {
 .phones {
     position: absolute;
     width: 20%;
-    height: 90%;
+    top: 20%;
+    height: 80%;
     display: flex;
     left: 3%;
     justify-content: flex-start;
@@ -245,7 +264,7 @@ a {
     left: 10px; 
     opacity: 0.8;
 }
-.liTables{
+/* .liTables{
     position: absolute;
     height: 10%;
     top: 65%;
@@ -256,7 +275,7 @@ a {
     justify-content: center;
     flex-direction: column;
     
-}
+} */
 .tableAppoint{
     font-size: 15px;
     color: white;

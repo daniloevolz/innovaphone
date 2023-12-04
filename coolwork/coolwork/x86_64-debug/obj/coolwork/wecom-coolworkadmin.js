@@ -203,7 +203,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             makeDivCreateRoom(colDireita)
         })
         var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;",texts.text("labelRooms") + "🔻" ,null))
-        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 20%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
+        var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 40%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
         // parte de exibição das salas
          list_AllRoom.forEach(function(room) {
             var liRoom =  rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id",room.id).addEvent("click",function(){
@@ -504,13 +504,14 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         list_room.forEach(function(room){
             listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id",room.id))
             listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id","closewindow"))
+
             
             var topButtons = listbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelRoomName"), null).setAttribute("id", "list-room"));
             topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
             topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
     
-            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:20%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
+            divinputs = listbox.add(new innovaphone.ui1.Div("position:absolute;top:12%;width:100%; height:80%; display: flex; justify-content: center;", null, null));
             var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral")); 
 
             divGeral.add(new innovaphone.ui1.Node("h1","position:absolute;width:100%;top:5%; text-align:center",room.name))
@@ -526,7 +527,9 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             if (listDeviceRoom.length > 0) {
                 listDeviceRoom.forEach(function (dev) {
                     console.log("List Dev ROOM:",JSON.stringify(dev));
+                    console.log("List Dev ROOM:",JSON.stringify(dev));
                     var html = `
+                    <div style="top: ${dev.topoffset}px; left: ${dev.leftoffset}px; cursor: pointer; position: absolute;" class="StatusPhone ${dev.pbxactive} phoneButtons" id="${dev.hwid}">
                     <div style="top: ${dev.topoffset}px; left: ${dev.leftoffset}px; cursor: pointer; position: absolute;" class="StatusPhone ${dev.pbxactive} phoneButtons" id="${dev.hwid}">
                         <div class="user-info">
                             <img class="imgProfile" src="../images/${dev.product}.png">
@@ -806,6 +809,13 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         var namePhone = nameUserPhone.cn == "null" ? nameUserPhone.hwid : nameUserPhone.cn;
 
         var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, namePhone, "phoneinfo").setAttribute("id", hwId));
+
+        var nameUserPhone = listDeviceRoom.filter(function(device){
+            return device.hwid == hwId;
+        })[0]
+        var namePhone = nameUserPhone.cn == "null" ? nameUserPhone.hwid : nameUserPhone.cn;
+
+        var phoneInfo = colDireita.add(new innovaphone.ui1.Node('div', null, namePhone, "phoneinfo").setAttribute("id", hwId));
         
 
         phoneInfo.setStyle("left", x + "px");
@@ -936,10 +946,10 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         } 
         else {
             availability.forEach(function(dates){
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD HH:mm:ss');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD HH:mm:ss');
+                var datastart = moment(dates.data_start).format('YYYY-MM-DD[T]HH:mm:ss');
+                var dataend = moment(dates.data_end).format('YYYY-MM-DD[T]HH:mm:ss');
                 tds.forEach(function(td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD HH:mm:ss');
+                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD[T]HH:mm:ss');
                     console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
                     if (dataDate >= datastart && dataDate <= dataend) {
                             td.classList.remove('unavailable');
@@ -1524,8 +1534,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                     api: "admin", mt: "InsertRoom", 
                     name: nameRoom, 
                     img: srcDaImagem, 
-                    dateStart: "", 
-                    dateEnd: "", 
+                    dateStart: dateStart, 
+                    dateEnd: dateEnd, 
                     type: optType, 
                     schedule: optModule, 
                     editor: editor, 
@@ -1912,7 +1922,9 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         
         obj.forEach(function (phone) {
 
+
             var phoneHTML = `
+            <div class="StatusPhone ${phone.online} phoneButtons" id="${phone.hwid}">
             <div class="StatusPhone ${phone.online} phoneButtons" id="${phone.hwid}">
             <div class="user-info">
                 <img class="imgProfile" src="../images/${phone.product}.png">
@@ -1920,6 +1932,7 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
             <div class="product-name">${phone.product}</div>
              </div>
             `;
+            document.getElementById("divPhones").innerHTML += phoneHTML;
             document.getElementById("divPhones").innerHTML += phoneHTML;
         });
     }
