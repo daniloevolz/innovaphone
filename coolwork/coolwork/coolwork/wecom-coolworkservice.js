@@ -571,7 +571,7 @@ new JsonApi("admin").onconnected(function(conn) {
             }
             if(obj.mt == "UpdateRoom"){
                 // var sql = "UPDATE tbl_room_schedule SET data_start = " + obj.datastart + ", data_end = " + obj.dataend + " WHERE room_id = '" + obj.roomID + "'";
-                var sql = "UPDATE tbl_room_schedule SET data_start = " + obj.datastart + ", data_end = " + obj.dataend + " WHERE room_id = '" + obj.roomID + "'";
+                var sql = "UPDATE tbl_room_schedule SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
                 Database.exec(sql)
                 .oncomplete(function (data) {
                     log("UpdateSuccess" + JSON.stringify(data));
