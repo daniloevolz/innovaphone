@@ -36,7 +36,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var UIuserPicture;
     var divinputs; 
     var avatar = start.consumeApi("com.innovaphone.avatar");
-
+    var devicesApi = start.consumeApi("com.innovaphone.devices");
+        devicesApi.onmessage.attach(onmessage); // onmessage is called for responses from the API
     // var websocket = null
 
     // function send(obj) {
@@ -90,10 +91,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var sip = "administrator";
 
 		
-that.add(new innovaphone.ui1.Div(null, null, "button")
-    .addText("Código de Provisionamento")
-    .addEvent("click", function () { devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: "Phones" }); }));
-
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
@@ -104,9 +101,8 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
         if (obj.msg.mt == "GetProvisioningCodeResult") {
             var code = obj.msg.code;
             console.log("devicesApi_onmessage:GetProvisioningCodeResult " + JSON.stringify(code));
-            that.add(new innovaphone.ui1.Node("span", "", code, ""));
-}
-        
+            labeling(code)
+        }
     }
     // setInterval(function(){
     //     devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e fazer melhorias 
@@ -270,12 +266,16 @@ that.add(new innovaphone.ui1.Div(null, null, "button")
                 .addText("Agendamento")
                 .addEvent("click", function () { app.send({api: "admin", mt: "InsertAppointment", type:"hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value})}, pcButton));
         var rvButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
-                .addText("Remove Telefone")
-                .addEvent("click", function () { app.send({api: "admin", mt:"ReplicateUpdate"})}, rvButton));
+                .addText("ProvisioningCode")
+                .addEvent("click", function () {devicesApi.send({ mt: "GetProvisioningCode", sip: "Erick-LAB", category: "inn-lab-ipva IP Phone" })}, rvButton));
 
         _colDireita = colDireita;
     }
-
+    function labeling(code){
+        console.log("PROVISION CODE STRINGFY", JSON.stringify(code))
+        console.log("PROVISION CODE", code)
+        _colDireita.add(new innovaphone.ui1.Node("div", "background-color: green; width: 300px; height: 300px; font-size: 50px; color: white; position: absolute; top: 30%; left: 50% ", code, "provCode")).setAttribute("id", "provCode");
+    }
     function tableAppointments(cRight){
         cRight.clear()
         var scrollcontainer = cRight.add((new innovaphone.ui1.Div(null, null, "list-box scrolltable")))
