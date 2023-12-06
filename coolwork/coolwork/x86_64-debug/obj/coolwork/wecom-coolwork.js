@@ -184,7 +184,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; top: 2%; justify-content: space-evenly;", null, null))
 
-        schedules.forEach(function (schedule) {    // revisar isso na segunda 30/10
+        schedules.forEach(function (schedule) {    
             if(schedule.schedule_module == "periodModule"){
                 divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("periodModule"), null))
             }else if(schedule.schedule_module == "dayModule"){
@@ -241,7 +241,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
                         console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
-                        makeDivPhoneProprieties(proprietiesDiv, room, schedules, d, resultMsg.schedules)
+                        makeDivPhoneProprieties(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
                     }
                 );
 
@@ -250,32 +250,18 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
 
     }
-    function makeDivPhoneProprieties(t, room, room_availability, device, dev_schedules) {
-       
-        // var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"))
-        // var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", device.id))
-        // listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closeDevWindow"))
-        // listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:100%;top:0%; text-align:center", device.product))
-
-        // var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; justify-content: space-evenly;", null, null))
-        // document.getElementById("closeDevWindow").addEventListener("click", function () {  // close 
-        //     t.rem(insideDiv);
-
-        // })
-        //var divSchedule = listbox.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:block").setAttribute("id", "div-schedule"))
-        //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button", "width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;", texts.text("labelCreateRoom"), null).setAttribute("id", "btnSaveRoom"))
-        // listbox.add(new innovaphone.ui1.Div("position:absolute;top:10%", null, null).setAttribute("id", "calendar"))
-        var dev_schedulesList = JSON.parse(dev_schedules)
+    function makeDivPhoneProprieties(t, room, divCalendar, defaultView, room_availability, device, dev_schedules) {
+            var dev_schedulesList = JSON.parse(dev_schedules)
 
             $(document).ready(function () {
                 $.fullCalendar.locale('pt-br');
                 // var id = $.urlParam('id');
-                $('#proprietiesDiv').fullCalendar('destroy'); // recriar o calendario quando clicar em outro fone 
-                $('#proprietiesDiv').fullCalendar({
+                $(`#${divCalendar}`).fullCalendar('destroy'); // recriar o calendario quando clicar em outro fone 
+                $(`#${divCalendar}`).fullCalendar({
     
                     header: {
                         left: 'today',
-                        center: 'title , month,agendaDay', //agendaWeek,
+                        center: 'title , month, agendaDay', //agendaWeek,
                         right: 'prev,next'
                     },
                     buttonText: {
@@ -298,7 +284,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         'Novembro',
                         'Dezembro'
                     ],
-                    defaultView: 'month',
+                    defaultView: `${defaultView}`, // definir no parametro 
                     slotDuration: '01:00:00',
                     minTime: '00:00:00',
                     maxTime: '24:00:00',
@@ -330,22 +316,18 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                     //var dayOfWeek = findDayOfWeek(clickedElement.classList)
                                     switch (dayOfWeek) {
                                         case "segunda-feira":
-
-                                            // ~pietro 
                                             var startTemp = moment(s.timestart_monday, 'HH:mm', true);
                                             var endTemp = moment(s.timeend_monday, 'HH:mm', true);
                                             var clickedDateStartMoment = moment(clickedDateStart);
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
                                                 return dateS.data_start === combinedDateTimeStart;
                                             });
-
-
-
 
                                             if (dateOccupied) {
                                                 // se tiver ocupado acaba aqui - Pietro
@@ -355,20 +337,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
 
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
                                                         console.log("CombinedDateTimeStart")
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                        makeDivConfirmPhoneRecurrentSchedule(t, room);
-
                                                     }
-                                                    //return
                                                 } else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
                                                     console.log("WECOM LOG: Data indisponível!!!")
@@ -376,13 +352,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             }
                                             return;
                                         case "terça-feira":
-
                                             var startTemp = moment(s.timestart_tuesday, 'HH:mm', true);
                                             var endTemp = moment(s.timeend_tuesday, 'HH:mm', true);
                                             var clickedDateStartMoment = moment(clickedDateStart);
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -400,21 +376,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_tuesday);
                                                     var endTemp = moment(s.timeend_tuesday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
 
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
-
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
-                                                    }
-                                                    return;
+                                                    } 
                                                 }
                                                 else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
@@ -430,6 +399,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -446,18 +416,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_wednesday);
                                                     var endTemp = moment(s.timeend_wednesday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-
-                                                    }
+                                                    } 
                                                     return;
                                                 } else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
@@ -473,6 +439,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -489,20 +456,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_thursday);
                                                     var endTemp = moment(s.timeend_thursday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
-                                                    }
-                                                    return;
+                                                    } 
+                                                
                                                 } else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
                                                     console.log("WECOM LOG: Data indisponível!!!")
@@ -517,6 +479,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -533,20 +496,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_friday);
                                                     var endTemp = moment(s.timeend_friday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-
                                                     }
-                                                    return
                                                 } else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
                                                     console.log("WECOM LOG: Data indisponível!!!")
@@ -561,6 +518,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -576,20 +534,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_saturday);
                                                     var endTemp = moment(s.timeend_saturday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
                                                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
 
-                                                    } else if (s.schedule_module == "periodoModule") {
-
-                                                        console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                                        makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, selectstart);
-
                                                     }
-                                                    return;
                                                 } else {
                                                     //Implementar mensagem de Data indisponível aqui. Toast
                                                     console.log("WECOM LOG: Data indisponível!!!")
@@ -604,6 +556,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
 
                                             var clickedDateEndMoment = moment(clickedDateEnd);
+                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                                             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
 
                                             var dateOccupied = dev_schedulesList.some(function (dateS) {
@@ -619,8 +572,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                     var startTemp = moment(s.timestart_sunday);
                                                     var endTemp = moment(s.timeend_sunday);
                                                     if (s.schedule_module == "hourModule") {
-                                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                                        $('#calendar').fullCalendar('gotoDate', start);
+                                                        $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                        $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                                     } else if (s.schedule_module == "dayModule") {
                                                         console.log("Abrir modal para confirmar o dia inteiro.")
 
@@ -646,21 +599,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 if (s.type == "periodType") {
                                     if (selectstart >= s.data_start.split("T")[0] && selectstart <= s.data_end.split("T")[0]) {
                                         if (s.schedule_module == "hourModule") {
-                                            $('#proprietiesDiv').fullCalendar('changeView', 'agendaDay');
-                                            $('#proprietiesDiv').fullCalendar('gotoDate', start);
+                                            $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                            $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                         } else if (s.schedule_module == "dayModule") {
                                             console.log("Abrir modal para confirmar o dia inteiro.")
-                                            var combinedDateTimeStart = selectstart+"T"+s.data_start.split("T")[1]
-                                            var combinedDateTimeEnd = selectstart + "T" +s.data_end.split("T")[1]
+                                            var combinedDateTimeStart = clickedDateStart+"T"+s.data_start.split("T")[1]
+                                            var combinedDateTimeEnd = clickedDateEnd + "T" +s.data_end.split("T")[1]
                                             makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
     
-                                        } else if (s.schedule_module == "periodoModule") {
-    
-                                            console.log("Abrir modal para perguntar se será manhã ou tarde.")
-                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start);
-    
-                                        }
-                                        return
+                                        } 
                                     } else {
                                         //Implementar mensagem de Data indisponível aqui. Toast
                                         console.log("WECOM LOG: Data indisponível!!!")
@@ -669,17 +616,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             })
                             //$('#proprietiesDiv').fullCalendar('unselect');
                         }
-                        else if (view.name === 'agendaWeek') {
-                            console.log("View: " + "Week");
-    
-                            var clickedElement = jsEvent.target
-                            console.log(" Elemento clicado " + clickedElement);
-                            var clickedDate = start.format('YYYY-MM-DD');
-                            console.log("Data do elemento clicado:", clickedDate);
-                            var teste = false;
-    
-                        }
                         else {
+                            schedules.forEach(function (s) {
                             console.log("View: " + "day");
                             // data inicio em iso string 
                             dateStart = "";
@@ -689,8 +627,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             dateEnd = "";
                             dateEnd = new Date(end);
                             console.log("data de término " + formatDate(dateEnd.toISOString()))
-                            makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, schedules, start);
-    
+                            makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
+                            })
     
                         }
                     },
@@ -704,19 +642,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         if (view.name === 'month') {
                             console.log('View: Modo mês');
                             console.log("DEV SCHEDULES" + dev_schedules)
-                            // var dev_schedulesList = JSON.parse(dev_schedules)
                             UpdateAvailability(room_availability, dev_schedulesList);
-                            
-                            // os agendamentos só vao aparecer se forem maior do que
-                            // a data de hoje 
-                        }
-                        else if (view.name === 'agendaWeek') {
-                            console.log("View Modo Semana")
                         }
                         else {
                             console.log('View: Modo dias');
-                            
-    
                             dayName = view.title
                             console.log("View title result = " + dayName)
                             var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
@@ -725,8 +654,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             var month = getMonthIndex(dateParts[1]);
                             var year = dateParts[2];
                             console.log("View day result = " + day + "/" + month + "/" + year)
-
-                            UpdateDayAvailability(room_availability, dev_schedulesList);
+                            UpdateDayAvailability(room_availability, dev_schedulesList, day, month, year);
                             // Função auxiliar para obter o índice do mês com base no nome do mês
                             function getMonthIndex(monthName) {
                                 var months = [
@@ -745,20 +673,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
 
     function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
-        // var start;
-        // var end;
         console.log("Start para Envio:" + start )
         console.log("End para Envio:" + end )
-        // schedules.forEach(function(s){
-        //     switch (s.schedule_module) {
-        //         case "dayModule":
-        //             start = start + "" + s.time_start // ajustar
-        //             end = start +" "+ s.
-        //             return
-        //         case "hourModule":
-        //             return
-        //     }
-        // })
         var today = new Date();
         var dataHoje = today.toISOString().split('T')[0];
 
@@ -769,7 +685,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
             listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
                 t.rem(insideDiv);
-    
             }))
             listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
             listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
@@ -895,7 +810,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 schedules.forEach(function(dateS){
                                     var dataSplit = dateS.data_start
                                     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + GetDeviceSchedulesResult)
+                                    //console.log("Data Split " + GetDeviceSchedulesResult)
                                     console.log("Data S " + dataS)
 
                                     if(dataDate == dataS ){
@@ -1146,7 +1061,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         return count;
     }
 
-    function UpdateDayAvailability(datastart, dataend, availability, schedules, day, month, year) {
+    function UpdateDayAvailability(availability, schedules, day, month, year) {
         // var tds = document.querySelectorAll('.fc-widget-content');
         var trs = document.querySelectorAll('.fc-slats tr');
         if (availability.length === 0) {
@@ -1157,16 +1072,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             });
         }
         else {
-
-
             //Deixa tudo indisponível
             trs.forEach(function (tr) {
                 tr.classList.remove('available');
                 tr.classList.add('unavailable');
             });
             console.log("UpdateDayAvailability");
-
-
             availability.forEach(function (dates) {
                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                 var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');

@@ -293,8 +293,8 @@ new JsonApi("user").onconnected(function(conn) {
                 var hwId = obj.dev;
                 var now = getDateNow();
 
-                Database.exec("SELECT * FROM tbl_device_schedule WHERE device_id ='" + hwId +"' AND device_room_id ='"+roomId+"' AND data_start >='" + now + "'")
-                // tentar sem o data_start  ~pietro continuar 29/11
+                Database.exec("SELECT * FROM tbl_device_schedule WHERE device_id ='" + hwId +"' AND device_room_id ='" + roomId + "'")
+                
                     .oncomplete(function (data) {
                         log("WECOM LOG:GetDeviceSchedules: ", JSON.stringify(data))
                         conn.send(JSON.stringify({ api: "user", mt: "GetDeviceSchedulesResult", room: obj.room, dev: obj.dev, schedules: JSON.stringify(data), src: obj.src }));
@@ -808,7 +808,6 @@ function deviceAnalise(deviceId, userObj) { // verificar se tem usuario e remove
                         // remover usuario do telefone que esta atualmente
                         log("User Obj on phone" + JSON.stringify(u)) 
                         pbxTableUpdateDevice(2, deviceId, u);
-                        log("deviceFound dentro do foreach =  " + deviceFound)
                         return;
                 }
             });
