@@ -1626,7 +1626,6 @@ function editUsersDepartmentsGrid() {
 
             var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
         
-
             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
             viewerCheckbox.setAttribute("name", "viewerDepartments");
             viewerCheckbox.setAttribute("value", user.guid);
