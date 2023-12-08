@@ -593,3 +593,108 @@ dialog {
 dialog::backdrop {
     background-color: hsl(250, 100%, 50%, 0.25);
 }
+
+/* calendar wecom */
+
+
+/* Estilos para o calendário */
+#bodycalendar{
+    display: inline-flex;
+    height: 414px;
+    padding: 23px 15px;
+    flex-direction: column;
+    align-items: center;
+    gap: 19px;
+    background: var(--Background, #FFF);
+    box-shadow: 0px 20px 50px 0px rgba(0, 0, 0, 0.15);
+  }
+  
+  .calendar {
+    background: var(--Background, #FFF);
+   
+  }
+  #month-year{
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    color: var(--Black, #212529);
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 125% */
+  }
+  table {
+    color: var(--Black, #212529);
+    text-align: center;
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px; /* 187.5% */
+  }
+  
+  table th, table td {
+    /* border: 1px solid #ccc; */
+    padding: 8px;
+    text-align: center;
+  }
+  table tr{
+    color: var(--black-400, #6C757D);
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 41px;
+  
+  }
+  .header h1{
+    width: 160px;
+    justify-content: center;
+  }
+  .header button{
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+  #month-year {
+    margin: 0;
+  }
+  /* Arquivo calendar.css */
+  
+  .prev-month {
+    color: lightgray; /* Define a cor dos dias do mês anterior */
+  }
+  .next-month{
+    color: lightgray;
+  }
+  .clock {
+  
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .clock span {
+    position: absolute;
+    transform: rotate(calc(30deg * var(--i))); 
+    inset: 12px;
+    text-align: center;
+  }
+  
+  .clock span b {
+    transform: rotate(calc(-30deg * var(--i)));
+    display: inline-block;
+    font-size: 20px;
+  }
+  
+  
+  
