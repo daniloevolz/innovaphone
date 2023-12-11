@@ -242,7 +242,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
                         console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
-                        makeDivPhoneProprieties(proprietiesDiv, room, proprietiesDiv, "month",  schedules, d, resultMsg.schedules)
+                        makeDivPhoneProprieties(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
                     }
                 );
 
@@ -266,8 +266,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                 // $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                                             } else if (s.schedule_module == "dayModule") {
                                                   
-                                                buildCalendar(room_availability,dev_schedulesList,divCalendar,device,room)
-    
+                                               // buildCalendar(room_availability,dev_schedulesList,divCalendar,device,room)
+
+                                                Calendar.createCalendar(divCalendar)
+
+
+
+
+
                                                 // var startTemp = moment(s.data_start, 'HH:mm', true);
                                                 // var endTemp = moment(s.data_end, 'HH:mm', true);
                                                 // var clickedDateStartMoment = moment(clickedStart);
@@ -396,7 +402,7 @@ function rebuildCalendar(availability,schedule,room,device) {
   var cells = document.querySelectorAll("#calendar-body td");
   cells.forEach(function(cell) {
 
-    UpdateAvailability(availability,schedule,room,device)
+    //UpdateAvailability(availability,schedule,room,device)
     var selectedDate = moment([year, currentMonth, cell.innerHTML]);
     var diaDaSemana = selectedDate.format('dddd'); // 'dddd' retorna o nome completo do dia
     cell.setAttribute("day-week", diaDaSemana); 
