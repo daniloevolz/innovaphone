@@ -17,7 +17,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var _colDireita;
     var schedules = []
 
-    
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -113,7 +113,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function constructor(t) {
         t.clear()
         // col esquerda
-        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda bg-clifford"));
         colEsquerda.setAttribute("id", "colesquerda")
 
         // col direita
@@ -168,7 +168,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
         var dateEndInput = document.getElementById("inputDateEnd")
 
-        var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
+        var pcButton = divAppointment.add(new innovaphone.ui1.Node("button",null, null, "bg-primary-900 border-2 border-primary-400")
             .addText("Set Presence")
             .addEvent("click", function () { app.send({ api: "admin", mt: "InsertAppointment", type: "hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value }) }, pcButton));
 

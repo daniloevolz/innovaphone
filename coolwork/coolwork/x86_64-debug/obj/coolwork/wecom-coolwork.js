@@ -17,7 +17,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var _colDireita;
     var schedules = []
 
-    
+
     var colorSchemes = {
         dark: {
             "--bg": "#191919",
@@ -113,7 +113,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function constructor(t) {
         t.clear()
         // col esquerda
-        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda bg-clifford"));
         colEsquerda.setAttribute("id", "colesquerda")
 
         // col direita
@@ -168,7 +168,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
         var dateEndInput = document.getElementById("inputDateEnd")
 
-        var pcButton = divAppointment.add(new innovaphone.ui1.Div(null, null, "button")
+        var pcButton = divAppointment.add(new innovaphone.ui1.Node("button",null, null, "bg-primary-900 border-2 border-primary-400")
             .addText("Set Presence")
             .addEvent("click", function () { app.send({ api: "admin", mt: "InsertAppointment", type: "hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value }) }, pcButton));
 
@@ -252,152 +252,217 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeDivPhoneProprieties(t, room, divCalendar, defaultView, room_availability, device, dev_schedules) {
             var dev_schedulesList = JSON.parse(dev_schedules)
 
-            $(document).ready(function () {
-                $.fullCalendar.locale('pt-br');
-                // var id = $.urlParam('id');
-                $(`#${divCalendar}`).fullCalendar('destroy'); // recriar o calendario quando clicar em outro fone 
-                $(`#${divCalendar}`).fullCalendar({
-    
-                    header: {
-                        left: 'today',
-                        center: 'title , month, agendaDay', //agendaWeek,
-                        right: 'prev,next'
-                    },
-                    buttonText: {
-                        today: 'Hoje',
-                        month: 'Mês',
-                        week: 'Semana',
-                        day: 'Dia'
-                    },
-                    monthNames: [
-                        'Janeiro',
-                        'Fevereiro',
-                        'Março',
-                        'Abril',
-                        'Maio',
-                        'Junho',
-                        'Julho',
-                        'Agosto',
-                        'Setembro',
-                        'Outubro',
-                        'Novembro',
-                        'Dezembro'
-                    ],
-                    defaultView: `${defaultView}`, // definir no parametro 
-                    slotDuration: '01:00:00',
-                    minTime: '00:00:00',
-                    maxTime: '24:00:00',
-                    selectable: true,
-                    selectLongPressDelay: 0,
-    
-                    selectHelper: true,
-                    select: function (start, end, jsEvent, view) {
-                        var selectstart = start.format('YYYY-MM-DD[T]HH:mm:ss');
-                        var selectend = end.format('YYYY-MM-DD[T]HH:mm:ss');
-                        var dayOfWeek = start.format('dddd');
-    
-                        if (view.name === 'month') {
-                            console.log("View: Month");
-                            var clickedElement = jsEvent.target
-    
-                            console.log(" Elemento clicado " + clickedElement);
-                            
-                            var clickedDateStart = start.format('YYYY-MM-DD');
-                            console.log("Data do elemento clicado Inicio:", clickedDateStart);
-    
-                            var clickedDateEnd = end.format('YYYY-MM-DD');
-                            console.log("Data do elemento clicado Inicio:", clickedDateEnd);
-
+            
                             room_availability.forEach(function (s) {
-                                if (s.type == "recurrentType") {
-                                    makeRecurrentSchedule(t, room, divCalendar, device, s, dayOfWeek, clickedDateStart, clickedDateEnd, dev_schedulesList)
-                                }
+                                // if (s.type == "recurrentType") {
+                                //     makeRecurrentSchedule(t, room, divCalendar, device, s, dayOfWeek, clickedDateStart, clickedDateEnd, dev_schedulesList)
+                                // }
                                 if (s.type == "periodType") {
-                                    if (selectstart >= s.data_start.split("T")[0] && selectstart <= s.data_end.split("T")[0]) {
-                                        if (s.schedule_module == "hourModule") {
-                                            $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-                                            $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-                                        } else if (s.schedule_module == "dayModule") {
-                                            console.log("Abrir modal para confirmar o dia inteiro.")
-                                            // var combinedDateTimeStart = clickedDateStart+"T"+s.data_start.split("T")[1]
 
-                                            var startTemp = moment(s.data_start, 'HH:mm', true);
-                                            var endTemp = moment(s.data_end, 'HH:mm', true);
-                                            var clickedDateStartMoment = moment(clickedStart);
-                                            var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-                            
-                                            var clickedDateEndMoment = moment(clickedEnd);
-                                            clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-                                            var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-                                            
-                                            var combinedDateTimeEnd = clickedDateEnd + "T" +s.data_end.split("T")[1]
-                                            makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
+                                             if (s.schedule_module == "hourModule") {
+                                                // $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
+                                                // $(`#${divCalendar}`).fullCalendar('gotoDate', start);
+                                            } else if (s.schedule_module == "dayModule") {
+                                                  
+                                                buildCalendar(room_availability,dev_schedulesList,divCalendar,device,room)
     
-                                        } 
-                                    } else {
-                                        //Implementar mensagem de Data indisponível aqui. Toast
-                                        console.log("WECOM LOG: Data indisponível!!!")
+                                                // var startTemp = moment(s.data_start, 'HH:mm', true);
+                                                // var endTemp = moment(s.data_end, 'HH:mm', true);
+                                                // var clickedDateStartMoment = moment(clickedStart);
+                                                // var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
+                                                // var clickedDateEndMoment = moment(clickedEnd);
+                                                // clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
+                                                // var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
+                                                // var combinedDateTimeEnd = clickedDateEnd + "T" +s.data_end.split("T")[1]
+                                                // makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
+        
+                                            } 
+                                    
+                
                                     }
-                                }
-                            })
+                                    
+                                        
+                                // if (selectstart >= s.data_start.split("T")[0] && selectstart <= s.data_end.split("T")[0]) {
+                                //             } 
+            
+                                //             else {
+                                //         //Implementar mensagem de Data indisponível aqui. Toast
+                                //         console.log("WECOM LOG: Data indisponível!!!")
+                                //     }
+                                })
+                            
                             
                         }
-                        else {
-                            room_availability.forEach(function (s) {
-                            console.log("View: " + "day");
-                            // data inicio em iso string 
-                            dateStart = "";
-                            dateStart = new Date(start);
-                            console.log("data de início " + formatDate(dateStart.toISOString()))
-                            // data fim
-                            dateEnd = "";
-                            dateEnd = new Date(end);
-                            console.log("data de término " + formatDate(dateEnd.toISOString()))
-                            makeDivConfirmPhoneRecurrentSchedule(listbox, room, device, s, start);
-                            })
+
+var currentMonth;
+var year;
+
+function buildCalendar(availability,schedule,divCalendar,device,room) {
+
+            document.getElementById(divCalendar).innerHTML = ''
+            document.getElementById(divCalendar).innerHTML += 
+            `<div id="bodycalendar">
+
+            <div class="calendar">
+              <div class="header">
+                <button id="prevMonth" style="display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; transform: rotate(-0deg);"><</button>
+                <h1 id="month-year"></h1>
+                <button id="nextMonth"style="display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; transform: rotate(180deg);"><</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dom</th>
+                    <th>Seg</th>
+                    <th>Ter</th>
+                    <th>Qua</th>
+                    <th>Qui</th>
+                    <th>Sex</th>
+                    <th>Sáb</th>
+                  </tr>
+                </thead>
+                <tbody id="calendar-body">
+                  <!-- Aqui será preenchido com os dias do mês -->
+                </tbody>
+              </table>
+            </div>
+            </div>
+            <div id="schedule-container" class="divclock"></div>`
+
     
-                        }
-                    },
-                    editable: false,
-                    eventLimit: true,
-                    events: [],
-                    eventRender: function (event, element) { },
-    
-                    viewRender: function (view, element) {
-    
-                        if (view.name === 'month') {
-                            console.log('View: Modo mês');
-                            console.log("DEV SCHEDULES" + dev_schedules)
-                            UpdateAvailability(room_availability, dev_schedulesList);
-                        }
-                        else {
-                            console.log('View: Modo dias');
-                            dayName = view.title
-                            console.log("View title result = " + dayName)
-                            var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
-                            // Obtém os valores do dia, mês e ano
-                            var day = String(dateParts[0]).padStart(2, '0');
-                            var month = getMonthIndex(dateParts[1]);
-                            var year = dateParts[2];
-                            console.log("View day result = " + day + "/" + month + "/" + year)
-                            UpdateDayAvailability(room_availability, dev_schedulesList, day, month, year);
-                            // Função auxiliar para obter o índice do mês com base no nome do mês
-                            function getMonthIndex(monthName) {
-                                var months = [
-                                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                                ];
-                                var index = months.indexOf(monthName) + 1;
-    
-                                return String(index).padStart(2, '0');
-                            }
-                        }
-                    },
-                });
-    
-            });
+  var date = new Date();
+  currentMonth = date.getMonth();
+  year = date.getFullYear();
+
+  document.getElementById("prevMonth").addEventListener("click", function() {
+    currentMonth--;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      year--;
     }
+    rebuildCalendar(availability,schedule,device,room);
+  });
+
+  document.getElementById("nextMonth").addEventListener("click", function() {
+    currentMonth++;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      year++;
+    }
+    rebuildCalendar(availability,schedule,room,device);
+  });
+
+  rebuildCalendar(availability,schedule,room,device);
+}
+
+// function buildDailySchedule(day) {
+//   var scheduleContainer = document.getElementById("schedule-container");
+//   scheduleContainer.innerHTML = `
+//     <div class="clock">
+//       <div class="clock-face">
+//         ${generateClockMarks()}
+//       </div>
+//     </div>`;
+// }
+
+function generateClockMarks() {
+  let marksHTML = '';
+  for (let i = 1; i <= 12; i++) {
+    marksHTML += `<div class="triangle" style="--i: ${i};"><b>${i}</b></div>`;
+  }
+  return marksHTML;
+}
+
+function rebuildCalendar(availability,schedule,room,device) {
+  var calendarBody = document.getElementById("calendar-body");
+  calendarBody.innerHTML = "";
+
+  var date = new Date([year, currentMonth, 1]);
+  var currentMonthFirstDay = date.getDay()
+  var daysInMonth = new Date(year, currentMonth + 1, 0).getDate();
+
+  var prevMonth = new Date(year, currentMonth, 0);
+  var daysInPrevMonth = prevMonth.getDate();
+  var prevMonthStartDay = prevMonth.getDay();
+
+  var day = 1;
+  var row;
+
+  var monthYearHeader = document.getElementById("month-year");
+  monthYearHeader.innerHTML = getMonthName(currentMonth) + " " + year;
+
+  row = calendarBody.insertRow();
+
+  for (var i = 0; i < currentMonthFirstDay; i++) {
+    var cell = row.insertCell();
+    var dayToShow = daysInPrevMonth - currentMonthFirstDay + i + 1;
+    cell.innerHTML = dayToShow;
+    cell.classList.add("prev-month");
+  }
+
+  for (var i = 0; i < daysInMonth; i++) {
+    if (row.cells.length === 7) {
+      row = calendarBody.insertRow();
+    }
+    var cell = row.insertCell();
+    cell.innerHTML = day;
+    cell.addEventListener("click", function() {
+    //   buildDailySchedule(parseInt(this.innerHTML));
+    });
+    day++;
+  }
+
+  var nextMonthDay = 1;
+  while (row.cells.length < 7) {
+    var cell = row.insertCell();
+    cell.innerHTML = nextMonthDay;
+    cell.classList.add("next-month");
+    nextMonthDay++;
+  }
+  var cells = document.querySelectorAll("#calendar-body td");
+  cells.forEach(function(cell) {
+
+    UpdateAvailability(availability,schedule,room,device)
+    var selectedDate = moment([year, currentMonth, cell.innerHTML]);
+    var diaDaSemana = selectedDate.format('dddd'); // 'dddd' retorna o nome completo do dia
+    cell.setAttribute("day-week", diaDaSemana); 
+
+    var selectedDay = parseInt(cell.innerHTML);
+    var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
+    cell.setAttribute("data-date", formattedDate )
+
+    cell.addEventListener("click",function(){
+        console.log("Data inicio:" + formattedDate + "00:00")
+        console.log("Data Fim:" + formattedDate + "23:59")
+        // makeDivConfirmPhoneRecurrentSchedule()
+    })
+
+    // cell.addEventListener("click", function() {
+    //     schedule.forEach(function(s){
+    //         console.log("Data de agendamento Inicio:" + formattedDate + s.data_start )
+    //         console.log("Data de agendamento Fim:" + formattedDate + s.data_end )
+    //     })
+        
+        // makeDivConfirmPhoneRecurrentSchedule()
+    //   buildDailySchedule(selectedDay);
+    });
+
+
+}
+
+function getMonthName(month) {
+  var months = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+  return months[month];
+}
+
+function getDayName(day) {
+  var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  return days[day];
+}
+
     function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
         console.log("Start para Envio:" + start )
         console.log("End para Envio:" + end )
@@ -510,15 +575,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 var endTemp = moment(s.timeend_wednesday, 'HH:mm');
                 var clickedDateStartMoment = moment(clickedStart);
                 var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
                 var clickedDateEndMoment = moment(clickedEnd);
                 clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
                 var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
                 var dateOccupied = dev_schedule.some(function (dateS) {
                     return dateS.data_start === combinedDateTimeStart;
                 });
-
                 if (dateOccupied) {
                     // se tiver ocupado acaba aqui - Pietro
                     console.log("WECOM LOG: Telefone ocupado nesta data!!!");
@@ -533,9 +595,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                         } else if (s.schedule_module == "dayModule") {
                             console.log("Abrir modal para confirmar o dia inteiro.")
-
                             makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
                         } 
                         return;
                     } else {
@@ -573,9 +633,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             $(`#${divCalendar}`).fullCalendar('gotoDate', start);
                         } else if (s.schedule_module == "dayModule") {
                             console.log("Abrir modal para confirmar o dia inteiro.")
-
                             makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
                         } 
                     
                     } else {
@@ -740,9 +798,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
     function UpdateAvailability(availability, schedules) {
-        var tds = document.querySelectorAll('.fc-day', '.fc-highlight');
+        var cells = document.querySelectorAll("#calendar-body td");
         if (availability.length === 0) {
-            tds.forEach(function (td) {
+            cells.forEach(function (td) {
                 td.classList.add('unavailable');
             });
         }
@@ -992,20 +1050,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 } else if (dates.type == "periodType"){
                     var datastart = moment(dates.data_start).format('YYYY-MM-DD');
                     var dataend = moment(dates.data_end).format('YYYY-MM-DD');
-                    tds.forEach(function (td) {
+                    cells.forEach(function (td) {
                         var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
-                        var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
-                        hourAvail -= hourBusy;
-                        console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
+                        // var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
+                        // var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
+                        // hourAvail -= hourBusy;
+                        // console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
                         if (dataDate >= datastart && dataDate <= dataend) {
-                            if (hourAvail <= 6) {
-                                td.classList.remove('unavailable');
-                                td.classList.add('parcialavailable');
-                            } else {
-                                td.classList.remove('unavailable');
-                                td.classList.add('available');
-                            }
+                            td.classList.remove("unavailable")
+                            td.classList.add("available")
 
                         } else {
                             td.classList.add('unavailable');

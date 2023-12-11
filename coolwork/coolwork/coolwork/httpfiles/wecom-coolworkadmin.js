@@ -110,7 +110,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     // setInterval(function(){
     //     devicesApi.send({ mt: "GetPhones" }); // controlador - revisar e fazer melhorias 
     // },5000)
-
+        
     function app_message(obj) {
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
             phone_list = JSON.parse(obj.result)
@@ -171,7 +171,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         controlDB = false
         t.clear()
         // col esquerda
-        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
+        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda "));
         colEsquerda.setAttribute("id", "colesquerda")
 
         // col direita
