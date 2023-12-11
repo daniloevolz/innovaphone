@@ -11,6 +11,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var UIuser;
     var avatar;
     var appdn = start.title;
+    var appUrl = start.originalUrl;
     var UIuserPicture;
     var devicesApi;
     var list_MyRooms = [];
@@ -58,6 +59,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         avatar = new innovaphone.Avatar(start, user, domain);
         UIuserPicture = avatar.url(user, 80, dn);
         avatar = new innovaphone.Avatar(start, user, domain);
+        appUrl = appUrl + "/Calendar.html"
 
         
         app.send({ api: "user", mt: "SelectMyRooms" })
@@ -113,7 +115,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function constructor(t) {
         t.clear()
         // col esquerda
-        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda bg-clifford"));
+        var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda bg-primary-900"));
         colEsquerda.setAttribute("id", "colesquerda")
 
         // col direita
@@ -240,7 +242,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
                         console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
-                        makeDivPhoneProprieties(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
+                        makeDivPhoneProprieties(proprietiesDiv, room, proprietiesDiv, "month",  schedules, d, resultMsg.schedules)
                     }
                 );
 
@@ -298,38 +300,10 @@ var currentMonth;
 var year;
 
 function buildCalendar(availability,schedule,divCalendar,device,room) {
-
-            document.getElementById(divCalendar).innerHTML = ''
-            document.getElementById(divCalendar).innerHTML += 
-            `<div id="bodycalendar">
-
-            <div class="calendar">
-              <div class="header">
-                <button id="prevMonth" style="display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; transform: rotate(-0deg);"><</button>
-                <h1 id="month-year"></h1>
-                <button id="nextMonth"style="display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; transform: rotate(180deg);"><</button>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Dom</th>
-                    <th>Seg</th>
-                    <th>Ter</th>
-                    <th>Qua</th>
-                    <th>Qui</th>
-                    <th>Sex</th>
-                    <th>Sáb</th>
-                  </tr>
-                </thead>
-                <tbody id="calendar-body">
-                  <!-- Aqui será preenchido com os dias do mês -->
-                </tbody>
-              </table>
-            </div>
-            </div>
-            <div id="schedule-container" class="divclock"></div>`
-
-    
+    divCalendar.clear()
+       divCalendar.add(new innovaphone.ui1.Node("iframe","position:absolute;width:100%;height:100%;",null,null).setAttribute("src",appUrl))
+       //~pietro
+        
   var date = new Date();
   currentMonth = date.getMonth();
   year = date.getFullYear();

@@ -6,6 +6,7 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-image: url(./images/background.png);
+    font-family: 'Montserrat';
 }
 
 a {
