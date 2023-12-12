@@ -268,7 +268,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                                   
                                                // buildCalendar(room_availability,dev_schedulesList,divCalendar,device,room)
 
-                                                Calendar.createCalendar(divCalendar)
+                                                Calendar.createCalendar(divCalendar,room_availability,dev_schedulesList,"",device,room)
+                                                UpdateAvailability(room_availability,dev_schedulesList)
+                                                //namespace calendar
 
 
 
@@ -778,7 +780,7 @@ function getDayName(day) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
     function UpdateAvailability(availability, schedules) {
-        var cells = document.querySelectorAll("#calendar-body td");
+        var cells = document.querySelectorAll("#calendar-body tr td");
         if (availability.length === 0) {
             cells.forEach(function (td) {
                 td.classList.add('unavailable');
