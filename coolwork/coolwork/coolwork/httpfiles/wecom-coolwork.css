@@ -694,6 +694,10 @@ dialog::backdrop {
     background-color: #1b955a;
     }
 
+    .parcialavailable {
+        background-color: #bfac43;
+    }
+
   .clock span {
     position: absolute;
     transform: rotate(calc(30deg * var(--i))); 

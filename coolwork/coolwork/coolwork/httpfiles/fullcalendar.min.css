@@ -222,9 +222,7 @@ min-height: 0em;
 display: none;
 }
 
-.parcialavailable {
-    background-color: #FFEE92
-}
+
 .subtitle-divs {
     display: inline-flex;
     align-items: center;
