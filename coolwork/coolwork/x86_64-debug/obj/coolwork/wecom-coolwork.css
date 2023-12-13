@@ -181,6 +181,10 @@ a {
     letter-spacing: 1px;
     justify-content: center;
     font-size: 14px;
+    color: black !important;
+}
+.btnSaveRoom{
+    background-color: green;
 }
 .divGeral{
     position: absolute;
@@ -299,7 +303,7 @@ th {
 
 td {
     text-align: center;
-    padding: 5px;
+    /* padding: 5px; */
 }
 
 ::placeholder {
@@ -618,7 +622,7 @@ dialog::backdrop {
     display: flex;
     align-items: center;
     gap: 28px;
-    color: var(--Black, #212529);
+    color: var(--Black, #e5e5e6) !important;
     text-align: center;
     font-family: sans-serif;
     font-size: 20px;
@@ -639,7 +643,7 @@ dialog::backdrop {
   
   table th, table td {
     /* border: 1px solid #ccc; */
-    padding: 8px;
+    /* padding: 8px; */
     text-align: center;
   }
   table tr{
@@ -666,10 +670,10 @@ dialog::backdrop {
   /* Arquivo calendar.css */
   
   .prev-month {
-    color: lightgray; /* Define a cor dos dias do mês anterior */
+    color: rgb(0, 0, 0); /* Define a cor dos dias do mês anterior */
   }
   .next-month{
-    color: lightgray;
+    color: rgb(0, 0, 0);
   }
   .clock {
   
@@ -683,7 +687,13 @@ dialog::backdrop {
     align-items: center;
     position: relative;
   }
-  
+  .unavailable{
+    background-color: #dd4348;
+  }
+  .available{
+    background-color: #1b955a;
+    }
+
   .clock span {
     position: absolute;
     transform: rotate(calc(30deg * var(--i))); 

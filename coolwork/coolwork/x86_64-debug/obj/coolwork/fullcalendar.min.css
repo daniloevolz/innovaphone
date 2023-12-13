@@ -221,12 +221,7 @@ min-height: 0em;
 > div > div.fc-bg > table > tbody > tr > td.fc-axis.fc-widget-content{
 display: none;
 }
-.unavailable{
-background-color: #f89598
-}
-.available{
-background-color: #9DDBBD
-}
+
 .parcialavailable {
     background-color: #FFEE92
 }

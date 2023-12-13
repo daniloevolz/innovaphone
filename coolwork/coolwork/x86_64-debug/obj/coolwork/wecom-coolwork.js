@@ -242,7 +242,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     function (resultMsg) { // this function is called when response to sendSrc arrives 
 
                         console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
-                        makeDivPhoneProprieties(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
+                        makeDivSchedule(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
                     }
                 );
 
@@ -251,31 +251,25 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
 
     }
-    function makeDivPhoneProprieties(t, room, divCalendar, defaultView, room_availability, device, dev_schedules) {
+    function makeDivSchedule(t, room, divCalendar, defaultView, room_availability, device, dev_schedules) {
             var dev_schedulesList = JSON.parse(dev_schedules)
 
             
                             room_availability.forEach(function (s) {
-                                // if (s.type == "recurrentType") {
-                                //     makeRecurrentSchedule(t, room, divCalendar, device, s, dayOfWeek, clickedDateStart, clickedDateEnd, dev_schedulesList)
-                                // }
-                                if (s.type == "periodType") {
+                                
+                                t.clear()
+                                Calendar.createCalendar(divCalendar,room_availability,dev_schedulesList,device,room)
+                                //UpdateAvailability(room_availability,dev_schedulesList)
+                                 if (s.type == "recurrentType") {
+                                   //makeRecurrentSchedule(t, room, divCalendar, device, s, dayOfWeek, clickedDateStart, clickedDateEnd, dev_schedulesList)
+                                 }
+                                else if (s.type == "periodType") {
 
                                              if (s.schedule_module == "hourModule") {
-                                                // $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-                                                // $(`#${divCalendar}`).fullCalendar('gotoDate', start);
+                                                console.log("Modal para Confirmar")
                                             } else if (s.schedule_module == "dayModule") {
-                                                  
-                                               // buildCalendar(room_availability,dev_schedulesList,divCalendar,device,room)
-
-                                                Calendar.createCalendar(divCalendar,room_availability,dev_schedulesList,"",device,room)
-                                                UpdateAvailability(room_availability,dev_schedulesList)
+                                              console.log("Modal para Confirmar")
                                                 //namespace calendar
-
-
-
-
-
                                                 // var startTemp = moment(s.data_start, 'HH:mm', true);
                                                 // var endTemp = moment(s.data_end, 'HH:mm', true);
                                                 // var clickedDateStartMoment = moment(clickedStart);
@@ -303,147 +297,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             
                             
                         }
-
-var currentMonth;
-var year;
-
-function buildCalendar(availability,schedule,divCalendar,device,room) {
-    divCalendar.clear()
-       divCalendar.add(new innovaphone.ui1.Node("iframe","position:absolute;width:100%;height:100%;",null,null).setAttribute("src",appUrl))
-       //~pietro
-        
-  var date = new Date();
-  currentMonth = date.getMonth();
-  year = date.getFullYear();
-
-  document.getElementById("prevMonth").addEventListener("click", function() {
-    currentMonth--;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      year--;
-    }
-    rebuildCalendar(availability,schedule,device,room);
-  });
-
-  document.getElementById("nextMonth").addEventListener("click", function() {
-    currentMonth++;
-    if (currentMonth > 11) {
-      currentMonth = 0;
-      year++;
-    }
-    rebuildCalendar(availability,schedule,room,device);
-  });
-
-  rebuildCalendar(availability,schedule,room,device);
-}
-
-// function buildDailySchedule(day) {
-//   var scheduleContainer = document.getElementById("schedule-container");
-//   scheduleContainer.innerHTML = `
-//     <div class="clock">
-//       <div class="clock-face">
-//         ${generateClockMarks()}
-//       </div>
-//     </div>`;
-// }
-
-function generateClockMarks() {
-  let marksHTML = '';
-  for (let i = 1; i <= 12; i++) {
-    marksHTML += `<div class="triangle" style="--i: ${i};"><b>${i}</b></div>`;
-  }
-  return marksHTML;
-}
-
-function rebuildCalendar(availability,schedule,room,device) {
-  var calendarBody = document.getElementById("calendar-body");
-  calendarBody.innerHTML = "";
-
-  var date = new Date([year, currentMonth, 1]);
-  var currentMonthFirstDay = date.getDay()
-  var daysInMonth = new Date(year, currentMonth + 1, 0).getDate();
-
-  var prevMonth = new Date(year, currentMonth, 0);
-  var daysInPrevMonth = prevMonth.getDate();
-  var prevMonthStartDay = prevMonth.getDay();
-
-  var day = 1;
-  var row;
-
-  var monthYearHeader = document.getElementById("month-year");
-  monthYearHeader.innerHTML = getMonthName(currentMonth) + " " + year;
-
-  row = calendarBody.insertRow();
-
-  for (var i = 0; i < currentMonthFirstDay; i++) {
-    var cell = row.insertCell();
-    var dayToShow = daysInPrevMonth - currentMonthFirstDay + i + 1;
-    cell.innerHTML = dayToShow;
-    cell.classList.add("prev-month");
-  }
-
-  for (var i = 0; i < daysInMonth; i++) {
-    if (row.cells.length === 7) {
-      row = calendarBody.insertRow();
-    }
-    var cell = row.insertCell();
-    cell.innerHTML = day;
-    cell.addEventListener("click", function() {
-    //   buildDailySchedule(parseInt(this.innerHTML));
-    });
-    day++;
-  }
-
-  var nextMonthDay = 1;
-  while (row.cells.length < 7) {
-    var cell = row.insertCell();
-    cell.innerHTML = nextMonthDay;
-    cell.classList.add("next-month");
-    nextMonthDay++;
-  }
-  var cells = document.querySelectorAll("#calendar-body td");
-  cells.forEach(function(cell) {
-
-    //UpdateAvailability(availability,schedule,room,device)
-    var selectedDate = moment([year, currentMonth, cell.innerHTML]);
-    var diaDaSemana = selectedDate.format('dddd'); // 'dddd' retorna o nome completo do dia
-    cell.setAttribute("day-week", diaDaSemana); 
-
-    var selectedDay = parseInt(cell.innerHTML);
-    var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
-    cell.setAttribute("data-date", formattedDate )
-
-    cell.addEventListener("click",function(){
-        console.log("Data inicio:" + formattedDate + "00:00")
-        console.log("Data Fim:" + formattedDate + "23:59")
-        // makeDivConfirmPhoneRecurrentSchedule()
-    })
-
-    // cell.addEventListener("click", function() {
-    //     schedule.forEach(function(s){
-    //         console.log("Data de agendamento Inicio:" + formattedDate + s.data_start )
-    //         console.log("Data de agendamento Fim:" + formattedDate + s.data_end )
-    //     })
-        
-        // makeDivConfirmPhoneRecurrentSchedule()
-    //   buildDailySchedule(selectedDay);
-    });
-
-
-}
-
-function getMonthName(month) {
-  var months = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-  ];
-  return months[month];
-}
-
-function getDayName(day) {
-  var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-  return days[day];
-}
 
     function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
         console.log("Start para Envio:" + start )
@@ -779,281 +632,280 @@ function getDayName(day) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
-    function UpdateAvailability(availability, schedules) {
-        var cells = document.querySelectorAll("#calendar-body tr td");
-        if (availability.length === 0) {
-            cells.forEach(function (td) {
-                td.classList.add('unavailable');
-            });
-        }
-        else {
 
-            availability.forEach(function (dates) {
-                if (dates.type == "recurrentType") {
-                    tds.forEach(function (td) {
-                        var dayOfWeek = findDayOfWeek(td.classList);
-                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        //var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
-                        //var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
-                        var defaultDate = "2000-01-01";
-                        switch (dayOfWeek) {
-                            case "monday":
-                                if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_monday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_monday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    // function UpdateAvailability(availability, schedules) {
+    //     var cells = document.querySelectorAll("#calendar-body tr td div");
+    //     if (availability.length === 0) {
+    //         cells.forEach(function (td) {
+    //             td.classList.add('unavailable');
+    //         });
+    //     }
+    //     else {
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //         availability.forEach(function (dates) {
+    //             if (dates.type == "recurrentType") {
+    //                 cells.forEach(function (td) {
+    //                     var dayOfWeek = findDayOfWeek(td.classList);
+    //                     var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+    //                     //var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
+    //                     //var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
+    //                     var defaultDate = "2000-01-01";
+    //                     switch (dayOfWeek) {
+    //                         case "monday":
+    //                             if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_monday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_monday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
-                                return
-                            case "tuesday":
-                                if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_tuesday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_tuesday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
+    //                             return
+    //                         case "tuesday":
+    //                             if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_tuesday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_tuesday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    //console.log("Data Split " + GetDeviceSchedulesResult)
-                                    console.log("Data S " + dataS)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 //console.log("Data Split " + GetDeviceSchedulesResult)
+    //                                 console.log("Data S " + dataS)
+
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
                                 
-                                return
-                            case "wednesday":
-                                if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_wednesday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_wednesday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                             return
+    //                         case "wednesday":
+    //                             if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_wednesday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_wednesday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
 
-                                return
-                            case "thursday":
-                                if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_thursday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_thursday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                             return
+    //                         case "thursday":
+    //                             if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_thursday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_thursday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
-                                return
-                            case "friday":
-                                if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_friday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_friday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
+    //                             return
+    //                         case "friday":
+    //                             if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_friday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_friday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
-                                return
-                            case "saturday":
-                                if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_saturday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_saturday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
+    //                             return
+    //                         case "saturday":
+    //                             if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_saturday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_saturday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
-                                return
-                            case "sunday":
-                                if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
-                                    var start = moment(defaultDate + " " + dates.timestart_sunday, "YYYY-MM-DD HH:mm");
-                                    var end = moment(defaultDate + " " + dates.timeend_sunday, "YYYY-MM-DD HH:mm");
-                                    var totalHours = 0;
-                                    totalHours += end.diff(start, 'hours');
-                                    console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
+    //                             return
+    //                         case "sunday":
+    //                             if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
+    //                                 var start = moment(defaultDate + " " + dates.timestart_sunday, "YYYY-MM-DD HH:mm");
+    //                                 var end = moment(defaultDate + " " + dates.timeend_sunday, "YYYY-MM-DD HH:mm");
+    //                                 var totalHours = 0;
+    //                                 totalHours += end.diff(start, 'hours');
+    //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
-                                } else {
-                                    td.classList.add('unavailable');
-                                }
-                                console.log("Schedules:" +  schedules)
+    //                                 if (totalHours <= 6) {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('parcialavailable');
+    //                                 } else {
+    //                                     td.classList.remove('unavailable');
+    //                                     td.classList.add('available');
+    //                                 }
+    //                             } else {
+    //                                 td.classList.add('unavailable');
+    //                             }
+    //                             console.log("Schedules:" +  schedules)
                                
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+    //                             schedules.forEach(function(dateS){
+    //                                 var dataSplit = dateS.data_start
+    //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+    //                                 console.log("Data Split " + dataSplit)
+    //                                 console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+    //                                 if(dataDate == dataS ){
+    //                                     td.classList.remove('parcialavailable');
+    //                                     td.classList.add('unavailable')
+    //                                 }
+    //                             })
 
-                                return
+    //                             return
 
-                            default:
-                                td.classList.add('unavailable');
+    //                         default:
+    //                             td.classList.add('unavailable');
                                 
-                        }
-                    });
+    //                     }
+    //                 });
 
-                } else if (dates.type == "periodType"){
-                    var datastart = moment(dates.data_start).format('YYYY-MM-DD');
-                    var dataend = moment(dates.data_end).format('YYYY-MM-DD');
-                    cells.forEach(function (td) {
-                        var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        // var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
-                        // var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
-                        // hourAvail -= hourBusy;
-                        // console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
-                        if (dataDate >= datastart && dataDate <= dataend) {
-                            td.classList.remove("unavailable")
-                            td.classList.add("available")
+    //             } else if (dates.type == "periodType"){
+    //                 var datastart = moment(dates.data_start).format('YYYY-MM-DD');
+    //                 var dataend = moment(dates.data_end).format('YYYY-MM-DD');
+    //                 cells.forEach(function (td) {
+    //                     var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+    //                     // var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
+    //                     // var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
+    //                     // hourAvail -= hourBusy;
+    //                     // console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
+    //                     if (dataDate >= datastart && dataDate <= dataend) {
+    //                         td.classList.remove("unavailable")
+    //                         td.classList.add("available")
 
-                        } else {
-                            td.classList.add('unavailable');
-                        }
-                    });
-                }
+    //                     } else {
+    //                         td.classList.add('unavailable');
+    //                     }
+    //                 });
+    //             }
+    //         })
+    //     }
+    //     console.log("UpdateAvailability Result Success");
+    // }
 
-
-                
-            })
-        }
-        console.log("UpdateAvailability Result Success");
-    }
     function countTotalHoursAvailability(dataString, array) {
         var targetDate = moment(dataString);
         var totalHours = 0;
@@ -1157,30 +1009,6 @@ function getDayName(day) {
             }
             console.log("UpdateDaySchedulesSuccess");
         }
-    }
-    // Função para encontrar o nome do dia da semana a partir das classes
-    function findDayOfWeek(classes) {
-        for (var j = 0; j < classes.length; j++) {
-            switch (classes[j]) {
-                case "fc-mon":
-                    return "monday";
-                case "fc-tue":
-                    return "tuesday";
-                case "fc-wed":
-                    return "wednesday";
-                case "fc-thu":
-                    return "thursday";
-                case "fc-fri":
-                    return "friday";
-                case "fc-sat":
-                    return "saturday";
-                case "fc-sun":
-                    return "sunday";
-            }
-                
-            
-        }
-        return null; // Retorna null se não encontrar o nome do dia
     }
 }
 
