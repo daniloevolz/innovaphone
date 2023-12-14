@@ -8,7 +8,7 @@ document.getElementById(id).innerHTML +=
 <div class="flex items-center justify-center py-8 px-4 font-sans">
                 <!-- caso precise , incluir isso .max-w-s --> 
                 <div class="shadow-lg">
-                    <div class="md:p-8 p-5 dark:bg-gray-800 bg-white rounded-t">
+                    <div class="md:p-8 p-5 bg-gray-800 bg-white rounded-t"  style = "background: var(--bg)">
                         <div class="px-4 flex items-center justify-between">
                             <span  tabindex="0" class="focus:outline-none  text-base font-bold dark:text-gray-100 text-gray-800" id = "month-year" >October 2020</span>
                             <div class="flex items-center">
@@ -134,51 +134,72 @@ function buildCalendar(availability, schedule) {
     calendarBody.appendChild(generateWeekdayHeader()); // dias da semana
   
     row = calendarBody.insertRow();
-
+    // dias do mes passado
     for (var i = prevMonthStartDay; i >= 0; i--) {
         var cell = row.insertCell();
         var dayToShow = daysInPrevMonth - i;
-      
-        // var cellDiv = document.createElement("div");
-        // cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full", "justify-center", "divCell");
-        // cell.appendChild(cellDiv);
-        // cellDiv.innerHTML = dayToShow;
-      
+        var cellDiv = document.createElement("div");
+        cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full", "text-transparent","justify-center", "divCell");
+        cellDiv.classList.remove("unavailable","available","parcialavailable")
+        cellDiv.style.backgroundColor = 'transparent'
+        cell.appendChild(cellDiv);
+        var pDiv = document.createElement("p")
+        pDiv.classList.add("text-base","text-gray-500","text-opacity-80","pCell")
+        cellDiv.appendChild(pDiv)
+        pDiv.innerHTML = dayToShow
         cell.classList.add("prev-month");
+        cell.addEventListener("click", function() {
+            currentMonth--;
+            if (currentMonth < 0) {
+              currentMonth = 11;
+              year--;
+            }
+            rebuildCalendar(availability, schedule);
+            
+          });
       }
-  
+    // dias atuais 
     for (var i = 0; i < daysInMonth; i++) {
       if (row.cells.length === 7) {
         row = calendarBody.insertRow();
       }
       var cell = row.insertCell();
-
       var cellDiv = document.createElement("div")
-      cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full", "justify-center", "divCell", "rounded-full");
+      cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full", "justify-center", "divCell","rounded-lg");
+      cellDiv.setAttribute("tabindex",0)
       cell.appendChild(cellDiv)
       var pDiv = document.createElement("p")
-      pDiv.classList.add("text-base","text-gray-500","dark:text-gray-100","pCell")
+      pDiv.classList.add("text-base","text-gray-500","dark:text-gray-100","font-semibold","pCell")
+      pDiv.style.color = "var(--text-standard)"
       cellDiv.appendChild(pDiv)
       pDiv.innerHTML = day;
-
-      // cell.classList.add("pt-6")
-
       cell.addEventListener("click", function () {
         // buildDailySchedule(parseInt(this.innerHTML));
       });
       day++;
     }
-  
+    // dias do mes seguinte
     var nextMonthDay = 1;
     while (row.cells.length < 7) {
       var cell = row.insertCell();
-
-      // var cellDiv = document.createElement("div")
-      // cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full", "justify-center", "divCell");
-      // cell.appendChild(cellDiv)
-      // cellDiv.innerHTML = nextMonthDay;
-      
+      var cellDiv = document.createElement("div")
+      cellDiv.classList.add("px-2", "py-2", "cursor-pointer", "flex", "w-full","text-transparent", "justify-center", "divCell");
+      cellDiv.classList.remove("unavailable","available","parcialavailable")
+      cellDiv.style.backgroundColor = 'transparent'
+      cell.appendChild(cellDiv)
+      var pDiv = document.createElement("p")
+      pDiv.classList.add("text-base","text-gray-500","text-opacity-80","pCell")
+      cellDiv.appendChild(pDiv)
+      pDiv.innerHTML = nextMonthDay
       cell.classList.add("next-month");
+      cell.addEventListener("click", function() {
+        currentMonth++; 
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          year++;
+        }
+        rebuildCalendar(availability, schedule);
+      });
       nextMonthDay++;
     }
     var cells = document.querySelectorAll("#calendar-body td div");
@@ -476,6 +497,7 @@ function UpdateAvailability(availability, schedules) {
                         if (dataDate >= datastart && dataDate <= dataend) {
                             td.classList.remove("unavailable")
                             td.classList.add("available")
+
 
                         } else {
                             td.classList.add('unavailable');

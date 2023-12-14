@@ -21,9 +21,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--bg": "#0B2E46",
+            "--button": "#AED4EF",
+            "--text-standard": "#ffffff",
         },
         light: {
             "--bg": "white",
@@ -109,8 +109,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         if(obj.api === "user" && obj.mt === "PhoneScheduleSuccess"){
             app.send({ api: "user", mt: "SelectMyRooms" })
         }
-    }
-   
+    } 
     //Função para construção da GUI...
     function constructor(t) {
         t.clear()
@@ -296,8 +295,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                                 })
                             
                             
-                        }
-
+    }
     function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
         console.log("Start para Envio:" + start )
         console.log("End para Envio:" + end )
