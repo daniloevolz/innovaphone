@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-12-11T18:41:30.151Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0" etag="uP2uwn_gECKl0tR2hwrr" version="22.1.7" type="github">
+<mxfile host="app.diagrams.net" modified="2023-12-14T12:21:07.643Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0" etag="RVy9Lt6ZyEM-_lKGb3Fk" version="22.1.7" type="github">
   <diagram name="Page-1" id="b5b7bab2-c9e2-2cf4-8b2a-24fd1a2a6d21">
     <mxGraphModel dx="1042" dy="1738" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
       <root>
@@ -54,7 +54,7 @@
           <mxGeometry y="180" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-18" value="admin" style="swimlane;whiteSpace=wrap;html=1;fillColor=#A8DADC;strokeColor=#457B9D;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="1">
-          <mxGeometry x="380" y="-790" width="620" height="160" as="geometry" />
+          <mxGeometry x="390" y="-850" width="870" height="200" as="geometry" />
         </mxCell>
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-19" value="TableUsers()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-18">
           <mxGeometry y="28" width="90" height="30" as="geometry" />
@@ -69,7 +69,7 @@
           <mxGeometry y="118" width="610" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-24" value="user" style="swimlane;whiteSpace=wrap;html=1;fillColor=#A8DADC;strokeColor=#457B9D;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="1">
-          <mxGeometry x="390" y="-1110" width="620" height="160" as="geometry" />
+          <mxGeometry x="390" y="-1110" width="870" height="220" as="geometry" />
         </mxCell>
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-25" value="SelectMyRooms(guid: string; deleted: bool )" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
           <mxGeometry y="28" width="260" height="30" as="geometry" />
@@ -77,11 +77,17 @@
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-26" value="SelectRoom(id: int)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
           <mxGeometry y="58" width="130" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="0LYC2R8pjvAZ-9sblbZq-27" value="GetDeviceSchedules(room: string; dev: string)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
-          <mxGeometry y="88" width="270" height="30" as="geometry" />
+        <mxCell id="0LYC2R8pjvAZ-9sblbZq-27" value="GetDeviceSchedules(room: string; dev: string)&amp;nbsp;GetDeviceSchedulesResult(room: string; dev: string; schedules:array; src: string)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
+          <mxGeometry y="88" width="700" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="0LYC2R8pjvAZ-9sblbZq-28" value="InsertDeviceSchedule(type: string; data_start: string; data_end: string; device: string; room: string; guid: string)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
-          <mxGeometry y="118" width="610" height="30" as="geometry" />
+        <mxCell id="0LYC2R8pjvAZ-9sblbZq-28" value="InsertDeviceSchedule(type: string; data_start: string; data_end: string; device: string; room: string; guid: string) InsertDeviceScheduleSuccess(id: int)&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
+          <mxGeometry y="118" width="810" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0LYC2R8pjvAZ-9sblbZq-37" value="UpdateDeviceSchedule(type: string; data_start: string; data_end: string; device: string; room: string; id: int) UpdateDeviceScheduleSuccess(id: int)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
+          <mxGeometry y="148" width="800" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0LYC2R8pjvAZ-9sblbZq-38" value="DeleteDeviceSchedule(id: int) DeleteDeviceScheduleSuccess(id: int)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;fontColor=#1D3557;" vertex="1" parent="0LYC2R8pjvAZ-9sblbZq-24">
+          <mxGeometry y="178" width="390" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0LYC2R8pjvAZ-9sblbZq-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#457B9D;fontColor=#1D3557;fillColor=#A8DADC;" edge="1" parent="1" source="0LYC2R8pjvAZ-9sblbZq-25" target="0LYC2R8pjvAZ-9sblbZq-2">
           <mxGeometry relative="1" as="geometry" />
