@@ -7,14 +7,16 @@ var Wecom = Wecom || {};
 Wecom.coolwork = Wecom.coolwork || function (start, args) {
     this.createNode("body")
     var that = this;
-    var phone_list = [];
+    var device_list = [];
     var UIuser;
+    var UIDomain;
     var avatar;
     var appdn = start.title;
     var appUrl = start.originalUrl;
     var UIuserPicture;
     var devicesApi;
     var list_MyRooms = [];
+    var list_tableUsers = []
     var _colDireita;
     var schedules = []
 
@@ -55,12 +57,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
 
         changeState("Connected");
+        UIDomain = domain
         UIuser = dn
-        avatar = new innovaphone.Avatar(start, user, domain);
-        UIuserPicture = avatar.url(user, 80, dn);
-        avatar = new innovaphone.Avatar(start, user, domain);
+        // avatar = new innovaphone.Avatar(start, user, domain);
+        // UIuserPicture = avatar.url(user, 80, dn);
+
+        console.log("USER" + user)
         appUrl = appUrl + "/Calendar.html"
 
+        app.send({ api: "user", mt: "TableUsers" });
         app.send({ api: "user", mt: "SelectMyRooms" })
 
         devicesApi = start.consumeApi("com.innovaphone.devices");
@@ -90,7 +95,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
     function app_message(obj) {
         if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
-            phone_list = JSON.parse(obj.result)
+            device_list = JSON.parse(obj.result)
         }
         if (obj.api === "user" && obj.mt === "SelectMyRoomsViewerResult") {
             app.send({ api: "user", mt: "SelectRooms", ids: obj.result })
@@ -98,10 +103,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             // // list_MyRooms = JSON.parse(obj.result)
             
         }
+        if (obj.api == "user" && obj.mt == "TableUsersResult") {
+            list_tableUsers = JSON.parse(obj.result);     
+            console.log("table-users " + JSON.stringify(list_tableUsers))      
+        }
         if (obj.api === "user" && obj.mt === "SelectRoomsResult") {
             var rooms = JSON.parse(obj.rooms);
             schedules = JSON.parse(obj.schedules);
-            var devices = obj.devices;
+            var devices = JSON.parse(obj.devices);
             that.clear();
             makeHeader("./images/home.svg","./images/menu.svg", texts.text("labelMyRooms"))
             makeViewRoom(rooms,devices,schedules)  
@@ -114,7 +123,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //     var devices = obj.dev;
         //     makeDivRoom(_colDireita, room, schedules, devices);
         // }
-        if(obj.api === "user" && obj.mt === "PhoneScheduleSuccess"){
+        if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
             app.send({ api: "user", mt: "SelectMyRooms" })
         }
     } 
@@ -158,11 +167,18 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      } 
      
      function makeViewRoom(rooms,devices,schedules){
-    
+        // div container (scroll)
+        const container = document.createElement("div")
+        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
+        container.style.height = 'calc(100vh - 70px)'
+        container.setAttribute("id","container")
+        document.body.appendChild(container);
+        
         rooms.forEach(function(room){
          //div principal
         const divMain =  document.createElement("div")
         divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex")
+        divMain.setAttribute("id",room.id)
         // img da sala
         const divImg = document.createElement("div")
         divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg")
@@ -179,506 +195,46 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
         const statusDevice = document.createElement("div")
         statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
-        
-        const deviceNumber = document.createElement("h1")
-        deviceNumber.textContent = `${"A definir"}`
-        deviceNumber.classList.add("text-white" ,"font-bold")
 
+        // filtro para retornar os telefones disponíveis
+        var devicesInfo = devices.filter(function (dev) {
+            return dev.room_id == room.id && dev.guid === null ;
+        });
+       
+        const deviceNumber = document.createElement("h1")
+        deviceNumber.textContent = `${parseInt(devicesInfo.length,10)}`
+        deviceNumber.classList.add("text-white" ,"font-bold")
+        divDeviceNumber.appendChild(deviceNumber)
+
+        
         // divImg.appendChild(imgRoom)
         divTitleRoom.appendChild(nameRoom)
         divTitleRoom.appendChild(divDeviceNumber)
         divDeviceNumber.appendChild(statusDevice)
-        divDeviceNumber.appendChild(deviceNumber)
+        
         divMain.appendChild(divImg)
         divMain.appendChild(divTitleRoom)
-        var container = makeContainer()
+
+        const divUsersAvatar = document.createElement("div")
+        divUsersAvatar.setAttribute("id","divUsersAvatar")
+
+        console.log("TABLEUSERS" + JSON.stringify(list_tableUsers))
+        if(list_tableUsers.length > 0 ){
+            list_tableUsers.forEach(function(users){
+                avatar = new innovaphone.Avatar(start, users.sip , UIDomain);
+                UIuserPicture = avatar.url(users.sip, 80, UIuser );
+                const imgAvatar = document.createElement("img")
+                imgAvatar.setAttribute("src", UIuserPicture);
+                imgAvatar.setAttribute("id","divAvatar")
+                divUsersAvatar.appendChild(imgAvatar)
+                divMain.appendChild(divUsersAvatar)
+            })
+        }
+   
+        
         container.appendChild(divMain)
         })
      }
-    
-    //Função para construção da GUI...
-    // function constructor(t) {
-    //     // t.clear()
-    //     // // col esquerda
-    //     // var colEsquerda = t.add(new innovaphone.ui1.Div(null, null, "colunaesquerda bg-primary-900"));
-    //     // colEsquerda.setAttribute("id", "colesquerda")
-
-    //     // // col direita
-    //     // var colDireita = t.add(new innovaphone.ui1.Div(null, null, "colunadireita"));
-    //     // colDireita.setAttribute("id", "coldireita")
-
-    //     // var divList = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
-    //     // var imglogo = divList.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
-    //     // var spanreport = divList.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
-
-    //     // var user = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 10%; width: 100%; align-items: center; display: flex; border-bottom: 1px solid #4b545c"));
-    //     // var imguser = user.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; border-radius: 50%;", null, null));
-    //     // imguser.setAttribute("src", UIuserPicture);
-    //     // var username = user.add(new innovaphone.ui1.Node("span", "font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", UIuser, null));
-    //     // username.setAttribute("id", "user");
-
-    //     // //var itens = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 20%; width: 100%; align-items: center; display: flex; justify-content: center; border-bottom: 1px solid #4b545c", texts.text("labelCreateRoom"), null))
-    //     // //itens.addEvent("click", function () {
-    //     // //    makeDivCreateRoom(t)
-    //     // //})
-    //     // var labelRoom = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; height: 10%; top: 30%; width: 100%; align-items: center; display: flex; justify-content:center;", texts.text("labelRooms") + "🔻", null))
-    //     // var rooms = colEsquerda.add(new innovaphone.ui1.Node("ul", "font-weight:bold; position: absolute; height: 55%; top: 40%; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding:0", null, null).setAttribute("id", "roomList"));
-    //     // //parte de exibição das salas
-    //     // list_MyRooms.forEach(function (room) {
-    //     //     var liRoom = rooms.add(new innovaphone.ui1.Node("li", "width: 100%; align-items: center; display: flex;  border-bottom: 1px solid #4b545c; padding: 10px;", null, null).setAttribute("id", room.id).addEvent("click", function () {
-    //     //         var clickedElement = document.getElementById(room.id)
-    //     //         var clickedId = clickedElement.getAttribute("id")
-    //     //         console.log('ID do elemento div clicado:', clickedId);
-    //     //         app.send({ api: "user", mt: "SelectRoom", id: clickedId });
-    //     //     }));
-    //     //     var imgRoom = liRoom.add(new innovaphone.ui1.Node("img", "width: 50px; height: 50px; margin-right: 10px;", null, null));
-    //     //     imgRoom.setAttribute("src", room.img);
-    //     //     liRoom.add(new innovaphone.ui1.Node("span", "font-weight: bold;", room.name, null));
-    //     // });
-
-        
-    //     // var divAppointment = colDireita.add(new innovaphone.ui1.Div("width:100%;height:100%;text-align:center;display:flex;justify-content:center;flex-direction: column; align-items:center", null, null).setAttribute("id", "userPresence"));
-    //     // divAppointment.add(new innovaphone.ui1.Node("span", "", "ID DA SALA:", ""));
-    //     // var inputRoom = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-    //     // inputRoom.setAttribute("id", "inputRoom").setAttribute("type", "text");
-    //     // var roomInput = document.getElementById("inputRoom");
-    //     // divAppointment.add(new innovaphone.ui1.Node("span", "", "HWID PHONE", ""));
-    //     // var inputPhone = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-    //     // inputPhone.setAttribute("id", "inputphone").setAttribute("type", "text");
-    //     // var phoneInput = document.getElementById("inputphone");
-    //     // divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE START", ""));
-    //     // var inputDateStart = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-    //     // inputDateStart.setAttribute("id", "inputDateStart").setAttribute("type", "text");
-    //     // var dateStartInput = document.getElementById("inputDateStart")
-    //     // divAppointment.add(new innovaphone.ui1.Node("span", "", "DATE END", ""));
-    //     // var inputDateEnd = divAppointment.add(new innovaphone.ui1.Node("input", "", "", ""));
-    //     // inputDateEnd.setAttribute("id", "inputDateEnd").setAttribute("type", "text");
-    //     // var dateEndInput = document.getElementById("inputDateEnd")
-
-    //     // var pcButton = divAppointment.add(new innovaphone.ui1.Node("button",null, null, "bg-primary-900 border-2 border-primary-400")
-    //     //     .addText("Set Presence")
-    //     //     .addEvent("click", function () { app.send({ api: "admin", mt: "InsertAppointment", type: "hour", dateStart: dateStartInput.value, dateEnd: dateEndInput.value, device: phoneInput.value, deviceRoom: roomInput.value }) }, pcButton));
-
-    //     // _colDireita = colDireita;
-    // }
-    //Função para criar div de visualização da sala
-    // function makeDivRoom(t, room, schedules, devices) {
-    //     t.clear();
-    //     var listbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", room.id))
-    //     listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"))
-    //     listbox.add(new innovaphone.ui1.Node("h1", "position:absolute;width:50%;top:5%; text-align:center", room.name))
-
-    //     var divDates = listbox.add(new innovaphone.ui1.Div("display:flex ; align-items:center ; width: 100%;position: absolute; top: 2%; justify-content: space-evenly;", null, null))
-
-    //     schedules.forEach(function (schedule) {    
-    //         if(schedule.schedule_module == "periodModule"){
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("periodModule"), null))
-    //         }else if(schedule.schedule_module == "dayModule"){
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("dayModule"), null))
-    //         }else{
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelScheduleModule") + ":" + " " + texts.text("hourModule"), null))
-    //         }
-    //         if(schedule.type == "periodType"){
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("periodType"), null))
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateStart") + formatDate(schedule.data_start), null))
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelDateEnd") + formatDate(schedule.data_end), null))
-    //         }else{
-    //             divDates.add(new innovaphone.ui1.Div("font-weight:bold;", texts.text("labelType") + ":" + " " + texts.text("recurrentType"), null))
-    //         }
-    //     })
-       
-    //     var proprietiesDiv = listbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:75%;left: 1%; justify-content: center;top: 20;", null, null).setAttribute("id", "proprietiesDiv"))
-    //     var imgRoom = listbox.add(new innovaphone.ui1.Node("div", "position: absolute;width: 50%; left:45%; height:65%; display: flex;align-items: center; justify-content: center;top: 20%;", null, null).setAttribute("id", "imgBD"))
-    //     imgRoom.add(new innovaphone.ui1.Node("img", "position:absolute;width:100%;height:100%").setAttribute("src", room.img))
-
-    //     if (devices.length > 0) {
-    //         devices.forEach(function (dev) {
-    //            var userPicture = avatar.url(dev.sip, 80)
-    //            var html = `<div style = "top: ${dev.topoffset + "px"}; left: ${dev.leftoffset + "px"}; position:absolute;" class="StatusPhone${dev.online} phoneButtons" id="${dev.hwid}">
-    //             <div class="user-info">
-    //                 <img class="imgProfile" src="${userPicture}">
-    //                 <div class="user-name">${dev.cn}</div>
-    //             </div>
-    //                 <div class="product-name">${dev.product}</div>
-    //             </div>    `
-    //             document.getElementById("imgBD").innerHTML += html
-    //         })
-    //     }
-        
-    //     document.getElementById("closewindow").addEventListener("click", function () {  // close 
-    //         app.send({ api: "user", mt: "SelectMyRooms" })
-
-    //     })
-
-    //     // Obtém todos os elementos com a classe "phoneButtons"
-    //     var phoneButtons = document.getElementsByClassName("phoneButtons");
-
-    //     // Adiciona um evento de clique a cada elemento
-    //     for (var i = 0; i < phoneButtons.length; i++) {
-    //         phoneButtons[i].addEventListener("click", function (event) {
-    //             //var elementoClicado = event.target;
-    //             var elementoClicado = event.target;
-    //             var id = event.currentTarget.id
-    //             //var ip = elementoClicado.getAttribute("data-ip"); // Suponha que o IP seja armazenado no atributo "data-ip"
-    //             console.log("ID do elemento clicado: " + id);
-    //             var d = devices.filter(function (dev) { return dev.hwid == id })[0]
-
-    //             app.sendSrc({ api: "user", mt: "GetDeviceSchedules", room: room.id, dev: id, src: id},
-    //                 function (resultMsg) { // this function is called when response to sendSrc arrives 
-
-    //                     console.log(JSON.stringify("ResultMsgSchedules" + resultMsg.schedules))
-    //                     makeDivSchedule(proprietiesDiv, room, "proprietiesDiv", "month",  schedules, d, resultMsg.schedules)
-    //                 }
-    //             );
-
-                
-    //         });
-    //     }
-
-    // }
-    // function makeDivSchedule(t, room, divCalendar, defaultView, room_availability, device, dev_schedules) {
-    //         var dev_schedulesList = JSON.parse(dev_schedules)
-
-            
-    //                         room_availability.forEach(function (s) {
-                                
-    //                             t.clear()
-    //                             Calendar.createCalendar(divCalendar,room_availability,dev_schedulesList,device,room)
-    //                             //UpdateAvailability(room_availability,dev_schedulesList)
-    //                              if (s.type == "recurrentType") {
-    //                                //makeRecurrentSchedule(t, room, divCalendar, device, s, dayOfWeek, clickedDateStart, clickedDateEnd, dev_schedulesList)
-    //                              }
-    //                             else if (s.type == "periodType") {
-
-    //                                          if (s.schedule_module == "hourModule") {
-    //                                             console.log("Modal para Confirmar")
-    //                                         } else if (s.schedule_module == "dayModule") {
-    //                                           console.log("Modal para Confirmar")
-    //                                             //namespace calendar
-    //                                             // var startTemp = moment(s.data_start, 'HH:mm', true);
-    //                                             // var endTemp = moment(s.data_end, 'HH:mm', true);
-    //                                             // var clickedDateStartMoment = moment(clickedStart);
-    //                                             // var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-    //                                             // var clickedDateEndMoment = moment(clickedEnd);
-    //                                             // clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //                                             // var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-    //                                             // var combinedDateTimeEnd = clickedDateEnd + "T" +s.data_end.split("T")[1]
-    //                                             // makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-        
-    //                                         } 
-                                    
-                
-    //                                 }
-                                    
-                                        
-    //                             // if (selectstart >= s.data_start.split("T")[0] && selectstart <= s.data_end.split("T")[0]) {
-    //                             //             } 
-            
-    //                             //             else {
-    //                             //         //Implementar mensagem de Data indisponível aqui. Toast
-    //                             //         console.log("WECOM LOG: Data indisponível!!!")
-    //                             //     }
-    //                             })
-                            
-                            
-    // }
-    // function makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, start, end) {
-    //     console.log("Start para Envio:" + start )
-    //     console.log("End para Envio:" + end )
-    //     var today = new Date();
-    //     var dataHoje = today.toISOString().split('T')[0];
-
-    //     if(start < dataHoje){
-    //         console.log("Escolha uma data maior superior a data de hoje!!!")
-    //     }else{
-    //         var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDivConfirm"))
-    //         var listbox = insideDiv.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable confirmDiv").setAttribute("id", device.id))
-    //         listbox.add(new innovaphone.ui1.Div(null, null, "closewindow").addEvent("click", function () { // close
-    //             t.rem(insideDiv);
-    //         }))
-    //         listbox.add(new innovaphone.ui1.Node("h1", null, room.name))
-    //         listbox.add(new innovaphone.ui1.Node("h1", null, texts.text(s.schedule_module)))
-    //         listbox.add(new innovaphone.ui1.Node("h1", null, device.product + " " + device.hwid))
-    //         listbox.add(new innovaphone.ui1.Node("h1", null, texts.text("whenLabel") + " " + formatDate(start)))
-    
-    //         listbox.add(new innovaphone.ui1.Div("width:80px; height: 50px; color: white; border-radius: 40px; font-weight:bold;", texts.text("makePhoneSceduleButton"), "button").addEvent("click", function () {
-    //             app.sendSrc({ api: "user", mt: "makePhoneSchedule", device: device.hwid, type: s.schedule_module, room: room.id, data_start: start, data_end: end }, function (obj) {
-    
-    //             });
-    //         }))
-    //     }
-
-    // }                    
-    // function makeRecurrentSchedule(t, room, divCalendar, device , s, dayWeek, clickedStart , clickedEnd, dev_schedule ){
-    //     switch (dayWeek) {
-
-    //         case "segunda-feira":
-    //             var startTemp = moment(s.timestart_monday, 'HH:mm', true);
-    //             var endTemp = moment(s.timeend_monday, 'HH:mm', true);
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-    //                 if (s.timestart_monday < s.timeend_monday && s.timestart_monday != "" && s.timeend_monday != "") {
-
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-    //                         console.log("CombinedDateTimeStart")
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
-    //                     }
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "terça-feira":
-    //             var startTemp = moment(s.timestart_tuesday, 'HH:mm', true);
-    //             var endTemp = moment(s.timeend_tuesday, 'HH:mm', true);
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-    //                 // se nao , continua a função aqui - Pietro
-    //                 if (s.timestart_tuesday < s.timeend_tuesday && s.timestart_tuesday != "" && s.timeend_tuesday != "") {
-    //                     var startTemp = moment(s.timestart_tuesday);
-    //                     var endTemp = moment(s.timeend_tuesday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
-    //                     } 
-    //                 }
-    //                 else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "quarta-feira":
-
-    //             var startTemp = moment(s.timestart_wednesday, 'HH:mm');
-    //             var endTemp = moment(s.timeend_wednesday, 'HH:mm');
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-
-    //                 if (s.timestart_wednesday < s.timeend_wednesday && s.timestart_wednesday != "" && s.timeend_wednesday != "") {
-    //                     var startTemp = moment(s.timestart_wednesday);
-    //                     var endTemp = moment(s.timeend_wednesday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-    //                     } 
-    //                     return;
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "quinta-feira":
-
-    //             var startTemp = moment(s.timestart_thursday, 'HH:mm');
-    //             var endTemp = moment(s.timeend_thursday, 'HH:mm');
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-
-    //                 if (s.timestart_thursday < s.timeend_thursday && s.timestart_thursday != "" && s.timeend_thursday != "") {
-    //                     var startTemp = moment(s.timestart_thursday);
-    //                     var endTemp = moment(s.timeend_thursday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-    //                     } 
-                    
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "sexta-feira":
-
-    //             var startTemp = moment(s.timestart_friday, 'HH:mm');
-    //             var endTemp = moment(s.timeend_friday, 'HH:mm');
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-
-    //                 if (s.timestart_friday < s.timeend_friday && s.timestart_friday != "" && s.timeend_friday != "") {
-    //                     var startTemp = moment(s.timestart_friday);
-    //                     var endTemp = moment(s.timeend_friday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
-    //                     }
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "sábado":
-
-    //             var startTemp = moment(s.timestart_saturday, 'HH:mm');
-    //             var endTemp = moment(s.timeend_saturday, 'HH:mm');
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-    //                 if (s.timestart_saturday < s.timeend_saturday && s.timestart_saturday != "" && s.timeend_saturday != "") {
-    //                     var startTemp = moment(s.timestart_saturday);
-    //                     var endTemp = moment(s.timeend_saturday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
-    //                     }
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //         case "domingo":
-
-    //             var startTemp = moment(s.timestart_sunday, 'HH:mm');
-    //             var endTemp = moment(s.timeend_sunday, 'HH:mm');
-    //             var clickedDateStartMoment = moment(clickedStart);
-    //             var combinedDateTimeStart = clickedDateStartMoment.format('YYYY-MM-DD') + 'T' + startTemp.format('HH:mm');
-
-    //             var clickedDateEndMoment = moment(clickedEnd);
-    //             clickedDateEndMoment.subtract(1, 'days'); // substract é do moment.js 
-    //             var combinedDateTimeEnd = clickedDateEndMoment.format('YYYY-MM-DD') + 'T' + endTemp.format('HH:mm');
-
-    //             var dateOccupied = dev_schedule.some(function (dateS) {
-    //                 return dateS.data_start === combinedDateTimeStart;
-    //             });
-
-    //             if (dateOccupied) {
-    //                 // se tiver ocupado acaba aqui - Pietro
-    //                 console.log("WECOM LOG: Telefone ocupado nesta data!!!");
-    //                 return;
-    //             } else {
-    //                 if (s.timestart_sunday < s.timeend_sunday && s.timestart_sunday != "" && s.timeend_sunday != "") {
-    //                     var startTemp = moment(s.timestart_sunday);
-    //                     var endTemp = moment(s.timeend_sunday);
-    //                     if (s.schedule_module == "hourModule") {
-    //                         $(`#${divCalendar}`).fullCalendar('changeView', 'agendaDay');
-    //                         $(`#${divCalendar}`).fullCalendar('gotoDate', start);
-    //                     } else if (s.schedule_module == "dayModule") {
-    //                         console.log("Abrir modal para confirmar o dia inteiro.")
-
-    //                         makeDivConfirmPhoneRecurrentSchedule(t, room, device, s, combinedDateTimeStart, combinedDateTimeEnd);
-
-    //                     }
-
-    //                 } else {
-    //                     //Implementar mensagem de Data indisponível aqui. Toast
-    //                     console.log("WECOM LOG: Data indisponível!!!")
-    //                 }
-    //             }
-    //             return;
-    //     } 
-    // }
     // //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
         if (newState == currentState) return;
@@ -692,408 +248,30 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             currentState = "Disconnected";
         }
     }
-    // function formatDate(inputDate) {
-    //     const date = new Date(inputDate);
+    function formatDate(inputDate) {
+        const date = new Date(inputDate);
 
-    //     const day = String(date.getDate()).padStart(2, '0');
-    //     const month = String(date.getMonth() + 1).padStart(2, '0');
-    //     const year = date.getFullYear();
-    //     const hours = String(date.getHours()).padStart(2, '0');
-    //     const minutes = String(date.getMinutes()).padStart(2, '0');
-    //     const seconds = String(date.getSeconds()).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    //     const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 
-    //     return formattedDate;
-    // }
-    // //Função para apresentar Loader, chamado quando o App está desconectado ou aguardando algum processo.
-    // function waitConnection(div) {
-    //     div.clear();
-    //     var div1 = div.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
-    //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
-    //     var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
-    //     div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
-    //     div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
-    //     div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
-    // }
-
-    // // function UpdateAvailability(availability, schedules) {
-    // //     var cells = document.querySelectorAll("#calendar-body tr td div");
-    // //     if (availability.length === 0) {
-    // //         cells.forEach(function (td) {
-    // //             td.classList.add('unavailable');
-    // //         });
-    // //     }
-    // //     else {
-
-    // //         availability.forEach(function (dates) {
-    // //             if (dates.type == "recurrentType") {
-    // //                 cells.forEach(function (td) {
-    // //                     var dayOfWeek = findDayOfWeek(td.classList);
-    // //                     var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-    // //                     //var hourAvail = countTotalHoursAvailability(String(dataDate), availability);
-    // //                     //var hourBusy = countTotalHoursBusy(String(dataDate), schedules);
-    // //                     var defaultDate = "2000-01-01";
-    // //                     switch (dayOfWeek) {
-    // //                         case "monday":
-    // //                             if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_monday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_monday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-    // //                             return
-    // //                         case "tuesday":
-    // //                             if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_tuesday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_tuesday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 //console.log("Data Split " + GetDeviceSchedulesResult)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-                                
-    // //                             return
-    // //                         case "wednesday":
-    // //                             if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_wednesday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_wednesday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-
-    // //                             return
-    // //                         case "thursday":
-    // //                             if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_thursday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_thursday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-    // //                             return
-    // //                         case "friday":
-    // //                             if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_friday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_friday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-    // //                             return
-    // //                         case "saturday":
-    // //                             if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_saturday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_saturday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-    // //                             return
-    // //                         case "sunday":
-    // //                             if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
-    // //                                 var start = moment(defaultDate + " " + dates.timestart_sunday, "YYYY-MM-DD HH:mm");
-    // //                                 var end = moment(defaultDate + " " + dates.timeend_sunday, "YYYY-MM-DD HH:mm");
-    // //                                 var totalHours = 0;
-    // //                                 totalHours += end.diff(start, 'hours');
-    // //                                 console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-    // //                                 if (totalHours <= 6) {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('parcialavailable');
-    // //                                 } else {
-    // //                                     td.classList.remove('unavailable');
-    // //                                     td.classList.add('available');
-    // //                                 }
-    // //                             } else {
-    // //                                 td.classList.add('unavailable');
-    // //                             }
-    // //                             console.log("Schedules:" +  schedules)
-                               
-    // //                             schedules.forEach(function(dateS){
-    // //                                 var dataSplit = dateS.data_start
-    // //                                 var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-    // //                                 console.log("Data Split " + dataSplit)
-    // //                                 console.log("Data S " + dataS)
-
-    // //                                 if(dataDate == dataS ){
-    // //                                     td.classList.remove('parcialavailable');
-    // //                                     td.classList.add('unavailable')
-    // //                                 }
-    // //                             })
-
-    // //                             return
-
-    // //                         default:
-    // //                             td.classList.add('unavailable');
-                                
-    // //                     }
-    // //                 });
-
-    // //             } else if (dates.type == "periodType"){
-    // //                 var datastart = moment(dates.data_start).format('YYYY-MM-DD');
-    // //                 var dataend = moment(dates.data_end).format('YYYY-MM-DD');
-    // //                 cells.forEach(function (td) {
-    // //                     var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-    // //                     // var hourAvail = 24 //countTotalHoursAvailability(String(dataDate), availability);
-    // //                     // var hourBusy = 0 //countTotalHoursBusy(String(dataDate), schedules);
-    // //                     // hourAvail -= hourBusy;
-    // //                     // console.log("Horas disponivies " + hourAvail + " em " + String(dataDate))
-    // //                     if (dataDate >= datastart && dataDate <= dataend) {
-    // //                         td.classList.remove("unavailable")
-    // //                         td.classList.add("available")
-
-    // //                     } else {
-    // //                         td.classList.add('unavailable');
-    // //                     }
-    // //                 });
-    // //             }
-    // //         })
-    // //     }
-    // //     console.log("UpdateAvailability Result Success");
-    // // }
-
-    // function countTotalHoursAvailability(dataString, array) {
-    //     var targetDate = moment(dataString);
-    //     var totalHours = 0;
-
-    //     array.forEach(function (obj) {
-    //         var start = moment(obj.time_start);
-    //         var end = moment(obj.time_end);
-
-    //         if (targetDate.isSame(start, 'day')) {
-    //             if (targetDate.isSame(end, 'day')) {
-    //                 totalHours += end.diff(start, 'hours');
-    //             } else {
-    //                 var endOfDay = moment(targetDate).endOf('day');
-    //                 totalHours += endOfDay.diff(start, 'hours');
-    //             }
-    //         } else if (targetDate.isAfter(start, 'day') && targetDate.isBefore(end, 'day')) {
-    //             //var startOfDay = moment(targetDate).startOf('day');
-    //             //totalHours += end.diff(startOfDay, 'hours');
-    //             totalHours = 24;
-    //         } else if (targetDate.isSame(end, 'day')) {
-    //             var startOfDay = moment(targetDate).startOf('day');
-    //             totalHours += end.diff(startOfDay, 'hours');
-    //         }
-    //     });
-
-    //     return totalHours;
-    // }
-    // function countTotalHoursBusy(dataString, array) {
-    //     var targetDate = moment(dataString);
-    //     var count = 0;
-
-    //     array.forEach(function (obj) {
-    //         var start = moment(obj.time_start);
-
-    //         if (targetDate.isSame(start, 'day')) {
-    //             count++;
-    //         }
-    //     });
-
-    //     return count;
-    // }
-    // function UpdateDayAvailability(availability, schedules, day, month, year) {
-    //     // var tds = document.querySelectorAll('.fc-widget-content');
-    //     var trs = document.querySelectorAll('.fc-slats tr');
-    //     if (availability.length === 0) {
-    //         trs.forEach(function (tr) {
-    //             console.log("Availability: 0");
-    //             tr.classList.remove('available');
-    //             tr.classList.add('unavailable');
-    //         });
-    //     }
-    //     else {
-    //         //Deixa tudo indisponível
-    //         trs.forEach(function (tr) {
-    //             tr.classList.remove('available');
-    //             tr.classList.add('unavailable');
-    //         });
-    //         console.log("UpdateDayAvailability");
-    //         availability.forEach(function (dates) {
-    //             var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-    //             var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-    //             trs.forEach(function (tr) {
-
-    //                 var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-    //                 // Obtém os valores do dia, mês e ano
-    //                 var hour = moment(dataTime).format('HH');
-    //                 var minute = moment(dataTime).format('mm');
-    //                 var second = moment(dataTime).format('ss');
-    //                 var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-    //                 // Cria o objeto de data
-    //                 var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-
-    //                 //console.log(dateView);
-
-    //                 if (dateView >= datastart && dateView <= dataend) {
-    //                     tr.classList.remove('unavailable');
-    //                     tr.classList.add('available');
-    //                 }
-    //             });
-    //         });
-    //         console.log("UpdateDayAvailabilitySuccess");
-    //         if (schedules.length > 0) {
-    //             schedules.forEach(function (dates) {
-    //                 var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-
-    //                 trs.forEach(function (tr) {
-    //                     var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-    //                     var hour = moment(dataTime).format('HH');
-    //                     var minute = moment(dataTime).format('mm');
-    //                     var second = moment(dataTime).format('ss');
-    //                     var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-    //                     // Cria o objeto de data
-    //                     var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-
-    //                     if (dateView == datastart) {
-    //                         tr.classList.remove('available');
-    //                         tr.classList.add('unavailable');
-    //                     }
-    //                 });
-    //             });
-    //         }
-    //         console.log("UpdateDaySchedulesSuccess");
-    //     }
-    // }
+        return formattedDate;
+    }
+    //Função para apresentar Loader, chamado quando o App está desconectado ou aguardando algum processo.
+    function waitConnection(div) {
+        div.clear();
+        var div1 = div.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+    }
 }
 
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;

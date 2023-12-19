@@ -39,8 +39,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var UIuserPicture;
     var divinputs; 
     var avatar = start.consumeApi("com.innovaphone.avatar");
-    var devicesApi = start.consumeApi("com.innovaphone.devices");
-        devicesApi.onmessage.attach(onmessage); // onmessage is called for responses from the API
+    // var devicesApi = start.consumeApi("com.innovaphone.devices");
+    //     devicesApi.onmessage.attach(onmessage); // onmessage is called for responses from the API
     // var websocket = null
 
     // function send(obj) {

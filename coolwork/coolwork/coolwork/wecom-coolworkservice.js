@@ -308,6 +308,15 @@ new JsonApi("user").onconnected(function(conn) {
             //             log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
             //         });
             // }
+            if (obj.mt == "TableUsers") {
+                log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid, sip: u.columns.h323 })
+                })
+                conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
+            }
+
             if (obj.mt == "SelectMyRooms") {
                 log("SelectMyRooms:");
                 var queryViewer;
@@ -387,15 +396,21 @@ new JsonApi("user").onconnected(function(conn) {
                         for (var i = 0; i < result.length; i++) {
                             var entry = result[i];
 
-                            // Verifica de qual tabela a entrada faz parte
                             if (entry.hasOwnProperty('r_id')) {
-                                roomData.push({
-                                    id: entry.r_id,
-                                    name: entry.r_name,
-                                    img: entry.r_img,
-                                    // Adicione as outras propriedades de tbl_room aqui
+                                var roomExists = roomData.some(function (room) {
+                                    return room.id === entry.r_id;
                                 });
-                            } else if (entry.hasOwnProperty('d_id')) {
+
+                                if (!roomExists) {
+                                    roomData.push({
+                                        id: entry.r_id,
+                                        name: entry.r_name,
+                                        img: entry.r_img,
+                                    
+                                    });
+                                }
+
+                            } if (entry.hasOwnProperty('d_id')) {
                                 deviceData.push({
                                     id: entry.d_id,
                                     hwid: entry.d_hwid,
@@ -410,7 +425,7 @@ new JsonApi("user").onconnected(function(conn) {
                                     room_id: entry.d_room_id,
                                     // Adicione as outras propriedades de tbl_devices aqui
                                 });
-                            } else if (entry.hasOwnProperty('rs_id')) {
+                            } if (entry.hasOwnProperty('rs_id')) {
                                 roomScheduleData.push({
                                     id: entry.rs_id,
                                     type: entry.rs_type,
@@ -454,14 +469,14 @@ new JsonApi("user").onconnected(function(conn) {
                     });
 
             }
-            if (obj.mt == "makePhoneSchedule") {
+            if (obj.mt == "makeDeviceSchedule") {
                 Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.data_start + "','" + obj.data_end + "','" + obj.device + "'," + obj.room + ",'" + conn.guid + "')")
                 .oncomplete(function (data) {
                     //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
-                conn.send(JSON.stringify({ api: "user", mt: "PhoneScheduleSuccess" }));
+                conn.send(JSON.stringify({ api: "user", mt: "DeviceScheduleSuccess" }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
-                        log("PhoneScheduleError:result=Error " + String(errorText));
+                        log("DeviceScheduleError:result=Error " + String(errorText));
                 });
             }
 
