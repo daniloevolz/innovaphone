@@ -44,7 +44,8 @@ Wecom.coolworkTexts = {
         labelDayWeek: "Dia da semana",
         labelScheduleModule: "Modelo de Agendamento",
         makePhoneSceduleButton: "Agendar",
-        whenLabel: "Quando:"
+        whenLabel: "Quando:",
+        labelMyRooms: "Minhas Salas"
         
     }
 }

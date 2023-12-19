@@ -227,14 +227,95 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
             }
+            // if (obj.mt == "SelectMyRooms") {
+            //     log("SelectMyRooms:");
+            //     var queryViewer;
+            //     if (obj.deleted) {
+            //         var queryViewer = 
+            //         "SELECT r.id AS room_id, r.name, r.img, " +
+            //       "s.id AS schedule_id, s.type, s.data_start, s.data_end, s.schedule_module, " +
+            //       "s.timestart_monday, s.timeend_monday, s.timestart_tuesday, s.timeend_tuesday, " +
+            //       "s.timestart_wednesday, s.timeend_wednesday, s.timestart_thursday, s.timeend_thursday, " +
+            //       "s.timestart_friday, s.timeend_friday, s.timestart_saturday, s.timeend_saturday, " +
+            //       "s.timestart_sunday, s.timeend_sunday " +
+            //       "FROM tbl_room r " +
+            //       "LEFT JOIN tbl_room_viewers v ON r.id = v.room_id " +
+            //       "LEFT JOIN tbl_room_availability s ON r.id = s.room_id " +
+            //       "WHERE v.viewer_guid = '" + conn.guid + "';";
+            //     } else {
+            //         //Query para Salas Não Excluídas
+            //         var queryViewer = 
+            //         "SELECT r.id AS room_id, r.name, r.img, " +
+            //       "s.id AS schedule_id, s.type, s.data_start, s.data_end, s.schedule_module, " +
+            //       "s.timestart_monday, s.timeend_monday, s.timestart_tuesday, s.timeend_tuesday, " +
+            //       "s.timestart_wednesday, s.timeend_wednesday, s.timestart_thursday, s.timeend_thursday, " +
+            //       "s.timestart_friday, s.timeend_friday, s.timestart_saturday, s.timeend_saturday, " +
+            //       "s.timestart_sunday, s.timeend_sunday " +
+            //       "FROM tbl_room r " +
+            //       "LEFT JOIN tbl_room_viewers v ON r.id = v.room_id " +
+            //       "LEFT JOIN tbl_room_availability s ON r.id = s.room_id " +
+            //       "WHERE v.viewer_guid = '" + conn.guid + "' AND r.deleted IS NULL;";
+            //     }
+            //     Database.exec(queryViewer)
+            //         .oncomplete(function (dataUsersViewer) {
+            //             log("SelectMyRooms:result=" + JSON.stringify(dataUsersViewer, null, 4));
+            //             conn.send(JSON.stringify({ api: "user", mt: "SelectMyRoomsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+            //         })
+            //         .onerror(function (error, errorText, dbErrorCode) {
+            //             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+            //         });
+
+            //     //if (obj.deleted) {
+            //     //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
+            //     //} else {
+            //     //    //Query para Departamentos Não Excluídos
+            //     //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
+            //     //}
+            //     //Database.exec(queryEditor)
+            //     //    .oncomplete(function (dataUsersViewer) {
+            //     //        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
+
+            //     //        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+            //     //    })
+            //     //    .onerror(function (error, errorText, dbErrorCode) {
+            //     //        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+            //     //    });
+            // }
+
+            // if (obj.mt == "SelectRoom") {
+            //     var roomId = obj.id;
+
+            //     var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
+            //     var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
+            //     var querySelectRoomSchedule = "SELECT * FROM tbl_room_availability WHERE room_id =" + roomId + ";";
+            //     Database.exec(querySelectRoom)
+            //         .oncomplete(function (roomData) {
+            //             Database.exec(querySelectDevices)
+            //                 .oncomplete(function (deviceData) {
+            //                     Database.exec(querySelectRoomSchedule)
+            //                         .oncomplete(function (roomScheduleData) {
+            //                             conn.send(JSON.stringify({ api: "user", mt: "SelectRoomResult", room: JSON.stringify(roomData[0]), dev: deviceData, schedules: JSON.stringify(roomScheduleData) }));
+            //                         })
+            //                         .onerror(function (error, errorText, dbErrorCode) {
+            //                             log("SelectRoomResult: Error ao selecionar tabela tbl_room_availability: " + String(errorText));
+            //                         });
+            //                 })
+            //                 .onerror(function (error, errorText, dbErrorCode) {
+            //                     log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));
+            //                 });
+            //         })
+            //         .onerror(function (error, errorText, dbErrorCode) {
+            //             log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
+            //         });
+            // }
             if (obj.mt == "SelectMyRooms") {
                 log("SelectMyRooms:");
                 var queryViewer;
                 if (obj.deleted) {
-                    var queryViewer = "SELECT r.id, r.name, r.img FROM tbl_room r JOIN tbl_room_viewers v ON r.id = v.room_id WHERE v.viewer_guid = '" + conn.guid + "';";
+                    var queryViewer = "SELECT r.id FROM tbl_room r JOIN tbl_room_viewers v ON r.id = v.room_id WHERE v.viewer_guid = '" + conn.guid + "';";
                 } else {
-                    //Query para Departamentos Não Excluídos
-                    var queryViewer = "SELECT r.id, r.name, r.img FROM tbl_room r JOIN tbl_room_viewers v ON r.id = v.room_id WHERE v.viewer_guid = '" + conn.guid + "' AND r.deleted IS NULL;";
+                  // Query para Departamentos Não Excluídos
+                    var queryViewer = "SELECT r.id FROM tbl_room r JOIN tbl_room_viewers v ON r.id = v.room_id WHERE v.viewer_guid = '" + conn.guid + "' AND r.deleted IS NULL;";
                 }
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
@@ -244,50 +325,118 @@ new JsonApi("user").onconnected(function(conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
-
-                //if (obj.deleted) {
-                //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
-                //} else {
-                //    //Query para Departamentos Não Excluídos
-                //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
-                //}
-                //Database.exec(queryEditor)
-                //    .oncomplete(function (dataUsersViewer) {
-                //        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-
-                //        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
-                //    })
-                //    .onerror(function (error, errorText, dbErrorCode) {
-                //        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                //    });
             }
 
-            if (obj.mt == "SelectRoom") {
-                var roomId = obj.id;
+            if (obj.mt == "SelectRooms") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
 
-                var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
-                var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
-                var querySelectRoomSchedule = "SELECT * FROM tbl_room_schedule WHERE room_id =" + roomId + ";";
-                Database.exec(querySelectRoom)
-                    .oncomplete(function (roomData) {
-                        Database.exec(querySelectDevices)
-                            .oncomplete(function (deviceData) {
-                                Database.exec(querySelectRoomSchedule)
-                                    .oncomplete(function (roomScheduleData) {
-                                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomResult", room: JSON.stringify(roomData[0]), dev: deviceData, schedules: JSON.stringify(roomScheduleData) }));
-                                    })
-                                    .onerror(function (error, errorText, dbErrorCode) {
-                                        log("SelectRoomResult: Error ao selecionar tabela tbl_room_schedule: " + String(errorText));
-                                    });
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));
-                            });
+                function extrairValoresId(lista) {
+                    var valoresId = [];
+                    for (var i = 0; i < lista.length; i++) {
+                      valoresId.push(lista[i].id);
+                    }
+                    return valoresId;
+                  }
+                  
+                  // Chamando a função
+                  var id = extrairValoresId(roomIds);
+
+                var query = "SELECT " +
+                    "R.id AS R_id, R.name AS R_name, R.img AS R_img, " +
+                    "D.id AS D_id, D.hwid AS D_hwid, D.pbxactive AS D_pbxactive, D.online AS D_online, D.product AS D_product, D.sip AS D_sip, D.cn AS D_cn, D.guid AS D_guid, D.leftoffset AS D_leftoffset, D.topoffset AS D_topoffset, D.room_id AS D_room_id, " +
+                    "RS.id AS RS_id, "+
+                    "RS.type AS RS_type, " +
+                    "RS.schedule_module AS RS_schedule_module, " +
+                    "RS.data_start AS RS_data_start, "+
+                    "RS.data_end AS RS_data_end, "+
+                    "RS.timestart_monday AS RS_timestart_monday, " +
+                    "RS.timeend_monday AS RS_timeend_monday, " +
+                    "RS.timestart_tuesday AS RS_timestart_tuesday, "+ 
+                    "RS.timeend_tuesday AS RS_timeend_tuesday, "+
+                    "RS.timestart_wednesday AS RS_timestart_wednesday, " +
+                    "RS.timeend_wednesday AS RS_timeend_wednesday, " +
+                    "RS.timestart_thursday AS RS_timestart_thursday, " +
+                    "RS.timeend_thursday AS RS_timeend_thursday, " +
+                    "RS.timestart_friday AS RS_timestart_friday, " +
+                    "RS.timeend_friday AS RS_timeend_friday, " +
+                    "RS.timestart_friday AS RS_timestart_friday, " +
+                    "RS.timeend_friday AS RS_timeend_friday, " +
+                    "RS.timestart_saturday AS RS_timestart_saturday, " +
+                    "RS.timeend_saturday AS RS_timeend_saturday, " +
+                    "RS.timestart_sunday AS RS_timestart_sunday, " +
+                    "RS.timeend_sunday AS RS_timeend_sunday, " +
+                    "RS.room_id AS RS_room_id " +
+                    "FROM " +
+                    "tbl_room R " +
+                    "LEFT JOIN " +
+                    "tbl_devices D ON R.id = D.room_id " +
+                    "LEFT JOIN " +
+                    "tbl_room_availability RS ON R.id = RS.room_id " +
+                    "WHERE " +
+                    "R.id IN (" + id + ");";
+
+                Database.exec(query)
+                    .oncomplete(function (result) {
+
+                        log("RESULTADO :"+ JSON.stringify(result))
+                        var roomData = [];
+                        var deviceData = [];
+                        var roomScheduleData = [];
+
+                        for (var i = 0; i < result.length; i++) {
+                            var entry = result[i];
+
+                            // Verifica de qual tabela a entrada faz parte
+                            if (entry.hasOwnProperty('r_id')) {
+                                roomData.push({
+                                    id: entry.r_id,
+                                    name: entry.r_name,
+                                    img: entry.r_img,
+                                    // Adicione as outras propriedades de tbl_room aqui
+                                });
+                            } else if (entry.hasOwnProperty('d_id')) {
+                                deviceData.push({
+                                    id: entry.d_id,
+                                    hwid: entry.d_hwid,
+                                    pbxactive: entry.d_pbxactive,
+                                    online: entry.d_online,
+                                    product: entry.d_product,
+                                    sip: entry.d_sip,
+                                    cn: entry.d_cn,
+                                    guid: entry.d_guid,
+                                    leftoffset: entry.d_leftoffset,
+                                    topoffset: entry.d_topoffset,
+                                    room_id: entry.d_room_id,
+                                    // Adicione as outras propriedades de tbl_devices aqui
+                                });
+                            } else if (entry.hasOwnProperty('rs_id')) {
+                                roomScheduleData.push({
+                                    id: entry.rs_id,
+                                    type: entry.rs_type,
+                                    data_start: entry.rs_data_start,
+                                    data_end: entry.rs_data_end,
+                                    // Adicione as outras propriedades de tbl_room_availability aqui
+                                });
+                            }
+                        }
+
+                        conn.send(JSON.stringify({
+                            api: "user",
+                            mt: "SelectRoomsResult",
+                            rooms: JSON.stringify(roomData),
+                            devices: JSON.stringify(deviceData),
+                            schedules: JSON.stringify(roomScheduleData)
+                        }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
+                        log("SelectRoomResult: Error ao selecionar dados: " + String(errorText));
                     });
-            }
+
+}
+
+
+
             if (obj.mt == "GetDeviceSchedules") {
                 var roomId = obj.room;
                 var hwId = obj.dev;
@@ -459,7 +608,7 @@ new JsonApi("admin").onconnected(function(conn) {
                     .oncomplete(function (roomData) {
                         var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
 
-                        Database.exec("INSERT INTO tbl_room_schedule (type, data_start, data_end, schedule_module, timestart_monday, timeend_monday, timestart_tuesday ,timeend_tuesday, timestart_wednesday, timeend_wednesday, timestart_thursday, timeend_thursday, timestart_friday, timeend_friday, timestart_saturday, timeend_saturday, timestart_sunday, timeend_sunday , room_id ) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + obj.startMonday + "','" + obj.endMonday + "','" + obj.startTuesday + "','" + obj.endTuesday + "','" + obj.startWednesday + "','" +  obj.endWednesday + "','" + obj.startThursday + "','" + obj.endThursday + "','"  + obj.startFriday + "','" + obj.endFriday + "','" + obj.startSaturday + "','" +  obj.endSaturday + "','" + obj.startSunday + "','" + obj.endSunday + "','" + roomID + "')")
+                        Database.exec("INSERT INTO tbl_room_availability (type, data_start, data_end, schedule_module, timestart_monday, timeend_monday, timestart_tuesday ,timeend_tuesday, timestart_wednesday, timeend_wednesday, timestart_thursday, timeend_thursday, timestart_friday, timeend_friday, timestart_saturday, timeend_saturday, timestart_sunday, timeend_sunday , room_id ) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + obj.startMonday + "','" + obj.endMonday + "','" + obj.startTuesday + "','" + obj.endTuesday + "','" + obj.startWednesday + "','" +  obj.endWednesday + "','" + obj.startThursday + "','" + obj.endThursday + "','"  + obj.startFriday + "','" + obj.endFriday + "','" + obj.startSaturday + "','" +  obj.endSaturday + "','" + obj.startSunday + "','" + obj.endSunday + "','" + roomID + "')")
                             .oncomplete(function (scheduleData) {
 
                             var viewers = obj.viewer
@@ -501,7 +650,7 @@ new JsonApi("admin").onconnected(function(conn) {
             
                 var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
                 var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
-                var querySelectRoomSchedule = "SELECT * FROM tbl_room_schedule WHERE room_id =" + roomId + ";"; 
+                var querySelectRoomSchedule = "SELECT * FROM tbl_room_availability WHERE room_id =" + roomId + ";"; 
                 var queryEditorsRoom = "SELECT * FROM tbl_room_editors WHERE room_id =" + roomId + ";"; 
                 var queryViewersRoom = "SELECT * FROM tbl_room_viewers WHERE room_id =" + roomId + ";"; 
                 Database.exec(querySelectRoom)
@@ -517,7 +666,7 @@ new JsonApi("admin").onconnected(function(conn) {
                                         conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomResult", rooms: JSON.stringify(roomData), dev: deviceData, schedules: JSON.stringify(roomScheduleData), editors: JSON.stringify(editors), viewers: JSON.stringify(viewers)  }));
                                     })
                                     .onerror(function (error, errorText, dbErrorCode) {
-                                        log("SelectRoomResult: Error ao selecionar tabela tbl_room_schedule: " + String(errorText));
+                                        log("SelectRoomResult: Error ao selecionar tabela tbl_room_availability: " + String(errorText));
                                     });
                                 })
                                 })
@@ -566,7 +715,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 });
             }
             if (obj.mt == "UpdateRoom") {
-                var sqlUpdate = "UPDATE tbl_room_schedule SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
+                var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
                 Database.exec(sqlUpdate)
                     .oncomplete(function (data) {
 
@@ -837,7 +986,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
                     conn.send(JSON.stringify(user))
                 }
             })
-            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "', pbxactive = '" + true + "' WHERE hwid = '" + hwId + "'"; 
+            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "',availability = '" +  true + "' , pbxactive = '" + true + "' WHERE hwid = '" + hwId + "'"; 
             Database.exec(sql)
             .oncomplete(function(data){ 
                 log("UPDATED DEVICE AFTER RESET" + data)
@@ -866,7 +1015,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
 
             }   
         })
-        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "', pbxactive = '" + false + "' WHERE hwid = '" + hwId + "'";
+        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' , availability = '" + false + "', pbxactive = '" + false + "' WHERE hwid = '" + hwId + "'";
         Database.exec(sql)
         .oncomplete(function(data){ 
             log("UPDATED DEVICE AFTER RESET" + data)

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script src="tailwind.config.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
+</head>
+<body class="m-1 bg-dark-100">
+
+</body>
+<script>
+    var img = './images/ImageSala2.png'
+makeHeader("./images/home.svg","./images/menu.svg", "Minhas Salas")
+//texts.text("labelMyRooms")
+makeViewRoom(img,"César",20,"off")
+
+function makeHeader(imgLeft,imgRight,title){
+   // construção do header
+ 
+   const header = document.createElement("header")
+   header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
+
+   //construção da div com o titulo e imgHome
+   const divTitle = document.createElement("div")
+   divTitle.classList.add("flex","items-center","justify-start", "gap-1")
+
+   //imgHome
+   const imgHome = document.createElement("img")
+   imgHome.setAttribute("src",imgLeft)
+
+   //titulo
+   const titleRoom = document.createElement("h1")
+   titleRoom.classList.add("text-white" ,"font-bold")
+   titleRoom.textContent = title
+
+   //imgMenu
+   const imgMenu = document.createElement("img")
+   imgMenu.setAttribute("src",imgRight)
+
+   
+      divTitle.appendChild(imgHome)
+      divTitle.appendChild(titleRoom)
+      header.appendChild(divTitle)
+      header.appendChild(imgMenu)
+      document.body.appendChild(header);
+
+}
+
+function makeContainer(){
+    var container = document.createElement("div")
+    document.body.appendChild(container);
+    return container
+} 
+
+function makeViewRoom(img,title,count,status){
+//div principal
+const divMain =  document.createElement("div")
+divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex")
+// img da sala
+const divImg = document.createElement("div")
+divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg")
+divImg.setAttribute("style", `background-image: url(${img});`);
+// div titulo da sala
+const divTitleRoom = document.createElement("div")
+divTitleRoom.classList.add("flex","items-center","justify-between", "gap-1")
+// nome da sala
+const nameRoom = document.createElement("h1")
+nameRoom.textContent = `${title}`
+nameRoom.classList.add("text-white" ,"font-bold")
+// device count
+const divDeviceNumber = document.createElement("div")
+divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
+const statusDevice = document.createElement("div")
+statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+
+const deviceNumber = document.createElement("h1")
+deviceNumber.textContent = `${count}`
+deviceNumber.classList.add("text-white" ,"font-bold")
+
+
+
+
+// divImg.appendChild(imgRoom)
+divTitleRoom.appendChild(nameRoom)
+divTitleRoom.appendChild(divDeviceNumber)
+divDeviceNumber.appendChild(statusDevice)
+divDeviceNumber.appendChild(deviceNumber)
+divMain.appendChild(divImg)
+divMain.appendChild(divTitleRoom)
+var container = makeContainer()
+container.appendChild(divMain)
+
+}
+</script>
+</html>
