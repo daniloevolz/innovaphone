@@ -8,8 +8,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     this.createNode("body")
     var that = this;
     var device_list = [];
-    var UIuser;
-    var UIDomain;
+    var userDN;
+    var userDomain;
     var avatar;
     var appdn = start.title;
     var appUrl = start.originalUrl;
@@ -57,8 +57,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function app_connected(domain, user, dn, appdomain) {
 
         changeState("Connected");
-        UIDomain = domain
-        UIuser = dn
+        userDomain = domain
+        userDN = dn
         // avatar = new innovaphone.Avatar(start, user, domain);
         // UIuserPicture = avatar.url(user, 80, dn);
 
@@ -207,7 +207,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divDeviceNumber.appendChild(deviceNumber)
 
         
-        // divImg.appendChild(imgRoom)
         divTitleRoom.appendChild(nameRoom)
         divTitleRoom.appendChild(divDeviceNumber)
         divDeviceNumber.appendChild(statusDevice)
@@ -216,22 +215,28 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divMain.appendChild(divTitleRoom)
 
         const divUsersAvatar = document.createElement("div")
+        divUsersAvatar.classList.add("flex","items-start","gap-1")
         divUsersAvatar.setAttribute("id","divUsersAvatar")
 
-        console.log("TABLEUSERS" + JSON.stringify(list_tableUsers))
-        if(list_tableUsers.length > 0 ){
-            list_tableUsers.forEach(function(users){
-                avatar = new innovaphone.Avatar(start, users.sip , UIDomain);
-                UIuserPicture = avatar.url(users.sip, 80, UIuser );
-                const imgAvatar = document.createElement("img")
-                imgAvatar.setAttribute("src", UIuserPicture);
-                imgAvatar.setAttribute("id","divAvatar")
-                divUsersAvatar.appendChild(imgAvatar)
-                divMain.appendChild(divUsersAvatar)
-            })
-        }
-   
-        
+       room.viewers.forEach(function (viewer) {
+
+        var viewers = list_tableUsers.filter(function (user) {
+            return user.guid == viewer.viewer_guid
+        });
+        viewers.forEach(function(view){
+
+            avatar = new innovaphone.Avatar(start, view.sip , userDomain);
+            UIuserPicture = avatar.url(view.sip, 15 , userDN );
+            const imgAvatar = document.createElement("img")
+            imgAvatar.setAttribute("src", UIuserPicture);
+            imgAvatar.setAttribute("id","divAvatar")
+            imgAvatar.classList.add("w-5","h-5","rounded-full")
+            divUsersAvatar.appendChild(imgAvatar)
+            divMain.appendChild(divUsersAvatar)
+
+        })
+    
+    })
         container.appendChild(divMain)
         })
      }
