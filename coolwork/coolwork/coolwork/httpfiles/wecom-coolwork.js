@@ -132,7 +132,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         // construção do header
       
         const header = document.createElement("header")
-        header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
+        header.classList.add("bg-dark-200/30" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg","backdrop-blur-md","border-solid","border-[1px]","border-dark-600/20")
      
         //construção da div com o titulo e imgHome
         const divTitle = document.createElement("div")
@@ -160,16 +160,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
      }
      
-     function makeContainer(){
-         var container = document.createElement("div")
-         document.body.appendChild(container);
-         return container
-     } 
-     
      function makeViewRoom(rooms,devices,schedules){
         // div container (scroll)
         const container = document.createElement("div")
-        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
+        container.classList.add("overflow-auto","flex","flex-col","sm:flex-wrap","justify-start","gap-1",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
@@ -177,11 +171,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         rooms.forEach(function(room){
          //div principal
         const divMain =  document.createElement("div")
-        divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex")
+        divMain.classList.add("rounded-lg","p-1","m-1","backdrop-blur-md","bg-dark-200/30","gap-2","flex-col","flex",'align-center',"justify-start","border-solid","border-[1px]","border-dark-600/20")
         divMain.setAttribute("id",room.id)
         // img da sala
-        const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg")
+        const divImg = document.createElement("div") 
+        divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg",)
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         // div titulo da sala
         const divTitleRoom = document.createElement("div")
@@ -195,6 +189,34 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
         const statusDevice = document.createElement("div")
         statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+
+        // div disponibilidade
+        const divMainAvailabilityP = document.createElement("div")
+        divMainAvailabilityP.classList.add("flex","p-1","items-center","justify-between","bg-dark-100/35","rounded-lg")
+        const imgCalendar = document.createElement("img")
+        imgCalendar.setAttribute("src","./images/calendar-days.svg")
+        divMainAvailabilityP.appendChild(imgCalendar)
+        // div data
+        const divDateP = document.createElement("div")
+        divDateP.classList.add("flex","items-center","gap-1","justify-center","content-center")
+        // texto inicio
+        const dateStart = document.createElement("p")
+        dateStart.textContent = '00/00'
+        dateStart.classList.add("text-xl","font-bold",)
+        // texto até
+        const dateAte = document.createElement("p")
+        dateAte.textContent = texts.text("labelTo")
+        dateAte.classList.add("text-sm","font-regular",'text-primary-600')
+        // texto fim
+        const dateEnd = document.createElement("p")
+        dateEnd.textContent = '00/00'
+        dateEnd.classList.add("text-xl","font-bold",)
+
+        divDateP.appendChild(dateStart)
+        divDateP.appendChild(dateAte)
+        divDateP.appendChild(dateEnd)
+        divMainAvailabilityP.appendChild(divDateP)
+
 
         // filtro para retornar os telefones disponíveis
         var devicesInfo = devices.filter(function (dev) {
@@ -213,6 +235,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         
         divMain.appendChild(divImg)
         divMain.appendChild(divTitleRoom)
+        divMain.appendChild(divMainAvailabilityP)
 
         const divUsersAvatar = document.createElement("div")
         divUsersAvatar.classList.add("flex","items-start","gap-1")
@@ -226,7 +249,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         viewers.forEach(function(view){
 
             avatar = new innovaphone.Avatar(start, view.sip , userDomain);
-            UIuserPicture = avatar.url(view.sip, 15 , userDN );
+            UIuserPicture = avatar.url(view.sip, 200 , userDN );
             const imgAvatar = document.createElement("img")
             imgAvatar.setAttribute("src", UIuserPicture);
             imgAvatar.setAttribute("id","divAvatar")
@@ -238,7 +261,21 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     
     })
         container.appendChild(divMain)
-        })
+
+        var devicesInfo = devices.filter(function (dev) {
+            return dev.room_id == room.id
+        });
+        var roomINFO = rooms.filter(function (r) {
+            return r.id == room.id
+        });
+        console.log("DEVICES INFO " + JSON.stringify(devicesInfo) + "ROOMS " + JSON.stringify(roomINFO))
+        // divMain.addEventListener("click",function(){
+            
+        // })
+     })
+    }
+     function makeRoom(){
+
      }
     // //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
