@@ -338,204 +338,271 @@ new JsonApi("user").onconnected(function(conn) {
 
             if (obj.mt == "SelectRooms") {
                 var roomIds = JSON.parse(obj.ids)
-                log("ROOMIDS" + obj.ids)
+                log("ROOMIDS" + obj.ids) 
+                var ids = extrairValoresId(roomIds);
 
-                function extrairValoresId(lista) {
-                    var valoresId = [];
-                    for (var i = 0; i < lista.length; i++) {
-                      valoresId.push(lista[i].id);
-                    }
-                    return valoresId;
-                  }
-                  
-                  // Chamando a função
-                  var id = extrairValoresId(roomIds);
-
-                var query = "SELECT " +
-                    "R.id AS R_id, R.name AS R_name, R.img AS R_img, " +
-                    "D.id AS D_id, D.hwid AS D_hwid, D.pbxactive AS D_pbxactive, D.online AS D_online, D.product AS D_product, D.sip AS D_sip, D.cn AS D_cn, D.guid AS D_guid, D.leftoffset AS D_leftoffset, D.topoffset AS D_topoffset, D.room_id AS D_room_id, " +
-                    "RA.id AS RA_id, " +
-                    "RA.type AS RA_type, " +
-                    "RA.schedule_module AS RA_schedule_module, " +
-                    "RA.data_start AS RA_data_start, "+
-                    "RA.data_end AS RA_data_end, "+
-                    "RA.timestart_monday AS RA_timestart_monday, " +
-                    "RA.timeend_monday AS RA_timeend_monday, " +
-                    "RA.timestart_tuesday AS RA_timestart_tuesday, "+ 
-                    "RA.timeend_tuesday AS RA_timeend_tuesday, "+
-                    "RA.timestart_wednesday AS RA_timestart_wednesday, " +
-                    "RA.timeend_wednesday AS RA_timeend_wednesday, " +
-                    "RA.timestart_thursday AS RA_timestart_thursday, " +
-                    "RA.timeend_thursday AS RA_timeend_thursday, " +
-                    "RA.timestart_friday AS RA_timestart_friday, " +
-                    "RA.timeend_friday AS RA_timeend_friday, " +
-                    "RA.timestart_saturday AS RA_timestart_saturday, " +
-                    "RA.timeend_saturday AS RA_timeend_saturday, " +
-                    "RA.timestart_sunday AS RA_timestart_sunday, " +
-                    "RA.timeend_sunday AS RA_timeend_sunday, " +
-                    "RA.room_id AS RA_room_id, " +
-                    "RE.editor_guid AS RE_editor_guid, " + // editor
-                    "RV.viewer_guid AS RV_viewer_guid " + // viewer
-                    "FROM " +
-                    "tbl_room R " +
-                    "LEFT JOIN tbl_devices D ON R.id = D.room_id " +
-                    "LEFT JOIN tbl_room_availability RA ON R.id = RA.room_id " +
-                    "LEFT JOIN tbl_room_editors RE ON R.id = RE.room_id " +
-                    "LEFT JOIN tbl_room_viewers RV ON R.id = RV.room_id " +
+                var query = "SELECT * " +
+                    "FROM tbl_room " +
                     "WHERE " +
-                    "R.id IN (" + id + ");";
+                    "id IN (" + ids + ");";
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomsResult", result: JSON.stringify(result), ids: obj.ids }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectDevices: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+
+                //Database.exec(query)
+                //    .oncomplete(function (result) {
+
+                //        log("RESULTADO :"+ JSON.stringify(result))
+
+                //        // variaveis p armazenar os dados da consulta 
+
+                //        var roomData = [];
+                //        var deviceData = [];
+                //        var roomScheduleData = [];
+
+                //        for (var i = 0; i < result.length; i++) {
+                //            var entry = result[i];
+
+                //            if (entry.hasOwnProperty('r_id')) {
+                //                var roomExists = roomData.some(function (room) {
+                //                    return room.id === entry.r_id;
+                //                });
+
+                //                if (!roomExists) {
+                //                    roomData.push({
+                //                        id: entry.r_id,
+                //                        name: entry.r_name,
+                //                        img: entry.r_img,
+                //                        editors: [],  
+                //                        viewers: [] 
+                                    
+                //                    });
+                //                }
+
+                //            } 
+
+                //            if (entry.hasOwnProperty('d_id')) {
+
+                //                var deviceExists = deviceData.some(function (device) {
+                //                    return device.id === entry.d_id;
+                //                });
+                        
+                //                if (!deviceExists) {
+                //                    deviceData.push({
+                //                        id: entry.d_id,
+                //                        hwid: entry.d_hwid,
+                //                        pbxactive: entry.d_pbxactive,
+                //                        online: entry.d_online,
+                //                        product: entry.d_product,
+                //                        sip: entry.d_sip,
+                //                        cn: entry.d_cn,
+                //                        guid: entry.d_guid,
+                //                        leftoffset: entry.d_leftoffset,
+                //                        topoffset: entry.d_topoffset,
+                //                        room_id: entry.d_room_id
+                                        
+                //                    });
+                //                }
+                //            }
+
+                //            if (entry.hasOwnProperty('ra_id')) {
+
+                //                var scheduleExists = roomScheduleData.some(function (schedule) {
+                //                    return schedule.id === entry.ra_id;
+                //                });
+
+                //                if(!scheduleExists){
+                //                    roomScheduleData.push({
+                //                            id: entry.ra_id,
+                //                            type: entry.ra_type,
+                //                            data_start: entry.ra_data_start,
+                //                            data_end: entry.ra_data_end, 
+                //                            schedule_module: entry.ra_schedule_module,
+                //                            timestart_monday: entry.ra_timestart_monday,
+                //                            timeend_monday: entry.ra_timeend_monday,
+                //                            timestart_tuesday: entry.ra_timestart_tuesday,
+                //                            timeend_tuesday: entry.ra_timeend_tuesday,
+                //                            timestart_wednesday: entry.ra_timestart_wednesday,
+                //                            timeend_wednesday: entry.ra_timeend_wednesday,
+                //                            timestart_thursday: entry.ra_timestart_thursday,
+                //                            timeend_thursday: entry.ra_timeend_thursday,
+                //                            timestart_friday: entry.ra_timestart_friday,
+                //                            timeend_friday: entry.ra_timeend_friday,
+                //                            timestart_saturday: entry.ra_timestart_saturday,
+                //                            timeend_saturday: entry.ra_timeend_saturday,
+                //                            timestart_sunday: entry.ra_timestart_sunday,
+                //                            timeend_sunday: entry.ra_timeend_sunday,
+                        
+                //                    });
+                //                }
+                               
+                //            }
+                          
+                //            if (Array.isArray(roomData)) {
+                                
+                //                var rooms = roomData.filter(function (room) {
+                //                    return room.id === entry.r_id;
+                //                });
+                //            }
+
+                               
+                //            if (Array.isArray(rooms) && rooms.length > 0) {
+                                
+                //                rooms.forEach(function (room) {
+                //                    room.editors = room.editors || [];
+                                    
+                //                    if (entry.hasOwnProperty('re_editor_guid')) {
+
+                //                        var editorExists = room.editors.some(function (editor) {
+                //                            return editor.editor_guid === entry.re_editor_guid;
+                //                        });
+
+                //                        if (!editorExists) {
+                //                            room.editors.push({
+                //                                editor_guid: entry.re_editor_guid
+                //                            });
+                //                        }
+                                
+                //                    }
+
+                //                    if (entry.hasOwnProperty('rv_viewer_guid')) {
+                //                       var viewerExists = room.viewers.some(function (viewer) {
+                //                        return viewer.viewer_guid === entry.rv_viewer_guid;
+                //                    });
+
+                //                        if (!viewerExists) {
+                //                            room.viewers.push({
+                //                                viewer_guid: entry.rv_viewer_guid
+                //                            });
+                //                        }
+                //                    }
+                //                });
+                //            } else {
+                //                console.error("Nenhuma sala correspondente encontrada para a entrada atual");
+                //            }
+
+                           
+                //        }
+
+                //        conn.send(JSON.stringify({
+                //            api: "user",
+                //            mt: "SelectRoomsResult",
+                //            rooms: JSON.stringify(roomData),
+                //            devices: JSON.stringify(deviceData),
+                //            schedules: JSON.stringify(roomScheduleData)
+                //        }));
+                //    })
+                //    .onerror(function (error, errorText, dbErrorCode) {
+                //        log("SelectRooms: Error ao selecionar tabela: " + String(errorText));
+                //        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                //    });
+
+}
+            if (obj.mt == "SelectDevices") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
+                var ids = extrairValoresId(roomIds);
+
+                var query = "SELECT * " +
+                    "FROM tbl_devices " +
+                    "WHERE " +
+                    "room_id IN (" + ids + ");";
 
                 Database.exec(query)
                     .oncomplete(function (result) {
-
-                        log("RESULTADO :"+ JSON.stringify(result))
-
-                        // variaveis p armazenar os dados da consulta 
-
-                        var roomData = [];
-                        var deviceData = [];
-                        var roomScheduleData = [];
-
-                        for (var i = 0; i < result.length; i++) {
-                            var entry = result[i];
-
-                            if (entry.hasOwnProperty('r_id')) {
-                                var roomExists = roomData.some(function (room) {
-                                    return room.id === entry.r_id;
-                                });
-
-                                if (!roomExists) {
-                                    roomData.push({
-                                        id: entry.r_id,
-                                        name: entry.r_name,
-                                        img: entry.r_img,
-                                        editors: [],  
-                                        viewers: [] 
-                                    
-                                    });
-                                }
-
-                            } 
-
-                            if (entry.hasOwnProperty('d_id')) {
-
-                                var deviceExists = deviceData.some(function (device) {
-                                    return device.id === entry.d_id;
-                                });
-                        
-                                if (!deviceExists) {
-                                    deviceData.push({
-                                        id: entry.d_id,
-                                        hwid: entry.d_hwid,
-                                        pbxactive: entry.d_pbxactive,
-                                        online: entry.d_online,
-                                        product: entry.d_product,
-                                        sip: entry.d_sip,
-                                        cn: entry.d_cn,
-                                        guid: entry.d_guid,
-                                        leftoffset: entry.d_leftoffset,
-                                        topoffset: entry.d_topoffset,
-                                        room_id: entry.d_room_id
-                                        
-                                    });
-                                }
-                            }
-
-                            if (entry.hasOwnProperty('ra_id')) {
-
-                                var scheduleExists = roomScheduleData.some(function (schedule) {
-                                    return schedule.id === entry.ra_id;
-                                });
-
-                                if(!scheduleExists){
-                                    roomScheduleData.push({
-                                            id: entry.ra_id,
-                                            type: entry.ra_type,
-                                            data_start: entry.ra_data_start,
-                                            data_end: entry.ra_data_end, 
-                                            schedule_module: entry.ra_schedule_module,
-                                            timestart_monday: entry.ra_timestart_monday,
-                                            timeend_monday: entry.ra_timeend_monday,
-                                            timestart_tuesday: entry.ra_timestart_tuesday,
-                                            timeend_tuesday: entry.ra_timeend_tuesday,
-                                            timestart_wednesday: entry.ra_timestart_wednesday,
-                                            timeend_wednesday: entry.ra_timeend_wednesday,
-                                            timestart_thursday: entry.ra_timestart_thursday,
-                                            timeend_thursday: entry.ra_timeend_thursday,
-                                            timestart_friday: entry.ra_timestart_friday,
-                                            timeend_friday: entry.ra_timeend_friday,
-                                            timestart_saturday: entry.ra_timestart_saturday,
-                                            timeend_saturday: entry.ra_timeend_saturday,
-                                            timestart_sunday: entry.ra_timestart_sunday,
-                                            timeend_sunday: entry.ra_timeend_sunday,
-                        
-                                    });
-                                }
-                               
-                            }
-                          
-                            if (Array.isArray(roomData)) {
-                                
-                                var rooms = roomData.filter(function (room) {
-                                    return room.id === entry.r_id;
-                                });
-                            }
-
-                               
-                            if (Array.isArray(rooms) && rooms.length > 0) {
-                                
-                                rooms.forEach(function (room) {
-                                    room.editors = room.editors || [];
-                                    
-                                    if (entry.hasOwnProperty('re_editor_guid')) {
-
-                                        var editorExists = room.editors.some(function (editor) {
-                                            return editor.editor_guid === entry.re_editor_guid;
-                                        });
-
-                                        if (!editorExists) {
-                                            room.editors.push({
-                                                editor_guid: entry.re_editor_guid
-                                            });
-                                        }
-                                
-                                    }
-
-                                    if (entry.hasOwnProperty('rv_viewer_guid')) {
-                                       var viewerExists = room.viewers.some(function (viewer) {
-                                        return viewer.viewer_guid === entry.rv_viewer_guid;
-                                    });
-
-                                        if (!viewerExists) {
-                                            room.viewers.push({
-                                                viewer_guid: entry.rv_viewer_guid
-                                            });
-                                        }
-                                    }
-                                });
-                            } else {
-                                console.error("Nenhuma sala correspondente encontrada para a entrada atual");
-                            }
-
-                           
-                        }
-
-                        conn.send(JSON.stringify({
-                            api: "user",
-                            mt: "SelectRoomsResult",
-                            rooms: JSON.stringify(roomData),
-                            devices: JSON.stringify(deviceData),
-                            schedules: JSON.stringify(roomScheduleData)
-                        }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesResult", result: JSON.stringify(result), ids: obj.ids }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        log("SelectRoomResult: Error ao selecionar dados: " + String(errorText));
+                        log("SelectDevices: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+                                     
+            }
+            if (obj.mt == "SelectRoomsAvailabilities") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
+                var ids = extrairValoresId(roomIds);
+
+                var query = "SELECT * " +
+                    "FROM tbl_room_availability " +
+                    "WHERE " +
+                    "room_id IN (" + ids + ");";
+
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomsAvailabilitiesResult", result: JSON.stringify(result), ids: obj.ids  }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomsAvailabilities: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
                     });
 
-}
+            }
+            if (obj.mt == "SelectDevicesSchedule") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
+                var ids = extrairValoresId(roomIds);
 
+                var query = "SELECT * " +
+                    "FROM tbl_device_schedule " +
+                    "WHERE " +
+                    "device_room_id IN (" + ids + ");";
 
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesScheduleResult", result: JSON.stringify(result), ids: obj.ids  }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectDevicesSchedule: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectRoomsEditors") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
+                var ids = extrairValoresId(roomIds);
 
+                var query = "SELECT * " +
+                    "FROM tbl_room_editors " +
+                    "WHERE " +
+                    "room_id IN (" + ids + ");"
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomsEditorsResult", result: JSON.stringify(result), ids: obj.ids }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomsEditors: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+
+                
+            }
+            if (obj.mt == "SelectRoomsViewers") {
+                var roomIds = JSON.parse(obj.ids)
+                log("ROOMIDS" + obj.ids)
+                var ids = extrairValoresId(roomIds);
+
+                var query = "select * " +
+                    "from tbl_room_viewers " +
+                    "where " +
+                    "room_id IN (" + ids + ");"
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectRoomsViewersResult", result: JSON.stringify(result), ids: obj.ids }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomsViewers: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+
+                
+
+            }
             if (obj.mt == "GetDeviceSchedules") {
                 var roomId = obj.room;
                 var hwId = obj.dev;
@@ -549,18 +616,19 @@ new JsonApi("user").onconnected(function(conn) {
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("WECOM LOG:GetDeviceSchedules: ", JSON.stringify(errorText))
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: errorText }));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                     });
 
             }
-            if (obj.mt == "makeDeviceSchedule") {
+            if (obj.mt == "InsertDeviceSchedule") {
                 Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.data_start + "','" + obj.data_end + "','" + obj.device + "'," + obj.room + ",'" + conn.guid + "')")
                 .oncomplete(function (data) {
                     //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
                 conn.send(JSON.stringify({ api: "user", mt: "DeviceScheduleSuccess" }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
-                        log("DeviceScheduleError:result=Error " + String(errorText));
+                    log("DeviceScheduleError:result=Error " + String(errorText));
+                    conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                 });
             }
 
@@ -921,6 +989,14 @@ function getDateNow() {
     return dateString.slice(0, -8);
 }
 
+//Function para extrair os Ids das Rooms e colocar uma , entre cada id para então consultar o BD.
+function extrairValoresId(lista) {
+    var valoresId = [];
+    for (var i = 0; i < lista.length; i++) {
+        valoresId.push(lista[i].id);
+    }
+    return valoresId;
+};
 
 // function checkAppointments() {
 //     log("CHECKAPOOINTMENTS")

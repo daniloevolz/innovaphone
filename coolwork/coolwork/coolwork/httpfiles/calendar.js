@@ -236,7 +236,7 @@ function buildCalendar(availability, schedule) {
   
   //funções de disponibilidade
       
-function UpdateAvailability(availability, schedules) {
+function UpdateAvailability(availability, schedules, recurrent) {
         var cells = document.querySelectorAll("#calendar-body tr td div");
         if (availability.length === 0) {
             cells.forEach(function (td) {
@@ -244,7 +244,10 @@ function UpdateAvailability(availability, schedules) {
             });
         }
         else {
-
+            if(recurrent == "sim"){
+                cells = document.querySelectorAll(".recurrentText")
+                console.log("recurrent == sim")
+            }
             availability.forEach(function (dates) {
                 if (dates.type == "recurrentType") {
                     cells.forEach(function (td) {
@@ -265,28 +268,30 @@ function UpdateAvailability(availability, schedules) {
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                    if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
-                                    } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('available');
-                                    }
+                                        if (totalHours <= 6) {
+                                            td.classList.remove('unavailable');
+                                            td.classList.add('text-green-500');
+                                            // td.classList.add('parcialavailable');
+                                        } else {
+                                            td.classList.remove('unavailable');
+                                            td.classList.add('text-green-500');
+                                        }
+                                    
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                // console.log("Schedules:" +  schedules)
+                                // schedules.forEach(function(dateS){
+                                //     var dataSplit = dateS.data_start
+                                //     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //     console.log("Data Split " + dataSplit)
+                                //     console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //     if(dataDate == dataS ){
+                                //         td.classList.remove('parcialavailable');
+                                //         td.classList.add('unavailable')
+                                //     }
+                                // })
                                 return
                             case "tuesday":
                                 if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
@@ -296,29 +301,32 @@ function UpdateAvailability(availability, schedules) {
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
+                                    console.log("LENGTH DELE " + dates.timestart_tuesday.length)
+                               
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
                                 }
                                 console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    //console.log("Data Split " + GetDeviceSchedulesResult)
-                                    console.log("Data S " + dataS)
+                                // schedules.forEach(function(dateS){
+                                //     var dataSplit = dateS.data_start
+                                //     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //     //console.log("Data Split " + GetDeviceSchedulesResult)
+                                //     console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //     if(dataDate == dataS ){
+                                //         td.classList.remove('parcialavailable');
+                                //         td.classList.add('unavailable')
+                                //     }
+                                // })
                                 
                                 return
                             case "wednesday":
@@ -329,12 +337,14 @@ function UpdateAvailability(availability, schedules) {
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
+                                
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
@@ -362,12 +372,14 @@ function UpdateAvailability(availability, schedules) {
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
+                             
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
@@ -467,19 +479,19 @@ function UpdateAvailability(availability, schedules) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
+                                // console.log("Schedules:" +  schedules)
                                
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                // schedules.forEach(function(dateS){
+                                //     var dataSplit = dateS.data_start
+                                //     var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //     console.log("Data Split " + dataSplit)
+                                //     console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //     if(dataDate == dataS ){
+                                //         td.classList.remove('parcialavailable');
+                                //         td.classList.add('unavailable')
+                                //     }
+                                // })
 
                                 return
 

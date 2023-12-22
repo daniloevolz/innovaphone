@@ -52,7 +52,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         changeState("Disconnected");
     };
     var currentState = "Loading";
-    // waitConnection(that);
+
+    waitConnection(that);
+    var rooms = [];
+    var devices = [];
+    var availiabilities = [];
+    var schedules = [];
+    var viewers = [];
+    var editors = [];
 
     function app_connected(domain, user, dn, appdomain) {
 
@@ -87,42 +94,70 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function devicesApi_onmessage(conn, obj) {
         console.log("WECOM-LOG:devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
-            var devices = obj.msg.phones;
-            console.log("WECOM-LOG:devicesApi_onmessage:GetPhonesResult " + JSON.stringify(devices));
-            app.send({ api: "user", mt: "PhoneList", devices: devices })
+            var phones = obj.msg.phones;
+            console.log("WECOM-LOG:devicesApi_onmessage:GetPhonesResult " + JSON.stringify(phones));
+            app.send({ api: "user", mt: "PhoneList", devices: phones })
         }
 
     }
     function app_message(obj) {
-        if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
-            device_list = JSON.parse(obj.result)
-        }
         if (obj.api === "user" && obj.mt === "SelectMyRoomsViewerResult") {
             app.send({ api: "user", mt: "SelectRooms", ids: obj.result })
             // that.clear()
             // // list_MyRooms = JSON.parse(obj.result)
-            
         }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
             list_tableUsers = JSON.parse(obj.result);     
             console.log("table-users " + JSON.stringify(list_tableUsers))      
         }
+        //Retorna todas as salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsResult") {
-            var rooms = JSON.parse(obj.rooms);
-            schedules = JSON.parse(obj.schedules);
-            var devices = JSON.parse(obj.devices);
+            rooms = JSON.parse(obj.result);
+            app.send({ api: "user", mt: "SelectDevices", ids: obj.ids })
+            app.send({ api: "user", mt: "SelectRoomsEditors", ids: obj.ids })
+            app.send({ api: "user", mt: "SelectRoomsViewers", ids: obj.ids })
+        }
+        //Retorna todas os devices de todas as salas solicitadas
+        if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
+            devices = JSON.parse(obj.result);
+            app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
+        }
+        //Retorna todas as disponibilidades de todas as salas solicitadas
+        if (obj.api === "user" && obj.mt === "SelectRoomsAvailabilitiesResult") {
+            availiabilities = JSON.parse(obj.result);
+            app.send({ api: "user", mt: "SelectDevicesSchedule", ids: obj.ids })
+        }
+        //Retorna todos os agendamentos de todas as salas solicitadas
+        if (obj.api === "user" && obj.mt === "SelectDevicesScheduleResult") {
+            schedules = JSON.parse(obj.result);
+
+            //Todos os dados carregados, vamos abrir a tela visual do App!!!!!!
+            console.info("Todos os dados carregados, vamos abrir a tela visual do App!!!!!!");
             that.clear();
-            makeHeader("./images/home.svg","./images/menu.svg", texts.text("labelMyRooms"))
-            makeViewRoom(rooms,devices,schedules)  
+            makeHeader("./images/home.svg", "./images/menu.svg", texts.text("labelMyRooms"))
+            makeViewRoom(rooms, devices, availiabilities, schedules, viewers, editors)
+        }
+        //Retorna todos os usuários visualizadores das salas solicitadas
+        if (obj.api === "user" && obj.mt === "SelectRoomsViewersResult") {
+            viewers = JSON.parse(obj.result);
+            //if (viewers.hasOwnProperty(obj.room)) {
+            //    viewers[obj.room].push = JSON.parse(obj.result)
+            //} else {
+            //    viewers[obj.room] = [];
+            //    viewers[obj.room].push = JSON.parse(obj.result)
+            //}
             
         }
-
-        // if (obj.api === "user" && obj.mt === "SelectRoomResult") {
-        //     var room = JSON.parse(obj.room);
-        //     schedules = JSON.parse(obj.schedules);
-        //     var devices = obj.dev;
-        //     makeDivRoom(_colDireita, room, schedules, devices);
-        // }
+        //Retorna todos os usuários editores das salas solicitadas
+        if (obj.api === "user" && obj.mt === "SelectRoomsEditorsResult") {
+            editors = JSON.parse(obj.result);
+            //if (editors.hasOwnProperty(obj.room)) {
+            //    editors[obj.room].push = JSON.parse(obj.result)
+            //} else {
+            //    editors[obj.room] = [];
+            //    editors[obj.room].push = JSON.parse(obj.result)
+            //} 
+        }
         if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
             app.send({ api: "user", mt: "SelectMyRooms" })
         }
@@ -132,7 +167,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         // construção do header
       
         const header = document.createElement("header")
-        header.classList.add("bg-dark-200/30" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg","backdrop-blur-md","border-solid","border-[1px]","border-dark-600/20")
+        header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
      
         //construção da div com o titulo e imgHome
         const divTitle = document.createElement("div")
@@ -160,123 +195,220 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
      }
      
-     function makeViewRoom(rooms,devices,schedules){
+     function makeContainer(){
+         var container = document.createElement("div")
+         document.body.appendChild(container);
+         return container
+     } 
+     
+    function makeViewRoom(rooms, devices, availiabilities, schedules, viewers, editors){
         // div container (scroll)
         const container = document.createElement("div")
-        container.classList.add("overflow-auto","flex","flex-col","sm:flex-wrap","justify-start","gap-1",)
+        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
         
         rooms.forEach(function(room){
-         //div principal
-        const divMain =  document.createElement("div")
-        divMain.classList.add("rounded-lg","p-1","m-1","backdrop-blur-md","bg-dark-200/30","gap-2","flex-col","flex",'align-center',"justify-start","border-solid","border-[1px]","border-dark-600/20")
-        divMain.setAttribute("id",room.id)
-        // img da sala
-        const divImg = document.createElement("div") 
-        divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg",)
-        divImg.setAttribute("style", `background-image: url(${room.img});`);
-        // div titulo da sala
-        const divTitleRoom = document.createElement("div")
-        divTitleRoom.classList.add("flex","items-center","justify-between", "gap-1")
-        // nome da sala
-        const nameRoom = document.createElement("h1")
-        nameRoom.textContent = `${room.name}`
-        nameRoom.classList.add("text-white" ,"font-bold")
-        // device count
-        const divDeviceNumber = document.createElement("div")
-        divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
-        const statusDevice = document.createElement("div")
-        statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+            //div principal
+            const divMain =  document.createElement("div")
+            divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex")
+            divMain.setAttribute("room",room.id)
+            divMain.setAttribute("id",room.id)
+            // img da sala
+            const divImg = document.createElement("div")
+            divImg.classList.add("aspect-[16/9]","bg-center","bg-cover","bg-no-repeat","rounded-lg")
+            divImg.setAttribute("style", `background-image: url(${room.img});`);
+            // div titulo da sala
+            const divTitleRoom = document.createElement("div")
+            divTitleRoom.classList.add("flex","items-center","justify-between", "gap-1")
+            // nome da sala
+            const nameRoom = document.createElement("h1")
+            nameRoom.textContent = `${room.name}`
+            nameRoom.classList.add("text-white" ,"font-bold")
+            // device count
+            const divDeviceNumber = document.createElement("div")
+            divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
+            const statusDevice = document.createElement("div")
+            statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
 
-        // div disponibilidade
-        const divMainAvailabilityP = document.createElement("div")
-        divMainAvailabilityP.classList.add("flex","p-1","items-center","justify-between","bg-dark-100/35","rounded-lg")
-        const imgCalendar = document.createElement("img")
-        imgCalendar.setAttribute("src","./images/calendar-days.svg")
-        divMainAvailabilityP.appendChild(imgCalendar)
-        // div data
-        const divDateP = document.createElement("div")
-        divDateP.classList.add("flex","items-center","gap-1","justify-center","content-center")
-        // texto inicio
-        const dateStart = document.createElement("p")
-        dateStart.textContent = '00/00'
-        dateStart.classList.add("text-xl","font-bold",)
-        // texto até
-        const dateAte = document.createElement("p")
-        dateAte.textContent = texts.text("labelTo")
-        dateAte.classList.add("text-sm","font-regular",'text-primary-600')
-        // texto fim
-        const dateEnd = document.createElement("p")
-        dateEnd.textContent = '00/00'
-        dateEnd.classList.add("text-xl","font-bold",)
-
-        divDateP.appendChild(dateStart)
-        divDateP.appendChild(dateAte)
-        divDateP.appendChild(dateEnd)
-        divMainAvailabilityP.appendChild(divDateP)
-
-
-        // filtro para retornar os telefones disponíveis
-        var devicesInfo = devices.filter(function (dev) {
-            return dev.room_id == room.id && dev.guid === null ;
-        });
+            // filtro para retornar os telefones disponíveis
+            var devicesInfo = devices.filter(function (dev) {
+                return dev.room_id == room.id && dev.guid === null ;
+            });
        
-        const deviceNumber = document.createElement("h1")
-        deviceNumber.textContent = `${parseInt(devicesInfo.length,10)}`
-        deviceNumber.classList.add("text-white" ,"font-bold")
-        divDeviceNumber.appendChild(deviceNumber)
+            const deviceNumber = document.createElement("h1")
+            deviceNumber.textContent = `${parseInt(devicesInfo.length,10)}`
+            deviceNumber.classList.add("text-white" ,"font-bold")
+            divDeviceNumber.appendChild(deviceNumber)
 
         
-        divTitleRoom.appendChild(nameRoom)
-        divTitleRoom.appendChild(divDeviceNumber)
-        divDeviceNumber.appendChild(statusDevice)
+            divTitleRoom.appendChild(nameRoom)
+            divTitleRoom.appendChild(divDeviceNumber)
+            divDeviceNumber.appendChild(statusDevice)
         
-        divMain.appendChild(divImg)
-        divMain.appendChild(divTitleRoom)
-        divMain.appendChild(divMainAvailabilityP)
+            divMain.appendChild(divImg)
+            divMain.appendChild(divTitleRoom)
 
-        const divUsersAvatar = document.createElement("div")
-        divUsersAvatar.classList.add("flex","items-start","gap-1")
-        divUsersAvatar.setAttribute("id","divUsersAvatar")
+            //disponibilidade da sala 
+            var availabilitiesInfo = availiabilities.filter(function (a) {
+                return a.room_id == room.id
+            });
+            console.log("Availabilities: " + JSON.stringify(availabilitiesInfo))
 
-       room.viewers.forEach(function (viewer) {
-
-        var viewers = list_tableUsers.filter(function (user) {
-            return user.guid == viewer.viewer_guid
-        });
-        viewers.forEach(function(view){
-
-            avatar = new innovaphone.Avatar(start, view.sip , userDomain);
-            UIuserPicture = avatar.url(view.sip, 200 , userDN );
-            const imgAvatar = document.createElement("img")
-            imgAvatar.setAttribute("src", UIuserPicture);
-            imgAvatar.setAttribute("id","divAvatar")
-            imgAvatar.classList.add("w-5","h-5","rounded-full")
-            divUsersAvatar.appendChild(imgAvatar)
-            divMain.appendChild(divUsersAvatar)
-
-        })
-    
-    })
-        container.appendChild(divMain)
-
-        var devicesInfo = devices.filter(function (dev) {
-            return dev.room_id == room.id
-        });
-        var roomINFO = rooms.filter(function (r) {
-            return r.id == room.id
-        });
-        console.log("DEVICES INFO " + JSON.stringify(devicesInfo) + "ROOMS " + JSON.stringify(roomINFO))
-        // divMain.addEventListener("click",function(){
+            availabilitiesInfo.forEach(function(a){
+                if(a.type == "periodType"){
+  
+                    // div disponibilidade periodo
+                   const divMainAvailabilityPeriod = document.createElement("div")
+                   divMainAvailabilityPeriod.classList.add("flex","p-1","items-center","justify-between","bg-dark-100/35","rounded-lg")
+                   const imgCalendar = document.createElement("img")
+                   imgCalendar.setAttribute("src","./images/calendar-days.svg")
+                   divMainAvailabilityPeriod.appendChild(imgCalendar)
+                   // div data
+                   const divDateP = document.createElement("div")
+                   divDateP.classList.add("flex","items-center","gap-1","justify-center","content-center")
+   
+                   const dateStart = document.createElement("p")
+                   const formatedDataStart = moment(a.data_start).format("DD/MM");
+                   dateStart.textContent = formatedDataStart
+                   dateStart.classList.add("text-xl","font-bold",)
+                   // texto até
+                   const dateAte = document.createElement("p")
+                   dateAte.textContent = texts.text("labelTo")
+                   dateAte.classList.add("text-sm","font-regular",'text-primary-600')
+                   // texto fim
+                   const dateEnd = document.createElement("p")
+                   const formatedDataEnd = moment(a.data_end).format("DD/MM");
+                   dateEnd.textContent = formatedDataEnd
+                   dateEnd.classList.add("text-xl","font-bold",)
+           
+                   divDateP.appendChild(dateStart)
+                   divDateP.appendChild(dateAte)
+                   divDateP.appendChild(dateEnd)
+                   divMainAvailabilityPeriod.appendChild(divDateP)
+                   divMain.appendChild(divMainAvailabilityPeriod)
+               }
+   
+               if(a.type == "recurrentType"){
+                   // div disponibilidade recorrente
+                   const divMainAvailabilityRecurrent = document.createElement("div")
+                   divMainAvailabilityRecurrent.classList.add("flex","p-1","items-start","bg-dark-100/35","rounded-lg","justify-center")
+                   // dias da semana 
+                   var week = [texts.text("labelSun"), texts.text("labelMon") ,texts.text("labelTerc"), texts.text("labelQuar") , texts.text("labelQuint") , texts.text("labelSex") , texts.text("labelSab")];
+                  
+                   const daysOfWeekMap = {
+                    "D": "domingo",
+                    "M": "segunda-feira",
+                    "T": "terça-feira",
+                    "W": "quarta-feira",
+                    "T2": "quinta-feira",
+                    "F": "sexta-feira",
+                    "S": "sabado"
+                };
+                   week.forEach(function(w){
+                       const dayDiv = document.createElement('div')
+                       dayDiv.classList.add("flex","w-[40px]","h-[40px]","p-1","flex-col","items-center","justify-center","gap-1")
+                       const dayText = document.createElement('p')
+                       dayText.classList.add("font-Montserrat","text-base","font-bold","leading-normal",'leading-normal',"color-dark-400","recurrentText")
+                       dayText.textContent = w
+                       dayText.setAttribute("day-week", daysOfWeekMap[w] )
+                       dayDiv.appendChild(dayText)
+                       divMainAvailabilityRecurrent.appendChild(dayDiv)
+                   })
+                   divMain.appendChild(divMainAvailabilityRecurrent)
+                   
+               }
+            })
+            const divUsersAvatar = document.createElement("div")
+            divUsersAvatar.classList.add("flex","items-start","gap-1")
+            divUsersAvatar.setAttribute("id", "divUsersAvatar")
+            console.log("ARRAY DO INFERNO:" + JSON.stringify(viewers))
             
-        // })
-     })
-    }
+            viewers.forEach(function (viewer) {
+
+                var viewersUsers = list_tableUsers.filter(function (user) {
+                    return user.guid == viewer.viewer_guid && viewer.room_id == room.id
+                });
+                viewersUsers.forEach(function(view){
+
+                    avatar = new innovaphone.Avatar(start, view.sip , userDomain);
+                    UIuserPicture = avatar.url(view.sip, 15 , userDN );
+                    const imgAvatar = document.createElement("img")
+                    imgAvatar.setAttribute("src", UIuserPicture);
+                    imgAvatar.setAttribute("id","divAvatar")
+                    imgAvatar.classList.add("w-5","h-5","rounded-full")
+                    divUsersAvatar.appendChild(imgAvatar)
+                    divMain.appendChild(divUsersAvatar)
+
+                })
+            })
+            container.appendChild(divMain)
+            UpdateAvailability(availabilitiesInfo,"","sim")
+
+        //todas as divs com o atributo "room"
+        const divsRoom = document.querySelectorAll('[room]');
+        //listener de clique a cada div
+        divsRoom.forEach(function (div) {
+            div.addEventListener('click', function (event) {
+                var id = event.currentTarget.id;
+                var room = rooms.filter(function (room) {
+                    return id == room.id
+                });
+                var devs = devices.filter(function (dev) {
+                    return id == dev.room_id
+                });
+                var avail = availiabilities.filter(function (avl) {
+                    return id == avl.room_id
+                });
+                var sched = schedules.filter(function (sched) {
+                    return id == sched.device_room_id
+                });
+                var viws = schedules.filter(function (viws) {
+                    return id == viws.room_id
+                });
+                event.stopPropagation();
+                //makeViewRoomDetail(room, devs, avail, sched, viws)
+            });
+        });
+        })   
+     }
      function makeRoom(){
 
      }
+     function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
+        that.clear();
+        makeHeader("./images/arrow-left.svg", "./images/menu.svg", room.name)
+        // div sala
+        const divImg = document.createElement("div")
+        divImg.classList.add("aspect-[16/9]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
+        divImg.setAttribute("style", "background-image: url(${room.img})")
+        document.body.appendChild(div102);
+        //card horarios implementado pelo Pietro
+        UpdateAvailability(availability, schedules)
+
+        // div container (scroll)
+        const div102 = document.createElement("div")
+        div102.classList.add("div102")
+        div102.style.height = 'calc(100vh - 70px)'
+        div102.setAttribute("id", "div102")
+        document.body.appendChild(div102);
+
+        devices.forEach(function (device) {
+            var sched = schedules.filter(function (sched) {
+                return device.id == sched.device_id
+            });
+
+            makeViewDevice(div102, device, availability, sched, viewers)
+        })
+
+
+
+    }
+    function makeViewDevice(div, device, availability, schedules, viewers) {
+
+
+    }
     // //Função para alterar o estado da váriavel de controle, utilizada para forçar o timer a tentar nova conexão.
     function changeState(newState) {
         if (newState == currentState) return;
