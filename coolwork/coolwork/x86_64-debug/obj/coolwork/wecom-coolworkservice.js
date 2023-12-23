@@ -631,6 +631,16 @@ new JsonApi("user").onconnected(function(conn) {
                     conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                 });
             }
+            if (obj.mt == "SetDeviceToUser") {
+                log("SetDeviceToUser:" + String(obj.deviceId));
+                var user = pbxTableUsers.filter(function (item) {
+
+                    return item.columns.guid == conn.guid
+                })[0];
+                pbxTableUpdateDevice(2, obj.deviceId, user);
+                log("SetDeviceToUser:return" + String(obj.deviceId));
+                conn.send(JSON.stringify({ api: "user", mt: "SetDeviceToUserSuccess", src: obj.src }));
+            }
 
         })
     }
@@ -1161,7 +1171,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
                     conn.send(JSON.stringify(user))
                 }
             })
-            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "',availability = '" +  true + "' , pbxactive = '" + true + "' WHERE hwid = '" + hwId + "'"; 
+            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "' WHERE hwid = '" + hwId + "'"; 
             Database.exec(sql)
             .oncomplete(function(data){ 
                 log("UPDATED DEVICE AFTER RESET" + data)
@@ -1190,7 +1200,7 @@ function pbxTableUpdateDevice(cod, hwId, user){
 
             }   
         })
-        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' , availability = '" + false + "', pbxactive = '" + false + "' WHERE hwid = '" + hwId + "'";
+        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' WHERE hwid = '" + hwId + "'";
         Database.exec(sql)
         .oncomplete(function(data){ 
             log("UPDATED DEVICE AFTER RESET" + data)

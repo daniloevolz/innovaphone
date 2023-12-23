@@ -464,7 +464,18 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             //div 36
             const div36 = document.createElement("div")
             div36.classList.add("div36")
+            div36.setAttribute("id",device.hwid)
             div36.innerHTML = texts.text("makePhoneUseButton")
+            div36.addEventListener("click", function (event) {
+                var dev = event.currentTarget.id;
+                event.stopPropagation()
+                app.sendSrc({ api: "user", mt: "SetDeviceToUser", deviceId: dev, src: dev }, function (obj) {
+                    app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
+                        devices = JSON.parse(obj.result)
+                        makeViewRoomDetail(room, devices, availability, schedules, viewers)
+                    })
+                })
+            })
             div84.appendChild(div34)
             div84.appendChild(div36)
         }
