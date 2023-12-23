@@ -236,7 +236,7 @@ function buildCalendar(availability, schedule) {
   
   //funções de disponibilidade
       
-function UpdateAvailability(availability, schedules, recurrent) {
+function UpdateAvailability(availability, type) {
         var cells = document.querySelectorAll("#calendar-body tr td div");
         if (availability.length === 0) {
             cells.forEach(function (td) {
@@ -244,9 +244,9 @@ function UpdateAvailability(availability, schedules, recurrent) {
             });
         }
         else {
-            if(recurrent == "sim"){
+            if (type == "recurrentType"){
                 cells = document.querySelectorAll(".recurrentText")
-                console.log("recurrent == sim")
+                console.log("recurrentType == sim")
             }
             availability.forEach(function (dates) {
                 if (dates.type == "recurrentType") {
@@ -314,7 +314,7 @@ function UpdateAvailability(availability, schedules, recurrent) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
+                                //console.log("Schedules:" +  schedules)
 
                                 // schedules.forEach(function(dateS){
                                 //     var dataSplit = dateS.data_start
@@ -349,19 +349,19 @@ function UpdateAvailability(availability, schedules, recurrent) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
+                                //console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                //schedules.forEach(function(dateS){
+                                //    var dataSplit = dateS.data_start
+                                //    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //    console.log("Data Split " + dataSplit)
+                                //    console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //    if(dataDate == dataS ){
+                                //        td.classList.remove('parcialavailable');
+                                //        td.classList.add('unavailable')
+                                //    }
+                                //})
 
                                 return
                             case "thursday":
@@ -384,19 +384,19 @@ function UpdateAvailability(availability, schedules, recurrent) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
+                                //console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                //schedules.forEach(function(dateS){
+                                //    var dataSplit = dateS.data_start
+                                //    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //    console.log("Data Split " + dataSplit)
+                                //    console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //    if(dataDate == dataS ){
+                                //        td.classList.remove('parcialavailable');
+                                //        td.classList.add('unavailable')
+                                //    }
+                                //})
                                 return
                             case "friday":
                                 if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
@@ -416,18 +416,18 @@ function UpdateAvailability(availability, schedules, recurrent) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                //console.log("Schedules:" +  schedules)
+                                //schedules.forEach(function(dateS){
+                                //    var dataSplit = dateS.data_start
+                                //    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //    console.log("Data Split " + dataSplit)
+                                //    console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //    if(dataDate == dataS ){
+                                //        td.classList.remove('parcialavailable');
+                                //        td.classList.add('unavailable')
+                                //    }
+                                //})
                                 return
                             case "saturday":
                                 if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
@@ -447,19 +447,19 @@ function UpdateAvailability(availability, schedules, recurrent) {
                                 } else {
                                     td.classList.add('unavailable');
                                 }
-                                console.log("Schedules:" +  schedules)
+                                //console.log("Schedules:" +  schedules)
 
-                                schedules.forEach(function(dateS){
-                                    var dataSplit = dateS.data_start
-                                    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
-                                    console.log("Data Split " + dataSplit)
-                                    console.log("Data S " + dataS)
+                                //schedules.forEach(function(dateS){
+                                //    var dataSplit = dateS.data_start
+                                //    var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+                                //    console.log("Data Split " + dataSplit)
+                                //    console.log("Data S " + dataS)
 
-                                    if(dataDate == dataS ){
-                                        td.classList.remove('parcialavailable');
-                                        td.classList.add('unavailable')
-                                    }
-                                })
+                                //    if(dataDate == dataS ){
+                                //        td.classList.remove('parcialavailable');
+                                //        td.classList.add('unavailable')
+                                //    }
+                                //})
                                 return
                             case "sunday":
                                 if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {

@@ -8,6 +8,107 @@ body {
     background-image: url(./images/background.png);
     font-family: 'Montserrat';
 }
+/*DeviceIcon*/
+.device-free {
+    background: #2AFF9C;
+}
+
+.device-busy {
+    background: #FFC107;
+}
+
+.div1396 {
+    width: 12px;
+    /*height: 88px;*/
+    flex-shrink: 0;
+    border-start-end-radius: 6px;
+    border-start-start-radius: 6px;
+}
+
+.div93 {
+    position: relative;
+    display: inline-flex;
+    /*width: 102px;*/
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: var(--Silver-Chalice-100, #EDEDED);
+}
+
+.div82 {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.deviceIcon {
+    display: flex;
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+}
+/*DeviceIcon*/
+/*ViewRoomDetail*/
+.div102 {
+    display: flex;
+    /*width: 374px;*/
+    height: 268px;
+    padding: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 6px;
+    background: #284258;
+}
+.divHorario {
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Dark-200, #284258);
+}
+.div101 {
+    position: relative;
+    display: inline-flex;
+    width: -webkit-fill-available;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: var(--Silver-Chalice-100, #EDEDED);
+}
+.div84 {
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    gap: 8px;
+    flex: 1 0 0;
+}
+.div34 {
+    display: flex;
+    padding: 8px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 6px;
+    background: var(--Primary-600, #AED4EF);
+}
+.div36 {
+    display: flex;
+    padding: 8px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 6px;
+    background: var(--Dark-400, #5B6D7F);
+}
+/*ViewRoomDetail*/
+
 
 a {
     color: var(--text-standard);
