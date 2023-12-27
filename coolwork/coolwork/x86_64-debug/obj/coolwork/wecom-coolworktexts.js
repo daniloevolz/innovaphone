@@ -2,6 +2,13 @@
 var Wecom = Wecom || {};
 Wecom.coolworkTexts = {
     en: {
+        labelSun: "S",
+        labelMon : "M",
+        labelTerc : "T",
+        labelQuar : "W",
+        labelQuint : "T",
+        labelSex : "F",
+        labelSab : "S"
     },
     de: {
     },
@@ -51,12 +58,13 @@ Wecom.coolworkTexts = {
         labelMyRooms: "Minhas Salas",
         labelTo: "até",
         labelSun: "D",
-        labelMon : "M",
+        labelMon : "S",
         labelTerc : "T",
-        labelQuar : "W",
-        labelQuint : "T",
-        labelSex : "F",
-        labelSab : "S"
+        labelQuar : "Q",
+        labelQuint : "Q",
+        labelSex : "S",
+        labelSab : "S",
+        labelSelectYourDay: "Selecione seu dia!"
         
     }
 }

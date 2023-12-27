@@ -340,23 +340,23 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 const divMainAvailabilityRecurrent = document.createElement("div")
                 divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
                 // dias da semana 
-                var week = [texts.text("labelSun"), texts.text("labelMon"), texts.text("labelTerc"), texts.text("labelQuar"), texts.text("labelQuint"), texts.text("labelSex"), texts.text("labelSab")];
+                var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
 
                 const daysOfWeekMap = {
-                    "D": "domingo",
-                    "M": "segunda-feira",
-                    "T": "terça-feira",
-                    "W": "quarta-feira",
-                    "T2": "quinta-feira",
-                    "F": "sexta-feira",
-                    "S": "sabado"
+                    "labelSun": "domingo",
+                    "labelMon": "segunda-feira",
+                    "labelTerc": "terça-feira",
+                    "labelQuar": "quarta-feira",
+                    "labelQuint" : "quinta-feira",
+                    "labelSex": "sexta-feira",
+                    "labelSab": "sabado"
                 };
                 week.forEach(function (w) {
                     const dayDiv = document.createElement('div')
                     dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
                     const dayText = document.createElement('p')
                     dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
-                    dayText.textContent = w
+                    dayText.textContent = texts.text(`${w}`)
                     dayText.setAttribute("day-week", daysOfWeekMap[w])
                     dayDiv.appendChild(dayText)
                     divMainAvailabilityRecurrent.appendChild(dayDiv)
@@ -415,6 +415,22 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
 
 
+    }
+    // calendario 
+    function makeCalendar(availability,schedules){
+        that.clear();
+        makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
+        // div principal
+        const divCalendar = document.createElement("div")
+        divCalendar.classList.add("flex","p-1","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
+        const divTextSelectDay = document.createElement("div")
+        divTextSelectDay.classList.add("color-white","font-Montserrat","text-2","not-italic","font-bold")
+        divTextSelectDay.textContent = texts.text("labelSelectYourDay")
+        
+        divCalendar.appendChild(divTextSelectDay)
+        Calendar.createCalendar(divCalendar,availability) // componente Calendar 
+        document.body.appendChild(divCalendar);
+        
     }
     function makeViewCalendarDetail(divMain, availability) {
         // div label horario
@@ -745,8 +761,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             //div 34
             const div34 = document.createElement("div")
             div34.classList.add("div34")
+            div34.setAttribute("id",device.hwid)
             div34.innerHTML = texts.text("makePhoneSceduleButton")
-
+            div34.addEventListener("click",function(event){
+                var deviceHw = event.currentTarget.id;
+                makeCalendar(availability)
+                // Calendar.createCalendar()
+                // var devInfo = schedules.filter(function (sched) {
+                //     return device.hwid == sched.device_id
+                // });
+                // console.log("DISPONIBILIDADE DA SALA " + JSON.stringify(availability) + "Schedules " + JSON.stringify(schedule) +
+                // "Device INFO " + JSON.stringify(devInfo)  + "Full devices " + JSON.stringify(device))
+            
+            })
             //div 36
             const div36 = document.createElement("div")
             div36.classList.add("div36")

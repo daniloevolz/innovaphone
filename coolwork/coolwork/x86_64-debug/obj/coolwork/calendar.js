@@ -1,17 +1,13 @@
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(id,availability,schedule,divCalendar,device,room){
+Calendar.createCalendar = function(divMain,availability,schedule,divCalendar,device,room){
 
-document.getElementById(id).innerHTML +=
-
-`
-<div class="flex items-center justify-center py-8 px-4 font-sans">
+divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
-                <div class="shadow-lg">
-                    <div class="md:p-8 p-5 bg-gray-800 bg-white rounded-t"  style = "background: var(--bg)">
-                        <div class="px-4 flex items-center justify-between">
-                            <span  tabindex="0" class="focus:outline-none  text-base font-bold dark:text-gray-100 text-gray-800" id = "month-year" >October 2020</span>
-                            <div class="flex items-center">
+                    <div class="flex height-[366px] p-4 flex-col items-center gap-3 items-stretch bg-dark-100">
+                        <div class="p-1 flex justify-between items-center items-stretch">
+                            <span  tabindex="0" class = "flex gap-1 items-center" id = "month-year" ></span>
+                            <div class="flex items-center justify-end">
                                 <button aria-label="calendar backward" class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100" id= "prevMonth">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -26,18 +22,24 @@ document.getElementById(id).innerHTML +=
                             </button>
     
                             </div>
-                        </div>
+
+                            </div>
+                        
                         <table class="w-full font-sans" id = "calendar-body">
 
                         </table>
                     </div>
-                </div>
-</div>
+
+
 `
-buildCalendar(availability,schedule,divCalendar,device,room)
+setTimeout(function(){
+    buildCalendar(availability,schedule,divCalendar,device,room)
+},300)
+
+
 }
 
-Calendar.createCalendar("mainDiv") // apenas para visualização na pagina html
+//Calendar.createCalendar("mainDiv") // apenas para visualização na pagina html
 
 var year;
 var currentMonth;
@@ -246,7 +248,7 @@ function UpdateAvailability(availability, type) {
         else {
             if (type == "recurrentType"){
                 cells = document.querySelectorAll(".recurrentText")
-                console.log("recurrentType == sim")
+                
             }
             availability.forEach(function (dates) {
                 if (dates.type == "recurrentType") {
