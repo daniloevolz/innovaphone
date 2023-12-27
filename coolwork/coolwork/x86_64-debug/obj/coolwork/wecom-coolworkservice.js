@@ -227,87 +227,7 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "Ping") {
                 conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
             }
-            // if (obj.mt == "SelectMyRooms") {
-            //     log("SelectMyRooms:");
-            //     var queryViewer;
-            //     if (obj.deleted) {
-            //         var queryViewer = 
-            //         "SELECT r.id AS room_id, r.name, r.img, " +
-            //       "s.id AS schedule_id, s.type, s.data_start, s.data_end, s.schedule_module, " +
-            //       "s.timestart_monday, s.timeend_monday, s.timestart_tuesday, s.timeend_tuesday, " +
-            //       "s.timestart_wednesday, s.timeend_wednesday, s.timestart_thursday, s.timeend_thursday, " +
-            //       "s.timestart_friday, s.timeend_friday, s.timestart_saturday, s.timeend_saturday, " +
-            //       "s.timestart_sunday, s.timeend_sunday " +
-            //       "FROM tbl_room r " +
-            //       "LEFT JOIN tbl_room_viewers v ON r.id = v.room_id " +
-            //       "LEFT JOIN tbl_room_availability s ON r.id = s.room_id " +
-            //       "WHERE v.viewer_guid = '" + conn.guid + "';";
-            //     } else {
-            //         //Query para Salas Não Excluídas
-            //         var queryViewer = 
-            //         "SELECT r.id AS room_id, r.name, r.img, " +
-            //       "s.id AS schedule_id, s.type, s.data_start, s.data_end, s.schedule_module, " +
-            //       "s.timestart_monday, s.timeend_monday, s.timestart_tuesday, s.timeend_tuesday, " +
-            //       "s.timestart_wednesday, s.timeend_wednesday, s.timestart_thursday, s.timeend_thursday, " +
-            //       "s.timestart_friday, s.timeend_friday, s.timestart_saturday, s.timeend_saturday, " +
-            //       "s.timestart_sunday, s.timeend_sunday " +
-            //       "FROM tbl_room r " +
-            //       "LEFT JOIN tbl_room_viewers v ON r.id = v.room_id " +
-            //       "LEFT JOIN tbl_room_availability s ON r.id = s.room_id " +
-            //       "WHERE v.viewer_guid = '" + conn.guid + "' AND r.deleted IS NULL;";
-            //     }
-            //     Database.exec(queryViewer)
-            //         .oncomplete(function (dataUsersViewer) {
-            //             log("SelectMyRooms:result=" + JSON.stringify(dataUsersViewer, null, 4));
-            //             conn.send(JSON.stringify({ api: "user", mt: "SelectMyRoomsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
-            //         })
-            //         .onerror(function (error, errorText, dbErrorCode) {
-            //             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-            //         });
-
-            //     //if (obj.deleted) {
-            //     //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "';";
-            //     //} else {
-            //     //    //Query para Departamentos Não Excluídos
-            //     //    var queryEditor = "SELECT d.id, d.name, d.color FROM tbl_departments d JOIN tbl_department_editors v ON d.id = v.department_id WHERE v.editor_guid = '" + conn.guid + "' AND d.deleted IS NULL;";
-            //     //}
-            //     //Database.exec(queryEditor)
-            //     //    .oncomplete(function (dataUsersViewer) {
-            //     //        log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
-
-            //     //        conn.send(JSON.stringify({ api: "user", mt: "SelectUserDepartmentsEditorResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
-            //     //    })
-            //     //    .onerror(function (error, errorText, dbErrorCode) {
-            //     //        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-            //     //    });
-            // }
-
-            // if (obj.mt == "SelectRoom") {
-            //     var roomId = obj.id;
-
-            //     var querySelectRoom = "SELECT * FROM tbl_room WHERE id = " + roomId + ";";
-            //     var querySelectDevices = "SELECT * FROM tbl_devices WHERE room_id = " + roomId + ";";
-            //     var querySelectRoomSchedule = "SELECT * FROM tbl_room_availability WHERE room_id =" + roomId + ";";
-            //     Database.exec(querySelectRoom)
-            //         .oncomplete(function (roomData) {
-            //             Database.exec(querySelectDevices)
-            //                 .oncomplete(function (deviceData) {
-            //                     Database.exec(querySelectRoomSchedule)
-            //                         .oncomplete(function (roomScheduleData) {
-            //                             conn.send(JSON.stringify({ api: "user", mt: "SelectRoomResult", room: JSON.stringify(roomData[0]), dev: deviceData, schedules: JSON.stringify(roomScheduleData) }));
-            //                         })
-            //                         .onerror(function (error, errorText, dbErrorCode) {
-            //                             log("SelectRoomResult: Error ao selecionar tabela tbl_room_availability: " + String(errorText));
-            //                         });
-            //                 })
-            //                 .onerror(function (error, errorText, dbErrorCode) {
-            //                     log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));
-            //                 });
-            //         })
-            //         .onerror(function (error, errorText, dbErrorCode) {
-            //             log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
-            //         });
-            // }
+            
             if (obj.mt == "TableUsers") {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
@@ -329,7 +249,7 @@ new JsonApi("user").onconnected(function(conn) {
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectMyRooms:result=" + JSON.stringify(dataUsersViewer, null, 4));
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectMyRoomsViewerResult", src: obj.src, result: JSON.stringify(dataUsersViewer, null, 4) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectMyRoomsViewerResult", src: obj.src, result: dataUsersViewer }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -337,7 +257,7 @@ new JsonApi("user").onconnected(function(conn) {
             }
 
             if (obj.mt == "SelectRooms") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids) 
                 var ids = extrairValoresId(roomIds);
 
@@ -354,157 +274,9 @@ new JsonApi("user").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
                     });
 
-                //Database.exec(query)
-                //    .oncomplete(function (result) {
-
-                //        log("RESULTADO :"+ JSON.stringify(result))
-
-                //        // variaveis p armazenar os dados da consulta 
-
-                //        var roomData = [];
-                //        var deviceData = [];
-                //        var roomScheduleData = [];
-
-                //        for (var i = 0; i < result.length; i++) {
-                //            var entry = result[i];
-
-                //            if (entry.hasOwnProperty('r_id')) {
-                //                var roomExists = roomData.some(function (room) {
-                //                    return room.id === entry.r_id;
-                //                });
-
-                //                if (!roomExists) {
-                //                    roomData.push({
-                //                        id: entry.r_id,
-                //                        name: entry.r_name,
-                //                        img: entry.r_img,
-                //                        editors: [],  
-                //                        viewers: [] 
-                                    
-                //                    });
-                //                }
-
-                //            } 
-
-                //            if (entry.hasOwnProperty('d_id')) {
-
-                //                var deviceExists = deviceData.some(function (device) {
-                //                    return device.id === entry.d_id;
-                //                });
-                        
-                //                if (!deviceExists) {
-                //                    deviceData.push({
-                //                        id: entry.d_id,
-                //                        hwid: entry.d_hwid,
-                //                        pbxactive: entry.d_pbxactive,
-                //                        online: entry.d_online,
-                //                        product: entry.d_product,
-                //                        sip: entry.d_sip,
-                //                        cn: entry.d_cn,
-                //                        guid: entry.d_guid,
-                //                        leftoffset: entry.d_leftoffset,
-                //                        topoffset: entry.d_topoffset,
-                //                        room_id: entry.d_room_id
-                                        
-                //                    });
-                //                }
-                //            }
-
-                //            if (entry.hasOwnProperty('ra_id')) {
-
-                //                var scheduleExists = roomScheduleData.some(function (schedule) {
-                //                    return schedule.id === entry.ra_id;
-                //                });
-
-                //                if(!scheduleExists){
-                //                    roomScheduleData.push({
-                //                            id: entry.ra_id,
-                //                            type: entry.ra_type,
-                //                            data_start: entry.ra_data_start,
-                //                            data_end: entry.ra_data_end, 
-                //                            schedule_module: entry.ra_schedule_module,
-                //                            timestart_monday: entry.ra_timestart_monday,
-                //                            timeend_monday: entry.ra_timeend_monday,
-                //                            timestart_tuesday: entry.ra_timestart_tuesday,
-                //                            timeend_tuesday: entry.ra_timeend_tuesday,
-                //                            timestart_wednesday: entry.ra_timestart_wednesday,
-                //                            timeend_wednesday: entry.ra_timeend_wednesday,
-                //                            timestart_thursday: entry.ra_timestart_thursday,
-                //                            timeend_thursday: entry.ra_timeend_thursday,
-                //                            timestart_friday: entry.ra_timestart_friday,
-                //                            timeend_friday: entry.ra_timeend_friday,
-                //                            timestart_saturday: entry.ra_timestart_saturday,
-                //                            timeend_saturday: entry.ra_timeend_saturday,
-                //                            timestart_sunday: entry.ra_timestart_sunday,
-                //                            timeend_sunday: entry.ra_timeend_sunday,
-                        
-                //                    });
-                //                }
-                               
-                //            }
-                          
-                //            if (Array.isArray(roomData)) {
-                                
-                //                var rooms = roomData.filter(function (room) {
-                //                    return room.id === entry.r_id;
-                //                });
-                //            }
-
-                               
-                //            if (Array.isArray(rooms) && rooms.length > 0) {
-                                
-                //                rooms.forEach(function (room) {
-                //                    room.editors = room.editors || [];
-                                    
-                //                    if (entry.hasOwnProperty('re_editor_guid')) {
-
-                //                        var editorExists = room.editors.some(function (editor) {
-                //                            return editor.editor_guid === entry.re_editor_guid;
-                //                        });
-
-                //                        if (!editorExists) {
-                //                            room.editors.push({
-                //                                editor_guid: entry.re_editor_guid
-                //                            });
-                //                        }
-                                
-                //                    }
-
-                //                    if (entry.hasOwnProperty('rv_viewer_guid')) {
-                //                       var viewerExists = room.viewers.some(function (viewer) {
-                //                        return viewer.viewer_guid === entry.rv_viewer_guid;
-                //                    });
-
-                //                        if (!viewerExists) {
-                //                            room.viewers.push({
-                //                                viewer_guid: entry.rv_viewer_guid
-                //                            });
-                //                        }
-                //                    }
-                //                });
-                //            } else {
-                //                console.error("Nenhuma sala correspondente encontrada para a entrada atual");
-                //            }
-
-                           
-                //        }
-
-                //        conn.send(JSON.stringify({
-                //            api: "user",
-                //            mt: "SelectRoomsResult",
-                //            rooms: JSON.stringify(roomData),
-                //            devices: JSON.stringify(deviceData),
-                //            schedules: JSON.stringify(roomScheduleData)
-                //        }));
-                //    })
-                //    .onerror(function (error, errorText, dbErrorCode) {
-                //        log("SelectRooms: Error ao selecionar tabela: " + String(errorText));
-                //        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(errorText) }));
-                //    });
-
-}
+            }
             if (obj.mt == "SelectDevices") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids)
                 var ids = extrairValoresId(roomIds);
 
@@ -515,7 +287,7 @@ new JsonApi("user").onconnected(function(conn) {
 
                 Database.exec(query)
                     .oncomplete(function (result) {
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesResult", result: JSON.stringify(result), ids: obj.ids }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesResult", result: JSON.stringify(result), ids: obj.ids, src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("SelectDevices: Error ao selecionar tabela: " + String(errorText));
@@ -524,7 +296,7 @@ new JsonApi("user").onconnected(function(conn) {
                                      
             }
             if (obj.mt == "SelectRoomsAvailabilities") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids)
                 var ids = extrairValoresId(roomIds);
 
@@ -544,7 +316,7 @@ new JsonApi("user").onconnected(function(conn) {
 
             }
             if (obj.mt == "SelectDevicesSchedule") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids)
                 var ids = extrairValoresId(roomIds);
 
@@ -563,7 +335,7 @@ new JsonApi("user").onconnected(function(conn) {
                     });
             }
             if (obj.mt == "SelectRoomsEditors") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids)
                 var ids = extrairValoresId(roomIds);
 
@@ -583,7 +355,7 @@ new JsonApi("user").onconnected(function(conn) {
                 
             }
             if (obj.mt == "SelectRoomsViewers") {
-                var roomIds = JSON.parse(obj.ids)
+                var roomIds = obj.ids
                 log("ROOMIDS" + obj.ids)
                 var ids = extrairValoresId(roomIds);
 
@@ -632,14 +404,38 @@ new JsonApi("user").onconnected(function(conn) {
                 });
             }
             if (obj.mt == "SetDeviceToUser") {
-                log("SetDeviceToUser:" + String(obj.deviceId));
+                log("SetDeviceToUser: device hwid " + String(obj.deviceId));
                 var user = pbxTableUsers.filter(function (item) {
 
                     return item.columns.guid == conn.guid
                 })[0];
-                pbxTableUpdateDevice(2, obj.deviceId, user);
-                log("SetDeviceToUser:return" + String(obj.deviceId));
-                conn.send(JSON.stringify({ api: "user", mt: "SetDeviceToUserSuccess", src: obj.src }));
+                log("SetDeviceToUser: user sip " + String(user.columns.h323));
+                pbxTableUpdateDevice(1, obj.deviceId, user, function (result) {
+                    log("SetDeviceToUser: pbxTableUpdateDevice return " + String(result));
+                    if (result == "success") {
+                        conn.send(JSON.stringify({ api: "user", mt: "SetDeviceToUserSuccess", src: obj.src }));
+                    } else {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(result), src: obj.src }));
+                    }
+                });
+                
+            }
+            if (obj.mt == "DeleteDeviceToUser") {
+                log("DeleteDeviceToUser: device hwid " + String(obj.deviceId));
+                var user = pbxTableUsers.filter(function (item) {
+
+                    return item.columns.guid == conn.guid
+                })[0];
+                log("DeleteDeviceToUser: user sip " + String(user.columns.h323));
+                pbxTableUpdateDevice(2, obj.deviceId, user, function (result) {
+                    log("DeleteDeviceToUser: pbxTableUpdateDevice return " + String(result));
+                    if (result == "success") {
+                        conn.send(JSON.stringify({ api: "user", mt: "DeleteDeviceToUserSuccess", src: obj.src }));
+                    } else {
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: JSON.stringify(result), src: obj.src }));
+                    }
+                });
+
             }
 
         })
@@ -1152,64 +948,72 @@ function deviceAnalise(deviceId, userObj) { // verificar se tem usuario e remove
     pbxTableUpdateDevice(1, deviceId, userObj);
 }
 
-function pbxTableUpdateDevice(cod, hwId, user){
+function pbxTableUpdateDevice(cod, hwId, user, callback) {
     // Add phone user
     //VERIFICAR COM UM FOREACH OS USUÁRIOS, SE O TELEFONE JÁ NÃO ATRIBUIDO A UM USUÁRIO
-    if (cod == 1){
-        log("Ligando o telefone", hwId , JSON.stringify(user))
+    if (cod == 1) {
+        log("pbxTableUpdateDevice: Assumindo o telefone ", hwId, " Para usuario: ", JSON.stringify(user))
         // fazer uma consulta da tbl
-        Database.exec("SELECT * FROM tbl_devices WHERE hwid ='"+ hwId +"'")
-        .oncomplete(function(data){
-            log("Select Result" + JSON.stringify(data))
-            if(!user.columns.devices){
-                user.columns["devices"] = []
-            }
-            user.columns.devices.push({hw:data[0].hwid, text:data[0].product, app: "phone", tls: true, trusted: true})
-            pbxTable.forEach(function(conn){
-                if(user.src == conn.pbx){
-                    user.mt = "ReplicateUpdate"
-                    conn.send(JSON.stringify(user))
+        Database.exec("SELECT * FROM tbl_devices WHERE hwid ='" + hwId + "'")
+            .oncomplete(function (data) {
+                log("pbxTableUpdateDevice: Select tbl_devices Result " + JSON.stringify(data))
+                if (!user.columns.devices) {
+                    user.columns["devices"] = []
                 }
+                user.columns.devices.push({ hw: data[0].hwid, text: data[0].product, app: "phone", tls: true, trusted: true, pbxactive: true })
+                pbxTable.forEach(function (conn) {
+                    if (user.src == conn.pbx) {
+                        user.mt = "ReplicateUpdate"
+                        conn.send(JSON.stringify(user))
+                        log("pbxTableUpdateDevice: ReplicateUpdate " + JSON.stringify(user))
+
+                        var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "' WHERE hwid = '" + hwId + "'";
+                        Database.exec(sql)
+                            .oncomplete(function (data) {
+                                log("pbxTableUpdateDevice: UPDATED DEVICE" + data)
+                                return callback("success");
+                            }).onerror(function (error, errorText, dbErrorCode) {
+                                return callback(errorText);
+                            });
+
+                    }
+                })
+
             })
-            var sql = "UPDATE tbl_devices SET sip = '" + user.columns.h323 + "', cn = '" + user.columns.cn + "', guid = '" + user.columns.guid + "' WHERE hwid = '" + hwId + "'"; 
-            Database.exec(sql)
-            .oncomplete(function(data){ 
-                log("UPDATED DEVICE AFTER RESET" + data)
-            })
-        })
     }
-    
+
     //Remove phone User  
-    if (cod == 2){
-        log("USER para ser removido: " + JSON.stringify(user) + "FIM DO USER : ") //~pietro continuar quarta 29/11
+    if (cod == 2) {
+        log("pbxTableUpdateDevice: USER para ser removido: " + JSON.stringify(user) + "FIM DO USER : ") //~pietro continuar quarta 29/11
 
         if (user.columns && user.columns.devices && Array.isArray(user.columns.devices)) {
 
-        var devices = user.columns.devices
-        log("Removendo do telefone", hwId)
-        var devicesUpdated = devices.filter(function(device){
-            return device.hw != hwId
-        })
-        user.columns.devices = devicesUpdated
-        log("ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
-        pbxTable.forEach(function(conn){
-            if(user.src == conn.pbx){
-                user.mt = "ReplicateUpdate"
-                log("ENVIADO AO PBX:>", JSON.stringify(user))
-                conn.send(JSON.stringify(user))
+            var devices = user.columns.devices
+            log("pbxTableUpdateDevice: Removendo o telefone ", hwId, " Do usuario ", user.columns.h323)
+            var devicesUpdated = devices.filter(function (device) {
+                return device.hw != hwId
+            })
+            user.columns.devices = devicesUpdated
+            log("pbxTableUpdateDevice: ANTES DO FOREACH pbxTable:>", JSON.stringify(user))
+            pbxTable.forEach(function (conn) {
+                if (user.src == conn.pbx) {
+                    user.mt = "ReplicateUpdate"
+                    log("pbxTableUpdateDevice: ENVIADO AO PBX:>", JSON.stringify(user))
+                    conn.send(JSON.stringify(user))
 
-            }   
-        })
-        var sql = "UPDATE tbl_devices SET sip = '" + "null" + "', cn = '" + "null" + "', guid = '" + "null" + "' WHERE hwid = '" + hwId + "'";
-        Database.exec(sql)
-        .oncomplete(function(data){ 
-            log("UPDATED DEVICE AFTER RESET" + data)
-        })
+                    var sql = "UPDATE tbl_devices SET sip = null, cn = null, guid = null WHERE hwid = '" + hwId + "'";
+                    Database.exec(sql)
+                        .oncomplete(function (data) {
+                            log("pbxTableUpdateDevice: UPDATED DEVICE" + data)
+                            return callback("success");
+                        }).onerror(function (error, errorText, dbErrorCode) {
+                            return callback(errorText);
+                        });
 
+                }
+            })
         }
-        
     }
-    
 }
 
 var pbxTable = [];

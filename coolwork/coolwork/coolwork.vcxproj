@@ -123,6 +123,8 @@
     <None Include="coolwork.mak" />
     <None Include="coolwork\coolwork.mak" />
     <None Include="coolwork\config.json" />
+    <None Include="coolwork\httpfiles\images\chevron-down.svg" />
+    <None Include="coolwork\httpfiles\images\chevron-up.svg" />
     <None Include="coolwork\plugins.json" />
     <None Include="coolwork\wecom-coolworkservice.js" />
     <None Include="coolwork\httpfiles\httpfiles.mak" />

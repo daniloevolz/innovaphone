@@ -45,6 +45,8 @@ Wecom.coolworkTexts = {
         labelScheduleModule: "Modelo de Agendamento",
         makePhoneSceduleButton: "Agendar",
         makePhoneUseButton: "Assumir",
+        deletePhoneUseButton: "Remover",
+        divHourCard: "Horários",
         whenLabel: "Quando:",
         labelMyRooms: "Minhas Salas",
         labelTo: "até",

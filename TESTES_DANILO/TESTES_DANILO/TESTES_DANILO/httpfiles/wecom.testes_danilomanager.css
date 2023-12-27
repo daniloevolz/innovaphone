@@ -1,0 +1,95 @@
+
+div.wecom-testes_danilo-panel {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:var(--wecom-testes_danilo-item-text);
+    font-size:14px;
+}
+
+div.wecom-testes_danilo-obj {
+    position:relative;
+    margin:10px;
+    padding:5px;
+    background-color:var(--wecom-testes_danilo-item);
+    color:var(--wecom-testes_danilo-item-text);
+    font-size:14px;
+}
+
+div.wecom-testes_danilo-header {
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+div.wecom-testes_danilo-label {
+    position:relative;
+    margin:5px 10px;
+    color:var(--wecom-testes_danilo-c2);
+}
+
+div.wecom-testes_danilo-label2 {
+    position:relative;
+    width:100px;
+    margin:5px 10px;
+    font-size: 15px;
+    text-align: left;
+    color: var(--innovaphone-TESTES_DANILO-item-text);
+}
+
+div.wecom-testes_danilo-value {
+    position:relative;
+    margin:5px 0px;
+    /*background-color:var(--wecom-testes_danilo-input);*/
+    color:var(--wecom-testes_danilo-input-text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+div.wecom-testes_danilo-appicon {
+    background-size: cover;
+    position: absolute;
+    height: 50px;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+}
+
+div.wecom-testes_danilo-button {
+    position:absolute;
+    width:120px;
+    height:25px;
+    background-color:var(--wecom-testes_danilo-button);
+    color:var(--wecom-testes_danilo-button-text);
+    text-align:center;
+    cursor:pointer;
+}
+
+input.wecom-testes_danilo-input {
+    width:100%;
+    box-sizing:border-box;
+    border:none;
+    margin:5px 0px;
+    padding: 5px 10px;
+    background-color:var(--wecom-testes_danilo-input);
+    color:var(--wecom-testes_danilo-input-text);
+}
+
+div.wecom-testes_danilo-choice {
+    box-sizing: border-box;
+    position:relative;
+    width:120px;
+    height:30px;
+    text-align:center;
+    background-color:var(--wecom-testes_danilo-button-bg);
+    margin:10px;
+    padding: 5px;
+}
+
+div.wecom-testes_danilo-choice:hover {
+    background-color:var(--wecom-testes_danilo-highlight-bg);
+}
+

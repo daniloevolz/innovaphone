@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billboard</title>
+    <link rel="stylesheet" href="wecom-billboard.css" type="text/css" />
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+</head>
+<script>
+//  variaveis globais
+var list_departments = [];
+var list_posts = [];
+var requestBody;
+var url = document.URL;
+var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
+var url = url.substring(0, penultimateSlashIndex);
+GetDepartments(url)
+
+// funções de requisição
+function GetDepartments(url){
+    fetch(url+'/get-departments', {
+                method: 'GET',
+                headers: {}
+            }).then(function (response) {
+                if (response.status == 200) {
+
+                    response.json().then(function (data) {
+                        // var departments = JSON.parse(data);
+                        list_departments = JSON.parse(data.data)
+                        console.log("get-departments result=" + JSON.stringify(list_departments));
+                        MakeDepartments(list_departments);
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert("Algo saiu errado:\n" + text);
+                    });
+                }
+            }); // final .then (response)
+
+}
+
+function GetPosts(url,data){
+    fetch(url + '/get-posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:  JSON.stringify(data)
+                }).then(function (response) {
+                if (response.status == 200) {
+                    response.json().then(function (data) {
+                        list_posts = JSON.parse(data.data)
+                        console.log("get-posts result=" + JSON.stringify(list_posts));
+                        //console.log(JSON.stringify(obj.department))
+                        MakePosts(list_posts);
+                    
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert("Algo saiu errado:\n" + text);
+                    });
+                }
+            }); // final .then (response)
+}
+
+// funções internas 
+function MakeDepartments(data){   
+
+var billboard = document.getElementById("billboard");
+billboard.innerHTML = '';
+
+var worktable = document.createElement("div");
+worktable.setAttribute("id", "worktable");
+
+var depcards = document.createElement("div");
+depcards.setAttribute("id", "depcards");
+depcards.className = "depcards"
+
+var logoWecom = document.createElement("div");
+logoWecom.setAttribute("id", "logowecom");
+logoWecom.className = "logo"
+
+depcards.innerHTML = '';
+
+data.forEach(function (department) {
+    var div = document.createElement("div");
+    div.setAttribute("id", department.id);
+    div.style.cssText = `display:flex;justify-content:center;align-items:center;border-radius:5px;margin:10px;background-color:${department.color};`;
+    div.className = "card"
+
+    div.addEventListener('click', function () {
+           var clickedId = this.id;
+           console.log('ID do elemento div clicado:', clickedId);
+           requestBody = parseInt(clickedId);
+           GetPosts(url,requestBody)
+     });
+
+    var ulNew = document.createElement("ul");
+    ulNew.setAttribute("id", "newDepPost");
+
+    var aElement = document.createElement("a");
+    aElement.textContent = department.name;
+
+    div.appendChild(ulNew);
+    div.appendChild(aElement);
+    depcards.appendChild(div);
+});
+
+worktable.appendChild(depcards);
+worktable.appendChild(logoWecom);
+billboard.appendChild(worktable);
+
+}
+
+function MakePosts(posts) {
+    var billboard = document.getElementById("billboard");
+    billboard.innerHTML = '';
+
+    var worktable = document.createElement("div");
+    worktable.setAttribute("id", "worktable");
+    billboard.appendChild(worktable);
+
+    var postDepartDiv = document.createElement("div");
+    postDepartDiv.setAttribute("id", "post-depart");
+    postDepartDiv.className = "post-depart"
+    worktable.appendChild(postDepartDiv);
+
+    var logoWecom = document.createElement("div");
+    logoWecom.setAttribute("id", "logowecom");
+    logoWecom.className = "logo"
+    worktable.appendChild(logoWecom);
+
+    posts.forEach(function (post) {
+        var postDiv = document.createElement("div");
+        postDiv.setAttribute("id", post.id);
+        postDiv.setAttribute("class", "post");
+        postDiv.style.backgroundColor = post.color;
+        postDepartDiv.appendChild(postDiv); 
+
+
+        var headpost = document.createElement("ul");
+        headpost.setAttribute("id", "headpost");
+        headpost.className = "headpost";
+        postDiv.appendChild(headpost);
+
+        var a = document.createElement("a");
+        a.textContent = post.title;
+        a.setAttribute("id", "textpost");
+        postDiv.appendChild(a);
+
+        document.getElementById(post.id).addEventListener('click', function () {
+            var clickedId = this.id;
+            var id = parseInt(clickedId)
+            console.log('ID do elemento div clicado:', clickedId);
+            makeDivPostMessage(posts,clickedId);
+        });
+
+        var footpost = document.createElement("ul");
+        footpost.setAttribute("id", "footpost");
+        footpost.className = "footpost"
+        postDiv.appendChild(footpost);
+
+        var spanStart = document.createElement("span");
+        spanStart.textContent = "Início: " + formatDate(new Date(post.date_start));
+        spanStart.setAttribute("id", "dateS");
+        spanStart.className = "dateS"
+        spanStart.style.fontSize = "10px";
+        footpost.appendChild(spanStart);
+
+        var spanEnd = document.createElement("span");
+        spanEnd.textContent = "Fim: " + formatDate(new Date(post.date_end));
+        spanEnd.setAttribute("id", "dateE");
+        spanStart.className = "dateE"
+        spanEnd.style.fontSize = "10px";
+        footpost.appendChild(spanEnd);
+    });
+
+    var footButtons = document.createElement("div");
+    footButtons.setAttribute("id", "footbuttons");
+    footButtons.className = 'footbuttons'
+    worktable.appendChild(footButtons);
+
+    var backDiv = document.createElement("div");
+    backDiv.setAttribute("id", "backDiv");
+    backDiv.className = "backDiv";
+    footButtons.appendChild(backDiv);
+
+    document.getElementById("backDiv").addEventListener("click", function () {
+        GetDepartments(url)
+        // makeDivDepartments();
+    });
+    // backDiv.appendChild(back);
+
+    function formatDate(date) {
+        var day = date.getDate();
+        var month = date.getMonth() + 1; // Months are 0-indexed
+        var year = date.getFullYear();
+
+        if (day < 10) day = '0' + day;
+        if (month < 10) month = '0' + month;
+
+        return day + '/' + month + '/' + year;
+    }
+}
+
+function makeDivPostMessage(posts,id){
+
+var post = posts.filter(function (item) {
+    return item.id === parseInt(id, 10);
+})[0];
+
+var department = list_departments.filter(function (item) {
+    return item.id === parseInt(post.department, 10);
+})[0];
+
+var insideDiv = document.createElement('div');
+insideDiv.className = 'insideDiv';
+insideDiv.id = 'insideDiv';
+
+var postMsgDiv = document.createElement('div');
+postMsgDiv.className = 'postmsg';
+postMsgDiv.style.backgroundColor = post.color;
+postMsgDiv.id = 'postmsg';
+
+var closeWindowDiv = document.createElement('div');
+closeWindowDiv.className = 'closewindow';
+closeWindowDiv.id = 'closewindow';
+
+var imgCloseWindow = document.createElement('img')
+imgCloseWindow.className = 'closewindow';
+imgCloseWindow.width = '100%';
+
+var nameBoxDiv = document.createElement('div');
+nameBoxDiv.className = 'namebox';
+nameBoxDiv.textContent = department.name;
+nameBoxDiv.id = 'namebox';
+
+var titleMsgDiv = document.createElement('div');
+titleMsgDiv.className = 'titlemsg';
+titleMsgDiv.textContent = post.title;
+titleMsgDiv.id = 'titlemsg';
+
+var msgBoxDiv = document.createElement('div');
+msgBoxDiv.className = 'msgbox';
+msgBoxDiv.style.height = '75%';
+msgBoxDiv.id = 'msgbox';
+
+var scrollBox = document.createElement('div');
+scrollBox.className = 'scrollbox';
+scrollBox.style.display = 'flex';
+scrollBox.style.color = 'white';
+scrollBox.style.width = '100%';
+scrollBox.style.height = '100%';
+scrollBox.id = 'scrollbox';
+
+var msgContent = document.createElement('div');
+msgContent.className = 'msgcontent';
+msgContent.style.overflow = 'auto';
+msgContent.textContent = post.description;
+msgContent.id = 'msgcontent';
+
+if (titleMsgDiv) {
+    if (titleMsgDiv.innerText.length > 20) {
+        titleMsgDiv.style.fontSize = '20px';
+    }
+}
+
+var footShowPost = document.createElement('div');
+footShowPost.className = 'footShowPost';
+footShowPost.id = 'footShowPost';
+
+var closeDateDiv = document.createElement('div');
+closeDateDiv.className = 'closedate';
+closeDateDiv.style.width = '60%'
+closeDateDiv.style.height = '60%'
+var dateString = post.date_end;
+var date = new Date(dateString);
+var day = date.getDate();
+var month = date.getMonth() + 1;
+var year = date.getFullYear();
+var hours = date.getHours();
+var minutes = date.getMinutes();
+var formattedDate = 'Fim: ' + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+closeDateDiv.textContent = formattedDate;
+closeDateDiv.id = 'closedate';
+
+closeWindowDiv.addEventListener('click', function () {
+    console.log("O elemento closeWindowDiv foi clicado!");
+    GetPosts(url,requestBody)
+});
+
+var billboard = document.getElementById("billboard")
+billboard.appendChild(insideDiv)
+insideDiv.appendChild(postMsgDiv)
+postMsgDiv.appendChild(closeWindowDiv);
+closeWindowDiv.appendChild(imgCloseWindow)
+postMsgDiv.appendChild(nameBoxDiv);
+postMsgDiv.appendChild(titleMsgDiv);
+scrollBox.appendChild(msgContent);
+msgBoxDiv.appendChild(scrollBox);
+postMsgDiv.appendChild(msgBoxDiv);
+postMsgDiv.appendChild(footShowPost);
+footShowPost.appendChild(closeDateDiv);
+}
+</script>
+<body>
+    <div id="billboard"></div>
+</body>
+</html>

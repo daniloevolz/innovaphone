@@ -9,6 +9,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var that = this;
     var device_list = [];
     var userDN;
+    var userSIP;
     var userDomain;
     var avatar;
     var appdn = start.title;
@@ -66,6 +67,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         changeState("Connected");
         userDomain = domain
         userDN = dn
+        userSIP = user
         // avatar = new innovaphone.Avatar(start, user, domain);
         // UIuserPicture = avatar.url(user, 80, dn);
 
@@ -113,15 +115,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //Retorna todas as salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsResult") {
             rooms = JSON.parse(obj.result);
-            app.send({ api: "user", mt: "SelectDevices", ids: obj.ids })
-            app.send({ api: "user", mt: "SelectRoomsEditors", ids: obj.ids })
-            app.send({ api: "user", mt: "SelectRoomsViewers", ids: obj.ids })
+            app.sendSrc({ api: "user", mt: "SelectDevices", ids: obj.ids, src: obj.ids}, function (obj) {
+                app.send({ api: "user", mt: "SelectRoomsEditors", ids: obj.ids })
+                app.send({ api: "user", mt: "SelectRoomsViewers", ids: obj.ids })
+                devices = JSON.parse(obj.result);
+                app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
+            })
+            
         }
         //Retorna todas os devices de todas as salas solicitadas
-        if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
-            devices = JSON.parse(obj.result);
-            app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
-        }
+        //if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
+        //    devices = JSON.parse(obj.result);
+        //    app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
+        //}
         //Retorna todas as disponibilidades de todas as salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsAvailabilitiesResult") {
             availabilities = JSON.parse(obj.result);
@@ -137,24 +143,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         //Retorna todos os usuários visualizadores das salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsViewersResult") {
-            viewers = JSON.parse(obj.result);
-            //if (viewers.hasOwnProperty(obj.room)) {
-            //    viewers[obj.room].push = JSON.parse(obj.result)
-            //} else {
-            //    viewers[obj.room] = [];
-            //    viewers[obj.room].push = JSON.parse(obj.result)
-            //}
-            
+            viewers = JSON.parse(obj.result);  
         }
         //Retorna todos os usuários editores das salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsEditorsResult") {
             editors = JSON.parse(obj.result);
-            //if (editors.hasOwnProperty(obj.room)) {
-            //    editors[obj.room].push = JSON.parse(obj.result)
-            //} else {
-            //    editors[obj.room] = [];
-            //    editors[obj.room].push = JSON.parse(obj.result)
-            //} 
         }
         if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
             app.send({ api: "user", mt: "SelectMyRooms" })
@@ -196,12 +189,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
      }
      
-     function makeContainer(){
-         var container = document.createElement("div")
-         document.body.appendChild(container);
-         return container
-     } 
-     
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         makeHeader("./images/home.svg", "./images/menu.svg", texts.text("labelMyRooms"))
@@ -215,7 +202,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         rooms.forEach(function(room){
             //div principal
             const divMain =  document.createElement("div")
-            divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex")
+            divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex", "h-fit")
             divMain.setAttribute("room",room.id)
             divMain.setAttribute("id", room.id)
             container.appendChild(divMain)
@@ -385,26 +372,35 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
         that.clear();
         makeHeader("./images/arrow-left.svg", "./images/menu.svg", room.name)
+        // div container
+        const container = document.createElement("div")
+        container.classList.add("overflow-auto","gap-2","grid", "sm:grid-cols-2", "md:grid-cols-4")
+        container.style.height = 'calc(100vh - 70px)'
+        container.setAttribute("id", "container")
+        document.body.appendChild(container);
         // div sala
         const divImg = document.createElement("div")
         divImg.classList.add("aspect-[16/9]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
-        document.body.appendChild(divImg);
-
-        
-
-        // div container (scroll)
-        const div102 = document.createElement("div")
-        div102.classList.add("div102")
-        div102.style.height = 'calc(100vh - 70px)'
-        div102.setAttribute("id", "div102")
-        document.body.appendChild(div102);
+        container.appendChild(divImg);
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
         divHorario.classList.add("divHorario")
-        document.body.appendChild(divHorario)
-        makeViewCalendarInfo(divHorario, availability)
+        container.appendChild(divHorario)
+        makeViewCalendarDetail(divHorario, availability)
+
+        
+        
+
+        // div container (scroll)
+        const div102 = document.createElement("div")
+        div102.classList.add("div102", "h-fit")
+        /*div102.style.height = 'calc(100vh - 70px)'*/
+        div102.setAttribute("id", "div102")
+        container.appendChild(div102);
+
+        
 
         devices.forEach(function (device) {
             var sched = schedules.filter(function (sched) {
@@ -420,6 +416,272 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
 
     }
+    function makeViewCalendarDetail(divMain, availability) {
+        // div label horario
+        const div160 = document.createElement("div")
+        div160.classList.add("div160")
+        divMain.appendChild(div160)
+
+        const divHourCard = document.createElement("div")
+        divHourCard.classList.add("divHourCard")
+        divHourCard.innerHTML = texts.text("divHourCard")
+        div160.appendChild(divHourCard)
+
+        availability.forEach(function (a) {
+            if (a.type == "periodType") {
+                makeViewTimePeriod(div160, a)
+                //// div disponibilidade periodo
+                //const divMainAvailabilityPeriod = document.createElement("div")
+                //divMainAvailabilityPeriod.classList.add("flex", "p-1", "items-center", "justify-between", "bg-dark-100/35", "rounded-lg")
+                //const imgCalendar = document.createElement("img")
+                //imgCalendar.setAttribute("src", "./images/calendar-days.svg")
+                //divMainAvailabilityPeriod.appendChild(imgCalendar)
+                //// div data
+                //const divDateP = document.createElement("div")
+                //divDateP.classList.add("flex", "items-center", "gap-1", "justify-center", "content-center")
+
+                //const dateStart = document.createElement("p")
+                //const formatedDataStart = moment(a.data_start).format("DD/MM");
+                //dateStart.textContent = formatedDataStart
+                //dateStart.classList.add("text-xl", "font-bold",)
+                //// texto até
+                //const dateAte = document.createElement("p")
+                //dateAte.textContent = texts.text("labelTo")
+                //dateAte.classList.add("text-sm", "font-regular", 'text-primary-600')
+                //// texto fim
+                //const dateEnd = document.createElement("p")
+                //const formatedDataEnd = moment(a.data_end).format("DD/MM");
+                //dateEnd.textContent = formatedDataEnd
+                //dateEnd.classList.add("text-xl", "font-bold",)
+
+                //divDateP.appendChild(dateStart)
+                //divDateP.appendChild(dateAte)
+                //divDateP.appendChild(dateEnd)
+                //divMainAvailabilityPeriod.appendChild(divDateP)
+                //div160.appendChild(divMainAvailabilityPeriod)
+
+            }
+
+            if (a.type == "recurrentType") {
+                //// div disponibilidade recorrente
+                //const divMainAvailabilityRecurrent = document.createElement("div")
+                //divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
+                //// dias da semana 
+                //var week = [texts.text("labelSun"), texts.text("labelMon"), texts.text("labelTerc"), texts.text("labelQuar"), texts.text("labelQuint"), texts.text("labelSex"), texts.text("labelSab")];
+
+                //const daysOfWeekMap = {
+                //    "D": "domingo",
+                //    "M": "segunda-feira",
+                //    "T": "terça-feira",
+                //    "W": "quarta-feira",
+                //    "T2": "quinta-feira",
+                //    "F": "sexta-feira",
+                //    "S": "sabado"
+                //};
+                //week.forEach(function (w) {
+                //    const dayDiv = document.createElement('div')
+                //    dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
+                //    const dayText = document.createElement('p')
+                //    dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
+                //    dayText.textContent = w
+                //    dayText.setAttribute("day-week", daysOfWeekMap[w])
+                //    dayDiv.appendChild(dayText)
+                //    divMainAvailabilityRecurrent.appendChild(dayDiv)
+                //})
+                //div160.appendChild(divMainAvailabilityRecurrent)
+                makeViewTimeRecurrent(div160, a)
+            }
+            
+            UpdateAvailability(availability, a.type)
+        })
+        // img expandir
+        //const divOpenTime = document.createElement("div")
+        //divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
+        //divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+        //div160.appendChild(divOpenTime)
+        //div160.addEventListener("click", function (event) {
+            
+            
+
+        //})
+
+
+    }
+    function makeViewTimePeriod(divMain, availability) {
+        //var div180 = document.getElementById("div180")
+        //if (div180) {
+        //    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+        //    divMain.removeChild(div180)
+
+        //} else {
+        //    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+            var div180 = document.createElement("div")
+            div180.setAttribute("id", "div180")
+            div180.classList.add("div180")
+            divMain.appendChild(div180)
+
+            //Start Date and time
+            const divDateStart = document.createElement("div")
+            divDateStart.setAttribute("id", "divDateStart")
+            divDateStart.classList.add("divDate")
+
+            const divStartDay = document.createElement("div")
+            divStartDay.setAttribute("id", "divStartDay")
+            divStartDay.classList.add("divDay")
+            divStartDay.innerHTML = moment(availability.data_start).format("DD/MM");
+
+            divDateStart.appendChild(divStartDay)
+
+            var div179S = document.createElement("div")
+            div179S.setAttribute("id", "div179s")
+            div179S.classList.add("div179")
+            divDateStart.appendChild(div179S)
+
+            const divStartISODay = document.createElement("div")
+            divStartISODay.setAttribute("id", "divStartISODay")
+            divStartISODay.classList.add("divISODay")
+            divStartISODay.innerHTML = moment(availability.data_start).format("dddd");
+
+            const divStartTime = document.createElement("div")
+            divStartTime.setAttribute("id", "divStartTime")
+            divStartTime.classList.add("divStartTime")
+            divStartTime.innerHTML = moment(availability.data_start).format("HH:mm");
+
+            div179S.appendChild(divStartISODay)
+            div179S.appendChild(divStartTime)
+
+            div180.appendChild(divDateStart)
+
+            //div to
+            const divToTime = document.createElement("div")
+            divToTime.setAttribute("id", "divToTime")
+            divToTime.classList.add("divToTime")
+            divToTime.innerHTML = texts.text("labelTo")
+            div180.appendChild(divToTime)
+
+            //End Date and time
+            const divDateEnd = document.createElement("div")
+            divDateEnd.setAttribute("id", "divDateEnd")
+            divDateEnd.classList.add("divDate")
+
+            const divEndDay = document.createElement("div")
+            divEndDay.setAttribute("id", "divEndDay")
+            divEndDay.classList.add("divDay")
+            divEndDay.innerHTML = moment(availability.data_end).format("DD/MM");
+
+            divDateEnd.appendChild(divEndDay)
+
+            var div179E = document.createElement("div")
+            div179E.setAttribute("id", "div179e")
+            div179E.classList.add("div179")
+            divDateEnd.appendChild(div179E)
+
+            const divEndISODay = document.createElement("div")
+            divEndISODay.setAttribute("id", "divEndISODay")
+            divEndISODay.classList.add("divISODay")
+            divEndISODay.innerHTML = moment(availability.data_end).format("dddd");
+
+            const divEndTime = document.createElement("div")
+            divEndTime.setAttribute("id", "divEndTime")
+            divEndTime.classList.add("divTime")
+            divEndTime.innerHTML = moment(availability.data_end).format("HH:mm");
+
+            div179E.appendChild(divEndISODay)
+            div179E.appendChild(divEndTime)
+
+            div180.appendChild(divDateEnd)
+
+        //}
+    }
+    function makeViewTimeRecurrent(divMain, a) {
+        // div disponibilidade recorrente
+        const divMainAvailabilityRecurrent = document.createElement("div")
+        divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
+        // dias da semana 
+        var week = [texts.text("labelSun"), texts.text("labelMon"), texts.text("labelTerc"), texts.text("labelQuar"), texts.text("labelQuint"), texts.text("labelSex"), texts.text("labelSab")];
+
+        const daysOfWeekMap = {
+            "D": "domingo",
+            "M": "segunda-feira",
+            "T": "terça-feira",
+            "W": "quarta-feira",
+            "T2": "quinta-feira",
+            "F": "sexta-feira",
+            "S": "sabado"
+        };
+        week.forEach(function (w) {
+            const dayDiv = document.createElement('div')
+            dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
+            const dayText = document.createElement('p')
+            dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
+            dayText.textContent = w
+            dayText.setAttribute("day-week", daysOfWeekMap[w])
+            dayDiv.appendChild(dayText)
+            divMainAvailabilityRecurrent.appendChild(dayDiv)
+        })
+        divMain.appendChild(divMainAvailabilityRecurrent)
+
+        if (a.timestart_monday != "") {
+            makeViewDay(divMain, "labelMondayDiv", a.timestart_monday, a.timeend_monday) 
+        }
+        if (a.timestart_tuesday != "") {
+            makeViewDay(divMain, "labeltuesdayDiv", a.timestart_tuesday, a.timeend_tuesday)
+        }
+        if (a.timestart_wednesday != "") {
+            makeViewDay(divMain, "labelwednesdayDiv", a.timestart_wednesday, a.timeend_wednesday)
+        }
+        if (a.timestart_thursday != "") {
+            makeViewDay(divMain, "labelthursdayDiv", a.timestart_thursday, a.timeend_thursday)
+        }
+        if (a.timestart_friday != "") {
+            makeViewDay(divMain, "labelfridayDiv", a.timestart_friday, a.timeend_friday)
+        }
+        if (a.timestart_saturday != "") {
+            makeViewDay(divMain, "labelsaturdayDiv", a.timestart_saturday, a.timeend_saturday)
+        }
+        if (a.timestart_sunday != "") {
+            makeViewDay(divMain, "labelsundayDiv", a.timestart_sunday, a.timeend_sunday)
+        }
+        function makeViewDay(divMain, day, timestart, timeend) {
+            //dias
+            var div180 = document.createElement("div")
+            div180.setAttribute("id", "div180")
+            div180.classList.add("div180")
+            divMain.appendChild(div180)
+
+            var divDayLabel = document.createElement("div")
+            divDayLabel.setAttribute("id", "div180")
+            divDayLabel.classList.add("divDayLabel")
+            divDayLabel.innerHTML = texts.text(day)
+            div180.appendChild(divDayLabel)
+
+            //div182
+            var div182 = document.createElement("div")
+            div182.setAttribute("id", "div182")
+            div182.classList.add("div182")
+            div180.appendChild(div182)
+
+            //time start
+            var divTimeStart = document.createElement("div")
+            divTimeStart.setAttribute("id", "divTimeStart")
+            divTimeStart.classList.add("divDate")
+            div182.appendChild(divTimeStart)
+            divTimeStart.innerHTML = timestart
+
+            //div to
+            const divToTime = document.createElement("div")
+            divToTime.setAttribute("id", "divToTime")
+            divToTime.classList.add("divToTime")
+            divToTime.innerHTML = texts.text("labelTo")
+            div182.appendChild(divToTime)
+            //time end
+            var divTimeEnd = document.createElement("div")
+            divTimeEnd.setAttribute("id", "divTimeEnd")
+            divTimeEnd.classList.add("divDate")
+            div182.appendChild(divTimeEnd)
+            divTimeEnd.innerHTML = timeend
+        }
+    }
     function makeViewDevice(divMain, device, availability, schedule, user) {
         //div 101
         const div101 = document.createElement("div")
@@ -431,6 +693,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div1396.classList.add("div1396", state)
         div1396.setAttribute("id", device.hwid)
         div101.appendChild(div1396)
+
+        var room = rooms.filter(function (room) {
+            return device.room_id == room.id
+        })[0];
 
         //div 84
         const div84 = document.createElement("div")
@@ -450,10 +716,30 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             //divUsersAvatar.appendChild(imgAvatar)
             div84.appendChild(imgAvatar)
 
-            //div 34
-            const div34 = document.createElement("div")
-            div34.classList.add("div34")
-            div34.innerHTML = user.cn
+            //div 100
+            const div100 = document.createElement("div")
+            div100.classList.add("div100")
+            div100.innerHTML = user.cn
+            div84.appendChild(div100)
+
+            if (user.sip == userSIP) {
+                //div 36
+                const div36 = document.createElement("div")
+                div36.classList.add("div36")
+                div36.setAttribute("id", device.hwid)
+                div36.innerHTML = texts.text("deletePhoneUseButton")
+                div36.addEventListener("click", function (event) {
+                    var dev = event.currentTarget.id;
+                    event.stopPropagation()
+                    app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
+                        app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
+                            devices = JSON.parse(obj.result)
+                            makeViewRoomDetail(room, devices, availability, schedules, viewers)
+                        })
+                    })
+                })
+                div84.appendChild(div36)
+            }
 
         } else {
             //div 34
@@ -517,9 +803,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         //div avatar
         if (user) {
+            //img user
+            avatar = new innovaphone.Avatar(start, user.sip, userDomain);
+            UIuserPicture = avatar.url(user.sip, 15, userDN);
             const divUsersAvatar = document.createElement("div")
             divUsersAvatar.classList.add("rounded-lg", "p-1", "m-1", "bg-dark-200", "gap-2", "flex-col", "flex")
             divUsersAvatar.setAttribute("id", user.guid)
+            divUsersAvatar.setAttribute("src", UIuserPicture)
             //img user
             avatar = new innovaphone.Avatar(start, user.sip, userDomain);
             UIuserPicture = avatar.url(user.sip, 15, userDN);
@@ -528,7 +818,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             imgAvatar.setAttribute("id", "divAvatar")
             imgAvatar.classList.add("w-5", "h-5", "rounded-full")
             divUsersAvatar.appendChild(imgAvatar)
-            div93.appendChild(divUsersAvatar)
+            div93.appendChild(imgAvatar)
         }
         divMain.appendChild(div93)
     }

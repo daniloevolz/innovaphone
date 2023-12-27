@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.testes_danilomanager",
+            "icon": "wecom-testes_danilo.png",
+            "lang": "wecom.testes_danilomanagertexts",
+            "domains": false
+        }
+    ]
+}

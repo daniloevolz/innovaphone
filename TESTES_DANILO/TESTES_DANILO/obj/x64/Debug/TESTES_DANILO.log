@@ -1,0 +1,25 @@
+﻿  powershell -ExecutionPolicy Bypass -file build.ps1 -prjout "x86_64-debug/TESTES_DANILO" -temp "x86_64-debug/obj/" -project "TESTES_DANILO" -rtm "jse/x86_64/generic" -files "../web1/appwebsocket/innovaphone.appwebsocket.Connection.js, ../web1/lib1/*.js, ../web1/lib1/*.css, ../web1/ui1.lib/*.js, ../web1/ui1.svg/*.js, ../web1/fonts/*.ttf, httpfiles/*, build.txt, label.txt, config.json, plugins.json, wecom-testes_daniloservice.js," -copyRTM 1
+  Building project ...
+      Project output dirctory : x86_64-debug/TESTES_DANILO
+      Temp directory          : x86_64-debug\obj\TESTES_DANILO
+      Runtime binary          : jse/x86_64/generic
+      Build Number            : 13C139
+  
+  Removing old files from x86_64-debug\obj\TESTES_DANILO...
+  Creating directories...
+  Checking for new items to add...
+      .\TESTES_DANILO\..\web1\appwebsocket\innovaphone.appwebsocket.Connection.js => x86_64-debug\obj\TESTES_DANILO\web1\appwebsocket
+      .\TESTES_DANILO\..\web1\lib1\*.js => x86_64-debug\obj\TESTES_DANILO\web1\lib1
+      .\TESTES_DANILO\..\web1\lib1\*.css => x86_64-debug\obj\TESTES_DANILO\web1\lib1
+      .\TESTES_DANILO\..\web1\ui1.lib\*.js => x86_64-debug\obj\TESTES_DANILO\web1\ui1.lib
+      .\TESTES_DANILO\..\web1\ui1.svg\*.js => x86_64-debug\obj\TESTES_DANILO\web1\ui1.svg
+      .\TESTES_DANILO\..\web1\fonts\*.ttf => x86_64-debug\obj\TESTES_DANILO\web1\fonts
+      .\TESTES_DANILO\httpfiles\* => x86_64-debug\obj\TESTES_DANILO
+      .\TESTES_DANILO\build.txt => x86_64-debug\obj\TESTES_DANILO
+      .\TESTES_DANILO\label.txt => x86_64-debug\obj\TESTES_DANILO
+      .\TESTES_DANILO\config.json => x86_64-debug\obj\TESTES_DANILO
+      .\TESTES_DANILO\plugins.json => x86_64-debug\obj\TESTES_DANILO
+      .\TESTES_DANILO\wecom-testes_daniloservice.js => x86_64-debug\obj\TESTES_DANILO
+  
+  Compressing files to x86_64-debug\TESTES_DANILO\httpfiles.zip...
+  Comando de build remoto não configurado, ignorando.
