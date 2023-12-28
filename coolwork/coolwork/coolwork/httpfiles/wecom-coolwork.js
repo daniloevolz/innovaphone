@@ -61,13 +61,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var schedules = [];
     var viewers = [];
     var editors = [];
-    //images para o header
-    var imgHome = document.createElement("img")
-    imgHome.src = "./images/home.svg";
-    var imgMenu = document.createElement("img")
-    imgMenu.src = "./images/menu.svg";
-    var imgArrow = document.createElement("img")
-    imgArrow.src = "./images/arrow-left.svg"
+
 
     function app_connected(domain, user, dn, appdomain) {
 
@@ -160,6 +154,36 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             app.send({ api: "user", mt: "SelectMyRooms" })
         }
     } 
+    function makeButton(text, variant, iconSVG) {
+        const button = document.createElement("button");
+        button.textContent = text;
+
+        if (iconSVG) {
+            const icon = document.createElement("img");
+            icon.src = iconSVG;
+            button.prepend(icon);
+        }
+
+        switch (variant) {
+            case "primario":
+                button.classList.add("bg-blue-500", "hover:bg-blue-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                break;
+            case "secundario":
+                button.classList.add("bg-gray-500", "hover:bg-gray-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                break;
+            case "destrutivo":
+                button.classList.add("bg-red-500", "hover:bg-red-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                break;
+            case "transparente":
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-2", "px-4", "rounded");
+                break;
+            default:
+                button.classList.add("bg-gray-500", "hover:bg-gray-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                break;
+        }
+
+        return button;
+    }
 
     function makeHeader(imgLeft,imgRight,title){
         // construção do header
@@ -176,7 +200,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         // imgHome.setAttribute("src", imgLeft)
         leftElement.addEventListener("click", function (event) {
             makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-            event.stopPropagation()
+        event.stopPropagation()
             event.preventDefault()
         })
      
@@ -200,7 +224,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
-        makeHeader(imgHome, imgMenu, texts.text("labelMyRooms"))
+        makeHeader(makeButton("","","./images/home.svg"), makeButton('','',"./images/menu.svg"), texts.text("labelMyRooms"))
         // div container (scroll)
         const container = document.createElement("div")
         container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
@@ -268,20 +292,20 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             viewers.forEach(function (viewer) {
                 if (processedUsersCount < 8) {
-                    var viewersUsers = list_tableUsers.filter(function (user) {
-                        return user.guid == viewer.viewer_guid && viewer.room_id == room.id;
-                    });
-            
+                var viewersUsers = list_tableUsers.filter(function (user) {
+                    return user.guid == viewer.viewer_guid && viewer.room_id == room.id;
+                });
+                
                     viewersUsers.slice(0, 6).forEach(function (view) {
-                        avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                        UIuserPicture = avatar.url(view.sip, 100, userDN);
-                        const imgAvatar = document.createElement("img");
-                        imgAvatar.setAttribute("src", UIuserPicture);
-                        imgAvatar.setAttribute("id", "divAvatar");
-                        imgAvatar.classList.add("w-5", "h-5", "rounded-full");
-                        divUsersAvatar.appendChild(imgAvatar);
-                        divMain.appendChild(divUsersAvatar);
-                    });
+                    avatar = new innovaphone.Avatar(start, view.sip, userDomain);
+                    UIuserPicture = avatar.url(view.sip, 100, userDN);
+                    const imgAvatar = document.createElement("img");
+                    imgAvatar.setAttribute("src", UIuserPicture);
+                    imgAvatar.setAttribute("id", "divAvatar");
+                    imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+                    divUsersAvatar.appendChild(imgAvatar);
+                    divMain.appendChild(divUsersAvatar);
+                });
                     // avatar com + 
                     processedUsersCount += viewersUsers.length;
                 }
@@ -384,7 +408,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
     function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
         that.clear();
-        makeHeader(imgArrow, imgMenu, room.name)
+        makeHeader(makeButton("","","./images/arrow-left.svg"), makeButton("","","./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
         container.classList.add("overflow-auto","gap-2","grid", "sm:grid-cols-2", "md:grid-cols-4","m-1")
@@ -432,7 +456,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     // calendario 
     function makeCalendar(availability,schedules){
         that.clear();
-        makeHeader(imgArrow, "Botão Salvar aqui", texts.text("labelSchedule"))
+        makeHeader(makeButton('','','./images/arrow-left.svg'), makeButton("Salvar","primario"), texts.text("labelSchedule"))
         // div principal
         const divCalendar = document.createElement("div")
         divCalendar.classList.add("flex","p-1","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
@@ -772,10 +796,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         } else {
             //div 34
-            const div34 = document.createElement("div")
-            div34.classList.add("div34")
+            const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primario")
+            //div34.classList.add("div34")
             div34.setAttribute("id",device.hwid)
-            div34.innerHTML = texts.text("makePhoneSceduleButton")
+            //div34.innerHTML = texts.text("makePhoneSceduleButton")
             div34.addEventListener("click",function(event){
                 var deviceHw = event.currentTarget.id;
                 makeCalendar(availability,schedule)
@@ -788,8 +812,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             
             })
             //div 36
-            const div36 = document.createElement("div")
-            div36.classList.add("div36")
+            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundario")
             div36.setAttribute("id",device.hwid)
             div36.innerHTML = texts.text("makePhoneUseButton")
             div36.addEventListener("click", function (event) {

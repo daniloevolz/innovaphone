@@ -303,8 +303,6 @@ function UpdateAvailability(availability, type) {
                                     var totalHours = 0;
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
-                                    console.log("LENGTH DELE " + dates.timestart_tuesday.length)
                                
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
