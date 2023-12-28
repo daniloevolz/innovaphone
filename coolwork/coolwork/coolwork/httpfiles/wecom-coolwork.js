@@ -184,8 +184,71 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         return button;
     }
-    const backButton = makeButton('', '', './images/arrow-left.svg');
+     const backButton = makeButton('', '', './images/arrow-left.svg');
 
+     function makeStatus(variant) {
+        const outerCircle = document.createElement("div");
+        outerCircle.classList.add("w-3", "h-3", "rounded-full", "flex", "items-center", "justify-center");
+
+        const innerCircle = document.createElement("div");
+        innerCircle.classList.add("w-2", "h-2", "rounded-full");
+
+        outerCircle.appendChild(innerCircle);
+
+        switch (variant) {
+            case "vermelho":
+                outerCircle.classList.add("bg-red-300");
+                innerCircle.classList.add("bg-red-500");
+                break;
+            case "verde":
+                outerCircle.classList.add("bg-green-300");
+                innerCircle.classList.add("bg-green-500");
+                break;
+            case "azul":
+                outerCircle.classList.add("bg-blue-300");
+                innerCircle.classList.add("bg-blue-500");
+                break;
+            case "amarelo":
+                outerCircle.classList.add("bg-yellow-300");
+                innerCircle.classList.add("bg-yellow-500");
+                break;
+            default:
+                outerCircle.classList.add("bg-gray-300");
+                innerCircle.classList.add("bg-gray-500");
+                break;
+        }
+
+        return outerCircle;
+    }
+
+    function makeBadge(text, variant) {
+        const badge = document.createElement("span");
+        badge.textContent = text;
+        badge.classList.add("inline-block", "py-1", "px-2", "rounded", "text-sm", "font-medium");
+
+        switch (variant) {
+            case "primaria":
+                badge.classList.add("bg-blue-500", "text-white");
+                break;
+            case "secundaria":
+                badge.classList.add("bg-gray-500", "text-white");
+                break;
+            case "sucesso":
+                badge.classList.add("bg-green-500", "text-white");
+                break;
+            case "perigo":
+                badge.classList.add("bg-red-500", "text-white");
+                break;
+            case "aviso":
+                badge.classList.add("bg-yellow-500", "text-black");
+                break;
+            default:
+                badge.classList.add("bg-gray-500", "text-white");
+                break;
+        }
+
+        return badge;
+    }
 
     function makeHeader(imgLeft,imgRight,title){
         // construção do header
@@ -252,11 +315,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             const nameRoom = document.createElement("h1")
             nameRoom.textContent = `${room.name}`
             nameRoom.classList.add("text-white" ,"font-bold")
+
             // device count
             const divDeviceNumber = document.createElement("div")
             divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
-            const statusDevice = document.createElement("div")
-            statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+            // const statusDevice = document.createElement("div")
+            // statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+            const statusDevice = makeStatus() 
+
 
             // filtro para retornar os telefones disponíveis
             var devicesInfo = devices.filter(function (dev) {
@@ -282,36 +348,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             });
             
             console.log("Availabilities: " + JSON.stringify(avail))
-
+            // calendario recorrent e periodo
             makeViewCalendarInfo(divMain, avail)
+            //componente avatar
+            makeAvatar(viewers,divMain,room)
 
-            const divUsersAvatar = document.createElement("div")
-            divUsersAvatar.classList.add("flex","items-start","gap-1")
-            divUsersAvatar.setAttribute("id", "divUsersAvatar")
-            console.log("ARRAY USERS:" + JSON.stringify(viewers))
-            
-            let processedUsersCount = 0;
-
-            viewers.forEach(function (viewer) {
-                if (processedUsersCount < 8) {
-                var viewersUsers = list_tableUsers.filter(function (user) {
-                    return user.guid == viewer.viewer_guid && viewer.room_id == room.id;
-                });
-                
-                    viewersUsers.slice(0, 6).forEach(function (view) {
-                    avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                    UIuserPicture = avatar.url(view.sip, 100, userDN);
-                    const imgAvatar = document.createElement("img");
-                    imgAvatar.setAttribute("src", UIuserPicture);
-                    imgAvatar.setAttribute("id", "divAvatar");
-                    imgAvatar.classList.add("w-5", "h-5", "rounded-full");
-                    divUsersAvatar.appendChild(imgAvatar);
-                    divMain.appendChild(divUsersAvatar);
-                });
-                    // avatar com + 
-                    processedUsersCount += viewersUsers.length;
-                }
-            });
         //todas as divs com o atributo "room"
         const divsRoom = document.querySelectorAll('[room]');
         //listener de clique a cada div
@@ -339,6 +380,36 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         });
         })   
     }
+    function makeAvatar(viewers,divMain,room) {
+        const divUsersAvatar = document.createElement("div");
+        divUsersAvatar.classList.add("flex","items-start","gap-1");
+        divUsersAvatar.setAttribute("id", "divUsersAvatar");
+        console.log("ARRAY USERS:" + JSON.stringify(viewers));
+    
+        let processedUsersCount = 0;
+    
+        viewers.forEach(function (viewer) {
+            if (processedUsersCount < 8) {
+                var viewersUsers = list_tableUsers.filter(function (user) {
+                    return user.guid == viewer.viewer_guid && viewer.room_id == room.id;
+                });
+    
+                viewersUsers.slice(0, 6).forEach(function (view) {
+                    let avatar = new innovaphone.Avatar(start, view.sip, userDomain);
+                    let UIuserPicture = avatar.url(view.sip, 120, userDN);
+                    const imgAvatar = document.createElement("img");
+                    imgAvatar.setAttribute("src", UIuserPicture);
+                    imgAvatar.setAttribute("id", "divAvatar");
+                    imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+                    divUsersAvatar.appendChild(imgAvatar);
+                    divMain.appendChild(divUsersAvatar);
+                });
+                // avatar com + 
+                processedUsersCount += viewersUsers.length;
+            }
+        });
+    }
+
     function makeViewCalendarInfo(divMain, availability) {
         availability.forEach(function (a) {
             if (a.type == "periodType") {
@@ -419,7 +490,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         document.body.appendChild(container);
         // div sala
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[16/9]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
+        divImg.classList.add("aspect-[3/4]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         container.appendChild(divImg);
 
@@ -653,23 +724,23 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         const divMainAvailabilityRecurrent = document.createElement("div")
         divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
         // dias da semana 
-        var week = [texts.text("labelSun"), texts.text("labelMon"), texts.text("labelTerc"), texts.text("labelQuar"), texts.text("labelQuint"), texts.text("labelSex"), texts.text("labelSab")];
+        var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
 
         const daysOfWeekMap = {
-            "D": "domingo",
-            "M": "segunda-feira",
-            "T": "terça-feira",
-            "W": "quarta-feira",
-            "T2": "quinta-feira",
-            "F": "sexta-feira",
-            "S": "sabado"
+            "labelSun": "domingo",
+            "labelMon": "segunda-feira",
+            "labelTerc": "terça-feira",
+            "labelQuar": "quarta-feira",
+            "labelQuint" : "quinta-feira",
+            "labelSex": "sexta-feira",
+            "labelSab": "sabado"
         };
         week.forEach(function (w) {
             const dayDiv = document.createElement('div')
             dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
             const dayText = document.createElement('p')
             dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
-            dayText.textContent = w
+            dayText.textContent = texts.text(`${w}`)
             dayText.setAttribute("day-week", daysOfWeekMap[w])
             dayDiv.appendChild(dayText)
             divMainAvailabilityRecurrent.appendChild(dayDiv)
