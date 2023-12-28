@@ -6,15 +6,12 @@ tailwind.config = {
           current: 'currentColor',
           white: '#ffffff',
           primary: {
-            100: '#CEF2FF',
-            200: '#A7E9FF',
-            300: '#6BE0FF',
-            400: '#26CAFF',
-            500: '#00A3FF',
-            600: '#0079FF',
-            700: '#005EFF',
-            800: '#0050E6',
-            900: '#0049B3'
+            100: '#199FDA',
+            200: '#4AA9DE',
+            300: '#68B4E2',
+            400: '#81BEE7',
+            500: '#98C9EB',
+            600: '#AED4EF',
           },
           dark: {
             100: '#0B2E46',

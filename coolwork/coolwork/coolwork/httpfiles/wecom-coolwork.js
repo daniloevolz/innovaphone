@@ -166,24 +166,26 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         switch (variant) {
             case "primario":
-                button.classList.add("bg-blue-500", "hover:bg-blue-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded");
                 break;
             case "secundario":
-                button.classList.add("bg-gray-500", "hover:bg-gray-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                 break;
             case "destrutivo":
-                button.classList.add("bg-red-500", "hover:bg-red-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                 break;
             case "transparente":
-                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-2", "px-4", "rounded");
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
                 break;
             default:
-                button.classList.add("bg-gray-500", "hover:bg-gray-700", "text-white", "font-bold", "py-2", "px-4", "rounded");
+                button.classList.add("hover:bg-dark-300", "rounded");
                 break;
         }
 
         return button;
     }
+    const backButton = makeButton('', '', './images/arrow-left.svg');
+
 
     function makeHeader(imgLeft,imgRight,title){
         // construção do header
@@ -408,7 +410,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
     function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
         that.clear();
-        makeHeader(makeButton("","","./images/arrow-left.svg"), makeButton("","","./images/menu.svg"), room.name)
+        makeHeader(backButton, makeButton("","","./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
         container.classList.add("overflow-auto","gap-2","grid", "sm:grid-cols-2", "md:grid-cols-4","m-1")
@@ -456,7 +458,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     // calendario 
     function makeCalendar(availability,schedules){
         that.clear();
-        makeHeader(makeButton('','','./images/arrow-left.svg'), makeButton("Salvar","primario"), texts.text("labelSchedule"))
+        makeHeader(backButton, makeButton("Salvar","primario"), texts.text("labelSchedule"))
         // div principal
         const divCalendar = document.createElement("div")
         divCalendar.classList.add("flex","p-1","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
