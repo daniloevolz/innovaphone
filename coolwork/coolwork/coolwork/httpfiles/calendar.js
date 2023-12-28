@@ -409,10 +409,11 @@ function UpdateAvailability(availability, type) {
 
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
@@ -440,10 +441,11 @@ function UpdateAvailability(availability, type) {
 
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
@@ -469,13 +471,14 @@ function UpdateAvailability(availability, type) {
                                     var totalHours = 0;
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
+                                    
                                     if (totalHours <= 6) {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('parcialavailable');
+                                        td.classList.add('text-green-500');
+                                        // td.classList.add('parcialavailable');
                                     } else {
                                         td.classList.remove('unavailable');
-                                        td.classList.add('available');
+                                        td.classList.add('text-green-500');
                                     }
                                 } else {
                                     td.classList.add('unavailable');
@@ -534,7 +537,7 @@ function UpdateAvailability(availability, type) {
                   return "wednesday";
               case "quinta-feira":
                   return "thursday";
-              case "sexta":
+              case "sexta-feira":
                   return "friday";
               case "sabado":
                   return "saturday";
