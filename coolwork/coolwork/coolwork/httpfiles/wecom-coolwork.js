@@ -186,6 +186,70 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
     const backButton = makeButton('', '', './images/arrow-left.svg');
 
+    function makeStatus(variant) {
+        const outerCircle = document.createElement("div");
+        outerCircle.classList.add("w-3", "h-3", "rounded-full", "flex", "items-center", "justify-center");
+
+        const innerCircle = document.createElement("div");
+        innerCircle.classList.add("w-2", "h-2", "rounded-full");
+
+        outerCircle.appendChild(innerCircle);
+
+        switch (variant) {
+            case "vermelho":
+                outerCircle.classList.add("bg-red-300");
+                innerCircle.classList.add("bg-red-500");
+                break;
+            case "verde":
+                outerCircle.classList.add("bg-green-300");
+                innerCircle.classList.add("bg-green-500");
+                break;
+            case "azul":
+                outerCircle.classList.add("bg-blue-300");
+                innerCircle.classList.add("bg-blue-500");
+                break;
+            case "amarelo":
+                outerCircle.classList.add("bg-yellow-300");
+                innerCircle.classList.add("bg-yellow-500");
+                break;
+            default:
+                outerCircle.classList.add("bg-gray-300");
+                innerCircle.classList.add("bg-gray-500");
+                break;
+        }
+
+        return outerCircle;
+    }
+
+    function makeBadge(text, variant) {
+        const badge = document.createElement("span");
+        badge.textContent = text;
+        badge.classList.add("inline-block", "py-1", "px-2", "rounded", "text-sm", "font-medium");
+
+        switch (variant) {
+            case "primaria":
+                badge.classList.add("bg-blue-500", "text-white");
+                break;
+            case "secundaria":
+                badge.classList.add("bg-gray-500", "text-white");
+                break;
+            case "sucesso":
+                badge.classList.add("bg-green-500", "text-white");
+                break;
+            case "perigo":
+                badge.classList.add("bg-red-500", "text-white");
+                break;
+            case "aviso":
+                badge.classList.add("bg-yellow-500", "text-black");
+                break;
+            default:
+                badge.classList.add("bg-gray-500", "text-white");
+                break;
+        }
+
+        return badge;
+    }
+    
 
     function makeHeader(imgLeft,imgRight,title){
         // construção do header
@@ -255,8 +319,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             // device count
             const divDeviceNumber = document.createElement("div")
             divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
-            const statusDevice = document.createElement("div")
-            statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+            const statusDevice = makeStatus()
 
             // filtro para retornar os telefones disponíveis
             var devicesInfo = devices.filter(function (dev) {
@@ -419,7 +482,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         document.body.appendChild(container);
         // div sala
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[16/9]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
+        divImg.classList.add("aspect-[3/4]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         container.appendChild(divImg);
 

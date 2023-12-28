@@ -186,6 +186,42 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     }
     const backButton = makeButton('', '', './images/arrow-left.svg');
 
+    function makeStatus(variant) {
+        const outerCircle = document.createElement("div");
+        outerCircle.classList.add("w-3", "h-3", "rounded-full", "flex", "items-center", "justify-center");
+
+        const innerCircle = document.createElement("div");
+        innerCircle.classList.add("w-2", "h-2", "rounded-full");
+
+        outerCircle.appendChild(innerCircle);
+
+        switch (variant) {
+            case "vermelho":
+                outerCircle.classList.add("bg-red-300");
+                innerCircle.classList.add("bg-red-500");
+                break;
+            case "verde":
+                outerCircle.classList.add("bg-green-300");
+                innerCircle.classList.add("bg-green-500");
+                break;
+            case "azul":
+                outerCircle.classList.add("bg-blue-300");
+                innerCircle.classList.add("bg-blue-500");
+                break;
+            case "amarelo":
+                outerCircle.classList.add("bg-yellow-300");
+                innerCircle.classList.add("bg-yellow-500");
+                break;
+            default:
+                outerCircle.classList.add("bg-gray-300");
+                innerCircle.classList.add("bg-gray-500");
+                break;
+        }
+
+        return outerCircle;
+    }
+    
+
 
     function makeHeader(imgLeft,imgRight,title){
         // construção do header
@@ -255,8 +291,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             // device count
             const divDeviceNumber = document.createElement("div")
             divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
-            const statusDevice = document.createElement("div")
-            statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
+            const statusDevice = makeStatus("vermelho")
 
             // filtro para retornar os telefones disponíveis
             var devicesInfo = devices.filter(function (dev) {
