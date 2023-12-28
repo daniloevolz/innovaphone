@@ -272,7 +272,7 @@ function UpdateAvailability(availability, type) {
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
                                         if (totalHours <= 6) {
-                                            td.classList.remove('unavailable');
+                                            td.classList.add('available');
                                             td.classList.add('text-green-500');
                                             // td.classList.add('parcialavailable');
                                         } else {

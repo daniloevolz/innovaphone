@@ -317,28 +317,35 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             nameRoom.classList.add("text-white" ,"font-bold")
 
             // device count
+
             const divDeviceNumber = document.createElement("div")
             divDeviceNumber.classList.add("justify-start","flex","items-center","gap-1")
-            // const statusDevice = document.createElement("div")
-            // statusDevice.classList.add("bg-[#FF0707]","w-3","h-3","rounded-full")
-            const statusDevice = makeStatus() 
 
-
-            // filtro para retornar os telefones disponíveis
             var devicesInfo = devices.filter(function (dev) {
                 return dev.room_id == room.id && dev.guid === null ;
             });
-       
+
+            const totalDevices = devices.length;
+            const availableDevices = devicesInfo.length;
+            const percentageAvailable = (availableDevices / totalDevices) * 100;
+            console.log("PORCENTAGEM " , percentageAvailable)
+            var statusDevice;
+            if(percentageAvailable >= 30 && percentageAvailable <= 50 ){
+              statusDevice = makeStatus("amarelo")
+            }
+            else if(percentageAvailable >= 50){
+              statusDevice = makeStatus("verde")
+            }
+            else{
+             statusDevice = makeStatus("vermelho")
+            }
             const deviceNumber = document.createElement("h1")
             deviceNumber.textContent = `${parseInt(devicesInfo.length,10)}`
             deviceNumber.classList.add("text-white" ,"font-bold")
             divDeviceNumber.appendChild(deviceNumber)
-
-        
             divTitleRoom.appendChild(nameRoom)
             divTitleRoom.appendChild(divDeviceNumber)
             divDeviceNumber.appendChild(statusDevice)
-        
             divMain.appendChild(divImg)
             divMain.appendChild(divTitleRoom)
 
@@ -346,7 +353,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             var avail = availabilities.filter(function (a) {
                 return a.room_id == room.id
             });
-            
             console.log("Availabilities: " + JSON.stringify(avail))
             // calendario recorrent e periodo
             makeViewCalendarInfo(divMain, avail)
