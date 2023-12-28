@@ -102,7 +102,7 @@ function buildCalendar(availability, schedule) {
       const p = document.createElement("p");
   
       div.classList.add("w-full", "flex", "justify-center");
-      p.classList.add("text-base", "font-medium", "text-center", "text-gray-800", "dark:text-gray-100");
+      p.classList.add("color-dark-300");
       p.textContent = weekday;
   
       div.appendChild(p);

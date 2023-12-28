@@ -253,7 +253,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             const divUsersAvatar = document.createElement("div")
             divUsersAvatar.classList.add("flex","items-start","gap-1")
             divUsersAvatar.setAttribute("id", "divUsersAvatar")
-            console.log("ARRAY DO INFERNO:" + JSON.stringify(viewers))
+            console.log("ARRAY USERS:" + JSON.stringify(viewers))
             
             viewers.forEach(function (viewer) {
 
