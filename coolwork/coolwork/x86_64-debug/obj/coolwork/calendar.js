@@ -34,7 +34,8 @@ divMain.innerHTML += `
 `
 setTimeout(function(){
     buildCalendar(availability,schedule,divCalendar,device,room)
-},300)
+},150)
+
 
 
 }
@@ -114,7 +115,7 @@ function buildCalendar(availability, schedule) {
     return thead;
   }
   
-  function rebuildCalendar(availability, schedule) {
+  function rebuildCalendar(availability, schedule, callback) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -215,9 +216,9 @@ function buildCalendar(availability, schedule) {
       cell.setAttribute("data-date", formattedDate);
       
       cell.addEventListener("click", function () {
-        console.log("Data inicio:" + formattedDate + "T" + "00:00");
-        console.log("Data Fim:" + formattedDate +  "T" + "23:59");
-        // makeDivConfirmPhoneRecurrentSchedule()
+        // console.log("Data inicio:" + formattedDate + "T" + "00:00");
+        // console.log("Data Fim:" + formattedDate +  "T" + "23:59");
+        callback(formattedDate)
       });
     });
     UpdateAvailability(availability,schedule) // atualizar visualização do calendario
