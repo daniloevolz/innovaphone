@@ -528,7 +528,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         })
     }
     // calendario 
-    function makeCalendar(availability,schedules){
+    function makeCalendar(availability,schedules,device,roomID){
         that.clear();
         makeHeader(backButton, makeButton("Salvar","primario"), texts.text("labelSchedule"))
         // div principal
@@ -552,13 +552,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         // envio de mensagens diferentes para cada caso de agendamento ( dia inteiro ou por hora)
 
-        // app.send({ api: "user", mt: "InsertDeviceSchedule",
-        // type: "dayModule",
-        // data_start: selectedDay,
-        // data_end: selectedDay,
-        // device_id: "ID DO DEVICE QUE SERA PASSADO NA FUNÇÃO",
-        // device_room_id : "ID (chave primaria) da sala"
-    // })
+        app.send({ api: "user", mt: "InsertDeviceSchedule",
+        type: "dayModule",
+        data_start: selectedDay,
+        data_end: selectedDay,
+        device: device, // (device_id = hwID )
+        room : roomID // (device_room_id)
+    })
 
     });
         document.body.appendChild(divCalendar);
@@ -845,7 +845,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         var room = rooms.filter(function (room) {
             return device.room_id == room.id
         })[0];
-
+       
         //div 84
         const div84 = document.createElement("div")
         div84.classList.add("div84")
@@ -897,7 +897,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             //div34.innerHTML = texts.text("makePhoneSceduleButton")
             div34.addEventListener("click",function(event){
                 var deviceHw = event.currentTarget.id;
-                makeCalendar(availability,schedule)
+                makeCalendar(availability,schedule,deviceHw,room.id)
                 // Calendar.createCalendar()
                 // var devInfo = schedules.filter(function (sched) {
                 //     return device.hwid == sched.device_id

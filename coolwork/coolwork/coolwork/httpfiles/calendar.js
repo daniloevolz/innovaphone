@@ -221,7 +221,7 @@ function buildCalendar(availability,callback) {
         callback(formattedDate)
          
     });
-    
+
     });
     UpdateAvailability(availability) // atualizar visualização do calendario
   }
@@ -297,7 +297,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 // console.log("Schedules:" +  schedules)
@@ -344,7 +344,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -393,7 +393,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -443,7 +443,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -537,7 +537,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -585,7 +585,7 @@ function UpdateAvailability(availability, type) {
                                         }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
                                     td.classList.add("pointer-events-none");
                                 }
                                 // console.log("Schedules:" +  schedules)
@@ -605,7 +605,7 @@ function UpdateAvailability(availability, type) {
                                 return
 
                             default:
-                                td.classList.add('unavailable');
+                                // td.classList.add('unavailable');
                                 
                         }
                     });

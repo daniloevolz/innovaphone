@@ -262,11 +262,6 @@
                     "cmd": "column",
                     "name": "user_guid",
                     "type": "TEXT"
-                  },
-                  {
-                    "cmd": "column",
-                    "name": "availability",
-                    "type": "BOOLEAN NOT NULL"
                   }
                 ]
               },
