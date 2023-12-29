@@ -166,7 +166,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         switch (variant) {
             case "primario":
-                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded");
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primario");
                 break;
             case "secundario":
                 button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
@@ -516,8 +516,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
 
-        
-
         devices.forEach(function (device) {
             var sched = schedules.filter(function (sched) {
                 return device.id == sched.device_id
@@ -528,9 +526,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             makeDeviceIcon(divImg, device, user)
             makeViewDevice(div102, device, availability, sched, user)
         })
-
-
-
     }
     // calendario 
     function makeCalendar(availability,schedules){
@@ -544,7 +539,28 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divTextSelectDay.textContent = texts.text("labelSelectYourDay")
         
         divCalendar.appendChild(divTextSelectDay)
-        Calendar.createCalendar(divCalendar,availability) // componente Calendar 
+        var selectedDay; 
+        Calendar.createCalendar(divCalendar,availability,function (day) {
+            selectedDay = day
+            console.log("SelectedDay " + day)
+        }); // componente Calendar 
+
+    // agendar
+    const saveButton = document.querySelector(".primario");
+    saveButton.addEventListener("click", function () {
+        console.log("Dia Selecionado " + selectedDay)
+
+        // envio de mensagens diferentes para cada caso de agendamento ( dia inteiro ou por hora)
+
+        // app.send({ api: "user", mt: "InsertDeviceSchedule",
+        // type: "dayModule",
+        // data_start: selectedDay,
+        // data_end: selectedDay,
+        // device_id: "ID DO DEVICE QUE SERA PASSADO NA FUNÇÃO",
+        // device_room_id : "ID (chave primaria) da sala"
+    // })
+
+    });
         document.body.appendChild(divCalendar);
         
     }
