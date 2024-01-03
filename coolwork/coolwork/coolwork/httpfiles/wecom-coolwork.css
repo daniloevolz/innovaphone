@@ -189,6 +189,54 @@ body {
     gap: 10px;
 }
 /*ViewRoomDetail*/
+/*MakeSchedule*/
+.div104 {
+    padding: 10px;
+    border-radius: 6px;
+    background: var(--Dark-200, #284258);
+    margin: 8px;
+}
+
+.frame107 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+
+.framebtn {
+    display: flex;
+    padding: 8px 16px;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 6px;
+    background: var(--Primary-600, #AED4EF);
+    color: var(--Dark-100, #0B2E46);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.frame107txt {
+    color: #FFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.frameCancelbtn {
+    display: flex;
+    padding: 8px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 6px;
+    background: var(--Persian-Red-600, #FA0836);
+}
+/*MakeSchedule*/
+
 a {
     color: var(--text-standard);
     text-decoration: underline;

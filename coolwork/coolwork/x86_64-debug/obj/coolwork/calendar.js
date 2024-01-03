@@ -1,6 +1,6 @@
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,schedule,divCalendar,device,room){
+Calendar.createCalendar = function(divMain,availability,callback){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -33,7 +33,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,schedule,divCalendar,device,room)
+    buildCalendar(availability,callback)
 },150)
 
 
@@ -45,7 +45,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability, schedule) {
+function buildCalendar(availability,callback) {
     var date = new Date();
     currentMonth = date.getMonth();
      year = date.getFullYear();
@@ -56,7 +56,7 @@ function buildCalendar(availability, schedule) {
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability, schedule);
+      rebuildCalendar(availability,callback);
       
     });
   
@@ -66,11 +66,11 @@ function buildCalendar(availability, schedule) {
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, schedule);
+      rebuildCalendar(availability, callback);
       
     });
     
-    rebuildCalendar(availability, schedule);
+    rebuildCalendar(availability, callback);
     
     
   }
@@ -115,7 +115,7 @@ function buildCalendar(availability, schedule) {
     return thead;
   }
   
-  function rebuildCalendar(availability, schedule, callback) {
+  function rebuildCalendar(availability,callback) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -157,7 +157,7 @@ function buildCalendar(availability, schedule) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability, schedule);
+            rebuildCalendar(availability,callback);
             
           });
       }
@@ -201,7 +201,7 @@ function buildCalendar(availability, schedule) {
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability, schedule);
+        rebuildCalendar(availability,callback);
       });
       nextMonthDay++;
     }
@@ -219,9 +219,11 @@ function buildCalendar(availability, schedule) {
         // console.log("Data inicio:" + formattedDate + "T" + "00:00");
         // console.log("Data Fim:" + formattedDate +  "T" + "23:59");
         callback(formattedDate)
-      });
+         
     });
-    UpdateAvailability(availability,schedule) // atualizar visualização do calendario
+
+    });
+    UpdateAvailability(availability) // atualizar visualização do calendario
   }
   
   function getMonthName(month) {
@@ -272,16 +274,31 @@ function UpdateAvailability(availability, type) {
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
                                         if (totalHours <= 6) {
-                                            td.classList.remove('unavailable');
-                                            td.classList.add('text-green-500');
+                                            if (type == "recurrentType"){
+                                                td.classList.remove("unavailable")
+                                                td.classList.add('text-green-500');
+                                                
+                                                
+                                            }else{
+                                                td.classList.remove("unavailable")
+                                                td.classList.add('available');
+                                            }
                                             // td.classList.add('parcialavailable');
                                         } else {
-                                            td.classList.remove('unavailable');
-                                            td.classList.add('text-green-500');
+                                            if (type == "recurrentType"){
+                                                td.classList.remove("unavailable")
+                                                td.classList.add('text-green-500');
+                                                
+                                                
+                                            }else{
+                                                td.classList.remove("unavailable")
+                                                td.classList.add('available');
+                                            }
                                         }
                                     
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 // console.log("Schedules:" +  schedules)
                                 // schedules.forEach(function(dateS){
@@ -305,15 +322,30 @@ function UpdateAvailability(availability, type) {
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
                                
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -338,17 +370,31 @@ function UpdateAvailability(availability, type) {
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
-                                
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -375,15 +421,30 @@ function UpdateAvailability(availability, type) {
 
                              
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -408,15 +469,30 @@ function UpdateAvailability(availability, type) {
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
 
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
                                     td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
                                 //schedules.forEach(function(dateS){
@@ -438,17 +514,31 @@ function UpdateAvailability(availability, type) {
                                     var totalHours = 0;
                                     totalHours += end.diff(start, 'hours');
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
-
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -473,15 +563,30 @@ function UpdateAvailability(availability, type) {
                                     console.log("Horas disponivies " + totalHours + " em " + String(dataDate))
                                     
                                     if (totalHours <= 6) {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                         // td.classList.add('parcialavailable');
                                     } else {
-                                        td.classList.remove('unavailable');
-                                        td.classList.add('text-green-500');
+                                        if (type == "recurrentType"){
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('text-green-500');
+                                            
+                                            
+                                        }else{
+                                            td.classList.remove("unavailable")
+                                            td.classList.add('available');
+                                        }
                                     }
                                 } else {
-                                    td.classList.add('unavailable');
+                                    // td.classList.add('unavailable');
+                                    td.classList.add("pointer-events-none");
                                 }
                                 // console.log("Schedules:" +  schedules)
                                
@@ -500,7 +605,7 @@ function UpdateAvailability(availability, type) {
                                 return
 
                             default:
-                                td.classList.add('unavailable');
+                                // td.classList.add('unavailable');
                                 
                         }
                     });

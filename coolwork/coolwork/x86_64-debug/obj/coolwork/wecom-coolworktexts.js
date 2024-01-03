@@ -13,6 +13,11 @@ Wecom.coolworkTexts = {
     de: {
     },
     pt: {
+        labelSelect: "Selecionar",
+        labelSelectYourDay: "Selecione seu dia!",
+        labelSelectHour: "Selecione seu horário",
+        labelBttCancel: "Cancelar",
+        labelTxtCancel: "Cancelar o agendamento",
         labelCreateRoom: "Criar Sala",
         labelRooms: "Salas",
         labelName: "Nome da Sala",
@@ -64,7 +69,8 @@ Wecom.coolworkTexts = {
         labelQuint : "Q",
         labelSex : "S",
         labelSab : "S",
-        labelSelectYourDay: "Selecione seu dia!"
+        labelSelectYourDay: "Selecione seu dia!",
+        save: "Salvar"
         
     }
 }
