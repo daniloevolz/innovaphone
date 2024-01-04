@@ -275,11 +275,11 @@ function UpdateAvailability(availability, type) {
             });
         }
         else {
-            if (type == "recurrentType"){
-                cells = document.querySelectorAll(".recurrentText")
-                
-            }
             availability.forEach(function (dates) {
+                if (type == "recurrentType"){
+                    cells = document.querySelectorAll(`.room-${dates.room_id}`)
+                    
+                }
                 if (dates.type == "recurrentType") {
                     cells.forEach(function (td) {
                         // var dayWeek = td.getAttribute('day-week')
@@ -562,8 +562,9 @@ function UpdateAvailability(availability, type) {
 
                             default:
                                 // td.classList.add('unavailable');
-                                
+                               
                         }
+                        td.classList.remove("recurrentText")
                     });
 
                 } else if (dates.type == "periodType"){
@@ -584,6 +585,7 @@ function UpdateAvailability(availability, type) {
             })
         }
         console.log("UpdateAvailability Result Success");
+
   }
 
     

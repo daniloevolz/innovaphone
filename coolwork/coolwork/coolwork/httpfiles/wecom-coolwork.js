@@ -354,6 +354,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             console.log("Availabilities: " + JSON.stringify(avail))
             // calendario recorrent e periodo
             makeViewCalendarInfo(divMain, avail)
+            
             //componente avatar
             makeAvatar(viewers,divMain,room)
 
@@ -467,7 +468,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 };
                 week.forEach(function (w) {
                     const dayDiv = document.createElement('div')
-                    dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText")
+                    dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText",`room-${a.room_id}`)
                     dayDiv.setAttribute("day-week", daysOfWeekMap[w])
                     const dayText = document.createElement('p')
                     dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400",)
@@ -476,11 +477,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     divMainAvailabilityRecurrent.appendChild(dayDiv)
                 })
                 divMain.appendChild(divMainAvailabilityRecurrent)
-
+                // UpdateAvailability(availability, a.type)
             }
-            UpdateAvailability(availability, a.type)
+             UpdateAvailability(availability, a.type)
         })
-
+       
 
     }
     function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
@@ -569,6 +570,24 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         divHourCard.innerHTML = texts.text("divHourCard")
         div160.appendChild(divHourCard)
 
+        availability.forEach(function (a) {
+            if (a.type == "periodType") {
+                var divPeriod = document.createElement("div")
+                const startDate = moment(a.data_start);
+                const endDate = moment(a.data_end);
+
+                const formattedStartDate = startDate.format("MM/DD");
+                const formattedEndDate = endDate.format("MM/DD");
+                divPeriod.innerHTML = formattedStartDate + " - " + formattedEndDate
+                div160.appendChild(divPeriod)
+            }
+
+            // if (a.type == "recurrentType") {
+            //     var divRecurrent = document.createElement("div")
+            //     divRecurrent.classList.add("flex","items-center","gap-1")
+            //     divRecurrent.innerHTML = 
+            //     div160.appendChild(divRecurrent)
+            // }
 
         // img expandir
         const divOpenTime = document.createElement("div")
@@ -591,7 +610,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 divAvailabilyDetail.classList.add("divAvailabilyDetail")
                 divMain.appendChild(divAvailabilyDetail)
 
-                availability.forEach(function (a) {
+                
                     if (a.type == "periodType") {
                         makeViewTimePeriod(divAvailabilyDetail, a)
                     }
@@ -600,11 +619,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         makeViewTimeRecurrent(divAvailabilyDetail, a)
                     }
 
-                    UpdateAvailability(availability, a.type)
-                })
+                    UpdateAvailability(availability, a.type)     
             }
         })
-
+    })
 
     }
     //Função apara apresentar os horários para agendamento por período
@@ -778,43 +796,56 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         };
         week.forEach(function (w) {
             const dayDiv = document.createElement('div')
-            dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1", "recurrentText","rounded-full")
+            dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1", `room-${a.room_id}`,"rounded-full")
             const dayText = document.createElement('p')
             dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
             dayText.textContent = texts.text(`${w}`)
             dayDiv.setAttribute("day-week", daysOfWeekMap[w])
             dayDiv.appendChild(dayText)
             divMainAvailabilityRecurrent.appendChild(dayDiv)
-        })
-        divMain.appendChild(divMainAvailabilityRecurrent)
 
-        if (a.timestart_monday != "") {
-            makeViewDay(divMain, "labelMondayDiv", a.timestart_monday, a.timeend_monday)
-        }
-        if (a.timestart_tuesday != "") {
-            makeViewDay(divMain, "labeltuesdayDiv", a.timestart_tuesday, a.timeend_tuesday)
-        }
-        if (a.timestart_wednesday != "") {
-            makeViewDay(divMain, "labelwednesdayDiv", a.timestart_wednesday, a.timeend_wednesday)
-        }
-        if (a.timestart_thursday != "") {
-            makeViewDay(divMain, "labelthursdayDiv", a.timestart_thursday, a.timeend_thursday)
-        }
-        if (a.timestart_friday != "") {
-            makeViewDay(divMain, "labelfridayDiv", a.timestart_friday, a.timeend_friday)
-        }
-        if (a.timestart_saturday != "") {
-            makeViewDay(divMain, "labelsaturdayDiv", a.timestart_saturday, a.timeend_saturday)
-        }
-        if (a.timestart_sunday != "") {
-            makeViewDay(divMain, "labelsundayDiv", a.timestart_sunday, a.timeend_sunday)
-        }
+
+            dayDiv.addEventListener("click",function(ev){
+                switch (dayDiv.getAttribute("day-week")) {
+                    case "segunda-feira":
+                        makeViewDay(divMain, "labelMondayDiv", a.timestart_monday, a.timeend_monday)
+                    break;
+                    case "terça-feira":
+                        makeViewDay(divMain, "labeltuesdayDiv", a.timestart_tuesday, a.timeend_tuesday)
+                    break;
+                    case "quarta-feira":
+                        makeViewDay(divMain, "labelwednesdayDiv", a.timestart_wednesday, a.timeend_wednesday)
+                    break;
+                    case "quinta-feira":
+                        makeViewDay(divMain, "labelthursdayDiv", a.timestart_thursday, a.timeend_thursday)
+                    break;
+                    case "sexta-feira":
+                        makeViewDay(divMain, "labelfridayDiv", a.timestart_friday, a.timeend_friday)
+                    break;
+                    case "sabado":
+                        makeViewDay(divMain, "labelsaturdayDiv", a.timestart_saturday, a.timeend_saturday)
+                    break;
+                    case "domingo":
+                        makeViewDay(divMain, "labelsundayDiv", a.timestart_sunday, a.timeend_sunday)
+                    break;
+                        
+                }
+            })
+
+        })
+
+        var div180 = document.createElement("div")
+        div180.setAttribute("id", "div180")
+        div180.classList.add("div180")
+        div180.style.display = 'none'
+        divMain.appendChild(divMainAvailabilityRecurrent)
+        divMain.appendChild(div180)
+
         function makeViewDay(divMain, day, timestart, timeend) {
             //dias
-            var div180 = document.createElement("div")
-            div180.setAttribute("id", "div180")
-            div180.classList.add("div180")
-            divMain.appendChild(div180)
+            var div180 = document.getElementById("div180")
+            div180.innerHTML = '';
+            div180.style.display = 'block'
 
             var divDayLabel = document.createElement("div")
             divDayLabel.setAttribute("id", "div180")
@@ -1156,28 +1187,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             frame107btn.innerHTML = texts.text("labelSelect")
             frame107.appendChild(frame107btn)
             frame107btn.addEventListener("click", function (event) {
-                makeCalendar(availability, schedules,)
+                makeCalendar(availability, schedules)
             })
-
-
-            //botão cancelar
-            const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
-            frame109btn.addEventListener("click", function (event) {
-                var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
-                makeCancelPopUp(obj, function (msg) {
-                    makeSuccessPopUp(msg)
-                })
-            })
-
-            frame109.appendChild(frame109btn)
 
         }
-        
-
-        
-
-        
-
         const div106 = document.createElement("div")
         div106.setAttribute("id", "div106")
         div106.classList.add("div104", "h-fit")
@@ -1193,13 +1206,23 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         frame19txt.innerHTML = texts.text("labelTxtCancel")
         frame109.appendChild(frame19txt)
 
+          //botão cancelar
+          const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
+          frame109btn.addEventListener("click", function (event) {
+              var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+              makeCancelPopUp(obj, function (msg) {
+                  makeSuccessPopUp(msg)
+              })
+          })
+
+          frame109.appendChild(frame109btn)
         
 
     }
     function makeSuccessPopUp(msg) {
         console.log(JSON.stringify(msg))
     }
-    function makeCancelPopUp(obj, callback) {  // possibilidade de componentização com outros pop ups?
+    function makeCancelPopUp(obj, callback) { 
         var insideDiv = document.createElement("div")
         insideDiv.classList.add("absolute", "w-full", "h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
         const divMain = document.createElement("div")
