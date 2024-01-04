@@ -887,15 +887,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
     function makeViewDevice(divMain, device, availability, schedule, viewer) {
         //div 101
-        const div101 = document.createElement("div")
-        div101.classList.add("div101")
-        div101.setAttribute("id", device.id)
+        const divMainViewDevice = document.createElement("div")
+        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-[50px]")
+        divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
-        var state = device.guid ? "device-busy" : "device-free";
-        const div1396 = document.createElement("div")
-        div1396.classList.add("div1396", state)
-        div1396.setAttribute("id", device.hwid)
-        div101.appendChild(div1396)
+        var state = device.guid ? "bg-[#FFC107]" : "bg-[#2AFF9C]";
+        const divStatusColor = document.createElement("div")
+        divStatusColor.classList.add(state, "h-[100%]", "w-[12px]","rounded-l-lg")
+        divStatusColor.setAttribute("id", device.hwid)
+        divMainViewDevice.appendChild(divStatusColor)
 
         var room = rooms.filter(function (room) {
             return device.room_id == room.id
@@ -932,7 +932,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             if (user.sip == userSIP) {
                 //div 36
-                const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundary")
+                const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundario")
                 div36.setAttribute("id", device.hwid)
                 div36.addEventListener("click", function (event) {
                     var dev = event.currentTarget.id;
@@ -953,7 +953,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         else {
             //div 36
-            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundary")
+            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundario")
             div36.setAttribute("id", device.hwid)
             div36.innerHTML = texts.text("makePhoneUseButton")
             div36.addEventListener("click", function (event) {
@@ -990,7 +990,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         })
         div84.appendChild(div34)
-        div101.appendChild(div84)
+        divMainViewDevice.appendChild(div84)
 
         //div 82
         const div82 = document.createElement("div")
@@ -998,10 +998,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         var deviceIcon = document.createElement("img")
         deviceIcon.classList.add("deviceIcon")
         deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
-        div101.appendChild(div82)
+        divMainViewDevice.appendChild(div82)
         div82.appendChild(deviceIcon)
 
-        divMain.appendChild(div101)
+        divMain.appendChild(divMainViewDevice)
 
     }
     function makeDeviceIcon(divMain, device, viewer) {
@@ -1157,12 +1157,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             const frame108btn = makeButton(texts.text("labelSelect"), "primary")
             frame108.appendChild(frame108btn)
             frame108btn.addEventListener("click", function (event) {
-                makeViewTimeHour(div105, availabilities, function (selected) {
-                    console.log("Hora selecionado retornado makeScheduleContainer ", selected)
-                            //
-                            //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
-                            //
-                })
+                makePopUp("TESTE", "teste para textos grandes, que não possui função nenhuma.", "ok", "cancel")
+
+                // makeViewTimeHour(div105, availabilities, function (selected) {
+                //     console.log("Hora selecionado retornado makeScheduleContainer ", selected)
+                //             //
+                //             //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
+                //             //
+                // })
             })
 
         } else {
@@ -1249,5 +1251,39 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         document.body.appendChild(insideDiv)
 
 
-    }}
+    }
+    function makePopUp(title, msg, btn1, btn2){
+        const bcgrd = document.createElement("div")
+        bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
+
+        const popUp = document.createElement("div")
+        popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
+        const titlePopUp = document.createElement("div") // aplicar tipografia 
+        titlePopUp.textContent = title
+        const msgPopUp = document.createElement("div")
+        msgPopUp.classList.add("text-center")
+        msgPopUp.textContent = msg
+        const divButtons = document.createElement("div")
+        divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
+        const button1 = makeButton(btn1, "primary", "");
+        button1.addEventListener("click",function(){
+            console.log("BUTTON 1 CLICADO")
+        })
+        divButtons.appendChild(button1)
+        popUp.appendChild(titlePopUp)
+        popUp.appendChild(msgPopUp)
+        popUp.appendChild(divButtons)
+        bcgrd.appendChild(popUp)
+        document.body.appendChild(bcgrd)
+        if(btn2){
+            const button2 = makeButton(btn2, "transparent", "");
+            button2.addEventListener("click",function(){
+                console.log("BUTTON 2 CLICADO")
+                document.body.removeChild(bcgrd)
+            })
+            divButtons.appendChild(button2)
+        }
+
+    }
+}
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;
