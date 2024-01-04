@@ -63,6 +63,7 @@ body {
     border-radius: 6px;
     background: #284258;
 }
+
 .divHorario {
     flex-direction: column;
     align-items: center;
@@ -77,6 +78,7 @@ body {
     background: var(--Dark-200, #284258);
     flex-wrap: nowrap;
 }
+
 .div101 {
     position: relative;
     display: inline-flex;
@@ -87,6 +89,7 @@ body {
     border: 2px solid var(--Primary-100, #199FDA);
     background: var(--Dark-100, #0B2E46);
 }
+
 .div84 {
     display: flex;
     align-items: center;
@@ -94,6 +97,7 @@ body {
     gap: 8px;
     flex: 1 0 0;
 }
+
 .div34 {
     display: flex;
     padding: 8px 16px;
@@ -103,6 +107,7 @@ body {
     border-radius: 6px;
     background: var(--Primary-600, #AED4EF);
 }
+
 .div36 {
     display: flex;
     padding: 8px 16px;
@@ -112,15 +117,30 @@ body {
     border-radius: 6px;
     background: var(--Dark-400, #5B6D7F);
 }
+
 .div160 {
     gap: 8px;
-    flex-direction: column;
+    flex-direction: row;
     display: flex;
     justify-content: space-between;
     align-items: stretch;
     align-self: stretch;
 }
+
 .div180 {
+    align-items: flex-start;
+    display: flex;
+    padding: 10px;
+    /*align-items: center;*/
+    gap: 10px;
+    align-self: stretch;
+    flex-direction: column;
+    border-radius: 8px;
+    background: var(--Dark-100, #0B2E46);
+}
+
+.div180Period {
+    flex-direction: row;
     display: flex;
     padding: 10px;
     align-items: center;
@@ -129,6 +149,27 @@ body {
     border-radius: 8px;
     background: var(--Dark-100, #0B2E46);
 }
+
+.divAvailabilyDetail {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    /* background: var(--Dark-100, #0B2E46); */
+    flex-direction: column;
+}
+
+.divStartTime {
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
 .divHourCard {
     color: #FFF;
     font-family: Montserrat;
@@ -137,20 +178,31 @@ body {
     font-weight: 700;
     line-height: normal;
 }
+
 .divDate {
     display: flex;
     padding: 10px;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 10px;
     border-radius: 8px;
     background: var(--Dark-400, #5B6D7F);
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
 }
+
 .div179 {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 10px;
 }
+
 .divDay {
     color: #FFF;
     font-family: Montserrat;
@@ -159,14 +211,16 @@ body {
     font-weight: 700;
     line-height: normal;
 }
+
 .divISODay {
-    color: #FFF;
+    color: rgba(255, 255, 255, 0.30);
     font-family: Montserrat;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
 }
+
 .divTime {
     color: #FFF;
     font-family: Montserrat;
@@ -175,7 +229,9 @@ body {
     font-weight: 500;
     line-height: normal;
 }
+
 .divToTime {
+    align-self: center;
     color: #FFF;
     font-family: Montserrat;
     font-size: 14px;
@@ -183,10 +239,20 @@ body {
     font-weight: 700;
     line-height: normal;
 }
+
 .div182 {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.divDayLabel {
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }
 /*ViewRoomDetail*/
 /*MakeSchedule*/
@@ -236,6 +302,40 @@ body {
     background: var(--Persian-Red-600, #FA0836);
 }
 /*MakeSchedule*/
+/* Inicio makeViewTimeHour */
+.div106{
+    display: flex;
+    width: 374px;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 6px;
+    background: var(--Dark-200, #284258);
+}
+.textHour{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}
+.divHour{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    border-bottom: 1px solid var(--Dark-600, #8F9BA8);
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+/ Fim makeViewTimeHour */
 
 a {
     color: var(--text-standard);

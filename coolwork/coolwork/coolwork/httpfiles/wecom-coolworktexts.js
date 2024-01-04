@@ -70,7 +70,8 @@ Wecom.coolworkTexts = {
         labelSex : "S",
         labelSab : "S",
         labelSelectYourDay: "Selecione seu dia!",
-        save: "Salvar"
+        save: "Salvar",
+        labelConfirm: "Confirmar"
         
     }
 }
