@@ -164,16 +164,16 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
 
         switch (variant) {
-            case "primario":
-                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primario");
+            case "primary":
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primary");
                 break;
-            case "secundario":
+            case "secundary":
                 button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                 break;
-            case "destrutivo":
+            case "destructive":
                 button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                 break;
-            case "transparente":
+            case "transparent":
                 button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
                 break;
             default:
@@ -195,19 +195,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         outerCircle.appendChild(innerCircle);
 
         switch (variant) {
-            case "vermelho":
+            case "red":
                 outerCircle.classList.add("bg-red-300");
                 innerCircle.classList.add("bg-red-500");
                 break;
-            case "verde":
+            case "green":
                 outerCircle.classList.add("bg-green-300");
                 innerCircle.classList.add("bg-green-500");
                 break;
-            case "azul":
+            case "blue":
                 outerCircle.classList.add("bg-blue-300");
                 innerCircle.classList.add("bg-blue-500");
                 break;
-            case "amarelo":
+            case "yellow":
                 outerCircle.classList.add("bg-yellow-300");
                 innerCircle.classList.add("bg-yellow-500");
                 break;
@@ -226,19 +226,19 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         badge.classList.add("inline-block", "py-1", "px-2", "rounded", "text-sm", "font-medium");
 
         switch (variant) {
-            case "primaria":
+            case "primary":
                 badge.classList.add("bg-blue-500", "text-white");
                 break;
-            case "secundaria":
+            case "secundary":
                 badge.classList.add("bg-gray-500", "text-white");
                 break;
-            case "sucesso":
+            case "success":
                 badge.classList.add("bg-green-500", "text-white");
                 break;
-            case "perigo":
+            case "danger":
                 badge.classList.add("bg-red-500", "text-white");
                 break;
-            case "aviso":
+            case "alert":
                 badge.classList.add("bg-yellow-500", "text-black");
                 break;
             default:
@@ -261,7 +261,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
         //imgHome
         const leftElement = imgLeft
-        // imgHome.setAttribute("src", imgLeft)
         leftElement.addEventListener("click", function (event) {
             makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
         event.stopPropagation()
@@ -330,13 +329,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             console.log("PORCENTAGEM " , percentageAvailable)
             var statusDevice;
             if(percentageAvailable >= 30 && percentageAvailable <= 50 ){
-              statusDevice = makeStatus("amarelo")
+              statusDevice = makeStatus("yellow")
             }
             else if(percentageAvailable >= 50){
-              statusDevice = makeStatus("verde")
+              statusDevice = makeStatus("green")
             }
             else{
-             statusDevice = makeStatus("vermelho")
+             statusDevice = makeStatus("red")
             }
             const deviceNumber = document.createElement("h1")
             deviceNumber.textContent = `${parseInt(devicesInfo.length,10)}`
@@ -421,7 +420,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
                 // div disponibilidade periodo
                 const divMainAvailabilityPeriod = document.createElement("div")
-                divMainAvailabilityPeriod.classList.add("flex", "p-1", "items-center", "justify-between", "bg-dark-100/35", "rounded-lg")
+                divMainAvailabilityPeriod.classList.add("flex", "p-1", "items-center", "justify-between", "bg-dark-100", "rounded-lg")
                 const imgCalendar = document.createElement("img")
                 imgCalendar.setAttribute("src", "./images/calendar-days.svg")
                 divMainAvailabilityPeriod.appendChild(imgCalendar)
@@ -453,7 +452,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             if (a.type == "recurrentType") {
                 // div disponibilidade recorrente
                 const divMainAvailabilityRecurrent = document.createElement("div")
-                divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
+                divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100", "rounded-lg", "justify-center","gap-1")
                 // dias da semana 
                 var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
 
@@ -468,11 +467,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 };
                 week.forEach(function (w) {
                     const dayDiv = document.createElement('div')
-                    dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
+                    dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText")
+                    dayDiv.setAttribute("day-week", daysOfWeekMap[w])
                     const dayText = document.createElement('p')
-                    dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
+                    dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400",)
                     dayText.textContent = texts.text(`${w}`)
-                    dayText.setAttribute("day-week", daysOfWeekMap[w])
                     dayDiv.appendChild(dayText)
                     divMainAvailabilityRecurrent.appendChild(dayDiv)
                 })
@@ -534,7 +533,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     // calendario 
     function makeCalendar(divMain, deviceHw,roomId, funcao2){
         divMain.innerHTML = "";
-        //makeHeader(backButton, makeButton("Salvar","primario"), texts.text("labelSchedule"))
+        //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
         const divCalendar = document.createElement("div")
         divCalendar.classList.add("flex","p-1","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
@@ -764,7 +763,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeViewTimeRecurrent(divMain, a) {
         // div disponibilidade recorrente
         const divMainAvailabilityRecurrent = document.createElement("div")
-        divMainAvailabilityRecurrent.classList.add("self-stretch", "flex", "p-1", "items-start", "bg-dark-100/35", "rounded-lg", "justify-center")
+        divMainAvailabilityRecurrent.classList.add("self-stretch", "flex", "p-1", "items-start", "bg-dark-100", "rounded-lg", "justify-center","gap-1")
         // dias da semana 
         var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
 
@@ -779,11 +778,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         };
         week.forEach(function (w) {
             const dayDiv = document.createElement('div')
-            dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1")
+            dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1", "recurrentText","rounded-full")
             const dayText = document.createElement('p')
-            dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400", "recurrentText")
+            dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
             dayText.textContent = texts.text(`${w}`)
-            dayText.setAttribute("day-week", daysOfWeekMap[w])
+            dayDiv.setAttribute("day-week", daysOfWeekMap[w])
             dayDiv.appendChild(dayText)
             divMainAvailabilityRecurrent.appendChild(dayDiv)
         })
@@ -902,7 +901,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             if (user.sip == userSIP) {
                 //div 36
-                const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundario")
+                const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundary")
                 div36.setAttribute("id", device.hwid)
                 div36.addEventListener("click", function (event) {
                     var dev = event.currentTarget.id;
@@ -923,7 +922,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         else {
             //div 36
-            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundario")
+            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundary")
             div36.setAttribute("id", device.hwid)
             div36.innerHTML = texts.text("makePhoneUseButton")
             div36.addEventListener("click", function (event) {
@@ -943,7 +942,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             div84.appendChild(div36)
         }
         //div 34
-        const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primario")
+        const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primary")
         //div34.classList.add("div34")
         div34.setAttribute("id", device.hwid)
         //div34.innerHTML = texts.text("makePhoneSceduleButton")
@@ -1062,7 +1061,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeScheduleContainer(deviceHw, roomId, scheduleId) {
         console.log("MAKESCHEDULECONTAINER")
         that.clear();
-        makeHeader(backButton, makeButton(texts.text("save"), "primario", ""), texts.text("labelSchedule"))
+        makeHeader(backButton, makeButton(texts.text("save"), "primary", ""), texts.text("labelSchedule"))
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
@@ -1085,14 +1084,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             frame107txt.innerHTML = texts.text("labelSelectYourDay")
             frame107.appendChild(frame107txt)
 
-            const frame107btn = makeButton(texts.text("labelSelect"),"primario")
+            const frame107btn = makeButton(texts.text("labelSelect"),"primary")
             frame107.appendChild(frame107btn)
             var selected
             frame107btn.addEventListener("click", function (event) {
                 makeCalendar(div104, deviceHw, roomId, function (selectedDay) {
                     selected = selectedDay;
                     if (!document.getElementById("frame104btn")) {
-                        const frame104btn = makeButton(texts.text("labelConfirm"), "primario")
+                        const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
@@ -1124,7 +1123,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             frame108txt.innerHTML = texts.text("labelSelectHour")
             frame108.appendChild(frame108txt)
 
-            const frame108btn = makeButton(texts.text("labelSelect"), "primario")
+            const frame108btn = makeButton(texts.text("labelSelect"), "primary")
             frame108.appendChild(frame108btn)
             frame108btn.addEventListener("click", function (event) {
                 makeViewTimeHour(div105, availabilities, function (selected) {
@@ -1162,7 +1161,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
 
             //botão cancelar
-            const frame109btn = makeButton(texts.text("labelBtnCancel"), "destrutivo", "")
+            const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
             frame109btn.addEventListener("click", function (event) {
                 var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
                 makeCancelPopUp(obj, function (msg) {
@@ -1212,11 +1211,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         textCancel.textContent = texts.text("labelCancelSchedule")
         const divButtons = document.createElement("div")
         divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
-        const buttonCancel = makeButton(texts.text("labelYesCancel"), "primario", "");
+        const buttonCancel = makeButton(texts.text("labelYesCancel"), "primary", "");
         buttonCancel.addEventListener("click", function (event) {
             app.sendSrc(obj,callback(msg))
         })
-        const buttonNoCancel = makeButton(texts.text("labelNo"), "secundario", "");
+        const buttonNoCancel = makeButton(texts.text("labelNo"), "secundary", "");
 
         divButtons.appendChild(buttonCancel)
         divButtons.appendChild(buttonNoCancel)
@@ -1227,8 +1226,5 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         document.body.appendChild(insideDiv)
 
 
-
-    }
-}
-
+    }}
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;
