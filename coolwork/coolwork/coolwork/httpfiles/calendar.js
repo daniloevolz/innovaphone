@@ -93,10 +93,10 @@ function buildCalendar(availability,callback) {
   }
   
   function generateWeekdayHeader() {
+    moment.locale("pt-br");
     const weekdays = moment.weekdaysShort(); // Use moment.js to get localized weekdays
     const thead = document.createElement("thead");
     const tr = document.createElement("tr");
-  
     weekdays.forEach((weekday) => {
       const th = document.createElement("th");
       const div = document.createElement("div");
@@ -208,7 +208,8 @@ function buildCalendar(availability,callback) {
     var cells = document.querySelectorAll("#calendar-body td div");
     cells.forEach(function (cell) {
       var selectedDate = moment([year, currentMonth, cell.textContent ]);
-      var diaDaSemana = selectedDate.format('dddd');
+        // selectedDate.locale("en")
+      var diaDaSemana = selectedDate.format('ddd');
       cell.setAttribute("day-week", diaDaSemana);
   
       var selectedDay = parseInt(cell.textContent);
@@ -284,13 +285,14 @@ function UpdateAvailability(availability, type) {
                     cells.forEach(function (td) {
                         // var dayWeek = td.getAttribute('day-week')
                         // console.log("DAY WEEK " + dayWeek)
-                        var dayOfWeek = findDayOfWeek(td.getAttribute('day-week'));
+                        // var dayOfWeek = findDayOfWeek(td.getAttribute('day-week'));
+                        var dayOfWeek = td.getAttribute('day-week')
                         var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
 
                         var defaultDate = "2000-01-01";
                         console.log("cases of week" + dayOfWeek)
                         switch (dayOfWeek) {
-                            case "monday":
+                            case "Mon":
                                 if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
                                   
                                     var start = moment(defaultDate + " " + dates.timestart_monday, "YYYY-MM-DD HH:mm");
@@ -329,7 +331,7 @@ function UpdateAvailability(availability, type) {
                                 //     }
                                 // })
                                 return
-                            case "tuesday":
+                            case "Tue":
                                 if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_tuesday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_tuesday, "YYYY-MM-DD HH:mm");
@@ -368,7 +370,7 @@ function UpdateAvailability(availability, type) {
                                 // })
                                 
                                 return
-                            case "wednesday":
+                            case "Wed":
                                 if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_wednesday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_wednesday, "YYYY-MM-DD HH:mm");
@@ -407,7 +409,7 @@ function UpdateAvailability(availability, type) {
                                 //})
 
                                 return
-                            case "thursday":
+                            case "Thu":
                                 if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_thursday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_thursday, "YYYY-MM-DD HH:mm");
@@ -446,7 +448,7 @@ function UpdateAvailability(availability, type) {
                                 //    }
                                 //})
                                 return
-                            case "friday":
+                            case "Fri":
                                 if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_friday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_friday, "YYYY-MM-DD HH:mm");
@@ -483,7 +485,7 @@ function UpdateAvailability(availability, type) {
                                 //    }
                                 //})
                                 return
-                            case "saturday":
+                            case "Sat":
                                 if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_saturday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_saturday, "YYYY-MM-DD HH:mm");
@@ -520,7 +522,7 @@ function UpdateAvailability(availability, type) {
                                 //    }
                                 //})
                                 return
-                            case "sunday":
+                            case "Sun":
                                 if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_sunday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_sunday, "YYYY-MM-DD HH:mm");
@@ -589,31 +591,31 @@ function UpdateAvailability(availability, type) {
   }
 
     
-  function findDayOfWeek(classes) {
-      for (var j = 0; j < classes.length; j++) {
-          switch (classes) {
-              case "segunda-feira":
-                  return "monday";
-              case "terça-feira":
-                  return "tuesday";
-              case "quarta-feira":
-                  return "wednesday";
-              case "quinta-feira":
-                  return "thursday";
-              case "sexta-feira":
-                  return "friday";
-              case "sabado":
-                  return "saturday";
-              case "domingo":
-                  return "sunday";
-          }
+//   function findDayOfWeek(classes) {
+//       for (var j = 0; j < classes.length; j++) {
+//           switch (classes) {
+//               case "segunda-feira":
+//                   return "monday";
+//               case "terça-feira":
+//                   return "tuesday";
+//               case "quarta-feira":
+//                   return "wednesday";
+//               case "quinta-feira":
+//                   return "thursday";
+//               case "sexta-feira":
+//                   return "friday";
+//               case "sabado":
+//                   return "saturday";
+//               case "domingo":
+//                   return "sunday";
+//           }
               
           
-      }
-      return null; // Retorna null se não encontrar o nome do dia
-  }
+//       }
+//       return null; // Retorna null se não encontrar o nome do dia
+//   }
 
   // Initialize moment.js with the desired locale
-  moment.locale('pt-br');
+ moment.locale('pt-br');
   
   

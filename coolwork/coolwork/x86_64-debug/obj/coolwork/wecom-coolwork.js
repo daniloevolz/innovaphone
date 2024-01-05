@@ -455,24 +455,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 const divMainAvailabilityRecurrent = document.createElement("div")
                 divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100", "rounded-lg", "justify-center","gap-1")
                 // dias da semana 
-                var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
+                var week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-                const daysOfWeekMap = {
-                    "labelSun": "domingo",
-                    "labelMon": "segunda-feira",
-                    "labelTerc": "terça-feira",
-                    "labelQuar": "quarta-feira",
-                    "labelQuint": "quinta-feira",
-                    "labelSex": "sexta-feira",
-                    "labelSab": "sabado"
-                };
                 week.forEach(function (w) {
                     const dayDiv = document.createElement('div')
                     dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText",`room-${a.room_id}`)
-                    dayDiv.setAttribute("day-week", daysOfWeekMap[w])
+                    dayDiv.setAttribute("day-week", w)
                     const dayText = document.createElement('p')
                     dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400",)
-                    dayText.textContent = texts.text(`${w}`)
+                    dayText.textContent = texts.text(`${w + "Abrev"}`)
                     dayDiv.appendChild(dayText)
                     divMainAvailabilityRecurrent.appendChild(dayDiv)
                 })
@@ -783,50 +774,43 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         const divMainAvailabilityRecurrent = document.createElement("div")
         divMainAvailabilityRecurrent.classList.add("self-stretch", "flex", "p-1", "items-start", "bg-dark-100", "rounded-lg", "justify-center","gap-1")
         // dias da semana 
-        var week = ["labelSun", "labelMon", "labelTerc", "labelQuar", "labelQuint", "labelSex", "labelSab"];
+        var week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-        const daysOfWeekMap = {
-            "labelSun": "domingo",
-            "labelMon": "segunda-feira",
-            "labelTerc": "terça-feira",
-            "labelQuar": "quarta-feira",
-            "labelQuint": "quinta-feira",
-            "labelSex": "sexta-feira",
-            "labelSab": "sabado"
-        };
         week.forEach(function (w) {
             const dayDiv = document.createElement('div')
             dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1", `room-${a.room_id}`,"rounded-full")
             const dayText = document.createElement('p')
             dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
-            dayText.textContent = texts.text(`${w}`)
-            dayDiv.setAttribute("day-week", daysOfWeekMap[w])
+            // D 
+            dayText.textContent = texts.text(`${w + "Abrev"}`)
+            // dia - semana 
+            dayDiv.setAttribute("day-week",  w)
             dayDiv.appendChild(dayText)
             divMainAvailabilityRecurrent.appendChild(dayDiv)
 
 
             dayDiv.addEventListener("click",function(ev){
                 switch (dayDiv.getAttribute("day-week")) {
-                    case "segunda-feira":
-                        makeViewDay(divMain, "labelMondayDiv", a.timestart_monday, a.timeend_monday)
+                    case "Mon":
+                        makeViewDay(divMain, "labelMonDiv", a.timestart_monday, a.timeend_monday)
                     break;
-                    case "terça-feira":
-                        makeViewDay(divMain, "labeltuesdayDiv", a.timestart_tuesday, a.timeend_tuesday)
+                    case "Tue":
+                        makeViewDay(divMain, "labelTueDiv", a.timestart_tuesday, a.timeend_tuesday)
                     break;
-                    case "quarta-feira":
-                        makeViewDay(divMain, "labelwednesdayDiv", a.timestart_wednesday, a.timeend_wednesday)
+                    case "Wed":
+                        makeViewDay(divMain, "labelWedDiv", a.timestart_wednesday, a.timeend_wednesday)
                     break;
-                    case "quinta-feira":
-                        makeViewDay(divMain, "labelthursdayDiv", a.timestart_thursday, a.timeend_thursday)
+                    case "Thu":
+                        makeViewDay(divMain, "labelThuDiv", a.timestart_thursday, a.timeend_thursday)
                     break;
-                    case "sexta-feira":
-                        makeViewDay(divMain, "labelfridayDiv", a.timestart_friday, a.timeend_friday)
+                    case "Fri":
+                        makeViewDay(divMain, "labelFriDiv", a.timestart_friday, a.timeend_friday)
                     break;
-                    case "sabado":
-                        makeViewDay(divMain, "labelsaturdayDiv", a.timestart_saturday, a.timeend_saturday)
+                    case "Sat":
+                        makeViewDay(divMain, "labelSatDiv", a.timestart_saturday, a.timeend_saturday)
                     break;
-                    case "domingo":
-                        makeViewDay(divMain, "labelsundayDiv", a.timestart_sunday, a.timeend_sunday)
+                    case "Sun":
+                        makeViewDay(divMain, "labelSunDiv", a.timestart_sunday, a.timeend_sunday)
                     break;
                         
                 }
@@ -1117,27 +1101,27 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             const frame107btn = makeButton(texts.text("labelSelect"),"primary")
             frame107.appendChild(frame107btn)
-            var selected
+            // var selected
             frame107btn.addEventListener("click", function (event) {
-                makeCalendar(div104, deviceHw, roomId, function (selectedDay) {
-                    selected = selectedDay;
-                    if (!document.getElementById("frame104btn")) {
-                        const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
-                        div104.appendChild(frame104btn)
-                        frame104btn.setAttribute("id", "frame104btn")
-                        frame104btn.addEventListener("click", function (event) {
-                            console.log("Dia selecionado retornado makeScheduleContainer ", selected)
-                            //
-                            //continuar aqui com a reconstrução da div104 com o dia selecionado e botão editar...
-                            //
-                        })
-                    } 
-                    
-                })
-                
+                makeConfirmSchedule(div104,deviceHw,roomId)
                 
             })
+           
+            
+                var btnSearch = setInterval(function(){
+                    var btnEdit = document.getElementById("btnEditDay");
+                    if(btnEdit){
+                        // clearInterval(btnSearch)
+                        btnEdit.addEventListener("click",function(){
+                            makeConfirmSchedule(div104,deviceHw,roomId)
+                })
+                    }
+                },100)
+           
 
+            // btnEditDay.addEventListener("click",function(){
+            //     callback(makeConfirmAndEditSchedule())
+            // })
             //Seleção horário
             const div105 = document.createElement("div")
             div105.setAttribute("id", "div105")
@@ -1285,5 +1269,74 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
 
     }
+    function makeConfirmSchedule(divMain,devHW,roomID){
+        makeCalendar(divMain, devHW, roomID, function (selectedDay) {
+            if (!document.getElementById("frame104btn")) {
+                const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
+                div104.appendChild(frame104btn)
+                frame104btn.setAttribute("id", "frame104btn")
+                frame104btn.addEventListener("click", function (event) {
+                    var selected;
+                    selected = selectedDay;
+                    console.log("Dia selecionado retornado makeScheduleContainer ", selected)
+                   // getDayOfWeekLabel(selected)
+                    divMain.innerHTML = ''
+
+                    const frame107 = document.createElement("div")
+                    frame107.setAttribute("id", "frame107")
+                    frame107.classList.add("frame107", "h-fit")
+                    div104.appendChild(frame107)
+
+                    const frame107txt = document.createElement("div")
+                    frame107txt.classList.add("frame107txt","pb-1")
+                    frame107txt.innerHTML = texts.text("labelSelectYourDay")
+                    frame107.appendChild(frame107txt)
+
+                    divMain.appendChild(frame107)
+                    const div32 = document.createElement("div")
+                    div32.setAttribute("id","div32")
+                    div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
+                    const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+                    div32.appendChild(btnShowSelectedDay)
+                    const btnEditDay = makeButton(texts.text("labelEdit"),"secundary","")
+                    btnEditDay.setAttribute("id","btnEditDay")
+                    div32.appendChild(btnEditDay)
+                    divMain.appendChild(div32)
+            
+                        // btnEditDay.addEventListener("click",function(){
+                        //     makeConfirmSchedule(div104,deviceHw,roomId)
+                        // })
+        
+                })
+            } 
+            
+        })
+    }
+    function getDayOfWeekLabel(selectedDate) {
+        console.log("SelectedDate" + selectedDate)
+        const daysOfWeekMap = {
+            "labelSun": "Sunday",
+            "labelMon": "Monday",
+            "labelTue": "Tuesday",
+            "labelWed": "Wednesday",
+            "labelThu": "Thursday",
+            "labelFri": "Friday",
+            "labelSat": "Saturday"
+        };
+
+            const selectedDayWeek = moment(selectedDate).format('dddd'); 
+            const selectedDayDate = moment(selectedDate).format('MM/DD');
+
+            for (const label in daysOfWeekMap) {
+                console.log("label" + daysOfWeekMap[label] + "dayweek" + selectedDayWeek)
+                if (daysOfWeekMap[label] === selectedDayWeek) {
+                    //var dayWeek = label.charAt(0).toUpperCase() + label.slice(1)
+                    return  texts.text(label) + " "  + selectedDayDate
+                    
+                }
+            }
+        
+            return null; 
+}
 }
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;
