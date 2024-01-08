@@ -80,7 +80,13 @@ Wecom.coolworkTexts = {
         labelFri : "Sex",
         labelSat : "Sáb",
         labelEdit: "Editar",
-        segunda: ""
+        segunda: "",
+        labelYouSure: "Você tem certeza?",
+        labelBtnCancel: "Cancelar",
+        labelYesCancel: "Sim, quero cancelar",
+        labelNo: "Não",
+        labelCancelSchedule: "Ao aceitar você ira cancelar seu agendamento "
+
         
     }
 }

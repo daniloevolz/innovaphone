@@ -562,24 +562,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div160.appendChild(divHourCard)
 
         availability.forEach(function (a) {
-            if (a.type == "periodType") {
-                var divPeriod = document.createElement("div")
-                const startDate = moment(a.data_start);
-                const endDate = moment(a.data_end);
-
-                const formattedStartDate = startDate.format("MM/DD");
-                const formattedEndDate = endDate.format("MM/DD");
-                divPeriod.innerHTML = formattedStartDate + " - " + formattedEndDate
-                div160.appendChild(divPeriod)
-            }
-
-            // if (a.type == "recurrentType") {
-            //     var divRecurrent = document.createElement("div")
-            //     divRecurrent.classList.add("flex","items-center","gap-1")
-            //     divRecurrent.innerHTML = 
-            //     div160.appendChild(divRecurrent)
-            // }
-
         // img expandir
         const divOpenTime = document.createElement("div")
         divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
@@ -1098,30 +1080,68 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             frame107txt.classList.add("frame107txt")
             frame107txt.innerHTML = texts.text("labelSelectYourDay")
             frame107.appendChild(frame107txt)
-
+           
             const frame107btn = makeButton(texts.text("labelSelect"),"primary")
             frame107.appendChild(frame107btn)
             // var selected
-            frame107btn.addEventListener("click", function (event) {
-                makeConfirmSchedule(div104,deviceHw,roomId)
-                
-            })
-           
-            
-                var btnSearch = setInterval(function(){
-                    var btnEdit = document.getElementById("btnEditDay");
-                    if(btnEdit){
-                        // clearInterval(btnSearch)
-                        btnEdit.addEventListener("click",function(){
-                            makeConfirmSchedule(div104,deviceHw,roomId)
-                })
-                    }
-                },100)
-           
+            frame107btn.addEventListener("click", function buildCalendar(event) {
+                makeCalendar(div104, deviceHw, roomId, function (selectedDay) {
+                    if (!document.getElementById("frame104btn")) {
+                        const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
+                        div104.appendChild(frame104btn)
+                        frame104btn.setAttribute("id", "frame104btn")
+                        frame104btn.addEventListener("click", function (event) {
+                            var selected;
+                            selected = selectedDay;
+                            console.log("Dia selecionado retornado makeScheduleContainer ", selected)
 
-            // btnEditDay.addEventListener("click",function(){
-            //     callback(makeConfirmAndEditSchedule())
-            // })
+                            div104.innerHTML = '' ;
+                            frame107.innerHTML = '' ;
+                            frame107.appendChild(frame107txt)
+
+                            const div32 = document.createElement("div")
+                            div32.setAttribute("id","div32")
+                            div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+                            div32.appendChild(btnShowSelectedDay)
+        
+                            const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
+                            btnEditDay.setAttribute("id", "btnEditDay");
+
+                            btnEditDay.addEventListener("click",function(){
+                                var oldDay = selectedDay
+                                buildCalendar()
+                                console.log("old day" + oldDay)                
+                                
+                                setTimeout(function(){
+                                    var cells = document.querySelectorAll("#calendar-body tr td div");
+                                    cells.forEach(function (td) {
+                                        if (td.getAttribute("data-date") == oldDay) {
+                                            td.classList.add("bg-[#199FDA]");
+                                        }
+                                        td.addEventListener("click", function () {
+                                            cells.forEach(function (otherTd) {
+                                                if (otherTd.classList.contains("bg-[#199FDA]")) {
+                                                    otherTd.classList.remove("bg-[#199FDA]");
+                                                }
+                                            });
+                                        });
+                                    });
+                                },200);
+                                })
+                     
+                            
+
+                            div32.appendChild(btnEditDay);
+                            
+                            div104.appendChild(frame107)
+                            div104.appendChild(div32);
+                            
+                        })
+                    } 
+                    
+                })
+            });
             //Seleção horário
             const div105 = document.createElement("div")
             div105.setAttribute("id", "div105")
@@ -1208,34 +1228,35 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeSuccessPopUp(msg) {
         console.log(JSON.stringify(msg))
     }
-    function makeCancelPopUp(obj, callback) { 
-        var insideDiv = document.createElement("div")
-        insideDiv.classList.add("absolute", "w-full", "h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
-        const divMain = document.createElement("div")
-        divMain.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
-        const titlePopUp = document.createElement("div") // aplicar tipografia 
-        titlePopUp.textContent = texts.text("labelYouSure")
-        const textCancel = document.createElement("div")
-        textCancel.classList.add("text-center")
-        textCancel.textContent = texts.text("labelCancelSchedule")
-        const divButtons = document.createElement("div")
-        divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
-        const buttonCancel = makeButton(texts.text("labelYesCancel"), "primary", "");
-        buttonCancel.addEventListener("click", function (event) {
-            app.sendSrc(obj,callback(msg))
-        })
-        const buttonNoCancel = makeButton(texts.text("labelNo"), "secundary", "");
 
-        divButtons.appendChild(buttonCancel)
-        divButtons.appendChild(buttonNoCancel)
-        divMain.appendChild(titlePopUp)
-        divMain.appendChild(textCancel)
-        divMain.appendChild(divButtons)
-        insideDiv.appendChild(divMain)
-        document.body.appendChild(insideDiv)
+    // function makeCancelPopUp(obj, callback) { 
+    //     var insideDiv = document.createElement("div")
+    //     insideDiv.classList.add("absolute", "w-full", "h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
+    //     const divMain = document.createElement("div")
+    //     divMain.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
+    //     const titlePopUp = document.createElement("div") // aplicar tipografia 
+    //     titlePopUp.textContent = texts.text("labelYouSure")
+    //     const textCancel = document.createElement("div")
+    //     textCancel.classList.add("text-center")
+    //     textCancel.textContent = texts.text("labelCancelSchedule")
+    //     const divButtons = document.createElement("div")
+    //     divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
+    //     const buttonCancel = makeButton(texts.text("labelYesCancel"), "primary", "");
+    //     buttonCancel.addEventListener("click", function (event) {
+    //         app.sendSrc(obj,callback(msg))
+    //     })
+    //     const buttonNoCancel = makeButton(texts.text("labelNo"), "secundary", "");
+
+    //     divButtons.appendChild(buttonCancel)
+    //     divButtons.appendChild(buttonNoCancel)
+    //     divMain.appendChild(titlePopUp)
+    //     divMain.appendChild(textCancel)
+    //     divMain.appendChild(divButtons)
+    //     insideDiv.appendChild(divMain)
+    //     document.body.appendChild(insideDiv)
 
 
-    }
+    // }
     function makePopUp(title, msg, btn1, btn2){
         const bcgrd = document.createElement("div")
         bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
@@ -1269,48 +1290,53 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
 
     }
-    function makeConfirmSchedule(divMain,devHW,roomID){
-        makeCalendar(divMain, devHW, roomID, function (selectedDay) {
-            if (!document.getElementById("frame104btn")) {
-                const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
-                div104.appendChild(frame104btn)
-                frame104btn.setAttribute("id", "frame104btn")
-                frame104btn.addEventListener("click", function (event) {
-                    var selected;
-                    selected = selectedDay;
-                    console.log("Dia selecionado retornado makeScheduleContainer ", selected)
-                   // getDayOfWeekLabel(selected)
-                    divMain.innerHTML = ''
+    function makeConfirmSchedule(divMain,devHW,roomID,editButtonCallback){
+        // makeCalendar(divMain, devHW, roomID, function (selectedDay) {
+        //     if (!document.getElementById("frame104btn")) {
+        //         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
+        //         div104.appendChild(frame104btn)
+        //         frame104btn.setAttribute("id", "frame104btn")
+        //         frame104btn.addEventListener("click", function (event) {
+        //             var selected;
+        //             selected = selectedDay;
+        //             console.log("Dia selecionado retornado makeScheduleContainer ", selected)
 
-                    const frame107 = document.createElement("div")
-                    frame107.setAttribute("id", "frame107")
-                    frame107.classList.add("frame107", "h-fit")
-                    div104.appendChild(frame107)
+        //             const frame107 = document.createElement("div")
+        //             frame107.setAttribute("id", "frame107")
+        //             frame107.classList.add("frame107", "h-fit")
+        //             div104.appendChild(frame107)
 
-                    const frame107txt = document.createElement("div")
-                    frame107txt.classList.add("frame107txt","pb-1")
-                    frame107txt.innerHTML = texts.text("labelSelectYourDay")
-                    frame107.appendChild(frame107txt)
+        //             const frame107txt = document.createElement("div")
+        //             frame107txt.classList.add("frame107txt","pb-1")
+        //             frame107txt.innerHTML = texts.text("labelSelectYourDay")
+        //             frame107.appendChild(frame107txt)
 
-                    divMain.appendChild(frame107)
-                    const div32 = document.createElement("div")
-                    div32.setAttribute("id","div32")
-                    div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                    const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
-                    div32.appendChild(btnShowSelectedDay)
-                    const btnEditDay = makeButton(texts.text("labelEdit"),"secundary","")
-                    btnEditDay.setAttribute("id","btnEditDay")
-                    div32.appendChild(btnEditDay)
-                    divMain.appendChild(div32)
+                    
+        //             const div32 = document.createElement("div")
+        //             div32.setAttribute("id","div32")
+        //             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
+        //             const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+        //             div32.appendChild(btnShowSelectedDay)
+
+        //             const btnEditDay = document.getElementById("btnEditDay") || makeButton(texts.text("labelEdit"), "secundary", "");
+        //             btnEditDay.setAttribute("id", "btnEditDay");
+        //             div32.appendChild(btnEditDay);
+                    
+        //             divMain.innerHTML = '';
+        //             divMain.appendChild(frame107)
+        //             divMain.appendChild(div32);
+
+                    
+        //             if (typeof editButtonCallback === 'function') {
+        //                 btnEditDay.addEventListener("click", function () {
+        //                     editButtonCallback(divMain, devHW, roomID);
+        //                 });
+        //             }
+                    
+        //         })
+        //     } 
             
-                        // btnEditDay.addEventListener("click",function(){
-                        //     makeConfirmSchedule(div104,deviceHw,roomId)
-                        // })
-        
-                })
-            } 
-            
-        })
+        // })
     }
     function getDayOfWeekLabel(selectedDate) {
         console.log("SelectedDate" + selectedDate)
