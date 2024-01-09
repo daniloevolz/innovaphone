@@ -152,7 +152,7 @@ body {
 
 .divAvailabilyDetail {
     display: flex;
-    padding: 10px;
+    /* padding: 10px; */
     align-items: center;
     gap: 10px;
     align-self: stretch;
@@ -359,6 +359,8 @@ body {
     border-radius: 6px;
     margin: 8px;
     background: var(--Dark-200, #284258);
+    height: calc(100vh - 300px);
+    overflow-y: auto;
 }
 .textHour{
     display: flex;

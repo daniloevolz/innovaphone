@@ -608,7 +608,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
 
         const div106 = document.createElement("div")
-        div106.classList.add("div106", "h-fit")
+        div106.classList.add("div106")
+        //"h-fit se precisar"
         div106.setAttribute("id", "div106")
         divMain.appendChild(div106);
 
@@ -1138,7 +1139,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             btnEditDay.addEventListener("click",function(){
                                 var oldDay = selectedDay
                                 buildCalendar()
-                                console.log("old day" + oldDay)                
+                                console.log("old day" + oldDay)   
+                                
+                                if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
+                                    document.getElementById("divTimeStart").innerHTML = '-- : --';
+                                    document.getElementById("divTimeEnd").innerHTML = '-- : --';
+                                }
                                 
                                 setTimeout(function(){
                                     var cells = document.querySelectorAll("#calendar-body tr td div");
@@ -1202,7 +1208,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             divTimeStart.setAttribute("id", "divTimeStart")
             divTimeStart.classList.add("divTime")
             div110.appendChild(divTimeStart)
-            divTimeStart.innerHTML = "00:00"
+            divTimeStart.innerHTML = "-- : --"
             divTimeStart.addEventListener("click", function (event) {
                 event.stopPropagation()
                 event.preventDefault()
@@ -1238,7 +1244,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             divTimeEnd.setAttribute("id", "divTimeEnd")
             divTimeEnd.classList.add("divTime")
             div110.appendChild(divTimeEnd)
-            divTimeEnd.innerHTML = "00:00"
+            divTimeEnd.innerHTML = "-- : -- "
 
             divTimeEnd.addEventListener("click", function (event) {
                 event.stopPropagation()
