@@ -4,7 +4,7 @@ Calendar.createCalendar = function(divMain,availability,callback){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
-                    <div class="flex height-[366px] p-4 flex-col items-center gap-3 items-stretch bg-dark-100">
+                    <div class="flex height-[366px] p-1 flex-col items-center gap-3 items-stretch bg-dark-100">
                         <div class="p-1 flex justify-between items-center items-stretch">
                             <span  tabindex="0" class = "flex gap-1 items-center" id = "month-year" ></span>
                             <div class="flex items-center justify-end">

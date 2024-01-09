@@ -169,6 +169,14 @@ body {
     font-weight: 500;
     line-height: normal;
 }
+.divEndTime{
+    color: #FFF;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
 
 .divHourCard {
     color: #FFF;
@@ -221,14 +229,14 @@ body {
     line-height: normal;
 }
 
-.divTime {
+/* .divTime {
     color: #FFF;
     font-family: Montserrat;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
-}
+} */
 
 .divToTime {
     align-self: center;
@@ -336,7 +344,9 @@ body {
     gap: 10px;
     flex: 1 0 0;
     border-radius: 6px;
-    border: 2px solid var(--Dark-600, #8F9BA8);
+    /* border: 2px solid var(--Dark-600, #8F9BA8); */
+    color: #999;
+    font-size: 24px;
     background: var(--Dark-400, #5B6D7F);
 }
 .div106{
@@ -347,6 +357,7 @@ body {
     align-items: flex-start;
     gap: 10px;
     border-radius: 6px;
+    margin: 8px;
     background: var(--Dark-200, #284258);
 }
 .textHour{

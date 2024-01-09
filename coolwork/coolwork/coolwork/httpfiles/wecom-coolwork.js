@@ -480,7 +480,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-2", "grid", "sm:grid-cols-2", "md:grid-cols-4", "m-1")
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2", "md:grid-cols-4", "m-1","content-start")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         document.body.appendChild(container);
@@ -523,7 +523,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
         const divCalendar = document.createElement("div")
-        divCalendar.classList.add("flex","p-1","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
+        divCalendar.classList.add("flex","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
         const divTextSelectDay = document.createElement("div")
         divTextSelectDay.classList.add("color-white","font-Montserrat","text-2","not-italic","font-bold")
         divTextSelectDay.textContent = texts.text("labelSelectYourDay")
@@ -760,7 +760,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //HH:mm
         const divEndTime = document.createElement("div")
         divEndTime.setAttribute("id", "divEndTime")
-        divEndTime.classList.add("divTime")
+        divEndTime.classList.add("divEndTime")
         divEndTime.innerHTML = moment(availability.data_end).format("HH:mm");
         div179E.appendChild(divEndTime)
         //dia-semana   
@@ -1216,6 +1216,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
                         divTimeStart.innerHTML = selected + ":00"
+                        divTimeStart.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
                     })
@@ -1251,6 +1252,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
                         divTimeEnd.innerHTML = selected + ":00"
+                        divTimeEnd.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
                     })
