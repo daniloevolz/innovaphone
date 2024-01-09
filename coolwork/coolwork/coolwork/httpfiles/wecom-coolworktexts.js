@@ -13,6 +13,9 @@ Wecom.coolworkTexts = {
     de: {
     },
     pt: {
+        labelOk: "Ok",
+        labelWarning: "Atenção!",
+        labelSelectDay: "Priemeiro selecione o dia",
         labelSelect: "Selecionar",
         labelSelectYourDay: "Selecione seu dia!",
         labelSelectHour: "Selecione seu horário",
@@ -62,6 +65,7 @@ Wecom.coolworkTexts = {
         whenLabel: "Quando:",
         labelMyRooms: "Minhas Salas",
         labelTo: "até",
+        labelToTime: "até as",
         SunAbrev: "D",
         MonAbrev : "S",
         TueAbrev : "T",

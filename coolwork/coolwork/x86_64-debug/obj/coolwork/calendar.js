@@ -41,6 +41,7 @@ setTimeout(function(){
 }
 
 //Calendar.createCalendar("mainDiv") // apenas para visualização na pagina html
+moment.locale('pt-br');
 
 var year;
 var currentMonth;
@@ -616,6 +617,6 @@ function UpdateAvailability(availability, type) {
 //   }
 
   // Initialize moment.js with the desired locale
- moment.locale('pt-br');
+
   
   
