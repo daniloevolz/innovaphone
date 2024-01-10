@@ -694,14 +694,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
         
-        var postType = (post.type == "private") ? texts.text("labelType") + texts.text("labelPrivate") : texts.text("labelType") + texts.text("labelPublic")
-        var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
-       
+        var postType = (post.type == "private") ? texts.text("labelPrivate") : texts.text("labelPublic")
+        //var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
+        var dateString = post.date_start;
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
-        var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, texts.text("labelCreator") + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
-
-        var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
-  
         var dateString = post.date_end;
         var date = new Date(dateString);
         var day = date.getDate();
@@ -709,19 +712,33 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var year = date.getFullYear();
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var formattedDate = texts.text("labelEnd") + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+        var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
-        document.getElementById("closedate").innerHTML = formattedDate
-
-
+        footInfo(footShowPost, texts.text("labelType"), postType)
+        footInfo(footShowPost, texts.text("labelCreator"), user.cn)
+        footInfo(footShowPost, texts.text("labelStart"), formattedDateStart)
+        footInfo(footShowPost, texts.text("labelEnd"), formattedDateEnd)
+        // var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, texts.text("labelCreator") + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
+        // var startDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDateStart, 'creatorPost').setAttribute('id', 'startdate'));
+        // var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDateEnd, 'creatorPost').setAttribute('id', 'closedate'));
+  
+        // document.getElementById("startdate").innerHTML = formattedDateStart
+       
+        // document.getElementById("closedate").innerHTML = formattedDateEnd
         // Adicionando o listener de clique
         var a = document.getElementById('closewindow');
         a.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(post.department);
         });
-                         
+        
 
+    }
+    function footInfo(div, text1, text2){
+        const divMain = div.add(new innovaphone.ui1.Node("div", null, null, 'creatorPost').setAttribute("id","divMain"));
+        const labelName = divMain.add(new innovaphone.ui1.Node("div", null, text1, null));
+        const labelInfo = divMain.add(new innovaphone.ui1.Node("div", null, text2, null));
+        return;
     }
     function createPostForm(dep_id) {
         var department = list_departments.filter(function (item) {
@@ -1041,6 +1058,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         //usersListDiv.add(table);
         return usersListDiv;
     }
+
     function editUsersDepartmentsGrid() {
         var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
 
