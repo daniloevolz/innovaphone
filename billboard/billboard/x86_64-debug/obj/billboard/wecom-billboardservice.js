@@ -709,20 +709,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var src = obj.src;
             var myArray = src.split(",");
             var pbx = myArray[0];
-            //log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-            //Teste Danilo 20/07: armazenar o conte�do call no par�metro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        var call = obj.call.toString();
-            //        signal[call] = obj.sig.cg.sip;
-            //    }
-            //})
-            //Teste Danilo 20/07: armazenar o conte�do call no pa�metro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        signal[obj.sig.cg.sip] = obj.call;
-            //    }
-            //})
+            
             //Teste Danilo 05/08: armazenar o conteudo call em nova lista
             var sip = obj.sig.cg.sip;
             var call = obj.call;
