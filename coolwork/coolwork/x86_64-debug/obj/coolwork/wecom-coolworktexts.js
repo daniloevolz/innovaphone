@@ -13,6 +13,9 @@ Wecom.coolworkTexts = {
     de: {
     },
     pt: {
+        labelOk: "Ok",
+        labelWarning: "Atenção!",
+        labelSelectDay: "Priemeiro selecione o dia",
         labelSelect: "Selecionar",
         labelSelectYourDay: "Selecione seu dia!",
         labelSelectHour: "Selecione seu horário",
@@ -62,6 +65,7 @@ Wecom.coolworkTexts = {
         whenLabel: "Quando:",
         labelMyRooms: "Minhas Salas",
         labelTo: "até",
+        labelToTime: "até as",
         SunAbrev: "D",
         MonAbrev : "S",
         TueAbrev : "T",
@@ -85,7 +89,14 @@ Wecom.coolworkTexts = {
         labelBtnCancel: "Cancelar",
         labelYesCancel: "Sim, quero cancelar",
         labelNo: "Não",
-        labelCancelSchedule: "Ao aceitar você ira cancelar seu agendamento "
+        labelCancelSchedule: "Ao aceitar você ira cancelar seu agendamento ",
+        0: "Dom",
+        1: "Seg",
+        2 : "Ter",
+        3 : "Qua",
+        4 : "Qui",
+        5 : "Sex",
+        6 : "Sáb",
 
         
     }

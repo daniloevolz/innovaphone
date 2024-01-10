@@ -1,10 +1,12 @@
+
+
 var Calendar = Calendar || {};
 
 Calendar.createCalendar = function(divMain,availability,callback){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
-                    <div class="flex height-[366px] p-4 flex-col items-center gap-3 items-stretch bg-dark-100">
+                    <div class="flex height-[366px] p-1 flex-col items-center gap-3 items-stretch bg-dark-100">
                         <div class="p-1 flex justify-between items-center items-stretch">
                             <span  tabindex="0" class = "flex gap-1 items-center" id = "month-year" ></span>
                             <div class="flex items-center justify-end">
@@ -41,11 +43,14 @@ setTimeout(function(){
 }
 
 //Calendar.createCalendar("mainDiv") // apenas para visualização na pagina html
+// moment.locale('pt-br');
 
 var year;
 var currentMonth;
 
 function buildCalendar(availability,callback) {
+   
+
     var date = new Date();
     currentMonth = date.getMonth();
      year = date.getFullYear();
@@ -93,24 +98,29 @@ function buildCalendar(availability,callback) {
   }
   
   function generateWeekdayHeader() {
-    moment.locale("pt-br");
-    const weekdays = moment.weekdaysShort(); // Use moment.js to get localized weekdays
+    // moment.locale(navigator.language || navigator.userLanguage);
+    var lang = navigator.language.split("-")[0]
+
+    const weekdays = moment.weekdaysShort();
     const thead = document.createElement("thead");
     const tr = document.createElement("tr");
-    weekdays.forEach((weekday) => {
-      const th = document.createElement("th");
-      const div = document.createElement("div");
-      const p = document.createElement("p");
-  
-      div.classList.add("w-full", "flex", "justify-center");
-      p.classList.add("color-dark-300");
-      p.textContent = weekday;
-  
-      div.appendChild(p);
-      th.appendChild(div);
-      tr.appendChild(th);
-    });
-  
+
+    for (var index = 0; index < weekdays.length; index++) {
+       var day = Wecom.coolworkTexts[lang][index]
+       const th = document.createElement("th");
+       const div = document.createElement("div");
+       const p = document.createElement("p");
+   
+       div.classList.add("w-full", "flex", "justify-center");
+       p.classList.add("color-dark-300");
+ 
+       p.textContent = day
+         
+         
+       div.appendChild(p);
+       th.appendChild(div);
+       tr.appendChild(th);
+    }
     thead.appendChild(tr);
     return thead;
   }
@@ -208,7 +218,7 @@ function buildCalendar(availability,callback) {
     var cells = document.querySelectorAll("#calendar-body td div");
     cells.forEach(function (cell) {
       var selectedDate = moment([year, currentMonth, cell.textContent ]);
-        // selectedDate.locale("en")
+    
       var diaDaSemana = selectedDate.format('ddd');
       cell.setAttribute("day-week", diaDaSemana);
   
@@ -616,6 +626,6 @@ function UpdateAvailability(availability, type) {
 //   }
 
   // Initialize moment.js with the desired locale
- moment.locale('pt-br');
+
   
   
