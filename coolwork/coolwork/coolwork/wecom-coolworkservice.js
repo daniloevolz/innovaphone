@@ -327,7 +327,7 @@ new JsonApi("user").onconnected(function(conn) {
 
                 Database.exec(query)
                     .oncomplete(function (result) {
-                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesScheduleResult", result: JSON.stringify(result), ids: obj.ids  }));
+                        conn.send(JSON.stringify({ api: "user", mt: "SelectDevicesScheduleResult", result: JSON.stringify(result), ids: obj.ids, src: obj.src  }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("SelectDevicesSchedule: Error ao selecionar tabela: " + String(errorText));
@@ -395,8 +395,8 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "InsertDeviceSchedule") {
                 Database.exec("INSERT INTO tbl_device_schedule (type, data_start, data_end, device_id, device_room_id, user_guid) VALUES ('" + obj.type + "','" + obj.data_start + "','" + obj.data_end + "','" + obj.device + "'," + obj.room + ",'" + conn.guid + "')")
                 .oncomplete(function (data) {
-                    //log("AGENDAMENTO BEM SUCEDIDO:" , data , "PARCE: ", JSON.parse(data))
-                conn.send(JSON.stringify({ api: "user", mt: "DeviceScheduleSuccess" }));
+                
+                conn.send(JSON.stringify({ api: "user", mt: "DeviceScheduleSuccess", src: obj.src }));
                 })
                 .onerror(function (error, errorText, dbErrorCode) {
                     log("DeviceScheduleError:result=Error " + String(errorText));

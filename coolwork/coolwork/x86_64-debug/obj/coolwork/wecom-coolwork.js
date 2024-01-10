@@ -18,8 +18,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var devicesApi;
     var list_MyRooms = [];
     var list_tableUsers = []
-    var schedules = []
-
+    var schedules = [];
+    var selectedDay; // dia do calendario
 
     var colorSchemes = {
         dark: {
@@ -149,9 +149,14 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         if (obj.api === "user" && obj.mt === "SelectRoomsEditorsResult") {
             editors = JSON.parse(obj.result);
         }
-        if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
-            app.send({ api: "user", mt: "SelectMyRooms" })
-        }
+        // if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
+        //     app.send({ api: "user", mt: "SelectMyRooms" })
+
+        //     // setTimeout(function(){
+        //     //     makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+        //     // },1000)
+
+        // }
     } 
     function makeButton(text, variant, iconSVG) {
         const button = document.createElement("button");
@@ -364,23 +369,23 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             divsRoom.forEach(function (div) {
                 div.addEventListener('click', function (event) {
                     var id = event.currentTarget.id;
-                    var room = rooms.filter(function (room) {
-                        return id == room.id
-                    })[0];
-                    var devs = devices.filter(function (dev) {
-                        return id == dev.room_id
-                    });
-                    var avail = availabilities.filter(function (avl) {
-                        return id == avl.room_id
-                    });
-                    var sched = schedules.filter(function (sched) {
-                        return id == sched.device_room_id
-                    });
-                    var viws = viewers.filter(function (viws) {
-                        return id == viws.room_id
-                    });
+                    // var room = rooms.filter(function (room) {
+                    //     return id == room.id
+                    // })[0];
+                    // var devs = devices.filter(function (dev) {
+                    //     return id == dev.room_id
+                    // });
+                    // var avail = availabilities.filter(function (avl) {
+                    //     return id == avl.room_id
+                    // });
+                    // var sched = schedules.filter(function (sched) {
+                    //     return id == sched.device_room_id
+                    // });
+                    // var viws = viewers.filter(function (viws) {
+                    //     return id == viws.room_id
+                    // });
                     event.stopPropagation();
-                    makeViewRoomDetail(room, devs, avail, sched, viws)
+                    makeViewRoomDetail(id)
                 });
             });
         })   
@@ -475,7 +480,24 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
        
 
     }
-    function makeViewRoomDetail(room, devices, availability, schedules, viewers) {
+    function makeViewRoomDetail(id) {
+
+        var room = rooms.filter(function (room) {
+            return id == room.id
+        })[0];
+        var devs = devices.filter(function (dev) {
+            return id == dev.room_id
+        });
+        var avail = availabilities.filter(function (avl) {
+            return id == avl.room_id
+        });
+        var sched = schedules.filter(function (sched) {
+            return id == sched.device_room_id
+        });
+        var viws = viewers.filter(function (viws) {
+            return id == viws.room_id
+        });
+
         that.clear();
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
@@ -494,7 +516,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         const divHorario = document.createElement("div")
         divHorario.classList.add("divHorario")
         container.appendChild(divHorario)
-        makeViewCalendarDetail(divHorario, availability)
+        makeViewCalendarDetail(divHorario, avail)
 
         // div container (scroll)
         const div102 = document.createElement("div")
@@ -503,15 +525,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
 
-        devices.forEach(function (device) {
-            var sched = schedules.filter(function (sched) {
-                return device.id == sched.device_id
+        devs.forEach(function (device) {
+            var s = sched.filter(function (s) {
+                return device.id == s.device_id
             });
-            var viewer = viewers.filter(function (v) {
+            var viewer = viws.filter(function (v) {
                 return v.viewer_guid == device.guid && v.room_id == room.id
             });
             makeDeviceIcon(divImg, device, viewer)
-            makeViewDevice(div102, device, availability, sched, viewer)
+            makeViewDevice(div102, device, avail, s, viewer)
         })
 
 
@@ -534,9 +556,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         })
         var sched = schedules.filter(function (s) {
             return s.room_id == roomId && s.device_id == deviceHw
-        })
-
-        var selectedDay; 
+        }) 
         Calendar.createCalendar(divCalendar,availability,function (day) {
             selectedDay = day
             console.log("SelectedDay " + day)
@@ -618,13 +638,18 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //textHour.setAttribute("id", "textHour")
         //textHour.innerHTML = texts.text("labelSelectHour")
         //div106.appendChild(textHour)
-        console.log("Agendamentos ", JSON.stringify(availability))
+        console.log("Disponibilidade ", JSON.stringify(availability))
 
         if (availability.type == "periodType") {
 
             // Garantir que divStartTime e divEndTime sejam strings
             const startTimeString = availability.data_start;
             const endTimeString = availability.data_end;
+
+            var sched = schedules.filter(function (s) {
+                return s.data_start >= availability.data_start && s.data_end <= availability.data_end
+            })
+            console.log("Agendamentos ", JSON.stringify(sched))
 
             var now = Date();
             var endHour;
@@ -651,8 +676,16 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             hoursInRange.forEach(function (h) {
                 console.log("Hora forEach:", h);
                 const divHour = document.createElement("div");
-                divHour.classList.add("divHour", "cursor-pointer");
                 divHour.setAttribute("hour", h);
+                divHour.classList.add("divHour", "cursor-pointer");
+                sched.forEach(function (s) {
+                    if (moment(s.data_start) == moment(day + "T" + h + ":00") || moment(s.data_end) == moment(day + "T" + h + ":00")) {
+                        divHour.classList.remove("cursor-pointer");
+                        divHour.classList.add("divHourBusy");
+                        divHour.removeAttribute("hour");
+                    }
+                })
+                
                 divHour.setAttribute("id", h);
                 divHour.innerHTML = h + ":00";
                 div106.appendChild(divHour);
@@ -660,7 +693,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             //todas as divs com o atributo "room"
             const divsHours = document.querySelectorAll('[hour]');
             //listener de clique a cada div
-            var control = 0;
+            //var control = 0;
             divsHours.forEach(function (div) {
                 div.addEventListener('click', function (event) {
                     var hour = event.currentTarget.id;
@@ -687,6 +720,92 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         if (availability.type == "recurrentType") {
             const isoDay = moment(day).isoWeekday();
             console.log(isoDay)
+            var date = {}
+            switch (isoDay) {
+                case 0:
+                    date.date_start = availability.timestart_monday
+                    return
+                case 1:
+                    return
+                case 2:
+                    return
+                case 3:
+                    return
+                case 4:
+                    return
+                case 5:
+                    return
+                case 6:
+                    return
+
+            }
+
+            // Garantir que divStartTime e divEndTime sejam strings
+            const startTimeString = date.data_start;
+            const endTimeString = date.data_end;
+
+            var sched = schedules.filter(function (s) {
+                return s.data_start >= availability.data_start && s.data_end <= availability.data_end
+            })
+            console.log("Agendamentos ", JSON.stringify(sched))
+            console.log("startTimeString Erick", startTimeString)
+            console.log("endTimeString Erick", endTimeString)
+            // Extrair apenas as horas dos valores de data e hora recebidos
+            const startHour = parseInt(startTimeString.split(":")[0]);
+            const endHour = parseInt(endTimeString.split(":")[0]);
+
+            var hours = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "00",]
+
+
+            // Filtrar as horas dentro do intervalo desejado
+            const hoursInRange = hours.filter(h => {
+                const hour = parseInt(h);
+                return hour >= startHour && hour <= endHour;
+            });
+
+            // Criar as divs somente para as horas no intervalo desejado
+            hoursInRange.forEach(function (h) {
+                console.log("Hora forEach:", h);
+                const divHour = document.createElement("div");
+                divHour.setAttribute("hour", h);
+                divHour.classList.add("divHour", "cursor-pointer");
+                sched.forEach(function (s) {
+                    if (moment(s.data_start) == moment(day + "T" + h + ":00") || moment(s.data_end) == moment(day + "T" + h + ":00")) {
+                        divHour.classList.remove("cursor-pointer");
+                        divHour.classList.add("divHourBusy");
+                        divHour.removeAttribute("hour");
+                    }
+                })
+
+                divHour.setAttribute("id", h);
+                divHour.innerHTML = h + ":00";
+                div106.appendChild(divHour);
+            });
+            //todas as divs com o atributo "room"
+            const divsHours = document.querySelectorAll('[hour]');
+            //listener de clique a cada div
+            //var control = 0;
+            divsHours.forEach(function (div) {
+                div.addEventListener('click', function (event) {
+                    var hour = event.currentTarget.id;
+                    console.log("Hora clicada a tratar ", hour)
+
+                    //if (control == 0) {
+                    //    var divTimeStart = document.getElementById("divTimeStart")
+                    //    divTimeStart.innerHTML = hour + ":00"
+                    //    control = 1
+                    //} else {
+                    //    var divTimeEnd = document.getElementById("divTimeEnd")
+                    //    divTimeEnd.innerHTML = hour + ":00"
+                    //    control = 0
+
+                    //    callback(hour)
+                    //}
+                    callback(hour)
+
+
+                });
+            });
 
 
         }
@@ -1081,7 +1200,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function makeScheduleContainer(deviceHw, roomId, scheduleId) {
         console.log("MAKESCHEDULECONTAINER")
         that.clear();
-        makeHeader(backButton, makeButton(texts.text("save"), "primary", ""), texts.text("labelSchedule"))
+        const btnSave = makeButton(texts.text("save"), "primary", "")
+        makeHeader(backButton,btnSave, texts.text("labelSchedule"))
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
@@ -1090,8 +1210,11 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         var avail = availabilities.filter(function (a) {
             return a.room_id == roomId
         })[0]
+        var selectedEnd;
+        var selectedStart;
 
         if (!scheduleId) {
+            
             //Seleção calendário
             const div104 = document.createElement("div")
             div104.setAttribute("id", "div104")
@@ -1110,7 +1233,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             const frame107btn = makeButton(texts.text("labelSelect"),"primary")
             frame107.appendChild(frame107btn)
-            // var selected
+            var selected
             frame107btn.addEventListener("click", function buildCalendar(event) {
                 makeCalendar(div104, deviceHw, roomId, function (selectedDay) {
                     if (!document.getElementById("frame104btn")) {
@@ -1118,7 +1241,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
-                            var selected;
+                            // var selected;
                             selected = selectedDay;
                             console.log("Dia selecionado retornado makeScheduleContainer ", selected)
 
@@ -1136,12 +1259,47 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                             const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
                             btnEditDay.setAttribute("id", "btnEditDay");
 
-                            btnEditDay.addEventListener("click",function(){
+                            btnEditDay.addEventListener("click",function(){ // click botão editar
                                 var oldDay = selectedDay
                                 buildCalendar()
-                                console.log("old day" + oldDay)   
-                                
+                                console.log("old daySelected" + oldDay)   
+                                // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
+                                var div106 = document.getElementById("div106")
+                                if(div106){
+                                    containerSchedule.removeChild(div106)
+                                }
+
+                                // const div106 = document.createElement("div")
+                                // div106.setAttribute("id", "div106")
+                                // div106.classList.add("div104", "h-fit")
+                                // containerSchedule.appendChild(div106)
+                    
+                                // const frame109 = document.createElement("div")
+                                // frame109.setAttribute("id", "frame109")
+                                // frame109.classList.add("frame107", "h-fit")
+                                // div106.appendChild(frame109)
+                    
+                                // const frame19txt = document.createElement("div")
+                                // frame19txt.classList.add("frame107txt")
+                                // frame19txt.innerHTML = texts.text("labelTxtCancel")
+                                // frame109.appendChild(frame19txt)
+                    
+                                // //botão cancelar
+                                // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
+                                // frame109btn.addEventListener("click", function (event) {
+                                //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+                                //     makeCancelPopUp(obj, function (msg) {
+                                //         makeSuccessPopUp(msg)
+                                //     })
+                                // })
+                    
+                                // frame109.appendChild(frame109btn)
+
+
+                                // se conter a data antiga limpa tudo 
                                 if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
+                                    selectedStart = ""
+                                    selectedEnd = ""
                                     document.getElementById("divTimeStart").innerHTML = '-- : --';
                                     document.getElementById("divTimeEnd").innerHTML = '-- : --';
                                 }
@@ -1215,19 +1373,22 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
 
-                    makeViewTimeHour(containerSchedule, day.innerText, avail, function (selected) {
-
-                        console.log("hora selecionado retornado makeschedulecontainer ", selected)
+                    makeViewTimeHour(containerSchedule, selected , avail, function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
-                        divTimeStart.innerHTML = selected + ":00"
+                        divTimeStart.innerHTML = selectedTime + ":00"
                         divTimeStart.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
                     })
                 } else {
-                    makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk"))
+                   makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
+        
                 }
 
             })
@@ -1251,108 +1412,135 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 event.preventDefault()
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
-                    makeViewTimeHour(containerSchedule, day.innerText, avail, function (selected) {
-
-                        console.log("hora selecionado retornado makeschedulecontainer ", selected)
+                    makeViewTimeHour(containerSchedule, selected, avail, function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
-                        divTimeEnd.innerHTML = selected + ":00"
+                        divTimeEnd.innerHTML = selectedTime + ":00"
                         divTimeEnd.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
                     })
                 } else {
-                    makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk"))
+                    makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
                 }
             })
         }
-        else {
-            //Seleção calendário
-            const div104 = document.createElement("div")
-            div104.setAttribute("id", "div104")
-            div104.classList.add("div104", "h-fit")
-            containerSchedule.appendChild(div104)
+        // else {
+        //     //Seleção calendário
+        //     const div104 = document.createElement("div")
+        //     div104.setAttribute("id", "div104")
+        //     div104.classList.add("div104", "h-fit")
+        //     containerSchedule.appendChild(div104)
 
-            const frame107 = document.createElement("div")
-            frame107.setAttribute("id", "frame107")
-            frame107.classList.add("frame107", "h-fit")
-            div104.appendChild(frame107)
+        //     const frame107 = document.createElement("div")
+        //     frame107.setAttribute("id", "frame107")
+        //     frame107.classList.add("frame107", "h-fit")
+        //     div104.appendChild(frame107)
 
-            const frame107txt = document.createElement("div")
-            frame107txt.classList.add("frame107txt")
-            frame107txt.innerHTML = texts.text("labelSelectYourDay")
-            frame107.appendChild(frame107txt)
+        //     const frame107txt = document.createElement("div")
+        //     frame107txt.classList.add("frame107txt")
+        //     frame107txt.innerHTML = texts.text("labelSelectYourDay")
+        //     frame107.appendChild(frame107txt)
 
-            const frame107btn = document.createElement("div")
-            frame107btn.classList.add("framebtn", "h-fit")
-            frame107btn.innerHTML = texts.text("labelSelect")
-            frame107.appendChild(frame107btn)
-            frame107btn.addEventListener("click", function (event) {
-                makeCalendar(availability, schedules)
-            })
+        //     const frame107btn = document.createElement("div")
+        //     frame107btn.classList.add("framebtn", "h-fit")
+        //     frame107btn.innerHTML = texts.text("labelSelect")
+        //     frame107.appendChild(frame107btn)
+        //     frame107btn.addEventListener("click", function (event) {
+        //         makeCalendar(availability, schedules)
+        //     })
 
-            const div106 = document.createElement("div")
-            div106.setAttribute("id", "div106")
-            div106.classList.add("div104", "h-fit")
-            containerSchedule.appendChild(div106)
+        //     // const div106 = document.createElement("div")
+        //     // div106.setAttribute("id", "div106")
+        //     // div106.classList.add("div104", "h-fit")
+        //     // containerSchedule.appendChild(div106)
 
-            const frame109 = document.createElement("div")
-            frame109.setAttribute("id", "frame109")
-            frame109.classList.add("frame107", "h-fit")
-            div106.appendChild(frame109)
+        //     // const frame109 = document.createElement("div")
+        //     // frame109.setAttribute("id", "frame109")
+        //     // frame109.classList.add("frame107", "h-fit")
+        //     // div106.appendChild(frame109)
 
-            const frame19txt = document.createElement("div")
-            frame19txt.classList.add("frame107txt")
-            frame19txt.innerHTML = texts.text("labelTxtCancel")
-            frame109.appendChild(frame19txt)
+        //     // const frame19txt = document.createElement("div")
+        //     // frame19txt.classList.add("frame107txt")
+        //     // frame19txt.innerHTML = texts.text("labelTxtCancel")
+        //     // frame109.appendChild(frame19txt)
 
-            //botão cancelar
-            const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
-            frame109btn.addEventListener("click", function (event) {
-                var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
-                makeCancelPopUp(obj, function (msg) {
-                    makeSuccessPopUp(msg)
+        //     // //botão cancelar
+        //     // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
+        //     // frame109btn.addEventListener("click", function (event) {
+        //     //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+        //     //     makeCancelPopUp(obj, function (msg) {
+        //     //         makeSuccessPopUp(msg)
+        //     //     })
+        //     // })
+
+        //     // frame109.appendChild(frame109btn)
+        // }
+        btnSave.addEventListener("click",function(){
+            var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
+            var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
+
+            console.log("start " + dateStart)
+            console.log("end " + dateEnd)
+            
+             app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
+                
+                var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                btnPopUp.addEventListener("click",function(event){
+                    event.stopPropagation()
+                    event.preventDefault()
+                    app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                        schedules = JSON.parse(obj.result)
+                        makeViewRoomDetail(roomId)
+                    })
                 })
+              
             })
+             })
 
-            frame109.appendChild(frame109btn)
-        }
+             
+            
     }
     function makeSuccessPopUp(msg) {
         console.log(JSON.stringify(msg))
     }
 
-    // function makeCancelPopUp(obj, callback) { 
-    //     var insideDiv = document.createElement("div")
-    //     insideDiv.classList.add("absolute", "w-full", "h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
-    //     const divMain = document.createElement("div")
-    //     divMain.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
-    //     const titlePopUp = document.createElement("div") // aplicar tipografia 
-    //     titlePopUp.textContent = texts.text("labelYouSure")
-    //     const textCancel = document.createElement("div")
-    //     textCancel.classList.add("text-center")
-    //     textCancel.textContent = texts.text("labelCancelSchedule")
-    //     const divButtons = document.createElement("div")
-    //     divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
-    //     const buttonCancel = makeButton(texts.text("labelYesCancel"), "primary", "");
-    //     buttonCancel.addEventListener("click", function (event) {
-    //         app.sendSrc(obj,callback(msg))
-    //     })
-    //     const buttonNoCancel = makeButton(texts.text("labelNo"), "secundary", "");
+    function makeCancelPopUp(obj, callback) { 
+        var insideDiv = document.createElement("div")
+        insideDiv.classList.add("absolute", "w-full", "h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
+        const divMain = document.createElement("div")
+        divMain.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
+        const titlePopUp = document.createElement("div") // aplicar tipografia 
+        titlePopUp.textContent = texts.text("labelYouSure")
+        const textCancel = document.createElement("div")
+        textCancel.classList.add("text-center")
+        textCancel.textContent = texts.text("labelCancelSchedule")
+        const divButtons = document.createElement("div")
+        divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
+        const buttonCancel = makeButton(texts.text("labelYesCancel"), "primary", "");
+        buttonCancel.addEventListener("click", function (event) {
+            app.sendSrc(obj,callback(msg))
+        })
+        const buttonNoCancel = makeButton(texts.text("labelNo"), "secundary", "");
 
-    //     divButtons.appendChild(buttonCancel)
-    //     divButtons.appendChild(buttonNoCancel)
-    //     divMain.appendChild(titlePopUp)
-    //     divMain.appendChild(textCancel)
-    //     divMain.appendChild(divButtons)
-    //     insideDiv.appendChild(divMain)
-    //     document.body.appendChild(insideDiv)
+        divButtons.appendChild(buttonCancel)
+        divButtons.appendChild(buttonNoCancel)
+        divMain.appendChild(titlePopUp)
+        divMain.appendChild(textCancel)
+        divMain.appendChild(divButtons)
+        insideDiv.appendChild(divMain)
+        document.body.appendChild(insideDiv)
 
 
-    // }
+    }
     function makePopUp(title, msg, btn1, btn2){
         const bcgrd = document.createElement("div")
+        bcgrd.setAttribute("id","bcgrd")
         bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
 
         const popUp = document.createElement("div")
@@ -1365,9 +1553,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         const divButtons = document.createElement("div")
         divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
         const button1 = makeButton(btn1, "primary", "");
-        button1.addEventListener("click",function(){
-            document.body.removeChild(bcgrd)
-        })
         divButtons.appendChild(button1)
         popUp.appendChild(titlePopUp)
         popUp.appendChild(msgPopUp)
@@ -1382,7 +1567,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             })
             divButtons.appendChild(button2)
         }
-
+        return button1
     }
   
     function getDayOfWeekLabel(selectedDate) {

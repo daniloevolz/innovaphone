@@ -591,6 +591,7 @@ function UpdateAvailability(availability, type) {
 
                         } else {
                             td.classList.add('unavailable');
+                            td.classList.add("pointer-events-none");
                         }
                     });
                 }
