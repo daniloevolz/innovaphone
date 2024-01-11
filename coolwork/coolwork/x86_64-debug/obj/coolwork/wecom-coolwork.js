@@ -502,25 +502,29 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2", "md:grid-cols-4", "m-1","content-start")
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-3","sm:grid-flow-col", "m-1","content-start")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         document.body.appendChild(container);
-        // div sala
-        const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
-        divImg.setAttribute("style", `background-image: url(${room.img});`);
-        container.appendChild(divImg);
+         // div sala
+         const divMainSala = document.createElement("div")
+         divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-3","p-2","h-full","w-full","justify-start","items-start")
+ 
+         const divImg = document.createElement("div")
+         divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala",)
+         divImg.setAttribute("style", `background-image: url(${room.img})`);
+         container.appendChild(divMainSala)
+         divMainSala.appendChild(divImg)
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario")
+        divHorario.classList.add("divHorario","sm:col-span-2")
         container.appendChild(divHorario)
         makeViewCalendarDetail(divHorario, avail)
 
         // div container (scroll)
         const div102 = document.createElement("div")
-        div102.classList.add("div102", "h-fit")
+        div102.classList.add("div102", "h-fit","sm:row-span-2","sm:col-span-2")
         /*div102.style.height = 'calc(100vh - 70px)'*/
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
@@ -726,6 +730,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     date.date_start = availability.timestart_monday
                     return
                 case 1:
+                    date.date_start = availability.timestart_monday
                     return
                 case 2:
                     return
@@ -1048,10 +1053,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
                             devices = JSON.parse(obj.result)
-                            var devs = devices.filter(function (dev) {
-                                return dev.room_id == room.id
-                            })
-                            makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                            // var devs = devices.filter(function (dev) {
+                            //     return dev.room_id == room.id
+                            // })
+                            var room = rooms.filter(function (room) {
+                                return device.room_id == room.id
+                            })[0];
+                            console.log("ROOMID " + JSON.stringify(room.id))
+
+                            makeViewRoomDetail(room.id)
                         })
                     })
                 })
@@ -1070,10 +1080,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 app.sendSrc({ api: "user", mt: "SetDeviceToUser", deviceId: dev, src: dev }, function (obj) {
                     app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
                         devices = JSON.parse(obj.result)
-                        var devs = devices.filter(function (d) {
-                            return d.room_id == room.id
-                        })
-                        makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                        // var devs = devices.filter(function (d) {
+                        //     return d.room_id == room.id
+                        // })
+                        var room = rooms.filter(function (room) {
+                            return device.room_id == room.id
+                        })[0];
+                        console.log("ROOMID " + JSON.stringify(room.id))
+
+                        makeViewRoomDetail(room.id)
                     })
                 })
             })
@@ -1204,6 +1219,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         makeHeader(backButton,btnSave, texts.text("labelSchedule"))
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
+        containerSchedule.classList.add("sm:mx-[200px]")
         containerSchedule.setAttribute("id", "containerSchedule")
         document.body.appendChild(containerSchedule)
 
