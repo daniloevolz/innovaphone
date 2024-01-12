@@ -5,7 +5,7 @@ body {
     overflow: auto;
     background-size: cover;
     background-repeat: no-repeat;
-    background-image: url(./images/background.png);
+    /* background-image: url(./images/background.png); */
     font-family: 'Montserrat';
 }
 /*DeviceIcon*/

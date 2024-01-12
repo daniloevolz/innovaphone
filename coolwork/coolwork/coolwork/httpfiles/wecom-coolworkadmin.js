@@ -55,9 +55,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
-            "--button": "#303030",
-            "--text-standard": "#f2f5f6",
+            "--bg": "#0B2E46",
+            "--button": "#AED4EF",
+            "--text-standard": "#ffffff",
         },
         light: {
             "--bg": "white",
@@ -117,7 +117,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             list_AllRoom = JSON.parse(obj.result)
-            constructor(that)
+            makeViewRoom() 
+            //constructor(that)
+            //se precisar usar a tela do admin original  para criar salas é so descomentar essa função       
         }
         if (obj.api === "admin" && obj.mt === "UpdateRoomResult") {
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -136,8 +138,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             list_viewers = JSON.parse(obj.viewers)
             console.log("List_Editors" + JSON.stringify(list_editors))
             console.log("List_viewers" + JSON.stringify(list_viewers))
-
-            makeDivRoom(_colDireita);            
+             
+            
+            //makeDivRoom(_colDireita); 
+            
         }
         if (obj.api === "admin" && obj.mt === "UpdateDevicesResult") {
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -152,6 +156,343 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             console.log("AGENDADO", JSON.parse(obj.result))
         }
     }
+    // funções tela nova (figma)
+    function makeViewRoom(){
+        that.clear();
+        const btnMenu = makeButton('','',"./images/menu.svg")
+        makeHeader(makeButton("","","./images/home.svg"), btnMenu , texts.text("labelYourRooms"))
+        btnMenu.addEventListener("click",function(){
+            console.log("click")
+            makeDivOptions()
+        })
+    }
+    function makeDivOptions(){
+        that.clear();
+        makeHeader(backButton,makeButton("","","./images/settings.svg"), texts.text("labelOptions"))
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        // criar sala
+        const divMakeRoom = document.createElement("div")
+        divMakeRoom.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        const plusIcon = document.createElement("img")
+        plusIcon.src = './images/plus-circle.svg'
+        const labelMakeRoom = document.createElement("div")
+        labelMakeRoom.textContent = texts.text("labelCreateRoom")
+        // provisioning code
+        const divProvCode = document.createElement("div")
+        divProvCode.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        const provIcon = document.createElement("img")
+        provIcon.src = './images/hash.svg'
+        const labelProvCode = document.createElement("div")
+        labelProvCode.textContent = texts.text("labelProvCode")
+        // tabela agendamento
+        const divTableSched = document.createElement("div")
+        divTableSched.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        const schedIcon = document.createElement("img")
+        schedIcon.src = './images/calendar-option.svg'
+        const labelTableSched = document.createElement("div")
+        labelTableSched.textContent = texts.text("labelTableSchedule")
+
+
+        divMakeRoom.appendChild(plusIcon)
+        divMakeRoom.appendChild(labelMakeRoom)
+        divProvCode.appendChild(provIcon)
+        divProvCode.appendChild(labelProvCode)
+        divTableSched.appendChild(schedIcon)
+        divTableSched.appendChild(labelTableSched)
+        divMain.appendChild(divMakeRoom)
+        divMain.appendChild(divProvCode)
+        divMain.appendChild(divTableSched)
+        document.body.appendChild(divMain)
+
+        divMakeRoom.addEventListener("click",function(event){
+            event.preventDefault
+            event.stopPropagation()
+            createRoomContext()
+        })
+
+    }
+    function createRoomContext(){
+        that.clear()
+        makeHeader(backButton,makeButton("","",""),texts.text("labelCreateRoom"))
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        // SALA SIMPLES
+        const divSimpleRoom = document.createElement("div")
+        divSimpleRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        const divTextSimpleRoom = document.createElement("div")
+        divTextSimpleRoom.classList.add("text-3","text-white" ,"font-bold")
+        divTextSimpleRoom.textContent = texts.text("labelSimpleRoom")
+        const divImgSimpleRoom = document.createElement("div")
+        divImgSimpleRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
+        const imgPhoneSimple = document.createElement("img")
+        imgPhoneSimple.src = './images/phone.svg'
+        const imgUserSimple = document.createElement("img")
+        imgUserSimple.src = './images/user.svg'
+        const imgLaptopSimple = document.createElement("img")
+        imgLaptopSimple.src = './images/laptop.svg'
+        const textSimpleRoom1 = document.createElement("div")
+        textSimpleRoom1.classList.add("text-3")
+        textSimpleRoom1.textContent = texts.text("labelSimpleRoomTxt1")
+        const textSimpleRoom2 = document.createElement("div")
+        textSimpleRoom2.classList.add("text-3")
+        textSimpleRoom2.textContent = texts.text("labelSimpleRoomTxt2")
+
+        divImgSimpleRoom.appendChild(imgPhoneSimple)
+        divImgSimpleRoom.appendChild(imgUserSimple)
+        divImgSimpleRoom.appendChild(imgLaptopSimple)
+        divSimpleRoom.appendChild(divTextSimpleRoom)
+        divSimpleRoom.appendChild(divImgSimpleRoom)
+        divSimpleRoom.appendChild(textSimpleRoom1)
+        divSimpleRoom.appendChild(textSimpleRoom2)
+        divMain.appendChild(divSimpleRoom)
+        // SALA COMPLEXA
+        const divComplexRoom = document.createElement("div")
+        divComplexRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        const divTextComplexRoom = document.createElement("div")
+        divTextComplexRoom.classList.add("text-3","text-white" ,"font-bold")
+        divTextComplexRoom.textContent = texts.text("labelComplexRoom")
+        const divImgComplexRoom = document.createElement("div")
+        divImgComplexRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
+        const imgPhoneComplex = document.createElement("img")
+        imgPhoneComplex.src = './images/phone-missed.svg'
+        const imgUserComplex = document.createElement("img")
+        imgUserComplex.src = './images/users.svg'
+        const imgMonitorComplex = document.createElement("img")
+        imgMonitorComplex.src = './images/monitor.svg'
+        const textComplexRoom1 = document.createElement("div")
+        textComplexRoom1.classList.add("text-3")
+        textComplexRoom1.textContent = texts.text("labelComplexRoomTxt1")
+        const textComplexRoom2 = document.createElement("div")
+        textComplexRoom2.classList.add("text-3")
+        textComplexRoom2.textContent = texts.text("labelComplexRoomTxt2")
+        divImgComplexRoom.appendChild(imgPhoneComplex)
+        divImgComplexRoom.appendChild(imgUserComplex)
+        divImgComplexRoom.appendChild(imgMonitorComplex)
+        divComplexRoom.appendChild(divTextComplexRoom)
+        divComplexRoom.appendChild(divImgComplexRoom)
+        divComplexRoom.appendChild(textComplexRoom1)
+        divComplexRoom.appendChild(textComplexRoom2)
+        divMain.appendChild(divComplexRoom)
+        // div criar do zero 
+        const makeFromZero = document.createElement("div")
+        makeFromZero.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full","justify-center")
+        makeFromZero.textContent = texts.text("labelmakeFromZero")
+
+        divMain.appendChild(makeFromZero)
+        document.body.appendChild(divMain) 
+
+        makeFromZero.addEventListener("click",function(){
+            makeDivCreateRoom()
+        })
+    }
+    function makeHeader(imgLeft,imgRight,title){
+        // construção do header
+      
+        const header = document.createElement("header")
+        header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
+     
+        //construção da div com o titulo e imgHome
+        const divTitle = document.createElement("div")
+        divTitle.classList.add("flex","items-center","justify-start", "gap-1")
+     
+        //imgHome
+        const leftElement = imgLeft
+        leftElement.addEventListener("click", function (event) {
+            makeViewRoom()
+            event.stopPropagation()
+            event.preventDefault()
+        })
+     
+        //titulo
+        const titleRoom = document.createElement("h1")
+        titleRoom.classList.add("text-white" ,"font-bold")
+        titleRoom.textContent = title
+     
+        //imgMenu
+        const rightElment = imgRight
+        // imgMenu.setAttribute("src",imgRight)
+     
+        
+           divTitle.appendChild(leftElement)
+           divTitle.appendChild(titleRoom)
+           header.appendChild(divTitle)
+           header.appendChild(rightElment)
+           document.body.appendChild(header);
+     
+    }
+
+     function makeButton(text, variant, iconSVG) {
+        const button = document.createElement("button");
+        button.textContent = text;
+
+        if (iconSVG) {
+            const icon = document.createElement("img");
+            icon.src = iconSVG;
+            button.prepend(icon);
+        }
+
+        switch (variant) {
+            case "primary":
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primary");
+                break;
+            case "secundary":
+                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            case "destructive":
+                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            case "transparent":
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            default:
+                button.classList.add("hover:bg-dark-300", "rounded");
+                break;
+        }
+
+        return button;
+    }
+     const backButton = makeButton('', '', './images/arrow-left.svg');
+
+    function makeDivCreateRoom(){
+        that.clear()
+        makeHeader(backButton,makeButton(texts.text("labelCreate"),"primary",""),texts.text("labelCreateRoom"))
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        //nome da sala
+        const divNameRoom = document.createElement("div")
+        divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
+        const labelNameRoom = document.createElement("div")
+        labelNameRoom.textContent = texts.text("labelNameRoom")
+        const iptNameRoom = document.createElement("input")
+        iptNameRoom.type = 'text'
+        iptNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-500","rounded-lg")
+        // imagem da sala
+        const divImgRoom = document.createElement("div")
+        divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelImgRoom = document.createElement("div")
+        labelImgRoom.textContent = texts.text("labelImageRoom")
+        const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+        divBtnChoose.addEventListener("click",function(){
+            console.log("Abrir Div Escolher Imagem")
+            makeDivChooseImage()
+        })
+        // tipo de sala
+        const divTypeRoom = document.createElement("div")
+        divTypeRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelTypeRoom = document.createElement("div")
+        labelTypeRoom.textContent = texts.text("labelTypeRoom")
+        const btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
+        const btnRecurrent = makeButton(texts.text("labelRecurrent"),"secundary","")
+        // tipo de agendamento 
+        const divTypeSchedule = document.createElement("div")
+        divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelTypeSchedule = document.createElement("div")
+        labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
+        const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
+        const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+        // usuarios
+        const divUsersRoom = document.createElement("div")
+        divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelUsersRoom = document.createElement("div")
+        labelUsersRoom.textContent = texts.text("labelUsers")
+        const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
+        divBtnAddUsers.addEventListener("click",function(){
+            console.log("Abrir Div Add Usuários")
+        })
+        //horario agendamento 
+        const divHourSchedule = document.createElement("div")
+        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelHourSchedule = document.createElement("div")
+        labelHourSchedule.textContent = texts.text("labelHourSchedule")
+        const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
+        btnMakeCalendar.addEventListener("click",function(){
+            console.log("Abrir Calendario")
+        })
+        // devices
+        const divAddDevices = document.createElement("div")
+        divAddDevices.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelAddDevices = document.createElement("div")
+        labelAddDevices.textContent = texts.text("labelDevices")
+        const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
+        divBtnAddDevices.addEventListener("click",function(){
+            console.log("Abrir div add devices")
+        })
+        //appends
+        divNameRoom.appendChild(labelNameRoom)
+        divNameRoom.appendChild(iptNameRoom)
+        divImgRoom.appendChild(labelImgRoom)
+        divImgRoom.appendChild(divBtnChoose)
+        divTypeRoom.appendChild(labelTypeRoom)
+        divTypeRoom.appendChild(btnPeriod)
+        divTypeRoom.appendChild(btnRecurrent)
+        divTypeSchedule.appendChild(labelTypeSchedule)
+        divTypeSchedule.appendChild(btnDaySchedule)
+        divTypeSchedule.appendChild(btnHourSchedule)
+        divUsersRoom.appendChild(labelUsersRoom)
+        divUsersRoom.appendChild(divBtnAddUsers)
+        divHourSchedule.appendChild(labelHourSchedule)
+        divHourSchedule.appendChild(btnMakeCalendar)
+        divAddDevices.appendChild(labelAddDevices)
+        divAddDevices.appendChild(divBtnAddDevices)
+
+        divMain.appendChild(divNameRoom)
+        divMain.appendChild(divImgRoom)
+        divMain.appendChild(divTypeRoom)
+        divMain.appendChild(divTypeSchedule)
+        divMain.appendChild(divUsersRoom)
+        divMain.appendChild(divHourSchedule)
+        divMain.appendChild(divAddDevices)
+
+        document.body.appendChild(divMain)
+        }
+
+        function makeDivChooseImage(){
+          const insideDiv = document.createElement("div")
+          insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+        
+          const divMain = document.createElement("div")
+          divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
+
+          const titleImg = document.createElement("div")
+          titleImg.textContent = texts.text("labelImageRoom")
+          titleImg.classList.add("text-3","text-white" ,"font-bold")
+
+          const mainImg = document.createElement("img")
+          mainImg.classList.add("h-[280px]","rounded-lg")
+          mainImg.src = './images/ImagemMesa.png'
+
+          const divSelectImgs = document.createElement("div")
+          divSelectImgs.classList.add("flex","w-full","items-start","gap-1")
+
+          const img1 = document.createElement("img")
+          img1.src = './images/ImagemMesaLateral.png'
+          const img2 = document.createElement("img")
+          img2.src = './images/ImagemMesa-Small.png'
+          const img3 = document.createElement("img")
+          img3.src = './images/ImagemMesa-Circle.png'
+
+          const divIptImage = document.createElement("div")
+          divIptImage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
+          const labelImportImg = document.createElement("div")
+          labelImportImg.textContent = texts.text("labelImportImg")
+          //   const iptFileImg =  precisamos fazer um componentes para inputs (text & file)
+
+          divSelectImgs.appendChild(img1)
+          divSelectImgs.appendChild(img2)
+          divSelectImgs.appendChild(img3)
+          divIptImage.appendChild(labelImportImg)
+          divMain.appendChild(titleImg)
+          divMain.appendChild(mainImg)
+          divMain.appendChild(divSelectImgs)
+          divMain.appendChild(divIptImage)
+          insideDiv.appendChild(divMain)
+
+          document.body.appendChild(insideDiv)
+        }
+     // fim funções tela nova (figma)
+
+
     function getDateNow() {
         // Cria uma nova data com a data e hora atuais em UTC
         var date = new Date();
@@ -377,117 +718,117 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
   
     }
 
-    function makeDivCreateRoom(t){
-        t.clear();
-        filesID = [];  // para não excluir os arquivos corretos da DB files ; 
-        console.log("FILES ID "  + filesID)
-        //var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
+    // function makeDivCreateRoom(t){
+    //     t.clear();
+    //     filesID = [];  // para não excluir os arquivos corretos da DB files ; 
+    //     console.log("FILES ID "  + filesID)
+    //     //var insideDiv = t.add(new innovaphone.ui1.Div(null, null, "insideDiv"));
     
-        var leftbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
+    //     var leftbox = t.add(new innovaphone.ui1.Node("div", null, null, "list-box scrolltable").setAttribute("id", "left-box"));
     
-        leftbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"));
+    //     leftbox.add(new innovaphone.ui1.Div(null, null, "closewindow").setAttribute("id", "closewindow"));
     
-        var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
-        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
-        topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
-        topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
+    //     var topButtons = leftbox.add(new innovaphone.ui1.Div("position:absolute;width:80%;", null, null).setAttribute("id", "top-bottons"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelGeral"), null).setAttribute("id", "list-geral"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul", null, null, null)).add(new innovaphone.ui1.Node("a", "width: 100%;", texts.text("labelUsers"), null).setAttribute("id", "list-users"));
+    //     topButtons.add(new innovaphone.ui1.Node("ul",null,null,null)).add(new innovaphone.ui1.Node("a","width: 100%;",texts.text("labelSchedules"),null).setAttribute("id","list-schedule"))
         
-        divinputs = leftbox.add(new innovaphone.ui1.Div(null, null, "divInputs"));
-        var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral"));
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
-        divGeral.add(new innovaphone.ui1.Input(null, null, null, 100, "text", "iptRoomName").setAttribute("id", "iptRoomName"));
-        input = divGeral.add(new innovaphone.ui1.Node("input", null, "", ""));
-        input.setAttribute("id", "fileinput").setAttribute("type", "file");
-        input.setAttribute("accept", "image/*");
-        input.container.addEventListener('change', onSelectFile, false);
+    //     divinputs = leftbox.add(new innovaphone.ui1.Div(null, null, "divInputs"));
+    //     var divGeral = divinputs.add(new innovaphone.ui1.Div(null, null, "divGeral").setAttribute("id", "div-geral"));
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelName"), null));
+    //     divGeral.add(new innovaphone.ui1.Input(null, null, null, 100, "text", "iptRoomName").setAttribute("id", "iptRoomName"));
+    //     input = divGeral.add(new innovaphone.ui1.Node("input", null, "", ""));
+    //     input.setAttribute("id", "fileinput").setAttribute("type", "file");
+    //     input.setAttribute("accept", "image/*");
+    //     input.container.addEventListener('change', onSelectFile, false);
 
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelTypeRoom"), null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectType"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("recurrentType"),null).setAttribute("id","recurrentType"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodType"),null).setAttribute("id","periodType"))
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelTypeRoom"), null))
+    //     var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectType"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("recurrentType"),null).setAttribute("id","recurrentType"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodType"),null).setAttribute("id","periodType"))
         
-        divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelModuleRoom"), null))
-        var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("hourModule"),null).setAttribute("id","hourModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("dayModule"),null).setAttribute("id","dayModule"))
-        selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodModule"),null).setAttribute("id","periodModule"))
+    //     divGeral.add(new innovaphone.ui1.Div(null, texts.text("labelModuleRoom"), null))
+    //     var selectTypeRoom = divGeral.add(new innovaphone.ui1.Node("select",null,null,null).setAttribute("id","selectModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("hourModule"),null).setAttribute("id","hourModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("dayModule"),null).setAttribute("id","dayModule"))
+    //     selectTypeRoom.add(new innovaphone.ui1.Node("option", null, texts.text("periodModule"),null).setAttribute("id","periodModule"))
 
-        // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
-        imgBD = divGeral.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","imgBD"))
-        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
+    //     // divPhones = leftbox.add(new innovaphone.ui1.Div("position: absolute;width: 40%; height:70%; display: flex;left: 3%; justify-content: center;top: 20%;",null,null).setAttribute("id","divPhones"))
+    //     imgBD = divGeral.add(new innovaphone.ui1.Node("div",null,null,null).setAttribute("id","imgBD"))
+    //     app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
 
-        var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
-        var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
-        var userTable = createUsersDepartmentsGrid();
-        rightDiv.add(userTable)
+    //     var divUsers = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none ;justify-content:center;align-items:center").setAttribute("id","div-users"))
+    //     var rightDiv = divUsers.add(new innovaphone.ui1.Node("div", null, null, "right-box scrolltable tableusers").setAttribute("id","list-box"))
+    //     var userTable = createUsersDepartmentsGrid();
+    //     rightDiv.add(userTable)
         
-        var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
-        //var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
-        //var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
-        //var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
-        //var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
-        //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
-        //divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
+    //     var divScheduleInn = divinputs.add(new innovaphone.ui1.Div("position:absolute;width:100%;height:100%;display:none").setAttribute("id","div-schedule"))
+    //     //var divStartHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourOpening"),"divStartHour"))
+    //     //var divEndHour = divSchedule.add(new innovaphone.ui1.Div(null,texts.text("labelHourClosing"),"divEndHour"))
+    //     //var hourStart = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","startIpt").setAttribute("id","startIpt"))
+    //     //var hourEnd = divSchedule.add(new innovaphone.ui1.Input(null,null,null,null,"time","endIpt").setAttribute("id","endIpt"))
+    //     //var btnSave = divSchedule.add(new innovaphone.ui1.Node("button","width:90px;height:35px;display:flex;justify-content:center;align-items:center;top:1%;left:75%;position:absolute;",texts.text("labelCreateRoom"),null).setAttribute("id","btnSaveRoom")) 
+    //     //divSchedule.add(new innovaphone.ui1.Div("position:absolute;top:10%",null,null).setAttribute("id","calendar"))
 
-        var divGeral = document.getElementById("div-geral");
-        var divUsers = document.getElementById("div-users");
-        var divSchedule = document.getElementById("div-schedule");
+    //     var divGeral = document.getElementById("div-geral");
+    //     var divUsers = document.getElementById("div-users");
+    //     var divSchedule = document.getElementById("div-schedule");
 
-        document.getElementById("list-geral").addEventListener("click", function () {
+    //     document.getElementById("list-geral").addEventListener("click", function () {
         
-            divGeral.style.display = "flex";
-            divUsers.style.display = "none";
-            divSchedule.style.display = "none";
-        });
+    //         divGeral.style.display = "flex";
+    //         divUsers.style.display = "none";
+    //         divSchedule.style.display = "none";
+    //     });
 
-        document.getElementById("list-users").addEventListener("click", function () {
+    //     document.getElementById("list-users").addEventListener("click", function () {
             
-            divGeral.style.display = "none";
-            divUsers.style.display = "flex";
-            divSchedule.style.display = "none";
-        });
+    //         divGeral.style.display = "none";
+    //         divUsers.style.display = "flex";
+    //         divSchedule.style.display = "none";
+    //     });
 
-        var a = document.getElementById("list-schedule");
-        a.addEventListener("click", function () {
-            divGeral.style.display = "none";
-            divUsers.style.display = "none";
-            divSchedule.style.display = "block";
+    //     var a = document.getElementById("list-schedule");
+    //     a.addEventListener("click", function () {
+    //         divGeral.style.display = "none";
+    //         divUsers.style.display = "none";
+    //         divSchedule.style.display = "block";
     
-            var selectType = document.getElementById("selectType");
-            var optType = selectType.options[selectType.selectedIndex].id;
-            // set checkbox conforme oq for selecionado
-            makeSchedule(divScheduleInn, optType);
-        });
+    //         var selectType = document.getElementById("selectType");
+    //         var optType = selectType.options[selectType.selectedIndex].id;
+    //         // set checkbox conforme oq for selecionado
+    //         makeSchedule(divScheduleInn, optType);
+    //     });
 
         
-        // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
-        //     filesID = [];                      // setTimeout muito coisa de Junior 
-        //     filesID = "vazio";   
-        // },2000)
-        document.getElementById("closewindow").addEventListener("click",function(){
-            // console.log("FILES ID "  + filesID)
-            // if(filesID ){                                      
-            //     console.log("FILES ID "  + filesID)
-            //    deleteFile(filesID)
-            // }
-            setTimeout(function () {
-                //insideDiv.clear()
-                //t.rem(insideDiv)
-                //controlDB = false // controle da DB files
+    //     // setTimeout(function(){                 //arrumar e usar promisses para limpar o FilesID e dps fechar a janela
+    //     //     filesID = [];                      // setTimeout muito coisa de Junior 
+    //     //     filesID = "vazio";   
+    //     // },2000)
+    //     document.getElementById("closewindow").addEventListener("click",function(){
+    //         // console.log("FILES ID "  + filesID)
+    //         // if(filesID ){                                      
+    //         //     console.log("FILES ID "  + filesID)
+    //         //    deleteFile(filesID)
+    //         // }
+    //         setTimeout(function () {
+    //             //insideDiv.clear()
+    //             //t.rem(insideDiv)
+    //             //controlDB = false // controle da DB files
             
-                //app.send({ api: "admin", mt: "SelectAllRoom" })
-            },500) // arrumar para carregar isso apos o termino da requisição 
-            leftbox.clear()
-            t.rem(leftbox)
-            controlDB = false // controle da DB files
+    //             //app.send({ api: "admin", mt: "SelectAllRoom" })
+    //         },500) // arrumar para carregar isso apos o termino da requisição 
+    //         leftbox.clear()
+    //         t.rem(leftbox)
+    //         controlDB = false // controle da DB files
 
-            app.send({ api: "admin", mt: "SelectAllRoom" })
-            waitConnection(that);
-        })
+    //         app.send({ api: "admin", mt: "SelectAllRoom" })
+    //         waitConnection(that);
+    //     })
     
 
 
-    }
+    // }
     function formatDate(inputDate) {
         const date = new Date(inputDate);
     

@@ -730,7 +730,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     date.date_start = availability.timestart_monday
                     return
                 case 1:
-                    date.date_start = availability.timestart_monday
                     return
                 case 2:
                     return
