@@ -98,7 +98,7 @@ Wecom.coolworkTexts = {
         4 : "Qui",
         5 : "Sex",
         6 : "Sáb",
-
+        
         
     }
 }

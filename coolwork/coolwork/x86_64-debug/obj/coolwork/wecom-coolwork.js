@@ -60,6 +60,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var schedules = [];
     var viewers = [];
     var editors = [];
+    var phones =[];
 
 
     function app_connected(domain, user, dn, appdomain) {
@@ -96,8 +97,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     function devicesApi_onmessage(conn, obj) {
         console.log("WECOM-LOG:devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
-            var phones = obj.msg.phones;
+            phones = obj.msg.phones;
             console.log("WECOM-LOG:devicesApi_onmessage:GetPhonesResult " + JSON.stringify(phones));
+
             app.send({ api: "user", mt: "PhoneList", devices: phones })
         }
 
@@ -158,6 +160,28 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
         // }
     } 
+    
+function addPhonesToDevices() {
+  phones.forEach(function(phone) {
+    // Procura o índice do item em devices pelo hwId
+    var index = devices.findIndex(function(device) {
+      return device.hwid === phone.hwId;
+    });
+
+    // Se encontrou, atualiza o name; caso contrário, adiciona um novo item
+    if (index !== -1) {
+      devices[index].name = phone.name;
+    }
+  });
+  console.log("Erick Devices",devices);
+}
+
+
+
+
+// Agora, devices contém os phones com os parâmetros necessários
+
+
     function makeButton(text, variant, iconSVG) {
         const button = document.createElement("button");
         button.textContent = text;
@@ -290,9 +314,84 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
      
      }
      
+    function makeUserSchedules(schedules){
+        that.clear()
+        addPhonesToDevices()
+        makeHeader(backButton, makeButton('','',"./images/menu.svg"), "Meus Agendamentos");
+        
+        console.log("ERICK Rooms",JSON.stringify(schedules))
+        
+        schedules.forEach(function(s){
+            const divMain = document.createElement('div')
+            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-1', 'rounded-lg',"margin-1")
+            divMain.setAttribute("id","divMain")
+            
+            const div185 = document.createElement('div')
+            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between',"flex-wrap",'rounded-lg')
+            div185.setAttribute("id","div185")
+            const divDevice = document.createElement('div')
+            divDevice.classList.add("flex","flex-col","items-center", "gap-1", "justify-center",)
+            const divImg = document.createElement('img')
+            divImg.classList.add("divImg","h-[45px]","w-[45px]",)
+            divImg.setAttribute("src", "../images/IP112.png")
+            console.log("Erick nameDevice", s)
+            var nameDevice = devices.filter(function(d){
+                return d.hwid === s.device_id
+                
+            })[0]
+            
+            console.log("Erick nameDevice", nameDevice)
+            const deviceHw = document.createElement('div')
+            deviceHw.classList.add("divDeviceHw")
+            deviceHw.textContent = nameDevice.name
+
+            const dateSchedule = document.createElement('div')
+            dateSchedule.classList.add("flex","flex-col")
+
+            var nameRoom = rooms.filter(function(r){
+                return r.id === s.device_room_id
+            })[0]
+
+
+            const roomSched = document.createElement('div')
+            roomSched.classList.add("nameroom", "font-medium", "text-xl")
+            roomSched.textContent = nameRoom.name
+            const formDate = s.data_end.split("T")
+
+            console.log("formDate",s.data_end, formDate[1])
+
+            const dateHour = document.createElement('div')
+            dateHour.classList.add("dateHour")
+            dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
+
+
+            const editBtn = makeButton(texts.text("labelEdit"), "primary", "");
+            const delBtn = makeButton(texts.text("deletePhoneUseButton"), "destructive", "");
+            divDevice.appendChild(divImg)
+            divDevice.appendChild(deviceHw)
+            dateSchedule.appendChild(roomSched)
+            dateSchedule.appendChild(dateHour)
+            
+            
+            
+            div185.appendChild(divDevice)
+            div185.appendChild(dateSchedule)
+            div185.appendChild(editBtn)
+            div185.appendChild(delBtn)
+            divMain.appendChild(div185)
+            document.body.appendChild(divMain)
+
+        })
+        
+        
+    }
+    var buttonMenu = makeButton('','',"./images/menu.svg")
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
-        makeHeader(makeButton("","","./images/home.svg"), makeButton('','',"./images/menu.svg"), texts.text("labelMyRooms"))
+        makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
+        buttonMenu.addEventListener("click",function(){
+            makeUserSchedules(schedules)
+        })
         // div container (scroll)
         const container = document.createElement("div")
         container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
@@ -502,29 +601,25 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-3","sm:grid-flow-col", "m-1","content-start")
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2", "md:grid-cols-4", "m-1","content-start")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         document.body.appendChild(container);
-         // div sala
-         const divMainSala = document.createElement("div")
-         divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-3","p-2","h-full","w-full","justify-start","items-start")
- 
-         const divImg = document.createElement("div")
-         divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala",)
-         divImg.setAttribute("style", `background-image: url(${room.img})`);
-         container.appendChild(divMainSala)
-         divMainSala.appendChild(divImg)
+        // div sala
+        const divImg = document.createElement("div")
+        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
+        divImg.setAttribute("style", `background-image: url(${room.img});`);
+        container.appendChild(divImg);
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario","sm:col-span-2")
+        divHorario.classList.add("divHorario")
         container.appendChild(divHorario)
         makeViewCalendarDetail(divHorario, avail)
 
         // div container (scroll)
         const div102 = document.createElement("div")
-        div102.classList.add("div102", "h-fit","sm:row-span-2","sm:col-span-2")
+        div102.classList.add("div102", "h-fit")
         /*div102.style.height = 'calc(100vh - 70px)'*/
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
@@ -730,7 +825,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     date.date_start = availability.timestart_monday
                     return
                 case 1:
-                    date.date_start = availability.timestart_monday
                     return
                 case 2:
                     return
@@ -1053,15 +1147,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
                             devices = JSON.parse(obj.result)
-                            // var devs = devices.filter(function (dev) {
-                            //     return dev.room_id == room.id
-                            // })
-                            var room = rooms.filter(function (room) {
-                                return device.room_id == room.id
-                            })[0];
-                            console.log("ROOMID " + JSON.stringify(room.id))
-
-                            makeViewRoomDetail(room.id)
+                            var devs = devices.filter(function (dev) {
+                                return dev.room_id == room.id
+                            })
+                            makeViewRoomDetail(room, devs, availability, schedules, viewers)
                         })
                     })
                 })
@@ -1080,15 +1169,10 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 app.sendSrc({ api: "user", mt: "SetDeviceToUser", deviceId: dev, src: dev }, function (obj) {
                     app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
                         devices = JSON.parse(obj.result)
-                        // var devs = devices.filter(function (d) {
-                        //     return d.room_id == room.id
-                        // })
-                        var room = rooms.filter(function (room) {
-                            return device.room_id == room.id
-                        })[0];
-                        console.log("ROOMID " + JSON.stringify(room.id))
-
-                        makeViewRoomDetail(room.id)
+                        var devs = devices.filter(function (d) {
+                            return d.room_id == room.id
+                        })
+                        makeViewRoomDetail(room, devs, availability, schedules, viewers)
                     })
                 })
             })
@@ -1219,7 +1303,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         makeHeader(backButton,btnSave, texts.text("labelSchedule"))
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
-        containerSchedule.classList.add("sm:mx-[200px]")
         containerSchedule.setAttribute("id", "containerSchedule")
         document.body.appendChild(containerSchedule)
 
