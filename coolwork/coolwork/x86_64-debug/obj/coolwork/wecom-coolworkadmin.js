@@ -26,6 +26,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
     var phone_list = [] // todos os devices
+    var us
     var listDeviceRoom = []; 
     var list_AllRoom = []
     var list_room = [];
@@ -37,8 +38,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var appointments = []
     var list_tableUsers = []
     var UIuserPicture;
+    var userSIP;
+    var userDN;
+    var userDomain;
     var divinputs; 
-    var avatar = start.consumeApi("com.innovaphone.avatar");
     // var devicesApi = start.consumeApi("com.innovaphone.devices");
     //     devicesApi.onmessage.attach(onmessage); // onmessage is called for responses from the API
     // var websocket = null
@@ -81,19 +84,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         app.send({ api: "admin", mt: "TableUsers" });
         app.send({ api: "admin", mt: "CheckAppointment" });
         controlDB = false
-        UIuser = dn
-        avatar = new innovaphone.Avatar(start, user, domain);
-        UIuserPicture = avatar.url(user, 80, dn);
+        userDomain = domain
+        userDN = dn
+        userSIP = user
         devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" }); // phonelist
         app.send({api:"admin", mt:"SelectAllRoom"})
-         // revisar 04/10
-        avatar = new innovaphone.Avatar(start, user, domain);
     }
-    var sip = "administrator";
-
-		
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
@@ -147,7 +145,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
-            list_tableUsers = JSON.parse(obj.result);           
+            list_tableUsers = JSON.parse(obj.result);        
+            console.log("TABLEUSERS" + JSON.stringify(list_tableUsers))   
         }
         if (obj.api == "admin" && obj.mt == "CheckAppointmentResult") {
             appointments = obj.result;
@@ -334,23 +333,55 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         switch (variant) {
             case "primary":
-                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primary");
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg","primary");
                 break;
             case "secundary":
-                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
                 break;
+            case "tertiary":
+                button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                break
             case "destructive":
-                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
                 break;
             case "transparent":
-                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded-lg");
                 break;
             default:
-                button.classList.add("hover:bg-dark-300", "rounded");
+                button.classList.add("hover:bg-dark-300", "rounded-lg");
                 break;
         }
 
         return button;
+    }
+
+    function makeInput(text,variant,placeHolder){
+        const input = document.createElement("input")
+        input.textContent = text
+        input.placeholder = placeHolder
+        input.type = variant
+
+        switch (variant) {
+            case "text":
+                input.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-white","rounded-lg","w-full","text-dark-600")
+                break
+            case "file":
+                input.style.display = "none";
+                const customFileInput = document.createElement("label");
+                customFileInput.textContent = text;
+                customFileInput.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg", "primary", "cursor-pointer");
+                customFileInput.appendChild(input);
+                return customFileInput;
+            case "checkbox":
+                input.classList.add("w-[16px]","h-[16px]","rounded-md");
+                break
+            case "search":
+                input.classList.add("flex","p-1","justify-between","items-center","rounded-md","bg-white","text-dark-500")
+
+        }
+
+        return input;
+    
     }
      const backButton = makeButton('', '', './images/arrow-left.svg');
 
@@ -364,9 +395,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
         const labelNameRoom = document.createElement("div")
         labelNameRoom.textContent = texts.text("labelNameRoom")
-        const iptNameRoom = document.createElement("input")
-        iptNameRoom.type = 'text'
-        iptNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-500","rounded-lg")
+        const iptNameRoom = makeInput("","text","Nome da sala")
         // imagem da sala
         const divImgRoom = document.createElement("div")
         divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -383,14 +412,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelTypeRoom = document.createElement("div")
         labelTypeRoom.textContent = texts.text("labelTypeRoom")
         const btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
-        const btnRecurrent = makeButton(texts.text("labelRecurrent"),"secundary","")
-        // tipo de agendamento 
-        const divTypeSchedule = document.createElement("div")
-        divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelTypeSchedule = document.createElement("div")
-        labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
-        const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
-        const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+        const btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
+        // tipo de agendamento colocar isso na tela de agendamento
+        // const divTypeSchedule = document.createElement("div")
+        // divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        // const labelTypeSchedule = document.createElement("div")
+        // labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
+        // const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
+        // const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
         // usuarios
         const divUsersRoom = document.createElement("div")
         divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -399,6 +428,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddUsers.addEventListener("click",function(){
             console.log("Abrir Div Add Usuários")
+            makeDivAddUsers()
         })
         //horario agendamento 
         const divHourSchedule = document.createElement("div")
@@ -426,9 +456,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divTypeRoom.appendChild(labelTypeRoom)
         divTypeRoom.appendChild(btnPeriod)
         divTypeRoom.appendChild(btnRecurrent)
-        divTypeSchedule.appendChild(labelTypeSchedule)
-        divTypeSchedule.appendChild(btnDaySchedule)
-        divTypeSchedule.appendChild(btnHourSchedule)
+        // divTypeSchedule.appendChild(labelTypeSchedule) colocar na tela de agendamento
+        // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
+        // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
         divUsersRoom.appendChild(labelUsersRoom)
         divUsersRoom.appendChild(divBtnAddUsers)
         divHourSchedule.appendChild(labelHourSchedule)
@@ -439,12 +469,102 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.appendChild(divNameRoom)
         divMain.appendChild(divImgRoom)
         divMain.appendChild(divTypeRoom)
-        divMain.appendChild(divTypeSchedule)
+        // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
         divMain.appendChild(divUsersRoom)
         divMain.appendChild(divHourSchedule)
         divMain.appendChild(divAddDevices)
 
         document.body.appendChild(divMain)
+        }
+        function makeDivAddUsers(){
+            const insideDiv = document.createElement("div")
+            insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+            
+            const divMain = document.createElement("div")
+            divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3")
+
+            const titleImg = document.createElement("div")
+            titleImg.textContent = texts.text("labelUsers")
+            titleImg.classList.add("text-3","text-white" ,"font-bold")
+
+            const iptSearch = makeInput("","search","Pesquisar...")
+            iptSearch.classList.add("w-full")
+
+            const selectAllUsers = document.createElement("div")
+            selectAllUsers.classList.add("flex","justify-between","items-center")
+
+            const nameOfUsers = document.createElement("div")
+            nameOfUsers.classList.add("text-3","text-white" ,"font-bold")
+            nameOfUsers.textContent = texts.text("labelNameOfUsers")
+
+            const divLabelandCheckbox = document.createElement("div")
+            divLabelandCheckbox.classList.add("flex","w-[145px]","p-1","justify-between","items-center")
+            const labelSelectAllUsers = document.createElement("div")
+            labelSelectAllUsers.textContent = texts.text("labelSelectAllUsers")
+            labelSelectAllUsers.classList.add("text-3","text-white" ,"font-bold")
+
+            const checkboxAllUsers = makeInput("","checkbox","")
+
+            const scrollUsers = document.createElement("div")
+            scrollUsers.classList.add("overflow-y-auto","h-[200px]","gap-1","flex-col","flex")
+
+
+            list_tableUsers.forEach(function(user){
+                
+                const divMainUsers = document.createElement("div")
+                divMainUsers.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
+                const divUsersAvatar = document.createElement("div")
+                divUsersAvatar.classList.add("flex","gap-1","items-center")
+                let avatar = new innovaphone.Avatar(start, user.sip, userDomain);
+                let UIuserPicture = avatar.url(user.sip, 120, userDN);
+                const imgAvatar = document.createElement("img");
+                imgAvatar.setAttribute("src", UIuserPicture);
+                imgAvatar.setAttribute("id", "divAvatar");
+                imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+                const nameUser = document.createElement("div")
+                nameUser.textContent = user.cn
+                const checkboxUser = makeInput("","checkbox","")
+                divUsersAvatar.appendChild(imgAvatar);
+                divUsersAvatar.appendChild(nameUser);
+                divMainUsers.appendChild(divUsersAvatar);
+                divMainUsers.appendChild(checkboxUser);
+                scrollUsers.appendChild(divMainUsers)
+            })
+            
+            const divManage = document.createElement("div")
+            divManage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
+            const textManage = document.createElement("div")
+            textManage.classList.add("text-3","font-bold","text-white")
+            textManage.textContent = texts.text("labelManageFunctions")
+            const btnManage = makeButton(texts.text("labelEdit"),"secundary","")
+
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+            const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+            buttonCancel.addEventListener("click",function(){
+              console.log("Fechar Tela")
+              document.body.removeChild(insideDiv)
+              
+            })
+            const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+
+            //appends
+            divButtons.appendChild(buttonCancel)
+            divButtons.appendChild(buttonConfirm)
+            divManage.appendChild(textManage)
+            divManage.appendChild(btnManage)
+            divLabelandCheckbox.appendChild(labelSelectAllUsers)
+            divLabelandCheckbox.appendChild(checkboxAllUsers)
+            selectAllUsers.appendChild(nameOfUsers)
+            selectAllUsers.appendChild(divLabelandCheckbox)
+            divMain.appendChild(titleImg)
+            divMain.appendChild(iptSearch)
+            divMain.appendChild(selectAllUsers)
+            divMain.appendChild(scrollUsers)
+            divMain.appendChild(divManage)
+            divMain.appendChild(divButtons)
+            insideDiv.appendChild(divMain)
+            document.body.appendChild(insideDiv)
         }
 
         function makeDivChooseImage(){
@@ -459,36 +579,68 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
           titleImg.classList.add("text-3","text-white" ,"font-bold")
 
           const mainImg = document.createElement("img")
-          mainImg.classList.add("h-[280px]","rounded-lg")
-          mainImg.src = './images/ImagemMesa.png'
+          mainImg.classList.add("h-[260px]","rounded-lg","aspect-[3/4]")
+          mainImg.src = './images/MESA-1.png'
 
           const divSelectImgs = document.createElement("div")
-          divSelectImgs.classList.add("flex","w-full","items-start","gap-1")
+          divSelectImgs.classList.add("flex","w-full","items-start","gap-1","flex-row")
 
           const img1 = document.createElement("img")
-          img1.src = './images/ImagemMesaLateral.png'
+          img1.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+          img1.src = './images/MESA-1.png'
           const img2 = document.createElement("img")
-          img2.src = './images/ImagemMesa-Small.png'
+          img2.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+          img2.src = './images/MESA-2.png'
           const img3 = document.createElement("img")
-          img3.src = './images/ImagemMesa-Circle.png'
+          img3.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+          img3.src = './images/MESA-3.png'
 
+          img1.addEventListener("click", function(event) {
+            changeMainImage(mainImg,'./images/MESA-1.png');
+            });
+        
+        img2.addEventListener("click", function(event) {
+            changeMainImage(mainImg,'./images/MESA-2.png');
+            });
+        
+        img3.addEventListener("click", function(event) {
+            changeMainImage(mainImg,'./images/MESA-3.png');
+            });
           const divIptImage = document.createElement("div")
           divIptImage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
           const labelImportImg = document.createElement("div")
           labelImportImg.textContent = texts.text("labelImportImg")
-          //   const iptFileImg =  precisamos fazer um componentes para inputs (text & file)
-
+          const iptFileImg =  makeInput(texts.text("labelChoose"),"file","")
+          iptFileImg.addEventListener("change", function () {
+            console.log("CLICANDO")
+          });
+          const divButtons = document.createElement("div")
+          divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+          const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+          buttonCancel.addEventListener("click",function(){
+            console.log("Fechar Tela")
+            document.body.removeChild(insideDiv)
+            
+          })
+          const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
           divSelectImgs.appendChild(img1)
           divSelectImgs.appendChild(img2)
           divSelectImgs.appendChild(img3)
           divIptImage.appendChild(labelImportImg)
+          divIptImage.appendChild(iptFileImg)
+          divButtons.appendChild(buttonCancel)
+          divButtons.appendChild(buttonConfirm)
           divMain.appendChild(titleImg)
           divMain.appendChild(mainImg)
           divMain.appendChild(divSelectImgs)
           divMain.appendChild(divIptImage)
+          divMain.append(divButtons)
           insideDiv.appendChild(divMain)
 
           document.body.appendChild(insideDiv)
+        }
+        function changeMainImage(mainImg,newSrc) {
+            mainImg.src = newSrc;
         }
      // fim funções tela nova (figma)
 

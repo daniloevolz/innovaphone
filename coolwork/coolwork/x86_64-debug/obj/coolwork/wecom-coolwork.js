@@ -677,38 +677,57 @@ function addPhonesToDevices() {
 
         availability.forEach(function (a) {
         // img expandir
-        const divOpenTime = document.createElement("div")
-        divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
-        divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-        divOpenTime.setAttribute("id", "divOpenTime")
-        div160.appendChild(divOpenTime)
-        divOpenTime.addEventListener("click", function (event) {
-            event.stopPropagation()
-            var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
-            var divOpenTime = document.getElementById("divOpenTime")
-            if (divAvailabilyDetail) {
-                divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-                divMain.removeChild(divAvailabilyDetail)
+        if (window.matchMedia("(max-width: 500px)").matches) {
+            const divOpenTime = document.createElement("div")
+            divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
+            divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+            divOpenTime.setAttribute("id", "divOpenTime")
+            div160.appendChild(divOpenTime)
+            divOpenTime.addEventListener("click", function (event) {
+                event.stopPropagation()
+                var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
+                var divOpenTime = document.getElementById("divOpenTime")
+                if (divAvailabilyDetail) {
+                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+                    divMain.removeChild(divAvailabilyDetail)
+    
+                } else {
+                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+                    var divAvailabilyDetail = document.createElement("div")
+                    divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
+                    divAvailabilyDetail.classList.add("divAvailabilyDetail")
+                    divMain.appendChild(divAvailabilyDetail)
+    
+                    
+                        if (a.type == "periodType") {
+                            makeViewTimePeriod(divAvailabilyDetail, a)
+                        }
+    
+                        if (a.type == "recurrentType") {
+                            makeViewTimeRecurrent(divAvailabilyDetail, a)
+                        }
+    
+                        UpdateAvailability(availability, a.type)     
+                }
+            })
+         }else{
+            var divAvailabilyDetail = document.createElement("div")
+            divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
+            divAvailabilyDetail.classList.add("divAvailabilyDetail")
+            divMain.appendChild(divAvailabilyDetail)
 
-            } else {
-                divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
-                var divAvailabilyDetail = document.createElement("div")
-                divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                divAvailabilyDetail.classList.add("divAvailabilyDetail")
-                divMain.appendChild(divAvailabilyDetail)
+            
+                if (a.type == "periodType") {
+                    makeViewTimePeriod(divAvailabilyDetail, a)
+                }
 
-                
-                    if (a.type == "periodType") {
-                        makeViewTimePeriod(divAvailabilyDetail, a)
-                    }
+                if (a.type == "recurrentType") {
+                    makeViewTimeRecurrent(divAvailabilyDetail, a)
+                }
 
-                    if (a.type == "recurrentType") {
-                        makeViewTimeRecurrent(divAvailabilyDetail, a)
-                    }
+                UpdateAvailability(availability, a.type)     
+         }
 
-                    UpdateAvailability(availability, a.type)     
-            }
-        })
     })
 
     }

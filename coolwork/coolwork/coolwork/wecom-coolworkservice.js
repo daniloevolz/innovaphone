@@ -455,7 +455,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid })
+                    list_users.push({ cn: u.columns.cn, guid: u.columns.guid, sip: u.columns.h323 })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(list_users), src: obj.src }));
             }
