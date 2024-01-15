@@ -115,8 +115,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             list_AllRoom = JSON.parse(obj.result)
-            makeViewRoom() 
-            //constructor(that)
+            // makeViewRoom() 
+            constructor(that)
             //se precisar usar a tela do admin original  para criar salas é so descomentar essa função       
         }
         if (obj.api === "admin" && obj.mt === "UpdateRoomResult") {
