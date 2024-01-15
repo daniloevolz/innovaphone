@@ -301,7 +301,8 @@ function truncateString(str, maxLength) {
         //imgHome
         const leftElement = imgLeft
         leftElement.addEventListener("click", function (event) {
-            app.send({ api: "user", mt: "SelectMyRooms" })
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            // app.send({ api: "user", mt: "SelectMyRooms" })
             event.stopPropagation()
             event.preventDefault()
         })
@@ -374,7 +375,8 @@ function truncateString(str, maxLength) {
             var nameRoom = rooms.filter(function(r){
                 return r.id === s.device_room_id
             })[0]
-
+            
+            var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
             nameRoom.name = truncateString(nameRoom.name, 10);
@@ -407,6 +409,7 @@ function truncateString(str, maxLength) {
             divMain.appendChild(div185)
             document.body.appendChild(divMain)
 
+            nameRoom.name = oldNameRoom
         })
         
         

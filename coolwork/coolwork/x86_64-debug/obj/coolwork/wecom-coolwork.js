@@ -301,7 +301,8 @@ function truncateString(str, maxLength) {
         //imgHome
         const leftElement = imgLeft
         leftElement.addEventListener("click", function (event) {
-            app.send({ api: "user", mt: "SelectMyRooms" })
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            // app.send({ api: "user", mt: "SelectMyRooms" })
             event.stopPropagation()
             event.preventDefault()
         })
@@ -374,7 +375,8 @@ function truncateString(str, maxLength) {
             var nameRoom = rooms.filter(function(r){
                 return r.id === s.device_room_id
             })[0]
-
+            
+            var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
             nameRoom.name = truncateString(nameRoom.name, 10);
@@ -407,6 +409,7 @@ function truncateString(str, maxLength) {
             divMain.appendChild(div185)
             document.body.appendChild(divMain)
 
+            nameRoom.name = oldNameRoom
         })
         
         
@@ -708,115 +711,40 @@ function truncateString(str, maxLength) {
         div160.appendChild(divHourCard)
 
         availability.forEach(function (a) {
-<<<<<<< HEAD
         // img expandir
-        if (window.matchMedia("(max-width: 500px)").matches) {
-            const divOpenTime = document.createElement("div")
-            divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
-            divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-            divOpenTime.setAttribute("id", "divOpenTime")
-            div160.appendChild(divOpenTime)
-            divOpenTime.addEventListener("click", function (event) {
-                event.stopPropagation()
-                var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
-                var divOpenTime = document.getElementById("divOpenTime")
-                if (divAvailabilyDetail) {
-                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-                    divMain.removeChild(divAvailabilyDetail)
-    
-                } else {
-                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
-                    var divAvailabilyDetail = document.createElement("div")
-                    divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                    divAvailabilyDetail.classList.add("divAvailabilyDetail")
-                    divMain.appendChild(divAvailabilyDetail)
-    
-                    
-                        if (a.type == "periodType") {
-                            makeViewTimePeriod(divAvailabilyDetail, a)
-                        }
-    
-                        if (a.type == "recurrentType") {
-                            makeViewTimeRecurrent(divAvailabilyDetail, a)
-                        }
-    
-                        UpdateAvailability(availability, a.type)     
-                }
-            })
-         }else{
-            var divAvailabilyDetail = document.createElement("div")
-            divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-            divAvailabilyDetail.classList.add("divAvailabilyDetail")
-            divMain.appendChild(divAvailabilyDetail)
-
-            
-                if (a.type == "periodType") {
-                    makeViewTimePeriod(divAvailabilyDetail, a)
-                }
-
-                if (a.type == "recurrentType") {
-                    makeViewTimeRecurrent(divAvailabilyDetail, a)
-                }
-
-                UpdateAvailability(availability, a.type)     
-         }
-
-    })
-=======
-            // img expandir
-            if (window.matchMedia("(max-width: 500px)").matches) {
-                const divOpenTime = document.createElement("div")
-                divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
+        const divOpenTime = document.createElement("div")
+        divOpenTime.classList.add("aspect-[16/9]", "w-[17px]", "h-[17px]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg")
+        divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+        divOpenTime.setAttribute("id", "divOpenTime")
+        div160.appendChild(divOpenTime)
+        divOpenTime.addEventListener("click", function (event) {
+            event.stopPropagation()
+            var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
+            var divOpenTime = document.getElementById("divOpenTime")
+            if (divAvailabilyDetail) {
                 divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-                divOpenTime.setAttribute("id", "divOpenTime")
-                div160.appendChild(divOpenTime)
-                divOpenTime.addEventListener("click", function (event) {
-                    event.stopPropagation()
-                    var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
-                    var divOpenTime = document.getElementById("divOpenTime")
-                    if (divAvailabilyDetail) {
-                        divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-                        divMain.removeChild(divAvailabilyDetail)
-        
-                    } else {
-                        divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
-                        var divAvailabilyDetail = document.createElement("div")
-                        divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                        divAvailabilyDetail.classList.add("divAvailabilyDetail")
-                        divMain.appendChild(divAvailabilyDetail)
-        
-                        
-                            if (a.type == "periodType") {
-                                makeViewTimePeriod(divAvailabilyDetail, a)
-                            }
-        
-                            if (a.type == "recurrentType") {
-                                makeViewTimeRecurrent(divAvailabilyDetail, a)
-                            }
-        
-                            UpdateAvailability(availability, a.type)     
-                    }
-                })
-             }else{
+                divMain.removeChild(divAvailabilyDetail)
+
+            } else {
+                divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
                 var divAvailabilyDetail = document.createElement("div")
                 divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
                 divAvailabilyDetail.classList.add("divAvailabilyDetail")
                 divMain.appendChild(divAvailabilyDetail)
-    
+
                 
                     if (a.type == "periodType") {
                         makeViewTimePeriod(divAvailabilyDetail, a)
                     }
-    
+
                     if (a.type == "recurrentType") {
                         makeViewTimeRecurrent(divAvailabilyDetail, a)
                     }
-    
+
                     UpdateAvailability(availability, a.type)     
-             }
-    
+            }
         })
->>>>>>> 82b7ef9172e3ac4f9813233db56634344405af86
+    })
 
     }
     //Função apara apresentar os horários para agendamento por período
