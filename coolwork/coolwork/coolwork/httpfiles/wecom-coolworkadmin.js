@@ -112,6 +112,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function app_message(obj) {
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
             phone_list = JSON.parse(obj.result)
+            makeDivAddDevices(phone_list)
         }
         if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
             list_AllRoom = JSON.parse(obj.result)
@@ -156,238 +157,141 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
     }
     // funções tela nova (figma)
-    function makeViewRoom(){
-        that.clear();
-        const btnMenu = makeButton('','',"./images/menu.svg")
-        makeHeader(makeButton("","","./images/home.svg"), btnMenu , texts.text("labelYourRooms"))
-        btnMenu.addEventListener("click",function(){
-            console.log("click")
-            makeDivOptions()
-        })
-    }
-    function makeDivOptions(){
-        that.clear();
-        makeHeader(backButton,makeButton("","","./images/settings.svg"), texts.text("labelOptions"))
-        const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
-        // criar sala
-        const divMakeRoom = document.createElement("div")
-        divMakeRoom.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
-        const plusIcon = document.createElement("img")
-        plusIcon.src = './images/plus-circle.svg'
-        const labelMakeRoom = document.createElement("div")
-        labelMakeRoom.textContent = texts.text("labelCreateRoom")
-        // provisioning code
-        const divProvCode = document.createElement("div")
-        divProvCode.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
-        const provIcon = document.createElement("img")
-        provIcon.src = './images/hash.svg'
-        const labelProvCode = document.createElement("div")
-        labelProvCode.textContent = texts.text("labelProvCode")
-        // tabela agendamento
-        const divTableSched = document.createElement("div")
-        divTableSched.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
-        const schedIcon = document.createElement("img")
-        schedIcon.src = './images/calendar-option.svg'
-        const labelTableSched = document.createElement("div")
-        labelTableSched.textContent = texts.text("labelTableSchedule")
+
+    //funções criação de telas 
+        function makeViewRoom(){
+            that.clear();
+            const btnMenu = makeButton('','',"./images/menu.svg")
+            makeHeader(makeButton("","","./images/home.svg"), btnMenu , texts.text("labelYourRooms"))
+            btnMenu.addEventListener("click",function(){
+                console.log("click")
+                makeDivOptions()
+            })
+        }
+        function makeDivOptions(){
+            that.clear();
+            makeHeader(backButton,makeButton("","","./images/settings.svg"), texts.text("labelOptions"))
+            const divMain = document.createElement("div")
+            divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+            // criar sala
+            const divMakeRoom = document.createElement("div")
+            divMakeRoom.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+            const plusIcon = document.createElement("img")
+            plusIcon.src = './images/plus-circle.svg'
+            const labelMakeRoom = document.createElement("div")
+            labelMakeRoom.textContent = texts.text("labelCreateRoom")
+            // provisioning code
+            const divProvCode = document.createElement("div")
+            divProvCode.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+            const provIcon = document.createElement("img")
+            provIcon.src = './images/hash.svg'
+            const labelProvCode = document.createElement("div")
+            labelProvCode.textContent = texts.text("labelProvCode")
+            // tabela agendamento
+            const divTableSched = document.createElement("div")
+            divTableSched.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+            const schedIcon = document.createElement("img")
+            schedIcon.src = './images/calendar-option.svg'
+            const labelTableSched = document.createElement("div")
+            labelTableSched.textContent = texts.text("labelTableSchedule")
 
 
-        divMakeRoom.appendChild(plusIcon)
-        divMakeRoom.appendChild(labelMakeRoom)
-        divProvCode.appendChild(provIcon)
-        divProvCode.appendChild(labelProvCode)
-        divTableSched.appendChild(schedIcon)
-        divTableSched.appendChild(labelTableSched)
-        divMain.appendChild(divMakeRoom)
-        divMain.appendChild(divProvCode)
-        divMain.appendChild(divTableSched)
-        document.body.appendChild(divMain)
+            divMakeRoom.appendChild(plusIcon)
+            divMakeRoom.appendChild(labelMakeRoom)
+            divProvCode.appendChild(provIcon)
+            divProvCode.appendChild(labelProvCode)
+            divTableSched.appendChild(schedIcon)
+            divTableSched.appendChild(labelTableSched)
+            divMain.appendChild(divMakeRoom)
+            divMain.appendChild(divProvCode)
+            divMain.appendChild(divTableSched)
+            document.body.appendChild(divMain)
 
-        divMakeRoom.addEventListener("click",function(event){
-            event.preventDefault
-            event.stopPropagation()
-            createRoomContext()
-        })
+            divMakeRoom.addEventListener("click",function(event){
+                event.preventDefault
+                event.stopPropagation()
+                createRoomContext()
+            })
 
-    }
-    function createRoomContext(){
+        }
+        function createRoomContext(){
+            that.clear()
+            makeHeader(backButton,makeButton("","",""),texts.text("labelCreateRoom"))
+            const divMain = document.createElement("div")
+            divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+            // SALA SIMPLES
+            const divSimpleRoom = document.createElement("div")
+            divSimpleRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+            const divTextSimpleRoom = document.createElement("div")
+            divTextSimpleRoom.classList.add("text-3","text-white" ,"font-bold")
+            divTextSimpleRoom.textContent = texts.text("labelSimpleRoom")
+            const divImgSimpleRoom = document.createElement("div")
+            divImgSimpleRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
+            const imgPhoneSimple = document.createElement("img")
+            imgPhoneSimple.src = './images/phone.svg'
+            const imgUserSimple = document.createElement("img")
+            imgUserSimple.src = './images/user.svg'
+            const imgLaptopSimple = document.createElement("img")
+            imgLaptopSimple.src = './images/laptop.svg'
+            const textSimpleRoom1 = document.createElement("div")
+            textSimpleRoom1.classList.add("text-3")
+            textSimpleRoom1.textContent = texts.text("labelSimpleRoomTxt1")
+            const textSimpleRoom2 = document.createElement("div")
+            textSimpleRoom2.classList.add("text-3")
+            textSimpleRoom2.textContent = texts.text("labelSimpleRoomTxt2")
+
+            divImgSimpleRoom.appendChild(imgPhoneSimple)
+            divImgSimpleRoom.appendChild(imgUserSimple)
+            divImgSimpleRoom.appendChild(imgLaptopSimple)
+            divSimpleRoom.appendChild(divTextSimpleRoom)
+            divSimpleRoom.appendChild(divImgSimpleRoom)
+            divSimpleRoom.appendChild(textSimpleRoom1)
+            divSimpleRoom.appendChild(textSimpleRoom2)
+            divMain.appendChild(divSimpleRoom)
+            // SALA COMPLEXA
+            const divComplexRoom = document.createElement("div")
+            divComplexRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+            const divTextComplexRoom = document.createElement("div")
+            divTextComplexRoom.classList.add("text-3","text-white" ,"font-bold")
+            divTextComplexRoom.textContent = texts.text("labelComplexRoom")
+            const divImgComplexRoom = document.createElement("div")
+            divImgComplexRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
+            const imgPhoneComplex = document.createElement("img")
+            imgPhoneComplex.src = './images/phone-missed.svg'
+            const imgUserComplex = document.createElement("img")
+            imgUserComplex.src = './images/users.svg'
+            const imgMonitorComplex = document.createElement("img")
+            imgMonitorComplex.src = './images/monitor.svg'
+            const textComplexRoom1 = document.createElement("div")
+            textComplexRoom1.classList.add("text-3")
+            textComplexRoom1.textContent = texts.text("labelComplexRoomTxt1")
+            const textComplexRoom2 = document.createElement("div")
+            textComplexRoom2.classList.add("text-3")
+            textComplexRoom2.textContent = texts.text("labelComplexRoomTxt2")
+            divImgComplexRoom.appendChild(imgPhoneComplex)
+            divImgComplexRoom.appendChild(imgUserComplex)
+            divImgComplexRoom.appendChild(imgMonitorComplex)
+            divComplexRoom.appendChild(divTextComplexRoom)
+            divComplexRoom.appendChild(divImgComplexRoom)
+            divComplexRoom.appendChild(textComplexRoom1)
+            divComplexRoom.appendChild(textComplexRoom2)
+            divMain.appendChild(divComplexRoom)
+            // div criar do zero 
+            const makeFromZero = document.createElement("div")
+            makeFromZero.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full","justify-center")
+            makeFromZero.textContent = texts.text("labelmakeFromZero")
+
+            divMain.appendChild(makeFromZero)
+            document.body.appendChild(divMain) 
+
+            makeFromZero.addEventListener("click",function(){
+                makeDivCreateRoom()
+            })
+        }
+        function makeDivCreateRoom(){
         that.clear()
-        makeHeader(backButton,makeButton("","",""),texts.text("labelCreateRoom"))
-        const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
-        // SALA SIMPLES
-        const divSimpleRoom = document.createElement("div")
-        divSimpleRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
-        const divTextSimpleRoom = document.createElement("div")
-        divTextSimpleRoom.classList.add("text-3","text-white" ,"font-bold")
-        divTextSimpleRoom.textContent = texts.text("labelSimpleRoom")
-        const divImgSimpleRoom = document.createElement("div")
-        divImgSimpleRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
-        const imgPhoneSimple = document.createElement("img")
-        imgPhoneSimple.src = './images/phone.svg'
-        const imgUserSimple = document.createElement("img")
-        imgUserSimple.src = './images/user.svg'
-        const imgLaptopSimple = document.createElement("img")
-        imgLaptopSimple.src = './images/laptop.svg'
-        const textSimpleRoom1 = document.createElement("div")
-        textSimpleRoom1.classList.add("text-3")
-        textSimpleRoom1.textContent = texts.text("labelSimpleRoomTxt1")
-        const textSimpleRoom2 = document.createElement("div")
-        textSimpleRoom2.classList.add("text-3")
-        textSimpleRoom2.textContent = texts.text("labelSimpleRoomTxt2")
-
-        divImgSimpleRoom.appendChild(imgPhoneSimple)
-        divImgSimpleRoom.appendChild(imgUserSimple)
-        divImgSimpleRoom.appendChild(imgLaptopSimple)
-        divSimpleRoom.appendChild(divTextSimpleRoom)
-        divSimpleRoom.appendChild(divImgSimpleRoom)
-        divSimpleRoom.appendChild(textSimpleRoom1)
-        divSimpleRoom.appendChild(textSimpleRoom2)
-        divMain.appendChild(divSimpleRoom)
-        // SALA COMPLEXA
-        const divComplexRoom = document.createElement("div")
-        divComplexRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
-        const divTextComplexRoom = document.createElement("div")
-        divTextComplexRoom.classList.add("text-3","text-white" ,"font-bold")
-        divTextComplexRoom.textContent = texts.text("labelComplexRoom")
-        const divImgComplexRoom = document.createElement("div")
-        divImgComplexRoom.classList.add("flex","p-1","justify-center","items-start","gap-1")
-        const imgPhoneComplex = document.createElement("img")
-        imgPhoneComplex.src = './images/phone-missed.svg'
-        const imgUserComplex = document.createElement("img")
-        imgUserComplex.src = './images/users.svg'
-        const imgMonitorComplex = document.createElement("img")
-        imgMonitorComplex.src = './images/monitor.svg'
-        const textComplexRoom1 = document.createElement("div")
-        textComplexRoom1.classList.add("text-3")
-        textComplexRoom1.textContent = texts.text("labelComplexRoomTxt1")
-        const textComplexRoom2 = document.createElement("div")
-        textComplexRoom2.classList.add("text-3")
-        textComplexRoom2.textContent = texts.text("labelComplexRoomTxt2")
-        divImgComplexRoom.appendChild(imgPhoneComplex)
-        divImgComplexRoom.appendChild(imgUserComplex)
-        divImgComplexRoom.appendChild(imgMonitorComplex)
-        divComplexRoom.appendChild(divTextComplexRoom)
-        divComplexRoom.appendChild(divImgComplexRoom)
-        divComplexRoom.appendChild(textComplexRoom1)
-        divComplexRoom.appendChild(textComplexRoom2)
-        divMain.appendChild(divComplexRoom)
-        // div criar do zero 
-        const makeFromZero = document.createElement("div")
-        makeFromZero.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full","justify-center")
-        makeFromZero.textContent = texts.text("labelmakeFromZero")
-
-        divMain.appendChild(makeFromZero)
-        document.body.appendChild(divMain) 
-
-        makeFromZero.addEventListener("click",function(){
-            makeDivCreateRoom()
-        })
-    }
-    function makeHeader(imgLeft,imgRight,title){
-        // construção do header
-      
-        const header = document.createElement("header")
-        header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
-     
-        //construção da div com o titulo e imgHome
-        const divTitle = document.createElement("div")
-        divTitle.classList.add("flex","items-center","justify-start", "gap-1")
-     
-        //imgHome
-        const leftElement = imgLeft
-        leftElement.addEventListener("click", function (event) {
-            makeViewRoom()
-            event.stopPropagation()
-            event.preventDefault()
-        })
-     
-        //titulo
-        const titleRoom = document.createElement("h1")
-        titleRoom.classList.add("text-white" ,"font-bold")
-        titleRoom.textContent = title
-     
-        //imgMenu
-        const rightElment = imgRight
-        // imgMenu.setAttribute("src",imgRight)
-     
-        
-           divTitle.appendChild(leftElement)
-           divTitle.appendChild(titleRoom)
-           header.appendChild(divTitle)
-           header.appendChild(rightElment)
-           document.body.appendChild(header);
-     
-    }
-
-     function makeButton(text, variant, iconSVG) {
-        const button = document.createElement("button");
-        button.textContent = text;
-
-        if (iconSVG) {
-            const icon = document.createElement("img");
-            icon.src = iconSVG;
-            button.prepend(icon);
-        }
-
-        switch (variant) {
-            case "primary":
-                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg","primary");
-                break;
-            case "secundary":
-                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
-                break;
-            case "tertiary":
-                button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
-                break
-            case "destructive":
-                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
-                break;
-            case "transparent":
-                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded-lg");
-                break;
-            default:
-                button.classList.add("hover:bg-dark-300", "rounded-lg");
-                break;
-        }
-
-        return button;
-    }
-
-    function makeInput(text,variant,placeHolder){
-        const input = document.createElement("input")
-        input.textContent = text
-        input.placeholder = placeHolder
-        input.type = variant
-
-        switch (variant) {
-            case "text":
-                input.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-white","rounded-lg","w-full","text-dark-600")
-                break
-            case "file":
-                input.style.display = "none";
-                const customFileInput = document.createElement("label");
-                customFileInput.textContent = text;
-                customFileInput.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg", "primary", "cursor-pointer");
-                customFileInput.appendChild(input);
-                return customFileInput;
-            case "checkbox":
-                input.classList.add("w-[16px]","h-[16px]","rounded-md");
-                break
-            case "search":
-                input.classList.add("flex","p-1","justify-between","items-center","rounded-md","bg-white","text-dark-500")
-
-        }
-
-        return input;
-    
-    }
-     const backButton = makeButton('', '', './images/arrow-left.svg');
-
-    function makeDivCreateRoom(){
-        that.clear()
-        makeHeader(backButton,makeButton(texts.text("labelCreate"),"primary",""),texts.text("labelCreateRoom"))
+        const btnCreateRoom = makeButton(texts.text("labelCreate"),"primary","")
+        makeHeader(backButton,btnCreateRoom,texts.text("labelCreateRoom"))
         const divMain = document.createElement("div")
         divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
         //nome da sala
@@ -396,15 +300,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelNameRoom = document.createElement("div")
         labelNameRoom.textContent = texts.text("labelNameRoom")
         const iptNameRoom = makeInput("","text","Nome da sala")
+        iptNameRoom.id = "iptNameRoom"
         // imagem da sala
         const divImgRoom = document.createElement("div")
         divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         const labelImgRoom = document.createElement("div")
         labelImgRoom.textContent = texts.text("labelImageRoom")
         const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+        var imgRoom;
         divBtnChoose.addEventListener("click",function(){
             console.log("Abrir Div Escolher Imagem")
-            makeDivChooseImage()
+            makeDivChooseImage(function(selectedImg){
+                imgRoom = selectedImg
+            })
         })
         // tipo de sala
         const divTypeRoom = document.createElement("div")
@@ -412,14 +320,30 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelTypeRoom = document.createElement("div")
         labelTypeRoom.textContent = texts.text("labelTypeRoom")
         const btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
+         btnPeriod.id = "periodType"
         const btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
-        // tipo de agendamento colocar isso na tela de agendamento
+        btnRecurrent.id = "recurrentType"
+
+        var typeRoom;
+        btnPeriod.addEventListener("click", function(event) {
+            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+                typeRoom = selectedButton.id
+            });
+        });
+        btnRecurrent.addEventListener("click", function(event) {
+            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+                typeRoom = selectedButton.id
+            });
+        });
+                // tipo de agendamento colocar isso na tela de agendamento
+
         // const divTypeSchedule = document.createElement("div")
         // divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         // const labelTypeSchedule = document.createElement("div")
         // labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
         // const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
         // const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+
         // usuarios
         const divUsersRoom = document.createElement("div")
         divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -437,6 +361,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         labelHourSchedule.textContent = texts.text("labelHourSchedule")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
         btnMakeCalendar.addEventListener("click",function(){
+            makeDivAddAvailability()
             console.log("Abrir Calendario")
         })
         // devices
@@ -447,6 +372,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddDevices.addEventListener("click",function(){
             console.log("Abrir div add devices")
+            app.send({api:"admin", mt:"SelectDevices"})
+            // makeDivAddDevices()
         })
         //appends
         divNameRoom.appendChild(labelNameRoom)
@@ -475,6 +402,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.appendChild(divAddDevices)
 
         document.body.appendChild(divMain)
+
+        btnCreateRoom.addEventListener("click",function(){
+            console.log("CRIAR SALA")
+            var nomeSala = document.getElementById("iptNameRoom").value
+            console.log("Nome da Sala: " + nomeSala + "\n"
+            + "Imagem da Sala: " + imgRoom + "\n"
+            + "Tipo de sala: " + typeRoom
+            )
+            
+            // app.send({ api: "admin", mt: "InsertRoom", 
+            // name: nameRoom, 
+            // img: srcDaImagem, 
+            // dateStart: dateStart, 
+            // dateEnd: dateEnd, 
+            // type: optType, 
+            // schedule: optModule, 
+            // editor: editor, 
+            // viewer: viewer });
+        })
         }
         function makeDivAddUsers(){
             const insideDiv = document.createElement("div")
@@ -483,11 +429,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divMain = document.createElement("div")
             divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3")
 
-            const titleImg = document.createElement("div")
-            titleImg.textContent = texts.text("labelUsers")
-            titleImg.classList.add("text-3","text-white" ,"font-bold")
+            const titleUsers = document.createElement("div")
+            titleUsers.textContent = texts.text("labelUsers")
+            titleUsers.classList.add("text-3","text-white" ,"font-bold")
 
-            const iptSearch = makeInput("","search","Pesquisar...")
+            const iptSearch = makeInput("","search",texts.text("labelIptSearch"))
             iptSearch.classList.add("w-full")
 
             const selectAllUsers = document.createElement("div")
@@ -500,7 +446,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divLabelandCheckbox = document.createElement("div")
             divLabelandCheckbox.classList.add("flex","w-[145px]","p-1","justify-between","items-center")
             const labelSelectAllUsers = document.createElement("div")
-            labelSelectAllUsers.textContent = texts.text("labelSelectAllUsers")
+            labelSelectAllUsers.textContent = texts.text("labelSelectAll")
             labelSelectAllUsers.classList.add("text-3","text-white" ,"font-bold")
 
             const checkboxAllUsers = makeInput("","checkbox","")
@@ -524,6 +470,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 const nameUser = document.createElement("div")
                 nameUser.textContent = user.cn
                 const checkboxUser = makeInput("","checkbox","")
+                checkboxUser.setAttribute("id",user.guid)
                 divUsersAvatar.appendChild(imgAvatar);
                 divUsersAvatar.appendChild(nameUser);
                 divMainUsers.appendChild(divUsersAvatar);
@@ -542,9 +489,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divButtons.classList.add("flex","justify-between","items-center","rounded-md")
             const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
             buttonCancel.addEventListener("click",function(){
-              console.log("Fechar Tela")
-              document.body.removeChild(insideDiv)
-              
+                console.log("Fechar Tela")
+                document.body.removeChild(insideDiv)
+                
             })
             const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
 
@@ -557,7 +504,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divLabelandCheckbox.appendChild(checkboxAllUsers)
             selectAllUsers.appendChild(nameOfUsers)
             selectAllUsers.appendChild(divLabelandCheckbox)
-            divMain.appendChild(titleImg)
+            divMain.appendChild(titleUsers)
             divMain.appendChild(iptSearch)
             divMain.appendChild(selectAllUsers)
             divMain.appendChild(scrollUsers)
@@ -566,82 +513,312 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             insideDiv.appendChild(divMain)
             document.body.appendChild(insideDiv)
         }
+        function makeDivAddAvailability(){
+            // mudará conforme o tipo de sala ( RECORRENTE OU PERÍODO )
+            const insideDiv = document.createElement("div")
+            insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+            
+            const divMain = document.createElement("div")
+            divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
 
-        function makeDivChooseImage(){
-          const insideDiv = document.createElement("div")
-          insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+            const titleImg = document.createElement("div")
+            titleImg.textContent = texts.text("labelImageRoom")
+            titleImg.classList.add("text-3","text-white" ,"font-bold")
+        }
+        function makeDivChooseImage(callback){
+            const insideDiv = document.createElement("div")
+            insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
         
-          const divMain = document.createElement("div")
-          divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
+            const divMain = document.createElement("div")
+            divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
 
-          const titleImg = document.createElement("div")
-          titleImg.textContent = texts.text("labelImageRoom")
-          titleImg.classList.add("text-3","text-white" ,"font-bold")
+            const titleImg = document.createElement("div")
+            titleImg.textContent = texts.text("labelImageRoom")
+            titleImg.classList.add("text-3","text-white" ,"font-bold")
 
-          const mainImg = document.createElement("img")
-          mainImg.classList.add("h-[260px]","rounded-lg","aspect-[3/4]")
-          mainImg.src = './images/MESA-1.png'
+            const mainImg = document.createElement("img")
+            mainImg.classList.add("h-[260px]","rounded-lg","aspect-[3/4]")
+            mainImg.src = './images/MESA-1.png'
 
-          const divSelectImgs = document.createElement("div")
-          divSelectImgs.classList.add("flex","w-full","items-start","gap-1","flex-row")
+            const divSelectImgs = document.createElement("div")
+            divSelectImgs.classList.add("flex","w-full","items-start","gap-1","flex-row")
 
-          const img1 = document.createElement("img")
-          img1.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-          img1.src = './images/MESA-1.png'
-          const img2 = document.createElement("img")
-          img2.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-          img2.src = './images/MESA-2.png'
-          const img3 = document.createElement("img")
-          img3.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-          img3.src = './images/MESA-3.png'
+            const img1 = document.createElement("img")
+            img1.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+            img1.src = './images/MESA-1.png'
+            const img2 = document.createElement("img")
+            img2.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+            img2.src = './images/MESA-2.png'
+            const img3 = document.createElement("img")
+            img3.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
+            img3.src = './images/MESA-3.png'
 
-          img1.addEventListener("click", function(event) {
-            changeMainImage(mainImg,'./images/MESA-1.png');
+            img1.addEventListener("click", function(event) {
+            addBorderAndChangeImage(img1, mainImg, './images/MESA-1.png');
             });
         
         img2.addEventListener("click", function(event) {
-            changeMainImage(mainImg,'./images/MESA-2.png');
-            });
+            addBorderAndChangeImage(img2,mainImg, './images/MESA-2.png');
+        });
         
         img3.addEventListener("click", function(event) {
-            changeMainImage(mainImg,'./images/MESA-3.png');
-            });
-          const divIptImage = document.createElement("div")
-          divIptImage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
-          const labelImportImg = document.createElement("div")
-          labelImportImg.textContent = texts.text("labelImportImg")
-          const iptFileImg =  makeInput(texts.text("labelChoose"),"file","")
-          iptFileImg.addEventListener("change", function () {
+            addBorderAndChangeImage(img3, mainImg,'./images/MESA-3.png');
+        });
+
+            const divIptImage = document.createElement("div")
+            divIptImage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
+            const labelImportImg = document.createElement("div")
+            labelImportImg.textContent = texts.text("labelImportImg")
+            const iptFileImg =  makeInput(texts.text("labelChoose"),"file","")
+            iptFileImg.addEventListener("change", function () {
             console.log("CLICANDO")
-          });
-          const divButtons = document.createElement("div")
-          divButtons.classList.add("flex","justify-between","items-center","rounded-md")
-          const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
-          buttonCancel.addEventListener("click",function(){
+            });
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+            const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+            buttonCancel.addEventListener("click",function(){
             console.log("Fechar Tela")
             document.body.removeChild(insideDiv)
             
-          })
-          const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
-          divSelectImgs.appendChild(img1)
-          divSelectImgs.appendChild(img2)
-          divSelectImgs.appendChild(img3)
-          divIptImage.appendChild(labelImportImg)
-          divIptImage.appendChild(iptFileImg)
-          divButtons.appendChild(buttonCancel)
-          divButtons.appendChild(buttonConfirm)
-          divMain.appendChild(titleImg)
-          divMain.appendChild(mainImg)
-          divMain.appendChild(divSelectImgs)
-          divMain.appendChild(divIptImage)
-          divMain.append(divButtons)
-          insideDiv.appendChild(divMain)
+            })
+            const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+            buttonConfirm.addEventListener("click",function(){
+            callback(mainImg.getAttribute("src"))
+            document.body.removeChild(insideDiv)
+            })
+            divSelectImgs.appendChild(img1)
+            divSelectImgs.appendChild(img2)
+            divSelectImgs.appendChild(img3)
+            divIptImage.appendChild(labelImportImg)
+            divIptImage.appendChild(iptFileImg)
+            divButtons.appendChild(buttonCancel)
+            divButtons.appendChild(buttonConfirm)
+            divMain.appendChild(titleImg)
+            divMain.appendChild(mainImg)
+            divMain.appendChild(divSelectImgs)
+            divMain.appendChild(divIptImage)
+            divMain.append(divButtons)
+            insideDiv.appendChild(divMain)
 
-          document.body.appendChild(insideDiv)
+            document.body.appendChild(insideDiv)
         }
-        function changeMainImage(mainImg,newSrc) {
-            mainImg.src = newSrc;
+        function makeDivAddDevices(devices){
+            // consultar os devices  
+            
+
+            const insideDiv = document.createElement("div")
+            insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+            
+            const divMain = document.createElement("div")
+            divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3")
+
+            const titleDevices = document.createElement("div")
+            titleDevices.textContent = texts.text("labelUsers")
+            titleDevices.classList.add("text-3","text-white" ,"font-bold")
+
+            const iptSearch = makeInput("","search",texts.text("labelIptSearch"))
+            iptSearch.classList.add("w-full")
+
+            const selectAllDevices = document.createElement("div")
+            selectAllDevices.classList.add("flex","justify-between","items-center")
+
+            const nameOfDevices = document.createElement("div")
+            nameOfDevices.classList.add("text-3","text-white" ,"font-bold")
+            nameOfDevices.textContent = texts.text("labelNameOfDevices")
+
+            const divLabelandCheckbox = document.createElement("div")
+            divLabelandCheckbox.classList.add("flex","w-[145px]","p-1","justify-between","items-center")
+            const labelSelectAllDevices = document.createElement("div")
+            labelSelectAllDevices.textContent = texts.text("labelSelectAll")
+            labelSelectAllDevices.classList.add("text-3","text-white" ,"font-bold")
+
+            const checkboxAllDevices = makeInput("","checkbox","")
+
+            const scrollDevices = document.createElement("div")
+            scrollDevices.classList.add("overflow-y-auto","h-[250px]","gap-1","flex-col","flex")
+
+
+            devices.forEach(function(dev){
+                
+                const divMainDevices = document.createElement("div")
+                divMainDevices.setAttribute("id",dev.hwid)
+                divMainDevices.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
+                const divImgDevice = document.createElement("div")
+                divImgDevice.classList.add("flex","items-center","gap-1")
+                const imgDevice = document.createElement("img");
+                imgDevice.src = './images/device-admin.png'
+                //imgDevice.classList.add("w-5", "h-5", "rounded-full");
+                const nameDevice = document.createElement("div")
+                nameDevice.textContent = dev.name
+                const checkboxDevice = makeInput("","checkbox","")
+                checkboxDevice.setAttribute("id",dev.hwid)
+
+                divImgDevice.appendChild(imgDevice)
+                divImgDevice.appendChild(nameDevice)
+                divMainDevices.appendChild(divImgDevice);
+                divMainDevices.appendChild(checkboxDevice);
+                scrollDevices.appendChild(divMainDevices)
+            })  
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+            const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+            buttonCancel.addEventListener("click",function(){
+                console.log("Fechar Tela")
+                document.body.removeChild(insideDiv)
+                
+            })
+            const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+
+            //appends
+            divButtons.appendChild(buttonCancel)
+            divButtons.appendChild(buttonConfirm)
+            divLabelandCheckbox.appendChild(labelSelectAllDevices)
+            divLabelandCheckbox.appendChild(checkboxAllDevices)
+            selectAllDevices.appendChild(nameOfDevices)
+            selectAllDevices.appendChild(divLabelandCheckbox)
+            divMain.appendChild(titleDevices)
+            divMain.appendChild(iptSearch)
+            divMain.appendChild(selectAllDevices)
+            divMain.appendChild(scrollDevices)
+            divMain.appendChild(divButtons)
+            insideDiv.appendChild(divMain)
+            document.body.appendChild(insideDiv)
         }
+        // funções componentização 
+        function makeHeader(imgLeft,imgRight,title){
+            // construção do header
+        
+            const header = document.createElement("header")
+            header.classList.add("bg-dark-200" ,"m-1" ,"flex", "items-center", "justify-between", "p-1", "rounded-lg")
+        
+            //construção da div com o titulo e imgHome
+            const divTitle = document.createElement("div")
+            divTitle.classList.add("flex","items-center","justify-start", "gap-1")
+        
+            //imgHome
+            const leftElement = imgLeft
+            leftElement.addEventListener("click", function (event) {
+                makeViewRoom()
+                event.stopPropagation()
+                event.preventDefault()
+            })
+        
+            //titulo
+            const titleRoom = document.createElement("h1")
+            titleRoom.classList.add("text-white" ,"font-bold")
+            titleRoom.textContent = title
+        
+            //imgMenu
+            const rightElment = imgRight
+            // imgMenu.setAttribute("src",imgRight)
+        
+            
+            divTitle.appendChild(leftElement)
+            divTitle.appendChild(titleRoom)
+            header.appendChild(divTitle)
+            header.appendChild(rightElment)
+            document.body.appendChild(header);
+        
+        }
+        function makeButton(text, variant, iconSVG) {
+            const button = document.createElement("button");
+            button.textContent = text;
+
+            if (iconSVG) {
+                const icon = document.createElement("img");
+                icon.src = iconSVG;
+                button.prepend(icon);
+            }
+
+            switch (variant) {
+                case "primary":
+                    button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg","primary");
+                    break;
+                case "secundary":
+                    button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
+                    break;
+                case "tertiary":
+                    button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                    break
+                case "destructive":
+                    button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
+                    break;
+                case "transparent":
+                    button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded-lg");
+                    break;
+                default:
+                    button.classList.add("hover:bg-dark-300", "rounded-lg");
+                    break;
+            }
+
+            return button;
+        }
+        function makeInput(text,variant,placeHolder){
+            const input = document.createElement("input")
+            input.textContent = text
+            input.placeholder = placeHolder
+            input.type = variant
+
+            switch (variant) {
+                case "text":
+                    input.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-white","rounded-lg","w-full","text-dark-600")
+                    break
+                case "file":
+                    input.style.display = "none";
+                    const customFileInput = document.createElement("label");
+                    customFileInput.textContent = text;
+                    customFileInput.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg", "primary", "cursor-pointer");
+                    customFileInput.appendChild(input);
+                    return customFileInput;
+                case "checkbox":
+                    input.classList.add("w-[16px]","h-[16px]","rounded-md");
+                    break
+                case "search":
+                    input.classList.add("flex","p-1","justify-between","items-center","rounded-md","bg-white","text-dark-500")
+
+            }
+
+            return input;
+        
+        }
+        //botão voltar (arrow)
+        const backButton = makeButton('', '', './images/arrow-left.svg');
+
+        // funções internas (adicionais)
+        function typeOfRoomButtons(event,btnPeriod,btnRecurrent,callback) {
+
+            const clickedButton = event.target;
+    
+            if (clickedButton === btnPeriod) {
+                btnRecurrent.className = ''
+                btnPeriod.className = ''
+                btnPeriod.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");            
+                btnRecurrent.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                callback(btnPeriod)
+            }
+            else if (clickedButton === btnRecurrent) {
+                btnRecurrent.className = ''
+                btnPeriod.className = ''
+                btnRecurrent.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
+                btnPeriod.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                callback(btnRecurrent)
+            }
+        }
+
+        let lastClickedImg = null;
+        function addBorderAndChangeImage(imgElement, mainImg , newSrc) {
+            if (lastClickedImg !== null) {
+                lastClickedImg.classList.remove("border-[3px]" ,"border-primary-100");
+            }
+        
+            imgElement.classList.add("border-[3px]" , "border-primary-100");
+        
+            // Atualizar o último elemento clicado
+            lastClickedImg = imgElement;
+        
+            mainImg.src = newSrc
+        }
+
      // fim funções tela nova (figma)
 
 
@@ -703,7 +880,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 var clickedElement = document.getElementById(room.id)
                 var clickedId = clickedElement.getAttribute("id")
                 console.log('ID do elemento div clicado:', clickedId);
-                app.send({api:"admin", mt:"SelectDevices"})
+                // app.send({api:"admin", mt:"SelectDevices"})
                 app.send({ api: "admin", mt: "SelectRoom", id: clickedId });
             }));
             var imgRoom = liRoom.add(new innovaphone.ui1.Node("img", "width: 50px; height: 50px; margin-right: 10px;", null, null));

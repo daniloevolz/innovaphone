@@ -90,6 +90,11 @@
                   },
                   {
                     "cmd": "column",
+                    "name": "name",
+                    "type": "VARCHAR(120)"
+                  },
+                  {
+                    "cmd": "column",
                     "name": "cn",
                     "type": "VARCHAR(120)"
                   },

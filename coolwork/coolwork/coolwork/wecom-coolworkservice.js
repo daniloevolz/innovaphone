@@ -531,13 +531,13 @@ new JsonApi("admin").onconnected(function(conn) {
             if (obj.mt == "PhoneList") {
                 var devices = [];
                 devices = obj.devices;
-                log("PhoneList: devices " + JSON.stringify(devices));
+                log("PhoneList:devices " + JSON.stringify(devices));
                 devices.forEach(function (dev) {
-                    log("PhoneList: dev" + JSON.stringify(dev))
+                    log("PhoneList:dev" + JSON.stringify(dev))
                     var filteredObject = filterObjectsByDevice(pbxTableUsers, dev.hwId);
-                    log("PhoneList: filteredObject" + JSON.stringify(filteredObject))
+                    log("PhoneList:filteredObject" + JSON.stringify(filteredObject))
                     log("hw id" + dev.hwId)
-                    Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
+                    Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, name) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.name + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
                     .oncomplete(function (data) {
                     log("InsertSuccess" + JSON.stringify(data))
                         if (filteredObject.length > 0) {
