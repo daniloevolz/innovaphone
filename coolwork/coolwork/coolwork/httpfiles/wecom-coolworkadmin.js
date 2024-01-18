@@ -335,14 +335,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 typeRoom = selectedButton.id
             });
         });
-                // tipo de agendamento colocar isso na tela de agendamento
-
-        // const divTypeSchedule = document.createElement("div")
-        // divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        // const labelTypeSchedule = document.createElement("div")
-        // labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
-        // const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
-        // const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+              
 
         // usuarios
         const divUsersRoom = document.createElement("div")
@@ -361,7 +354,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         labelHourSchedule.textContent = texts.text("labelHourSchedule")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
         btnMakeCalendar.addEventListener("click",function(){
-            makeDivAddAvailability()
+            makeDivAddAvailability(typeRoom)
             console.log("Abrir Calendario")
         })
         // devices
@@ -513,7 +506,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             insideDiv.appendChild(divMain)
             document.body.appendChild(insideDiv)
         }
-        function makeDivAddAvailability(){
+        function makeDivAddAvailability(typeRoom){
             // mudará conforme o tipo de sala ( RECORRENTE OU PERÍODO )
             const insideDiv = document.createElement("div")
             insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
@@ -521,9 +514,80 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divMain = document.createElement("div")
             divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
 
-            const titleImg = document.createElement("div")
-            titleImg.textContent = texts.text("labelImageRoom")
-            titleImg.classList.add("text-3","text-white" ,"font-bold")
+            if(typeRoom == "periodType"){
+                const titleSchedule = document.createElement("div")
+                titleSchedule.textContent = texts.text("labelSchedulePeriod")
+                titleSchedule.classList.add("text-3","text-white" ,"font-bold")
+                const divCalendar = document.createElement("div")
+                Calendar.createCalendar(divCalendar,"",function(selectedDay){
+                    console.log("Dia Selecionado " + selectedDay)
+                })
+                
+                const divTypeSchedule = document.createElement("div")
+                divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+                const labelTypeSchedule = document.createElement("div")
+                labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
+                const btnDaySchedule = makeButton(texts.text("labelDay"),"primary","")
+                const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+
+                // PIETRO CONTINUAR NA SEXTA-FEIRA 
+                
+            //     //Seleção horário
+            //     const div105 = document.createElement("div")
+            //     div105.setAttribute("id", "div105")
+            //     div105.classList.add("div105", "h-fit")
+            //     const labelSelectHour = document.createElement("div")
+            //     labelSelectHour.textContent = texts.text("labelSelectHour")
+            //     labelSelectHour.classList.add("text-3","font-bold","text-white")
+
+            //     var div110 = document.createElement("div")
+            //     div110.setAttribute("id", "div110")
+            //     div110.classList.add("div110")
+
+            //                 //time start
+            //     var divTimeStart = document.createElement("div")
+            //     divTimeStart.setAttribute("id", "divTimeStart")
+            //     divTimeStart.classList.add("divTime")
+            //     //div110.appendChild(divTimeStart)
+            //     divTimeStart.innerHTML = "-- : --"
+            //     divTimeStart.addEventListener("click", function (event) {
+            //         event.stopPropagation()
+            //         event.preventDefault()
+            //             //makeViewTimeHour(containerSchedule, selected , avail, function (selectedTime) {
+            //     })
+
+            //      //div to
+            // const divToTime = document.createElement("div")
+            // divToTime.setAttribute("id", "divToTime")
+            // divToTime.classList.add("divToTime")
+            // divToTime.innerHTML = texts.text("labelToTime")
+            // div110.appendChild(divToTime)
+
+            // //time end
+            // var divTimeEnd = document.createElement("div")
+            // divTimeEnd.setAttribute("id", "divTimeEnd")
+            // divTimeEnd.classList.add("divTime")
+            // div110.appendChild(divTimeEnd)
+            // divTimeEnd.innerHTML = "-- : -- "
+
+            // divTimeEnd.addEventListener("click", function (event) {
+            //     event.stopPropagation()
+            //     event.preventDefault()
+
+
+            //     })
+
+                divTypeSchedule.appendChild(labelTypeSchedule)
+                divTypeSchedule.appendChild(btnDaySchedule)
+                divTypeSchedule.appendChild(btnHourSchedule)
+
+                divMain.appendChild(titleSchedule)
+                divMain.appendChild(divCalendar)
+                divMain.appendChild(divTypeSchedule)
+                insideDiv.appendChild(divMain)
+            }
+            document.body.appendChild(insideDiv)
+          
         }
         function makeDivChooseImage(callback){
             const insideDiv = document.createElement("div")

@@ -117,6 +117,7 @@ Wecom.coolworkTexts = {
         labelNo: "Não",
         labelCancelSchedule: "Ao aceitar você ira cancelar seu agendamento ",
         labelScheduleDone: "Agendamento Realizado",
+        labelSchedulePeriod : "Agendamento Período",
         0: "Dom",
         1: "Seg",
         2 : "Ter",
