@@ -285,6 +285,11 @@ function UpdateAvailability(availability, type) {
                 td.classList.add('unavailable');
             });
         }
+        else if(availability == "all"){
+            cells.forEach(function(td){
+                td.classList.add("available")
+            })
+        }
         else {
             availability.forEach(function (dates) {
                 if (type == "recurrentType"){

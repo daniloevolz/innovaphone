@@ -519,8 +519,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 titleSchedule.textContent = texts.text("labelSchedulePeriod")
                 titleSchedule.classList.add("text-3","text-white" ,"font-bold")
                 const divCalendar = document.createElement("div")
-                Calendar.createCalendar(divCalendar,"",function(selectedDay){
+                
+                var selectedDay;
+                Calendar.createCalendar(divCalendar,"all",function(day){
+                    selectedDay = day
                     console.log("Dia Selecionado " + selectedDay)
+                    
                 })
                 
                 const divTypeSchedule = document.createElement("div")
@@ -530,53 +534,44 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 const btnDaySchedule = makeButton(texts.text("labelDay"),"primary","")
                 const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
 
-                // PIETRO CONTINUAR NA SEXTA-FEIRA 
+                const divHourSelect = document.createElement("div")
+                divHourSelect.classList.add("flex","p-1","flex-col","gap-1","items-start","bg-dark-200","rounded-lg")
+                const divHourSelectLabel = document.createElement("div")
+                divHourSelectLabel.classList.add("text-1","font-bold","text-white")
+                divHourSelectLabel.textContent = texts.text("labelSelectHour")
+
+                const divTime = document.createElement("div")
+                divTime.classList.add("flex","justify-center","items-center","gap-1")
+
+                const divTimeStart = document.createElement("div")
+                divTimeStart.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
+                divTimeStart.textContent = '-- : --'
+                divTimeStart.addEventListener("click",function(event){
+                    event.stopPropagation()
+                    event.preventDefault()
+                    if(selectedDay != null || selectedDay != undefined){
+                        
+                        console.log("tem algo")
+                        console.log(selectedDay)
+                    }
+                        else{
+                        console.log("vazio")
+                    }
+                })
                 
-            //     //Seleção horário
-            //     const div105 = document.createElement("div")
-            //     div105.setAttribute("id", "div105")
-            //     div105.classList.add("div105", "h-fit")
-            //     const labelSelectHour = document.createElement("div")
-            //     labelSelectHour.textContent = texts.text("labelSelectHour")
-            //     labelSelectHour.classList.add("text-3","font-bold","text-white")
+                const divToTime = document.createElement("div")
+                divToTime.classList.add("text-white","text-2")
+                divToTime.textContent = texts.text("labelToTime")
 
-            //     var div110 = document.createElement("div")
-            //     div110.setAttribute("id", "div110")
-            //     div110.classList.add("div110")
+                const divTimeEnd  = document.createElement("div")
+                divTimeEnd.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
+                divTimeEnd.textContent = '-- : --'
 
-            //                 //time start
-            //     var divTimeStart = document.createElement("div")
-            //     divTimeStart.setAttribute("id", "divTimeStart")
-            //     divTimeStart.classList.add("divTime")
-            //     //div110.appendChild(divTimeStart)
-            //     divTimeStart.innerHTML = "-- : --"
-            //     divTimeStart.addEventListener("click", function (event) {
-            //         event.stopPropagation()
-            //         event.preventDefault()
-            //             //makeViewTimeHour(containerSchedule, selected , avail, function (selectedTime) {
-            //     })
-
-            //      //div to
-            // const divToTime = document.createElement("div")
-            // divToTime.setAttribute("id", "divToTime")
-            // divToTime.classList.add("divToTime")
-            // divToTime.innerHTML = texts.text("labelToTime")
-            // div110.appendChild(divToTime)
-
-            // //time end
-            // var divTimeEnd = document.createElement("div")
-            // divTimeEnd.setAttribute("id", "divTimeEnd")
-            // divTimeEnd.classList.add("divTime")
-            // div110.appendChild(divTimeEnd)
-            // divTimeEnd.innerHTML = "-- : -- "
-
-            // divTimeEnd.addEventListener("click", function (event) {
-            //     event.stopPropagation()
-            //     event.preventDefault()
-
-
-            //     })
-
+                divTime.appendChild(divTimeStart)
+                divTime.appendChild(divToTime)
+                divTime.appendChild(divTimeEnd)
+                divHourSelect.appendChild(divHourSelectLabel)
+                divHourSelect.appendChild(divTime)
                 divTypeSchedule.appendChild(labelTypeSchedule)
                 divTypeSchedule.appendChild(btnDaySchedule)
                 divTypeSchedule.appendChild(btnHourSchedule)
@@ -584,9 +579,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 divMain.appendChild(titleSchedule)
                 divMain.appendChild(divCalendar)
                 divMain.appendChild(divTypeSchedule)
+                divMain.appendChild(divHourSelect)
                 insideDiv.appendChild(divMain)
             }
             document.body.appendChild(insideDiv)
+            // para deixar todo calendario verde quando for por Período
           
         }
         function makeDivChooseImage(callback){
@@ -1701,101 +1698,101 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     }, rvButton));
     }
 
-    // continuar na quinta 
-    function UpdateAvailability(availability){
-        console.log("Availability" + JSON.stringify(availability))
-        var tds = document.querySelectorAll('.fc-day','.fc-highlight');
-        if (availability.length === 0) {
-            tds.forEach(function(td) {
-                td.classList.add('unavailable');  
-            });
-        } 
-        else {
-            availability.forEach(function(dates){
-                var datastart = moment(dates.data_start).format('YYYY-MM-DD[T]HH:mm:ss');
-                var dataend = moment(dates.data_end).format('YYYY-MM-DD[T]HH:mm:ss');
-                tds.forEach(function(td) {
-                    var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD[T]HH:mm:ss');
-                    console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
-                    if (dataDate >= datastart && dataDate <= dataend) {
-                            td.classList.remove('unavailable');
-                            td.classList.add('available');
-                    } else {
-                        td.classList.add('unavailable');                 
-                    }
-                });
-            })
-        }
-        console.log("UpdateAvailability Result Success");                             
-    }
+    // // continuar na quinta 
+    // function UpdateAvailability(availability){
+    //     console.log("Availability" + JSON.stringify(availability))
+    //     var tds = document.querySelectorAll('.fc-day','.fc-highlight');
+    //     if (availability.length === 0) {
+    //         tds.forEach(function(td) {
+    //             td.classList.add('unavailable');  
+    //         });
+    //     } 
+    //     else {
+    //         availability.forEach(function(dates){
+    //             var datastart = moment(dates.data_start).format('YYYY-MM-DD[T]HH:mm:ss');
+    //             var dataend = moment(dates.data_end).format('YYYY-MM-DD[T]HH:mm:ss');
+    //             tds.forEach(function(td) {
+    //                 var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD[T]HH:mm:ss');
+    //                 console.log("DataStart" + datastart + "DataEnd" + dataend + "\n" + "Data Elementos" + dataDate)
+    //                 if (dataDate >= datastart && dataDate <= dataend) {
+    //                         td.classList.remove('unavailable');
+    //                         td.classList.add('available');
+    //                 } else {
+    //                     td.classList.add('unavailable');                 
+    //                 }
+    //             });
+    //         })
+    //     }
+    //     console.log("UpdateAvailability Result Success");                             
+    // }
 
-    // ajustar na quinta feira 
-    function UpdateDayAvailability(availability, day, month, year){
-        // var tds = document.querySelectorAll('.fc-widget-content');
-        var trs = document.querySelectorAll('.fc-slats tr');
-        if (availability.length === 0) {
-            trs.forEach(function(tr) {
-                console.log("Availability: 0");
-                tr.classList.remove('available');
-                tr.classList.add('unavailable');  
-            });
-        } 
-        else {
+    // // ajustar na quinta feira 
+    // function UpdateDayAvailability(availability, day, month, year){
+    //     // var tds = document.querySelectorAll('.fc-widget-content');
+    //     var trs = document.querySelectorAll('.fc-slats tr');
+    //     if (availability.length === 0) {
+    //         trs.forEach(function(tr) {
+    //             console.log("Availability: 0");
+    //             tr.classList.remove('available');
+    //             tr.classList.add('unavailable');  
+    //         });
+    //     } 
+    //     else {
             
 
-            //Deixa tudo indisponível
-            trs.forEach(function (tr) {
-                tr.classList.remove('available');
-                tr.classList.add('unavailable');
-            });
-            console.log("UpdateDayAvailability");
+    //         //Deixa tudo indisponível
+    //         trs.forEach(function (tr) {
+    //             tr.classList.remove('available');
+    //             tr.classList.add('unavailable');
+    //         });
+    //         console.log("UpdateDayAvailability");
 
-            availability.forEach(function(dates) {
-                var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                var dataend = moment(dates.data_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                trs.forEach(function(tr) {
+    //         availability.forEach(function(dates) {
+    //             var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+    //             var dataend = moment(dates.data_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+    //             trs.forEach(function(tr) {
                     
-                    var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-                    // Obtém os valores do dia, mês e ano
-                    var hour = moment(dataTime).format('HH');
-                    var minute = moment(dataTime).format('mm');
-                    var second = moment(dataTime).format('ss');
-                    var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                    // Cria o objeto de data
-                    var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+    //                 var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+    //                 // Obtém os valores do dia, mês e ano
+    //                 var hour = moment(dataTime).format('HH');
+    //                 var minute = moment(dataTime).format('mm');
+    //                 var second = moment(dataTime).format('ss');
+    //                 var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+    //                 // Cria o objeto de data
+    //                 var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                    //console.log(dateView);
+    //                 //console.log(dateView);
 
-                    if (dateView>=datastart && dateView<=dataend) {
-                        tr.classList.remove('unavailable');
-                        tr.classList.add('available');
-                    }
-                });
-            });
-            console.log("UpdateDayAvailabilitySuccess");
-            if(availability.length >0){
-                availability.forEach(function (dates) {
-                    var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+    //                 if (dateView>=datastart && dateView<=dataend) {
+    //                     tr.classList.remove('unavailable');
+    //                     tr.classList.add('available');
+    //                 }
+    //             });
+    //         });
+    //         console.log("UpdateDayAvailabilitySuccess");
+    //         if(availability.length >0){
+    //             availability.forEach(function (dates) {
+    //                 var datastart = moment(dates.data_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
                     
-                    trs.forEach(function (tr) {
-                        var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
-                        var hour = moment(dataTime).format('HH');
-                        var minute = moment(dataTime).format('mm');
-                        var second = moment(dataTime).format('ss');
-                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
-                        // Cria o objeto de data
-                        var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+    //                 trs.forEach(function (tr) {
+    //                     var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
+    //                     var hour = moment(dataTime).format('HH');
+    //                     var minute = moment(dataTime).format('mm');
+    //                     var second = moment(dataTime).format('ss');
+    //                     var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+    //                     // Cria o objeto de data
+    //                     var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
-                        if (dateView == datastart) {
-                            tr.classList.remove('available');
-                            tr.classList.add('unavailable');
-                        }
-                    });
-                });
-            }
-            console.log("UpdateDaySchedulesSuccess");         
-        }
-    }
+    //                     if (dateView == datastart) {
+    //                         tr.classList.remove('available');
+    //                         tr.classList.add('unavailable');
+    //                     }
+    //                 });
+    //             });
+    //         }
+    //         console.log("UpdateDaySchedulesSuccess");         
+    //     }
+    // }
     function makePeriodSchedule(){
         $(document).ready(function () {
             $.fullCalendar.locale('pt-br');
