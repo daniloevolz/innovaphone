@@ -13,8 +13,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var dateStart; //agendamentos 
     var dateEnd;  // agendamentos 
 
-    var editor = []; // editores 
-    var viewer = []; // visualizadores 
+    // var editor = []; // editores 
+    // var viewer = []; // visualizadores 
 
     //var divPhones;  //db files variáveis
 
@@ -79,7 +79,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     app.onmessage = app_message;
     waitConnection(that);
     var devicesApi; // revisar - importante 
-
+    //var apiPhone;
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
         app.send({ api: "admin", mt: "CheckAppointment" });
@@ -90,6 +90,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" }); // phonelist
+
+        //apiPhone = start.consumeApi("com.innovaphone.phone") // testes pietro
+
         app.send({api:"admin", mt:"SelectAllRoom"})
     }
     function devicesApi_onmessage(conn, obj) {
@@ -324,7 +327,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
         btnRecurrent.id = "recurrentType"
 
-        var typeRoom;
+        var typeRoom = "periodType";
         btnPeriod.addEventListener("click", function(event) {
             typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
                 typeRoom = selectedButton.id
@@ -338,6 +341,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
               
 
         // usuarios
+        var viewers = []
         const divUsersRoom = document.createElement("div")
         divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         const labelUsersRoom = document.createElement("div")
@@ -345,7 +349,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddUsers.addEventListener("click",function(){
             console.log("Abrir Div Add Usuários")
-            makeDivAddUsers()
+            makeDivAddUsers(function(viewer){
+                viewers = viewer
+            })
         })
         //horario agendamento 
         const divHourSchedule = document.createElement("div")
@@ -353,8 +359,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelHourSchedule = document.createElement("div")
         labelHourSchedule.textContent = texts.text("labelHourSchedule")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
+        var typeSchedule;
+        var dateAvailability;
         btnMakeCalendar.addEventListener("click",function(){
-            makeDivAddAvailability(typeRoom)
+            makeDivAddAvailability(typeRoom,function(date){
+                dateAvailability = date
+                console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
+            },function(sched){
+                typeSchedule = sched
+            })
             console.log("Abrir Calendario")
         })
         // devices
@@ -396,14 +409,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         document.body.appendChild(divMain)
 
-        btnCreateRoom.addEventListener("click",function(){
-            console.log("CRIAR SALA")
-            var nomeSala = document.getElementById("iptNameRoom").value
-            console.log("Nome da Sala: " + nomeSala + "\n"
-            + "Imagem da Sala: " + imgRoom + "\n"
-            + "Tipo de sala: " + typeRoom
-            )
-            
+        btnCreateRoom.addEventListener("click",function(event){
+            const nomeSala = document.getElementById("iptNameRoom").value
+            if(typeRoom == "periodType"){
+                app.send({ api: "admin", mt: "InsertRoom", 
+                name: nomeSala, 
+                img: imgRoom, 
+                dateStart: dateAvailability[0].start, 
+                dateEnd: dateAvailability[0].end, 
+                type: typeRoom, 
+                schedule: typeSchedule, 
+                viewer: viewers, 
+                }); //viewer: viewer 
+            }               
             // app.send({ api: "admin", mt: "InsertRoom", 
             // name: nameRoom, 
             // img: srcDaImagem, 
@@ -415,7 +433,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             // viewer: viewer });
         })
         }
-        function makeDivAddUsers(){
+        function makeDivAddUsers(viewers){
             const insideDiv = document.createElement("div")
             insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
             
@@ -463,7 +481,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 const nameUser = document.createElement("div")
                 nameUser.textContent = user.cn
                 const checkboxUser = makeInput("","checkbox","")
-                checkboxUser.setAttribute("id",user.guid)
+                checkboxUser.setAttribute("id","viewercheckbox_" + user.guid)
                 divUsersAvatar.appendChild(imgAvatar);
                 divUsersAvatar.appendChild(nameUser);
                 divMainUsers.appendChild(divUsersAvatar);
@@ -487,6 +505,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 
             })
             const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+            buttonConfirm.addEventListener("click",function(){
+                var viewer = [];
+                // viewer = [];
+    
+                list_tableUsers.forEach(function (user) {
+                    var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
+                    if (viewerCheckbox.checked) {
+                        viewer.push(user.guid);
+                    }
+                     viewers(viewer)
+                });
+            })
 
             //appends
             divButtons.appendChild(buttonCancel)
@@ -506,7 +536,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             insideDiv.appendChild(divMain)
             document.body.appendChild(insideDiv)
         }
-        function makeDivAddAvailability(typeRoom){
+
+        function makeDivAddAvailability(typeRoom,dateTime,typeSchedule){
             // mudará conforme o tipo de sala ( RECORRENTE OU PERÍODO )
             const insideDiv = document.createElement("div")
             insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
@@ -531,8 +562,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
                 const labelTypeSchedule = document.createElement("div")
                 labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
-                const btnDaySchedule = makeButton(texts.text("labelDay"),"primary","")
-                const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
+                const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
+                btnDaySchedule.id = "dayModule"
+                const btnHourSchedule = makeButton(texts.text("labelHour"),"tertiary","")
+                btnHourSchedule.id = "hourModule"
+                var typeSched = "dayModule" ;
+                btnDaySchedule.addEventListener("click", function(event) {
+                    typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                        typeSched = selectedButton.id
+                    });
+                });
+
+                btnHourSchedule.addEventListener("click", function(event) {
+                    typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                        typeSched = selectedButton.id
+                    });
+                });
+                
 
                 const divHourSelect = document.createElement("div")
                 divHourSelect.classList.add("flex","p-1","flex-col","gap-1","items-start","bg-dark-200","rounded-lg")
@@ -543,30 +589,84 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 const divTime = document.createElement("div")
                 divTime.classList.add("flex","justify-center","items-center","gap-1")
 
-                const divTimeStart = document.createElement("div")
-                divTimeStart.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
-                divTimeStart.textContent = '-- : --'
-                divTimeStart.addEventListener("click",function(event){
-                    event.stopPropagation()
-                    event.preventDefault()
-                    if(selectedDay != null || selectedDay != undefined){
-                        
-                        console.log("tem algo")
-                        console.log(selectedDay)
-                    }
-                        else{
-                        console.log("vazio")
-                    }
-                })
+                var dates = []; 
+                var dataStart;
+                var dataEnd; 
+                const divTimeStart = makeInput("00:00","time","")
+                // divTimeStart.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
+                // divTimeStart.textContent = '-- : --'
+                    divTimeStart.addEventListener("change",function(event){
+                        if(selectedDay == null || selectedDay == undefined){
+                            this.value = ''
+                            makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                                event.preventDefault()
+                                event.stopPropagation()
+                                document.body.removeChild(document.getElementById("bcgrd"))
+                            })  
+                        }
+                        else if(divTimeEnd.value < divTimeStart.value && divTimeEnd.value != ''){
+                            this.value = ''
+                            makePopUp(texts.text("labelWarning"), texts.text("labelDaySmaller"), texts.text("labelOk")).addEventListener("click",function(event){
+                                event.preventDefault()
+                                event.stopPropagation()
+                                document.body.removeChild(document.getElementById("bcgrd"))
+                            })  
+                        }else{
+                            dataStart = selectedDay + "T" + this.value
+                            console.log(dataStart)
+                        }
+                    })
+                
                 
                 const divToTime = document.createElement("div")
                 divToTime.classList.add("text-white","text-2")
                 divToTime.textContent = texts.text("labelToTime")
 
-                const divTimeEnd  = document.createElement("div")
-                divTimeEnd.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
-                divTimeEnd.textContent = '-- : --'
+                const divTimeEnd  = makeInput("00:00","time","")
+                    divTimeEnd.addEventListener("change",function(event){
+                        if(divTimeStart.value == null || divTimeStart.value == undefined || divTimeStart.value == ''){
+                            this.value = ''
+                            makePopUp(texts.text("labelWarning"), texts.text("labelSelectDivStart"), texts.text("labelOk")).addEventListener("click",function(event){
+                                event.preventDefault()
+                                event.stopPropagation()
+                                document.body.removeChild(document.getElementById("bcgrd"))
+                            })  
+                        }
+                        else if(divTimeStart.value > divTimeEnd.value && divTimeStart.value != ''){
+                            this.value = ''
+                            makePopUp(texts.text("labelWarning"), texts.text("labelDayBigger"), texts.text("labelOk")).addEventListener("click",function(event){
+                                event.preventDefault()
+                                event.stopPropagation()
+                                document.body.removeChild(document.getElementById("bcgrd"))
+                            })  
+                        }else{
+                            dataEnd = selectedDay + "T" + this.value
+                            
+                            dates.push({
+                                start: dataStart,
+                                end: dataEnd
+                            })
+                            console.log(JSON.stringify(dates))
+                        }
+                    })
 
+                const divButtons = document.createElement("div")
+                divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+                const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+                buttonCancel.addEventListener("click",function(){
+                console.log("Fechar Tela")
+                document.body.removeChild(insideDiv)
+                
+                })
+                const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+                buttonConfirm.addEventListener("click",function(){
+                dateTime(dates)
+                typeSchedule(typeSched)
+                console.log("typeSched " ,typeSched)
+                document.body.removeChild(insideDiv)
+                })
+                divButtons.appendChild(buttonCancel)
+                divButtons.appendChild(buttonConfirm)
                 divTime.appendChild(divTimeStart)
                 divTime.appendChild(divToTime)
                 divTime.appendChild(divTimeEnd)
@@ -580,11 +680,45 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 divMain.appendChild(divCalendar)
                 divMain.appendChild(divTypeSchedule)
                 divMain.appendChild(divHourSelect)
+                divMain.appendChild(divButtons)
                 insideDiv.appendChild(divMain)
             }
+            // isso nos dois modelos de agendamento
+
             document.body.appendChild(insideDiv)
             // para deixar todo calendario verde quando for por Período
           
+        }
+        function makePopUp(title, msg, btn1, btn2){
+            const bcgrd = document.createElement("div")
+            bcgrd.setAttribute("id","bcgrd")
+            bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
+    
+            const popUp = document.createElement("div")
+            popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
+            const titlePopUp = document.createElement("div") // aplicar tipografia 
+            titlePopUp.textContent = title
+            const msgPopUp = document.createElement("div")
+            msgPopUp.classList.add("text-center")
+            msgPopUp.textContent = msg
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
+            const button1 = makeButton(btn1, "primary", "");
+            divButtons.appendChild(button1)
+            popUp.appendChild(titlePopUp)
+            popUp.appendChild(msgPopUp)
+            popUp.appendChild(divButtons)
+            bcgrd.appendChild(popUp)
+            document.body.appendChild(bcgrd)
+            if(btn2){
+                const button2 = makeButton(btn2, "transparent", "");
+                button2.addEventListener("click",function(){
+                    console.log("BUTTON 2 CLICADO")
+                    document.body.removeChild(bcgrd)
+                })
+                divButtons.appendChild(button2)
+            }
+            return button1
         }
         function makeDivChooseImage(callback){
             const insideDiv = document.createElement("div")
@@ -711,13 +845,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 //imgDevice.classList.add("w-5", "h-5", "rounded-full");
                 const nameDevice = document.createElement("div")
                 nameDevice.textContent = dev.name
+                 const divCheckbox = document.createElement("div")
+                divCheckbox.classList.add("flex", "gap-1" ,"items-center")
+                const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
+                identifyBtn.id = dev.hwid
+                identifyBtn.addEventListener("click",function(){
+                     console.log("ID  " + this.id)
+                    // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+                })
                 const checkboxDevice = makeInput("","checkbox","")
                 checkboxDevice.setAttribute("id",dev.hwid)
 
+                divCheckbox.appendChild(identifyBtn)
+                divCheckbox.appendChild(checkboxDevice)
                 divImgDevice.appendChild(imgDevice)
                 divImgDevice.appendChild(nameDevice)
                 divMainDevices.appendChild(divImgDevice);
-                divMainDevices.appendChild(checkboxDevice);
+                divMainDevices.appendChild(divCheckbox);
                 scrollDevices.appendChild(divMainDevices)
             })  
             const divButtons = document.createElement("div")
@@ -831,6 +975,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     customFileInput.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg", "primary", "cursor-pointer");
                     customFileInput.appendChild(input);
                     return customFileInput;
+                case "time":
+                    input.classList.add("text-black","rounded-lg")
+                    break
                 case "checkbox":
                     input.classList.add("w-[16px]","h-[16px]","rounded-md");
                     break
@@ -846,23 +993,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const backButton = makeButton('', '', './images/arrow-left.svg');
 
         // funções internas (adicionais)
-        function typeOfRoomButtons(event,btnPeriod,btnRecurrent,callback) {
+        function typeOfRoomButtons(event,btn1,btn2,callback) {
 
             const clickedButton = event.target;
     
-            if (clickedButton === btnPeriod) {
-                btnRecurrent.className = ''
-                btnPeriod.className = ''
-                btnPeriod.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");            
-                btnRecurrent.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
-                callback(btnPeriod)
+            if (clickedButton === btn1) {
+                btn2.className = ''
+                btn1.className = ''
+                btn1.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");            
+                btn2.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                callback(btn1)
             }
-            else if (clickedButton === btnRecurrent) {
-                btnRecurrent.className = ''
-                btnPeriod.className = ''
-                btnRecurrent.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
-                btnPeriod.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
-                callback(btnRecurrent)
+            else if (clickedButton === btn2) {
+                btn1.className = ''
+                btn2.className = ''
+                btn2.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg");
+                btn1.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                callback(btn2)
             }
         }
 
