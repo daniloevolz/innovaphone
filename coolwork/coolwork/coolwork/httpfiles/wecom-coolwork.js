@@ -312,23 +312,150 @@ function addPhonesToDevices() {
            header.appendChild(rightElment)
            document.body.appendChild(header);
      
-     }
-     
+    }
+    
+    function truncateString(str, maxLength) {
+        if (str.length > maxLength) {
+            return str.substring(0, maxLength) + "...";
+        } else {
+            return str;
+        }
+    }
+    function filterSchedule(){
+        const mainFilter = document.createElement("div")
+        mainFilter.classList.add("flex", "bg-dark-200",'items-center',"m-1", 'justify-between', 'p-1','margin-1', 'rounded-lg',"margin-1","self-stretch", "gap-1")
+        mainFilter.setAttribute("id","divMainFilter")
+        
+        document.body.appendChild(mainFilter)
+        const searchContain= document.createElement("div")
+        searchContain.classList.add("relative", "w-full")
+        
+        const inputShare = document.createElement("input")
+        inputShare.classList.add('p-1', 'w-full', "border", "rounded-md","font-Montserrat","text-2","not-italic","font-bold","text-black");
+        inputShare.id = "inputShare";
+        inputShare.placeholder = 'Pesquisar sala';
+        inputShare.setAttribute('type','text');
+        const iconShare = makeButton('', "", "./images/search.svg")
+        iconShare.classList.add("absolute", "top-1/2", "right-4", "transform", "-translate-y-1/2", "bg-none", "border-none", "cursor-pointer", "outline-none")
+        iconShare.setAttribute("id","iconShare")
+        const ishare = document.createElement("i")
+        ishare.classList.add("fas", "fa-search")
+        
+        const btnDiv = document.createElement("div")
+        btnDiv.classList.add('justify-end', 'flex', 'items-center', 'gap-3', 'w-[300px]')
+        btnDiv.id = "btnDiv"
+
+        var btnDate = makeButton(texts.text("labelDate"), "primary",'')
+        var btnAll = makeButton(texts.text("labelAll"), "secundary",'')
+        btnAll.id = "btnAll"
+        var btnTrash = makeButton('', "", "./images/trash-2.svg")
+        
+        inputShare.appendChild(ishare)
+        searchContain.appendChild(inputShare)
+        searchContain.appendChild(iconShare)
+        mainFilter.appendChild(searchContain)
+        btnDiv.appendChild(btnDate)
+        btnDiv.appendChild(btnAll)
+        btnDiv.appendChild(btnTrash)
+        mainFilter.appendChild(btnDiv)
+        
+        btnDate.addEventListener('click', function(event){
+
+            makeCalendar(mainFilter, null, null, function (selectedDay) {
+                selected = selectedDay;
+                var filtred = schedules.filter(function(s){
+                    // Extract the date part from s.data_start
+                    var sDate = s.data_start.split('T')[0];
+                    
+                    return sDate === selected;
+                });
+                console.log("DIA FILTRADO", filtred)
+                makeUserSchedules(filtred)
+            })
+            
+        })
+    
+
+        inputShare.addEventListener("keydown", handleEnterKey);
+
+        function handleEnterKey(event) {
+            if (event.key === "Enter") {
+                const searchTerm = inputShare.value.toLowerCase();
+        
+                const filteredRooms = rooms.filter(function (r) {
+                    const roomName = r.name.toLowerCase();
+                    return roomName.includes(searchTerm);
+                });
+                const filteredSchedules = schedules.filter(function (s) {
+                    // Verifica se o 'room_id' está incluído nos IDs dos quartos filtrados
+                    return filteredRooms.id === s.room_id;
+                });
+            
+                console.log("ERICK filtro de Room", filteredRooms);
+                console.log("Agendamentos filtrados", filteredSchedules);
+            
+                makeUserSchedules(filteredSchedules);
+            }
+        }
+        
+      
+        // function filterRooms(searchTerm) {
+        //     return 
+        // }        
+       
+        // function filterSchedules(filtredRoom) {
+        //     // Supondo que 'schedules' é uma lista de agendamentos
+        //     return 
+        // }
+        btnAll.addEventListener("click",function(event){
+            makeUserSchedules(schedules)
+        })
+
+        btnTrash.addEventListener("click",function(event){
+            nextSchedules(schedules)
+        })
+        
+        
+    }
+    function nextSchedules(schedules){
+        const today = new Date();
+
+        // Filtrar os agendamentos com base na data de início sendo maior que hoje
+        const filtredschedules = schedules.filter(function (s) {
+            // Converta a string de data para um objeto Date para comparação
+            const startDate = new Date(s.data_start);
+
+            // Compare apenas as datas (ignorando horas, minutos, etc.)
+            return startDate > today;
+        });
+        makeUserSchedules(filtredschedules)
+    }
     function makeUserSchedules(schedules){
         that.clear()
         addPhonesToDevices()
         makeHeader(backButton, makeButton('','',"./images/menu.svg"), "Meus Agendamentos");
-        
-        console.log("ERICK Rooms",JSON.stringify(schedules))
-        
+        filterSchedule()
+        const container = document.createElement('div')
+        container.classList.add('overflow-auto', 'w-full')
+        container.style.height = 'calc(100vh - 130px)'
+
         schedules.forEach(function(s){
+            //div principal
+
             const divMain = document.createElement('div')
-            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-1', 'rounded-lg',"margin-1")
+            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
             divMain.setAttribute("id","divMain")
-            
+            //div dos elementos1 device e schedule
+            const divE1 = document.createElement('div')
+            divE1.classList.add("justify-start","flex","items-center","gap-3")
+            //div dos elementos2 edit e delete
+            const divE2 = document.createElement('div')
+            divE2.classList.add("justify-end","flex","items-center","gap-3")
+         
             const div185 = document.createElement('div')
-            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between',"flex-wrap",'rounded-lg')
+            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
             div185.setAttribute("id","div185")
+            //div imagem e nome do device
             const divDevice = document.createElement('div')
             divDevice.classList.add("flex","flex-col","items-center", "gap-1", "justify-center",)
             const divImg = document.createElement('img')
@@ -339,11 +466,14 @@ function addPhonesToDevices() {
                 return d.hwid === s.device_id
                 
             })[0]
+            nameDevice.name = truncateString(nameDevice.name, 10);
             
             console.log("Erick nameDevice", nameDevice)
             const deviceHw = document.createElement('div')
             deviceHw.classList.add("divDeviceHw")
             deviceHw.textContent = nameDevice.name
+
+            //div data e sala schedule
 
             const dateSchedule = document.createElement('div')
             dateSchedule.classList.add("flex","flex-col")
@@ -351,9 +481,11 @@ function addPhonesToDevices() {
             var nameRoom = rooms.filter(function(r){
                 return r.id === s.device_room_id
             })[0]
-
+            
+            var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
+            nameRoom.name = truncateString(nameRoom.name, 10);
             roomSched.classList.add("nameroom", "font-medium", "text-xl")
             roomSched.textContent = nameRoom.name
             const formDate = s.data_end.split("T")
@@ -365,32 +497,99 @@ function addPhonesToDevices() {
             dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
 
 
-            const editBtn = makeButton(texts.text("labelEdit"), "primary", "");
-            const delBtn = makeButton(texts.text("deletePhoneUseButton"), "destructive", "");
+            const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
+            const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
+
             divDevice.appendChild(divImg)
             divDevice.appendChild(deviceHw)
             dateSchedule.appendChild(roomSched)
             dateSchedule.appendChild(dateHour)
-            
-            
-            
-            div185.appendChild(divDevice)
-            div185.appendChild(dateSchedule)
-            div185.appendChild(editBtn)
-            div185.appendChild(delBtn)
+                 
+            divE1.appendChild(divDevice)
+            divE1.appendChild(dateSchedule)
+            divE2.appendChild(editBtn)
+            divE2.appendChild(delBtn)
+            div185.appendChild(divE1)
+            div185.appendChild(divE2)
             divMain.appendChild(div185)
-            document.body.appendChild(divMain)
-
+            container.appendChild(divMain)
+            
+            nameRoom.name = oldNameRoom
         })
+
+        document.body.appendChild(container)
         
+    }
+    function calendarAnalise(deviceHw, roomId){
+        if(!deviceHw && !roomId){
+            var info = availabilities.filter(function (a) {
+                return a.room_id == roomId
+            })
+    
+        }else{
+            return schedules
+        }
+
+        return
+    }
+    function makeCalendar(divMain, deviceHw, roomId, funcao2){
+        divMain.innerHTML = "";
+        //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
+        // div principal
+        const divCalendar = document.createElement("div")
+        divCalendar.classList.add("flex","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
+        const divTextSelectDay = document.createElement("div")
+        divTextSelectDay.classList.add("color-white","font-Montserrat","text-2","not-italic","font-bold")
+        divTextSelectDay.textContent = texts.text("labelSelectYourDay")
         
+        divCalendar.appendChild(divTextSelectDay)
+
+        var info = calendarAnalise(deviceHw, roomId)
+
+        Calendar.createCalendar(divCalendar,"",function (day) {
+            
+            selectedDay = day
+            console.log("SelectedDay " + day)
+            funcao2(selectedDay)
+        }); // componente Calendar
+
+        setTimeout(function(){
+            UpdateSchedule(schedules)
+        },500)
+
+        divMain.appendChild(divCalendar);
+        
+    }
+    function UpdateSchedule(schedule){
+        var cells = document.querySelectorAll("#calendar-body tr td div");
+        if (schedule.length === 0) {
+            cells.forEach(function (td) {
+                td.classList.add('unavailable');
+            });
+        }
+        else{
+            cells.forEach(function(td){
+              var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');  
+
+              schedules.forEach(function(dateS){
+                var dataSplit = dateS.data_start
+                var dataS = dataSplit.split("T")[0]  // ajuste para comparar as datas 
+
+                if(dataDate == dataS ){
+                    td.classList.remove('unavailable');
+                    td.classList.add('available')
+                }
+            })
+            })
+          
+        }
     }
     var buttonMenu = makeButton('','',"./images/menu.svg")
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
-            makeUserSchedules(schedules)
+            nextSchedules(schedules)
         })
         // div container (scroll)
         const container = document.createElement("div")
@@ -639,7 +838,7 @@ function addPhonesToDevices() {
 
     }
     // calendario 
-    function makeCalendar(divMain, deviceHw,roomId, funcao2){
+    function makeCalendarOld(divMain, deviceHw,roomId, funcao2){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
