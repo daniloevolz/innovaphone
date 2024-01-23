@@ -182,6 +182,16 @@ function addPhonesToDevices() {
 // Agora, devices contém os phones com os parâmetros necessários
 
 
+//função para diminuir a string
+function truncateString(str, maxLength) {
+    if (str.length > maxLength) {
+        return str.substring(0, maxLength) + "...";
+    } else {
+        return str;
+    }
+}
+
+
     function makeButton(text, variant, iconSVG) {
         const button = document.createElement("button");
         button.textContent = text;
@@ -292,7 +302,8 @@ function addPhonesToDevices() {
         const leftElement = imgLeft
         leftElement.addEventListener("click", function (event) {
             makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-        event.stopPropagation()
+            // app.send({ api: "user", mt: "SelectMyRooms" })
+            event.stopPropagation()
             event.preventDefault()
         })
      
@@ -444,6 +455,7 @@ function addPhonesToDevices() {
 
             const divMain = document.createElement('div')
             divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
+            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
             divMain.setAttribute("id","divMain")
             //div dos elementos1 device e schedule
             const divE1 = document.createElement('div')
@@ -454,7 +466,9 @@ function addPhonesToDevices() {
          
             const div185 = document.createElement('div')
             div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
+            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
             div185.setAttribute("id","div185")
+            //div imagem e nome do device
             //div imagem e nome do device
             const divDevice = document.createElement('div')
             divDevice.classList.add("flex","flex-col","items-center", "gap-1", "justify-center",)
@@ -467,11 +481,14 @@ function addPhonesToDevices() {
                 
             })[0]
             nameDevice.name = truncateString(nameDevice.name, 10);
+            nameDevice.name = truncateString(nameDevice.name, 10);
             
             console.log("Erick nameDevice", nameDevice)
             const deviceHw = document.createElement('div')
             deviceHw.classList.add("divDeviceHw")
             deviceHw.textContent = nameDevice.name
+
+            //div data e sala schedule
 
             //div data e sala schedule
 
@@ -483,8 +500,11 @@ function addPhonesToDevices() {
             })[0]
             
             var oldNameRoom = nameRoom.name
+            
+            var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
+            nameRoom.name = truncateString(nameRoom.name, 10);
             nameRoom.name = truncateString(nameRoom.name, 10);
             roomSched.classList.add("nameroom", "font-medium", "text-xl")
             roomSched.textContent = nameRoom.name
@@ -800,25 +820,31 @@ function addPhonesToDevices() {
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2", "md:grid-cols-4", "m-1","content-start")
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         document.body.appendChild(container);
         // div sala
+        const divMainSala = document.createElement("div")
+        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-2","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
+
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala")
+        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
-        container.appendChild(divImg);
+        container.appendChild(divMainSala)
+        divMainSala.appendChild(divImg)
+
+        
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario")
+        divHorario.classList.add("divHorario","w-full","h-full",)
         container.appendChild(divHorario)
         makeViewCalendarDetail(divHorario, avail)
 
-        // div container (scroll)
+        // div container (scroll) devices
         const div102 = document.createElement("div")
-        div102.classList.add("div102", "h-fit")
+        div102.classList.add("div102","sm:col-start-2")
         /*div102.style.height = 'calc(100vh - 70px)'*/
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
