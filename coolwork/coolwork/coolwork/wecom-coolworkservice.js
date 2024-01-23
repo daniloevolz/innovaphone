@@ -592,13 +592,22 @@ new JsonApi("admin").onconnected(function(conn) {
                                 })
                             })
 
-                            var editors = obj.editor
-                            editors.forEach(function(e){
-                                Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + roomID + "')")
-                                .oncomplete(function (editorsData) { 
-                                    log("InsertEditors Success")
+                            var devices = obj.device
+                            devices.forEach(function(d){
+                                var queryUpdateDevices = "UPDATE tbl_devices SET room_id = " + roomID + " WHERE hwid = " + d + ";";
+                                Database.exec(queryUpdateDevices)
+                                .oncomplete(function (){
+                                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", result: JSON.stringify(data), src: data.src }));
+                                })
                             })
-                        })
+
+                        //     var editors = obj.editor
+                        //     editors.forEach(function(e){
+                        //         Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + roomID + "')")
+                        //         .oncomplete(function (editorsData) { 
+                        //             log("InsertEditors Success")
+                        //     })
+                        // })
                     
                     })
                     conn.send(JSON.stringify({api: "admin" , mt: "InsertRoomResult"}))
@@ -608,15 +617,38 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("Erro ao inserir na tbl_room: " + String(errorText));
                     });
             }
-            if (obj.mt == "SelectAllRoom") { // revisar 04/10
-                Database.exec("SELECT * FROM tbl_room")
-                .oncomplete(function (data) {
-                log("SelectSuccess" + JSON.stringify(data))
-                conn.send(JSON.stringify({ api: "admin", mt: "SelectAllRoomResult", result: JSON.stringify(data), src: data.src }));
-                })
-                .onerror(function (error, errorText, dbErrorCode) {
-                        log("SelectAllRoomResult:result=Error " + String(errorText));
-                });
+            if (obj.mt == "SelectAllRoom") { 
+                var querySelectRoom = "SELECT * FROM tbl_room ";
+                var querySelectDevices = "SELECT * FROM tbl_devices";
+                var querySelectRoomAvailability = "SELECT * FROM tbl_room_availability"; 
+                var queryEditorsRoom = "SELECT * FROM tbl_room_editors"; 
+                var queryViewersRoom = "SELECT * FROM tbl_room_viewers"; 
+                Database.exec(querySelectRoom)
+                    .oncomplete(function (roomData) {
+                        Database.exec(querySelectDevices)
+                            .oncomplete(function (deviceData) {
+                                Database.exec(queryEditorsRoom)
+                                .oncomplete(function (editors) {
+                                    Database.exec(queryViewersRoom)
+                                .oncomplete(function (viewers) {
+                                    Database.exec(querySelectRoomAvailability)
+                                    .oncomplete(function (roomAvailData) {
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectRoomsResult", rooms: JSON.stringify(roomData), dev: deviceData, availabilities: JSON.stringify(roomAvailData), editors: JSON.stringify(editors), viewers: JSON.stringify(viewers)  }));
+                                    })
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        log("SelectRoomResult: Error ao selecionar tabela tbl_room_availability: " + String(errorText));
+                                    });
+                                })
+                                })
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("SelectRoomResult: Error ao selecionar tabela tbl_devices: " + String(errorText));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectRoomResult: Error ao selecionar sala: " + String(errorText));
+                    });
+                //conn.send(JSON.stringify({ api: "admin", mt: "SelectAllRoomResult", result: JSON.stringify(data), src: data.src }));
             }
             if (obj.mt == "SelectRoom") {
                 var roomId = obj.id;
