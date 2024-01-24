@@ -110,6 +110,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         }
         if(obj.api == "admin" && obj.mt == "InsertRoomResult"){
             app.send({api:"admin", mt:"SelectAllRoom"})
+            filesID = [] // limpeza da variavel para nao excluir a imagem antiga (a que acabou de ser adicionada)
         }
     }
 
@@ -507,10 +508,149 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divMain.appendChild(divButtons)
             insideDiv.appendChild(divMain)
         }
-        // isso nos dois modelos de agendamento
+        else if(typeRoom == "recurrentType"){
+            const titleSchedule = document.createElement("div")
+            titleSchedule.textContent = texts.text("labelScheduleRecurrent")
+            titleSchedule.classList.add("text-3","text-white" ,"font-bold")
+            const divDaysWeek = document.createElement("div")
+            divDaysWeek.classList.add("flex","p-1","items-start")
 
+            var week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+            week.forEach(function (w) {
+                const dayDiv = document.createElement('div')
+                dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText")
+                dayDiv.setAttribute("day-week", w)
+                const dayText = document.createElement('p')
+                dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
+                dayText.textContent = texts.text(`${w + "Abrev"}`)
+                dayDiv.appendChild(dayText)
+                divDaysWeek.appendChild(dayDiv)
+            })
+
+            const divTypeSchedule = document.createElement("div")
+            divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+            const labelTypeSchedule = document.createElement("div")
+            labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
+            const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
+            btnDaySchedule.id = "dayModule"
+            const btnHourSchedule = makeButton(texts.text("labelHour"),"tertiary","")
+            btnHourSchedule.id = "hourModule"
+            var typeSched = "dayModule" ;
+            btnDaySchedule.addEventListener("click", function(event) {
+                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                    typeSched = selectedButton.id
+                });
+            });
+
+            btnHourSchedule.addEventListener("click", function(event) {
+                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                    typeSched = selectedButton.id
+                });
+            });
+
+            const divHourSelect = document.createElement("div")
+            divHourSelect.classList.add("flex","p-1","flex-col","gap-1","items-start","bg-dark-200","rounded-lg")
+            const divHourSelectLabel = document.createElement("div")
+            divHourSelectLabel.classList.add("text-1","font-bold","text-white")
+            divHourSelectLabel.textContent = texts.text("labelSelectHour")
+
+            const divTime = document.createElement("div")
+            divTime.classList.add("flex","justify-center","items-center","gap-1")
+
+            var dates = []; 
+            var dataStart;
+            var dataEnd; 
+
+            const divTimeStart = makeInput("00:00","time","")
+            // divTimeStart.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
+            // divTimeStart.textContent = '-- : --'
+                divTimeStart.addEventListener("change",function(event){
+                    // if(selectedDay == null || selectedDay == undefined){
+                    //     this.value = ''
+                    //     makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                    //         event.preventDefault()
+                    //         event.stopPropagation()
+                    //         document.body.removeChild(document.getElementById("bcgrd"))
+                    //     })  
+                    // }
+                    // else if(divTimeEnd.value < divTimeStart.value && divTimeEnd.value != ''){
+                    //     this.value = ''
+                    //     makePopUp(texts.text("labelWarning"), texts.text("labelDaySmaller"), texts.text("labelOk")).addEventListener("click",function(event){
+                    //         event.preventDefault()
+                    //         event.stopPropagation()
+                    //         document.body.removeChild(document.getElementById("bcgrd"))
+                    //     })  
+                    // }else{
+                    //     dataStart = selectedDay + "T" + this.value
+                    //     console.log(dataStart)
+                    // }
+                })
+            
+            
+            const divToTime = document.createElement("div")
+            divToTime.classList.add("text-white","text-2")
+            divToTime.textContent = texts.text("labelToTime")
+
+            const divTimeEnd  = makeInput("00:00","time","")
+                divTimeEnd.addEventListener("change",function(event){
+                    // if(divTimeStart.value == null || divTimeStart.value == undefined || divTimeStart.value == ''){
+                    //     this.value = ''
+                    //     makePopUp(texts.text("labelWarning"), texts.text("labelSelectDivStart"), texts.text("labelOk")).addEventListener("click",function(event){
+                    //         event.preventDefault()
+                    //         event.stopPropagation()
+                    //         document.body.removeChild(document.getElementById("bcgrd"))
+                    //     })  
+                    // }
+                    // else if(divTimeStart.value > divTimeEnd.value && divTimeStart.value != ''){
+                    //     this.value = ''
+                    //     makePopUp(texts.text("labelWarning"), texts.text("labelDayBigger"), texts.text("labelOk")).addEventListener("click",function(event){
+                    //         event.preventDefault()
+                    //         event.stopPropagation()
+                    //         document.body.removeChild(document.getElementById("bcgrd"))
+                    //     })  
+                    // }else{
+                    //     dataEnd = selectedDay + "T" + this.value
+                        
+                    //     dates.push({
+                    //         start: dataStart,
+                    //         end: dataEnd
+                    //     })
+                    //     console.log(JSON.stringify(dates))
+                    // }
+                })
+
+            
+            // isso nos dois modelos de agendamento
+            const divEditRecurrent = document.createElement("div")
+            divEditRecurrent.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+            const labelHourSchedule = document.createElement("div")
+            labelHourSchedule.textContent = texts.text("labelHourIndividual")
+            const btnEditRecurrentDay = makeButton(texts.text("labelEdit"),"secundary","")
+
+            //  divButtons.appendChild(buttonCancel)
+            //     divButtons.appendChild(buttonConfirm)
+            divTime.appendChild(divTimeStart)
+            divTime.appendChild(divToTime)
+            divTime.appendChild(divTimeEnd)
+            divHourSelect.appendChild(divHourSelectLabel)
+            divHourSelect.appendChild(divTime)
+            divTypeSchedule.appendChild(labelTypeSchedule)
+            divTypeSchedule.appendChild(btnDaySchedule)
+            divTypeSchedule.appendChild(btnHourSchedule)
+            divEditRecurrent.appendChild(labelHourSchedule)
+            divEditRecurrent.appendChild(btnEditRecurrentDay)
+
+            divMain.appendChild(titleSchedule)
+            divMain.appendChild(divDaysWeek)
+            divMain.appendChild(divTypeSchedule)
+            divMain.appendChild(divHourSelect)
+            divMain.appendChild(divEditRecurrent)
+            //divMain.appendChild(divButtons)
+            insideDiv.appendChild(divMain)
+        }
+       
         document.body.appendChild(insideDiv)
-        // para deixar todo calendario verde quando for por Período
         
     }
     function makePopUp(title, msg, btn1, btn2){
@@ -545,6 +685,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         return button1
     }
     function makeDivChooseImage(callback){
+        // filesID = [] // limpeza
+        controlDB = false
         const insideDiv = new innovaphone.ui1.Div(null, null, "bg-black bg-opacity-50 justify-center items-center absolute h-full w-full top-0 flex");
 
         const divMain = new innovaphone.ui1.Div(null, null, "inline-flex p-3 flex-col flex-start gap-1 rounded-lg bg-dark-100");
@@ -592,13 +734,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         buttonCancel.addEvent("click", function () {
             console.log("Fechar Tela");
             that.rem(insideDiv);
+            console.log("Files ID " + filesID)
+            deleteFile(filesID) 
         });
         const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
         buttonConfirm.addEvent("click", function () {
             var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")
             callback(mainImgSrc);
-           
             that.rem(insideDiv);
+            filesID = []
         });
 
         divSelectImgs.add(img1);
@@ -1692,7 +1836,7 @@ function drag(ev) {
 }
 
 // db files
-container
+// container
 var folder = null;
 
 function onSelectFile() {
@@ -1803,12 +1947,13 @@ function startfileUpload() {
     }
 
     function addFileToFileList(file) {
-        filesID = file.id
+        // filesID = file.id
 
         if(controlDB){
             // document.getElementById("imgBD").innerHTML = ''
             var divMainImg = document.getElementById("divMainImg")
             divMainImg.setAttribute("src",start.originalUrl + "/files/" + file.id)
+            filesID = file.id
             // var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
             // imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
             // var delButton = new innovaphone.ui1.Div(null, null, "button")
