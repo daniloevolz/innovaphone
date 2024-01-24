@@ -15,8 +15,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var listbox; // db files variaveis
     var filesToUpload = []; // db files variaveis
     var phone_list = [] // todos os devices
-    var iptFileImg;
-
     var listDeviceRoom = []; 
     var list_AllRoom = []
     var list_room = [];
@@ -32,6 +30,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var devices = []
     var availabilities = []
     var viewers = []
+    var devHwid = []
 
     var colorSchemes = {
         dark: {
@@ -90,9 +89,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         // chamar todos que nao estão vinculados a uma sala para serem adicionados em outra
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
             phone_list = JSON.parse(obj.result)
-            makeDivAddDevices(phone_list,function(devID){
-                devHwId = devID
-            })
+            makeDivAddDevices(phone_list)
         }
         // if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
         //     list_AllRoom = JSON.parse(obj.result)
@@ -548,89 +545,80 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         return button1
     }
     function makeDivChooseImage(callback){
-        const insideDiv = document.createElement("div")
-        insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
+        const insideDiv = new innovaphone.ui1.Div(null, null, "bg-black bg-opacity-50 justify-center items-center absolute h-full w-full top-0 flex");
+
+        const divMain = new innovaphone.ui1.Div(null, null, "inline-flex p-3 flex-col flex-start gap-1 rounded-lg bg-dark-100");
     
-        const divMain = document.createElement("div")
-        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100")
+        const titleImg = new innovaphone.ui1.Div(null, texts.text("labelImageRoom"), "text-3 text-white font-bold");
+    
+        const mainImg = new innovaphone.ui1.Node("img", null,"","h-[260px] rounded-lg aspect-[3/4]");
+        mainImg.setAttribute("src", './images/MESA-1.png');
+        mainImg.setAttribute("id", "divMainImg");
+    
+        const divSelectImgs = new innovaphone.ui1.Div(null,null,"flex w-full items-start gap-1 flex-row");
 
-        const titleImg = document.createElement("div")
-        titleImg.textContent = texts.text("labelImageRoom")
-        titleImg.classList.add("text-3","text-white" ,"font-bold")
+        const img1 = createImage('./images/MESA-1.png');
+        const img2 = createImage('./images/MESA-2.png');
+        const img3 = createImage('./images/MESA-3.png');
 
-        const mainImg = document.createElement("img")
-        mainImg.classList.add("h-[260px]","rounded-lg","aspect-[3/4]")
-        mainImg.src = './images/MESA-1.png'
-        mainImg.id = "divMainImg"
-
-        const divSelectImgs = document.createElement("div")
-        divSelectImgs.classList.add("flex","w-full","items-start","gap-1","flex-row")
-
-        const img1 = document.createElement("img")
-        img1.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-        img1.src = './images/MESA-1.png'
-        const img2 = document.createElement("img")
-        img2.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-        img2.src = './images/MESA-2.png'
-        const img3 = document.createElement("img")
-        img3.classList.add("basis-1/3","w-[96px]","aspect-[4/3]","rounded-lg")
-        img3.src = './images/MESA-3.png'
-
-        img1.addEventListener("click", function(event) {
-        addBorderAndChangeImage(img1, mainImg, './images/MESA-1.png');
+        img1.addEvent("click", function (event) {
+            addBorderAndChangeImage(img1, mainImg, './images/MESA-1.png');
         });
     
-    img2.addEventListener("click", function(event) {
-        addBorderAndChangeImage(img2,mainImg, './images/MESA-2.png');
-    });
+        img2.addEvent("click", function (event) {
+            addBorderAndChangeImage(img2, mainImg, './images/MESA-2.png');
+        });
     
-    img3.addEventListener("click", function(event) {
-        addBorderAndChangeImage(img3, mainImg,'./images/MESA-3.png');
-    });
+        img3.addEvent("click", function (event) {
+            addBorderAndChangeImage(img3, mainImg, './images/MESA-3.png');
+        });
+        const divIptImage = new innovaphone.ui1.Div(null,null,"flex p-1 justify-between items-center rounded-lg bg-dark-200");
+        const labelImportImg = new innovaphone.ui1.Div(null, texts.text("labelImportImg"));
+        const customFileInput = new innovaphone.ui1.Node("label",null,texts.text("labelChoose"),"bg-primary-600 hover:bg-primary-500 text-dark-100 font-medium py-1 px-2 rounded-lg primary cursor-pointer");
+        inputDbFiles = customFileInput.add(new innovaphone.ui1.Node("input","display:none", "", ""));
+        inputDbFiles.setAttribute("id", "fileinput").setAttribute("type", "file");
+        inputDbFiles.setAttribute("accept","image/*")
+        inputDbFiles.container.addEventListener('change', onSelectFile, false);
+        // input.style.display = "none";
 
-        const divIptImage = document.createElement("div")
-        divIptImage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
-        const labelImportImg = document.createElement("div")
-        labelImportImg.textContent = texts.text("labelImportImg")
-         iptFileImg =  makeInput(texts.text("labelChoose"),"file","")
         //input = divGeral.add(new innovaphone.ui1.Node("input", null, "", ""));
-        iptFileImg.setAttribute("id", "fileinput").setAttribute("type", "file");
-        iptFileImg.setAttribute("accept", "image/*");
-        iptFileImg.container.addEventListener('change', onSelectFile, false);
-        // iptFileImg.accept = "image/*"
-        // iptFileImg.container.addEventListener("change", function (event) {
-        //     onSelectFile(event.target) // teste db files pietro
-        // });
-        const divButtons = document.createElement("div")
-        divButtons.classList.add("flex","justify-between","items-center","rounded-md")
-        const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
-        buttonCancel.addEventListener("click",function(){
-        console.log("Fechar Tela")
-        document.body.removeChild(insideDiv)
-        
-        })
-        const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
-        buttonConfirm.addEventListener("click",function(){
-        callback(mainImg.getAttribute("src"))
-        document.body.removeChild(insideDiv)
-        })
-        divSelectImgs.appendChild(img1)
-        divSelectImgs.appendChild(img2)
-        divSelectImgs.appendChild(img3)
-        divIptImage.appendChild(labelImportImg)
-        divIptImage.appendChild(iptFileImg)
-        divButtons.appendChild(buttonCancel)
-        divButtons.appendChild(buttonConfirm)
-        divMain.appendChild(titleImg)
-        divMain.appendChild(mainImg)
-        divMain.appendChild(divSelectImgs)
-        divMain.appendChild(divIptImage)
-        divMain.append(divButtons)
-        insideDiv.appendChild(divMain)
+        //     input.setAttribute("id", "fileinput").setAttribute("type", "file");
+        //     input.setAttribute("accept", "image/*");
+        //     input.container.addEventListener('change', onSelectFile, false);
+        app.sendSrc({ mt: "SqlInsert", statement: "insert-folder", args: { name: "myFolder" }} , folderAdded);
 
-        document.body.appendChild(insideDiv)
+        const divButtons = new innovaphone.ui1.Div(null,null,"flex justify-between items-center rounded-md");
+        const buttonCancel = new innovaphone.ui1.Node("button","",texts.text("labelBtnCancel"), "bg-dark-300 hover:bg-dark-400 text-primary-600 font-bold py-1 px-2 rounded-lg")
+        buttonCancel.addEvent("click", function () {
+            console.log("Fechar Tela");
+            that.rem(insideDiv);
+        });
+        const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
+        buttonConfirm.addEvent("click", function () {
+            var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")
+            callback(mainImgSrc);
+           
+            that.rem(insideDiv);
+        });
+
+        divSelectImgs.add(img1);
+        divSelectImgs.add(img2);
+        divSelectImgs.add(img3);
+        divIptImage.add(labelImportImg);
+        divIptImage.add(customFileInput);
+        divButtons.add(buttonCancel);
+        divButtons.add(buttonConfirm);
+        divMain.add(titleImg);
+        divMain.add(mainImg);
+        divMain.add(divSelectImgs);
+        divMain.add(divIptImage);
+        divMain.add(divButtons);
+        insideDiv.add(divMain);
+
+        that.add(insideDiv);
+
     }
-    function makeDivAddDevices(devices,devID){
+    function makeDivAddDevices(devices){
         // consultar os devices  
         
 
@@ -707,17 +695,17 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         })
         const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
         buttonConfirm.addEventListener("click",function(){
-            var devices = [];
+            var devArray = [];
             // viewer = [];
 
             devices.forEach(function (dev) {
                 var devCheckbox = document.getElementById("checkboxDev_" + dev.hwid);
                 if (devCheckbox.checked) {
-                    devices.push(dev.hwid);
+                    devArray.push(dev.hwid);
                 }
                 
             });
-                devID(devices)
+                devHwid = devArray  // ajustar para usar callBack caso funcione assim  ~~ Pietro
                 document.body.removeChild(insideDiv)
         })
 
@@ -933,6 +921,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         });
 
         that.clear();
+        backButton.addEventListener("click",function(event){
+            event.stopPropagation()
+            event.preventDefault()
+            makeViewRoom(rooms,devices,availabilities,viewers)
+        })
         makeHeader(backButton, makeButton(texts.text("save"),"primary",""), room.name)
         // div container
         const container = document.createElement("div")
@@ -1145,6 +1138,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion COMPONENTES
 
     //#region FUNÇÕES INTERNAS
+    function createImage(src) {
+        const img = new innovaphone.ui1.Node("img", null, null,"basis-1/3 w-[96px] aspect-[4/3] rounded-lg");
+        img.setAttribute("src", src);
+        return img;
+    }
     function typeOfRoomButtons(event,btn1,btn2,callback) {
 
         const clickedButton = event.target;
@@ -1164,19 +1162,20 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             callback(btn2)
         }
     }
-    let lastClickedImg = null;
+    // let lastClickedImg = null;
     function addBorderAndChangeImage(imgElement, mainImg , newSrc) {
-        if (lastClickedImg !== null) {
-            lastClickedImg.classList.remove("border-[3px]" ,"border-primary-100");
-        }
+        // if (lastClickedImg !== null) {
+        //     lastClickedImg.classList.remove("border-[3px]" ,"border-primary-100");
+        // }
     
-        imgElement.classList.add("border-[3px]" , "border-primary-100");
+       // imgElement.classList.add("border-[3px]" , "border-primary-100");
     
         // Atualizar o último elemento clicado
-        lastClickedImg = imgElement;
+        //lastClickedImg = imgElement;
     
-        mainImg.src = newSrc
+        mainImg.setAttribute("src",newSrc) 
     }
+    // rever uma forma de fazer isso 
     function makeDivOptions(){
         that.clear();
         // backButton.addEventListener("click",function(event){
@@ -1696,19 +1695,13 @@ function drag(ev) {
 container
 var folder = null;
 
-// function onSelectFile(input) {
-//     // if(filesID){
-//     //     deleteFile(filesID)
-//     // }
-//         console.log("Evento do Input File" + input.container.files[0])
-//         controlDB = true
-//         postFile(input.container.files[0]);
-    
-   
-// }
-function onSelectFile(input) {
-        controlDB = true;
-        postFile(input.container.files[0]);
+function onSelectFile() {
+    // if(filesID){
+    //     deleteFile(filesID)
+    // }
+        console.log("Evento do Input File" + inputDbFiles.container.files[0])
+        controlDB = true
+        postFile(inputDbFiles.container.files[0]);
 }
 
 function startfileUpload() {
@@ -1721,7 +1714,7 @@ function startfileUpload() {
         if (!file) return;
         //dialog.container.showModal();
         sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
-
+        console.log("FILE IMG " + String(file))
         fetch('?dbfiles=myfiles&folder=' + folder + '&name=' + encodeURI(file.name) + '&key=' + sessionKey,
             {
                 method: 'POST',
@@ -1774,7 +1767,7 @@ function startfileUpload() {
                 console.log("Success");
                 //dialog.container.close();
                 console.log(data);
-                document.getElementById("imgBD").innerHTML = '';
+                //document.getElementById("imgBD").innerHTML = '';
                 listFolder(folder);
             }).catch(error => {
                 //dialog.container.close();
@@ -1813,15 +1806,18 @@ function startfileUpload() {
         filesID = file.id
 
         if(controlDB){
-            document.getElementById("imgBD").innerHTML = ''
-            var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
-            imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
-            var delButton = new innovaphone.ui1.Div(null, null, "button")
-            .addText("\uD83D\uDDD1")
-            .addEvent("click", function () { deleteFile(file.id) }, delButton);
-        imgBD.add(delButton)
+            // document.getElementById("imgBD").innerHTML = ''
+            var divMainImg = document.getElementById("divMainImg")
+            divMainImg.setAttribute("src",start.originalUrl + "/files/" + file.id)
+            // var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
+            // imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
+            // var delButton = new innovaphone.ui1.Div(null, null, "button")
+            // .addText("\uD83D\uDDD1")
+            // .addEvent("click", function () { deleteFile(file.id) }, delButton);
+        //imgBD.add(delButton)
         }else{
-            document.getElementById("imgBD").innerHTML = ''
+            console.log("Control DB FALSE")
+            // document.getElementById("imgBD").innerHTML = ''
         }
     }
     //Função para apresentar Loader, chamado quando o App está desconectado ou aguardando algum processo.
