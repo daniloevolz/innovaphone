@@ -518,6 +518,10 @@ function truncateString(str, maxLength) {
 
 
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
+            editBtn.addEventListener('click', function(event){
+                console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule ID", s.id)
+                makeScheduleContainer(nameDevice.hwid, nameRoom.id, s.id)
+            })
             const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
 
             divDevice.appendChild(divImg)
@@ -1754,57 +1758,62 @@ function truncateString(str, maxLength) {
                 }
             })
         }
-        // else {
-        //     //Seleção calendário
-        //     const div104 = document.createElement("div")
-        //     div104.setAttribute("id", "div104")
-        //     div104.classList.add("div104", "h-fit")
-        //     containerSchedule.appendChild(div104)
+        else {
+            //Seleção calendário
+            backButton.removeEventListener("click")
 
-        //     const frame107 = document.createElement("div")
-        //     frame107.setAttribute("id", "frame107")
-        //     frame107.classList.add("frame107", "h-fit")
-        //     div104.appendChild(frame107)
+            backButton.addEventListener("click", function(){
+                makeUserSchedules()
+            })
+            const div104 = document.createElement("div")
+            div104.setAttribute("id", "div104")
+            div104.classList.add("div104", "h-fit")
+            containerSchedule.appendChild(div104)
 
-        //     const frame107txt = document.createElement("div")
-        //     frame107txt.classList.add("frame107txt")
-        //     frame107txt.innerHTML = texts.text("labelSelectYourDay")
-        //     frame107.appendChild(frame107txt)
+            const frame107 = document.createElement("div")
+            frame107.setAttribute("id", "frame107")
+            frame107.classList.add("frame107", "h-fit")
+            div104.appendChild(frame107)
 
-        //     const frame107btn = document.createElement("div")
-        //     frame107btn.classList.add("framebtn", "h-fit")
-        //     frame107btn.innerHTML = texts.text("labelSelect")
-        //     frame107.appendChild(frame107btn)
-        //     frame107btn.addEventListener("click", function (event) {
-        //         makeCalendar(availability, schedules)
-        //     })
+            const frame107txt = document.createElement("div")
+            frame107txt.classList.add("frame107txt")
+            frame107txt.innerHTML = texts.text("labelSelectYourDay")
+            frame107.appendChild(frame107txt)
 
-        //     // const div106 = document.createElement("div")
-        //     // div106.setAttribute("id", "div106")
-        //     // div106.classList.add("div104", "h-fit")
-        //     // containerSchedule.appendChild(div106)
+            const frame107btn = document.createElement("div")
+            frame107btn.classList.add("framebtn", "h-fit")
+            frame107btn.innerHTML = texts.text("labelSelect")
+            frame107.appendChild(frame107btn)
+            frame107btn.addEventListener("click", function (event) {
+                makeCalendar(availability, schedules)
+            })
 
-        //     // const frame109 = document.createElement("div")
-        //     // frame109.setAttribute("id", "frame109")
-        //     // frame109.classList.add("frame107", "h-fit")
-        //     // div106.appendChild(frame109)
+            const div106 = document.createElement("div")
+            div106.setAttribute("id", "div106")
+            div106.classList.add("div104", "h-fit")
+            containerSchedule.appendChild(div106)
 
-        //     // const frame19txt = document.createElement("div")
-        //     // frame19txt.classList.add("frame107txt")
-        //     // frame19txt.innerHTML = texts.text("labelTxtCancel")
-        //     // frame109.appendChild(frame19txt)
+            const frame109 = document.createElement("div")
+            frame109.setAttribute("id", "frame109")
+            frame109.classList.add("frame107", "h-fit")
+            div106.appendChild(frame109)
 
-        //     // //botão cancelar
-        //     // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
-        //     // frame109btn.addEventListener("click", function (event) {
-        //     //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
-        //     //     makeCancelPopUp(obj, function (msg) {
-        //     //         makeSuccessPopUp(msg)
-        //     //     })
-        //     // })
+            const frame19txt = document.createElement("div")
+            frame19txt.classList.add("frame107txt")
+            frame19txt.innerHTML = texts.text("labelTxtCancel")
+            frame109.appendChild(frame19txt)
 
-        //     // frame109.appendChild(frame109btn)
-        // }
+            // //botão cancelar
+            // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
+            // frame109btn.addEventListener("click", function (event) {
+            //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+            //     makeCancelPopUp(obj, function (msg) {
+            //         makeSuccessPopUp(msg)
+            //     })
+            // })
+
+            // frame109.appendChild(frame109btn)
+        }
         btnSave.addEventListener("click",function(){
             var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
             var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
