@@ -188,7 +188,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     btnMakeCalendar.addEventListener("click",function(){
         makeDivAddAvailability(typeRoom,function(date){
             dateAvailability = date
-            console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
+            console.log(dateAvailability)
+            console.log(date)
+            //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
         },function(sched){
             typeSchedule = sched
         })
@@ -246,7 +248,32 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             viewer: viewers,
             device : devHwId
             }); //viewer: viewer 
-        }               
+        }else if(typeRoom == "recurrentType"){
+            app.send({ api: "admin", mt: "InsertRoom", 
+            name: nomeSala, 
+            img: imgRoom, 
+            type: typeRoom, 
+            schedule: typeSchedule,
+            //start
+            startMonday: dateAvailability[0].startMonday,
+            startTuesday: dateAvailability[0].startTuesday,
+            startWednesday: dateAvailability[0].startWednesday,
+            startThursday: dateAvailability[0].startThursday,
+            startFriday: dateAvailability[0].startFriday,
+            startSaturday: dateAvailability[0].startSaturday,
+            startSunday: dateAvailability[0].startSunday,
+            //end
+            endMonday: dateAvailability[1].endMonday,
+            endTuesday: dateAvailability[1].endTuesday,
+            endWednesday: dateAvailability[1].endWednesday,
+            endThursday: dateAvailability[1].endThursday,
+            endFriday: dateAvailability[1].endFriday,
+            endSaturday: dateAvailability[1].endSaturday,
+            endSunday: dateAvailability[1].endSunday,
+            viewer: viewers,
+            device : devHwId
+        }) 
+        }           
         // app.send({ api: "admin", mt: "InsertRoom", 
         // name: nameRoom, 
         // img: srcDaImagem, 
@@ -392,19 +419,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const btnHourSchedule = makeButton(texts.text("labelHour"),"tertiary","")
             btnHourSchedule.id = "hourModule"
             var typeSched = "dayModule" ;
-            btnDaySchedule.addEventListener("click", function(event) {
-                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
-                    typeSched = selectedButton.id
-                });
-            });
-
-            btnHourSchedule.addEventListener("click", function(event) {
-                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
-                    typeSched = selectedButton.id
-                });
-            });
-            
-
+           
             const divHourSelect = document.createElement("div")
             divHourSelect.classList.add("flex","p-1","flex-col","gap-1","items-start","bg-dark-200","rounded-lg")
             const divHourSelectLabel = document.createElement("div")
@@ -509,6 +524,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             insideDiv.appendChild(divMain)
         }
         else if(typeRoom == "recurrentType"){
+            var daysSelected = [] // armazenar os dias
+            var datesRecurrent = []
+
             const titleSchedule = document.createElement("div")
             titleSchedule.textContent = texts.text("labelScheduleRecurrent")
             titleSchedule.classList.add("text-3","text-white" ,"font-bold")
@@ -519,35 +537,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             week.forEach(function (w) {
                 const dayDiv = document.createElement('div')
-                dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText")
+                dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1","rounded-full","recurrentText","dayDiv")
                 dayDiv.setAttribute("day-week", w)
-                const dayText = document.createElement('p')
-                dayText.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
-                dayText.textContent = texts.text(`${w + "Abrev"}`)
-                dayDiv.appendChild(dayText)
+                dayDiv.setAttribute("id", w)
+                // const dayText = document.createElement('p')
+                dayDiv.classList.add("font-Montserrat", "text-base", "font-bold", "leading-normal", 'leading-normal', "color-dark-400")
+                dayDiv.textContent = texts.text(`${w + "Abrev"}`)
+                //dayDiv.appendChild(dayText)
                 divDaysWeek.appendChild(dayDiv)
             })
-
+    
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
             const labelTypeSchedule = document.createElement("div")
             labelTypeSchedule.textContent = texts.text("labelTypeSchedule")
-            const btnDaySchedule = makeButton(texts.text("labelDay"),"secundary","")
+            const btnDaySchedule = makeButton(texts.text("labelDay"),"tertiary","")
             btnDaySchedule.id = "dayModule"
-            const btnHourSchedule = makeButton(texts.text("labelHour"),"tertiary","")
+            const btnHourSchedule = makeButton(texts.text("labelHour"),"secundary","")
             btnHourSchedule.id = "hourModule"
-            var typeSched = "dayModule" ;
-            btnDaySchedule.addEventListener("click", function(event) {
-                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
-                    typeSched = selectedButton.id
-                });
-            });
-
-            btnHourSchedule.addEventListener("click", function(event) {
-                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
-                    typeSched = selectedButton.id
-                });
-            });
+            
 
             const divHourSelect = document.createElement("div")
             divHourSelect.classList.add("flex","p-1","flex-col","gap-1","items-start","bg-dark-200","rounded-lg")
@@ -558,66 +566,89 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divTime = document.createElement("div")
             divTime.classList.add("flex","justify-center","items-center","gap-1")
 
-            var dates = []; 
-            var dataStart;
-            var dataEnd; 
+            // var dates = []; 
+            // var dataStart;
+            // var dataEnd; 
 
             const divTimeStart = makeInput("00:00","time","")
             // divTimeStart.classList.add("flex","p-1","flex-col","items-center","gap-1","rounded-lg","bg-dark-400","text-3")
             // divTimeStart.textContent = '-- : --'
-                divTimeStart.addEventListener("change",function(event){
-                    // if(selectedDay == null || selectedDay == undefined){
-                    //     this.value = ''
-                    //     makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
-                    //         event.preventDefault()
-                    //         event.stopPropagation()
-                    //         document.body.removeChild(document.getElementById("bcgrd"))
-                    //     })  
-                    // }
-                    // else if(divTimeEnd.value < divTimeStart.value && divTimeEnd.value != ''){
-                    //     this.value = ''
-                    //     makePopUp(texts.text("labelWarning"), texts.text("labelDaySmaller"), texts.text("labelOk")).addEventListener("click",function(event){
-                    //         event.preventDefault()
-                    //         event.stopPropagation()
-                    //         document.body.removeChild(document.getElementById("bcgrd"))
-                    //     })  
-                    // }else{
-                    //     dataStart = selectedDay + "T" + this.value
-                    //     console.log(dataStart)
-                    // }
-                })
+            divTimeStart.addEventListener("change", function (event) {
+                if (daysSelected.length > 0) {
+                    console.log("Contém algo");
+                    var startTime = this.value;
+                    
+                    daysSelected.forEach(function (dayDiv) {
+                        var dayId = dayDiv.getAttribute("id");
             
-            
+                        switch (dayId) {
+                            case "Mon":
+                                datesRecurrent.push({ startMonday : startTime });
+                                break;
+                            case "Tue":
+                                datesRecurrent.push({ startTuesday: startTime });
+                                break;
+                            case "Wed":
+                                datesRecurrent.push({ startWednesday : startTime });
+                                break;
+                            case "Thu":
+                                datesRecurrent.push({ startThursday : startTime });
+                                break;
+                            case "Fri":
+                                datesRecurrent.push({ startFriday : startTime });
+                                break;
+                            case "Sat":
+                                datesRecurrent.push({ startSaturday : startTime });
+                                break;
+                            case "Sun":
+                                datesRecurrent.push({ startSun : startTime });
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            })
             const divToTime = document.createElement("div")
             divToTime.classList.add("text-white","text-2")
             divToTime.textContent = texts.text("labelToTime")
 
             const divTimeEnd  = makeInput("00:00","time","")
                 divTimeEnd.addEventListener("change",function(event){
-                    // if(divTimeStart.value == null || divTimeStart.value == undefined || divTimeStart.value == ''){
-                    //     this.value = ''
-                    //     makePopUp(texts.text("labelWarning"), texts.text("labelSelectDivStart"), texts.text("labelOk")).addEventListener("click",function(event){
-                    //         event.preventDefault()
-                    //         event.stopPropagation()
-                    //         document.body.removeChild(document.getElementById("bcgrd"))
-                    //     })  
-                    // }
-                    // else if(divTimeStart.value > divTimeEnd.value && divTimeStart.value != ''){
-                    //     this.value = ''
-                    //     makePopUp(texts.text("labelWarning"), texts.text("labelDayBigger"), texts.text("labelOk")).addEventListener("click",function(event){
-                    //         event.preventDefault()
-                    //         event.stopPropagation()
-                    //         document.body.removeChild(document.getElementById("bcgrd"))
-                    //     })  
-                    // }else{
-                    //     dataEnd = selectedDay + "T" + this.value
+                    if (daysSelected.length > 0) {
+                        console.log("Contém algo");
+                        var endTime = this.value;
                         
-                    //     dates.push({
-                    //         start: dataStart,
-                    //         end: dataEnd
-                    //     })
-                    //     console.log(JSON.stringify(dates))
-                    // }
+                        daysSelected.forEach(function (dayDiv) {
+                            var dayId = dayDiv.getAttribute("id");
+                
+                            switch (dayId) {
+                                case "Mon":
+                                    datesRecurrent.push({ endMonday : endTime });
+                                    break;
+                                case "Tue":
+                                    datesRecurrent.push({ endTuesday: endTime });
+                                    break;
+                                case "Wed":
+                                    datesRecurrent.push({ endWednesday : endTime });
+                                    break;
+                                case "Thu":
+                                    datesRecurrent.push({ endThursday : endTime });
+                                    break;
+                                case "Fri":
+                                    datesRecurrent.push({ endFriday : endTime });
+                                    break;
+                                case "Sat":
+                                    datesRecurrent.push({ endSaturday : endTime });
+                                    break;
+                                case "Sun":
+                                    datesRecurrent.push({ endSun : endTime });
+                                    break;
+                                default:
+                                    break;
+                            }
+                        });
+                    }
                 })
 
             
@@ -627,7 +658,32 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const labelHourSchedule = document.createElement("div")
             labelHourSchedule.textContent = texts.text("labelHourIndividual")
             const btnEditRecurrentDay = makeButton(texts.text("labelEdit"),"secundary","")
-
+            
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-between","items-center","rounded-md")
+            const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
+            buttonCancel.addEventListener("click",function(){
+                console.log("Fechar Tela")
+                document.body.removeChild(insideDiv)
+                
+            })
+            const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
+            buttonConfirm.addEventListener("click",function(){
+                dateTime(datesRecurrent)
+                // var devArray = [];
+                // // viewer = [];
+    
+                // devices.forEach(function (dev) {
+                //     var devCheckbox = document.getElementById("checkboxDev_" + dev.hwid);
+                //     if (devCheckbox.checked) {
+                //         devArray.push(dev.hwid);
+                //     }
+                    
+                // });
+                // 
+                    document.body.removeChild(insideDiv)
+            })
+    
             //  divButtons.appendChild(buttonCancel)
             //     divButtons.appendChild(buttonConfirm)
             divTime.appendChild(divTimeStart)
@@ -635,22 +691,71 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divTime.appendChild(divTimeEnd)
             divHourSelect.appendChild(divHourSelectLabel)
             divHourSelect.appendChild(divTime)
+            divButtons.appendChild(buttonCancel)
+            divButtons.appendChild(buttonConfirm)
             divTypeSchedule.appendChild(labelTypeSchedule)
             divTypeSchedule.appendChild(btnDaySchedule)
             divTypeSchedule.appendChild(btnHourSchedule)
             divEditRecurrent.appendChild(labelHourSchedule)
             divEditRecurrent.appendChild(btnEditRecurrentDay)
-
             divMain.appendChild(titleSchedule)
             divMain.appendChild(divDaysWeek)
             divMain.appendChild(divTypeSchedule)
             divMain.appendChild(divHourSelect)
             divMain.appendChild(divEditRecurrent)
+            divMain.appendChild(divButtons)
             //divMain.appendChild(divButtons)
             insideDiv.appendChild(divMain)
+
+            var typeSched = "hourModule";
+            btnDaySchedule.addEventListener("click", function(event) {
+                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                    typeSched = selectedButton.id
+                    divMain.removeChild(divHourSelect)
+                });
+            });
+
+            btnHourSchedule.addEventListener("click", function(event) {
+                typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
+                    typeSched = selectedButton.id
+                    //divMain.removeChild(divHourSelect)
+                    divMain.appendChild(divHourSelect)
+                    divMain.removeChild(divButtons)
+                    divMain.appendChild(divButtons)
+                });
+            });
         }
        
         document.body.appendChild(insideDiv)
+        // listener específico para Recorrente ( ver possibilidade de melhoria no codigo ~pietro)
+
+        document.querySelectorAll(".dayDiv").forEach(function(d){
+            var marked = false;
+            d.addEventListener("click",function(event){
+                console.log("Clicando")
+                if(!marked){
+                    event.preventDefault()
+                    event.stopPropagation()
+                    d.classList.add("rounded-full","bg-dark-400")
+                    marked = true
+                    daysSelected.push(d)
+                    console.dir("DaysSelectedArray " + daysSelected)
+                }else{
+                    d.classList.remove("rounded-full", "bg-dark-400");
+                    marked = false;
+
+                    var index = daysSelected.indexOf(d);
+
+                    if (index !== -1) {
+                        daysSelected.splice(index, 1);
+                    }
+            
+                    console.log(daysSelected);
+                }
+                
+            })
+        })
+
         
     }
     function makePopUp(title, msg, btn1, btn2){
