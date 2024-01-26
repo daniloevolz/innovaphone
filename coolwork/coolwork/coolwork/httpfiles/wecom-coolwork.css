@@ -1073,9 +1073,14 @@ dialog::backdrop {
     .available:active{
         background-color: rgba(15,82,48,0.30);
     }
-    .available:focus{
-        background-color: #199FDA
+    .selectedCellFocus{
+        background-color: #199FDA;
+
+        
     }
+    /* .available:focus{
+        background-color: #199FDA
+    } */
     .parcialavailable {
         background-color: rgba(15,82,48,0.70);
        

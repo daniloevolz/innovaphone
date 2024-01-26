@@ -594,7 +594,9 @@ new JsonApi("admin").onconnected(function(conn) {
 
                             var devices = obj.device
                             devices.forEach(function(d){
-                                var queryUpdateDevices = "UPDATE tbl_devices SET room_id = " + roomID + " WHERE hwid = " + d + ";";
+                                var queryUpdateDevices = "UPDATE tbl_devices SET room_id = '" + roomID + "' WHERE hwid = '" + d + "'";
+                                //var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
+
                                 Database.exec(queryUpdateDevices)
                                 .oncomplete(function (){
                                     conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", result: JSON.stringify(data), src: data.src }));

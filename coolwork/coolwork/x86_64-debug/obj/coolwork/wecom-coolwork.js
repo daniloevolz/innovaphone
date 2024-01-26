@@ -1760,8 +1760,7 @@ function truncateString(str, maxLength) {
         }
         else {
             //Seleção calendário
-            backButton.removeEventListener("click")
-
+            
             backButton.addEventListener("click", function(){
                 makeUserSchedules()
             })
