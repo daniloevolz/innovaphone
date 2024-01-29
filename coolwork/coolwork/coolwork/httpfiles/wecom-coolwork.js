@@ -520,7 +520,7 @@ function truncateString(str, maxLength) {
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
             editBtn.addEventListener('click', function(event){
                 console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule ID", s.id)
-                makeScheduleContainer(nameDevice.hwid, nameRoom.id, s.id)
+                makeScheduleContainer(nameDevice.hwid, nameRoom.id, s)
             })
             const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
 
@@ -531,8 +531,14 @@ function truncateString(str, maxLength) {
                  
             divE1.appendChild(divDevice)
             divE1.appendChild(dateSchedule)
-            divE2.appendChild(editBtn)
-            divE2.appendChild(delBtn)
+
+            const today = new Date();
+            const startDate = new Date(s.data_start);
+            if(today < startDate){
+
+                divE2.appendChild(editBtn)
+                divE2.appendChild(delBtn)
+            }
             div185.appendChild(divE1)
             div185.appendChild(divE2)
             divMain.appendChild(div185)
@@ -1525,7 +1531,7 @@ function truncateString(str, maxLength) {
 
     //Função para criar a tela de seleção para o agendamento
     //chamar no click da div34
-    function makeScheduleContainer(deviceHw, roomId, scheduleId) {
+    function makeScheduleContainer(deviceHw, roomId, schedule) {
         console.log("MAKESCHEDULECONTAINER")
         that.clear();
         const btnSave = makeButton(texts.text("save"), "primary", "")
@@ -1541,7 +1547,7 @@ function truncateString(str, maxLength) {
         var selectedEnd;
         var selectedStart;
 
-        if (!scheduleId) {
+        if (!schedule) {
             
             //Seleção calendário
             const div104 = document.createElement("div")
@@ -1615,7 +1621,7 @@ function truncateString(str, maxLength) {
                                 // //botão cancelar
                                 // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
                                 // frame109btn.addEventListener("click", function (event) {
-                                //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+                                //     var obj = { mt: "UpdateSchedule", api: "user", id: schedule }
                                 //     makeCancelPopUp(obj, function (msg) {
                                 //         makeSuccessPopUp(msg)
                                 //     })
@@ -1762,7 +1768,7 @@ function truncateString(str, maxLength) {
             //Seleção calendário
             
             backButton.addEventListener("click", function(){
-                makeUserSchedules()
+                nextSchedules(schedules)
             })
             const div104 = document.createElement("div")
             div104.setAttribute("id", "div104")
@@ -1784,9 +1790,78 @@ function truncateString(str, maxLength) {
             frame107btn.innerHTML = texts.text("labelSelect")
             frame107.appendChild(frame107btn)
             frame107btn.addEventListener("click", function (event) {
-                makeCalendar(availability, schedules)
-            })
+                makeCalendar(div104, schedule.device_id, schedule.device_room_id, function (selectedDay) {
+                    if (!document.getElementById("frame104btn")) {
+                        const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
+                        div104.appendChild(frame104btn)
+                        frame104btn.setAttribute("id", "frame104btn")
+                        frame104btn.addEventListener("click", function (event) {
+                            // var selected;
+                            selected = selectedDay;
+                            console.log("Dia selecionado retornado makeScheduleContainer ", selected)
 
+                            div104.innerHTML = '' ;
+                            frame107.innerHTML = '' ;
+                            frame107.appendChild(frame107txt)
+
+                            const div32 = document.createElement("div")
+                            div32.setAttribute("id","div32")
+                            div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+                            btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
+                            div32.appendChild(btnShowSelectedDay)
+        
+                            const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
+                            btnEditDay.setAttribute("id", "btnEditDay");
+
+                            btnEditDay.addEventListener("click",function(){ // click botão editar
+                                var oldDay = selectedDay
+                                buildCalendar()
+                                console.log("old daySelected" + oldDay)   
+                                // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
+                                var div106 = document.getElementById("div106")
+                                if(div106){
+                                    containerSchedule.removeChild(div106)
+                                }
+
+                                // se conter a data antiga limpa tudo 
+                                if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
+                                    selectedStart = ""
+                                    selectedEnd = ""
+                                    document.getElementById("divTimeStart").innerHTML = '-- : --';
+                                    document.getElementById("divTimeEnd").innerHTML = '-- : --';
+                                }
+                                
+                                setTimeout(function(){
+                                    var cells = document.querySelectorAll("#calendar-body tr td div");
+                                    cells.forEach(function (td) {
+                                        if (td.getAttribute("data-date") == oldDay) {
+                                            td.classList.add("bg-[#199FDA]");
+                                        }
+                                        td.addEventListener("click", function () {
+                                            cells.forEach(function (otherTd) {
+                                                if (otherTd.classList.contains("bg-[#199FDA]")) {
+                                                    otherTd.classList.remove("bg-[#199FDA]");
+                                                }
+                                            });
+                                        });
+                                    });
+                                },200);
+                                })
+                     
+                            
+
+                            div32.appendChild(btnEditDay);
+                            
+                            div104.appendChild(frame107)
+                            div104.appendChild(div32);
+                            
+                        })
+                    } 
+                    
+                } )
+            })
+0
             const div106 = document.createElement("div")
             div106.setAttribute("id", "div106")
             div106.classList.add("div104", "h-fit")
@@ -1805,7 +1880,7 @@ function truncateString(str, maxLength) {
             // //botão cancelar
             // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
             // frame109btn.addEventListener("click", function (event) {
-            //     var obj = { mt: "UpdateSchedule", api: "user", id: scheduleId }
+            //     var obj = { mt: "UpdateSchedule", api: "user", id: schedule }
             //     makeCancelPopUp(obj, function (msg) {
             //         makeSuccessPopUp(msg)
             //     })
