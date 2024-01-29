@@ -576,7 +576,12 @@ function truncateString(str, maxLength) {
 
         var info = calendarAnalise(deviceHw, roomId)
 
-        Calendar.createCalendar(divCalendar,"",function (day) {
+            var availability = availabilities.filter(function (a) {
+            return a.room_id == roomId
+        })
+        console.log("AVAILABILITIES " + JSON.stringify(availability))
+
+        Calendar.createCalendar(divCalendar,availability,function (day) {
             
             selectedDay = day
             console.log("SelectedDay " + day)
@@ -1577,7 +1582,7 @@ function truncateString(str, maxLength) {
                         frame104btn.addEventListener("click", function (event) {
                             // var selected;
                             selected = selectedDay;
-                            console.log("Dia selecionado retornado makeScheduleContainer ", selected)
+                            console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selectedDay))
 
                             div104.innerHTML = '' ;
                             frame107.innerHTML = '' ;
@@ -1586,7 +1591,7 @@ function truncateString(str, maxLength) {
                             const div32 = document.createElement("div")
                             div32.setAttribute("id","div32")
                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selectedDay.startDate),"primary","")
                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
                             div32.appendChild(btnShowSelectedDay)
         
@@ -1861,7 +1866,7 @@ function truncateString(str, maxLength) {
                     
                 } )
             })
-
+0
             const div106 = document.createElement("div")
             div106.setAttribute("id", "div106")
             div106.classList.add("div104", "h-fit")
@@ -1889,8 +1894,8 @@ function truncateString(str, maxLength) {
             // frame109.appendChild(frame109btn)
         }
         btnSave.addEventListener("click",function(){
-            var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
-            var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
+            var dateStart = selectedDay.startDate + "T" + document.getElementById("divTimeStart").innerHTML;
+            var dateEnd = selectedDay.endDate + "T" + document.getElementById("divTimeEnd").innerHTML;
 
             console.log("start " + dateStart)
             console.log("end " + dateEnd)

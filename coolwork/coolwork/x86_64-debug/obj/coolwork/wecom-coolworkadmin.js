@@ -188,8 +188,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     btnMakeCalendar.addEventListener("click",function(){
         makeDivAddAvailability(typeRoom,function(date){
             dateAvailability = date
-            console.log(dateAvailability)
-            console.log(date)
+            console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
+            //console.log(date)
             //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
         },function(sched){
             typeSchedule = sched
@@ -587,7 +587,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             insideDiv.appendChild(divMain)
         }
         else if(typeRoom == "recurrentType"){
-            var daysSelected = [] // armazenar os dias
+            var daysSelected = [] // armazenar os dias clicados
             var datesRecurrent = []
 
             const titleSchedule = document.createElement("div")
@@ -731,9 +731,66 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 document.body.removeChild(insideDiv)
                 
             })
+
             const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
             buttonConfirm.addEventListener("click",function(){
-                dateTime(datesRecurrent)
+
+                const inputs = document.querySelectorAll('.inputIndividualHour'); 
+                inputs.forEach(function(input, index) {
+                    const dataDay = input.dataset.day;
+                    const startTime = input.value;
+                    //var endTime;
+                    // Verifica se o próximo input na lista é para o horário de fim
+                    const nextInput = inputs[index + 1];
+                    if (nextInput && nextInput.dataset.day === dataDay) {
+                        const endTime = nextInput.value;
+                        console.log("DIA DA SEMANA  " + dataDay + " Hora inicio " + startTime + " Hora fim " + endTime);
+
+                        daysSelected.forEach(function (dayDiv) {
+                            //var dayId = dayDiv.getAttribute("id");
+                            datesRecurrent = [] // limpeza
+                            switch (dataDay) {
+                                case "Mon":
+                                    datesRecurrent.push({ startMonday : startTime });
+                                    datesRecurrent.push({ endMonday : endTime });
+                                    break;
+                                case "Tue":
+                                    datesRecurrent.push({ startTuesday: startTime });
+                                    datesRecurrent.push({ endTuesday : endTime });
+                                    break;
+                                case "Wed":
+                                    datesRecurrent.push({ startWednesday : startTime });
+                                    datesRecurrent.push({ endWednesday : endTime });
+                                    break;
+                                case "Thu":
+                                    datesRecurrent.push({ startThursday : startTime });
+                                    datesRecurrent.push({ endThursday : endTime });
+                                    break;
+                                case "Fri":
+                                    datesRecurrent.push({ startFriday : startTime });
+                                    datesRecurrent.push({ endFriday : endTime });
+                                    break;
+                                case "Sat":
+                                    datesRecurrent.push({ startSaturday : startTime });
+                                    datesRecurrent.push({ endSaturday : endTime });
+                                    break;
+                                case "Sun":
+                                    datesRecurrent.push({ startSun : startTime });
+                                    datesRecurrent.push({ endTSun : endTime });
+                                    break;
+                                default:
+                                    break;
+                            }
+                        });
+                    } else {
+                        console.log("Não há um próximo input ou é para um dia diferente");
+                    }
+
+
+                });
+                
+                dateTime(datesRecurrent) // passar todas as datas recorrentes para o callback 
+
                 // var devArray = [];
                 // // viewer = [];
     
@@ -806,107 +863,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 
                // vamos passar isso para uma função separado para evitar duplicidade de funções
                //(DRY - Don't Repeat Yourself): APENAS UM TESTE SERÁ MODIFICADO NA SEGUNDA-FEIRA 29/2  ~pietro
-               document.querySelectorAll(".dayDiv").forEach(function(d){
-                var marked = false;
-                d.addEventListener("click",function(event){
-                    console.log("Clicando")
-                    if(!marked){
-                        event.preventDefault()
-                        event.stopPropagation()
-                        d.classList.add("rounded-full","bg-dark-400")
-                        marked = true
-                        daysSelected.push(d)
-                        console.dir("DaysSelectedArray " + daysSelected)
-                        const divHourSelectLabel = document.createElement("div")
-                        divHourSelectLabel.classList.add("text-1","font-bold","text-white")
-                        divHourSelectLabel.textContent = texts.text("labelSelectHour")
-                        
-
-                            var dayId = d.getAttribute("id");
-                
-                            switch (dayId) {
-                                case "Mon":
-                                    // const divTimeStart = makeInput("00:00","time","")
-                                    // const divToTime = document.createElement("div")
-                                    // divToTime.classList.add("text-white","text-2")
-                                    // divToTime.textContent = texts.text("labelToTime")
-                                    // const divTimeEnd  = makeInput("00:00","time","")
-                                    // divHourSelect.appendChild(divTimeStart)
-                                    // divHourSelect.appendChild(divToTime)
-                                    // divHourSelect.appendChild(divTimeEnd)
-                                    // divAllHours.appendChild(divHourSelect)
-                                    // //datesRecurrent.push({ endMonday : endTime });
-                                    break;
-                                case "Tue":
-                                    //datesRecurrent.push({ endTuesday: endTime });
-                                    break;
-                                case "Wed":
-                                    //datesRecurrent.push({ endWednesday : endTime });
-                                    break;
-                                case "Thu":
-                                    //datesRecurrent.push({ endThursday : endTime });
-                                    break;
-                                case "Fri":
-                                    //datesRecurrent.push({ endFriday : endTime });
-                                    break;
-                                case "Sat":
-                                    //datesRecurrent.push({ endSaturday : endTime });
-                                    break;
-                                case "Sun":
-                                    //datesRecurrent.push({ endSun : endTime });
-                                    break;
-                                default:
-                                    break;
-                            }
-                       
-                        
-                    }else{
-                        d.classList.remove("rounded-full", "bg-dark-400");
-                        marked = false;
-    
-                        var index = daysSelected.indexOf(d);
-    
-                        if (index !== -1) {
-                            daysSelected.splice(index, 1);
-                        }
-                
-                        console.log(daysSelected);
-                    }
-                    
-                })
-            })
-
+               getAllClickedWeekDays(daysSelected,"individual",divAllHours)
             })
         }
         document.body.appendChild(insideDiv)
-        // listener específico para Recorrente ( ver possibilidade de melhoria no codigo ~pietro)
+      
 
-        document.querySelectorAll(".dayDiv").forEach(function(d){
-            var marked = false;
-            d.addEventListener("click",function(event){
-                console.log("Clicando")
-                if(!marked){
-                    event.preventDefault()
-                    event.stopPropagation()
-                    d.classList.add("rounded-full","bg-dark-400")
-                    marked = true
-                    daysSelected.push(d)
-                    console.dir("DaysSelectedArray " + daysSelected)
-                }else{
-                    d.classList.remove("rounded-full", "bg-dark-400");
-                    marked = false;
-
-                    var index = daysSelected.indexOf(d);
-
-                    if (index !== -1) {
-                        daysSelected.splice(index, 1);
-                    }
-            
-                    console.log(daysSelected);
-                }
-                
-            })
-        })
+        // depois que adiciona tudo no body, chamaremos a função para aplicar o click nos
+        // dias recorrentes 
+        getAllClickedWeekDays(daysSelected)
 
         
     }
@@ -1542,6 +1507,76 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion COMPONENTES
 
     //#region FUNÇÕES INTERNAS
+    function getAllClickedWeekDays(daysSelected,individualHour,divAllHours){
+        document.querySelectorAll(".dayDiv").forEach(function(d){
+            var marked = false;
+            d.addEventListener("click",function(event){
+                console.log("Clicando")
+                if(!marked){
+                    event.preventDefault()
+                    event.stopPropagation()
+                    d.classList.add("rounded-full","bg-dark-400")
+                    marked = true
+                    daysSelected.push(d)
+                    console.dir("DaysSelectedArray " + daysSelected)
+                    
+                    if(individualHour == "individual"){
+                        var dayId = d.getAttribute("id"); // ids das divs
+
+                    // const divAllHours = document.createElement("div") // div com scroll
+                    // divAllHours.classList.add("flex","overflow-auto","height-[250px]","flex-col","items-start","gap-1")
+
+                    const divHourSelectLabel = document.createElement("div")
+                    divHourSelectLabel.classList.add("text-1","font-bold","text-white")
+                    divHourSelectLabel.textContent = texts.text("labelSelectHourTo") + " " +  texts.text("label" + dayId + "Div")
+                        
+                    const divIndividualHours = document.createElement("div")
+                    divIndividualHours.classList.add("flex","p-1","flex-col","items-start","gap-1","rounded-lg","bg-dark-200","w-full")
+                    
+                    
+                    const divTimeInputs = document.createElement("div")
+                    divTimeInputs.classList.add("flex","justify-center","items-center","gap-1")
+        
+                    const divTimeStart = makeInput("00:00","time","")
+                    divTimeStart.classList.add("inputIndividualHour")
+                    const divToTime = document.createElement("div")
+                    divToTime.classList.add("text-white","text-2")
+                    divToTime.textContent = texts.text("labelToTime")
+                    const divTimeEnd  = makeInput("00:00","time","")
+                    divTimeEnd.classList.add("inputIndividualHour")
+                    divTimeInputs.appendChild(divTimeStart)
+                    divTimeInputs.appendChild(divToTime)
+                    divTimeInputs.appendChild(divTimeEnd)
+                    divIndividualHours.appendChild(divHourSelectLabel)
+                    divIndividualHours.appendChild(divTimeInputs)
+                    divAllHours.appendChild(divIndividualHours)
+
+                    divTimeStart.dataset.day = d.getAttribute("id");
+                    divTimeEnd.dataset.day = d.getAttribute("id");
+
+                    }
+                }else{
+                    d.classList.remove("rounded-full", "bg-dark-400");
+                    marked = false;
+
+                    var index = daysSelected.indexOf(d);
+
+                    if (index !== -1) {
+                        daysSelected.splice(index, 1);
+                    }
+            
+                    console.log(daysSelected);
+
+                    if(individualHour == "individual"){
+                        
+                    }
+                }
+                
+            })
+        })
+       }
+      
+
     function makeViewDay(divMain, day, timestart, timeend) {
         //dias
         var div180 = document.getElementById("div180")

@@ -36,7 +36,7 @@ divMain.innerHTML += `
 `
 setTimeout(function(){
     buildCalendar(availability,callback)
-},150)
+},250)
 
 
 
@@ -215,19 +215,24 @@ function buildCalendar(availability,callback) {
       });
       nextMonthDay++;
     }
-    var cells = document.querySelectorAll("#calendar-body td div");
-var selectedCells = [];
+    var cells = document.querySelectorAll("#calendar-body tr td div");
+    var selectedCells = [];
 
+    
 cells.forEach(function (cell) {
+
+  var selectedDate = moment([year, currentMonth, cell.textContent]);
+
+  var diaDaSemana = selectedDate.format('ddd');
+  cell.setAttribute("day-week", diaDaSemana);
+
+  var selectedDay = parseInt(cell.textContent);
+  var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
+  console.log("FORMATTED-DATE" + formattedDate)
+  cell.setAttribute("data-date", formattedDate);
+  
   cell.addEventListener("click", function () {
-    var selectedDate = moment([year, currentMonth, cell.textContent]);
 
-    var diaDaSemana = selectedDate.format('ddd');
-    cell.setAttribute("day-week", diaDaSemana);
-
-    var selectedDay = parseInt(cell.textContent);
-    var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
-    cell.setAttribute("data-date", formattedDate);
 
     if (cell.classList.contains("selected")) {
       // Desselecionar a data clicada se já estiver selecionada

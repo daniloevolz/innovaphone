@@ -54,6 +54,7 @@ Wecom.coolworkTexts = {
         labelEditor: "Editor",
         labelViewer: "Visualizador",
         labelType: "Tipo",
+        labelSelectHourTo: "Selecione seu horário para",
         labelSchedueModule: "Modelo",
         labelTypeSchedule: "Tipo de agendamento",
         labelModuleRoom: "Modelo de Agendamento dos Telefones",
