@@ -216,25 +216,60 @@ function buildCalendar(availability,callback) {
       nextMonthDay++;
     }
     var cells = document.querySelectorAll("#calendar-body td div");
-    cells.forEach(function (cell) {
-      var selectedDate = moment([year, currentMonth, cell.textContent ]);
-    
-      var diaDaSemana = selectedDate.format('ddd');
-      cell.setAttribute("day-week", diaDaSemana);
-  
-      var selectedDay = parseInt(cell.textContent);
-      var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
-      cell.setAttribute("data-date", formattedDate);
-      
-      cell.addEventListener("click", function () {
-        // console.log("Data inicio:" + formattedDate + "T" + "00:00");
-        // console.log("Data Fim:" + formattedDate +  "T" + "23:59");
-        callback(formattedDate)
-         
-    });
+var selectedCells = [];
 
-    });
-    UpdateAvailability(availability) // atualizar visualização do calendario
+cells.forEach(function (cell) {
+  cell.addEventListener("click", function () {
+    var selectedDate = moment([year, currentMonth, cell.textContent]);
+
+    var diaDaSemana = selectedDate.format('ddd');
+    cell.setAttribute("day-week", diaDaSemana);
+
+    var selectedDay = parseInt(cell.textContent);
+    var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
+    cell.setAttribute("data-date", formattedDate);
+
+    if (cell.classList.contains("selected")) {
+      // Desselecionar a data clicada se já estiver selecionada
+      cell.classList.remove("selected");
+      cell.classList.remove("selectedCellFocus");
+
+      selectedCells = selectedCells.filter(function (selectedCell) {
+        return selectedCell !== cell;
+      });
+    } else if (selectedCells.length < 2) {
+      // Selecionar a data clicada
+      cell.classList.add("selected");
+      cell.classList.add("selectedCellFocus");
+      selectedCells.push(cell);
+    }
+
+    if (selectedCells.length === 2) {
+      cells.forEach(function (otherCell) {
+        if (!otherCell.classList.contains("selected")) {
+          otherCell.classList.add("pointer-events-none");
+        }
+      });
+
+      var startDate = moment(selectedCells[0].getAttribute("data-date"));
+      var endDate = moment(selectedCells[1].getAttribute("data-date"));
+
+      console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
+      console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
+
+      // Enviar os dados por meio do callback
+      callback({
+        startDate: startDate.format("YYYY-MM-DD"),
+        endDate: endDate.format("YYYY-MM-DD")
+      });
+    } else {
+      cells.forEach(function (otherCell) {
+        otherCell.classList.remove("pointer-events-none");
+      });
+    }
+  });
+});
+        UpdateAvailability(availability) // atualizar visualização do calendario
   }
   
   function getMonthName(month) {
