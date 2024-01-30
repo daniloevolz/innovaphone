@@ -436,7 +436,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
-            })
+            },"availability")
             
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -555,7 +555,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 dateTime(dates)
                 console.log("Hour Module")
             }
-            if(typeSched = "dayModule"){
+            else if(typeSched = "dayModule"){
                 dates = []
                 dates.push({
                     start: selectedDay.startDate + "T" + "00:00",

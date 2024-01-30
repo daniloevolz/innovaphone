@@ -2,7 +2,7 @@
 
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,callback){
+Calendar.createCalendar = function(divMain,availability,callback,module){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -35,7 +35,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,callback)
+    buildCalendar(availability,callback,module)
 },250)
 
 
@@ -48,7 +48,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability,callback) {
+function buildCalendar(availability,callback,module) {
    
 
     var date = new Date();
@@ -61,7 +61,7 @@ function buildCalendar(availability,callback) {
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability,callback);
+      rebuildCalendar(availability,callback,module);
       
     });
   
@@ -71,11 +71,11 @@ function buildCalendar(availability,callback) {
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, callback);
+      rebuildCalendar(availability, callback,module);
       
     });
     
-    rebuildCalendar(availability, callback);
+    rebuildCalendar(availability, callback,module);
     
     
   }
@@ -125,7 +125,7 @@ function buildCalendar(availability,callback) {
     return thead;
   }
   
-  function rebuildCalendar(availability,callback) {
+  function rebuildCalendar(availability,callback,module) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -211,16 +211,15 @@ function buildCalendar(availability,callback) {
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability,callback);
+        rebuildCalendar(availability,callback,module);
       });
       nextMonthDay++;
     }
     var cells = document.querySelectorAll("#calendar-body tr td div");
     var selectedCells = [];
 
-    
 cells.forEach(function (cell) {
-
+  
   var selectedDate = moment([year, currentMonth, cell.textContent]);
 
   var diaDaSemana = selectedDate.format('ddd');
@@ -232,46 +231,75 @@ cells.forEach(function (cell) {
   cell.setAttribute("data-date", formattedDate);
   
   cell.addEventListener("click", function () {
-
-
-    if (cell.classList.contains("selected")) {
-      // Desselecionar a data clicada se já estiver selecionada
-      cell.classList.remove("selected");
-      cell.classList.remove("selectedCellFocus");
-
-      selectedCells = selectedCells.filter(function (selectedCell) {
-        return selectedCell !== cell;
-      });
-    } else if (selectedCells.length < 2) {
-      // Selecionar a data clicada
-      cell.classList.add("selected");
-      cell.classList.add("selectedCellFocus");
-      selectedCells.push(cell);
-    }
-
-    if (selectedCells.length === 2) {
-      cells.forEach(function (otherCell) {
-        if (!otherCell.classList.contains("selected")) {
-          otherCell.classList.add("pointer-events-none");
+    
+    if (module == "schedule") {
+      // Lógica para modo de agendamento
+      if (cell.classList.contains("selected")) {
+        // Desselecionar a data clicada se já estiver selecionada
+        cell.classList.remove("selected");
+        cell.classList.remove("selectedCellFocus");
+  
+        selectedCells = selectedCells.filter(function (selectedCell) {
+          return selectedCell !== cell;
+        });
+        selectedCells.pop(cell)
+      } else if(selectedCells.length < 1){
+        // Selecionar a data clicada
+        cell.classList.add("selected");
+        cell.classList.add("selectedCellFocus");
+        //selectedCells = []
+        selectedCells.push(cell);
+      }
+  
+      if (selectedCells.length === 1) {
+        var selectedDate;
+        selectedDate = moment(selectedCells[0].getAttribute("data-date"));
+        console.log("Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
+  
+        // Enviar a data por meio do callback
+        callback({
+          selectedDate: selectedDate.format("YYYY-MM-DD")
+        });
+      }
+    } else if (module === "availability") {
+      // Lógica para modo de disponibilidade
+      if (!cell.classList.contains("selected")) {
+        // Selecionar a data clicada
+        if (selectedCells.length < 2) {
+          cell.classList.add("selected");
+          cell.classList.add("selectedCellFocus");
+          selectedCells.push(cell);
         }
-      });
-
-      var startDate = moment(selectedCells[0].getAttribute("data-date"));
-      var endDate = moment(selectedCells[1].getAttribute("data-date"));
-
-      console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
-      console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
-
-      // Enviar os dados por meio do callback
-      callback({
-        startDate: startDate.format("YYYY-MM-DD"),
-        endDate: endDate.format("YYYY-MM-DD")
-      });
-    } else {
-      cells.forEach(function (otherCell) {
-        otherCell.classList.remove("pointer-events-none");
-      });
+      } else {
+        // Desselecionar a data clicada se já estiver selecionada
+        cell.classList.remove("selected");
+        cell.classList.remove("selectedCellFocus");
+  
+        selectedCells = selectedCells.filter(function (selectedCell) {
+          return selectedCell !== cell;
+        });
+      }
+  
+      if (selectedCells.length === 2) {
+        var startDate = moment(selectedCells[0].getAttribute("data-date"));
+        var endDate = moment(selectedCells[1].getAttribute("data-date"));
+  
+        console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
+        console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
+  
+        // Enviar os dados por meio do callback
+        callback({
+          startDate: startDate.format("YYYY-MM-DD"),
+          endDate: endDate.format("YYYY-MM-DD")
+        });
+      }
     }
+  
+    cells.forEach(function (otherCell) {
+      if (!otherCell.classList.contains("selected")) {
+        otherCell.classList.remove("pointer-events-none");
+      }
+    });
   });
 });
         UpdateAvailability(availability) // atualizar visualização do calendario

@@ -20,6 +20,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var list_tableUsers = []
     var schedules = [];
     var selectedDay; // dia do calendario
+    var selected // call back 
 
     var colorSchemes = {
         dark: {
@@ -444,7 +445,7 @@ function truncateString(str, maxLength) {
     function makeUserSchedules(schedules){
         that.clear()
         addPhonesToDevices()
-        makeHeader(backButton, makeButton('','',"./images/menu.svg"), "Meus Agendamentos");
+        makeHeader(backButton, makeButton('','',"./images/menu.svg"), texts.text("labelMySchedules"));
         filterSchedule()
         const container = document.createElement('div')
         container.classList.add('overflow-auto', 'w-full')
@@ -582,11 +583,11 @@ function truncateString(str, maxLength) {
         console.log("AVAILABILITIES " + JSON.stringify(availability))
 
         Calendar.createCalendar(divCalendar,availability,function (day) {
-            
+            //selectedDay;
             selectedDay = day
-            console.log("SelectedDay " + day)
-            funcao2(selectedDay)
-        }); // componente Calendar
+            console.log("SelectedDay " + JSON.stringify(day))
+            funcao2(day)
+        },"schedule"); // componente Calendar
 
         setTimeout(function(){
             UpdateSchedule(schedules)
@@ -832,6 +833,7 @@ function truncateString(str, maxLength) {
         });
 
         that.clear();
+
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
         // div container
         const container = document.createElement("div")
@@ -994,8 +996,9 @@ function truncateString(str, maxLength) {
             var endHour;
             if (moment(availability.data_end).format("DD/MM") == moment(now).format("DD/MM")) {
                 endHour = parseInt(endTimeString.split("T")[1].split(":")[0]);
+                console.log("end hour " + endHour)
             } else {
-                endHour = 23;
+                endHour = 23; 
             }
             console.log("startTimeString Erick", startTimeString)
             console.log("endTimeString Erick", endTimeString)
@@ -1572,17 +1575,17 @@ function truncateString(str, maxLength) {
 
             const frame107btn = makeButton(texts.text("labelSelect"),"primary")
             frame107.appendChild(frame107btn)
-            var selected
+            
             frame107btn.addEventListener("click", function buildCalendar(event) {
-                makeCalendar(div104, deviceHw, roomId, function (selectedDay) {
+                makeCalendar(div104, deviceHw, roomId, function (day) {
                     if (!document.getElementById("frame104btn")) {
                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
-                            // var selected;
-                            selected = selectedDay;
-                            console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selectedDay))
+                            //var selected;
+                            selected = day;
+                            console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selected))
 
                             div104.innerHTML = '' ;
                             frame107.innerHTML = '' ;
@@ -1591,7 +1594,8 @@ function truncateString(str, maxLength) {
                             const div32 = document.createElement("div")
                             div32.setAttribute("id","div32")
                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selectedDay.startDate),"primary","")
+                            console.log("getDayOfWeekLabel" + selected.selectedDate)
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
                             div32.appendChild(btnShowSelectedDay)
         
@@ -1599,7 +1603,7 @@ function truncateString(str, maxLength) {
                             btnEditDay.setAttribute("id", "btnEditDay");
 
                             btnEditDay.addEventListener("click",function(){ // click botão editar
-                                var oldDay = selectedDay
+                                var oldDay = day
                                 buildCalendar()
                                 console.log("old daySelected" + oldDay)   
                                 // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
@@ -1795,16 +1799,15 @@ function truncateString(str, maxLength) {
             frame107btn.innerHTML = texts.text("labelSelect")
             frame107.appendChild(frame107btn)
             frame107btn.addEventListener("click", function (event) {
-                makeCalendar(div104, schedule.device_id, schedule.device_room_id, function (selectedDay) {
+                makeCalendar(div104, schedule.device_id, schedule.device_room_id, function (day) {
                     if (!document.getElementById("frame104btn")) {
                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
                             // var selected;
-                            selected = selectedDay;
+                            selected = day;
                             console.log("Dia selecionado retornado makeScheduleContainer ", selected)
-
                             div104.innerHTML = '' ;
                             frame107.innerHTML = '' ;
                             frame107.appendChild(frame107txt)
@@ -1812,7 +1815,7 @@ function truncateString(str, maxLength) {
                             const div32 = document.createElement("div")
                             div32.setAttribute("id","div32")
                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
                             div32.appendChild(btnShowSelectedDay)
         
@@ -1820,7 +1823,7 @@ function truncateString(str, maxLength) {
                             btnEditDay.setAttribute("id", "btnEditDay");
 
                             btnEditDay.addEventListener("click",function(){ // click botão editar
-                                var oldDay = selectedDay
+                                var oldDay = day
                                 buildCalendar()
                                 console.log("old daySelected" + oldDay)   
                                 // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
