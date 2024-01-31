@@ -1393,7 +1393,7 @@ function truncateString(str, maxLength) {
                             var devs = devices.filter(function (dev) {
                                 return dev.room_id == room.id
                             })
-                            makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                            makeViewRoomDetail(room.id)
                         })
                     })
                 })
@@ -1415,7 +1415,7 @@ function truncateString(str, maxLength) {
                         var devs = devices.filter(function (d) {
                             return d.room_id == room.id
                         })
-                        makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                        makeViewRoomDetail(room.id)
                     })
                 })
             })
