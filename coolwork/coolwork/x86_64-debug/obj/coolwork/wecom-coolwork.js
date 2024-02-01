@@ -373,8 +373,8 @@ function truncateString(str, maxLength) {
         
         btnDate.addEventListener('click', function(event){
 
-            makeCalendar(mainFilter, null, null, function (selectedDay) {
-                selected = selectedDay;
+            makeCalendar("selectSchedule",mainFilter, null, null, function (day) {
+                selected = day.selectedDate;
                 var filtred = schedules.filter(function(s){
                     // Extract the date part from s.data_start
                     var sDate = s.data_start.split('T')[0];
@@ -563,7 +563,7 @@ function truncateString(str, maxLength) {
 
         return
     }
-    function makeCalendar(divMain, deviceHw, roomId, funcao2){
+    function makeCalendar(selectSchedule,divMain, deviceHw, roomId, funcao2){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -584,15 +584,17 @@ function truncateString(str, maxLength) {
 
         Calendar.createCalendar(divCalendar,availability,function (day) {
             //selectedDay;
-            selectedDay = day
-            console.log("SelectedDay " + JSON.stringify(day))
+            selectedDay = day.selectedDate
+            console.log("SelectedDay " + JSON.stringify(selectedDay))
             funcao2(day)
         },"schedule"); // componente Calendar
 
-        setTimeout(function(){
-            UpdateSchedule(schedules)
-        },500)
-
+        if(selectSchedule == "selectSchedule"){  // condição para quando for consultar os schedules e nao agendar
+            setTimeout(function(){
+                UpdateSchedule(schedules)
+            },500)
+        }
+       
         divMain.appendChild(divCalendar);
         
     }
@@ -825,8 +827,8 @@ function truncateString(str, maxLength) {
         var avail = availabilities.filter(function (avl) {
             return id == avl.room_id
         });
-        var sched = schedules.filter(function (sched) {
-            return id == sched.device_room_id
+        var sched = schedules.filter(function (allSched) {
+            return id == allSched.device_room_id
         });
         var viws = viewers.filter(function (viws) {
             return id == viws.room_id
@@ -868,7 +870,7 @@ function truncateString(str, maxLength) {
 
         devs.forEach(function (device) {
             var s = sched.filter(function (s) {
-                return device.id == s.device_id
+                return device.hwid == s.device_id
             });
             var viewer = viws.filter(function (v) {
                 return v.viewer_guid == device.guid && v.room_id == room.id
@@ -878,34 +880,34 @@ function truncateString(str, maxLength) {
         })
 
 
-
+        console.log("TODOS SCHEDULES DESSA SALA " + JSON.stringify(sched))
     }
     // calendario 
-    function makeCalendarOld(divMain, deviceHw,roomId, funcao2){
-        divMain.innerHTML = "";
-        //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
-        // div principal
-        const divCalendar = document.createElement("div")
-        divCalendar.classList.add("flex","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
-        const divTextSelectDay = document.createElement("div")
-        divTextSelectDay.classList.add("color-white","font-Montserrat","text-2","not-italic","font-bold")
-        divTextSelectDay.textContent = texts.text("labelSelectYourDay")
+    // function makeCalendarOld(divMain, deviceHw,roomId, funcao2){
+    //     divMain.innerHTML = "";
+    //     //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
+    //     // div principal
+    //     const divCalendar = document.createElement("div")
+    //     divCalendar.classList.add("flex","flex-col", "items-start", "gap-2","self-stretch","rounded-lg","bg-dark-200", "m-1")
+    //     const divTextSelectDay = document.createElement("div")
+    //     divTextSelectDay.classList.add("color-white","font-Montserrat","text-2","not-italic","font-bold")
+    //     divTextSelectDay.textContent = texts.text("labelSelectYourDay")
         
-        divCalendar.appendChild(divTextSelectDay)
-        var availability = availabilities.filter(function (a) {
-            return a.room_id == roomId
-        })
-        var sched = schedules.filter(function (s) {
-            return s.room_id == roomId && s.device_id == deviceHw
-        }) 
-        Calendar.createCalendar(divCalendar,availability,function (day) {
-            selectedDay = day
-            console.log("SelectedDay " + day)
-            funcao2(selectedDay)
-        }); // componente Calendar 
-        divMain.appendChild(divCalendar);
+    //     divCalendar.appendChild(divTextSelectDay)
+    //     var availability = availabilities.filter(function (a) {
+    //         return a.room_id == roomId
+    //     })
+    //     var sched = schedules.filter(function (s) {
+    //         return s.room_id == roomId && s.device_id == deviceHw
+    //     }) 
+    //     Calendar.createCalendar(divCalendar,availability,function (day) {
+    //         selectedDay = day
+    //         console.log("SelectedDay " + day)
+    //         funcao2(selectedDay)
+    //     }); // componente Calendar 
+    //     divMain.appendChild(divCalendar);
         
-    }
+    // }
     function makeViewCalendarDetail(divMain, availability) {
         // div label horario
         const div160 = document.createElement("div")
@@ -955,109 +957,80 @@ function truncateString(str, maxLength) {
 
     }
     //Função apara apresentar os horários para agendamento por período
-    function makeViewTimeHour(divMain, day, availability, callback) {
-        //divMain.innerHTML = "";
-        //const frame108 = document.createElement("div")
-        //frame108.setAttribute("id", "frame108")
-        //frame108.classList.add("frame107", "h-fit")
-        //divMain.appendChild(frame108)
-
-        //const frame108txt = document.createElement("div")
-        //frame108txt.classList.add("frame107txt")
-        //frame108txt.innerHTML = texts.text("labelSelectHour")
-        //frame108.appendChild(frame108txt)
-
+    function makeViewTimeHour(divMain, day, availability, deviceSelected, callback) {
 
         const div106 = document.createElement("div")
         div106.classList.add("div106")
         //"h-fit se precisar"
         div106.setAttribute("id", "div106")
         divMain.appendChild(div106);
-
-        //const textHour = document.createElement("div")
-        //textHour.classList.add("textHour")
-        //textHour.setAttribute("id", "textHour")
-        //textHour.innerHTML = texts.text("labelSelectHour")
-        //div106.appendChild(textHour)
-        console.log("Disponibilidade ", JSON.stringify(availability))
-
+        console.log(JSON.stringify(deviceSelected))
         if (availability.type == "periodType") {
-
-            // Garantir que divStartTime e divEndTime sejam strings
             const startTimeString = availability.data_start;
             const endTimeString = availability.data_end;
-
-            var sched = schedules.filter(function (s) {
-                return s.data_start >= availability.data_start && s.data_end <= availability.data_end
-            })
-            console.log("Agendamentos ", JSON.stringify(sched))
-
-            var now = Date();
-            var endHour;
-            if (moment(availability.data_end).format("DD/MM") == moment(now).format("DD/MM")) {
-                endHour = parseInt(endTimeString.split("T")[1].split(":")[0]);
-            } else {
-                endHour = 23;
-            }
-            console.log("startTimeString Erick", startTimeString)
-            console.log("endTimeString Erick", endTimeString)
+        
+            var sched = deviceSelected.filter(function (s) {
+                // Extrair apenas a parte da data (sem o horário) para comparar com o dia selecionado
+                const startDate = s.data_start.split("T")[0];
+                const endDate = s.data_end.split("T")[0];
+                const selectedDay = day.split("T")[0];
+        
+                // Verifica se o agendamento está dentro do intervalo do dia selecionado
+                return startDate === selectedDay && s.data_start >= startTimeString && s.data_start < endTimeString;
+            });
+        
+            console.log("Agendamentos ", JSON.stringify(sched));
+        
             // Extrair apenas as horas dos valores de data e hora recebidos
             const startHour = parseInt(startTimeString.split("T")[1].split(":")[0]);
-
-            var hours = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "00",]
-
-
-            // Filtrar as horas dentro do intervalo desejado
-            const hoursInRange = hours.filter(h => {
-                const hour = parseInt(h);
-                return hour >= startHour && hour <= endHour;
-            });
-
+            const endHourParsed = parseInt(endTimeString.split("T")[1].split(":")[0]);
+        
             // Criar as divs somente para as horas no intervalo desejado
-            hoursInRange.forEach(function (h) {
-                console.log("Hora forEach:", h);
+            for (let hour = startHour; hour <= endHourParsed; hour++) {
+                const hourString = hour.toString().padStart(2, "0");
+        
                 const divHour = document.createElement("div");
-                divHour.setAttribute("hour", h);
+                divHour.setAttribute("hour", hourString + ":00");
                 divHour.classList.add("divHour", "cursor-pointer");
+        
                 sched.forEach(function (s) {
-                    if (moment(s.data_start) == moment(day + "T" + h + ":00") || moment(s.data_end) == moment(day + "T" + h + ":00")) {
+                    const startHourSched = parseInt(s.data_start.split("T")[1].split(":")[0]);
+                    const endHourSched = parseInt(s.data_end.split("T")[1].split(":")[0]);
+        
+                    if (hour >= startHourSched && hour <= endHourSched) {
                         divHour.classList.remove("cursor-pointer");
-                        divHour.classList.add("divHourBusy");
+                        divHour.classList.add("opacity-5");
                         divHour.removeAttribute("hour");
                     }
-                })
-                
-                divHour.setAttribute("id", h);
-                divHour.innerHTML = h + ":00";
+                });
+        
+                divHour.setAttribute("id", hourString + ":00");
+                divHour.textContent = hourString + ":00";
                 div106.appendChild(divHour);
-            });
-            //todas as divs com o atributo "room"
+            }
+        
             const divsHours = document.querySelectorAll('[hour]');
-            //listener de clique a cada div
-            //var control = 0;
             divsHours.forEach(function (div) {
                 div.addEventListener('click', function (event) {
                     var hour = event.currentTarget.id;
-                    console.log("Hora clicada a tratar ", hour)
-
-                    //if (control == 0) {
-                    //    var divTimeStart = document.getElementById("divTimeStart")
-                    //    divTimeStart.innerHTML = hour + ":00"
-                    //    control = 1
-                    //} else {
-                    //    var divTimeEnd = document.getElementById("divTimeEnd")
-                    //    divTimeEnd.innerHTML = hour + ":00"
-                    //    control = 0
-
-                    //    callback(hour)
-                    //}
-                    callback(hour)
-
-
+                    console.log("Hora clicada a tratar ", hour);
+                    callback(hour);
                 });
             });
-
         }
+        
+        
+        
+        
+        
+        // Função de callback para o evento de clique
+        function clickHandler(event) {
+            var hour = event.currentTarget.id;
+            console.log("Hora clicada a tratar ", hour);
+            callback(hour);
+        }
+        
+
         if (availability.type == "recurrentType") {
             const isoDay = moment(day).isoWeekday();
             console.log(isoDay)
@@ -1150,9 +1123,7 @@ function truncateString(str, maxLength) {
 
 
         }
-
-        
-        
+    
     }
     function makeViewTimePeriod(divMain, availability) {
         //dias
@@ -1392,7 +1363,7 @@ function truncateString(str, maxLength) {
                             var devs = devices.filter(function (dev) {
                                 return dev.room_id == room.id
                             })
-                            makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                            makeViewRoomDetail(room.id)
                         })
                     })
                 })
@@ -1414,7 +1385,7 @@ function truncateString(str, maxLength) {
                         var devs = devices.filter(function (d) {
                             return d.room_id == room.id
                         })
-                        makeViewRoomDetail(room, devs, availability, schedules, viewers)
+                        makeViewRoomDetail(room.id)
                     })
                 })
             })
@@ -1428,7 +1399,7 @@ function truncateString(str, maxLength) {
         //div34.innerHTML = texts.text("makePhoneSceduleButton")
         div34.addEventListener("click", function (event) {
             var deviceHw = event.currentTarget.id;
-            makeScheduleContainer(deviceHw, room.id)
+            makeScheduleContainer(deviceHw, room.id, schedule)
             //makeScheduleContainer(availability, schedule, )
             // Calendar.createCalendar()
             // var devInfo = schedules.filter(function (sched) {
@@ -1553,8 +1524,12 @@ function truncateString(str, maxLength) {
         })[0]
         var selectedEnd;
         var selectedStart;
+        console.log("Schedules" +JSON.stringify(schedule))
+        var scheduleDeviceClicked = [schedule.find(function(s){
+            return s.device_id == deviceHw;
+        })];[0]
 
-        if (!schedule) {
+        //if (!schedule) {
             
             //Seleção calendário
             const div104 = document.createElement("div")
@@ -1576,14 +1551,13 @@ function truncateString(str, maxLength) {
             frame107.appendChild(frame107btn)
             
             frame107btn.addEventListener("click", function buildCalendar(event) {
-                makeCalendar(div104, deviceHw, roomId, function (day) {
+                makeCalendar("",div104, deviceHw, roomId, function (day) {
                     if (!document.getElementById("frame104btn")) {
                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
-                            //var selected;
-                            selected = day;
+                            selected = day.selectedDate;
                             console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selected))
 
                             div104.innerHTML = '' ;
@@ -1593,8 +1567,8 @@ function truncateString(str, maxLength) {
                             const div32 = document.createElement("div")
                             div32.setAttribute("id","div32")
                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                            console.log("getDayOfWeekLabel" + selected.selectedDate)
-                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
+                            console.log("getDayOfWeekLabel" + selected)
+                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected),"primary","")
                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
                             div32.appendChild(btnShowSelectedDay)
         
@@ -1602,12 +1576,12 @@ function truncateString(str, maxLength) {
                             btnEditDay.setAttribute("id", "btnEditDay");
 
                             btnEditDay.addEventListener("click",function(){ // click botão editar
-                                var oldDay = day
+                                var oldDay = day.selectedDate
                                 buildCalendar()
                                 console.log("old daySelected" + oldDay)   
                                 // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
-                                var div106 = document.getElementById("div106")
-                                if(div106){
+                                var div106Id = document.getElementById("div106")
+                                if(div106Id){
                                     containerSchedule.removeChild(div106)
                                 }
 
@@ -1715,11 +1689,11 @@ function truncateString(str, maxLength) {
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
 
-                    makeViewTimeHour(containerSchedule, selected , avail, function (selectedTime) {
+                    makeViewTimeHour(containerSchedule, selected , avail, scheduleDeviceClicked, function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
-                        divTimeStart.innerHTML = selectedTime + ":00"
+                        divTimeStart.innerHTML = selectedTime
                         divTimeStart.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
@@ -1754,11 +1728,11 @@ function truncateString(str, maxLength) {
                 event.preventDefault()
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
-                    makeViewTimeHour(containerSchedule, selected, avail, function (selectedTime) {
+                    makeViewTimeHour(containerSchedule, selected, avail, scheduleDeviceClicked , function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
-                        divTimeEnd.innerHTML = selectedTime + ":00"
+                        divTimeEnd.innerHTML = selectedTime
                         divTimeEnd.style.color = "white"
                         var div106 = document.getElementById("div106")
                         containerSchedule.removeChild(div106)
@@ -1771,136 +1745,136 @@ function truncateString(str, maxLength) {
                     })  
                 }
             })
-        }
-        else {
-            //Seleção calendário
+      //  }
+//         else {
+//             //Seleção calendário
             
-            backButton.addEventListener("click", function(){
-                nextSchedules(schedules)
-            })
-            const div104 = document.createElement("div")
-            div104.setAttribute("id", "div104")
-            div104.classList.add("div104", "h-fit")
-            containerSchedule.appendChild(div104)
+//             backButton.addEventListener("click", function(){
+//                 nextSchedules(schedules)
+//             })
+//             const div104 = document.createElement("div")
+//             div104.setAttribute("id", "div104")
+//             div104.classList.add("div104", "h-fit")
+//             containerSchedule.appendChild(div104)
 
-            const frame107 = document.createElement("div")
-            frame107.setAttribute("id", "frame107")
-            frame107.classList.add("frame107", "h-fit")
-            div104.appendChild(frame107)
+//             const frame107 = document.createElement("div")
+//             frame107.setAttribute("id", "frame107")
+//             frame107.classList.add("frame107", "h-fit")
+//             div104.appendChild(frame107)
 
-            const frame107txt = document.createElement("div")
-            frame107txt.classList.add("frame107txt")
-            frame107txt.innerHTML = texts.text("labelSelectYourDay")
-            frame107.appendChild(frame107txt)
+//             const frame107txt = document.createElement("div")
+//             frame107txt.classList.add("frame107txt")
+//             frame107txt.innerHTML = texts.text("labelSelectYourDay")
+//             frame107.appendChild(frame107txt)
 
-            const frame107btn = document.createElement("div")
-            frame107btn.classList.add("framebtn", "h-fit")
-            frame107btn.innerHTML = texts.text("labelSelect")
-            frame107.appendChild(frame107btn)
-            frame107btn.addEventListener("click", function (event) {
-                makeCalendar(div104, schedule.device_id, schedule.device_room_id, function (day) {
-                    if (!document.getElementById("frame104btn")) {
-                        const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
-                        div104.appendChild(frame104btn)
-                        frame104btn.setAttribute("id", "frame104btn")
-                        frame104btn.addEventListener("click", function (event) {
-                            // var selected;
-                            selected = day;
-                            console.log("Dia selecionado retornado makeScheduleContainer ", selected)
-                            div104.innerHTML = '' ;
-                            frame107.innerHTML = '' ;
-                            frame107.appendChild(frame107txt)
+//             const frame107btn = document.createElement("div")
+//             frame107btn.classList.add("framebtn", "h-fit")
+//             frame107btn.innerHTML = texts.text("labelSelect")
+//             frame107.appendChild(frame107btn)
+//             frame107btn.addEventListener("click", function (event) {
+//                 makeCalendar("",div104, schedule.device_id, schedule.device_room_id, function (day) {
+//                     if (!document.getElementById("frame104btn")) {
+//                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
+//                         div104.appendChild(frame104btn)
+//                         frame104btn.setAttribute("id", "frame104btn")
+//                         frame104btn.addEventListener("click", function (event) {
+//                             // var selected;
+//                             selected = day;
+//                             console.log("Dia selecionado retornado makeScheduleContainer ", selected)
+//                             div104.innerHTML = '' ;
+//                             frame107.innerHTML = '' ;
+//                             frame107.appendChild(frame107txt)
 
-                            const div32 = document.createElement("div")
-                            div32.setAttribute("id","div32")
-                            div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                            const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
-                            btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
-                            div32.appendChild(btnShowSelectedDay)
+//                             const div32 = document.createElement("div")
+//                             div32.setAttribute("id","div32")
+//                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
+//                             const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
+//                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
+//                             div32.appendChild(btnShowSelectedDay)
         
-                            const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
-                            btnEditDay.setAttribute("id", "btnEditDay");
+//                             const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
+//                             btnEditDay.setAttribute("id", "btnEditDay");
 
-                            btnEditDay.addEventListener("click",function(){ // click botão editar
-                                var oldDay = day
-                                buildCalendar()
-                                console.log("old daySelected" + oldDay)   
-                                // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
-                                var div106 = document.getElementById("div106")
-                                if(div106){
-                                    containerSchedule.removeChild(div106)
-                                }
+//                             btnEditDay.addEventListener("click",function(){ // click botão editar
+//                                 var oldDay = day
+//                                 buildCalendar()
+//                                 console.log("old daySelected" + oldDay)   
+//                                 // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
+//                                 var div106 = document.getElementById("div106")
+//                                 if(div106){
+//                                     containerSchedule.removeChild(div106)
+//                                 }
 
-                                // se conter a data antiga limpa tudo 
-                                if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
-                                    selectedStart = ""
-                                    selectedEnd = ""
-                                    document.getElementById("divTimeStart").innerHTML = '-- : --';
-                                    document.getElementById("divTimeEnd").innerHTML = '-- : --';
-                                }
+//                                 // se conter a data antiga limpa tudo 
+//                                 if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
+//                                     selectedStart = ""
+//                                     selectedEnd = ""
+//                                     document.getElementById("divTimeStart").innerHTML = '-- : --';
+//                                     document.getElementById("divTimeEnd").innerHTML = '-- : --';
+//                                 }
                                 
-                                setTimeout(function(){
-                                    var cells = document.querySelectorAll("#calendar-body tr td div");
-                                    cells.forEach(function (td) {
-                                        if (td.getAttribute("data-date") == oldDay) {
-                                            td.classList.add("bg-[#199FDA]");
-                                        }
-                                        td.addEventListener("click", function () {
-                                            cells.forEach(function (otherTd) {
-                                                if (otherTd.classList.contains("bg-[#199FDA]")) {
-                                                    otherTd.classList.remove("bg-[#199FDA]");
-                                                }
-                                            });
-                                        });
-                                    });
-                                },200);
-                                })
+//                                 setTimeout(function(){
+//                                     var cells = document.querySelectorAll("#calendar-body tr td div");
+//                                     cells.forEach(function (td) {
+//                                         if (td.getAttribute("data-date") == oldDay) {
+//                                             td.classList.add("bg-[#199FDA]");
+//                                         }
+//                                         td.addEventListener("click", function () {
+//                                             cells.forEach(function (otherTd) {
+//                                                 if (otherTd.classList.contains("bg-[#199FDA]")) {
+//                                                     otherTd.classList.remove("bg-[#199FDA]");
+//                                                 }
+//                                             });
+//                                         });
+//                                     });
+//                                 },200);
+//                                 })
                      
                             
 
-                            div32.appendChild(btnEditDay);
+//                             div32.appendChild(btnEditDay);
                             
-                            div104.appendChild(frame107)
-                            div104.appendChild(div32);
+//                             div104.appendChild(frame107)
+//                             div104.appendChild(div32);
                             
-                        })
-                    } 
+//                         })
+//                     } 
                     
-                } )
-            })
-0
-            const div106 = document.createElement("div")
-            div106.setAttribute("id", "div106")
-            div106.classList.add("div104", "h-fit")
-            containerSchedule.appendChild(div106)
+//                 } )
+//             })
+// 0
+//             const div106 = document.createElement("div")
+//             div106.setAttribute("id", "div106")
+//             div106.classList.add("div104", "h-fit")
+//             containerSchedule.appendChild(div106)
 
-            const frame109 = document.createElement("div")
-            frame109.setAttribute("id", "frame109")
-            frame109.classList.add("frame107", "h-fit")
-            div106.appendChild(frame109)
+//             const frame109 = document.createElement("div")
+//             frame109.setAttribute("id", "frame109")
+//             frame109.classList.add("frame107", "h-fit")
+//             div106.appendChild(frame109)
 
-            const frame19txt = document.createElement("div")
-            frame19txt.classList.add("frame107txt")
-            frame19txt.innerHTML = texts.text("labelTxtCancel")
-            frame109.appendChild(frame19txt)
+//             const frame19txt = document.createElement("div")
+//             frame19txt.classList.add("frame107txt")
+//             frame19txt.innerHTML = texts.text("labelTxtCancel")
+//             frame109.appendChild(frame19txt)
 
-            // //botão cancelar
-            // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
-            // frame109btn.addEventListener("click", function (event) {
-            //     var obj = { mt: "UpdateSchedule", api: "user", id: schedule }
-            //     makeCancelPopUp(obj, function (msg) {
-            //         makeSuccessPopUp(msg)
-            //     })
-            // })
+//             // //botão cancelar
+//             // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
+//             // frame109btn.addEventListener("click", function (event) {
+//             //     var obj = { mt: "UpdateSchedule", api: "user", id: schedule }
+//             //     makeCancelPopUp(obj, function (msg) {
+//             //         makeSuccessPopUp(msg)
+//             //     })
+//             // })
 
-            // frame109.appendChild(frame109btn)
-        }
+//             // frame109.appendChild(frame109btn)
+//         }
         btnSave.addEventListener("click",function(){
-            var dateStart = selectedDay.startDate + "T" + document.getElementById("divTimeStart").innerHTML;
-            var dateEnd = selectedDay.endDate + "T" + document.getElementById("divTimeEnd").innerHTML;
+            var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
+            var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
 
-            console.log("start " + dateStart)
-            console.log("end " + dateEnd)
+            console.log("Hora inicio agendamento " + dateStart)
+            console.log("hora fim agendamento " + dateEnd)
             
              app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                 
