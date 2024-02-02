@@ -1525,10 +1525,15 @@ function truncateString(str, maxLength) {
         var selectedEnd;
         var selectedStart;
         console.log("Schedules" +JSON.stringify(schedule))
-        var scheduleDeviceClicked = [schedule.find(function(s){
-            return s.device_id == deviceHw;
-        })];[0] // ~pietro verificar pq esta armazenando apenas um agendamento nessa var sendo que existem 2 objetos
-
+        // var scheduleDeviceClicked = [schedule.find(function(s){
+        //     return s.device_id == deviceHw;
+        // })]; // ~pietro verificar pq esta armazenando apenas um agendamento nessa var sendo que existem 2 objetos
+        var scheduleDeviceClicked = [];
+        schedule.forEach(function(s) {
+            if (s.device_id === deviceHw) {
+                scheduleDeviceClicked.push(s);
+            }
+        });
         //if (!schedule) {
             
             //Seleção calendário
