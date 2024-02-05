@@ -20,6 +20,7 @@ Wecom.coolworkTexts = {
         labelIptSearch: "Pesquisar...",
         labelSelectDay: "Primeiro selecione o dia",
         labelSelectDivStart: "Primeiro selecione a hora de início",
+        labelDayCannotBeSmaller: "O dia selecionado nao pode ser menor que o dia de hoje",
         labelDaySmaller: "O dia de término nao pode ser menor que o dia de início",
         labelDayBigger: "O dia de início nao pode ser maior que o dia de término ",
         labelSelect: "Selecionar",

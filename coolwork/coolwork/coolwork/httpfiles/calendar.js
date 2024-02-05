@@ -2,7 +2,7 @@
 
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,callback,module){
+Calendar.createCalendar = function(divMain,availability,schedules,callback,module){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -35,7 +35,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,callback,module)
+    buildCalendar(availability,callback,module,schedules)
 },250)
 
 
@@ -48,7 +48,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability,callback,module) {
+function buildCalendar(availability,callback,module,schedules) {
    
 
     var date = new Date();
@@ -61,7 +61,7 @@ function buildCalendar(availability,callback,module) {
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability,callback,module);
+      rebuildCalendar(availability,callback,module,schedules);
       
     });
   
@@ -71,11 +71,11 @@ function buildCalendar(availability,callback,module) {
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, callback,module);
+      rebuildCalendar(availability, callback,module,schedules);
       
     });
     
-    rebuildCalendar(availability, callback,module);
+    rebuildCalendar(availability, callback,module,schedules);
     
     
   }
@@ -125,7 +125,7 @@ function buildCalendar(availability,callback,module) {
     return thead;
   }
   
-  function rebuildCalendar(availability,callback,module) {
+  function rebuildCalendar(availability,callback,module,schedules) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -167,7 +167,7 @@ function buildCalendar(availability,callback,module) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback);
+            rebuildCalendar(availability,callback,schedules);
             
           });
       }
@@ -211,7 +211,7 @@ function buildCalendar(availability,callback,module) {
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability,callback,module);
+        rebuildCalendar(availability,callback,module,schedules);
       });
       nextMonthDay++;
     }
@@ -231,7 +231,6 @@ cells.forEach(function (cell) {
   cell.setAttribute("data-date", formattedDate);
   
   cell.addEventListener("click", function () {
-    
     if (module == "schedule") {
       // Lógica para modo de agendamento
       if (cell.classList.contains("selected")) {
@@ -255,7 +254,17 @@ cells.forEach(function (cell) {
         var selectedDate;
         selectedDate = moment(selectedCells[0].getAttribute("data-date"));
         console.log("Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
-  
+
+        // var dataAtual = moment().format('YYYY/MM/DD');
+        // console.log("SelectedDate " + selectedDate)
+        // if(selectedDate < dataAtual ){
+        //     makePopUp(texts.text("labelWarning"), texts.text("labelDayCannotBeSmaller"), texts.text("labelOk")).addEventListener("click",function(event){
+        //         event.preventDefault()
+        //         event.stopPropagation()
+        //         document.body.removeChild(document.getElementById("bcgrd"))
+        //     })
+        //   }  
+    
         // Enviar a data por meio do callback
         callback({
           selectedDate: selectedDate.format("YYYY-MM-DD")
@@ -302,7 +311,7 @@ cells.forEach(function (cell) {
     });
   });
 });
-        UpdateAvailability(availability) // atualizar visualização do calendario
+        UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
   }
   
   function getMonthName(month) {
@@ -346,7 +355,7 @@ cells.forEach(function (cell) {
   //funções de disponibilidade
 
       
-function UpdateAvailability(availability, type) {
+function UpdateAvailability(availability, type, schedules) {
         var cells = document.querySelectorAll("#calendar-body tr td div");
         if (availability.length === 0) {
             cells.forEach(function (td) {
@@ -355,13 +364,22 @@ function UpdateAvailability(availability, type) {
         }
         else if(availability == "all"){
             cells.forEach(function(td){
-                td.classList.add("available")
+                var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                var dataAtual = moment().format('YYYY-MM-DD');
+                if(dataDate < dataAtual){
+                  td.classList.add("unavailable")
+                  td.classList.add("pointer-events-none");
+                }else{
+                  td.classList.add("available")
+                }
             })
         }
         else {
             availability.forEach(function (dates) {
+                var dataAtual = moment().format('YYYY-MM-DD');
                 if (type == "recurrentType"){
                     cells = document.querySelectorAll(`.room-${dates.room_id}`)
+                    // para a tela do makeViewRoomDetail e makeViewRoom apenas
                     
                 }
                 if (dates.type == "recurrentType") {
@@ -650,22 +668,50 @@ function UpdateAvailability(availability, type) {
                                
                         }
                         td.classList.remove("recurrentText")
-                    });
+
+                        //var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
+                        
+                        if(dataDate < dataAtual){
+                          td.classList.add("unavailable")
+                        }else{
+                          td.classList.add("available")
+                        }
+
+                      });
 
                 } else if (dates.type == "periodType"){
                     var datastart = moment(dates.data_start).format('YYYY-MM-DD');
                     var dataend = moment(dates.data_end).format('YYYY-MM-DD');
+                    //var dataAtual = moment().format('YYYY-MM-DD');
                     cells.forEach(function (td) {
                         var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        if (dataDate >= datastart && dataDate <= dataend) {
+                        if (String(dataDate) >= String(dataAtual) && String(dataDate) <= String(dataend)) {
                             td.classList.remove("unavailable")
                             td.classList.add("available")
+                        }
 
-
-                        } else {
+                        else {
+                            td.classList.remove("available")
                             td.classList.add('unavailable');
                             td.classList.add("pointer-events-none");
                         }
+                        console.log("SCHEDULES UPDATEAVAILABILITY " + JSON.stringify(schedules))
+                        schedules.forEach(function(s){
+                          // availabilities com hora
+                          var datastartDateHour = moment(dates.data_start).format('YYYY-MM-DD HH:mm');
+                          var dataendDateHour = moment(dates.data_end).format('YYYY-MM-DD HH:mm');
+                          // agendamentos com hora 
+                          var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
+                          var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
+                          
+                          if(dataStartSchedule >= datastartDateHour && dataEndSchedule <= dataendDateHour && String(dataDate) == String(datastart)){
+                              td.classList.remove("available")
+                              td.classList.add('unavailable');
+                              td.classList.add("pointer-events-none");
+                          }
+                        })
+
+                        
                     });
                 }
             })

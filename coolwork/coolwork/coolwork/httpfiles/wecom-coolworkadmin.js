@@ -735,7 +735,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
             buttonConfirm.addEventListener("click",function(){
 
-                const inputs = document.querySelectorAll('.inputIndividualHour'); 
+                const inputs = document.querySelectorAll('.inputIndividualHour');
+                
                 inputs.forEach(function(input, index) {
                     const dataDay = input.dataset.day;
                     const startTime = input.value;

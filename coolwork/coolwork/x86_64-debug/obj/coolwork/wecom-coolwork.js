@@ -373,7 +373,7 @@ function truncateString(str, maxLength) {
         
         btnDate.addEventListener('click', function(event){
 
-            makeCalendar("selectSchedule",mainFilter, null, null, function (day) {
+            makeCalendar("","viewSchedule",mainFilter, null, null, function (day) {
                 selected = day.selectedDate;
                 var filtred = schedules.filter(function(s){
                     // Extract the date part from s.data_start
@@ -563,7 +563,7 @@ function truncateString(str, maxLength) {
 
         return
     }
-    function makeCalendar(selectSchedule,divMain, deviceHw, roomId, funcao2){
+    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -582,14 +582,24 @@ function truncateString(str, maxLength) {
         })
         console.log("AVAILABILITIES " + JSON.stringify(availability))
 
-        Calendar.createCalendar(divCalendar,availability,function (day) {
+        Calendar.createCalendar(divCalendar,availability,daySchedule,function (day) {
             //selectedDay;
             selectedDay = day.selectedDate
             console.log("SelectedDay " + JSON.stringify(selectedDay))
-            funcao2(day)
+            //var dataAtual = moment().format('YYYY/MM/DD');
+            // if(selectedDay < dataAtual ){
+            //     makePopUp(texts.text("labelWarning"), texts.text("labelDayCannotBeSmaller"), texts.text("labelOk")).addEventListener("click",function(event){
+            //         event.preventDefault()
+            //         event.stopPropagation()
+            //         document.body.removeChild(document.getElementById("bcgrd"))
+            //     })  
+            // }else{
+                funcao2(day) 
+            //}
+            
         },"schedule"); // componente Calendar
 
-        if(selectSchedule == "selectSchedule"){  // condição para quando for consultar os schedules e nao agendar
+        if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
             setTimeout(function(){
                 UpdateSchedule(schedules)
             },500)
@@ -990,26 +1000,36 @@ function truncateString(str, maxLength) {
                 const hourString = hour.toString().padStart(2, "0");
         
                 const divHour = document.createElement("div");
-                divHour.setAttribute("hour", hourString + ":00");
+                divHour.setAttribute("date-time", day + " " + hourString + ":00");
                 divHour.classList.add("divHour", "cursor-pointer");
-        
+                
+                // for each para divs com agendamento
                 sched.forEach(function (s) {
                     const startHourSched = parseInt(s.data_start.split("T")[1].split(":")[0]);
                     const endHourSched = parseInt(s.data_end.split("T")[1].split(":")[0]);
-        
+                    // quando ja tiver agendamento nesse horário reduz a opacidade
                     if (hour >= startHourSched && hour <= endHourSched) {
                         divHour.classList.remove("cursor-pointer");
-                        divHour.classList.add("opacity-5");
-                        divHour.removeAttribute("hour");
+                        divHour.classList.add("opacity-[60%]");
+                        divHour.removeAttribute("date-time");
                     }
                 });
-        
+
+                var horaAtual = moment().format('HH:mm')
+
                 divHour.setAttribute("id", hourString + ":00");
                 divHour.textContent = hourString + ":00";
                 div106.appendChild(divHour);
+                // colocar opacidade na div com hora menor que a hora atual
+
+                // if(String(divHour.id) <= String(horaAtual)){
+                //     divHour.classList.remove("cursor-pointer");
+                //     divHour.classList.add("opacity-[60%]");
+                //     divHour.removeAttribute("date-time");
+                // }
             }
         
-            const divsHours = document.querySelectorAll('[hour]');
+            const divsHours = document.querySelectorAll('[date-time]');
             divsHours.forEach(function (div) {
                 div.addEventListener('click', function (event) {
                     var hour = event.currentTarget.id;
@@ -1527,7 +1547,7 @@ function truncateString(str, maxLength) {
         console.log("Schedules" +JSON.stringify(schedule))
         // var scheduleDeviceClicked = [schedule.find(function(s){
         //     return s.device_id == deviceHw;
-        // })]; // ~pietro verificar pq esta armazenando apenas um agendamento nessa var sendo que existem 2 objetos
+        // })]; 
         var scheduleDeviceClicked = [];
         schedule.forEach(function(s) {
             if (s.device_id === deviceHw) {
@@ -1556,12 +1576,13 @@ function truncateString(str, maxLength) {
             frame107.appendChild(frame107btn)
             
             frame107btn.addEventListener("click", function buildCalendar(event) {
-                makeCalendar("",div104, deviceHw, roomId, function (day) {
+                makeCalendar(scheduleDeviceClicked,"",div104, deviceHw, roomId, function (day) {
                     if (!document.getElementById("frame104btn")) {
                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
                         div104.appendChild(frame104btn)
                         frame104btn.setAttribute("id", "frame104btn")
                         frame104btn.addEventListener("click", function (event) {
+                            selected = '';
                             selected = day.selectedDate;
                             console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selected))
 
@@ -1639,11 +1660,9 @@ function truncateString(str, maxLength) {
                                             });
                                         });
                                     });
-                                },200);
+                                },350);
                                 })
                      
-                            
-
                             div32.appendChild(btnEditDay);
                             
                             div104.appendChild(frame107)
