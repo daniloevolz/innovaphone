@@ -1015,18 +1015,17 @@ function truncateString(str, maxLength) {
                     }
                 });
 
-                var horaAtual = moment().format('HH:mm')
+                var horaAtual = moment().format('YYYY-MM-DD HH:mm')
 
                 divHour.setAttribute("id", hourString + ":00");
                 divHour.textContent = hourString + ":00";
                 div106.appendChild(divHour);
                 // colocar opacidade na div com hora menor que a hora atual
-
-                // if(String(divHour.id) <= String(horaAtual)){
-                //     divHour.classList.remove("cursor-pointer");
-                //     divHour.classList.add("opacity-[60%]");
-                //     divHour.removeAttribute("date-time");
-                // }
+                if(divHour.getAttribute("date-time") <= String(horaAtual)){
+                    divHour.classList.remove("cursor-pointer");
+                    divHour.classList.add("opacity-[60%]");
+                    divHour.removeAttribute("date-time");
+                }
             }
         
             const divsHours = document.querySelectorAll('[date-time]');

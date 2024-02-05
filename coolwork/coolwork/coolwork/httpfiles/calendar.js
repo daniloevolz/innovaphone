@@ -704,14 +704,20 @@ function UpdateAvailability(availability, type, schedules) {
                           var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
                           var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
                           
-                          if(dataStartSchedule >= datastartDateHour && dataEndSchedule <= dataendDateHour && String(dataDate) == String(datastart)){
-                              td.classList.remove("available")
-                              td.classList.add('unavailable');
-                              td.classList.add("pointer-events-none");
+                          console.log("DATADATE " + dataDate)
+                          if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour) && String(dataDate) == String(datastart)){
+                            // refazer foreach para pegar as novas TD que cairam nesse If
+                            var newCell = document.querySelectorAll(`[data-date="${datastart}"]`); 
+                              newCell.forEach(function(newTd){
+                                newTd.classList.remove("available");
+                                newTd.classList.add('unavailable');
+                                newTd.classList.add("pointer-events-none");
+                              })
+                               
                           }
                         })
 
-                        
+                        //rever 06/02 ~pietro
                     });
                 }
             })
