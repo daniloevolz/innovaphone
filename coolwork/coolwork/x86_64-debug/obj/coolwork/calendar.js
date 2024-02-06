@@ -304,12 +304,13 @@ cells.forEach(function (cell) {
       }
     }
   
-    cells.forEach(function (otherCell) {
-      if (!otherCell.classList.contains("selected")) {
-        otherCell.classList.remove("pointer-events-none");
-      }
-    });
+    // cells.forEach(function (otherCell) {
+    //   if (!otherCell.classList.contains("selected")) {
+    //     otherCell.classList.remove("pointer-events-none");
+    //   }
+    // });
   });
+
 });
         UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
   }
@@ -394,7 +395,13 @@ function UpdateAvailability(availability, type, schedules) {
                         console.log("cases of week" + dayOfWeek)
                         switch (dayOfWeek) {
                             case "Mon":
-                                if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_monday < dates.timeend_monday && dates.timestart_monday != "" && dates.timeend_monday != "") {
                                   
                                     var start = moment(defaultDate + " " + dates.timestart_monday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_monday, "YYYY-MM-DD HH:mm");
@@ -415,10 +422,22 @@ function UpdateAvailability(availability, type, schedules) {
                                     // td.classList.add('parcialavailable');
                                 
                                     
-                                } else {
-                                    td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
-                                }
+                              
+                              } 
+                              else {
+                              if (type == "recurrentType"){
+                                  
+                                  makeStatusWeekButton("unavailable", td);
+                                  
+                                  
+                              }else{
+                                td.classList.remove("available")
+                                td.classList.remove("cursor-pointer")   
+                                td.classList.add("pointer-events-none");
+                                td.classList.add("unavailable")
+                              }
+                                    
+                              }
                                 // console.log("Schedules:" +  schedules)
                                 // schedules.forEach(function(dateS){
                                 //     var dataSplit = dateS.data_start
@@ -433,7 +452,13 @@ function UpdateAvailability(availability, type, schedules) {
                                 // })
                                 return
                             case "Tue":
-                                if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_tuesday < dates.timeend_tuesday && dates.timestart_tuesday != "" && dates.timeend_tuesday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_tuesday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_tuesday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -452,10 +477,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     // td.classList.add('parcialavailable');
                                 
                                     
-                                } else {
-                                    td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
-                                }
+                              } 
+                              else {
+                                if (type == "recurrentType"){
+                                  makeStatusWeekButton("unavailable", td);
+                              }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
+                              }
+                              }
                                 //console.log("Schedules:" +  schedules)
 
                                 // schedules.forEach(function(dateS){
@@ -472,7 +504,13 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                 return
                             case "Wed":
-                                if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_wednesday < dates.timeend_wednesday && dates.timestart_wednesday != "" && dates.timeend_wednesday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_wednesday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_wednesday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -492,8 +530,14 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                     
                                 } else {
+                                  if (type == "recurrentType"){
+                                    makeStatusWeekButton("unavailable", td);
+                                }else{
+                                    td.classList.remove("available")
+                                    td.classList.remove("cursor-pointer")   
                                     td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
+                                    td.classList.add("unavailable")
+                                }
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -511,7 +555,13 @@ function UpdateAvailability(availability, type, schedules) {
 
                                 return
                             case "Thu":
-                                if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_thursday < dates.timeend_thursday && dates.timestart_thursday != "" && dates.timeend_thursday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_thursday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_thursday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -532,8 +582,14 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                     
                                 } else {
+                                  if (type == "recurrentType"){
+                                    makeStatusWeekButton("unavailable", td);
+                                }else{
+                                    td.classList.remove("available")
+                                    td.classList.remove("cursor-pointer")   
                                     td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
+                                    td.classList.add("unavailable")
+                                }
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -550,7 +606,13 @@ function UpdateAvailability(availability, type, schedules) {
                                 //})
                                 return
                             case "Fri":
-                                if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_friday < dates.timeend_friday && dates.timestart_friday != "" && dates.timeend_friday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_friday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_friday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -570,8 +632,14 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                     
                                 } else {
+                                  if (type == "recurrentType"){
+                                    makeStatusWeekButton("unavailable", td);
+                                }else{
+                                    td.classList.remove("available")
+                                    td.classList.remove("cursor-pointer")   
                                     td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
+                                    td.classList.add("unavailable")
+                                }
                                 }
                                 //console.log("Schedules:" +  schedules)
                                 //schedules.forEach(function(dateS){
@@ -587,7 +655,13 @@ function UpdateAvailability(availability, type, schedules) {
                                 //})
                                 return
                             case "Sat":
-                                if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_saturday < dates.timeend_saturday && dates.timestart_saturday != "" && dates.timeend_saturday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_saturday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_saturday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -606,8 +680,14 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                     
                                 } else {
+                                  if (type == "recurrentType"){
+                                    makeStatusWeekButton("unavailable", td);
+                                }else{
+                                    td.classList.remove("available")
+                                    td.classList.remove("cursor-pointer")   
                                     td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
+                                    td.classList.add("unavailable")
+                                }
                                 }
                                 //console.log("Schedules:" +  schedules)
 
@@ -624,7 +704,13 @@ function UpdateAvailability(availability, type, schedules) {
                                 //})
                                 return
                             case "Sun":
-                                if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
+                              if (String(dataDate) < String(dataAtual)) {
+                                td.classList.remove("avaiable")
+                                td.classList.add("unavailable")
+                                td.classList.remove("cursor-pointer")                        
+                                td.classList.add("pointer-events-none")                               
+                              }
+                              else if (dates.timestart_sunday < dates.timeend_sunday && dates.timestart_sunday != "" && dates.timeend_sunday != "") {
                                     var start = moment(defaultDate + " " + dates.timestart_sunday, "YYYY-MM-DD HH:mm");
                                     var end = moment(defaultDate + " " + dates.timeend_sunday, "YYYY-MM-DD HH:mm");
                                     var totalHours = 0;
@@ -644,8 +730,14 @@ function UpdateAvailability(availability, type, schedules) {
                                 
                                     
                                 } else {
+                                  if (type == "recurrentType"){
+                                    makeStatusWeekButton("unavailable", td);
+                                }else{
+                                    td.classList.remove("available")
+                                    td.classList.remove("cursor-pointer")   
                                     td.classList.add("pointer-events-none");
-                                    makeStatusWeekButton("unavailable",td);
+                                    td.classList.add("unavailable")
+                                }
                                 }
                                 // console.log("Schedules:" +  schedules)
                                
@@ -669,13 +761,7 @@ function UpdateAvailability(availability, type, schedules) {
                         }
                         td.classList.remove("recurrentText")
 
-                        //var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
-                        
-                        if(dataDate < dataAtual){
-                          td.classList.add("unavailable")
-                        }else{
-                          td.classList.add("available")
-                        }
+                        //var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD')
 
                       });
 
@@ -689,33 +775,27 @@ function UpdateAvailability(availability, type, schedules) {
                             td.classList.remove("unavailable")
                             td.classList.add("available")
                         }
-
                         else {
                             td.classList.remove("available")
                             td.classList.add('unavailable');
                             td.classList.add("pointer-events-none");
                         }
                         console.log("SCHEDULES UPDATEAVAILABILITY " + JSON.stringify(schedules))
-                        schedules.forEach(function(s){
-                          // availabilities com hora
-                          var datastartDateHour = moment(dates.data_start).format('YYYY-MM-DD HH:mm');
-                          var dataendDateHour = moment(dates.data_end).format('YYYY-MM-DD HH:mm');
-                          // agendamentos com hora 
-                          var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
-                          var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
+                        // schedules.forEach(function(s){
+                        //   // availabilities com hora
+                        //   var datastartDateHour = moment(dates.data_start).format('YYYY-MM-DD HH:mm');
+                        //   var dataendDateHour = moment(dates.data_end).format('YYYY-MM-DD HH:mm');
+                        //   // agendamentos com hora 
+                        //   var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
+                        //   var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
                           
-                          console.log("DATADATE " + dataDate)
-                          if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour) && String(dataDate) == String(datastart)){
-                            // refazer foreach para pegar as novas TD que cairam nesse If
-                            var newCell = document.querySelectorAll(`[data-date="${datastart}"]`); 
-                              newCell.forEach(function(newTd){
-                                newTd.classList.remove("available");
-                                newTd.classList.add('unavailable');
-                                newTd.classList.add("pointer-events-none");
-                              })
-                               
-                          }
-                        })
+                        //   console.log("DATADATE " + dataDate)
+                        // //   if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour)){
+                        // //         td.classList.remove("available");
+                        // //         td.classList.add('unavailable');
+                        // //         td.classList.add("pointer-events-none");
+                        // // }
+                        // })
 
                         //rever 06/02 ~pietro
                     });
