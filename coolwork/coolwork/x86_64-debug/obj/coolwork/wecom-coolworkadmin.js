@@ -238,7 +238,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     btnCreateRoom.addEventListener("click",function(event){
         const nomeSala = document.getElementById("iptNameRoom").value
-        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || dateAvailability[0].start == "" || dateAvailability[0].end == ""){
+        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == ""){
         makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
             event.preventDefault()
             event.stopPropagation()
@@ -256,34 +256,61 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             viewer: viewers,
             device : devHwId
             }); //viewer: viewer 
-        }else if(typeRoom == "recurrentType"){
-            console.log("dateAvailability " + JSON.stringify(dateAvailability))
-            // ~pietro possibilidade de fazer um forEach nessa lista dateAvailability e
-            app.send({ api: "admin", mt: "InsertRoom", 
-            name: nomeSala, 
-            img: imgRoom, 
-            type: typeRoom, 
-            schedule: typeSchedule,
-            //start
-            startMonday: dateAvailability[0].startMonday,
-            startTuesday: dateAvailability[0].startTuesday,
-            startWednesday: dateAvailability[0].startWednesday,
-            startThursday: dateAvailability[0].startThursday,
-            startFriday: dateAvailability[0].startFriday,
-            startSaturday: dateAvailability[0].startSaturday,
-            startSunday: dateAvailability[0].startSunday,
-            //end
-            endMonday: dateAvailability[1].endMonday,
-            endTuesday: dateAvailability[1].endTuesday,
-            endWednesday: dateAvailability[1].endWednesday,
-            endThursday: dateAvailability[1].endThursday,
-            endFriday: dateAvailability[1].endFriday,
-            endSaturday: dateAvailability[1].endSaturday,
-            endSunday: dateAvailability[1].endSunday,
-            viewer: viewers,
-            device : devHwId
-        }) 
-        }           
+        }else if (typeRoom == "recurrentType") {
+            console.log("dateAvailability " + JSON.stringify(dateAvailability));
+        
+            // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
+            let combinedAvailability = {
+                startMonday: [],
+                startTuesday: [],
+                startWednesday: [],
+                startThursday: [],
+                startFriday: [],
+                startSaturday: [],
+                startSunday: [],
+                endMonday: [],
+                endTuesday: [],
+                endWednesday: [],
+                endThursday: [],
+                endFriday: [],
+                endSaturday: [],
+                endSunday: []
+            };
+        
+            // Combine os horários de disponibilidade de todas as salas
+            dateAvailability.forEach(function(availability) {
+                for (let key in availability) {
+                    combinedAvailability[key].push(availability[key]);
+                }
+            });
+        
+            // Envie uma única mensagem com todos os horários de disponibilidade combinados
+            app.send({
+                api: "admin",
+                mt: "InsertRoom",
+                name: nomeSala,
+                img: imgRoom,
+                type: typeRoom,
+                schedule: typeSchedule,
+                startMonday: combinedAvailability.startMonday.join(", "),
+                startTuesday: combinedAvailability.startTuesday.join(", "),
+                startWednesday: combinedAvailability.startWednesday.join(", "),
+                startThursday: combinedAvailability.startThursday.join(", "),
+                startFriday: combinedAvailability.startFriday.join(", "),
+                startSaturday: combinedAvailability.startSaturday.join(", "),
+                startSunday: combinedAvailability.startSunday.join(", "),
+                endMonday: combinedAvailability.endMonday.join(", "),
+                endTuesday: combinedAvailability.endTuesday.join(", "),
+                endWednesday: combinedAvailability.endWednesday.join(", "),
+                endThursday: combinedAvailability.endThursday.join(", "),
+                endFriday: combinedAvailability.endFriday.join(", "),
+                endSaturday: combinedAvailability.endSaturday.join(", "),
+                endSunday: combinedAvailability.endSunday.join(", "),
+                viewer: viewers,
+                device: devHwId
+            });
+        }
+        
         // app.send({ api: "admin", mt: "InsertRoom", 
         // name: nameRoom, 
         // img: srcDaImagem, 
@@ -436,7 +463,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divCalendar = document.createElement("div")
             
             var selectedDay;
-            Calendar.createCalendar(divCalendar,"all",function(day){
+            Calendar.createCalendar(divCalendar,"all","",function(day){
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
@@ -738,6 +765,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
             buttonConfirm.addEventListener("click",function(){
+                typeSchedule(typeSched)
 
                 const inputs = document.querySelectorAll('.inputIndividualHour');
                 
@@ -787,7 +815,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                         break;
                                     case "Sun":
                                         datesRecurrent.push({ startSun : startTime });
-                                        datesRecurrent.push({ endTSun : endTime });
+                                        datesRecurrent.push({ endSun : endTime });
                                         break;
                                     default:
                                         break;
@@ -799,9 +827,31 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     
     
                     });
-                }
 
-                dateTime(datesRecurrent) // passar todas as datas recorrentes para o callback 
+                }
+                
+                if(typeSched = "hourModule"){
+                    dateTime(datesRecurrent)
+                    console.log("Hour Module")
+                }else{
+                    console.log("Nao é HourModule")
+                }
+                
+                // implementar a lógica de quando for o dia inteiro para o recorrente aqui
+                // ~ pietro
+
+                // else if(typeSched = "dayModule"){
+                //     datesRecurrent = []
+                //     datesRecurrent.push({
+                //         start: selectedDay.startDate + "T" + "00:00",
+                //         end:  selectedDay.endDate + "T" + "23:59"
+                //     })
+                //     console.log( "DATES TIPO DIA " + JSON.stringify(dates))
+                //     dateTime(dates)
+                //     console.log("day Module")
+              
+                // }
+
 
                 document.body.removeChild(insideDiv)
             })
@@ -828,10 +878,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divMain.appendChild(divButtons)
             //divMain.appendChild(divButtons)
             insideDiv.appendChild(divMain)
-
-           
             var typeSched = "hourModule";
-
             btnDaySchedule.addEventListener("click", function(event) {
                 typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
                     typeSched = selectedButton.id
@@ -872,6 +919,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                })
 
                 individualWeekDays(daysSelected, "individual", divAllHours);
+                typeSched = "hourModule";
 
             })
         }

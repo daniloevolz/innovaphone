@@ -1038,110 +1038,93 @@ function truncateString(str, maxLength) {
             });
         }
         
-        
-        
-        
-        
-        // Função de callback para o evento de clique
-        function clickHandler(event) {
-            var hour = event.currentTarget.id;
-            console.log("Hora clicada a tratar ", hour);
-            callback(hour);
-        }
-        
-
         if (availability.type == "recurrentType") {
             const isoDay = moment(day).isoWeekday();
-            console.log(isoDay)
-            var date = {}
+            console.log(isoDay);
+            var date = {};
             switch (isoDay) {
-                case 0:
-                    date.date_start = availability.timestart_monday
-                    return
                 case 1:
-                    return
+                    date.startTime = availability.timestart_monday;
+                    date.endTime = availability.timeend_monday;
+                    break;
                 case 2:
-                    return
+                    date.startTime = availability.timestart_tuesday;
+                    date.endTime = availability.timeend_tuesday;
+                    break;
                 case 3:
-                    return
+                    date.startTime = availability.timestart_wednesday;
+                    date.endTime = availability.timeend_wednesday;
+                    break;
                 case 4:
-                    return
+                    date.startTime = availability.timestart_thursday;
+                    date.endTime = availability.timeend_thursday;
+                    break;
                 case 5:
-                    return
+                    date.startTime = availability.timestart_friday;
+                    date.endTime = availability.timeend_friday;
+                    break;
                 case 6:
-                    return
-
+                    date.startTime = availability.timestart_saturday;
+                    date.endTime = availability.timeend_saturday;
+                    break;
+                case 7:
+                    date.startTime = availability.timestart_sunday;
+                    date.endTime = availability.timeend_sunday;
+                    break;
             }
-
-            // Garantir que divStartTime e divEndTime sejam strings
-            const startTimeString = date.data_start;
-            const endTimeString = date.data_end;
-
-            var sched = schedules.filter(function (s) {
-                return s.data_start >= availability.data_start && s.data_end <= availability.data_end
-            })
-            console.log("Agendamentos ", JSON.stringify(sched))
-            console.log("startTimeString Erick", startTimeString)
-            console.log("endTimeString Erick", endTimeString)
-            // Extrair apenas as horas dos valores de data e hora recebidos
-            const startHour = parseInt(startTimeString.split(":")[0]);
-            const endHour = parseInt(endTimeString.split(":")[0]);
-
-            var hours = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "00",]
-
-
-            // Filtrar as horas dentro do intervalo desejado
-            const hoursInRange = hours.filter(h => {
-                const hour = parseInt(h);
-                return hour >= startHour && hour <= endHour;
-            });
-
-            // Criar as divs somente para as horas no intervalo desejado
-            hoursInRange.forEach(function (h) {
-                console.log("Hora forEach:", h);
+        
+            const startTime = moment(date.startTime, 'HH:mm');
+            const endTime = moment(date.endTime, 'HH:mm');
+            
+            const hoursInRange = [];
+            let currentTime = startTime.clone();
+        
+            // Cria um array com todas as horas disponíveis dentro do intervalo
+            while (currentTime.isBefore(endTime)) {
+                hoursInRange.push(currentTime.format('HH') + ":00"); // Ajuste para obter horas cheias
+                currentTime.add(1, 'hour');
+            }
+        
+            // Cria as divs para as horas disponíveis
+            hoursInRange.forEach(function(time) {
                 const divHour = document.createElement("div");
-                divHour.setAttribute("hour", h);
+                divHour.setAttribute("hour", time);
                 divHour.classList.add("divHour", "cursor-pointer");
-                sched.forEach(function (s) {
-                    if (moment(s.data_start) == moment(day + "T" + h + ":00") || moment(s.data_end) == moment(day + "T" + h + ":00")) {
-                        divHour.classList.remove("cursor-pointer");
-                        divHour.classList.add("divHourBusy");
-                        divHour.removeAttribute("hour");
-                    }
-                })
-
-                divHour.setAttribute("id", h);
-                divHour.innerHTML = h + ":00";
+                
+                // Verificar conflitos com agendamentos existentes
+                var horaAtual = moment().format('YYYY-MM-DD HH:mm');
+                const selectedDateTime = moment(day + ' ' + time, 'YYYY-MM-DD HH:mm');
+                var isConflict = deviceSelected.some(function(s) {
+                    const startDateTime = moment(s.data_start);
+                    const endDateTime = moment(s.data_end);
+                    return selectedDateTime.isBetween(startDateTime, endDateTime, null, '[]');
+                });
+        
+                // Se houver conflito, definir opacidade e remover atributo de data-hora
+                if (isConflict || selectedDateTime <= horaAtual) {
+                    divHour.classList.remove("cursor-pointer");
+                    divHour.classList.add("pointer-events-none");
+                    divHour.classList.add("opacity-[60%]");
+                    divHour.removeAttribute("date-time");
+                }
+        
+                divHour.setAttribute("id", time);
+                divHour.textContent = time;
                 div106.appendChild(divHour);
             });
-            //todas as divs com o atributo "room"
+        
             const divsHours = document.querySelectorAll('[hour]');
-            //listener de clique a cada div
-            //var control = 0;
             divsHours.forEach(function (div) {
                 div.addEventListener('click', function (event) {
                     var hour = event.currentTarget.id;
-                    console.log("Hora clicada a tratar ", hour)
-
-                    //if (control == 0) {
-                    //    var divTimeStart = document.getElementById("divTimeStart")
-                    //    divTimeStart.innerHTML = hour + ":00"
-                    //    control = 1
-                    //} else {
-                    //    var divTimeEnd = document.getElementById("divTimeEnd")
-                    //    divTimeEnd.innerHTML = hour + ":00"
-                    //    control = 0
-
-                    //    callback(hour)
-                    //}
-                    callback(hour)
-
-
+                    console.log("Hora clicada a tratar ", hour);
+                    callback(hour);
                 });
             });
-
-
         }
+        
+        
+        
     
     }
     function makeViewTimePeriod(divMain, availability) {
