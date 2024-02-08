@@ -627,7 +627,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const divDaysWeek = document.createElement("div")
             divDaysWeek.classList.add("flex","p-1","items-start")
 
-            var week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
             week.forEach(function (w) {
                 const dayDiv = document.createElement('div')
@@ -1306,7 +1306,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 const divMainAvailabilityRecurrent = document.createElement("div")
                 divMainAvailabilityRecurrent.classList.add("flex", "p-1", "items-start", "bg-dark-100", "rounded-lg", "justify-center","gap-1")
                 // dias da semana 
-                var week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
                 week.forEach(function (w) {
                     const dayDiv = document.createElement('div')
@@ -1468,7 +1468,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             icon.src = iconSVG;
             button.prepend(icon);
         }
-
         switch (variant) {
             case "primary":
                 button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg","primary");

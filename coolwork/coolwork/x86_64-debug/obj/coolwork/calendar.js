@@ -233,44 +233,63 @@ cells.forEach(function (cell) {
   cell.addEventListener("click", function () {
     if (module == "schedule") {
       // Lógica para modo de agendamento
-      if (cell.classList.contains("selected")) {
-        // Desselecionar a data clicada se já estiver selecionada
-        cell.classList.remove("selected");
-        cell.classList.remove("selectedCellFocus");
+     
+      // if (cell.classList.contains("selected")) {
+      //   // Desselecionar a data clicada se já estiver selecionada
+      //   cell.classList.remove("selected");
+      //   cell.classList.remove("selectedCellFocus");
+      //   console.log("Erick Calendar 2", JSON.stringify(cell))
   
-        selectedCells = selectedCells.filter(function (selectedCell) {
-          return selectedCell !== cell;
-        });
-        selectedCells.pop(cell)
-      } else if(selectedCells.length < 1){
-        // Selecionar a data clicada
-        cell.classList.add("selected");
-        cell.classList.add("selectedCellFocus");
-        //selectedCells = []
-        selectedCells.push(cell);
-      }
+      //   // selectedCells = selectedCells.filter(function (selectedCell) {
+      //   //   return selectedCell !== cell;
+      //   // });
+      //   selectedCells.pop(cell)
+      // } else if(selectedCells.length < 1){
+      //   // Selecionar a data clicada
+      //   cell.classList.add("selected");
+      //   cell.classList.add("selectedCellFocus");
+      //   //selectedCells = []
+      //   selectedCells.push(cell);
+      //   console.log("Erick Calendar 2", JSON.stringify(selectedCells))
+      // }
   
-      if (selectedCells.length === 1) {
-        var selectedDate;
-        selectedDate = moment(selectedCells[0].getAttribute("data-date"));
-        console.log("Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
+      // if (selectedCells.length === 1) {
+      //   var selectedDate;
+      //   selectedDate = moment(selectedCells[0].getAttribute("data-date"));
+      //   console.log("Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
 
-        // var dataAtual = moment().format('YYYY/MM/DD');
-        // console.log("SelectedDate " + selectedDate)
-        // if(selectedDate < dataAtual ){
-        //     makePopUp(texts.text("labelWarning"), texts.text("labelDayCannotBeSmaller"), texts.text("labelOk")).addEventListener("click",function(event){
-        //         event.preventDefault()
-        //         event.stopPropagation()
-        //         document.body.removeChild(document.getElementById("bcgrd"))
-        //     })
-        //   }  
-    
-        // Enviar a data por meio do callback
-        callback({
-          selectedDate: selectedDate.format("YYYY-MM-DD")
-        });
-      }
-    } else if (module === "availability") {
+      //   callback({
+      //     selectedDate: selectedDate.format("YYYY-MM-DD")
+      //   });
+      // }
+  
+      // Remove a classe "selected" de todas as células
+      cells.forEach(function(cell) {
+          cell.classList.remove('selected');
+          cell.classList.remove('selectedCellFocus');
+      });
+      
+      // Adiciona a classe "selected" apenas à célula clicada
+      this.classList.add('selected');
+      this.classList.add('selectedCellFocus');
+      // Obtém o valor do atributo "data-date" da célula clicada
+      var selectedDate = this.getAttribute('data-date')//.format("YYYY-MM-DD");
+      console.log("ERICK Calendar 2", selectedDate)
+      // Chama o callback com o dia clicado
+      callback({
+        selectedDate
+      });
+      // if (typeof callback === 'function') {
+      //     callback(selectedDate);
+      // }
+      // function callback(selectedDate) {
+      //   selectedDate.format("YYYY-MM-DD")
+      //   console.log('Dia clicado:', selectedDate);
+      //   // Ou faça qualquer outra coisa com o dia clicado
+      
+    } 
+
+    else if (module === "availability") {
       // Lógica para modo de disponibilidade
       if (!cell.classList.contains("selected")) {
         // Selecionar a data clicada
@@ -394,7 +413,7 @@ function UpdateAvailability(availability, type, schedules) {
                         var defaultDate = "2000-01-01";
                         console.log("cases of week" + dayOfWeek)
                         switch (dayOfWeek) {
-                            case "Mon":
+                            case "Monday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -428,6 +447,8 @@ function UpdateAvailability(availability, type, schedules) {
                               if (type == "recurrentType"){
                                   
                                   makeStatusWeekButton("unavailable", td);
+                                  td.classList.remove("cursor-pointer")  
+                                  td.classList.add("pointer-events-none");
                                   
                                   
                               }else{
@@ -451,7 +472,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 //     }
                                 // })
                                 return
-                            case "Tue":
+                            case "Tuesday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -480,12 +501,17 @@ function UpdateAvailability(availability, type, schedules) {
                               } 
                               else {
                                 if (type == "recurrentType"){
+                                  
                                   makeStatusWeekButton("unavailable", td);
-                              }else{
-                                  td.classList.remove("available")
-                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.remove("cursor-pointer")  
                                   td.classList.add("pointer-events-none");
-                                  td.classList.add("unavailable")
+                                  
+                                  
+                              }else{
+                                td.classList.remove("available")
+                                td.classList.remove("cursor-pointer")   
+                                td.classList.add("pointer-events-none");
+                                td.classList.add("unavailable")
                               }
                               }
                                 //console.log("Schedules:" +  schedules)
@@ -503,7 +529,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 // })
                                 
                                 return
-                            case "Wed":
+                            case "Wednesday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -531,12 +557,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     
                                 } else {
                                   if (type == "recurrentType"){
+                                  
                                     makeStatusWeekButton("unavailable", td);
-                                }else{
-                                    td.classList.remove("available")
-                                    td.classList.remove("cursor-pointer")   
+                                    td.classList.remove("cursor-pointer")  
                                     td.classList.add("pointer-events-none");
-                                    td.classList.add("unavailable")
+                                    
+                                    
+                                }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
                                 }
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -554,7 +585,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 //})
 
                                 return
-                            case "Thu":
+                            case "Thursday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -583,12 +614,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     
                                 } else {
                                   if (type == "recurrentType"){
+                                  
                                     makeStatusWeekButton("unavailable", td);
-                                }else{
-                                    td.classList.remove("available")
-                                    td.classList.remove("cursor-pointer")   
+                                    td.classList.remove("cursor-pointer")  
                                     td.classList.add("pointer-events-none");
-                                    td.classList.add("unavailable")
+                                    
+                                    
+                                }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
                                 }
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -605,7 +641,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 //    }
                                 //})
                                 return
-                            case "Fri":
+                            case "Friday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -633,12 +669,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     
                                 } else {
                                   if (type == "recurrentType"){
+                                  
                                     makeStatusWeekButton("unavailable", td);
-                                }else{
-                                    td.classList.remove("available")
-                                    td.classList.remove("cursor-pointer")   
+                                    td.classList.remove("cursor-pointer")  
                                     td.classList.add("pointer-events-none");
-                                    td.classList.add("unavailable")
+                                    
+                                    
+                                }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
                                 }
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -654,7 +695,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 //    }
                                 //})
                                 return
-                            case "Sat":
+                            case "Saturday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -681,12 +722,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     
                                 } else {
                                   if (type == "recurrentType"){
+                                  
                                     makeStatusWeekButton("unavailable", td);
-                                }else{
-                                    td.classList.remove("available")
-                                    td.classList.remove("cursor-pointer")   
+                                    td.classList.remove("cursor-pointer")  
                                     td.classList.add("pointer-events-none");
-                                    td.classList.add("unavailable")
+                                    
+                                    
+                                }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
                                 }
                                 }
                                 //console.log("Schedules:" +  schedules)
@@ -703,7 +749,7 @@ function UpdateAvailability(availability, type, schedules) {
                                 //    }
                                 //})
                                 return
-                            case "Sun":
+                            case "Sunday":
                               if (String(dataDate) < String(dataAtual)) {
                                 td.classList.remove("avaiable")
                                 td.classList.add("unavailable")
@@ -731,12 +777,17 @@ function UpdateAvailability(availability, type, schedules) {
                                     
                                 } else {
                                   if (type == "recurrentType"){
+                                  
                                     makeStatusWeekButton("unavailable", td);
-                                }else{
-                                    td.classList.remove("available")
-                                    td.classList.remove("cursor-pointer")   
+                                    td.classList.remove("cursor-pointer")  
                                     td.classList.add("pointer-events-none");
-                                    td.classList.add("unavailable")
+                                    
+                                    
+                                }else{
+                                  td.classList.remove("available")
+                                  td.classList.remove("cursor-pointer")   
+                                  td.classList.add("pointer-events-none");
+                                  td.classList.add("unavailable")
                                 }
                                 }
                                 // console.log("Schedules:" +  schedules)
