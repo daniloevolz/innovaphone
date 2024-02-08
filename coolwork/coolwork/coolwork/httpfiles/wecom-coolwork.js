@@ -181,6 +181,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 case "secundary":
                     button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                     break;
+                case "tertiary":
+                    button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                    break
                 case "destructive":
                     button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                     break;
@@ -298,7 +301,15 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         //#endregion
 
-    //#region  Funções Internas
+    //#region Funções Internas
+    function getDefaultDayWithAvailability(week, a) {
+        for (let day of week) {
+            if (a[`timestart_${day.toLowerCase()}`] && a[`timeend_${day.toLowerCase()}`]) {
+                return day;
+            }
+        }
+        return null;
+    }
 //função para diminuir a string
 function truncateString(str, maxLength) {
     if (str.length > maxLength) {
@@ -824,8 +835,11 @@ function getDayOfWeekLabel(selectedDate) {
             // calendario recorrent e periodo
             makeViewCalendarInfo(divMain, avail)
             
+            var viewersFilter = viewers.filter(function (v){
+                return v.room_id == room.id
+            })
             //componente avatar
-            makeAvatar(viewers,divMain,room)
+            makeAvatar(viewersFilter,divMain,room)
 
             //todas as divs com o atributo "room"
             const divsRoom = document.querySelectorAll('[room]');
@@ -854,15 +868,15 @@ function getDayOfWeekLabel(selectedDate) {
             });
         })   
     }
-    function makeAvatar(viewers, divMain) {
+    function makeAvatar(viewersFilter, divMain) {
         const divUsersAvatar = document.createElement("div");
         divUsersAvatar.classList.add("flex", "items-start", "gap-1");
         divUsersAvatar.setAttribute("id", "divUsersAvatar");
-        console.log("ARRAY USERS:" + JSON.stringify(viewers));
+        console.log("ARRAY USERS:" + JSON.stringify(viewersFilter));
 
         let processedUsersCount = 0;
 
-        viewers.forEach(function (viewer) {
+        viewersFilter.forEach(function (viewer) {
             if (processedUsersCount < 8) {
                 var viewersUsers = list_tableUsers.filter(function (user) {
                     return user.guid == viewer.viewer_guid;
@@ -1278,7 +1292,7 @@ function getDayOfWeekLabel(selectedDate) {
         const divStartISODay = document.createElement("div")
         divStartISODay.setAttribute("id", "divStartISODay")
         divStartISODay.classList.add("divISODay")
-        divStartISODay.innerHTML = moment(availability.data_start).format("dddd");
+        divStartISODay.innerHTML = texts.text("label" + moment(availability.data_start).format("dddd") + "Div");
         divDateStart.appendChild(divStartISODay)
         //apende div
         div180.appendChild(divDateStart)
@@ -1319,7 +1333,7 @@ function getDayOfWeekLabel(selectedDate) {
         const divEndISODay = document.createElement("div")
         divEndISODay.setAttribute("id", "divEndISODay")
         divEndISODay.classList.add("divISODay")
-        divEndISODay.innerHTML = moment(availability.data_end).format("dddd");
+        divEndISODay.innerHTML = texts.text("label" + moment(availability.data_end).format("dddd") + "Div");
         divDateEnd.appendChild(divEndISODay)
 
         div180.appendChild(divDateEnd)
@@ -1333,7 +1347,14 @@ function getDayOfWeekLabel(selectedDate) {
         var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     
         var defaultDay = getDefaultDayWithAvailability(week, a);
-    
+        
+        var div180 = document.createElement("div");
+        div180.setAttribute("id", "div180");
+        div180.classList.add("div180");
+        div180.style.display = 'none';
+        divMain.appendChild(divMainAvailabilityRecurrent);
+        divMain.appendChild(div180);
+
         week.forEach(function (w, index) {
             const dayDiv = document.createElement('div');
             dayDiv.classList.add("flex", "w-[40px]", "h-[40px]", "p-1", "flex-col", "items-center", "justify-center", "gap-1", `room-${a.room_id}`,"rounded-full");
@@ -1345,14 +1366,7 @@ function getDayOfWeekLabel(selectedDate) {
             dayDiv.setAttribute("day-week",  w);
             dayDiv.appendChild(dayText);
             divMainAvailabilityRecurrent.appendChild(dayDiv);
-            
-            var div180 = document.createElement("div");
-            div180.setAttribute("id", "div180");
-            div180.classList.add("div180");
-            div180.style.display = 'none';
-            divMain.appendChild(divMainAvailabilityRecurrent);
-            divMain.appendChild(div180);
-            
+
             dayDiv.addEventListener("click", function(ev){
                 const dayOfWeek = dayDiv.getAttribute("day-week");
                 const startTime = a[`timestart_${dayOfWeek.toLowerCase()}`];
@@ -1362,7 +1376,6 @@ function getDayOfWeekLabel(selectedDate) {
                 makeViewDay(divMain, `label${dayOfWeek}Div`, startTime, endTime);
             });
     
-            // Mostra a div correspondente ao primeiro dia com horários definidos por padrão
             if (w === defaultDay) {
                 const startTime = a[`timestart_${defaultDay.toLowerCase()}`];
                 const endTime = a[`timeend_${defaultDay.toLowerCase()}`];
@@ -1371,14 +1384,6 @@ function getDayOfWeekLabel(selectedDate) {
         });
 
     }
-    function getDefaultDayWithAvailability(week, a) {
-        for (let day of week) {
-            if (a[`timestart_${day.toLowerCase()}`] && a[`timeend_${day.toLowerCase()}`]) {
-                return day;
-            }
-        }
-        return null;
-    }
     function makeViewDay(divMain, day, timestart, timeend) {
         //dias
         var div180 = document.getElementById("div180");
@@ -1386,7 +1391,7 @@ function getDayOfWeekLabel(selectedDate) {
         div180.style.display = 'block';
 
         var divDayLabel = document.createElement("div");
-        divDayLabel.setAttribute("id", "div180");
+        //divDayLabel.setAttribute("id", "div180");
         divDayLabel.classList.add("divDayLabel");
         divDayLabel.innerHTML = texts.text(day);
         div180.appendChild(divDayLabel);
@@ -1656,7 +1661,7 @@ function getDayOfWeekLabel(selectedDate) {
                     frame104btn.addEventListener("click", function (event) {
                         
                         console.log("Erick Dia day STR", JSON.stringify(day))
-                        console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(selected))
+                        console.log("Dia selecionado retornado makeScheduleContainer ", JSON.stringify(day))
     
                         div104.innerHTML = '' ;
                         frame107.innerHTML = '' ;
@@ -1665,7 +1670,7 @@ function getDayOfWeekLabel(selectedDate) {
                         const div32 = document.createElement("div")
                         div32.setAttribute("id","div32")
                         div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-                        console.log("getDayOfWeekLabel" + selected)
+                        console.log("getDayOfWeekLabel" + day)
                         const btnShowSelectedDay = makeButton(getDayOfWeekLabel(day),"primary","")
                         btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
                         div32.appendChild(btnShowSelectedDay)
@@ -1759,7 +1764,7 @@ function getDayOfWeekLabel(selectedDate) {
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
 
-                    makeViewTimeHour(containerSchedule, selected , avail, scheduleDeviceClicked, function (selectedTime) {
+                    makeViewTimeHour(containerSchedule, selectedDay , avail, scheduleDeviceClicked, function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //
@@ -1798,7 +1803,7 @@ function getDayOfWeekLabel(selectedDate) {
                 event.preventDefault()
                 var day = document.getElementById("btnShowSelectedDay")
                 if (day) {
-                    makeViewTimeHour(containerSchedule, selected, avail, scheduleDeviceClicked , function (selectedTime) {
+                    makeViewTimeHour(containerSchedule, selectedDay, avail, scheduleDeviceClicked , function (selectedTime) {
                         //
                         //continuar aqui com a reconstrução da div105 com a hora selecionado e botão editar...
                         //

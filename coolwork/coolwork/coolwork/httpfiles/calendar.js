@@ -222,7 +222,7 @@ cells.forEach(function (cell) {
   
   var selectedDate = moment([year, currentMonth, cell.textContent]);
 
-  var diaDaSemana = selectedDate.format('ddd');
+  var diaDaSemana = selectedDate.format('dddd');
   cell.setAttribute("day-week", diaDaSemana);
 
   var selectedDay = parseInt(cell.textContent);

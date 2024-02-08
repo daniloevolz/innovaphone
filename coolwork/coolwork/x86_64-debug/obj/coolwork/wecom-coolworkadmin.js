@@ -238,7 +238,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     btnCreateRoom.addEventListener("click",function(event){
         const nomeSala = document.getElementById("iptNameRoom").value
-        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == ""){
+        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
         makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
             event.preventDefault()
             event.stopPropagation()
@@ -335,6 +335,18 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         const iptSearch = makeInput("","search",texts.text("labelIptSearch"))
         iptSearch.classList.add("w-full")
+        iptSearch.addEventListener("input", function () {
+            const filter = this.value.trim();
+            if (filter === "") {
+                searchItems(list_tableUsers,'scrollUsers','user',filter);
+            } else {
+                const filteredUsers = list_tableUsers.filter(user => user.cn.toLowerCase().includes(filter.toLowerCase()));
+                searchItems(filteredUsers, 'scrollUsers', 'user', filter);
+
+            }
+        });
+        
+        
 
         const selectAllUsers = document.createElement("div")
         selectAllUsers.classList.add("flex","justify-between","items-center")
@@ -352,8 +364,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const checkboxAllUsers = makeInput("","checkbox","")
 
         const scrollUsers = document.createElement("div")
+        scrollUsers.id = 'scrollUsers'
         scrollUsers.classList.add("overflow-y-auto","h-[200px]","gap-1","flex-col","flex")
 
+        // ordem alfabética
+        list_tableUsers.sort((a,b) => a.cn.localeCompare(b.cn))
 
         list_tableUsers.forEach(function(user){
             
@@ -582,11 +597,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             buttonConfirm.addEventListener("click",function(){
             typeSchedule(typeSched)
             console.log("typeSched " ,typeSched)
-            if(typeSched = "hourModule"){
+            if(typeSched === "hourModule"){
                 dateTime(dates)
                 console.log("Hour Module")
             }
-            else if(typeSched = "dayModule"){
+            else if(typeSched === "dayModule"){
                 dates = []
                 dates.push({
                     start: selectedDay.startDate + "T" + "00:00",
@@ -594,7 +609,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 })
                 console.log( "DATES TIPO DIA " + JSON.stringify(dates))
                 dateTime(dates)
-                console.log("day Module")
+                console.log("Day Module")
           
             }
             document.body.removeChild(insideDiv)
@@ -676,25 +691,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                         var dayId = dayDiv.getAttribute("id");
             
                         switch (dayId) {
-                            case "Mon":
+                            case "Monday":
                                 datesRecurrent.push({ startMonday : startTime });
                                 break;
-                            case "Tue":
+                            case "Tuesday":
                                 datesRecurrent.push({ startTuesday: startTime });
                                 break;
-                            case "Wed":
+                            case "Wednesday":
                                 datesRecurrent.push({ startWednesday : startTime });
                                 break;
-                            case "Thu":
+                            case "Thursday":
                                 datesRecurrent.push({ startThursday : startTime });
                                 break;
-                            case "Fri":
+                            case "Friday":
                                 datesRecurrent.push({ startFriday : startTime });
                                 break;
-                            case "Sat":
+                            case "Saturday":
                                 datesRecurrent.push({ startSaturday : startTime });
                                 break;
-                            case "Sun":
+                            case "Sunday":
                                 datesRecurrent.push({ startSun : startTime });
                                 break;
                             default:
@@ -717,25 +732,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                             var dayId = dayDiv.getAttribute("id");
                 
                             switch (dayId) {
-                                case "Mon":
+                                case "Monday":
                                     datesRecurrent.push({ endMonday : endTime });
                                     break;
-                                case "Tue":
+                                case "Tuesday":
                                     datesRecurrent.push({ endTuesday: endTime });
                                     break;
-                                case "Wed":
+                                case "Wednesday":
                                     datesRecurrent.push({ endWednesday : endTime });
                                     break;
-                                case "Thu":
+                                case "Thursday":
                                     datesRecurrent.push({ endThursday : endTime });
                                     break;
-                                case "Fri":
+                                case "Friday":
                                     datesRecurrent.push({ endFriday : endTime });
                                     break;
-                                case "Sat":
+                                case "Saturday":
                                     datesRecurrent.push({ endSaturday : endTime });
                                     break;
-                                case "Sun":
+                                case "Sunday":
                                     datesRecurrent.push({ endSun : endTime });
                                     break;
                                 default:
@@ -788,38 +803,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                 
                             //     console.dir("Todas Divs dentro do DaySelected" + dayDiv)
                                 
-                                switch (dataDay) {
-                                    case "Mon":
-                                        datesRecurrent.push({ startMonday : startTime });
-                                        datesRecurrent.push({ endMonday : endTime });
-                                        break;
-                                    case "Tue":
-                                        datesRecurrent.push({ startTuesday: startTime });
-                                        datesRecurrent.push({ endTuesday : endTime });
-                                        break;
-                                    case "Wed":
-                                        datesRecurrent.push({ startWednesday : startTime });
-                                        datesRecurrent.push({ endWednesday : endTime });
-                                        break;
-                                    case "Thu":
-                                        datesRecurrent.push({ startThursday : startTime });
-                                        datesRecurrent.push({ endThursday : endTime });
-                                        break;
-                                    case "Fri":
-                                        datesRecurrent.push({ startFriday : startTime });
-                                        datesRecurrent.push({ endFriday : endTime });
-                                        break;
-                                    case "Sat":
-                                        datesRecurrent.push({ startSaturday : startTime });
-                                        datesRecurrent.push({ endSaturday : endTime });
-                                        break;
-                                    case "Sun":
-                                        datesRecurrent.push({ startSun : startTime });
-                                        datesRecurrent.push({ endSun : endTime });
-                                        break;
-                                    default:
-                                        break;
-                                }
+                            recurrentDatesAvail(dataDay,datesRecurrent,startTime,endTime)
                            // });
                         } else {
                             console.log("Não há um próximo input ou é para um dia diferente");
@@ -830,11 +814,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
                 }
                 
-                if(typeSched = "hourModule"){
+                if(typeSched == "hourModule"){
                     dateTime(datesRecurrent)
                     console.log("Hour Module")
                 }else{
-                    console.log("Nao é HourModule")
+                    daysSelected.forEach(function(days){
+                        var dayId = days.getAttribute("id");
+                        var startDayTime = "00:00"
+                        var EndDayTime = "23:59"
+                        recurrentDatesAvail(dayId,datesRecurrent,startDayTime,EndDayTime)
+                    })
+                    dateTime(datesRecurrent) 
+                    
+                    console.log("DayModule " + "Datas" + JSON.stringify(datesRecurrent))
                 }
                 
                 // implementar a lógica de quando for o dia inteiro para o recorrente aqui
@@ -1055,6 +1047,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         const iptSearch = makeInput("","search",texts.text("labelIptSearch"))
         iptSearch.classList.add("w-full")
+        iptSearch.addEventListener("input", function () {
+            const filter = this.value.trim();
+            if (filter === "") {
+                searchItems(devices,'scrollDevices','device',filter);
+            } else {
+                //const filteredUsers = list_tableUsers.filter(user => user.cn.toLowerCase().includes(filter.toLowerCase()));
+                searchItems(devices, 'scrollDevices', 'device', filter);
+
+            }
+        });
 
         const selectAllDevices = document.createElement("div")
         selectAllDevices.classList.add("flex","justify-between","items-center")
@@ -1070,9 +1072,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         labelSelectAllDevices.classList.add("text-3","text-white" ,"font-bold")
 
         const checkboxAllDevices = makeInput("","checkbox","")
-
+       
         const scrollDevices = document.createElement("div")
+        scrollDevices.id = "scrollDevices"
         scrollDevices.classList.add("overflow-y-auto","h-[250px]","gap-1","flex-col","flex")
+
 
 
         devices.forEach(function(dev){
@@ -1097,6 +1101,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             })
             const checkboxDevice = makeInput("","checkbox","")
             checkboxDevice.setAttribute("id",'checkboxDev_' + dev.hwid)
+            checkboxDevice.classList.add("checkboxDev")
 
             divCheckbox.appendChild(identifyBtn)
             divCheckbox.appendChild(checkboxDevice)
@@ -1105,7 +1110,29 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divMainDevices.appendChild(divImgDevice);
             divMainDevices.appendChild(divCheckbox);
             scrollDevices.appendChild(divMainDevices)
-        })  
+        }) 
+
+        checkboxAllDevices.addEventListener("click",function(){
+            document.querySelectorAll(".checkboxDev").forEach(function(checkbox){
+                if(!checkbox.checked){
+                    checkbox.checked = true
+                    this.checked = true
+                }
+                else if(checkboxAllDevices.checked || !checkbox.checked){
+                    checkbox.checked = true
+                    this.checked = true
+                }
+                else if(!checkboxAllDevices.checked && checkbox.checked){
+                    checkbox.checked = true
+                    this.checked = true
+                }
+                else{
+                    checkbox.checked = false
+                    this.checked = false
+                }
+            })
+        })
+
         const divButtons = document.createElement("div")
         divButtons.classList.add("flex","justify-between","items-center","rounded-md")
         const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
@@ -1561,6 +1588,106 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion COMPONENTES
 
     //#region FUNÇÕES INTERNAS
+
+    // função genérica para busca de usuarios e devices no input search
+    function searchItems(arrayItems, idTable,itemType, filter = "") {
+        const scroll = document.getElementById(idTable);
+        scroll.innerHTML = '';
+    
+        arrayItems.forEach(function (item) {
+            if (itemType === "user" && item.cn && item.cn.toLowerCase().includes(filter.toLowerCase())) {
+                const divMainUsers = document.createElement("div");
+                divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+                const divUsersAvatar = document.createElement("div");
+                divUsersAvatar.classList.add("flex", "gap-1", "items-center");
+                let avatar = new innovaphone.Avatar(start, item.sip, userDomain);
+                let UIuserPicture = avatar.url(item.sip, 120, userDN);
+                const imgAvatar = document.createElement("img");
+                imgAvatar.setAttribute("src", UIuserPicture);
+                imgAvatar.setAttribute("id", "divAvatar");
+                imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+                const nameUser = document.createElement("div");
+                nameUser.textContent = item.cn;
+                const checkboxUser = makeInput("", "checkbox", "");
+                checkboxUser.setAttribute("id", "viewercheckbox_" + item.guid);
+                checkboxUser.classList.add("checkboxUser");
+                divUsersAvatar.appendChild(imgAvatar);
+                divUsersAvatar.appendChild(nameUser);
+                divMainUsers.appendChild(divUsersAvatar);
+                divMainUsers.appendChild(checkboxUser);
+                scroll.appendChild(divMainUsers);
+            }
+            else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())){
+                    const divMainDevices = document.createElement("div")
+                    divMainDevices.setAttribute("id",item.hwid)
+                    divMainDevices.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
+                    const divImgDevice = document.createElement("div")
+                    divImgDevice.classList.add("flex","items-center","gap-1")
+                    const imgDevice = document.createElement("img");
+                    imgDevice.src = './images/device-admin.png'
+                    //imgDevice.classList.add("w-5", "h-5", "rounded-full");
+                    const nameDevice = document.createElement("div")
+                    nameDevice.textContent = item.name
+                        const divCheckbox = document.createElement("div")
+                    divCheckbox.classList.add("flex", "gap-1" ,"items-center")
+                    const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
+                    identifyBtn.id = item.hwid
+                    identifyBtn.addEventListener("click",function(){
+                            console.log("ID  " + this.id)
+                        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+                    })
+                    const checkboxDevice = makeInput("","checkbox","")
+                    checkboxDevice.setAttribute("id",'checkboxDev_' + item.hwid)
+                    checkboxDevice.classList.add("checkboxDev")
+        
+                    divCheckbox.appendChild(identifyBtn)
+                    divCheckbox.appendChild(checkboxDevice)
+                    divImgDevice.appendChild(imgDevice)
+                    divImgDevice.appendChild(nameDevice)
+                    divMainDevices.appendChild(divImgDevice);
+                    divMainDevices.appendChild(divCheckbox);
+                    scroll.appendChild(divMainDevices)
+                
+            }
+
+        });
+    }
+    
+    //função REUTILIZAVEL para enviar as datas recorrentes para o banco 
+    function recurrentDatesAvail(dataDay,datesRecurrent,startTime,endTime){
+        switch (dataDay) {
+            case "Monday":
+                datesRecurrent.push({ startMonday : startTime });
+                datesRecurrent.push({ endMonday : endTime });
+                break;
+            case "Tuesday":
+                datesRecurrent.push({ startTuesday: startTime });
+                datesRecurrent.push({ endTuesday : endTime });
+                break;
+            case "Wednesday":
+                datesRecurrent.push({ startWednesday : startTime });
+                datesRecurrent.push({ endWednesday : endTime });
+                break;
+            case "Thursday":
+                datesRecurrent.push({ startThursday : startTime });
+                datesRecurrent.push({ endThursday : endTime });
+                break;
+            case "Friday":
+                datesRecurrent.push({ startFriday : startTime });
+                datesRecurrent.push({ endFriday : endTime });
+                break;
+            case "Saturday":
+                datesRecurrent.push({ startSaturday : startTime });
+                datesRecurrent.push({ endSaturday : endTime });
+                break;
+            case "Sunday":
+                datesRecurrent.push({ startSun : startTime });
+                datesRecurrent.push({ endSun : endTime });
+                break;
+            default:
+                break;
+        }
+    }
     function individualWeekDays(daysSelected,individualHour,divAllHours){
         if(individualHour == "individual"){
             daysSelected = [];
