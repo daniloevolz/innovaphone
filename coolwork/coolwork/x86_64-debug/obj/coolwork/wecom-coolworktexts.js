@@ -139,5 +139,9 @@ Wecom.coolworkTexts = {
         labelFilter: "Filtro",
         labelDate: "Data",
         labelAll: "Todos",
+        labelFree: "Livre",
+        labelInUse: "Em uso",
+        labelInUseByMe: "Estou Usando",
+        labelAssumed: "Assumido"
     }
 }

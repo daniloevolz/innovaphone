@@ -381,14 +381,14 @@ function filterSchedule(){
     btnDate.addEventListener('click', function(event){
 
         makeCalendar("","viewSchedule",mainFilter, null, null, function (day) {
-            selected = day.selectedDate;
+            selected = day
             var filtred = schedules.filter(function(s){
                 // Extract the date part from s.data_start
                 var sDate = s.data_start.split('T')[0];
                 
-                return sDate === selected;
+                return String(sDate) == String(selected);
             });
-            console.log("DIA FILTRADO", filtred)
+            console.log("filteredDate - Pietro", filtred)
             makeUserSchedules(filtred)
         })
         
@@ -693,8 +693,8 @@ function getDayOfWeekLabel(selectedDate) {
 
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
             editBtn.addEventListener('click', function(event){
-                console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule ID", s.id)
-                makeScheduleContainer(nameDevice.hwid, nameRoom.id, s)
+                console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule device_id", s.device_id)
+                makeScheduleContainer(nameDevice.hwid, nameRoom.id, schedules)
             })
             const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
 
@@ -725,7 +725,7 @@ function getDayOfWeekLabel(selectedDate) {
         
     }
     
-    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2){
+    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -749,7 +749,7 @@ function getDayOfWeekLabel(selectedDate) {
             console.log("SelectedDay " + JSON.stringify(selectedDay))
             funcao2(selectedDay) 
             
-        },"schedule"); // componente Calendar
+        },module); // componente Calendar
 
         if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
             setTimeout(function(){
@@ -975,7 +975,7 @@ function getDayOfWeekLabel(selectedDate) {
         var viws = viewers.filter(function (viws) {
             return id == viws.room_id
         });
-
+        console.log("Sched " + sched)
         that.clear();
 
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
@@ -1425,11 +1425,40 @@ function getDayOfWeekLabel(selectedDate) {
     }
     function makeViewDevice(divMain, device, availability, schedule, viewer) {
         //div 101
+          
+            const dateNow = moment();
+            const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
+
         const divMainViewDevice = document.createElement("div")
         divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-[50px]")
         divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
-        var state = device.guid ? "bg-[#FFC107]" : "bg-[#2AFF9C]";
+        var myUser = list_tableUsers.filter(function(u){
+                return u.sip == userSIP
+        })[0]
+
+        const div100User = document.createElement("div")
+        div100User.classList.add("div100User")
+        const div100Status = document.createElement("div")
+        div100Status.classList.add("div100Status","text-bold")
+        //div100Status.textContent = 'Horário para colocar'
+
+        var state;
+        if(!device.guid){
+            state = "bg-[#2AFF9C]" ;
+            div100User.innerHTML = texts.text("labelFree")
+        }else if(device.guid == myUser.guid){
+            state = "bg-[#26CAFF]"
+            div100Status.innerHTML = texts.text("labelInUseByMe")
+            div100Status.style.color = "#26CAFF"
+        }else{
+            state = "bg-[#FFC107]"
+        }
+
+        const div100 = document.createElement("div")
+        div100.classList.add("div100")
+
+       // var state = device.guid ? "bg-[#FFC107]" : "bg-[#2AFF9C]";
         const divStatusColor = document.createElement("div")
         divStatusColor.classList.add(state, "h-[100%]", "w-[12px]","rounded-l-lg")
         divStatusColor.setAttribute("id", device.hwid)
@@ -1443,34 +1472,45 @@ function getDayOfWeekLabel(selectedDate) {
         const div84 = document.createElement("div")
         div84.classList.add("div84")
 
+        const divNumberPosition = document.createElement("div")
+        divNumberPosition.textContent = "00"
+        const div82 = document.createElement("div")
+        div82.classList.add("inline-flex","gap-2","items-center")
+        var deviceIcon = document.createElement("img")
+        deviceIcon.classList.add("deviceIcon")
+        deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
+        div82.appendChild(divNumberPosition)
+        div82.appendChild(deviceIcon)
+        div84.appendChild(div82)
 
-        //div avatar
+        div100.appendChild(div100User)
+        div100.appendChild(div100Status)
+        div84.appendChild(div100)
+
+        // se tiver alguem usando o telefone
         if (viewer.length > 0) {
-            //const divUsersAvatar = document.createElement("div")
-            //divUsersAvatar.classList.add("rounded-lg", "p-1", "m-1", "bg-dark-200", "gap-2", "flex-col", "flex")
-            //divUsersAvatar.setAttribute("id", user.guid)
-            //img user
-            //avatar = new innovaphone.Avatar(start, user.sip, userDomain);
-            //UIuserPicture = avatar.url(user.sip, 15, userDN);
-            //const imgAvatar = document.createElement("img")
-            //imgAvatar.setAttribute("src", UIuserPicture);
-            //imgAvatar.setAttribute("id", user.guid)
-            //imgAvatar.classList.add("w-5", "h-5", "rounded-full")
-            ////divUsersAvatar.appendChild(imgAvatar)
-            //div84.appendChild(imgAvatar)
-            makeAvatar(viewer, div84)
+                // if(device.guid == myUser.guid ){
+                //     state = "bg-[#26CAFF]"
+                // }else if(device.guid && device.guid != myUser.guid ){
+                // }
+            //div 82
             var user = list_tableUsers.filter(function (u) {
                 return u.guid == viewer[0].viewer_guid
             })[0];
-            //div 100
-            const div100 = document.createElement("div")
-            div100.classList.add("div100")
-            div100.innerHTML = user.cn
-            div84.appendChild(div100)
+              
+            var userScheduels = schedule.filter(function(s){
+                return s.user_guid == user.guid
+            })[0]
 
-            if (user.sip == userSIP) {
+            div100User.textContent = user.cn 
+
+            //div 100
+            
+            // se eu estiver usando o telefone
+            if (user.sip == userSIP) {  
                 //div 36
-                const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundary")
+                // const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundary")
+                const div36 = makeButton('','',"./images/frame-36.png")
                 div36.setAttribute("id", device.hwid)
                 div36.addEventListener("click", function (event) {
                     var dev = event.currentTarget.id;
@@ -1487,13 +1527,42 @@ function getDayOfWeekLabel(selectedDate) {
                 })
                 div84.appendChild(div36)
             }
+            //se ja tiver um agendamento rolando 
+            else if(user.sip != userSIP  && userScheduels && userScheduels.data_start <= formattedDate && userScheduels.data_end >= formattedDate ){
+                div100Status.innerHTML = texts.text("labelInUse")
+                div100Status.style.color = "#FFC107"
+            }
+            // se tiver assumido por outra pessoa
+            else {
+                div100Status.innerHTML = texts.text("labelAssumed")
+                div100Status.style.color = "#FFC107"
+
+            //div 34
+            const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primary")
+            //div34.classList.add("div34")
+            div34.setAttribute("id", device.hwid)
+            div34.innerHTML = texts.text("makePhoneSceduleButton")
+            div34.addEventListener("click", function (event) {
+                var deviceHw = event.currentTarget.id;
+                makeScheduleContainer(deviceHw, room.id, schedule)
+               
+                    // ~pietro estudar possibilidade de componentização 
+
+            })
+
+            div84.appendChild(div34)
+            }
 
         }
-        else {
+        // quando telefone estiver livre
+        else {  
             //div 36
-            const div36 = makeButton(texts.text("makePhoneUseButton"), "secundary")
+            const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-center","items-center","gap-1")
+
+            const div36 = makeButton("","","./images/setDevice.png")
             div36.setAttribute("id", device.hwid)
-            div36.innerHTML = texts.text("makePhoneUseButton")
+            //div36.innerHTML = texts.text("makePhoneUseButton")
             div36.addEventListener("click", function (event) {
                 var dev = event.currentTarget.id;
                 event.stopPropagation()
@@ -1508,37 +1577,28 @@ function getDayOfWeekLabel(selectedDate) {
                 })
             })
 
-            div84.appendChild(div36)
+            //div 34
+            const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primary")
+            //div34.classList.add("div34")
+            div34.setAttribute("id", device.hwid)
+            div34.innerHTML = texts.text("makePhoneSceduleButton")
+            div34.addEventListener("click", function (event) {
+                var deviceHw = event.currentTarget.id;
+                makeScheduleContainer(deviceHw, room.id, schedule)
+                //makeScheduleContainer(availability, schedule, )
+                // Calendar.createCalendar()
+                // var devInfo = schedules.filter(function (sched) {
+                //     return device.hwid == sched.device_id
+                // });
+                // console.log("DISPONIBILIDADE DA SALA " + JSON.stringify(availability) + "Schedules " + JSON.stringify(schedule) +
+                // "Device INFO " + JSON.stringify(devInfo)  + "Full devices " + JSON.stringify(device))
+
+            })
+            divButtons.appendChild(div36)
+            divButtons.appendChild(div34)
+            div84.appendChild(divButtons)
         }
-        //div 34
-        const div34 = makeButton(texts.text("makePhoneSceduleButton"), "primary")
-        //div34.classList.add("div34")
-        div34.setAttribute("id", device.hwid)
-        //div34.innerHTML = texts.text("makePhoneSceduleButton")
-        div34.addEventListener("click", function (event) {
-            var deviceHw = event.currentTarget.id;
-            makeScheduleContainer(deviceHw, room.id, schedule)
-            //makeScheduleContainer(availability, schedule, )
-            // Calendar.createCalendar()
-            // var devInfo = schedules.filter(function (sched) {
-            //     return device.hwid == sched.device_id
-            // });
-            // console.log("DISPONIBILIDADE DA SALA " + JSON.stringify(availability) + "Schedules " + JSON.stringify(schedule) +
-            // "Device INFO " + JSON.stringify(devInfo)  + "Full devices " + JSON.stringify(device))
-
-        })
-        div84.appendChild(div34)
         divMainViewDevice.appendChild(div84)
-
-        //div 82
-        const div82 = document.createElement("div")
-        div82.classList.add("div82")
-        var deviceIcon = document.createElement("img")
-        deviceIcon.classList.add("deviceIcon")
-        deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
-        divMainViewDevice.appendChild(div82)
-        div82.appendChild(deviceIcon)
-
         divMain.appendChild(divMainViewDevice)
 
     }
@@ -1550,7 +1610,20 @@ function getDayOfWeekLabel(selectedDate) {
         div93.style.top = device.topoffset
         div93.style.left = device.leftoffset
         //div retangle 1396
-        var state = device.guid ? "device-busy" : "device-free";
+
+        var myUser = list_tableUsers.filter(function(u){
+            return u.sip == userSIP
+        })[0]
+
+        var state;
+
+        if(!device.guid){
+            state = "bg-[#2AFF9C]" ;
+        }else if(device.guid == myUser.guid){
+            state = "bg-[#26CAFF]"
+        }else{
+            state = "bg-[#FFC107]"
+        }
         const div1396 = document.createElement("div")
         div1396.classList.add("div1396", state)
         div1396.setAttribute("id", device.hwid)
@@ -1720,7 +1793,7 @@ function getDayOfWeekLabel(selectedDate) {
                         
                     })
                    
-                });
+                },"schedule");
 
                 div104.appendChild(frame104btn);
 
@@ -1950,7 +2023,7 @@ function getDayOfWeekLabel(selectedDate) {
 
             console.log("Hora inicio agendamento " + dateStart)
             console.log("hora fim agendamento " + dateEnd)
-            
+                // ~pietro ajustar para UPDATEDevice Schedule quando for modo de edição no MakeUserSchedules()
              app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                 
                 var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))

@@ -50,7 +50,7 @@ var currentMonth;
 
 function buildCalendar(availability,callback,module,schedules) {
    
-
+    console.log("Module " + module)
     var date = new Date();
     currentMonth = date.getMonth();
      year = date.getFullYear();
@@ -288,7 +288,7 @@ cells.forEach(function (cell) {
       //   // Ou faça qualquer outra coisa com o dia clicado
       
     } 
-
+    // colocar modo Edição junto com schedule
     else if (module === "availability") {
       // Lógica para modo de disponibilidade
       if (!cell.classList.contains("selected")) {
