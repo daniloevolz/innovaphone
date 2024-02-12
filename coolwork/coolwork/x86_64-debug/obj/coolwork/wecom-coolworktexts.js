@@ -64,6 +64,7 @@ Wecom.coolworkTexts = {
         labelRecurrent: "Recorrente",
         labelPeriod: "Período",
         periodModule: "Período do Dia",
+        labelScheduleDeleted: "Agendamento Deletado",
         dayModule: "Dia Inteiro",
         labelIdentify: "Identificar",
         hourModule: "Horário Definido",

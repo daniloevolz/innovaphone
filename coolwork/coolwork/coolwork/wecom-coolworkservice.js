@@ -403,6 +403,28 @@ new JsonApi("user").onconnected(function(conn) {
                     conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                 });
             }
+            if (obj.mt == "DeleteDeviceSchedule") {
+                Database.exec("DELETE FROM tbl_device_schedule WHERE id = " + obj.schedID)
+                .oncomplete(function (data) {
+                conn.send(JSON.stringify({ api: "user", mt: "DeleteScheduleSuccess", src: obj.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("DeleteDeviceScheduleError:result=Error " + String(errorText));
+                    conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
+                });
+            }
+
+            if (obj.mt == "UpdateDeviceSchedule") {
+                var sql = "UPDATE tbl_device_schedule SET data_start = '" + obj.data_start + "', data_end = '" + obj.data_end + "' WHERE id = '" + obj.schedID + "'"; 
+                Database.exec(sql)
+                .oncomplete(function (data) {
+                conn.send(JSON.stringify({ api: "user", mt: "UpdatDeviceScheduleSuccess", src: obj.src }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("UpdatDeviceScheduleError:result=Error " + String(errorText));
+                    conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
+                });
+            }   
             if (obj.mt == "SetDeviceToUser") {
                 log("SetDeviceToUser: device hwid " + String(obj.deviceId));
                 var user = pbxTableUsers.filter(function (item) {

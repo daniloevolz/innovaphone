@@ -50,7 +50,7 @@ var currentMonth;
 
 function buildCalendar(availability,callback,module,schedules) {
    
-
+    console.log("Module " + module)
     var date = new Date();
     currentMonth = date.getMonth();
      year = date.getFullYear();
@@ -167,7 +167,7 @@ function buildCalendar(availability,callback,module,schedules) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback,schedules);
+            rebuildCalendar(availability,callback,module,schedules);
             
           });
       }
@@ -231,7 +231,7 @@ cells.forEach(function (cell) {
   cell.setAttribute("data-date", formattedDate);
   
   cell.addEventListener("click", function () {
-    if (module == "schedule") {
+    if (module == "schedule" || module == "update") {
       // Lógica para modo de agendamento
      
       // if (cell.classList.contains("selected")) {
@@ -288,7 +288,7 @@ cells.forEach(function (cell) {
       //   // Ou faça qualquer outra coisa com o dia clicado
       
     } 
-
+    // colocar modo Edição junto com schedule
     else if (module === "availability") {
       // Lógica para modo de disponibilidade
       if (!cell.classList.contains("selected")) {

@@ -167,7 +167,7 @@ function buildCalendar(availability,callback,module,schedules) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback,schedules);
+            rebuildCalendar(availability,callback,module,schedules);
             
           });
       }
@@ -231,7 +231,7 @@ cells.forEach(function (cell) {
   cell.setAttribute("data-date", formattedDate);
   
   cell.addEventListener("click", function () {
-    if (module == "schedule") {
+    if (module == "schedule" || module == "update") {
       // Lógica para modo de agendamento
      
       // if (cell.classList.contains("selected")) {

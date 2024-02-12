@@ -1153,10 +1153,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 }
                 devHwId = devArray 
                 console.log(devHwId)
-                
+                // ajustar para usar callBack caso funcione assim  ~~ Pietro
             }); 
 
-                 // ajustar para usar callBack caso funcione assim  ~~ Pietro
+                 
                 document.body.removeChild(insideDiv)
         })
 

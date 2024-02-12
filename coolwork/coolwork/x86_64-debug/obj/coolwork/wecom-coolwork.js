@@ -390,7 +390,7 @@ function filterSchedule(){
             });
             console.log("filteredDate - Pietro", filtred)
             makeUserSchedules(filtred)
-        })
+        },"update")
         
     })
 
@@ -692,11 +692,35 @@ function getDayOfWeekLabel(selectedDate) {
 
 
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
+            editBtn.setAttribute("id",parseInt(s.id))
             editBtn.addEventListener('click', function(event){
                 console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule device_id", s.device_id)
-                makeScheduleContainer(nameDevice.hwid, nameRoom.id, schedules)
+                makeScheduleContainer(nameDevice.hwid, nameRoom.id,schedules,s,"update")
             })
             const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
+            delBtn.addEventListener("click",function(event){
+
+                app.send({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id}
+                // aplicar o popUp apos o delete do Schedule e voltar para a tela inicial 
+
+                // tratar a mensagem de sucesso
+
+
+                // , function (obj) {
+                    
+                //     // componentizar esse bloco de codigo em uma função separada ~pietro
+                //     var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDeleted"), texts.text("labelOk"))
+                //     btnPopUp.addEventListener("click",function(event){
+                //         event.stopPropagation()
+                //         event.preventDefault()
+                //         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                //             schedules = JSON.parse(obj.result)
+                //             makeViewRoomDetail(s.room_id)
+                //         })
+                //     })
+                  
+                 )
+            })
 
             divDevice.appendChild(divImg)
             divDevice.appendChild(deviceHw)
@@ -725,7 +749,7 @@ function getDayOfWeekLabel(selectedDate) {
         
     }
     
-    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2){
+    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -749,7 +773,7 @@ function getDayOfWeekLabel(selectedDate) {
             console.log("SelectedDay " + JSON.stringify(selectedDay))
             funcao2(selectedDay) 
             
-        },"schedule"); // componente Calendar
+        },module); // componente Calendar
 
         if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
             setTimeout(function(){
@@ -1544,7 +1568,7 @@ function getDayOfWeekLabel(selectedDate) {
             div34.innerHTML = texts.text("makePhoneSceduleButton")
             div34.addEventListener("click", function (event) {
                 var deviceHw = event.currentTarget.id;
-                makeScheduleContainer(deviceHw, room.id, schedule)
+                makeScheduleContainer(deviceHw, room.id, schedule,null,"schedule")
                
                     // ~pietro estudar possibilidade de componentização 
 
@@ -1584,7 +1608,7 @@ function getDayOfWeekLabel(selectedDate) {
             div34.innerHTML = texts.text("makePhoneSceduleButton")
             div34.addEventListener("click", function (event) {
                 var deviceHw = event.currentTarget.id;
-                makeScheduleContainer(deviceHw, room.id, schedule)
+                makeScheduleContainer(deviceHw, room.id, schedule,null,"schedule")
                 //makeScheduleContainer(availability, schedule, )
                 // Calendar.createCalendar()
                 // var devInfo = schedules.filter(function (sched) {
@@ -1662,7 +1686,7 @@ function getDayOfWeekLabel(selectedDate) {
     }
     //Função para criar a tela de seleção para o agendamento
     //chamar no click da div34
-    function makeScheduleContainer(deviceHw, roomId, schedule) {
+    function makeScheduleContainer(deviceHw, roomId, schedule, updateSched, module) {
         console.log("MAKESCHEDULECONTAINER")
         that.clear();
         const btnSave = makeButton(texts.text("save"), "primary", "")
@@ -1688,7 +1712,7 @@ function getDayOfWeekLabel(selectedDate) {
             }
         });
         //if (!schedule) {
-            
+            console.log("Schedule to Edit " +  JSON.stringify(scheduleDeviceClicked))
             //Seleção calendário
             const div104 = document.createElement("div")
             div104.setAttribute("id", "div104")
@@ -1793,7 +1817,7 @@ function getDayOfWeekLabel(selectedDate) {
                         
                     })
                    
-                });
+                },module);
 
                 div104.appendChild(frame104btn);
 
@@ -1893,152 +1917,57 @@ function getDayOfWeekLabel(selectedDate) {
                     })  
                 }
             })
-      //  }
-//         else {
-//             //Seleção calendário
-            
-//             backButton.addEventListener("click", function(){
-//                 nextSchedules(schedules)
-//             })
-//             const div104 = document.createElement("div")
-//             div104.setAttribute("id", "div104")
-//             div104.classList.add("div104", "h-fit")
-//             containerSchedule.appendChild(div104)
-
-//             const frame107 = document.createElement("div")
-//             frame107.setAttribute("id", "frame107")
-//             frame107.classList.add("frame107", "h-fit")
-//             div104.appendChild(frame107)
-
-//             const frame107txt = document.createElement("div")
-//             frame107txt.classList.add("frame107txt")
-//             frame107txt.innerHTML = texts.text("labelSelectYourDay")
-//             frame107.appendChild(frame107txt)
-
-//             const frame107btn = document.createElement("div")
-//             frame107btn.classList.add("framebtn", "h-fit")
-//             frame107btn.innerHTML = texts.text("labelSelect")
-//             frame107.appendChild(frame107btn)
-//             frame107btn.addEventListener("click", function (event) {
-//                 makeCalendar("",div104, schedule.device_id, schedule.device_room_id, function (day) {
-//                     if (!document.getElementById("frame104btn")) {
-//                         const frame104btn = makeButton(texts.text("labelConfirm"), "primary")
-//                         div104.appendChild(frame104btn)
-//                         frame104btn.setAttribute("id", "frame104btn")
-//                         frame104btn.addEventListener("click", function (event) {
-//                             // var selected;
-//                             selected = day;
-//                             console.log("Dia selecionado retornado makeScheduleContainer ", selected)
-//                             div104.innerHTML = '' ;
-//                             frame107.innerHTML = '' ;
-//                             frame107.appendChild(frame107txt)
-
-//                             const div32 = document.createElement("div")
-//                             div32.setAttribute("id","div32")
-//                             div32.classList.add("flex","justify-between","items-center","items-stretch","rounded-md")
-//                             const btnShowSelectedDay = makeButton(getDayOfWeekLabel(selected.selectedDate),"primary","")
-//                             btnShowSelectedDay.setAttribute("id","btnShowSelectedDay")
-//                             div32.appendChild(btnShowSelectedDay)
-        
-//                             const btnEditDay = makeButton(texts.text("labelEdit"), "secundary", "");
-//                             btnEditDay.setAttribute("id", "btnEditDay");
-
-//                             btnEditDay.addEventListener("click",function(){ // click botão editar
-//                                 var oldDay = day
-//                                 buildCalendar()
-//                                 console.log("old daySelected" + oldDay)   
-//                                 // para remover a div dos horarios se ela estiver aberta quando clicar no botão "editar"
-//                                 var div106 = document.getElementById("div106")
-//                                 if(div106){
-//                                     containerSchedule.removeChild(div106)
-//                                 }
-
-//                                 // se conter a data antiga limpa tudo 
-//                                 if(document.getElementById("divTimeStart").innerHTML != '-- : --' && document.getElementById("divTimeEnd").innerHTML != '-- : --'){
-//                                     selectedStart = ""
-//                                     selectedEnd = ""
-//                                     document.getElementById("divTimeStart").innerHTML = '-- : --';
-//                                     document.getElementById("divTimeEnd").innerHTML = '-- : --';
-//                                 }
-                                
-//                                 setTimeout(function(){
-//                                     var cells = document.querySelectorAll("#calendar-body tr td div");
-//                                     cells.forEach(function (td) {
-//                                         if (td.getAttribute("data-date") == oldDay) {
-//                                             td.classList.add("bg-[#199FDA]");
-//                                         }
-//                                         td.addEventListener("click", function () {
-//                                             cells.forEach(function (otherTd) {
-//                                                 if (otherTd.classList.contains("bg-[#199FDA]")) {
-//                                                     otherTd.classList.remove("bg-[#199FDA]");
-//                                                 }
-//                                             });
-//                                         });
-//                                     });
-//                                 },200);
-//                                 })
-                     
-                            
-
-//                             div32.appendChild(btnEditDay);
-                            
-//                             div104.appendChild(frame107)
-//                             div104.appendChild(div32);
-                            
-//                         })
-//                     } 
-                    
-//                 } )
-//             })
-// 0
-//             const div106 = document.createElement("div")
-//             div106.setAttribute("id", "div106")
-//             div106.classList.add("div104", "h-fit")
-//             containerSchedule.appendChild(div106)
-
-//             const frame109 = document.createElement("div")
-//             frame109.setAttribute("id", "frame109")
-//             frame109.classList.add("frame107", "h-fit")
-//             div106.appendChild(frame109)
-
-//             const frame19txt = document.createElement("div")
-//             frame19txt.classList.add("frame107txt")
-//             frame19txt.innerHTML = texts.text("labelTxtCancel")
-//             frame109.appendChild(frame19txt)
-
-//             // //botão cancelar
-//             // const frame109btn = makeButton(texts.text("labelBtnCancel"), "destructive", "")
-//             // frame109btn.addEventListener("click", function (event) {
-//             //     var obj = { mt: "UpdateSchedule", api: "user", id: schedule }
-//             //     makeCancelPopUp(obj, function (msg) {
-//             //         makeSuccessPopUp(msg)
-//             //     })
-//             // })
-
-//             // frame109.appendChild(frame109btn)
-//         }
         btnSave.addEventListener("click",function(){
             var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
             var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
 
             console.log("Hora inicio agendamento " + dateStart)
-            console.log("hora fim agendamento " + dateEnd)
+            console.log("Hora fim agendamento " + dateEnd)
             
-             app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
-                
-                var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
-                btnPopUp.addEventListener("click",function(event){
-                    event.stopPropagation()
+             if(dateStart == "" || dateEnd == ""){
+                makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
                     event.preventDefault()
-                    app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
-                        schedules = JSON.parse(obj.result)
-                        makeViewRoomDetail(roomId)
+                    event.stopPropagation()
+                    document.body.removeChild(document.getElementById("bcgrd"))
+                })      
+             }
+             else if(module == "schedule"){
+                app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
+                    
+                    // componentizar esse bloco de codigo em uma função separada ~pietro
+                    var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                    btnPopUp.addEventListener("click",function(event){
+                        event.stopPropagation()
+                        event.preventDefault()
+                        app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                            schedules = JSON.parse(obj.result)
+                            makeViewRoomDetail(roomId)
+                        })
                     })
+                  
                 })
-              
-            })
-             })
+                 
+             }else if(module == "update"){
+                console.log("Update p banco " + JSON.stringify(updateSched.id))
 
+                app.sendSrc({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw  }, function (obj) {
+                    
+                    // componentizar esse bloco de codigo em uma função separada ~pietro
+                    var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                    btnPopUp.addEventListener("click",function(event){
+                        event.stopPropagation()
+                        event.preventDefault()
+                        app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                            schedules = JSON.parse(obj.result)
+                            makeViewRoomDetail(roomId)
+                        })
+                    })
+                  
+                })
+
+             }
+
+            })
              
             
     }
