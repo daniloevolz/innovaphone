@@ -275,12 +275,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
          
             //imgHome
             const leftElement = imgLeft
-            leftElement.addEventListener("click", function (event) {
-                makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-                // app.send({ api: "user", mt: "SelectMyRooms" })
-                event.stopPropagation()
-                event.preventDefault()
-            })
+            leftElement.setAttribute("id","leftButton")
+            // leftElement.addEventListener("click", function (event) {
+            //     makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            //     // app.send({ api: "user", mt: "SelectMyRooms" })
+            //     event.stopPropagation()
+            //     event.preventDefault()
+            // })
          
             //titulo
             const titleRoom = document.createElement("h1")
@@ -302,6 +303,25 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         //#endregion
 
     //#region Funções Internas
+        // Função intermediária para adicionar ouvinte de evento personalizado
+        function addCustomEventListener(element, eventType, callback) {
+            function eventHandler() {
+                callback();
+            }
+
+            // Adiciona o ouvinte de evento personalizado ao elemento
+            element.addEventListener(eventType, eventHandler);
+
+            // Retorna a função de evento intermediária, para que possa ser usada para remover o ouvinte mais tarde
+            return eventHandler;
+        }
+        function arrowImgFunctions(number,id){
+            if(number === 1){
+                makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            }else if(number === 2){
+                makeViewRoomDetail(id)
+            }
+        }
     function getDefaultDayWithAvailability(week, a) {
         for (let day of week) {
             if (a[`timestart_${day.toLowerCase()}`] && a[`timeend_${day.toLowerCase()}`]) {
@@ -619,6 +639,12 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear()
         addPhonesToDevices()
         makeHeader(backButton, makeButton('','',"./images/menu.svg"), texts.text("labelMySchedules"));
+
+        backButton.addEventListener("click",function EvtFunct(){
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click",EvtFunct)
+        })
+        
         filterSchedule()
         const container = document.createElement('div')
         container.classList.add('overflow-auto', 'w-full')
@@ -1015,7 +1041,18 @@ function getDayOfWeekLabel(selectedDate) {
         console.log("Sched " + sched)
         that.clear();
 
+      
+        //backButton.removeEventListener("click",backButton)
+
+    
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
+
+            backButton.addEventListener("click",function EvtFunc(){
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click",EvtFunc)
+        })
+        
+
         // div container
         const container = document.createElement("div")
         container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
@@ -1708,6 +1745,11 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         const btnSave = makeButton(texts.text("save"), "primary", "")
         makeHeader(backButton,btnSave, texts.text("labelSchedule"))
+
+        backButton.addEventListener("click",function EvtFunc(){
+            makeViewRoomDetail(roomId)
+            backButton.removeEventListener("click",EvtFunc)
+        })
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
@@ -1871,6 +1913,8 @@ function getDayOfWeekLabel(selectedDate) {
             divTimeStart.setAttribute("id", "divTimeStart")
             divTimeStart.classList.add("divTime")
             div110.appendChild(divTimeStart)
+            // aqui vamos implementar if(availability.schedule_module == "dayModule")
+            // para deixar as divs com 00:00 - 23:59 quando for agendamento dia inteiro 
             divTimeStart.innerHTML = "-- : --"
             divTimeStart.addEventListener("click", function (event) {
                 event.stopPropagation()
