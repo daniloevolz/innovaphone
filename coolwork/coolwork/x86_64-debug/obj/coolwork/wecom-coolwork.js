@@ -576,7 +576,7 @@ function makePopUp(title, msg, btn1, btn2){
     bcgrd.appendChild(popUp)
     document.body.appendChild(bcgrd)
     if(btn2){
-        const button2 = makeButton(btn2, "transparent", "");
+        const button2 = makeButton(btn2, "secundary", "");
         button2.addEventListener("click",function(){
             console.log("BUTTON 2 CLICADO")
             document.body.removeChild(bcgrd)
@@ -615,7 +615,7 @@ function getDayOfWeekLabel(selectedDate) {
 //#endregion
 
     //#region Funções de Criação de Telas
-    function makeUserSchedules(schedules){
+    function makeUserSchedules(AllSchedule){
         that.clear()
         addPhonesToDevices()
         makeHeader(backButton, makeButton('','',"./images/menu.svg"), texts.text("labelMySchedules"));
@@ -624,7 +624,7 @@ function getDayOfWeekLabel(selectedDate) {
         container.classList.add('overflow-auto', 'w-full')
         container.style.height = 'calc(100vh - 130px)'
 
-        schedules.forEach(function(s){
+        AllSchedule.forEach(function(s){
             //div principal
 
             const divMain = document.createElement('div')
@@ -690,17 +690,33 @@ function getDayOfWeekLabel(selectedDate) {
             dateHour.classList.add("dateHour")
             dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
 
-
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
             editBtn.setAttribute("id",parseInt(s.id))
             editBtn.addEventListener('click', function(event){
                 console.log("deviceHW", nameDevice.hwid,"Room ID", nameRoom.id, "Schedule device_id", s.device_id)
-                makeScheduleContainer(nameDevice.hwid, nameRoom.id,schedules,s,"update")
+                makeScheduleContainer(nameDevice.hwid, nameRoom.id,AllSchedule,s,"update")
             })
             const delBtn = makeButton(texts.text(""), "", "./images/trash-2.svg");
             delBtn.addEventListener("click",function(event){
 
-                app.send({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id}
+                 // componentizar esse bloco de codigo em uma função separada ~pietro
+                 var btnPopUp = makePopUp(texts.text("labelYouSure"), texts.text("labelDeleteSchedule"), texts.text("labelYesDelete"),texts.text("labelNo"))
+                 btnPopUp.addEventListener("click",function(event){
+                     event.stopPropagation()
+                     event.preventDefault()
+                     app.sendSrc({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id, src: nameDevice.hwid }, function (obj) {
+                        app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                            schedules = JSON.parse(obj.result)
+                            makeViewRoomDetail(nameRoom.id) // ou makeViewRoom?? 
+                        })
+                       
+                    })
+                 })
+               
+             })
+                // //app.send({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id }
+               
+                
                 // aplicar o popUp apos o delete do Schedule e voltar para a tela inicial 
 
                 // tratar a mensagem de sucesso
@@ -718,9 +734,6 @@ function getDayOfWeekLabel(selectedDate) {
                 //             makeViewRoomDetail(s.room_id)
                 //         })
                 //     })
-                  
-                 )
-            })
 
             divDevice.appendChild(divImg)
             divDevice.appendChild(deviceHw)
@@ -1462,7 +1475,8 @@ function getDayOfWeekLabel(selectedDate) {
         })[0]
 
         const div100User = document.createElement("div")
-        div100User.classList.add("div100User")
+        div100User.classList.add("div100User") 
+
         const div100Status = document.createElement("div")
         div100Status.classList.add("div100Status","text-bold")
         //div100Status.textContent = 'Horário para colocar'
@@ -1590,13 +1604,16 @@ function getDayOfWeekLabel(selectedDate) {
             div36.addEventListener("click", function (event) {
                 var dev = event.currentTarget.id;
                 event.stopPropagation()
-                app.sendSrc({ api: "user", mt: "SetDeviceToUser", deviceId: dev, src: dev }, function (obj) {
-                    app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
-                        devices = JSON.parse(obj.result)
-                        var devs = devices.filter(function (d) {
-                            return d.room_id == room.id
+                
+                var btnPopUp = makePopUp(texts.text("labelTakeOverPhone"), texts.text("labelTakeOverPhoneText"), texts.text("labelTakeOverPhone"),texts.text("labelCancel"))
+                btnPopUp.addEventListener("click",function(event){
+                    event.stopPropagation()
+                    event.preventDefault()
+                    app.sendSrc({ api: "user", mt: "SetDeviceToUser", deviceId: dev, src: dev }, function (obj) {
+                        app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
+                            devices = JSON.parse(obj.result)
+                            makeViewRoomDetail(room.id)
                         })
-                        makeViewRoomDetail(room.id)
                     })
                 })
             })
@@ -1935,7 +1952,7 @@ function getDayOfWeekLabel(selectedDate) {
                 app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                     
                     // componentizar esse bloco de codigo em uma função separada ~pietro
-                    var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                    var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
                     btnPopUp.addEventListener("click",function(event){
                         event.stopPropagation()
                         event.preventDefault()
@@ -1944,6 +1961,15 @@ function getDayOfWeekLabel(selectedDate) {
                             makeViewRoomDetail(roomId)
                         })
                     })
+                    // var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                    // btnPopUp.addEventListener("click",function(event){
+                    //     event.stopPropagation()
+                    //     event.preventDefault()
+                    //     app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                    //         schedules = JSON.parse(obj.result)
+                    //         makeViewRoomDetail(roomId)
+                    //     })
+                    // })
                   
                 })
                  
@@ -1953,7 +1979,7 @@ function getDayOfWeekLabel(selectedDate) {
                 app.sendSrc({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw  }, function (obj) {
                     
                     // componentizar esse bloco de codigo em uma função separada ~pietro
-                    var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
+                    var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
                     btnPopUp.addEventListener("click",function(event){
                         event.stopPropagation()
                         event.preventDefault()
