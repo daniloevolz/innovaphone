@@ -275,12 +275,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
          
             //imgHome
             const leftElement = imgLeft
-            leftElement.addEventListener("click", function (event) {
-                makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-                // app.send({ api: "user", mt: "SelectMyRooms" })
-                event.stopPropagation()
-                event.preventDefault()
-            })
+            //leftElement.addEventListener("click", function (event) {
+            //    makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            //    // app.send({ api: "user", mt: "SelectMyRooms" })
+            //    event.stopPropagation()
+            //    event.preventDefault()
+            //})
          
             //titulo
             const titleRoom = document.createElement("h1")
@@ -1511,7 +1511,7 @@ function getDayOfWeekLabel(selectedDate) {
         div84.classList.add("div84")
 
         const divNumberPosition = document.createElement("div")
-        divNumberPosition.textContent = "00"
+        divNumberPosition.textContent = device.name
         const div82 = document.createElement("div")
         div82.classList.add("inline-flex","gap-2","items-center")
         var deviceIcon = document.createElement("img")

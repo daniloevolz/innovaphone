@@ -83,7 +83,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if (obj.msg.mt == "GetProvisioningCodeResult") {
             var code = obj.msg.code;
             console.log("devicesApi_onmessage:GetProvisioningCodeResult " + JSON.stringify(code));
-            labeling(code)
+            var div = document.getElementById("labelProvCode")
+            div.textContent = code
+            setTimeout(returnText, 60000)
+            var returnText = function () {
+                div.textContent = texts.text("labelProvCode")
+            }
         }
     }
     function app_message(obj) {
@@ -1873,35 +1878,36 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         mainImg.setAttribute("src",newSrc) 
     }
     // rever uma forma de fazer isso 
-    function makeDivOptions(){
+    function makeDivOptions() {
         that.clear();
         // backButton.addEventListener("click",function(event){
         //     event.preventDefault();
         //     event.stopPropagation();
         //     makeViewRoom(rooms,devices,availabilities,viewers)
         // })
-        makeHeader(backButton , makeButton("","","./images/settings.svg"), texts.text("labelOptions"),function(){
-            makeViewRoom(rooms,devices,availabilities,viewers)
-        },)
+        makeHeader(backButton, makeButton("", "", "./images/settings.svg"), texts.text("labelOptions"), function () {
+            makeViewRoom(rooms, devices, availabilities, viewers)
+        })
         const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
         // criar sala
         const divMakeRoom = document.createElement("div")
-        divMakeRoom.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
         const plusIcon = document.createElement("img")
         plusIcon.src = './images/plus-circle.svg'
         const labelMakeRoom = document.createElement("div")
         labelMakeRoom.textContent = texts.text("labelCreateRoom")
         // provisioning code
         const divProvCode = document.createElement("div")
-        divProvCode.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        divProvCode.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
         const provIcon = document.createElement("img")
         provIcon.src = './images/hash.svg'
         const labelProvCode = document.createElement("div")
+        labelProvCode.setAttribute("id","labelProvCode")
         labelProvCode.textContent = texts.text("labelProvCode")
         // tabela agendamento
         const divTableSched = document.createElement("div")
-        divTableSched.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
+        divTableSched.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
         const schedIcon = document.createElement("img")
         schedIcon.src = './images/calendar-option.svg'
         const labelTableSched = document.createElement("div")
@@ -1919,12 +1925,20 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.appendChild(divTableSched)
         document.body.appendChild(divMain)
 
-        divMakeRoom.addEventListener("click",function(event){
+        divMakeRoom.addEventListener("click", function (event) {
             event.preventDefault
             event.stopPropagation()
             createRoomContext()
         })
 
+        divProvCode.addEventListener("click", function (event) {
+            event.preventDefault
+            event.stopPropagation()
+            getProvisioningCode(userSIP, "inn-lab-ipva IP Phone", "labelProvCode")
+        })
+    }
+    function getProvisioningCode(sip, category, divId) {
+        devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: category, div: divId })
     }
     function createRoomContext(){
         that.clear()

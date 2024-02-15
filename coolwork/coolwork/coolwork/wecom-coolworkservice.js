@@ -560,28 +560,38 @@ new JsonApi("admin").onconnected(function(conn) {
                     log("PhoneList:filteredObject" + JSON.stringify(filteredObject))
                     log("hw id" + dev.hwId)
                     Database.exec("INSERT INTO tbl_devices (hwid, pbxactive, online, product, name) SELECT '" + dev.hwId + "','" + dev.pbxActive + "','" + dev.online + "','" + dev.product + "','" + dev.name + "' WHERE NOT EXISTS (SELECT 1 FROM tbl_devices WHERE hwid = '" + dev.hwId + "')")
-                    .oncomplete(function (data) {
-                    log("InsertSuccess" + JSON.stringify(data))
-                        if (filteredObject.length > 0) {
-                            log("PhoneList: filteredObject>0")
-                            dev.sip = filteredObject[0].columns.h323;
-                            dev.cn = filteredObject[0].columns.cn;
-                            dev.guid = filteredObject[0].columns.guid;
-                            var sql = "UPDATE tbl_devices SET sip = '" + dev.sip + "', cn = '" + dev.cn + "', guid = '" + dev.guid + "' WHERE hwid = '" + dev.hwId + "'"; 
-                            Database.exec(sql)
-                            .oncomplete(function (data) {
-                            log("UpdateSuccess" + JSON.stringify(data))
-                            })
-                            .onerror(function (error, errorText, dbErrorCode) {
-                                    log("UpdateDevicesResult:result=Error " + String(errorText));
-                            });
-                        }
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
+                        .oncomplete(function (data) {
+                            log("InsertSuccess" + JSON.stringify(data))
+                            //conn.send(JSON.stringify({ api: "admin", mt: "InsertDevicesResult", src: data.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
                             log("InsertDevicesResult:result=Error " + String(errorText));
                             conn.send(JSON.stringify({api: "admin", mt: "Error", src: errorText}))
-                    });
+                        });
+                    if (filteredObject.length > 0) {
+                        log("PhoneList: filteredObject>0")
+                        dev.sip = filteredObject[0].columns.h323;
+                        dev.cn = filteredObject[0].columns.cn;
+                        dev.guid = filteredObject[0].columns.guid;
+                        var sql = "UPDATE tbl_devices SET sip = '" + dev.sip + "', cn = '" + dev.cn + "', guid = '" + dev.guid + "' WHERE hwid = '" + dev.hwId + "'";
+                        Database.exec(sql)
+                            .oncomplete(function (data) {
+                                log("PhoneList: filteredObject>0 UpdateSuccess" + JSON.stringify(data))
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("PhoneList: filteredObject>0 UpdateDevicesResult:result=Error " + String(errorText));
+                            });
+                    } else {
+                        log("PhoneList: filteredObject<0 Updating device " + dev.name)
+                        var sql = "UPDATE tbl_devices SET pbxactive = '" + dev.pbxActive + "', online = '" + dev.online + "', name = '" + dev.name + "' WHERE hwid = '" + dev.hwId + "'";
+                        Database.exec(sql)
+                            .oncomplete(function (data) {
+                                log("PhoneList: filteredObject<0 UpdateSuccess" + JSON.stringify(data))
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                log("PhoneList: filteredObject<0 UpdateDevicesResult:result=Error " + String(errorText) + " " + dev.name);
+                            });
+                    }
 
                  });
       
