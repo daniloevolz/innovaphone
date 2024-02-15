@@ -1400,28 +1400,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMainSala.appendChild(divImg)
 
         //card horarios implementado pelo Pietro
-        const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario","w-full","h-full",)
-        container.appendChild(divHorario)
-        makeViewCalendarDetail(divHorario, avail)
+        // const divHorario = document.createElement("div")
+        // divHorario.classList.add("divHorario","w-full","h-full",)
+        // container.appendChild(divHorario)
+        // makeViewCalendarDetail(divHorario, avail)
 
-        // div container (scroll) devices
-        const div102 = document.createElement("div")
-        div102.classList.add("div102","sm:col-start-2")
-        /*div102.style.height = 'calc(100vh - 70px)'*/
-        div102.setAttribute("id", "div102")
-        container.appendChild(div102);
+        // // div container (scroll) devices
+        // const div102 = document.createElement("div")
+        // div102.classList.add("div102","sm:col-start-2")
+        // /*div102.style.height = 'calc(100vh - 70px)'*/
+        // div102.setAttribute("id", "div102")
+        // container.appendChild(div102);
 
-        devs.forEach(function (device) {
-            var s = sched.filter(function (s) {
-                return device.id == s.device_id
-            });
-            var viewer = viws.filter(function (v) {
-                return v.viewer_guid == device.guid && v.room_id == room.id
-            });
-            makeDeviceIcon(divImg, device, viewer)
-            makeViewDevice(div102, device, avail, s, viewer)
-        })
+        // devs.forEach(function (device) {
+        //     var s = sched.filter(function (s) {
+        //         return device.id == s.device_id
+        //     });
+        //     var viewer = viws.filter(function (v) {
+        //         return v.viewer_guid == device.guid && v.room_id == room.id
+        //     });
+        //     makeDeviceIcon(divImg, device, viewer)
+        //     makeViewDevice(div102, device, avail, s, viewer)
+        // })
     }
     function makeAvatar(viewersFilter, divMain) {
         const divUsersAvatar = document.createElement("div");

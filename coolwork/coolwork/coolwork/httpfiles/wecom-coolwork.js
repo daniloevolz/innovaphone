@@ -619,6 +619,10 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear()
         addPhonesToDevices()
         makeHeader(backButton, makeButton('','',"./images/menu.svg"), texts.text("labelMySchedules"));
+        backButton.addEventListener("click",function EvtFunct(){
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click",EvtFunct)
+        })
         filterSchedule()
         const container = document.createElement('div')
         container.classList.add('overflow-auto', 'w-full')
@@ -1016,6 +1020,10 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
 
         makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
+        backButton.addEventListener("click",function EvtFunct(){
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click",EvtFunct)
+        })
         // div container
         const container = document.createElement("div")
         container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
@@ -1708,6 +1716,10 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         const btnSave = makeButton(texts.text("save"), "primary", "")
         makeHeader(backButton,btnSave, texts.text("labelSchedule"))
+        backButton.addEventListener("click",function EvtFunct(){
+            makeViewRoomDetail(roomId)
+            backButton.removeEventListener("click",EvtFunct)
+        })
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
@@ -1871,7 +1883,11 @@ function getDayOfWeekLabel(selectedDate) {
             divTimeStart.setAttribute("id", "divTimeStart")
             divTimeStart.classList.add("divTime")
             div110.appendChild(divTimeStart)
-            divTimeStart.innerHTML = "-- : --"
+            if(avail.schedule_module == "dayModule"){
+                divTimeStart.innerHTML = "00:00"
+            }else{
+                divTimeStart.innerHTML = "-- : --"
+            
             divTimeStart.addEventListener("click", function (event) {
                 event.stopPropagation()
                 event.preventDefault()
@@ -1897,7 +1913,7 @@ function getDayOfWeekLabel(selectedDate) {
                 }
 
             })
-
+}
             //div to
             const divToTime = document.createElement("div")
             divToTime.setAttribute("id", "divToTime")
@@ -1910,7 +1926,10 @@ function getDayOfWeekLabel(selectedDate) {
             divTimeEnd.setAttribute("id", "divTimeEnd")
             divTimeEnd.classList.add("divTime")
             div110.appendChild(divTimeEnd)
-            divTimeEnd.innerHTML = "-- : -- "
+            if(avail.schedule_module == "dayModule"){
+                divTimeEnd.innerHTML = "23:59"
+            }else{                
+                divTimeEnd.innerHTML = "-- : -- "
 
             divTimeEnd.addEventListener("click", function (event) {
                 event.stopPropagation()
@@ -1934,6 +1953,7 @@ function getDayOfWeekLabel(selectedDate) {
                     })  
                 }
             })
+        }
         btnSave.addEventListener("click",function(){
             var dateStart = selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
             var dateEnd = selectedDay + "T" + document.getElementById("divTimeEnd").innerHTML;
