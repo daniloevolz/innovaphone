@@ -25,7 +25,6 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var rooms = [];
     var devices = [];
     var availabilities = [];
-    var schedules = [];
     var viewers = [];
     var editors = [];
     var phones =[];
@@ -135,6 +134,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         if (obj.api === "user" && obj.mt === "SelectRoomsAvailabilitiesResult") {
             availabilities = JSON.parse(obj.result);
             app.send({ api: "user", mt: "SelectDevicesSchedule", ids: obj.ids })
+            console.log("ERICK TESTE MADRUGADA", availabilities)
         }
         //Retorna todos os agendamentos de todas as salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectDevicesScheduleResult") {
@@ -431,12 +431,12 @@ function filterSchedule(){
     })
 
     btnTrash.addEventListener("click",function(event){
-        nextSchedules(schedules)
+        nextSchedules()
     })
     
     
 }
-function nextSchedules(schedules){
+function nextSchedules(){
     const today = new Date();
 
     // Filtrar os agendamentos com base na data de início sendo maior que hoje
@@ -803,7 +803,7 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
-            nextSchedules(schedules)
+            nextSchedules()
         })
         // div container (scroll)
         const container = document.createElement("div")
@@ -1975,21 +1975,25 @@ function getDayOfWeekLabel(selectedDate) {
                  
              }else if(module == "update"){
                 console.log("Update p banco " + JSON.stringify(updateSched.id))
+                var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
+                btnPopUp.addEventListener("click",function(event){
+                    event.stopPropagation()
+                    event.preventDefault()
+                    console.log("ERICK UPDATESCHEDULE ST.D ED.D SCED.ID DEV.HWID", dateStart, dateEnd, updateSched.id, deviceHw)
+                    console.log("Erick Teste madruga", availabilities.id )
 
-                app.sendSrc({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw  }, function (obj) {
-                    
-                    // componentizar esse bloco de codigo em uma função separada ~pietro
-                    var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
-                    btnPopUp.addEventListener("click",function(event){
-                        event.stopPropagation()
-                        event.preventDefault()
-                        app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
-                            schedules = JSON.parse(obj.result)
-                            makeViewRoomDetail(roomId)
-                        })
-                    })
-                  
+                    app.sendSrc({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw })
+
+
+                    app.send({ api: "user", mt: "SelectDevicesSchedule", ids: availabilities.id })
+
+                    // app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
+                    //     schedules = JSON.parse(obj.result)
+                    //     makeViewRoomDetail(roomId)
+                    // })
+                    nextSchedules()
                 })
+
 
              }
 
