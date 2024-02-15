@@ -1400,28 +1400,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMainSala.appendChild(divImg)
 
         //card horarios implementado pelo Pietro
-        const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario","w-full","h-full",)
-        container.appendChild(divHorario)
-        makeViewCalendarDetail(divHorario, avail)
+        // const divHorario = document.createElement("div")
+        // divHorario.classList.add("divHorario","w-full","h-full",)
+        // container.appendChild(divHorario)
+        // makeViewCalendarDetail(divHorario, avail)
 
-        // div container (scroll) devices
-        const div102 = document.createElement("div")
-        div102.classList.add("div102","sm:col-start-2")
-        /*div102.style.height = 'calc(100vh - 70px)'*/
-        div102.setAttribute("id", "div102")
-        container.appendChild(div102);
+        // // div container (scroll) devices
+        // const div102 = document.createElement("div")
+        // div102.classList.add("div102","sm:col-start-2")
+        // /*div102.style.height = 'calc(100vh - 70px)'*/
+        // div102.setAttribute("id", "div102")
+        // container.appendChild(div102);
 
-        devs.forEach(function (device) {
-            var s = sched.filter(function (s) {
-                return device.id == s.device_id
-            });
-            var viewer = viws.filter(function (v) {
-                return v.viewer_guid == device.guid && v.room_id == room.id
-            });
-            makeDeviceIcon(divImg, device, viewer)
-            makeViewDevice(div102, device, avail, s, viewer)
-        })
+        // devs.forEach(function (device) {
+        //     var s = sched.filter(function (s) {
+        //         return device.id == s.device_id
+        //     });
+        //     var viewer = viws.filter(function (v) {
+        //         return v.viewer_guid == device.guid && v.room_id == room.id
+        //     });
+        //     makeDeviceIcon(divImg, device, viewer)
+        //     makeViewDevice(div102, device, avail, s, viewer)
+        // })
     }
     function makeAvatar(viewersFilter, divMain) {
         const divUsersAvatar = document.createElement("div");
@@ -1878,6 +1878,92 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         mainImg.setAttribute("src",newSrc) 
     }
     // rever uma forma de fazer isso 
+
+    function makeDivAppearance(){
+        that.clear();
+        // backButton.addEventListener("click",function(event){
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        //     makeViewRoom(rooms,devices,availabilities,viewers)
+        // })
+        makeHeader(backButton, makeButton("", "", "./images/brush.svg"), texts.text("labelAppearance"), function () {
+            makeDivOptions()
+        })
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
+        // cor primária
+        const divPrimaryColor = document.createElement("div")
+        divPrimaryColor.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const paletteIcon1 = document.createElement("img")
+        paletteIcon1.src = './images/palette.svg'
+        const labelPrimaryColor = document.createElement("div")
+        labelPrimaryColor.textContent = texts.text("labelPrimaryColor")
+        // cor secundária
+        const divSecundaryColor = document.createElement("div")
+        divSecundaryColor.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const paletteIcon2 = document.createElement("img")
+        paletteIcon2.src = './images/palette.svg'
+        const labelSecundaryColor = document.createElement("div")
+        labelSecundaryColor.textContent = texts.text("labelSecundaryColor")
+        // texto
+        const divText = document.createElement("div")
+        divText.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const textIcon = document.createElement("img")
+        textIcon.src = './images/text-cursor.svg'
+        const labelText = document.createElement("div")
+        labelText.textContent = texts.text("labelText")
+        //imagem fundo
+        const divImgInside = document.createElement("div")
+        divImgInside.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const imgInsideIcon = document.createElement("img")
+        imgInsideIcon.src = './images/image-inside.svg'
+        const labelImgInside = document.createElement("div")
+        labelImgInside.textContent = texts.text("labelImgInside")
+        // logo 
+        const divLogo = document.createElement("div")
+        divLogo.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const divLogoIcon = document.createElement("img")
+        divLogoIcon.src = './images/codesandbox.svg'
+        const labelLogo = document.createElement("div")
+        labelLogo.textContent = texts.text("labelLogo")
+
+
+        divPrimaryColor.appendChild(paletteIcon1)
+        divPrimaryColor.appendChild(labelPrimaryColor)
+        divSecundaryColor.appendChild(paletteIcon2)
+        divSecundaryColor.appendChild(labelSecundaryColor)
+        divText.appendChild(textIcon)
+        divText.appendChild(labelText)
+        divImgInside.appendChild(imgInsideIcon)
+        divImgInside.appendChild(labelImgInside)
+        divLogo.appendChild(divLogoIcon)
+        divLogo.appendChild(labelLogo)
+        divMain.appendChild(divPrimaryColor)
+        divMain.appendChild(divSecundaryColor)
+        divMain.appendChild(divText)
+        divMain.appendChild(divImgInside)
+        divMain.appendChild(divLogo)
+        document.body.appendChild(divMain)
+
+        // //listeners
+        // divMakeRoom.addEventListener("click", function (event) {
+        //     event.preventDefault
+        //     event.stopPropagation()
+        //     createRoomContext()
+        // })
+
+        // divProvCode.addEventListener("click", function (event) {
+        //     event.preventDefault
+        //     event.stopPropagation()
+        //     getProvisioningCode(userSIP, "inn-lab-ipva IP Phone", "labelProvCode")
+        // })
+        
+        // divAppearance.addEventListener('click',function(event){
+        //     event.preventDefault
+        //     event.stopPropagation()
+        //     // criar div de aparencia
+        // })
+    }
     function makeDivOptions() {
         that.clear();
         // backButton.addEventListener("click",function(event){
@@ -1912,6 +1998,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         schedIcon.src = './images/calendar-option.svg'
         const labelTableSched = document.createElement("div")
         labelTableSched.textContent = texts.text("labelTableSchedule")
+        //aparencia
+        const divAppearance = document.createElement("div")
+        divAppearance.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        const appearanceIcon = document.createElement("img")
+        appearanceIcon.src = './images/brush.svg'
+        const labelAppearance= document.createElement("div")
+        labelAppearance.setAttribute("id","labelAppearance")
+        labelAppearance.textContent = texts.text("labelAppearance")
 
 
         divMakeRoom.appendChild(plusIcon)
@@ -1920,11 +2014,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divProvCode.appendChild(labelProvCode)
         divTableSched.appendChild(schedIcon)
         divTableSched.appendChild(labelTableSched)
+        divAppearance.appendChild(appearanceIcon)
+        divAppearance.appendChild(labelAppearance)
         divMain.appendChild(divMakeRoom)
         divMain.appendChild(divProvCode)
         divMain.appendChild(divTableSched)
+        divMain.appendChild(divAppearance)
         document.body.appendChild(divMain)
 
+        //listeners
         divMakeRoom.addEventListener("click", function (event) {
             event.preventDefault
             event.stopPropagation()
@@ -1935,6 +2033,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             event.preventDefault
             event.stopPropagation()
             getProvisioningCode(userSIP, "inn-lab-ipva IP Phone", "labelProvCode")
+        })
+        
+        divAppearance.addEventListener('click',function(event){
+            event.preventDefault
+            event.stopPropagation()
+            makeDivAppearance()
         })
     }
     function getProvisioningCode(sip, category, divId) {
