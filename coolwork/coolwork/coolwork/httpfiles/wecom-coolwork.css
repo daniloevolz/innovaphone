@@ -29,11 +29,13 @@ body {
     vertical-align: middle;
     position: relative;
     display: inline-flex;
-    height: 50px;
+    height: 80px;
+    width: 100px;
     flex-shrink: 0;
     border-radius: 6px;
     background: var(--Silver-Chalice-100, #EDEDED);
     align-items: center;
+    margin: 12px;
 }
 
 .div82 {
