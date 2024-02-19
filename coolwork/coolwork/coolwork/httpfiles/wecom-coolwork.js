@@ -436,9 +436,11 @@ function filterSchedule(){
     
     
 }
-function nextSchedules(){
+function nextSchedules(schedule){
     const today = new Date();
-
+    if(schedule){
+        schedules = schedule
+    }
     // Filtrar os agendamentos com base na data de início sendo maior que hoje
     const filtredschedules = schedules.filter(function (s) {
         // Converta a string de data para um objeto Date para comparação
@@ -711,7 +713,7 @@ function getDayOfWeekLabel(selectedDate) {
                      app.sendSrc({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id, src: nameDevice.hwid }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)
-                            makeViewRoomDetail(nameRoom.id) // ou makeViewRoom?? 
+                            nextSchedules() 
                         })
                        
                     })
@@ -1913,7 +1915,7 @@ function getDayOfWeekLabel(selectedDate) {
                 }
 
             })
-}
+            }
             //div to
             const divToTime = document.createElement("div")
             divToTime.setAttribute("id", "divToTime")
@@ -1961,14 +1963,14 @@ function getDayOfWeekLabel(selectedDate) {
             console.log("Hora inicio agendamento " + dateStart)
             console.log("Hora fim agendamento " + dateEnd)
             
-             if(dateStart == "" || dateEnd == ""){
+            if(dateStart == "" || dateEnd == ""){
                 makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
                     event.preventDefault()
                     event.stopPropagation()
                     document.body.removeChild(document.getElementById("bcgrd"))
                 })      
              }
-             else if(module == "schedule"){
+            else if(module == "schedule"){
                 app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                     
                     // componentizar esse bloco de codigo em uma função separada ~pietro
@@ -1981,45 +1983,51 @@ function getDayOfWeekLabel(selectedDate) {
                             makeViewRoomDetail(roomId)
                         })
                     })
-                    // var btnPopUp = makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
-                    // btnPopUp.addEventListener("click",function(event){
-                    //     event.stopPropagation()
-                    //     event.preventDefault()
-                    //     app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
-                    //         schedules = JSON.parse(obj.result)
-                    //         makeViewRoomDetail(roomId)
-                    //     })
-                    // })
                   
                 })
                  
-             }else if(module == "update"){
+            }else if(module == "update"){
                 console.log("Update p banco " + JSON.stringify(updateSched.id))
                 var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
+                
+                
                 btnPopUp.addEventListener("click",function(event){
                     event.stopPropagation()
                     event.preventDefault()
                     console.log("ERICK UPDATESCHEDULE ST.D ED.D SCED.ID DEV.HWID", dateStart, dateEnd, updateSched.id, deviceHw)
                     console.log("Erick Teste madruga", availabilities.id )
 
-                    app.sendSrc({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw })
+                    app.send({ api: "user", mt: "UpdateDeviceSchedule", data_start: dateStart, data_end: dateEnd, schedID: updateSched.id , src: deviceHw })
 
-
-                    app.send({ api: "user", mt: "SelectDevicesSchedule", ids: availabilities.id })
-
+                    var okPopUp = makePopUp(texts.text("labelMySchedules"), texts.text("labelScheduleDone"), texts.text("labelOk"),)
+                    okPopUp.addEventListener('click',function(){
+                        
+                        updateDataStartById(updateSched.id, dateStart, dateEnd, deviceHw)
+                        
+                    })
                     // app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                     //     schedules = JSON.parse(obj.result)
                     //     makeViewRoomDetail(roomId)
                     // })
-                    nextSchedules()
+                    
                 })
 
-
-             }
+            }
 
             })
              
-            
+    }
+    function updateDataStartById(id, dateStart, dateEnd, deviceHw) {
+        for (var i = 0; i < schedules.length; i++) {
+            if (schedules[i].id === id) {
+                schedules[i].data_start = dateStart;
+                schedules[i].data_end = dateEnd;
+                schedules[i].device_id = deviceHw;
+                break; // interrompe o loop após encontrar o item
+            }
+        }
+        console.log("Erick Sched", schedules)
+        makeUserSchedules(schedules)
     }
     //#endregion
 

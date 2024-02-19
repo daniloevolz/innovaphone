@@ -317,7 +317,7 @@ new JsonApi("user").onconnected(function(conn) {
             }
             if (obj.mt == "SelectDevicesSchedule") {
                 var roomIds = obj.ids
-                log("ROOMIDS" + obj.ids)
+                log("ROOMIDS", JSON.stringify(roomIds))
                 var ids = extrairValoresId(roomIds);
 
                 var query = "SELECT * " +
