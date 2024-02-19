@@ -22,6 +22,8 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var selectedDay; // dia do calendario
     var selected // call back 
 
+    var mySchedules; // apenas para localizar meus agendamentos
+
     var rooms = [];
     var devices = [];
     var availabilities = [];
@@ -36,9 +38,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             "--text-standard": "#ffffff",
         },
         light: {
-            "--bg": "white",
-            "--button": "#e0e0e0",
-            "--text-standard": "#4a4a49",
+            "--bg": "#0B2E46",
+            "--button": "#AED4EF",
+            "--text-standard": "#ffffff",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -112,7 +114,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
             list_tableUsers = JSON.parse(obj.result);     
-            console.log("table-users " + JSON.stringify(list_tableUsers))      
+            console.log("table-users " + JSON.stringify(list_tableUsers))  
+            
+           
         }
         //Retorna todas as salas solicitadas
         if (obj.api === "user" && obj.mt === "SelectRoomsResult") {
@@ -162,8 +166,12 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
         // }
     } 
     //#endregion
-
+    // var mySchedules = schedules.filter(function(s){
+    //     return s.user_guid == myUser.guid
+    // })
     //#region Funções de Componentização
+
+    
         function makeButton(text, variant, iconSVG) {
             const button = document.createElement("button");
             button.textContent = text;
@@ -341,6 +349,7 @@ function truncateString(str, maxLength) {
     }
 }
 function filterSchedule(){
+
     const mainFilter = document.createElement("div")
     mainFilter.classList.add("flex", "bg-dark-200",'items-center',"m-1", 'justify-between', 'p-1','margin-1', 'rounded-lg',"margin-1","self-stretch", "gap-1")
     mainFilter.setAttribute("id","divMainFilter")
@@ -382,7 +391,7 @@ function filterSchedule(){
 
         makeCalendar("","viewSchedule",mainFilter, null, null, function (day) {
             selected = day
-            var filtred = schedules.filter(function(s){
+            var filtred = mySchedules.filter(function(s){
                 // Extract the date part from s.data_start
                 var sDate = s.data_start.split('T')[0];
                 
@@ -405,7 +414,7 @@ function filterSchedule(){
                 const roomName = r.name.toLowerCase();
                 return roomName.includes(searchTerm);
             });
-            const filteredSchedules = schedules.filter(function (s) {
+            const filteredSchedules = mySchedules.filter(function (s) {
                 // Verifica se o 'room_id' está incluído nos IDs dos quartos filtrados
                 return filteredRooms.id === s.room_id;
             });
@@ -427,7 +436,7 @@ function filterSchedule(){
     //     return 
     // }
     btnAll.addEventListener("click",function(event){
-        makeUserSchedules(schedules)
+        makeUserSchedules(mySchedules)
     })
 
     btnTrash.addEventListener("click",function(event){
@@ -436,13 +445,13 @@ function filterSchedule(){
     
     
 }
-function nextSchedules(schedule){
+function nextSchedules(mySchedules){
     const today = new Date();
-    if(schedule){
-        schedules = schedule
-    }
+    // if(schedule){
+    //     schedules = schedule
+    // }
     // Filtrar os agendamentos com base na data de início sendo maior que hoje
-    const filtredschedules = schedules.filter(function (s) {
+    const filtredschedules = mySchedules.filter(function (s) {
         // Converta a string de data para um objeto Date para comparação
         const startDate = new Date(s.data_start);
 
@@ -809,7 +818,16 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
-            nextSchedules()
+
+            var myUserGuid = list_tableUsers.filter(function(u){
+                return u.sip == userSIP
+            })[0]
+        
+            mySchedules = [schedules.filter(function(s){
+                return  s.user_guid == myUserGuid.guid
+            })][0]
+            
+            nextSchedules(mySchedules)
         })
         // div container (scroll)
         const container = document.createElement("div")
@@ -1470,9 +1488,17 @@ function getDayOfWeekLabel(selectedDate) {
         div182.appendChild(divTimeEnd);
         divTimeEnd.innerHTML = timeend;
     }
+
+
+    //console.log("MyUseVar " + JSON.stringify(myUser))
+
+
     function makeViewDevice(divMain, device, availability, schedule, viewer) {
         //div 101
-          
+        var myUser = list_tableUsers.filter(function(u){
+            return u.sip == userSIP
+        })[0]
+
             const dateNow = moment();
             const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
 
@@ -1480,9 +1506,7 @@ function getDayOfWeekLabel(selectedDate) {
         divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-[50px]")
         divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
-        var myUser = list_tableUsers.filter(function(u){
-                return u.sip == userSIP
-        })[0]
+
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -2018,16 +2042,16 @@ function getDayOfWeekLabel(selectedDate) {
              
     }
     function updateDataStartById(id, dateStart, dateEnd, deviceHw) {
-        for (var i = 0; i < schedules.length; i++) {
-            if (schedules[i].id === id) {
-                schedules[i].data_start = dateStart;
-                schedules[i].data_end = dateEnd;
-                schedules[i].device_id = deviceHw;
+        for (var i = 0; i < mySchedules.length; i++) {
+            if (mySchedules[i].id === id) {
+                mySchedules[i].data_start = dateStart;
+                mySchedules[i].data_end = dateEnd;
+                mySchedules[i].device_id = deviceHw;
                 break; // interrompe o loop após encontrar o item
             }
         }
-        console.log("Erick Sched", schedules)
-        makeUserSchedules(schedules)
+        console.log("Erick Sched", mySchedules)
+        makeUserSchedules(mySchedules)
     }
     //#endregion
 

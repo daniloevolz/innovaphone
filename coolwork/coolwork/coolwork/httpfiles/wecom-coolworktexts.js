@@ -86,6 +86,7 @@ Wecom.coolworkTexts = {
         labelDay : "Dia",
         labelHour : "Hora",
         labelDevices: "Dispositivos",
+        labelRoomAvailability: "Disponibilidade da sala",
         labelNameOfDevices: "Nome de Dispositivos",
         labelScheduleModule: "Modelo de Agendamento",
         makePhoneSceduleButton: "Agendar",
