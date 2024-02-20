@@ -178,6 +178,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "DeleteRoomSuccess"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
+        if(obj.api == "admin" && obj.mt == "UpdateRoomAvailabilityResult"){  
+            app.send({api:"admin", mt:"SelectAllRoom"})
+        }
     }
 
     //#region CRIAÇÃO DE SALA
@@ -252,7 +255,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var typeSchedule;
     var dateAvailability;
     btnMakeCalendar.addEventListener("click",function(){
-        makeDivAddAvailability(typeRoom,function(date){
+        makeDivAddAvailability(null,null,typeRoom,function(date){
             dateAvailability;
             dateAvailability = date
             console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
@@ -528,7 +531,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         insideDiv.appendChild(divMain)
         document.body.appendChild(insideDiv)
     }
-    function makeDivAddAvailability(typeRoom,dateTime,typeSchedule){
+    function makeDivAddAvailability(update,avail,typeRoom,dateTime,typeSchedule){
         getAllClickedWeekDaysActive = true
         // mudará conforme o tipo de sala ( RECORRENTE OU PERÍODO )
         const insideDiv = document.createElement("div")
@@ -545,6 +548,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             
             var selectedDay;
             Calendar.createCalendar(divCalendar,"all","",function(day){
+                selectedDay = "";
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
@@ -1162,7 +1166,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
             identifyBtn.id = dev.hwid
             identifyBtn.addEventListener("click",function(){
-                    console.log("ID  " + this.id)
+                    console.log("ID " + this.id)
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
@@ -1259,10 +1263,36 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             console.log("click")
             makeDivOptions()
         })
+
+        if(rooms.length > 0) {
+            const divIptSearch = document.createElement("div")
+            divIptSearch.classList.add("m-1", "flex", "items-center" ,"justify-between" , "p-1" , "rounded-lg")
+            const inputSearch = makeInput(null,"search",texts.text("labelSearchYourRoom"))
+            inputSearch.classList.add("w-full")
+            divIptSearch.appendChild(inputSearch)
+            document.body.appendChild(divIptSearch)
+
+            inputSearch.addEventListener("input", function(event) {
+                const searchText = event.target.value.toLowerCase();
+                const divsRoom = document.querySelectorAll('[room]');
+                
+                divsRoom.forEach(function(div) {
+                    const roomName = div.querySelector('h1').textContent.toLowerCase();
+    
+                    if (roomName.includes(searchText)) {
+                        div.style.display = "flex"; // Mostrar a div da sala
+                    } else {
+                        div.style.display = "none"; // Ocultar a div da sala
+                    }
+                });
+            });
+        
+            
+        }
         // div container (scroll)
         const container = document.createElement("div")
         container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
-        container.style.height = 'calc(100vh - 70px)'
+        container.style.height = 'calc(100vh - 120px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
         
@@ -1357,7 +1387,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     makeViewRoomDetail(id)
                 });
             });
-        })   
+        })
+        
+        
     }
     function makeViewCalendarInfo(divMain, availability) {
         availability.forEach(function (a) {
@@ -1443,7 +1475,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             event.preventDefault()
             makeViewRoom(rooms,devices,availabilities,viewers)
         })
-        makeHeader(backButton, makeButton(texts.text("save"),"primary",""), room.name)
+        const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
+        makeHeader(backButton, btnUpdateRoom , room.name)
         // div container
         const container = document.createElement("div")
         container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
@@ -1486,8 +1519,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
        divDevices.appendChild(divOptDevices)
        divDevices.appendChild(divAllDevices)
 
-
-
         devs.forEach(function (device) {
             makeViewDevice(divAllDevices,device)
         })
@@ -1501,7 +1532,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var dateAvailability;
         var typeSchedule;
         btnMakeCalendar.addEventListener("click",function(){
-            makeDivAddAvailability(avail.type,function(date){
+            makeDivAddAvailability("update",avail,avail.type,function(date){
                 dateAvailability = date
                 console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
                 //console.log(date)
@@ -1536,9 +1567,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
          labelEditRoom.textContent = texts.text("labelEditRoom")
          const btnEditRoom = makeButton(texts.text("labelEdit"),"primary","")
          btnEditRoom.addEventListener("click",function(ev){
-            makeDivCreateRoom()
+            makeDivEditRoom(room.name,avail.type)
+            console.log("EDITAR A SALA TODA")
          })
-
 
         divHourSchedule.appendChild(labelHourSchedule)
         divHourSchedule.appendChild(btnMakeCalendar)
@@ -1546,7 +1577,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divDeleteRoom.appendChild(btnDeleteRoom)
         divEditRoom.appendChild(labelEditRoom)
         divEditRoom.appendChild(btnEditRoom)
-
         container.appendChild(divMainSala)
         container.appendChild(divDevices)
         container.appendChild(divHourSchedule)
@@ -1599,46 +1629,17 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 });
 
             });
-
-    // var typeSchedule;
-    // var dateAvailability;
-    // btnMakeCalendar.addEventListener("click",function(){
-    //     makeDivAddAvailability(typeRoom,function(date){
-    //         dateAvailability = date
-    //         console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
-    //         //console.log(date)
-    //         //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
-    //     },function(sched){
-    //         typeSchedule = sched
-    //     })
-    //     console.log("Abrir Calendario")
-    // })
-        
-
-
-        //card horarios implementado pelo Pietro
-        // const divHorario = document.createElement("div")
-        // divHorario.classList.add("divHorario","w-full","h-full",)
-        // container.appendChild(divHorario)
-        // makeViewCalendarDetail(divHorario, avail)
-
-        // // div container (scroll) devices
-        // const div102 = document.createElement("div")
-        // div102.classList.add("div102","sm:col-start-2")
-        // /*div102.style.height = 'calc(100vh - 70px)'*/
-        // div102.setAttribute("id", "div102")
-        // container.appendChild(div102);
-
-        // devs.forEach(function (device) {
-        //     var s = sched.filter(function (s) {
-        //         return device.id == s.device_id
-        //     });
-        //     var viewer = viws.filter(function (v) {
-        //         return v.viewer_guid == device.guid && v.room_id == room.id
-        //     });
-        //     makeDeviceIcon(divImg, device, viewer)
-        //     makeViewDevice(div102, device, avail, s, viewer)
-        // })
+            
+            btnUpdateRoom.addEventListener("click",function(){
+                app.send(
+                    {api: "admin", mt: "UpdateRoomAvailability", 
+                    datastart: dateAvailability[0].start, 
+                    dataend: dateAvailability[0].end,
+                    roomID: id
+                
+                
+                })
+            })
     }
     function makeAvatar(viewersFilter, divMain) {
         const divUsersAvatar = document.createElement("div");
@@ -2549,7 +2550,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelLogo = document.createElement("div")
         labelLogo.textContent = texts.text("labelLogo")
 
-
         divPrimaryColor.appendChild(paletteIcon1)
         divPrimaryColor.appendChild(labelPrimaryColor)
         divSecundaryColor.appendChild(paletteIcon2)
@@ -2792,6 +2792,229 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     }
     //#endregion FUNÇÕES INTERNAS
 
+    //#region EDIÇÃO DE SALA
+    function makeDivEditRoom(nameRoom,type){
+        that.clear()
+        const btnUpdateRoom = makeButton(texts.text("labelSave"),"primary","")
+        makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        //nome da sala
+        const divNameRoom = document.createElement("div")
+        divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
+        const labelNameRoom = document.createElement("div")
+        labelNameRoom.textContent = texts.text("labelNameRoom")
+        const iptNameRoom = makeInput(nameRoom,"text","")
+        iptNameRoom.value = nameRoom
+        iptNameRoom.id = "iptNameRoom"
+        // imagem da sala
+        const divImgRoom = document.createElement("div")
+        divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelImgRoom = document.createElement("div")
+        labelImgRoom.textContent = texts.text("labelImageRoom")
+        const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+        var imgRoom;
+        divBtnChoose.addEventListener("click",function(){
+            console.log("Abrir Div Escolher Imagem")
+            makeDivChooseImage(function(selectedImg){
+                imgRoom = selectedImg
+            })
+        })
+        // tipo de sala
+        const divTypeRoom = document.createElement("div")
+        divTypeRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelTypeRoom = document.createElement("div")
+        labelTypeRoom.textContent = texts.text("labelTypeRoom")
+
+        var typeRoom = type;
+
+        var btnPeriod;
+        var btnRecurrent;
+
+        if(type == 'periodType'){
+            btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
+            btnPeriod.id = "periodType"
+            btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
+            btnRecurrent.id = "recurrentType"
+        }else{
+            btnPeriod = makeButton(texts.text("labelPeriod"),"tertiary","")
+            btnPeriod.id = "periodType"
+            btnRecurrent = makeButton(texts.text("labelRecurrent"),"secundary","")
+            btnRecurrent.id = "recurrentType"
+        }
+
+        btnPeriod.addEventListener("click", function(event) {
+            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+                typeRoom = selectedButton.id
+            });
+        });
+
+        btnRecurrent.addEventListener("click", function(event) {
+            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+                typeRoom = selectedButton.id
+            });
+        });
+                
+    
+        // usuarios
+        var viewers = []
+        const divUsersRoom = document.createElement("div")
+        divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelUsersRoom = document.createElement("div")
+        labelUsersRoom.textContent = texts.text("labelUsers")
+        const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
+        divBtnAddUsers.addEventListener("click",function(){
+            console.log("Abrir Div Add Usuários")
+            makeDivAddUsers(function(viewer){
+                viewers = viewer
+            })
+        })
+        //horario agendamento 
+        const divHourSchedule = document.createElement("div")
+        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelHourSchedule = document.createElement("div")
+        labelHourSchedule.textContent = texts.text("labelHourSchedule")
+        const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
+        var typeSchedule;
+        var dateAvailability;
+        btnMakeCalendar.addEventListener("click",function(){
+            makeDivAddAvailability(null,null,typeRoom,function(date){
+                dateAvailability;
+                dateAvailability = date
+                console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
+                //console.log(date)
+                //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
+            },function(sched){
+                typeSchedule = sched
+            })
+            console.log("Abrir Calendario")
+        })
+        // devices
+        const divAddDevices = document.createElement("div")
+        divAddDevices.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        const labelAddDevices = document.createElement("div")
+        labelAddDevices.textContent = texts.text("labelDevices")
+        const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
+        divBtnAddDevices.addEventListener("click",function(){
+            console.log("Abrir div add devices")
+            app.send({api:"admin", mt:"SelectDevices"})
+            // makeDivAddDevices()
+        })
+        //appends
+        divNameRoom.appendChild(labelNameRoom)
+        divNameRoom.appendChild(iptNameRoom)
+        divImgRoom.appendChild(labelImgRoom)
+        divImgRoom.appendChild(divBtnChoose)
+        divTypeRoom.appendChild(labelTypeRoom)
+        divTypeRoom.appendChild(btnPeriod)
+        divTypeRoom.appendChild(btnRecurrent)
+        // divTypeSchedule.appendChild(labelTypeSchedule) colocar na tela de agendamento
+        // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
+        // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
+        divUsersRoom.appendChild(labelUsersRoom)
+        divUsersRoom.appendChild(divBtnAddUsers)
+        divHourSchedule.appendChild(labelHourSchedule)
+        divHourSchedule.appendChild(btnMakeCalendar)
+        divAddDevices.appendChild(labelAddDevices)
+        divAddDevices.appendChild(divBtnAddDevices)
+    
+        divMain.appendChild(divNameRoom)
+        divMain.appendChild(divImgRoom)
+        divMain.appendChild(divTypeRoom)
+        // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
+        divMain.appendChild(divUsersRoom)
+        divMain.appendChild(divHourSchedule)
+        divMain.appendChild(divAddDevices)
+    
+        document.body.appendChild(divMain)
+    
+        btnUpdateRoom.addEventListener("click",function(event){
+            const nomeSala = document.getElementById("iptNameRoom").value
+            if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+            makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
+                event.preventDefault()
+                event.stopPropagation()
+                document.body.removeChild(document.getElementById("bcgrd"))
+            })      
+            }
+            if(typeRoom == "periodType"){
+                app.send({ api: "admin", mt: "InsertRoom", 
+                name: nomeSala, 
+                img: imgRoom, 
+                dateStart: dateAvailability[0].start, 
+                dateEnd: dateAvailability[0].end, 
+                type: typeRoom, 
+                schedule: typeSchedule, 
+                viewer: viewers,
+                device : devHwId
+                }); //viewer: viewer 
+            }else if (typeRoom == "recurrentType") {
+                console.log("dateAvailability " + JSON.stringify(dateAvailability));
+            
+                // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
+                let combinedAvailability = {
+                    startMonday: [],
+                    startTuesday: [],
+                    startWednesday: [],
+                    startThursday: [],
+                    startFriday: [],
+                    startSaturday: [],
+                    startSunday: [],
+                    endMonday: [],
+                    endTuesday: [],
+                    endWednesday: [],
+                    endThursday: [],
+                    endFriday: [],
+                    endSaturday: [],
+                    endSunday: []
+                };
+            
+                // Combine os horários de disponibilidade de todas as salas
+                dateAvailability.forEach(function(availability) {
+                    for (let key in availability) {
+                        combinedAvailability[key].push(availability[key]);
+                    }
+                });
+            
+                // Envie uma única mensagem com todos os horários de disponibilidade combinados
+                app.send({
+                    api: "admin",
+                    mt: "InsertRoom",
+                    name: nomeSala,
+                    img: imgRoom,
+                    type: typeRoom,
+                    schedule: typeSchedule,
+                    startMonday: combinedAvailability.startMonday.join(", "),
+                    startTuesday: combinedAvailability.startTuesday.join(", "),
+                    startWednesday: combinedAvailability.startWednesday.join(", "),
+                    startThursday: combinedAvailability.startThursday.join(", "),
+                    startFriday: combinedAvailability.startFriday.join(", "),
+                    startSaturday: combinedAvailability.startSaturday.join(", "),
+                    startSunday: combinedAvailability.startSunday.join(", "),
+                    endMonday: combinedAvailability.endMonday.join(", "),
+                    endTuesday: combinedAvailability.endTuesday.join(", "),
+                    endWednesday: combinedAvailability.endWednesday.join(", "),
+                    endThursday: combinedAvailability.endThursday.join(", "),
+                    endFriday: combinedAvailability.endFriday.join(", "),
+                    endSaturday: combinedAvailability.endSaturday.join(", "),
+                    endSunday: combinedAvailability.endSunday.join(", "),
+                    viewer: viewers,
+                    device: devHwId
+                });
+            }
+            
+            // app.send({ api: "admin", mt: "InsertRoom", 
+            // name: nameRoom, 
+            // img: srcDaImagem, 
+            // dateStart: dateStart, 
+            // dateEnd: dateEnd, 
+            // type: optType, 
+            // schedule: optModule, 
+            // editor: editor, 
+            // viewer: viewer });
+        })
+        }
+    //#endregion
     function clickedPhone(hwId, colDireita, e){
         console.log("Clicked Phone", hwId)
         var x = e.clientX;

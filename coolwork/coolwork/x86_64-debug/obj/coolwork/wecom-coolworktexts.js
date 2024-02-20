@@ -16,6 +16,7 @@ Wecom.coolworkTexts = {
         labelOk: "Ok",
         labelWarning: "Atenção!",
         labelCompleteAll: "Favor Completar todos os campos",
+        labelSearchYourRoom: "Buscar Salas",
         labelMySchedules: "Meus Agendamentos",
         labelIptSearch: "Pesquisar...",
         labelSelectDay: "Primeiro selecione o dia",

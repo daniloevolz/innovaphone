@@ -832,23 +832,27 @@ function UpdateAvailability(availability, type, schedules) {
                             td.classList.add("pointer-events-none");
                         }
                         console.log("SCHEDULES UPDATEAVAILABILITY " + JSON.stringify(schedules))
-                        // schedules.forEach(function(s){
-                        //   // availabilities com hora
+
+                        schedules.forEach(function(s){
+                          var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD');
+                          if(s.type == "dayModule" && dataDate == dataStartSchedule ){
+                              td.classList.remove("available");
+                              td.classList.add('scheduled')
+                              td.classList.add("pointer-events-none");
+                          }
                         //   var datastartDateHour = moment(dates.data_start).format('YYYY-MM-DD HH:mm');
                         //   var dataendDateHour = moment(dates.data_end).format('YYYY-MM-DD HH:mm');
                         //   // agendamentos com hora 
-                        //   var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
+                          
                         //   var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
                           
                         //   console.log("DATADATE " + dataDate)
-                        // //   if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour)){
-                        // //         td.classList.remove("available");
-                        // //         td.classList.add('unavailable');
-                        // //         td.classList.add("pointer-events-none");
-                        // // }
-                        // })
-
-                        //rever 06/02 ~pietro
+                        //   if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour)){
+                                
+                        //         td.classList.add('unavailable');
+                        //         td.classList.add("pointer-events-none");
+                        // }
+                        })   
                     });
                 }
             })

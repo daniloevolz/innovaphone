@@ -793,6 +793,16 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("UpdateRoomResult:result=Error " + String(errorText));
                     });
             }
+            if (obj.mt == "UpdateRoomAvailability") {
+                var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
+                Database.exec(sqlUpdate)
+                    .oncomplete(function (data) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomAvailabilityResult" }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("UpdateRoomAvailability: ResultERROR " + String(errorText));
+                });
+            }
                
             if (obj.mt == "UpdateDeviceRoom") {
                 var devices = [];

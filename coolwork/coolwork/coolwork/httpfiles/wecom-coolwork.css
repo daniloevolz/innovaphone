@@ -2,7 +2,7 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    overflow: auto;
+    /* overflow: auto; */
     background-size: cover;
     background-repeat: no-repeat;
     /* background-image: url(./images/background.png); */
@@ -1065,6 +1065,9 @@ dialog::backdrop {
     justify-content: center;
     align-items: center;
     position: relative;
+  } 
+    .scheduled{
+        background-color: rgb(196, 57, 57);
   }
     .unavailable{
         background-color: rgba(94, 94, 94, 0.25);
