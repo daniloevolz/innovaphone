@@ -181,7 +181,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "UpdateRoomAvailabilityResult"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
-    }
+    } 
 
     //#region CRIAÇÃO DE SALA
     function makeDivCreateRoom(){
@@ -634,8 +634,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                         console.log(JSON.stringify(dates))
                     }
                 })
-            
-            var typeSched = "hourModule";
+
+            // if(avail){ 
+            //     var typeSched = avail;
+            // }else{
+            //     
+            // }
+            var typeSched = "hourModule"
+
             btnDaySchedule.addEventListener("click", function(event) {
                 typeOfRoomButtons(event, btnDaySchedule, btnHourSchedule ,function(selectedButton){
                     typeSched = selectedButton.id
@@ -991,37 +997,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         // dias recorrentes 
         getAllClickedWeekDays(daysSelected);
         
-    }
-    function makePopUp(title, msg, btn1, btn2){
-        const bcgrd = document.createElement("div")
-        bcgrd.setAttribute("id","bcgrd")
-        bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
-    
-        const popUp = document.createElement("div")
-        popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
-        const titlePopUp = document.createElement("div") // aplicar tipografia 
-        titlePopUp.textContent = title
-        const msgPopUp = document.createElement("div")
-        msgPopUp.classList.add("text-center")
-        msgPopUp.textContent = msg
-        const divButtons = document.createElement("div")
-        divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
-        const button1 = makeButton(btn1, "primary", "");
-        divButtons.appendChild(button1)
-        popUp.appendChild(titlePopUp)
-        popUp.appendChild(msgPopUp)
-        popUp.appendChild(divButtons)
-        bcgrd.appendChild(popUp)
-        document.body.appendChild(bcgrd)
-        if(btn2){
-            const button2 = makeButton(btn2, "secundary", "");
-            button2.addEventListener("click",function(){
-                console.log("BUTTON 2 CLICADO")
-                document.body.removeChild(bcgrd)
-            })
-            divButtons.appendChild(button2)
-        }
-        return button1
     }
     function makeDivChooseImage(callback){
         // filesID = [] // limpeza
@@ -1631,14 +1606,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             });
             
             btnUpdateRoom.addEventListener("click",function(){
-                app.send(
-                    {api: "admin", mt: "UpdateRoomAvailability", 
-                    datastart: dateAvailability[0].start, 
-                    dataend: dateAvailability[0].end,
-                    roomID: id
-                
-                
-                })
+                if(avail.type == "periodType"){
+                    app.send({
+                        api: "admin", mt: "UpdateRoomAvailability", 
+                        datastart: dateAvailability[0].start, 
+                        dataend: dateAvailability[0].end,
+                        schedModule: typeSchedule,
+                        roomID: id
+                    })
+                }    
             })
     }
     function makeAvatar(viewersFilter, divMain) {
@@ -1674,6 +1650,37 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion VISUALIZAÇÃO DE SALA
 
     //#region COMPONENTES
+    function makePopUp(title, msg, btn1, btn2){
+        const bcgrd = document.createElement("div")
+        bcgrd.setAttribute("id","bcgrd")
+        bcgrd.classList.add("absolute","w-full","h-full", "justify-center", "items-center", "top-0", "left-0", "flex", "z-1000", "bg-blue-500", "bg-opacity-40")
+    
+        const popUp = document.createElement("div")
+        popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
+        const titlePopUp = document.createElement("div") // aplicar tipografia 
+        titlePopUp.textContent = title
+        const msgPopUp = document.createElement("div")
+        msgPopUp.classList.add("text-center")
+        msgPopUp.textContent = msg
+        const divButtons = document.createElement("div")
+        divButtons.classList.add("flex", "p-2", "flex-col", "items-center", "gap-2", "items-stretch")
+        const button1 = makeButton(btn1, "primary", "");
+        divButtons.appendChild(button1)
+        popUp.appendChild(titlePopUp)
+        popUp.appendChild(msgPopUp)
+        popUp.appendChild(divButtons)
+        bcgrd.appendChild(popUp)
+        document.body.appendChild(bcgrd)
+        if(btn2){
+            const button2 = makeButton(btn2, "secundary", "");
+            button2.addEventListener("click",function(){
+                console.log("BUTTON 2 CLICADO")
+                document.body.removeChild(bcgrd)
+            })
+            divButtons.appendChild(button2)
+        }
+        return button1
+    }
     function makeHeader(imgLeft,imgRight,title,callback){
         // construção do header
     
@@ -2550,7 +2557,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelLogo = document.createElement("div")
         labelLogo.textContent = texts.text("labelLogo")
 
-
         divPrimaryColor.appendChild(paletteIcon1)
         divPrimaryColor.appendChild(labelPrimaryColor)
         divSecundaryColor.appendChild(paletteIcon2)
@@ -2796,7 +2802,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#region EDIÇÃO DE SALA
     function makeDivEditRoom(nameRoom,type){
         that.clear()
-        const btnUpdateRoom = makeButton(texts.text("labelEdit"),"primary","")
+        const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
         makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
         const divMain = document.createElement("div")
         divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
@@ -2831,7 +2837,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         var btnPeriod;
         var btnRecurrent;
-        
+
         if(type == 'periodType'){
             btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
             btnPeriod.id = "periodType"

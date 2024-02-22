@@ -454,7 +454,6 @@ function nextSchedules(mySchedules){
     const filtredschedules = mySchedules.filter(function (s) {
         // Converta a string de data para um objeto Date para comparação
         const startDate = new Date(s.data_start);
-
         // Compare apenas as datas (ignorando horas, minutos, etc.)
         return startDate > today;
     });
