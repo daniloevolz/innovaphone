@@ -1994,20 +1994,19 @@ function getDayOfWeekLabel(selectedDate) {
                 })      
              }
             else if(module == "schedule"){
-                app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
-                    
-                    // componentizar esse bloco de codigo em uma função separada ~pietro
-                    var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
-                    btnPopUp.addEventListener("click",function(event){
-                        event.stopPropagation()
-                        event.preventDefault()
+                // componentizar esse bloco de codigo em uma função separada ~pietro
+                var btnPopUp = makePopUp(texts.text("labelConfirmSchedule"), texts.text("labelScheduleComplete"), texts.text("labelConfirmSchedule"),texts.text("labelCancel"))
+                btnPopUp.addEventListener("click",function(event){
+                    event.stopPropagation()
+                    event.preventDefault()
+                    app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)
                             makeViewRoomDetail(roomId)
                         })
-                    })
-                  
                 })
+                
+            })
                  
             }else if(module == "update"){
                 console.log("Update p banco " + JSON.stringify(updateSched.id))

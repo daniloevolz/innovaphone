@@ -349,19 +349,22 @@ cells.forEach(function (cell) {
 
     }
 
-    selectedCells.forEach(function(selectedCell) {
-      console.log("data-dateSelectedCell "  + selectedCell.getAttribute("data-date"))
-      console.log("dateDate Cell normal " + cell.getAttribute("date-date"))
-      console.log("igual")
-      selectedCell.classList.add("selected");
-      selectedCell.classList.add("selectedCellFocus");
-    });
-  
 
   });
 
+  selectedCells.forEach(function(selectedCell) {
+
+    if(selectedCell.getAttribute("data-date") == cell.getAttribute("data-date") ){
+      console.log("Valores Iguais")
+      cell.classList.add("selected");
+      cell.classList.add("selectedCellFocus");
+    }
+    
+  });
+
+
 });
-//~pietro 22/2/24 continuar
+
 
 
         UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
