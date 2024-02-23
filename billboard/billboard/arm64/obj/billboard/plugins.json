@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.billboardmanager",
+            "icon": "wecom-billboard.png",
+            "lang": "wecom.billboardmanagertexts",
+            "domains": false
+        }
+    ]
+}

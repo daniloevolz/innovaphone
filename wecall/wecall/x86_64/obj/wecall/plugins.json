@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.wecallmanager",
+            "icon": "wecom-wecall.png",
+            "lang": "wecom.wecallmanagertexts",
+            "domains": false
+        }
+    ]
+}

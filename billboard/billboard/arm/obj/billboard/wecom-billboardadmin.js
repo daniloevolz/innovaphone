@@ -24,6 +24,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var licenseUsed = 0;
     var avatar = start.consumeApi("com.innovaphone.avatar");
     var appUrl = start.originalUrl;
+    var receivedFragments = [];
 
     var colorSchemes = {
         dark: {
@@ -116,12 +117,34 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") {
-            list_departments = JSON.parse(obj.result)
-            makeDivDepart(_colDireita, list_departments, list_tableUsers);
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_departments = JSON.parse(receivedFragments.join(""));
+                // Faça o que quiser com os dados aqui
+                makeDivDepart(_colDireita, list_departments, list_tableUsers);
+                // Limpe o array de fragmentos recebidos
+                receivedFragments = [];
+            }
+
+            //list_departments = JSON.parse(obj.result)
+            //makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
-            list_post = JSON.parse(obj.result)
-            makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_post = JSON.parse(receivedFragments.join(""));
+                // Faça o que quiser com os dados aqui
+                makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
+                // Limpe o array de fragmentos recebidos
+                receivedFragments = [];
+            }
+
+            //list_post = JSON.parse(obj.result)
+            //makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
         }
         if (obj.api == "admin" && obj.mt == "UpdatePostSuccess") {
             app.send({ api: "admin", mt: "SelectPosts" })
@@ -130,6 +153,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             app.send({ api: "admin", mt: "SelectDepartments" });
         }
         if (obj.api == 'admin' && obj.mt == "SelectDepartments") {
+
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectAdminDepartmentViewersResult") {
@@ -506,7 +530,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, "nameDepDiv").setAttribute("id", "nameDepDiv"))
-        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #ffff;">`
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #000000;">`
         //var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
         postMsgDiv.add(userTable);
@@ -768,9 +792,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 makePopup(texts.text("labelAlert"),texts.text("labelFullAllPosts"), 500, 200);
             } else if (endPost < startPost) {
                 makePopup(texts.text("labelAlert"),texts.text("labelDataEndPostAlert"), 500, 200);
-            } else if (startPost < currentDate) {
-                makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
-            } else {
+            }
+            //else if (startPost < currentDate) {
+            //    makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
+            //}
+            else {
                 app.send({ api: "admin", mt: "UpdatePost", id: parseInt(dep_id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(departPost, 10), date_start: startPost, date_end: endPost, type: idSel });
             };
             s.removeEventListener('click', s);

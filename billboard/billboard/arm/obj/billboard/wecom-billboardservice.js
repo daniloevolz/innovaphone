@@ -228,6 +228,19 @@ new JsonApi("user").onconnected(function (conn) {
                     // Database.exec("SELECT * FROM tbl_posts WHERE department ='" + obj.department + "'")
                     Database.exec("SELECT * FROM tbl_posts WHERE department = '" + obj.department + "' AND deleted IS NULL")
                         .oncomplete(function (data) {
+                            var jsonData = JSON.stringify(data, null, 4);
+                            var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                            var fragments = [];
+                            for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                fragments.push(jsonData.substr(i, maxFragmentSize));
+                            }
+                            // Enviar cada fragmento separadamente através do websocket
+                            for (var i = 0; i < fragments.length; i++) {
+                                var isLastFragment = i === fragments.length - 1;
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                conn.send(JSON.stringify({ api: "user", mt: "SelectAllPostsResult", src: obj.src, result: fragments[i], lastFragment: isLastFragment, dep_id: obj.department }));
+                            }
+
                             conn.send(JSON.stringify({ api: "user", mt: "SelectAllPostsResult", src: obj.src, result: JSON.stringify(data), dep_id: obj.department }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
@@ -546,8 +559,25 @@ new JsonApi("admin").onconnected(function (conn) {
                     //var queryViewer;
                     //Database.exec(queryViewer)
                     .oncomplete(function (data) {
-                        log("SelectPosts:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+
+                        var jsonData = JSON.stringify(data, null, 4);
+                        var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                        var fragments = [];
+                        for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                            fragments.push(jsonData.substr(i, maxFragmentSize));
+                        }
+                        // Enviar cada fragmento separadamente através do websocket
+                        for (var i = 0; i < fragments.length; i++) {
+                            var isLastFragment = i === fragments.length - 1;
+
+                            //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                            log("SelectPosts:result=" + JSON.stringify(fragments, null, 4));
+                            conn.send(JSON.stringify({ api: "admin", mt: "SelectPostsResult", src: obj.src, result: fragments[i], lastFragment: isLastFragment }));
+
+                        }
+
+                        //log("SelectPosts:result=" + JSON.stringify(data, null, 4));
+                        //conn.send(JSON.stringify({ api: "admin", mt: "SelectPostsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
@@ -562,8 +592,25 @@ new JsonApi("admin").onconnected(function (conn) {
                     //var queryViewer;
                     //Database.exec(queryViewer)
                     .oncomplete(function (data) {
-                        log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
+
+                        var jsonData = JSON.stringify(data, null, 4);
+                        var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                        var fragments = [];
+                        for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                            fragments.push(jsonData.substr(i, maxFragmentSize));
+                        }
+                        // Enviar cada fragmento separadamente através do websocket
+                        for (var i = 0; i < fragments.length; i++) {
+                            var isLastFragment = i === fragments.length - 1;
+
+                            //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                            log("SelectDepartments:result=" + JSON.stringify(fragments, null, 4));
+                            conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: fragments[i], lastFragment: isLastFragment }));
+
+                        }
+
+                        //log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
+                        //conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));

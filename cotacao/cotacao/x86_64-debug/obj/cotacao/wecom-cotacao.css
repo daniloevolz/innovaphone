@@ -11,7 +11,7 @@ body {
     margin: 0px;
     overflow-x: hidden;
     overflow-y: hidden;
-    background-image: url('background.png');
+    background-image: url('background.jpg');
 }
 
 div.button {
@@ -99,7 +99,7 @@ div#logowecom {
 
 .linha2 {
     order: 2;
-    background-image: url("background.png");
+    background-image: url("background.jpg");
     background-size: cover;
     align-content: center;
     width: 100%;
@@ -337,7 +337,6 @@ label {
         float: left;
         font-size: 15px;
         text-align:left;
-    
     }
 
     .img-item {

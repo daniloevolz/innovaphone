@@ -1,0 +1,312 @@
+{
+  "database": {
+    "init": [
+      {
+        "cmd": "table",
+        "name": "tbl_activities",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "sip",
+            "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "name",
+            "type": "VARCHAR(120)"
+
+          },
+          {
+            "cmd": "column",
+            "name": "date",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "status",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "details",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "tbl_availability",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "sip",
+            "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "name",
+            "type": "VARCHAR(120)"
+
+          },
+          {
+            "cmd": "column",
+            "name": "date",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "status",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "group_name",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "tbl_calls",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "sip",
+            "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "number",
+            "type": "VARCHAR(120)"
+
+          },
+          {
+            "cmd": "column",
+            "name": "call_started",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "call_ringing",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "call_connected",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "call_ended",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "status",
+            "type": "INTEGER"
+          },
+          {
+            "cmd": "column",
+            "name": "direction",
+            "type": "VARCHAR(50)"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "list_buttons",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "button_name",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_prt",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "button_prt_user",
+            "type": "VARCHAR(250)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_user",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type",
+            "type": "VARCHAR(50) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_1",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_2",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_3",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_type_4",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "button_device",
+            "type": "VARCHAR(50)"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "list_alarm_actions",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "action_name",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_alarm_code",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_start_type",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_prt",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "action_user",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_type",
+            "type": "VARCHAR(50) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "action_device",
+            "type": "VARCHAR(50)"
+          }
+        ]
+      }
+    ]
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "licenseAppFile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseInstallDate",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseAppToken",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlalert",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlPhoneApiEvents",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/phoneevents",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallEvents",
+        "type": "BOOL",
+        "default": false,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "googleApiKey",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      }
+    ]
+
+  },
+  "javascript": {
+    "eval": [
+      "wecom-novaalertservice.js"
+    ]
+  },
+  "apis": {
+    "wecom-novaalert": {
+      "presence": true,
+      "com.innovaphone.phoneinfo": {
+        "info": {}
+      },
+      "com.innovaphone.phone": {
+        "info": {}
+      },
+      "com.innovaphone.calllist": {
+        "info": {}
+      }
+    }
+  }
+}

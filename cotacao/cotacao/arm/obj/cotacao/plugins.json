@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.cotacaomanager",
+            "icon": "wecom-cotacao.png",
+            "lang": "wecom.cotacaomanagertexts",
+            "domains": false
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.dwcschedulermanager",
+            "icon": "wecom-dwcscheduler.png",
+            "lang": "wecom.dwcschedulermanagertexts",
+            "domains": false
+        }
+    ]
+}

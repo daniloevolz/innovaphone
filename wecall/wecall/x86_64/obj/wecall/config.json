@@ -1,0 +1,174 @@
+{
+  "database": {
+    "init": [
+      {
+        "cmd": "table",
+        "name": "tbl_dashboards",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "sip",
+            "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "app_name",
+            "type": "VARCHAR(120) NOT NULL"
+
+          },
+          {
+            "cmd": "column",
+            "name": "url",
+            "type": "text"
+
+          },
+          {
+            "cmd": "column",
+            "name": "date_add",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  "javascript": {
+    "eval": [
+      "wecom-wecallservice.js"
+    ]
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "licenseAppFile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseInstallDate",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "licenseAppToken",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "url",
+        "type": "STRING",
+        "default": "https://wecall.3sales.net/home/desktop/startup/",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urladmin",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urldash",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlmobile",
+        "type": "STRING",
+        "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallHistory",
+        "type": "BOOL",
+        "default": false,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlCallHistory",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/callhistory",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "sendCallEvents",
+        "type": "BOOL",
+        "default": true,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlPhoneApiEvents",
+        "type": "STRING",
+        "default": "http://wecall.sales3.net/phoneevents",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlSSO",
+        "type": "STRING",
+        "default": "https://wecallsup.3sales.net/api/innovaphone/gettoken",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "CodClient",
+        "type": "STRING",
+        "default": "1234567890876543",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "CodLeaveAllGroups",
+        "type": "STRING",
+        "default": "#32#",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "LeaveAllGroupsOnStatup",
+        "type": "BOOL",
+        "default": false,
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlGetGroups",
+        "type": "STRING",
+        "default": "https://wecallsup.3sales.net/api/innovaphone/getgroups",
+        "password": false
+      }
+    ]
+  },
+  "apis": {
+    "wecom-wecall": {
+      "presence": true,
+      "com.innovaphone.phoneinfo": {
+        "info": {}
+      },
+      "com.innovaphone.phone": {
+        "info": {}
+      },
+      "com.innovaphone.calllist": {
+        "info": {}
+      }
+    }
+  }
+}
