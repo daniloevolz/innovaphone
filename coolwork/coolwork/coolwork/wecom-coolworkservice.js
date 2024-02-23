@@ -317,7 +317,7 @@ new JsonApi("user").onconnected(function(conn) {
             }
             if (obj.mt == "SelectDevicesSchedule") {
                 var roomIds = obj.ids
-                log("ROOMIDS" + obj.ids)
+                log("ROOMIDS", JSON.stringify(roomIds))
                 var ids = extrairValoresId(roomIds);
 
                 var query = "SELECT * " +
@@ -658,7 +658,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 var queryEditorsRoom = "SELECT * FROM tbl_room_editors"; 
                 var queryViewersRoom = "SELECT * FROM tbl_room_viewers"; 
                 Database.exec(querySelectRoom)
-                    .oncomplete(function (roomData) {
+                    .oncomplete(function (roomData) {    
                         Database.exec(querySelectDevices)
                             .oncomplete(function (deviceData) {
                                 Database.exec(queryEditorsRoom)
@@ -792,6 +792,16 @@ new JsonApi("admin").onconnected(function(conn) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("UpdateRoomResult:result=Error " + String(errorText));
                     });
+            }
+            if (obj.mt == "UpdateRoomAvailability") {
+                var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "', schedule_module = '" + obj.schedModule +  "' WHERE room_id = '" + obj.roomID + "'";
+                Database.exec(sqlUpdate)
+                    .oncomplete(function (data) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomAvailabilityResult" }));
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("UpdateRoomAvailability: ResultERROR " + String(errorText));
+                });
             }
                
             if (obj.mt == "UpdateDeviceRoom") {

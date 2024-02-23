@@ -2,7 +2,7 @@
 body {
     background-color: var(--bg);
     color: var(--text-standard);
-    overflow: auto;
+    /* overflow: auto; */
     background-size: cover;
     background-repeat: no-repeat;
     /* background-image: url(./images/background.png); */
@@ -29,11 +29,13 @@ body {
     vertical-align: middle;
     position: relative;
     display: inline-flex;
-    height: 50px;
+    height: 80px;
+    width: 100px;
     flex-shrink: 0;
     border-radius: 6px;
     background: var(--Silver-Chalice-100, #EDEDED);
     align-items: center;
+    margin: 12px;
 }
 
 .div82 {
@@ -1063,6 +1065,9 @@ dialog::backdrop {
     justify-content: center;
     align-items: center;
     position: relative;
+  } 
+    .scheduled{
+        background-color: rgb(196, 57, 57);
   }
     .unavailable{
         background-color: rgba(94, 94, 94, 0.25);

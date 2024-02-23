@@ -54,7 +54,15 @@ function buildCalendar(availability,callback,module,schedules) {
     var date = new Date();
     currentMonth = date.getMonth();
      year = date.getFullYear();
-  
+
+    //  cells.forEach(function (cell) {
+    //   var cellDate = cell.getAttribute("data-date");
+    //   if (selectedCells.includes(cellDate)) {
+    //       cell.classList.add("selected");
+    //       cell.classList.add("selectedCellFocus");
+    //   }
+  //});
+
     document.getElementById("prevMonth").addEventListener("click", function () {
       currentMonth--;
       if (currentMonth < 0) {
@@ -124,7 +132,7 @@ function buildCalendar(availability,callback,module,schedules) {
     thead.appendChild(tr);
     return thead;
   }
-  
+  var selectedCells = [];
   function rebuildCalendar(availability,callback,module,schedules) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
@@ -216,7 +224,19 @@ function buildCalendar(availability,callback,module,schedules) {
       nextMonthDay++;
     }
     var cells = document.querySelectorAll("#calendar-body tr td div");
-    var selectedCells = [];
+
+  //   selectedCells.forEach(function (selectedCell) {
+
+  //     var dataCell = moment(selectedCell.getAttribute("data-date"))
+  //     console.log("dataCell " + dataCell.format("YYYY-MM-DD"))
+  //     var cell = document.querySelector('[data-date="' + dataCell.format("YYYY-MM-DD") + '"]');
+  //     if (cell) {
+  //         cell.classList.add("selected");
+  //         cell.classList.add("selectedCellFocus");
+  //     }
+  // });
+
+    
 
 cells.forEach(function (cell) {
   
@@ -227,7 +247,7 @@ cells.forEach(function (cell) {
 
   var selectedDay = parseInt(cell.textContent);
   var formattedDate = moment(selectedDay + "-" + (currentMonth + 1) + "-" + year, "D-M-YYYY").format("YYYY-MM-DD");
-  console.log("FORMATTED-DATE" + formattedDate)
+  //console.log("FORMATTED-DATE" + formattedDate)
   cell.setAttribute("data-date", formattedDate);
   
   cell.addEventListener("click", function () {
@@ -298,6 +318,10 @@ cells.forEach(function (cell) {
           cell.classList.add("selectedCellFocus");
           selectedCells.push(cell);
         }
+        else if(selectedCells.length < 1){
+          selectedCells = []
+          console.log("SelectedCells Vazia , Nenhuma Data Escolhida")
+        }
       } else {
         // Desselecionar a data clicada se já estiver selecionada
         cell.classList.remove("selected");
@@ -321,16 +345,28 @@ cells.forEach(function (cell) {
           endDate: endDate.format("YYYY-MM-DD")
         });
       }
+
+
     }
-  
-    // cells.forEach(function (otherCell) {
-    //   if (!otherCell.classList.contains("selected")) {
-    //     otherCell.classList.remove("pointer-events-none");
-    //   }
-    // });
+
+
   });
 
+  selectedCells.forEach(function(selectedCell) {
+
+    if(selectedCell.getAttribute("data-date") == cell.getAttribute("data-date") ){
+      console.log("Valores Iguais")
+      cell.classList.add("selected");
+      cell.classList.add("selectedCellFocus");
+    }
+    
+  });
+
+
 });
+
+
+
         UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
   }
   
@@ -832,23 +868,27 @@ function UpdateAvailability(availability, type, schedules) {
                             td.classList.add("pointer-events-none");
                         }
                         console.log("SCHEDULES UPDATEAVAILABILITY " + JSON.stringify(schedules))
-                        // schedules.forEach(function(s){
-                        //   // availabilities com hora
+
+                        schedules.forEach(function(s){
+                          var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD');
+                          if(s.type == "dayModule" && dataDate == dataStartSchedule ){
+                              td.classList.remove("available");
+                              td.classList.add('scheduled')
+                              td.classList.add("pointer-events-none");
+                          }
                         //   var datastartDateHour = moment(dates.data_start).format('YYYY-MM-DD HH:mm');
                         //   var dataendDateHour = moment(dates.data_end).format('YYYY-MM-DD HH:mm');
                         //   // agendamentos com hora 
-                        //   var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD HH:mm');
+                          
                         //   var dataEndSchedule = moment(s.data_end).format('YYYY-MM-DD HH:mm');
                           
                         //   console.log("DATADATE " + dataDate)
-                        // //   if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour)){
-                        // //         td.classList.remove("available");
-                        // //         td.classList.add('unavailable');
-                        // //         td.classList.add("pointer-events-none");
-                        // // }
-                        // })
-
-                        //rever 06/02 ~pietro
+                        //   if(String(dataStartSchedule) >= String(datastartDateHour) && String(dataEndSchedule) <= String(dataendDateHour)){
+                                
+                        //         td.classList.add('unavailable');
+                        //         td.classList.add("pointer-events-none");
+                        // }
+                        })   
                     });
                 }
             })
