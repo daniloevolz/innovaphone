@@ -552,7 +552,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
-            },"availability")
+            },"availability",buttonCancel,buttonConfirm)
             
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")

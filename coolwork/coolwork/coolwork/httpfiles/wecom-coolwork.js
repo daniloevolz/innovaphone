@@ -389,7 +389,7 @@ function filterSchedule(){
     
     btnDate.addEventListener('click', function(event){
 
-        makeCalendar("","viewSchedule",mainFilter, null, null, function (day) {
+        makeCalendar(mySchedules,"viewSchedule",mainFilter, null, null, function (day) {
             selected = day
             var filtred = mySchedules.filter(function(s){
                 // Extract the date part from s.data_start
