@@ -1,0 +1,33 @@
+{
+    "config": {
+      "init": [
+        {
+          "cmd": "item",
+          "name": "urlb3",
+          "type": "STRING",
+          "default": "",
+          "password": false
+        },
+        {
+            "cmd": "item",
+            "name": "urltodas",
+            "type": "STRING",
+            "default": "",
+            "password": false
+          },
+          {
+            "cmd": "item",
+            "name": "urlbcb",
+            "type": "STRING",
+            "default": "",
+            "password": false
+          }
+      ]
+    
+    },
+    "javascript": {
+        "eval": [
+            "wecom-cotacaoservice.js"
+        ]
+    }
+}
