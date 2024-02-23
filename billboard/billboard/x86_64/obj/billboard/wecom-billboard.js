@@ -17,6 +17,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     var list_viewers_departments = [];
     var createDepartment = false;
     var billboard;
+    var receivedFragments = [];
 
 
     var colorSchemes = {
@@ -152,17 +153,39 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
             console.log(obj.result);
-            list_posts = JSON.parse(obj.result)
-            var dep_id = JSON.parse(obj.dep_id)
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_posts = JSON.parse(receivedFragments.join(""));
+                // Faça o que quiser com os dados aqui
+                //list_posts = JSON.parse(obj.result)
+                var dep_id = JSON.parse(obj.dep_id)
                 var hasPosts = list_posts.filter(function (item) {
                     return item.department
                 })
                 console.log("Has posts" + JSON.stringify(hasPosts))
                 if (hasPosts.length > 0) {
-                    makePopup(texts.text("labelAlert"),texts.text("labelDelAllPosts"), 500, 200);
+                    makePopup(texts.text("labelAlert"), texts.text("labelDelAllPosts"), 500, 200);
                 } else {
                     app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
                 }
+                receivedFragments = [];
+            }
+            //list_posts = JSON.parse(obj.result)
+            //var dep_id = JSON.parse(obj.dep_id)
+            //var hasPosts = list_posts.filter(function (item) {
+            //    return item.department
+            //})
+            //console.log("Has posts" + JSON.stringify(hasPosts))
+            //if (hasPosts.length > 0) {
+            //    makePopup(texts.text("labelAlert"), texts.text("labelDelAllPosts"), 500, 200);
+            //} else {
+            //    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+            //}
+
+
+            
         }
     }
     function makePopup(header, content, width, height) {
@@ -222,7 +245,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 document.getElementById(department.id).style.fontSize = "20px"
             }
             var ulNew = div.add(new innovaphone.ui1.Node("ul", null, null, null).setAttribute("id", "newDepPost"))
-            var aElement = div.add(new innovaphone.ui1.Node("a", null, nameDepartment, null))
+            if (department.color=="#000000") {
+                var aElement = div.add(new innovaphone.ui1.Node("a", "color:white;", nameDepartment, null))
+            } else {
+                var aElement = div.add(new innovaphone.ui1.Node("a", null, nameDepartment, null))
+            }
+            
         });
 
         if (createDepartment == true) {
@@ -905,9 +933,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 makePopup(texts.text("labelAlert"),texts.text("labelCompletePostFormAlert"), 500, 200);
             } else if (endPost < startPost) {
                 makePopup(texts.text("labelAlert"),texts.text("labelDataEndPostAlert"), 500, 200);
-            } else if (startPost < currentDate) {
-                makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
-            } else {
+            }
+            //else if (startPost < currentDate) {
+            //    makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
+            //}
+            else {
                 app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
 
             };
@@ -944,7 +974,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             makeDivDepartments();
         });
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "nameDepDiv").setAttribute("id", "nameDepDiv"))
-        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" placeholder="${texts.text("labelNameDepart")} " style="color: #ffff;">`
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" placeholder="${texts.text("labelNameDepart")} " style="color: #000000;">`
         var userTable = createUsersDepartmentsGrid();
         postMsgDiv.add(userTable)
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "buttonsDiv").setAttribute("id", "buttonsDiv"))
