@@ -505,7 +505,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             list_tableUsers.forEach(function (user) {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-                if (viewerCheckbox.checked) {
+                if (viewerCheckbox && viewerCheckbox.checked) {
                     viewer.push(user.guid);
                 }
                     viewers(viewer)
@@ -552,7 +552,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
-            },"availability",buttonCancel,buttonConfirm)
+            },"availability")
             
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -1189,11 +1189,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
         buttonConfirm.addEventListener("click",function(){
             var devArray = [];
-            // viewer = [];
-
+           
             devices.forEach(function (dev) {
                 var devCheckbox = document.getElementById("checkboxDev_" + dev.hwid);
-                if (devCheckbox.checked) {
+                if (devCheckbox && devCheckbox.checked) {
                     devArray.push(dev.hwid);
                 }
                 devHwId = devArray 
@@ -2227,68 +2226,154 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.appendChild(div93)
     }
     // função genérica para busca de usuarios e devices no input search
-    function searchItems(arrayItems, idTable,itemType, filter = "") {
-        const scroll = document.getElementById(idTable);
-        scroll.innerHTML = '';
+    // function searchItems(arrayItems, idTable,itemType, filter = "") {
+    //     const scroll = document.getElementById(idTable);
+    //     scroll.innerHTML = '';
     
-        arrayItems.forEach(function (item) {
-            if (itemType === "user" && item.cn && item.cn.toLowerCase().includes(filter.toLowerCase())) {
-                const divMainUsers = document.createElement("div");
-                divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
-                const divUsersAvatar = document.createElement("div");
-                divUsersAvatar.classList.add("flex", "gap-1", "items-center");
-                let avatar = new innovaphone.Avatar(start, item.sip, userDomain);
-                let UIuserPicture = avatar.url(item.sip, 120, userDN);
-                const imgAvatar = document.createElement("img");
-                imgAvatar.setAttribute("src", UIuserPicture);
-                imgAvatar.setAttribute("id", "divAvatar");
-                imgAvatar.classList.add("w-5", "h-5", "rounded-full");
-                const nameUser = document.createElement("div");
-                nameUser.textContent = item.cn;
-                const checkboxUser = makeInput("", "checkbox", "");
-                checkboxUser.setAttribute("id", "viewercheckbox_" + item.guid);
-                checkboxUser.classList.add("checkboxUser");
-                divUsersAvatar.appendChild(imgAvatar);
-                divUsersAvatar.appendChild(nameUser);
-                divMainUsers.appendChild(divUsersAvatar);
-                divMainUsers.appendChild(checkboxUser);
-                scroll.appendChild(divMainUsers);
-            }
-            else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())){
-                    const divMainDevices = document.createElement("div")
-                    divMainDevices.setAttribute("id",item.hwid)
-                    divMainDevices.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
-                    const divImgDevice = document.createElement("div")
-                    divImgDevice.classList.add("flex","items-center","gap-1")
-                    const imgDevice = document.createElement("img");
-                    imgDevice.src = './images/device-admin.png'
-                    //imgDevice.classList.add("w-5", "h-5", "rounded-full");
-                    const nameDevice = document.createElement("div")
-                    nameDevice.textContent = item.name
-                        const divCheckbox = document.createElement("div")
-                    divCheckbox.classList.add("flex", "gap-1" ,"items-center")
-                    const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
-                    identifyBtn.id = item.hwid
-                    identifyBtn.addEventListener("click",function(){
-                            console.log("ID  " + this.id)
-                        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
-                    })
-                    const checkboxDevice = makeInput("","checkbox","")
-                    checkboxDevice.setAttribute("id",'checkboxDev_' + item.hwid)
-                    checkboxDevice.classList.add("checkboxDev")
+    //     arrayItems.forEach(function (item) {
+    //         if (itemType === "user" && item.cn && item.cn.toLowerCase().includes(filter.toLowerCase())) {
+    //             const divMainUsers = document.createElement("div");
+    //             divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+    //             const divUsersAvatar = document.createElement("div");
+    //             divUsersAvatar.classList.add("flex", "gap-1", "items-center");
+    //             let avatar = new innovaphone.Avatar(start, item.sip, userDomain);
+    //             let UIuserPicture = avatar.url(item.sip, 120, userDN);
+    //             const imgAvatar = document.createElement("img");
+    //             imgAvatar.setAttribute("src", UIuserPicture);
+    //             imgAvatar.setAttribute("id", "divAvatar");
+    //             imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+    //             const nameUser = document.createElement("div");
+    //             nameUser.textContent = item.cn;
+    //             const checkboxUser = makeInput("", "checkbox", "");
+    //             checkboxUser.setAttribute("id", "viewercheckbox_" + item.guid);
+    //             checkboxUser.classList.add("checkboxUser");
+    //             divUsersAvatar.appendChild(imgAvatar);
+    //             divUsersAvatar.appendChild(nameUser);
+    //             divMainUsers.appendChild(divUsersAvatar);
+    //             divMainUsers.appendChild(checkboxUser);
+    //             scroll.appendChild(divMainUsers);
+    //         }
+    //         else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())){
+    //                 const divMainDevices = document.createElement("div")
+    //                 divMainDevices.setAttribute("id",item.hwid)
+    //                 divMainDevices.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
+    //                 const divImgDevice = document.createElement("div")
+    //                 divImgDevice.classList.add("flex","items-center","gap-1")
+    //                 const imgDevice = document.createElement("img");
+    //                 imgDevice.src = './images/device-admin.png'
+    //                 //imgDevice.classList.add("w-5", "h-5", "rounded-full");
+    //                 const nameDevice = document.createElement("div")
+    //                 nameDevice.textContent = item.name
+    //                     const divCheckbox = document.createElement("div")
+    //                 divCheckbox.classList.add("flex", "gap-1" ,"items-center")
+    //                 const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
+    //                 identifyBtn.id = item.hwid
+    //                 identifyBtn.addEventListener("click",function(){
+    //                         console.log("ID  " + this.id)
+    //                     // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+    //                 })
+    //                 const checkboxDevice = makeInput("","checkbox","")
+    //                 checkboxDevice.setAttribute("id",'checkboxDev_' + item.hwid)
+    //                 checkboxDevice.classList.add("checkboxDev")
         
-                    divCheckbox.appendChild(identifyBtn)
-                    divCheckbox.appendChild(checkboxDevice)
-                    divImgDevice.appendChild(imgDevice)
-                    divImgDevice.appendChild(nameDevice)
-                    divMainDevices.appendChild(divImgDevice);
-                    divMainDevices.appendChild(divCheckbox);
-                    scroll.appendChild(divMainDevices)
+    //                 divCheckbox.appendChild(identifyBtn)
+    //                 divCheckbox.appendChild(checkboxDevice)
+    //                 divImgDevice.appendChild(imgDevice)
+    //                 divImgDevice.appendChild(nameDevice)
+    //                 divMainDevices.appendChild(divImgDevice);
+    //                 divMainDevices.appendChild(divCheckbox);
+    //                 scroll.appendChild(divMainDevices)
                 
-            }
+    //         }
 
-        });
+    //     });
+    // }
+    let checkedUsers = {}; // Objeto para armazenar os IDs dos usuários marcados
+
+function searchItems(arrayItems, idTable, itemType, filter = "") {
+    const scroll = document.getElementById(idTable);
+    scroll.innerHTML = '';
+
+    arrayItems.forEach(function (item) {
+        if (itemType === "user" && item.cn && item.cn.toLowerCase().includes(filter.toLowerCase())) {
+            const divMainUsers = createUserElement(item);
+            scroll.appendChild(divMainUsers);
+        } else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())) {
+            const divMainDevices = createDeviceElement(item);
+            scroll.appendChild(divMainDevices);
+        }
+    });
+}
+
+function createUserElement(user) {
+    const divMainUsers = document.createElement("div");
+    divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+    const divUsersAvatar = document.createElement("div");
+    divUsersAvatar.classList.add("flex", "gap-1", "items-center");
+    let avatar = new innovaphone.Avatar(start, user.sip, userDomain);
+    let UIuserPicture = avatar.url(user.sip, 120, userDN);
+    const imgAvatar = document.createElement("img");
+    imgAvatar.setAttribute("src", UIuserPicture);
+    imgAvatar.setAttribute("id", "divAvatar");
+    imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+    const nameUser = document.createElement("div");
+    nameUser.textContent = user.cn;
+    const checkboxUser = makeInput("", "checkbox", "");
+    checkboxUser.setAttribute("id", "viewercheckbox_" + user.guid);
+    checkboxUser.classList.add("checkboxUser");
+
+    // Verifica se o usuário está marcado e marca o checkbox, se necessário
+    if (checkedUsers[user.guid]) {
+        checkboxUser.checked = true;
     }
+
+    // Event listener para marcar/desmarcar usuários
+    checkboxUser.addEventListener("change", function () {
+        if (this.checked) {
+            checkedUsers[user.guid] = true;
+        } else {
+            delete checkedUsers[user.guid];
+        }
+    });
+
+    divUsersAvatar.appendChild(imgAvatar);
+    divUsersAvatar.appendChild(nameUser);
+    divMainUsers.appendChild(divUsersAvatar);
+    divMainUsers.appendChild(checkboxUser);
+    return divMainUsers;
+}
+
+function createDeviceElement(device) {
+    const divMainDevices = document.createElement("div");
+    divMainDevices.setAttribute("id", device.hwid);
+    divMainDevices.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+    const divImgDevice = document.createElement("div");
+    divImgDevice.classList.add("flex", "items-center", "gap-1");
+    const imgDevice = document.createElement("img");
+    imgDevice.src = './images/device-admin.png';
+    const nameDevice = document.createElement("div");
+    nameDevice.textContent = device.name;
+    const divCheckbox = document.createElement("div");
+    divCheckbox.classList.add("flex", "gap-1", "items-center");
+    const identifyBtn = makeButton(texts.text("labelIdentify"), "primary", "");
+    identifyBtn.id = device.hwid;
+    identifyBtn.addEventListener("click", function () {
+        console.log("ID  " + this.id);
+        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+    });
+    const checkboxDevice = makeInput("", "checkbox", "");
+    checkboxDevice.setAttribute("id", 'checkboxDev_' + device.hwid);
+    checkboxDevice.classList.add("checkboxDev");
+
+    divCheckbox.appendChild(identifyBtn);
+    divCheckbox.appendChild(checkboxDevice);
+    divImgDevice.appendChild(imgDevice);
+    divImgDevice.appendChild(nameDevice);
+    divMainDevices.appendChild(divImgDevice);
+    divMainDevices.appendChild(divCheckbox);
+    return divMainDevices;
+}
+
     
     //função REUTILIZAVEL para enviar as datas recorrentes para o banco 
     function recurrentDatesAvail(dataDay,datesRecurrent,startTime,endTime){

@@ -2,7 +2,7 @@
 
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,schedules,callback,module,btnCancel,btnConfirm){
+Calendar.createCalendar = function(divMain,availability,schedules,callback,module){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -35,7 +35,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm)
+    buildCalendar(availability,callback,module,schedules)
 },250)
 
 
@@ -48,7 +48,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm) {
+function buildCalendar(availability,callback,module,schedules) {
    
     console.log("Module " + module)
     var date = new Date();
@@ -69,7 +69,7 @@ function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfi
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm);
+      rebuildCalendar(availability,callback,module,schedules);
       
     });
   
@@ -79,11 +79,11 @@ function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfi
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, callback,module,schedules,btnCancel,btnConfirm);
+      rebuildCalendar(availability, callback,module,schedules);
       
     });
     
-    rebuildCalendar(availability, callback,module,schedules,btnCancel,btnConfirm);
+    rebuildCalendar(availability, callback,module,schedules);
     
     
   }
@@ -133,7 +133,7 @@ function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfi
     return thead;
   }
   var selectedCells = [];
-  function rebuildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm) {
+  function rebuildCalendar(availability,callback,module,schedules) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -175,7 +175,7 @@ function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfi
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm);
+            rebuildCalendar(availability,callback,module,schedules);
             
           });
       }
@@ -219,7 +219,7 @@ function buildCalendar(availability,callback,module,schedules,btnCancel,btnConfi
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability,callback,module,schedules,btnCancel,btnConfirm);
+        rebuildCalendar(availability,callback,module,schedules);
       });
       nextMonthDay++;
     }
@@ -311,7 +311,7 @@ cells.forEach(function (cell) {
     // colocar modo Edição junto com schedule
 
     else if (module === "availability") {
-      console.log("Btn cancel" + btnCancel, "Btn Confirm " + btnConfirm)
+
       // Lógica para modo de disponibilidade
       if (!cell.classList.contains("selected")) {
         // Selecionar a data clicada
