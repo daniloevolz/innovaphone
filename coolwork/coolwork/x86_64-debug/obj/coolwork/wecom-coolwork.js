@@ -23,6 +23,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var selected // call back 
 
     var mySchedules; // apenas para localizar meus agendamentos
+    var myUserGuid; // localizar meu usuario pela tableUsers
 
     var rooms = [];
     var devices = [];
@@ -399,7 +400,7 @@ function filterSchedule(){
             });
             console.log("filteredDate - Pietro", filtred)
             makeUserSchedules(filtred)
-        },"update")
+        },"update","UpdateSchedule")
         
     })
 
@@ -721,7 +722,10 @@ function getDayOfWeekLabel(selectedDate) {
                      app.sendSrc({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id, src: nameDevice.hwid }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)
-                            nextSchedules() 
+                            mySchedules = [schedules.filter(function(s){
+                                return  s.user_guid == myUserGuid.guid
+                            })][0]
+                            nextSchedules(mySchedules) 
                         })
                        
                     })
@@ -776,7 +780,7 @@ function getDayOfWeekLabel(selectedDate) {
         
     }
     
-    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module){
+    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module,UpdateSched){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -800,13 +804,13 @@ function getDayOfWeekLabel(selectedDate) {
             console.log("SelectedDay " + JSON.stringify(selectedDay))
             funcao2(selectedDay) 
             
-        },module); // componente Calendar
+        },module,UpdateSched); // componente Calendar
 
-        if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
-            setTimeout(function(){
-                UpdateSchedule(schedules)
-            },500)
-        }
+        // if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
+        //     setTimeout(function(){
+        //         UpdateSchedule(daySchedule)
+        //     },500)
+        // }
        
         divMain.appendChild(divCalendar);
         
@@ -818,7 +822,7 @@ function getDayOfWeekLabel(selectedDate) {
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
 
-            var myUserGuid = list_tableUsers.filter(function(u){
+            myUserGuid = list_tableUsers.filter(function(u){
                 return u.sip == userSIP
             })[0]
         
@@ -1871,7 +1875,7 @@ function getDayOfWeekLabel(selectedDate) {
                         
                     })
                    
-                },module);
+                },module,null);
 
                 div104.appendChild(frame104btn);
 
@@ -1999,6 +2003,12 @@ function getDayOfWeekLabel(selectedDate) {
                 btnPopUp.addEventListener("click",function(event){
                     event.stopPropagation()
                     event.preventDefault()
+                    if(avail.schedule_module == "dayModule" ){
+                        var horaAtual = moment()
+                        horaAtual.add(2, 'minutes'); 
+                        var horaFinal = horaAtual.format('HH:mm');
+                        dateStart = selectedDay + "T" + horaFinal
+                    }
                     app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)

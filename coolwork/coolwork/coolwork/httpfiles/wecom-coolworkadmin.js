@@ -552,7 +552,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
-            },"availability")
+            },"availability",null)
             
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -665,6 +665,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divButtons.classList.add("flex","justify-between","items-center","rounded-md")
             const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
             buttonCancel.addEventListener("click",function(){
+            document.dispatchEvent(new Event("limparLista"));
             console.log("Fechar Tela")
             document.body.removeChild(insideDiv)
             
@@ -674,21 +675,42 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             typeSchedule(typeSched)
             console.log("typeSched " ,typeSched)
             if(typeSched === "hourModule"){
-                dateTime(dates)
-                console.log("Hour Module")
+
+                if(dates.length > 0){
+                    dateTime(dates)
+                    console.log("Hour Module")
+                    document.body.removeChild(insideDiv)
+                }else{
+                    makePopUp(texts.text("labelWarning"), texts.text("labelMustSelectHour"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
+                }
+               
             }
             else if(typeSched === "dayModule"){
-                dates = []
-                dates.push({
-                    start: selectedDay.startDate + "T" + "00:00",
-                    end:  selectedDay.endDate + "T" + "23:59"
-                })
-                console.log( "DATES TIPO DIA " + JSON.stringify(dates))
-                dateTime(dates)
-                console.log("Day Module")
-          
+                
+                if(selectedDay){
+                    dates = []
+                    dates.push({
+                        start: selectedDay.startDate + "T" + "00:00",
+                        end:  selectedDay.endDate + "T" + "23:59"
+                    })
+                    console.log( "DATES TIPO DIA " + JSON.stringify(dates))
+                    dateTime(dates)
+                    console.log("Day Module")
+                    document.body.removeChild(insideDiv)
+                    document.dispatchEvent(new Event("limparLista"));
+                }else{
+                    makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
+                }
             }
-            document.body.removeChild(insideDiv)
+            
             })
             divButtons.appendChild(buttonCancel)
             divButtons.appendChild(buttonConfirm)
@@ -1952,7 +1974,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                         
                     })
                    
-                },module);
+                },module,null);
 
                 div104.appendChild(frame104btn);
 

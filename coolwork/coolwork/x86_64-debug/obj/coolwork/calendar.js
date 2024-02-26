@@ -2,7 +2,7 @@
 
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,schedules,callback,module){
+Calendar.createCalendar = function(divMain,availability,schedules,callback,module,UpdateSched){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -35,7 +35,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,callback,module,schedules)
+    buildCalendar(availability,callback,module,schedules,UpdateSched)
 },250)
 
 
@@ -48,7 +48,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability,callback,module,schedules) {
+function buildCalendar(availability,callback,module,schedules,UpdateSched) {
    
     console.log("Module " + module)
     var date = new Date();
@@ -69,7 +69,7 @@ function buildCalendar(availability,callback,module,schedules) {
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability,callback,module,schedules);
+      rebuildCalendar(availability,callback,module,schedules,UpdateSched);
       
     });
   
@@ -79,11 +79,11 @@ function buildCalendar(availability,callback,module,schedules) {
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, callback,module,schedules);
+      rebuildCalendar(availability, callback,module,schedules,UpdateSched);
       
     });
     
-    rebuildCalendar(availability, callback,module,schedules);
+    rebuildCalendar(availability, callback,module,schedules,UpdateSched);
     
     
   }
@@ -133,7 +133,7 @@ function buildCalendar(availability,callback,module,schedules) {
     return thead;
   }
   var selectedCells = [];
-  function rebuildCalendar(availability,callback,module,schedules) {
+  function rebuildCalendar(availability,callback,module,schedules,UpdateSched) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -175,7 +175,7 @@ function buildCalendar(availability,callback,module,schedules) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback,module,schedules);
+            rebuildCalendar(availability,callback,module,schedules,UpdateSched);
             
           });
       }
@@ -219,7 +219,7 @@ function buildCalendar(availability,callback,module,schedules) {
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability,callback,module,schedules);
+        rebuildCalendar(availability,callback,module,schedules,UpdateSched);
       });
       nextMonthDay++;
     }
@@ -382,9 +382,19 @@ cells.forEach(function (cell) {
 
 });
 
+document.addEventListener("limparLista", function() {
+  // Limpar a lista selectedCells
+  if(selectedCells){
+    selectedCells.forEach(function(selectedCell) {
+      selectedCell.classList.remove("selected");
+      selectedCell.classList.remove("selectedCellFocus");
+  });
+  selectedCells = [];
+  }
+ 
+});
 
-
-        UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
+        UpdateAvailability(availability,"",schedules, UpdateSched) // atualizar visualização do calendario
   }
   
   function getMonthName(month) {
@@ -428,7 +438,7 @@ cells.forEach(function (cell) {
   //funções de disponibilidade
 
       
-function UpdateAvailability(availability, type, schedules) {
+function UpdateAvailability(availability, type, schedules,UpdateSched) {
         var cells = document.querySelectorAll("#calendar-body tr td div");
         if (availability.length === 0) {
             cells.forEach(function (td) {
@@ -910,6 +920,35 @@ function UpdateAvailability(availability, type, schedules) {
                     });
                 }
             })
+        }
+        //para consultar meus Schedules na tela de usuario 
+        //cada vez que avançar ou voltar nas setas do calendario
+        if(UpdateSched == "UpdateSchedule"){
+          var cells = document.querySelectorAll("#calendar-body tr td div");
+          if (schedules.length === 0) {
+              cells.forEach(function (td) {
+                  td.classList.add('unavailable');
+                  td.classList.add("pointer-events-none")
+              });
+          }
+          else{
+              cells.forEach(function(td){
+                td.classList.add("pointer-events-none")
+                var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');  
+      
+                schedules.forEach(function(dateS){
+                  var dataStart = dateS.data_start
+                  var dataSplit = moment(dataStart).format('YYYY-MM-DD') // ajuste para comparar as datas 
+       
+                  if(dataDate === dataSplit) {
+                    td.classList.remove('unavailable');
+                    td.classList.add('available')
+                    td.classList.remove("pointer-events-none")
+                } 
+              })
+              })
+            
+          }
         }
         console.log("UpdateAvailability Result Success");
 

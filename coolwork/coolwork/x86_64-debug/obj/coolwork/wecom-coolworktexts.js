@@ -19,6 +19,7 @@ Wecom.coolworkTexts = {
         labelSearchYourRoom: "Buscar Salas",
         labelMySchedules: "Meus Agendamentos",
         labelIptSearch: "Pesquisar...",
+        labelMustSelectHour: "Selecione o Horario",
         labelSelectDay: "Primeiro selecione o dia",
         labelSelectDivStart: "Primeiro selecione a hora de início",
         labelDayCannotBeSmaller: "O dia selecionado nao pode ser menor que o dia de hoje",
