@@ -199,7 +199,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                 case "transparent":
                     button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
                     break;
-                    case "ghost":
+                case "ghost":
                     button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
                     break;
                 default:
