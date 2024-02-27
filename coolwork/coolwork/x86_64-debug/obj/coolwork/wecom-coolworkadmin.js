@@ -1493,13 +1493,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         makeHeader(backButton, btnUpdateRoom , room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-5", "m-1","content-start",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         
         // div sala
         const divMainSala = document.createElement("div")
-        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-2","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
+        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-5","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
 
         const divImg = document.createElement("div")
         divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
@@ -1508,7 +1508,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         //div devices
         const divDevices  = document.createElement("div")
-        divDevices.classList.add("bg-dark-200","flex","justify-center","items-center","flex-col","rounded-lg")
+        divDevices.classList.add("bg-dark-200","flex","justify-center","sm:row-span-2","items-center","flex-col","rounded-lg")
 
         // identficar e adicionar devices
         const divOptDevices = document.createElement("div")
@@ -1539,7 +1539,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         //editar horario disponibilidade
         const divHourSchedule = document.createElement("div")
-        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-3","bg-dark-200","rounded-lg","w-full")
         const labelHourSchedule = document.createElement("div")
         labelHourSchedule.textContent = texts.text("labelRoomAvailability")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
@@ -1559,7 +1559,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         //deletar sala 
         const divDeleteRoom = document.createElement("div")
-        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-4","bg-dark-200","rounded-lg","w-full")
         const labelDeleteRoom = document.createElement("div")
         labelDeleteRoom.textContent = texts.text("labelDeleteRoom")
         const btnDeleteRoom = makeButton(texts.text("labelDelete"),"destructive","")
@@ -1576,7 +1576,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
          //editar sala  
          const divEditRoom = document.createElement("div")
-         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","sm:col-start-2","sm:row-start-5","rounded-lg","w-full")
          const labelEditRoom = document.createElement("div")
          labelEditRoom.textContent = texts.text("labelEditRoom")
          const btnEditRoom = makeButton(texts.text("labelEdit"),"primary","")
