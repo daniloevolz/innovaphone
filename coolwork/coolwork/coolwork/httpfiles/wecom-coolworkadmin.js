@@ -57,6 +57,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     waitConnection(that);
 
     var devicesApi; // revisar - importante 
+
+    var uriGateway;
+    var startIndex;
+    var firstPart;
+    var secondPart;
+    var secondPartFinal;
+    var endPointEvent;
+
     //var apiPhone;
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
@@ -74,6 +82,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         app.send({api:"admin", mt:"SelectAllRoom"})
     }
+
+    
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
@@ -92,18 +102,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             }
         }
         if (obj.msg.mt == "GetGatewaysResult"){
-            var uriGateway = obj.msg.gateways[0].uri
+            uriGateway = obj.msg.gateways[0].uri
            
             // Encontrar o índice da parte após "/devices/passthrough/"
-            const startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
+            startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
 
             // Extrair a parte até "/devices/passthrough/"
-            const firstPart = uriGateway.substring(0, startIndex);
+            firstPart = uriGateway.substring(0, startIndex);
 
             // Extrair a parte após "/devices/passthrough/"
-            const secondPart = uriGateway.substring(startIndex);
-            const secondPartFinal = secondPart.split("/")
-            const endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+            secondPart = uriGateway.substring(startIndex);
+            secondPartFinal = secondPart.split("/")
+            endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+
             console.log("Primeira parte:", firstPart);
             console.log("Segunda parte:", secondPartFinal);
             console.log("Endpoint EventoURL", endPointEvent )
@@ -1182,6 +1193,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             identifyBtn.id = dev.hwid
             identifyBtn.addEventListener("click",function(){
                     console.log("ID " + this.id)
+                    // var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
+                    
+                    // fetch( {
+                    //     method: 'GET',
+                    //     headers: {}
+                    // })
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
@@ -1476,6 +1493,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var avail = availabilities.filter(function (avl) {
             return id == avl.room_id
         })[0];
+
+        var availArray = availabilities.filter(function (avl) {
+            return id == avl.room_id
+        });
         // var sched = schedules.filter(function (sched) {
         //     return id == sched.device_room_id
         // });
@@ -1493,22 +1514,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         makeHeader(backButton, btnUpdateRoom , room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-5", "m-1","content-start",)
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-6", "m-1","content-start",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         
         // div sala
         const divMainSala = document.createElement("div")
-        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-5","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
+        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-6","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
 
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
+        divImg.classList.add("w-[100%]","h-[100%]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         divImg.setAttribute("id","divImg")
 
+        //div horario
+        const divHour = document.createElement("div")
+        divHour.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        makeViewCalendarInfo(divHour,availArray)
+        //"sm:col-start-2","sm:row-start-3"
+
         //div devices
         const divDevices  = document.createElement("div")
-        divDevices.classList.add("bg-dark-200","flex","justify-center","sm:row-span-2","items-center","flex-col","rounded-lg")
+        divDevices.classList.add("bg-dark-200","flex","justify-center","sm:row-span-2","sm:col-start-2","items-center","flex-col","rounded-lg")
 
         // identficar e adicionar devices
         const divOptDevices = document.createElement("div")
@@ -1539,7 +1566,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         //editar horario disponibilidade
         const divHourSchedule = document.createElement("div")
-        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-3","bg-dark-200","rounded-lg","w-full")
+        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-4","bg-dark-200","rounded-lg","w-full")
         const labelHourSchedule = document.createElement("div")
         labelHourSchedule.textContent = texts.text("labelRoomAvailability")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
@@ -1559,7 +1586,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         //deletar sala 
         const divDeleteRoom = document.createElement("div")
-        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-4","bg-dark-200","rounded-lg","w-full")
+        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-5","bg-dark-200","rounded-lg","w-full")
         const labelDeleteRoom = document.createElement("div")
         labelDeleteRoom.textContent = texts.text("labelDeleteRoom")
         const btnDeleteRoom = makeButton(texts.text("labelDelete"),"destructive","")
@@ -1576,7 +1603,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
          //editar sala  
          const divEditRoom = document.createElement("div")
-         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","sm:col-start-2","sm:row-start-5","rounded-lg","w-full")
+         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","sm:col-start-2","sm:row-start-6","rounded-lg","w-full")
          const labelEditRoom = document.createElement("div")
          labelEditRoom.textContent = texts.text("labelEditRoom")
          const btnEditRoom = makeButton(texts.text("labelEdit"),"primary","")
@@ -1592,6 +1619,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divEditRoom.appendChild(labelEditRoom)
         divEditRoom.appendChild(btnEditRoom)
         container.appendChild(divMainSala)
+        container.appendChild(divHour)
         container.appendChild(divDevices)
         container.appendChild(divHourSchedule)
         container.appendChild(divDeleteRoom)

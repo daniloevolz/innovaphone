@@ -1061,12 +1061,11 @@ function getDayOfWeekLabel(selectedDate) {
         divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-2","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
 
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
+        divImg.classList.add("w-[100%]","h-[100%]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         container.appendChild(divMainSala)
         divMainSala.appendChild(divImg)
 
-        
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
@@ -1139,10 +1138,30 @@ function getDayOfWeekLabel(selectedDate) {
         divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
         divOpenTime.setAttribute("id", "divOpenTime")
         div160.appendChild(divOpenTime)
+
+        if (window.matchMedia('(min-width: 480px)').matches){
+            divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+            var divAvailabilyDetail = document.createElement("div")
+            divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
+            divAvailabilyDetail.classList.add("divAvailabilyDetail")
+            divMain.appendChild(divAvailabilyDetail)
+
+            
+                if (a.type == "periodType") {
+                    makeViewTimePeriod(divAvailabilyDetail, a)
+                }
+
+                if (a.type == "recurrentType") {
+                    makeViewTimeRecurrent(divAvailabilyDetail, a)
+                }
+
+                UpdateAvailability(availability, a.type)     
+        }
         divOpenTime.addEventListener("click", function (event) {
             event.stopPropagation()
             var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
             var divOpenTime = document.getElementById("divOpenTime")
+            
             if (divAvailabilyDetail) {
                 divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
                 divMain.removeChild(divAvailabilyDetail)
@@ -1362,7 +1381,7 @@ function getDayOfWeekLabel(selectedDate) {
         //dia-semana
         const divStartISODay = document.createElement("div")
         divStartISODay.setAttribute("id", "divStartISODay")
-        divStartISODay.classList.add("divISODay")
+        divStartISODay.classList.add("divISODay","pb-1")
         divStartISODay.innerHTML = texts.text("label" + moment(availability.data_start).format("dddd") + "Div");
         divDateStart.appendChild(divStartISODay)
         //apende div
