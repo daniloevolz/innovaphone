@@ -68,6 +68,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" }); // phonelist
+        devicesApi.send({ mt: "GetGateways" });
 
         //apiPhone = start.consumeApi("com.innovaphone.events") // testes pietro
 
@@ -89,6 +90,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             var returnText = function () {
                 div.textContent = texts.text("labelProvCode")
             }
+        }
+        if (obj.msg.mt == "GetGatewaysResult"){
+            var uriGateway = obj.msg.gateways[0].uri
+           
+            // Encontrar o índice da parte após "/devices/passthrough/"
+            const startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
+
+            // Extrair a parte até "/devices/passthrough/"
+            const firstPart = uriGateway.substring(0, startIndex);
+
+            // Extrair a parte após "/devices/passthrough/"
+            const secondPart = uriGateway.substring(startIndex);
+            const secondPartFinal = secondPart.split("/")
+            const endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+            console.log("Primeira parte:", firstPart);
+            console.log("Segunda parte:", secondPartFinal);
+            console.log("Endpoint EventoURL", endPointEvent )
         }
     }
     // function app_message(obj) {
@@ -1647,7 +1665,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         let processedUsersCount = 0;
 
         viewersFilter.forEach(function (viewer) {
-            if (processedUsersCount < 8) {
+            if (processedUsersCount < 6) {
                 var viewersUsers = list_tableUsers.filter(function (user) {
                     return user.guid == viewer.viewer_guid;
                 });

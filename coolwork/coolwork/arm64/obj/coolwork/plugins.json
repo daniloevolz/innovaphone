@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.coolworkmanager",
+            "icon": "wecom-coolwork.png",
+            "lang": "wecom.coolworkmanagertexts",
+            "domains": false
+        }
+    ]
+}

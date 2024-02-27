@@ -941,7 +941,7 @@ function getDayOfWeekLabel(selectedDate) {
         let processedUsersCount = 0;
 
         viewersFilter.forEach(function (viewer) {
-            if (processedUsersCount < 8) {
+            if (processedUsersCount < 6) {
                 var viewersUsers = list_tableUsers.filter(function (user) {
                     return user.guid == viewer.viewer_guid;
                 });

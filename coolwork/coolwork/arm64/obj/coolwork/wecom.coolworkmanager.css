@@ -1,0 +1,95 @@
+
+div.wecom-coolwork-panel {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:var(--wecom-coolwork-item-text);
+    font-size:14px;
+}
+
+div.wecom-coolwork-obj {
+    position:relative;
+    margin:10px;
+    padding:5px;
+    background-color:var(--wecom-coolwork-item);
+    color:var(--wecom-coolwork-item-text);
+    font-size:14px;
+}
+
+div.wecom-coolwork-header {
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+div.wecom-coolwork-label {
+    position:relative;
+    margin:5px 10px;
+    color:var(--wecom-coolwork-c2);
+}
+
+div.wecom-coolwork-label2 {
+    position:relative;
+    width:100px;
+    margin:5px 10px;
+    font-size: 15px;
+    text-align: left;
+    color: var(--innovaphone-coolwork-item-text);
+}
+
+div.wecom-coolwork-value {
+    position:relative;
+    margin:5px 0px;
+    /*background-color:var(--wecom-coolwork-input);*/
+    color:var(--wecom-coolwork-input-text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+div.wecom-coolwork-appicon {
+    background-size: cover;
+    position: absolute;
+    height: 50px;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+}
+
+div.wecom-coolwork-button {
+    position:absolute;
+    width:120px;
+    height:25px;
+    background-color:var(--wecom-coolwork-button);
+    color:var(--wecom-coolwork-button-text);
+    text-align:center;
+    cursor:pointer;
+}
+
+input.wecom-coolwork-input {
+    width:100%;
+    box-sizing:border-box;
+    border:none;
+    margin:5px 0px;
+    padding: 5px 10px;
+    background-color:var(--wecom-coolwork-input);
+    color:var(--wecom-coolwork-input-text);
+}
+
+div.wecom-coolwork-choice {
+    box-sizing: border-box;
+    position:relative;
+    width:120px;
+    height:30px;
+    text-align:center;
+    background-color:var(--wecom-coolwork-button-bg);
+    margin:10px;
+    padding: 5px;
+}
+
+div.wecom-coolwork-choice:hover {
+    background-color:var(--wecom-coolwork-highlight-bg);
+}
+
