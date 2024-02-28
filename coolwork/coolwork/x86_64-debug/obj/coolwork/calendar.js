@@ -2,7 +2,7 @@
 
 var Calendar = Calendar || {};
 
-Calendar.createCalendar = function(divMain,availability,schedules,callback,module){
+Calendar.createCalendar = function(divMain,availability,schedules,callback,module,UpdateSched){
 
 divMain.innerHTML += `
                 <!-- caso precise , incluir isso .max-w-s --> 
@@ -35,7 +35,7 @@ divMain.innerHTML += `
 
 `
 setTimeout(function(){
-    buildCalendar(availability,callback,module,schedules)
+    buildCalendar(availability,callback,module,schedules,UpdateSched)
 },250)
 
 
@@ -48,7 +48,7 @@ setTimeout(function(){
 var year;
 var currentMonth;
 
-function buildCalendar(availability,callback,module,schedules) {
+function buildCalendar(availability,callback,module,schedules,UpdateSched) {
    
     console.log("Module " + module)
     var date = new Date();
@@ -69,7 +69,7 @@ function buildCalendar(availability,callback,module,schedules) {
         currentMonth = 11;
         year--;
       }
-      rebuildCalendar(availability,callback,module,schedules);
+      rebuildCalendar(availability,callback,module,schedules,UpdateSched);
       
     });
   
@@ -79,11 +79,11 @@ function buildCalendar(availability,callback,module,schedules) {
         currentMonth = 0;
         year++;
       }
-      rebuildCalendar(availability, callback,module,schedules);
+      rebuildCalendar(availability, callback,module,schedules,UpdateSched);
       
     });
     
-    rebuildCalendar(availability, callback,module,schedules);
+    rebuildCalendar(availability, callback,module,schedules,UpdateSched);
     
     
   }
@@ -133,7 +133,7 @@ function buildCalendar(availability,callback,module,schedules) {
     return thead;
   }
   var selectedCells = [];
-  function rebuildCalendar(availability,callback,module,schedules) {
+  function rebuildCalendar(availability,callback,module,schedules,UpdateSched) {
     var calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
   
@@ -175,7 +175,7 @@ function buildCalendar(availability,callback,module,schedules) {
               currentMonth = 11;
               year--;
             }
-            rebuildCalendar(availability,callback,module,schedules);
+            rebuildCalendar(availability,callback,module,schedules,UpdateSched);
             
           });
       }
@@ -219,7 +219,7 @@ function buildCalendar(availability,callback,module,schedules) {
           currentMonth = 0;
           year++;
         }
-        rebuildCalendar(availability,callback,module,schedules);
+        rebuildCalendar(availability,callback,module,schedules,UpdateSched);
       });
       nextMonthDay++;
     }
@@ -309,7 +309,9 @@ cells.forEach(function (cell) {
       
     } 
     // colocar modo Edição junto com schedule
+
     else if (module === "availability") {
+
       // Lógica para modo de disponibilidade
       if (!cell.classList.contains("selected")) {
         // Selecionar a data clicada
@@ -317,35 +319,50 @@ cells.forEach(function (cell) {
           cell.classList.add("selected");
           cell.classList.add("selectedCellFocus");
           selectedCells.push(cell);
-        }
-        else if(selectedCells.length < 1){
-          selectedCells = []
-          console.log("SelectedCells Vazia , Nenhuma Data Escolhida")
-        }
+        } 
+
+        // else if(selectedCells.length < 1){
+        //   selectedCells = []
+        //   console.log("SelectedCells Vazia , Nenhuma Data Escolhida")
+        // }
       } else {
         // Desselecionar a data clicada se já estiver selecionada
         cell.classList.remove("selected");
         cell.classList.remove("selectedCellFocus");
-  
-        selectedCells = selectedCells.filter(function (selectedCell) {
-          return selectedCell !== cell;
+    
+        selectedCells = selectedCells.filter(function(selectedCell) {
+            return selectedCell !== cell;
         });
-      }
-  
+        
+
+    }
+    // Verifica se há apenas uma célula selecionada, permitindo que ela permaneça na lista
+    if (selectedCells.length === 1) {
+        var selectedDate = moment(selectedCells[0].getAttribute("data-date"));
+        console.log("Lista com apenas 1 cell \n Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
+    }
+    
+    //Limpa a lista se não houver células selecionadas ou se houver mais de duas células selecionadas
+    if (selectedCells.length !== 1 && selectedCells.length !== 2) {
+        console.log("LISTA LIMPA")
+        selectedCells = [];
+    }
+
       if (selectedCells.length === 2) {
         var startDate = moment(selectedCells[0].getAttribute("data-date"));
         var endDate = moment(selectedCells[1].getAttribute("data-date"));
-  
+
         console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
         console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
-  
+
         // Enviar os dados por meio do callback
         callback({
-          startDate: startDate.format("YYYY-MM-DD"),
-          endDate: endDate.format("YYYY-MM-DD")
+            startDate: startDate.format("YYYY-MM-DD"),
+            endDate: endDate.format("YYYY-MM-DD")
         });
-      }
 
+
+    }
 
     }
 
@@ -365,9 +382,19 @@ cells.forEach(function (cell) {
 
 });
 
+document.addEventListener("limparLista", function() {
+  // Limpar a lista selectedCells
+  if(selectedCells){
+    selectedCells.forEach(function(selectedCell) {
+      selectedCell.classList.remove("selected");
+      selectedCell.classList.remove("selectedCellFocus");
+  });
+  selectedCells = [];
+  }
+ 
+});
 
-
-        UpdateAvailability(availability,"",schedules) // atualizar visualização do calendario
+        UpdateAvailability(availability,"",schedules, UpdateSched) // atualizar visualização do calendario
   }
   
   function getMonthName(month) {
@@ -411,7 +438,7 @@ cells.forEach(function (cell) {
   //funções de disponibilidade
 
       
-function UpdateAvailability(availability, type, schedules) {
+function UpdateAvailability(availability, type, schedules,UpdateSched) {
         var cells = document.querySelectorAll("#calendar-body tr td div");
         if (availability.length === 0) {
             cells.forEach(function (td) {
@@ -869,6 +896,7 @@ function UpdateAvailability(availability, type, schedules) {
                         }
                         console.log("SCHEDULES UPDATEAVAILABILITY " + JSON.stringify(schedules))
 
+                        // quando ja tiver um agendamento no dia inteiro 
                         schedules.forEach(function(s){
                           var dataStartSchedule = moment(s.data_start).format('YYYY-MM-DD');
                           if(s.type == "dayModule" && dataDate == dataStartSchedule ){
@@ -892,6 +920,35 @@ function UpdateAvailability(availability, type, schedules) {
                     });
                 }
             })
+        }
+        //para consultar meus Schedules na tela de usuario 
+        //cada vez que avançar ou voltar nas setas do calendario
+        if(UpdateSched == "UpdateSchedule"){
+          var cells = document.querySelectorAll("#calendar-body tr td div");
+          if (schedules.length === 0) {
+              cells.forEach(function (td) {
+                  td.classList.add('unavailable');
+                  td.classList.add("pointer-events-none")
+              });
+          }
+          else{
+              cells.forEach(function(td){
+                td.classList.add("pointer-events-none")
+                var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');  
+      
+                schedules.forEach(function(dateS){
+                  var dataStart = dateS.data_start
+                  var dataSplit = moment(dataStart).format('YYYY-MM-DD') // ajuste para comparar as datas 
+       
+                  if(dataDate === dataSplit) {
+                    td.classList.remove('unavailable');
+                    td.classList.add('available')
+                    td.classList.remove("pointer-events-none")
+                } 
+              })
+              })
+            
+          }
         }
         console.log("UpdateAvailability Result Success");
 

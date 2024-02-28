@@ -23,6 +23,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
     var selected // call back 
 
     var mySchedules; // apenas para localizar meus agendamentos
+    var myUserGuid; // localizar meu usuario pela tableUsers
 
     var rooms = [];
     var devices = [];
@@ -196,6 +197,9 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
                     button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
                     break;
                 case "transparent":
+                    button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                    break;
+                case "ghost":
                     button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
                     break;
                 default:
@@ -389,7 +393,7 @@ function filterSchedule(){
     
     btnDate.addEventListener('click', function(event){
 
-        makeCalendar("","viewSchedule",mainFilter, null, null, function (day) {
+        makeCalendar(mySchedules,"viewSchedule",mainFilter, null, null, function (day) {
             selected = day
             var filtred = mySchedules.filter(function(s){
                 // Extract the date part from s.data_start
@@ -399,7 +403,7 @@ function filterSchedule(){
             });
             console.log("filteredDate - Pietro", filtred)
             makeUserSchedules(filtred)
-        },"update")
+        },"update","UpdateSchedule")
         
     })
 
@@ -721,7 +725,10 @@ function getDayOfWeekLabel(selectedDate) {
                      app.sendSrc({ api: "user", mt: "DeleteDeviceSchedule", schedID: s.id, src: nameDevice.hwid }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)
-                            nextSchedules() 
+                            mySchedules = [schedules.filter(function(s){
+                                return  s.user_guid == myUserGuid.guid
+                            })][0]
+                            nextSchedules(mySchedules) 
                         })
                        
                     })
@@ -776,7 +783,7 @@ function getDayOfWeekLabel(selectedDate) {
         
     }
     
-    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module){
+    function makeCalendar(daySchedule,viewSchedule,divMain, deviceHw, roomId, funcao2,module,UpdateSched){
         divMain.innerHTML = "";
         //makeHeader(backButton, makeButton("Salvar","primary"), texts.text("labelSchedule"))
         // div principal
@@ -800,13 +807,13 @@ function getDayOfWeekLabel(selectedDate) {
             console.log("SelectedDay " + JSON.stringify(selectedDay))
             funcao2(selectedDay) 
             
-        },module); // componente Calendar
+        },module,UpdateSched); // componente Calendar
 
-        if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
-            setTimeout(function(){
-                UpdateSchedule(schedules)
-            },500)
-        }
+        // if(viewSchedule == "viewSchedule"){  // condição para quando for consultar os schedules e nao agendar
+        //     setTimeout(function(){
+        //         UpdateSchedule(daySchedule)
+        //     },500)
+        // }
        
         divMain.appendChild(divCalendar);
         
@@ -818,7 +825,7 @@ function getDayOfWeekLabel(selectedDate) {
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
 
-            var myUserGuid = list_tableUsers.filter(function(u){
+            myUserGuid = list_tableUsers.filter(function(u){
                 return u.sip == userSIP
             })[0]
         
@@ -937,7 +944,7 @@ function getDayOfWeekLabel(selectedDate) {
         let processedUsersCount = 0;
 
         viewersFilter.forEach(function (viewer) {
-            if (processedUsersCount < 8) {
+            if (processedUsersCount < 6) {
                 var viewersUsers = list_tableUsers.filter(function (user) {
                     return user.guid == viewer.viewer_guid;
                 });
@@ -1054,12 +1061,11 @@ function getDayOfWeekLabel(selectedDate) {
         divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-2","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
 
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
+        divImg.classList.add("w-[100%]","h-[100%]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         container.appendChild(divMainSala)
         divMainSala.appendChild(divImg)
 
-        
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
@@ -1132,10 +1138,30 @@ function getDayOfWeekLabel(selectedDate) {
         divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
         divOpenTime.setAttribute("id", "divOpenTime")
         div160.appendChild(divOpenTime)
+
+        if (window.matchMedia('(min-width: 480px)').matches){
+            divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+            var divAvailabilyDetail = document.createElement("div")
+            divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
+            divAvailabilyDetail.classList.add("divAvailabilyDetail")
+            divMain.appendChild(divAvailabilyDetail)
+
+            
+                if (a.type == "periodType") {
+                    makeViewTimePeriod(divAvailabilyDetail, a)
+                }
+
+                if (a.type == "recurrentType") {
+                    makeViewTimeRecurrent(divAvailabilyDetail, a)
+                }
+
+                UpdateAvailability(availability, a.type)     
+        }
         divOpenTime.addEventListener("click", function (event) {
             event.stopPropagation()
             var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
             var divOpenTime = document.getElementById("divOpenTime")
+            
             if (divAvailabilyDetail) {
                 divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
                 divMain.removeChild(divAvailabilyDetail)
@@ -1355,7 +1381,7 @@ function getDayOfWeekLabel(selectedDate) {
         //dia-semana
         const divStartISODay = document.createElement("div")
         divStartISODay.setAttribute("id", "divStartISODay")
-        divStartISODay.classList.add("divISODay")
+        divStartISODay.classList.add("divISODay","pb-1")
         divStartISODay.innerHTML = texts.text("label" + moment(availability.data_start).format("dddd") + "Div");
         divDateStart.appendChild(divStartISODay)
         //apende div
@@ -1871,7 +1897,7 @@ function getDayOfWeekLabel(selectedDate) {
                         
                     })
                    
-                },module);
+                },module,null);
 
                 div104.appendChild(frame104btn);
 
@@ -1999,6 +2025,12 @@ function getDayOfWeekLabel(selectedDate) {
                 btnPopUp.addEventListener("click",function(event){
                     event.stopPropagation()
                     event.preventDefault()
+                    if(avail.schedule_module == "dayModule" ){
+                        var horaAtual = moment()
+                        horaAtual.add(2, 'minutes'); 
+                        var horaFinal = horaAtual.format('HH:mm');
+                        dateStart = selectedDay + "T" + horaFinal
+                    }
                     app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {
                             schedules = JSON.parse(obj.result)

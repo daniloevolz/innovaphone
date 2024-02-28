@@ -57,6 +57,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     waitConnection(that);
 
     var devicesApi; // revisar - importante 
+
+    var uriGateway;
+    var startIndex;
+    var firstPart;
+    var secondPart;
+    var secondPartFinal;
+    var endPointEvent;
+
     //var apiPhone;
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
@@ -68,11 +76,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         devicesApi = start.consumeApi("com.innovaphone.devices");
         devicesApi.onmessage.attach(devicesApi_onmessage); // onmessage is called for responses from the API
         devicesApi.send({ mt: "GetPhones" }); // phonelist
+        devicesApi.send({ mt: "GetGateways" });
 
         //apiPhone = start.consumeApi("com.innovaphone.events") // testes pietro
 
         app.send({api:"admin", mt:"SelectAllRoom"})
     }
+
+    
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
@@ -89,6 +100,24 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             var returnText = function () {
                 div.textContent = texts.text("labelProvCode")
             }
+        }
+        if (obj.msg.mt == "GetGatewaysResult"){
+            uriGateway = obj.msg.gateways[0].uri
+           
+            // Encontrar o índice da parte após "/devices/passthrough/"
+            startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
+
+            // Extrair a parte até "/devices/passthrough/"
+            firstPart = uriGateway.substring(0, startIndex);
+
+            // Extrair a parte após "/devices/passthrough/"
+            secondPart = uriGateway.substring(startIndex);
+            secondPartFinal = secondPart.split("/")
+            endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+
+            console.log("Primeira parte:", firstPart);
+            console.log("Segunda parte:", secondPartFinal);
+            console.log("Endpoint EventoURL", endPointEvent )
         }
     }
     // function app_message(obj) {
@@ -505,7 +534,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
             list_tableUsers.forEach(function (user) {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-                if (viewerCheckbox.checked) {
+                if (viewerCheckbox && viewerCheckbox.checked) {
                     viewer.push(user.guid);
                 }
                     viewers(viewer)
@@ -552,7 +581,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 selectedDay = day
                 console.log("Dia Selecionado " + JSON.stringify(selectedDay))
                 
-            },"availability")
+            },"availability",null)
             
             const divTypeSchedule = document.createElement("div")
             divTypeSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
@@ -665,6 +694,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             divButtons.classList.add("flex","justify-between","items-center","rounded-md")
             const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
             buttonCancel.addEventListener("click",function(){
+            document.dispatchEvent(new Event("limparLista"));
             console.log("Fechar Tela")
             document.body.removeChild(insideDiv)
             
@@ -674,21 +704,42 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             typeSchedule(typeSched)
             console.log("typeSched " ,typeSched)
             if(typeSched === "hourModule"){
-                dateTime(dates)
-                console.log("Hour Module")
+
+                if(dates.length > 0){
+                    dateTime(dates)
+                    console.log("Hour Module")
+                    document.body.removeChild(insideDiv)
+                }else{
+                    makePopUp(texts.text("labelWarning"), texts.text("labelMustSelectHour"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
+                }
+               
             }
             else if(typeSched === "dayModule"){
-                dates = []
-                dates.push({
-                    start: selectedDay.startDate + "T" + "00:00",
-                    end:  selectedDay.endDate + "T" + "23:59"
-                })
-                console.log( "DATES TIPO DIA " + JSON.stringify(dates))
-                dateTime(dates)
-                console.log("Day Module")
-          
+                
+                if(selectedDay){
+                    dates = []
+                    dates.push({
+                        start: selectedDay.startDate + "T" + "00:00",
+                        end:  selectedDay.endDate + "T" + "23:59"
+                    })
+                    console.log( "DATES TIPO DIA " + JSON.stringify(dates))
+                    dateTime(dates)
+                    console.log("Day Module")
+                    document.body.removeChild(insideDiv)
+                    document.dispatchEvent(new Event("limparLista"));
+                }else{
+                    makePopUp(texts.text("labelWarning"), texts.text("labelSelectDay"), texts.text("labelOk")).addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    })  
+                }
             }
-            document.body.removeChild(insideDiv)
+            
             })
             divButtons.appendChild(buttonCancel)
             divButtons.appendChild(buttonConfirm)
@@ -1142,6 +1193,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             identifyBtn.id = dev.hwid
             identifyBtn.addEventListener("click",function(){
                     console.log("ID " + this.id)
+                    // var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
+                    
+                    // fetch( {
+                    //     method: 'GET',
+                    //     headers: {}
+                    // })
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
@@ -1189,11 +1246,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
         buttonConfirm.addEventListener("click",function(){
             var devArray = [];
-            // viewer = [];
-
+           
             devices.forEach(function (dev) {
                 var devCheckbox = document.getElementById("checkboxDev_" + dev.hwid);
-                if (devCheckbox.checked) {
+                if (devCheckbox && devCheckbox.checked) {
                     devArray.push(dev.hwid);
                 }
                 devHwId = devArray 
@@ -1437,6 +1493,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         var avail = availabilities.filter(function (avl) {
             return id == avl.room_id
         })[0];
+
+        var availArray = availabilities.filter(function (avl) {
+            return id == avl.room_id
+        });
         // var sched = schedules.filter(function (sched) {
         //     return id == sched.device_room_id
         // });
@@ -1454,22 +1514,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         makeHeader(backButton, btnUpdateRoom , room.name)
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
+        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-6", "m-1","content-start",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         
         // div sala
         const divMainSala = document.createElement("div")
-        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-2","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
+        divMainSala.classList.add("aspect-[4/3]", "bg-dark-200", "rounded-lg", "divMainSala","sm:row-span-6","p-2","justify-start","items-start","min-w-[220px]","h-full","w-full")
 
         const divImg = document.createElement("div")
-        divImg.classList.add("aspect-[4/3]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
+        divImg.classList.add("w-[100%]","h-[100%]", "bg-center", "bg-cover", "bg-no-repeat", "rounded-lg", "divSala","sm:bg-[length:606px_455px]")
         divImg.setAttribute("style", `background-image: url(${room.img});`);
         divImg.setAttribute("id","divImg")
 
+        //div horario
+        const divHour = document.createElement("div")
+        divHour.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        makeViewCalendarInfo(divHour,availArray)
+        //"sm:col-start-2","sm:row-start-3"
+
         //div devices
         const divDevices  = document.createElement("div")
-        divDevices.classList.add("bg-dark-200","flex","justify-center","items-center","flex-col","rounded-lg")
+        divDevices.classList.add("bg-dark-200","flex","justify-center","sm:row-span-2","sm:col-start-2","items-center","flex-col","rounded-lg")
 
         // identficar e adicionar devices
         const divOptDevices = document.createElement("div")
@@ -1500,7 +1566,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
         //editar horario disponibilidade
         const divHourSchedule = document.createElement("div")
-        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-4","bg-dark-200","rounded-lg","w-full")
         const labelHourSchedule = document.createElement("div")
         labelHourSchedule.textContent = texts.text("labelRoomAvailability")
         const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
@@ -1520,7 +1586,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         //deletar sala 
         const divDeleteRoom = document.createElement("div")
-        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+        divDeleteRoom.classList.add("flex","p-1","items-center","justify-between","sm:col-start-2","sm:row-start-5","bg-dark-200","rounded-lg","w-full")
         const labelDeleteRoom = document.createElement("div")
         labelDeleteRoom.textContent = texts.text("labelDeleteRoom")
         const btnDeleteRoom = makeButton(texts.text("labelDelete"),"destructive","")
@@ -1537,7 +1603,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
          //editar sala  
          const divEditRoom = document.createElement("div")
-         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+         divEditRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","sm:col-start-2","sm:row-start-6","rounded-lg","w-full")
          const labelEditRoom = document.createElement("div")
          labelEditRoom.textContent = texts.text("labelEditRoom")
          const btnEditRoom = makeButton(texts.text("labelEdit"),"primary","")
@@ -1553,6 +1619,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divEditRoom.appendChild(labelEditRoom)
         divEditRoom.appendChild(btnEditRoom)
         container.appendChild(divMainSala)
+        container.appendChild(divHour)
         container.appendChild(divDevices)
         container.appendChild(divHourSchedule)
         container.appendChild(divDeleteRoom)
@@ -1626,7 +1693,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         let processedUsersCount = 0;
 
         viewersFilter.forEach(function (viewer) {
-            if (processedUsersCount < 8) {
+            if (processedUsersCount < 6) {
                 var viewersUsers = list_tableUsers.filter(function (user) {
                     return user.guid == viewer.viewer_guid;
                 });
@@ -1953,7 +2020,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                         
                     })
                    
-                },module);
+                },module,null);
 
                 div104.appendChild(frame104btn);
 
@@ -2227,69 +2294,93 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.appendChild(div93)
     }
     // função genérica para busca de usuarios e devices no input search
-    function searchItems(arrayItems, idTable,itemType, filter = "") {
+
+    let checkedUsers = {}; 
+
+    function searchItems(arrayItems, idTable, itemType, filter = "") {
         const scroll = document.getElementById(idTable);
         scroll.innerHTML = '';
-    
+
         arrayItems.forEach(function (item) {
             if (itemType === "user" && item.cn && item.cn.toLowerCase().includes(filter.toLowerCase())) {
-                const divMainUsers = document.createElement("div");
-                divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
-                const divUsersAvatar = document.createElement("div");
-                divUsersAvatar.classList.add("flex", "gap-1", "items-center");
-                let avatar = new innovaphone.Avatar(start, item.sip, userDomain);
-                let UIuserPicture = avatar.url(item.sip, 120, userDN);
-                const imgAvatar = document.createElement("img");
-                imgAvatar.setAttribute("src", UIuserPicture);
-                imgAvatar.setAttribute("id", "divAvatar");
-                imgAvatar.classList.add("w-5", "h-5", "rounded-full");
-                const nameUser = document.createElement("div");
-                nameUser.textContent = item.cn;
-                const checkboxUser = makeInput("", "checkbox", "");
-                checkboxUser.setAttribute("id", "viewercheckbox_" + item.guid);
-                checkboxUser.classList.add("checkboxUser");
-                divUsersAvatar.appendChild(imgAvatar);
-                divUsersAvatar.appendChild(nameUser);
-                divMainUsers.appendChild(divUsersAvatar);
-                divMainUsers.appendChild(checkboxUser);
+                const divMainUsers = createUserElement(item);
                 scroll.appendChild(divMainUsers);
+            } else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())) {
+                const divMainDevices = createDeviceElement(item);
+                scroll.appendChild(divMainDevices);
             }
-            else if (itemType === "device" && item.name && item.name.toLowerCase().includes(filter.toLowerCase())){
-                    const divMainDevices = document.createElement("div")
-                    divMainDevices.setAttribute("id",item.hwid)
-                    divMainDevices.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
-                    const divImgDevice = document.createElement("div")
-                    divImgDevice.classList.add("flex","items-center","gap-1")
-                    const imgDevice = document.createElement("img");
-                    imgDevice.src = './images/device-admin.png'
-                    //imgDevice.classList.add("w-5", "h-5", "rounded-full");
-                    const nameDevice = document.createElement("div")
-                    nameDevice.textContent = item.name
-                        const divCheckbox = document.createElement("div")
-                    divCheckbox.classList.add("flex", "gap-1" ,"items-center")
-                    const identifyBtn = makeButton(texts.text("labelIdentify"),"primary","")
-                    identifyBtn.id = item.hwid
-                    identifyBtn.addEventListener("click",function(){
-                            console.log("ID  " + this.id)
-                        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
-                    })
-                    const checkboxDevice = makeInput("","checkbox","")
-                    checkboxDevice.setAttribute("id",'checkboxDev_' + item.hwid)
-                    checkboxDevice.classList.add("checkboxDev")
-        
-                    divCheckbox.appendChild(identifyBtn)
-                    divCheckbox.appendChild(checkboxDevice)
-                    divImgDevice.appendChild(imgDevice)
-                    divImgDevice.appendChild(nameDevice)
-                    divMainDevices.appendChild(divImgDevice);
-                    divMainDevices.appendChild(divCheckbox);
-                    scroll.appendChild(divMainDevices)
-                
-            }
-
         });
     }
-    
+
+    function createUserElement(user) {
+        const divMainUsers = document.createElement("div");
+        divMainUsers.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+        const divUsersAvatar = document.createElement("div");
+        divUsersAvatar.classList.add("flex", "gap-1", "items-center");
+        let avatar = new innovaphone.Avatar(start, user.sip, userDomain);
+        let UIuserPicture = avatar.url(user.sip, 120, userDN);
+        const imgAvatar = document.createElement("img");
+        imgAvatar.setAttribute("src", UIuserPicture);
+        imgAvatar.setAttribute("id", "divAvatar");
+        imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+        const nameUser = document.createElement("div");
+        nameUser.textContent = user.cn;
+        const checkboxUser = makeInput("", "checkbox", "");
+        checkboxUser.setAttribute("id", "viewercheckbox_" + user.guid);
+        checkboxUser.classList.add("checkboxUser");
+
+        // Verifica se o usuário está marcado e marca o checkbox, se necessário
+        if (checkedUsers[user.guid]) {
+            checkboxUser.checked = true;
+        }
+
+        // Event listener para marcar/desmarcar usuários
+        checkboxUser.addEventListener("change", function () {
+            if (this.checked) {
+                checkedUsers[user.guid] = true;
+            } else {
+                delete checkedUsers[user.guid];
+            }
+        });
+
+        divUsersAvatar.appendChild(imgAvatar);
+        divUsersAvatar.appendChild(nameUser);
+        divMainUsers.appendChild(divUsersAvatar);
+        divMainUsers.appendChild(checkboxUser);
+        return divMainUsers;
+    }
+
+    function createDeviceElement(device) {
+        const divMainDevices = document.createElement("div");
+        divMainDevices.setAttribute("id", device.hwid);
+        divMainDevices.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+        const divImgDevice = document.createElement("div");
+        divImgDevice.classList.add("flex", "items-center", "gap-1");
+        const imgDevice = document.createElement("img");
+        imgDevice.src = './images/device-admin.png';
+        const nameDevice = document.createElement("div");
+        nameDevice.textContent = device.name;
+        const divCheckbox = document.createElement("div");
+        divCheckbox.classList.add("flex", "gap-1", "items-center");
+        const identifyBtn = makeButton(texts.text("labelIdentify"), "primary", "");
+        identifyBtn.id = device.hwid;
+        identifyBtn.addEventListener("click", function () {
+            console.log("ID  " + this.id);
+            // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+        });
+        const checkboxDevice = makeInput("", "checkbox", "");
+        checkboxDevice.setAttribute("id", 'checkboxDev_' + device.hwid);
+        checkboxDevice.classList.add("checkboxDev");
+
+        divCheckbox.appendChild(identifyBtn);
+        divCheckbox.appendChild(checkboxDevice);
+        divImgDevice.appendChild(imgDevice);
+        divImgDevice.appendChild(nameDevice);
+        divMainDevices.appendChild(divImgDevice);
+        divMainDevices.appendChild(divCheckbox);
+        return divMainDevices;
+    }
+
     //função REUTILIZAVEL para enviar as datas recorrentes para o banco 
     function recurrentDatesAvail(dataDay,datesRecurrent,startTime,endTime){
         switch (dataDay) {
