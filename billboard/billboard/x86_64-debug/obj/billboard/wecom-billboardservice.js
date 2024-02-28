@@ -147,7 +147,7 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "InsertPost") {
                     var now = getDateNow();
-                    Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end, type) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title + "','" + obj.description + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "','" + obj.type + "')")
+                    Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end, type) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title.replace(/'/g, "''") + "','" + obj.description.replace(/'/g, "''") + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "','" + obj.type + "')")
                         .oncomplete(function () {
                             log("InsertPost:result=success");
                             conn.send(JSON.stringify({ api: "user", mt: "InsertPostSuccess", src: obj.department }));
@@ -167,7 +167,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "UpdatePost") {
-                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
+                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title.replace(/'/g, "''") + "', description = '" + obj.description.replace(/'/g, "''") + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
                         .oncomplete(function () {
                             log("UpdatePost:result=success");
 
@@ -321,7 +321,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "InsertDepartment") {
-                    Database.exec("INSERT INTO tbl_departments (name, color, creator_guid) VALUES ('" + obj.name + "','" + obj.color + "','" + conn.guid +"') RETURNING id;")
+                    Database.exec("INSERT INTO tbl_departments (name, color, creator_guid) VALUES ('" + obj.name.replace(/'/g, "''") + "','" + obj.color + "','" + conn.guid +"') RETURNING id;")
                         .oncomplete(function (id) {
                             log("InsertDepartment:result=success " + JSON.stringify(id[0].id));
 
@@ -401,7 +401,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "UpdateDepartment") {
-                    Database.exec("UPDATE tbl_departments SET name = '" + obj.name + "', color = '" + obj.color + "' WHERE id = " + obj.id)
+                    Database.exec("UPDATE tbl_departments SET name = '" + obj.name.replace(/'/g, "''") + "', color = '" + obj.color + "' WHERE id = " + obj.id)
                         .oncomplete(function () {
                             log("UpdateDepartment:result=success");
 
@@ -694,7 +694,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "UpdatePost") {
-                Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title + "', description = '" + obj.description + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
+                Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title.replace(/'/g, "''") + "', description = '" + obj.description.replace(/'/g, "''") + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
                     .oncomplete(function () {
                         log("UpdatePost:result=success");
 

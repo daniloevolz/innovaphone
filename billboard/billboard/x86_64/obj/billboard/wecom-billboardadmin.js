@@ -122,10 +122,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             if (obj.lastFragment) {
                 // Todos os fragmentos foram recebidos
                 list_departments = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
                 // Faça o que quiser com os dados aqui
                 makeDivDepart(_colDireita, list_departments, list_tableUsers);
                 // Limpe o array de fragmentos recebidos
-                receivedFragments = [];
+                
             }
 
             //list_departments = JSON.parse(obj.result)
@@ -137,10 +138,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             if (obj.lastFragment) {
                 // Todos os fragmentos foram recebidos
                 list_post = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
                 // Faça o que quiser com os dados aqui
                 makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
                 // Limpe o array de fragmentos recebidos
-                receivedFragments = [];
+                
             }
 
             //list_post = JSON.parse(obj.result)

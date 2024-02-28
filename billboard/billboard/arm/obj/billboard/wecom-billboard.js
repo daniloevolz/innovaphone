@@ -158,6 +158,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             if (obj.lastFragment) {
                 // Todos os fragmentos foram recebidos
                 list_posts = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
                 // Faça o que quiser com os dados aqui
                 //list_posts = JSON.parse(obj.result)
                 var dep_id = JSON.parse(obj.dep_id)
@@ -170,7 +171,6 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 } else {
                     app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
                 }
-                receivedFragments = [];
             }
             //list_posts = JSON.parse(obj.result)
             //var dep_id = JSON.parse(obj.dep_id)
