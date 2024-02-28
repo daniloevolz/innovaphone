@@ -1652,41 +1652,57 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         //         });
         //     });
             btnAddDevices.addEventListener("click", function () {
-                document.querySelectorAll(".div93").forEach(function (div) {
-                    console.log("Elemento selecionado:", div);
-                    div.setAttribute("draggable", "true");
-                    div.addEventListener("drag", function(event){
-                        console.log("Iniciou o arraste");
-                        event.dataTransfer.setData("text", event.target.id);
-                    });
-                });
+                
+              
 
-                document.getElementById("divImg").addEventListener("dragover", function(ev) {
-                    console.log("Sobre a área de drop");
-                    ev.preventDefault(); // Evite o comportamento padrão
-                });
+                // document.querySelectorAll(".div93").forEach(function (div) {
+                //     console.log("Elemento selecionado:", div);
+                //     div.setAttribute("draggable", "true");
+                //     div.addEventListener("drag", function(event){
+                //         console.log("Iniciou o arraste");
+                //         event.dataTransfer.setData("text", event.target.id);
+                //     });
+                // });
+
+
+                // document.getElementById("divImg").addEventListener("dragover", function(ev) {
+                //     console.log("Sobre a área de drop");
+                //     ev.preventDefault(); // Evite o comportamento padrão
+                // });
     
-                document.getElementById("divImg").addEventListener("drop", function(ev) {
-                    console.log("DROP");
-                    ev.preventDefault(); // Evite o comportamento padrão
-                    var data = ev.dataTransfer.getData("text");
-                    var draggedElement = document.getElementById(data);
+                // document.getElementById("divImg").addEventListener("drop", function(ev) {
+                //     console.log("DROP");
+                //     ev.preventDefault(); // Evite o comportamento padrão
+                //     var data = ev.dataTransfer.getData("text");
+                //     var draggedElement = document.getElementById(data);
                     
-                    // Obtenha a posição do mouse em relação à divMainSala
-                    var offsetX = ev.clientX - divMainSala.getBoundingClientRect().left;
-                    var offsetY = ev.clientY - divMainSala.getBoundingClientRect().top;
+                //     // Obtenha a posição do mouse em relação à divMainSala
+                //     var offsetX = ev.clientX - divMainSala.getBoundingClientRect().left;
+                //     var offsetY = ev.clientY - divMainSala.getBoundingClientRect().top;
                     
-                    // Posicione o elemento na divMainSala na posição do mouse
-                    draggedElement.style.position = 'absolute';
-                    draggedElement.style.left = offsetX + 'px';
-                    draggedElement.style.top = offsetY + 'px';
+                //     // Posicione o elemento na divMainSala na posição do mouse
+                //     draggedElement.style.position = 'absolute';
+                //     draggedElement.style.left = offsetX + 'px';
+                //     draggedElement.style.top = offsetY + 'px';
                     
-                    // Adicione o elemento à divMainSala
-                    divMainSala.appendChild(draggedElement);
-                });
+                //     // Adicione o elemento à divMainSala
+                //     divMainSala.appendChild(draggedElement);
+                // });
 
             });
+
+            var phoneElements = document.querySelectorAll('.div93');
+            phoneElements.forEach(function (phoneElement) {
+                phoneElement.draggable = true;
+                phoneElement.addEventListener("dragstart",drag,true)
+                
+            });
             
+
+            document.getElementById("divImg").addEventListener("dragover",allowDrop,true)
+            document.getElementById("divImg").addEventListener("drop",drop,true)
+            
+
             btnUpdateRoom.addEventListener("click",function(){
                 if(avail.type == "periodType"){
                     app.send({
@@ -2243,6 +2259,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
          divNameDevice.textContent = device.name
          var deviceIcon = document.createElement("img")
          deviceIcon.classList.add("deviceIcon")
+         deviceIcon.draggable = false
          deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
          div93.appendChild(div82)
          div82.appendChild(divNameDevice)
@@ -3286,22 +3303,40 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     }
 
     function allowDrop(ev) {
+        ev.stopPropagation();
         ev.preventDefault();
     }
-    
-    function drag(ev) {
+
+      function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
         ev.dataTransfer.dropEffect = 'copy';
-        console.log("Draggable")
+        console.log("Drag")
     }
+
     
-    function drop(ev) {
+ function drop(ev) {
+        ev.stopPropagation();
         ev.preventDefault();
         var data = ev.dataTransfer.getData("text");
-        ev.dataTransfer.dropEffect = 'copy';
-        // Manipule os dados conforme necessário (por exemplo, adicione o elemento arrastado à div de destino)
         var draggedElement = document.getElementById(data);
-        ev.target.appendChild(draggedElement);
+
+        // Atualize a posição do elemento arrastado para as coordenadas do evento de soltura
+        
+        draggedElement.style.left = (ev.clientX - document.getElementById("divImg").offsetLeft) + "px";
+        draggedElement.style.top = (ev.clientY - document.getElementById("divImg").offsetTop) + "px";
+
+        // draggedElement.style.left = ((ev.clientX - document.getElementById("divImg").offsetLeft) / window.innerWidth * 100) + "%";
+        // draggedElement.style.top = ((ev.clientY - document.getElementById("divImg").offsetTop) / window.innerHeight * 100) + "%";
+
+
+        // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
+        draggedElement.style.zIndex = "2000";
+
+        // Defina a posição como absoluta para garantir o posicionamento correto
+        draggedElement.style.position = "absolute";
+
+        // Anexe o elemento à div "divImg"
+        document.getElementById("divImg").appendChild(draggedElement);
     }
 
 function resetPhonesDrop(ev){
