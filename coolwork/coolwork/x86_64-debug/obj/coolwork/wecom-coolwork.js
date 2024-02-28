@@ -2025,11 +2025,17 @@ function getDayOfWeekLabel(selectedDate) {
                 btnPopUp.addEventListener("click",function(event){
                     event.stopPropagation()
                     event.preventDefault()
-                    if(avail.schedule_module == "dayModule" ){
+                    if(avail.schedule_module == "dayModule" ){ // agendamento para outro dia - dia todo 
                         var horaAtual = moment()
-                        horaAtual.add(2, 'minutes'); 
-                        var horaFinal = horaAtual.format('HH:mm');
-                        dateStart = selectedDay + "T" + horaFinal
+                        if(horaAtual.format("YYYY-MM-DD") != moment(selectedDay).format("YYYY-MM-DD")){
+                            dateStart =  selectedDay + "T" + document.getElementById("divTimeStart").innerHTML;
+                        }else{  // agendamento para hoje  - dia todo 
+                            var horaAtual = moment()
+                            horaAtual.add(2, 'minutes'); 
+                            var horaFinal = horaAtual.format('HH:mm');
+                            dateStart = selectedDay + "T" + horaFinal
+                        }
+                       
                     }
                     app.sendSrc({ api: "user", mt: "InsertDeviceSchedule", type: avail.schedule_module, data_start: dateStart, data_end: dateEnd, device: deviceHw, room: roomId, src: deviceHw  }, function (obj) {
                         app.sendSrc({ api: "user", mt: "SelectDevicesSchedule", ids: rooms, src: obj.src }, function (obj) {

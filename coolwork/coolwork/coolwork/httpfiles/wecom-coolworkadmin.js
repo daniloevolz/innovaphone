@@ -843,6 +843,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                 break;
                         }
                     });
+                }else{
+                    makePopUp(texts.text("labelWarning"),texts.text("labelSelectDayRecurrent"), "ok").addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    }) 
+                    this.value = "--:--" 
                 }
             })
             const divToTime = document.createElement("div")
@@ -884,6 +891,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                     break;
                             }
                         });
+                    }else{
+                        makePopUp(texts.text("labelWarning"),texts.text("labelSelectDayRecurrent"), "ok").addEventListener("click",function(event){
+                            event.preventDefault()
+                            event.stopPropagation()
+                            document.body.removeChild(document.getElementById("bcgrd"))
+                        })  
+                        this.value = "--:--" 
                     }
                 })
 
@@ -1003,6 +1017,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     typeSched = selectedButton.id
                     divMain.removeChild(divHourSelect)
                     divMain.removeChild(divEditRecurrent)
+                    datesRecurrent = []
                 });
             });
 
@@ -2420,6 +2435,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(individualHour == "individual"){
             daysSelected = [];
             document.querySelectorAll(".individualDiv").forEach(function(i){
+                if(i.classList.contains("bg-dark-400")){
+                    console.log("Está Pintada ")
+                    i.classList.remove("bg-dark-400")
+                }
                 var marked = false;
                 i.removeEventListener("click", i)
                 i.addEventListener("click",function(event){          

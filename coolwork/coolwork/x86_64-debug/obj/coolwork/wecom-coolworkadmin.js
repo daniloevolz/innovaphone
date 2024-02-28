@@ -57,6 +57,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     waitConnection(that);
 
     var devicesApi; // revisar - importante 
+
+    var uriGateway;
+    var startIndex;
+    var firstPart;
+    var secondPart;
+    var secondPartFinal;
+    var endPointEvent;
+
     //var apiPhone;
     function app_connected(domain, user, dn, appdomain) {
         app.send({ api: "admin", mt: "TableUsers" });
@@ -74,6 +82,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         app.send({api:"admin", mt:"SelectAllRoom"})
     }
+
+    
     function devicesApi_onmessage(conn, obj) {
         console.log("devicesApi_onmessage: " + JSON.stringify(obj));
         if (obj.msg.mt == "GetPhonesResult") {
@@ -92,18 +102,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             }
         }
         if (obj.msg.mt == "GetGatewaysResult"){
-            var uriGateway = obj.msg.gateways[0].uri
+            uriGateway = obj.msg.gateways[0].uri
            
             // Encontrar o índice da parte após "/devices/passthrough/"
-            const startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
+            startIndex = uriGateway.indexOf("/devices/passthrough/") + "/devices/passthrough/".length;
 
             // Extrair a parte até "/devices/passthrough/"
-            const firstPart = uriGateway.substring(0, startIndex);
+            firstPart = uriGateway.substring(0, startIndex);
 
             // Extrair a parte após "/devices/passthrough/"
-            const secondPart = uriGateway.substring(startIndex);
-            const secondPartFinal = secondPart.split("/")
-            const endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+            secondPart = uriGateway.substring(startIndex);
+            secondPartFinal = secondPart.split("/")
+            endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+
             console.log("Primeira parte:", firstPart);
             console.log("Segunda parte:", secondPartFinal);
             console.log("Endpoint EventoURL", endPointEvent )
@@ -832,6 +843,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                 break;
                         }
                     });
+                }else{
+                    makePopUp(texts.text("labelWarning"),texts.text("labelSelectDayRecurrent"), "ok").addEventListener("click",function(event){
+                        event.preventDefault()
+                        event.stopPropagation()
+                        document.body.removeChild(document.getElementById("bcgrd"))
+                    }) 
+                    this.value = "--:--" 
                 }
             })
             const divToTime = document.createElement("div")
@@ -873,6 +891,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                     break;
                             }
                         });
+                    }else{
+                        makePopUp(texts.text("labelWarning"),texts.text("labelSelectDayRecurrent"), "ok").addEventListener("click",function(event){
+                            event.preventDefault()
+                            event.stopPropagation()
+                            document.body.removeChild(document.getElementById("bcgrd"))
+                        })  
+                        this.value = "--:--" 
                     }
                 })
 
@@ -992,6 +1017,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     typeSched = selectedButton.id
                     divMain.removeChild(divHourSelect)
                     divMain.removeChild(divEditRecurrent)
+                    datesRecurrent = []
                 });
             });
 
@@ -1182,6 +1208,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             identifyBtn.id = dev.hwid
             identifyBtn.addEventListener("click",function(){
                     console.log("ID " + this.id)
+                    // var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
+                    
+                    // fetch( {
+                    //     method: 'GET',
+                    //     headers: {}
+                    // })
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
@@ -2403,6 +2435,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(individualHour == "individual"){
             daysSelected = [];
             document.querySelectorAll(".individualDiv").forEach(function(i){
+                if(i.classList.contains("bg-dark-400")){
+                    console.log("Está Pintada ")
+                    i.classList.remove("bg-dark-400")
+                }
                 var marked = false;
                 i.removeEventListener("click", i)
                 i.addEventListener("click",function(event){          

@@ -21,6 +21,7 @@ Wecom.coolworkTexts = {
         labelIptSearch: "Pesquisar...",
         labelMustSelectHour: "Selecione o Horario",
         labelSelectDay: "Primeiro selecione o dia",
+        labelSelectDayRecurrent: "Primeiro Selecione os dias da semana",
         labelSelectDivStart: "Primeiro selecione a hora de início",
         labelDayCannotBeSmaller: "O dia selecionado nao pode ser menor que o dia de hoje",
         labelDaySmaller: "O dia de término nao pode ser menor que o dia de início",
