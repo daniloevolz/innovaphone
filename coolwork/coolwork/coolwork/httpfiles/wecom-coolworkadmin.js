@@ -64,6 +64,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var secondPart;
     var secondPartFinal;
     var endPointEvent;
+    var endPointStopEvent;
 
     //var apiPhone;
     function app_connected(domain, user, dn, appdomain) {
@@ -113,7 +114,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             // Extrair a parte após "/devices/passthrough/"
             secondPart = uriGateway.substring(startIndex);
             secondPartFinal = secondPart.split("/")
-            endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=piano&tag=n:0"
+            endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=mezzo&tag=n:1"
+
+            endPointStopEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=stop&tag=n:0"
 
             console.log("Primeira parte:", firstPart);
             console.log("Segunda parte:", secondPartFinal);
@@ -837,7 +840,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                                 datesRecurrent.push({ startSaturday : startTime });
                                 break;
                             case "Sunday":
-                                datesRecurrent.push({ startSun : startTime });
+                                datesRecurrent.push({ startSunday : startTime });
                                 break;
                             default:
                                 break;
@@ -1208,12 +1211,21 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             identifyBtn.id = dev.hwid
             identifyBtn.addEventListener("click",function(){
                     console.log("ID " + this.id)
-                    // var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
-                    
-                    // fetch( {
-                    //     method: 'GET',
-                    //     headers: {}
-                    // })
+
+                    var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
+                    console.log("URL")
+                
+                    fetch( requestURL, {
+                        method: 'GET',
+                        headers: {}
+                    })
+                    setTimeout(function(){
+                        var stopReq = firstPart + this.id + "/" + secondPartFinal[1] + endPointStopEvent
+                        fetch( stopReq, {
+                            method: 'GET',
+                            headers: {}
+                        })
+                    },500)
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
@@ -2441,8 +2453,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 datesRecurrent.push({ endSaturday : endTime });
                 break;
             case "Sunday":
-                datesRecurrent.push({ startSun : startTime });
-                datesRecurrent.push({ endSun : endTime });
+                datesRecurrent.push({ startSunday : startTime });
+                datesRecurrent.push({ endSunday : endTime });
                 break;
             default:
                 break;
