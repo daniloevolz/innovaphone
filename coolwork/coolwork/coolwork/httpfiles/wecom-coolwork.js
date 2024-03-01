@@ -105,6 +105,36 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             app.send({ api: "user", mt: "PhoneList", devices: phones })
         }
+        if (obj.msg.mt == "GetProvisioningCodeResult") {
+            var code = obj.msg.code;
+            var now = new Date()
+            var validUntil = now.setMinutes(now.getMinutes() + 10)
+            console.log("devicesApi_onmessage:GetProvisioningCodeResult " + JSON.stringify(code));
+
+            var btnPopUp = makePopUp(texts.text("provisioningCodeTitle"), texts.text("provisioningCodeMsg") + formatDate(validUntil), code, texts.text("labelOk"))
+            btnPopUp.addEventListener("click", function (event) {
+                event.stopPropagation()
+                event.preventDefault()
+                // Crie um elemento <textarea> temporário
+                var textareaTemporario = document.createElement("textarea");
+                textareaTemporario.value = code;
+
+                // Adicione o elemento <textarea> ao corpo do documento
+                document.body.appendChild(textareaTemporario);
+
+                // Selecione o texto dentro do elemento <textarea>
+                textareaTemporario.select();
+
+                // Copie o texto para a área de transferência
+                document.execCommand("copy");
+
+                // Remova o elemento <textarea> temporário
+                document.body.removeChild(textareaTemporario);
+
+                // O valor foi copiado para a área de transferência
+                console.log("Valor copiado para a área de transferência:", code);
+            })
+        }
 
     }
     function app_message(obj) {
@@ -576,6 +606,7 @@ function makePopUp(title, msg, btn1, btn2){
     const popUp = document.createElement("div")
     popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
     const titlePopUp = document.createElement("div") // aplicar tipografia 
+    titlePopUp.classList.add("font-bold", "[24px]")
     titlePopUp.textContent = title
     const msgPopUp = document.createElement("div")
     msgPopUp.classList.add("text-center")
@@ -825,15 +856,16 @@ function getDayOfWeekLabel(selectedDate) {
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
 
-            myUserGuid = list_tableUsers.filter(function(u){
-                return u.sip == userSIP
-            })[0]
+            //myUserGuid = list_tableUsers.filter(function(u){
+            //    return u.sip == userSIP
+            //})[0]
         
-            mySchedules = [schedules.filter(function(s){
-                return  s.user_guid == myUserGuid.guid
-            })][0]
+            //mySchedules = [schedules.filter(function(s){
+            //    return  s.user_guid == myUserGuid.guid
+            //})][0]
             
-            nextSchedules(mySchedules)
+            //nextSchedules(mySchedules)
+            makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors)
         })
         // div container (scroll)
         const container = document.createElement("div")
@@ -1532,6 +1564,8 @@ function getDayOfWeekLabel(selectedDate) {
         divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
 
+        const divButtons = document.createElement("div")
+        divButtons.classList.add("flex","justify-center","items-center","gap-1")
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -1570,7 +1604,7 @@ function getDayOfWeekLabel(selectedDate) {
         div84.classList.add("div84")
 
         const divNumberPosition = document.createElement("div")
-        divNumberPosition.textContent = device.name
+        divNumberPosition.textContent = "00"
         const div82 = document.createElement("div")
         div82.classList.add("inline-flex","gap-2","items-center")
         var deviceIcon = document.createElement("img")
@@ -1622,7 +1656,8 @@ function getDayOfWeekLabel(selectedDate) {
                         })
                     })
                 })
-                div84.appendChild(div36)
+                divButtons.appendChild(div36)
+                div84.appendChild(divButtons)
             }
             //se ja tiver um agendamento rolando 
             else if(user.sip != userSIP  && userScheduels && userScheduels.data_start <= formattedDate && userScheduels.data_end >= formattedDate ){
@@ -1647,15 +1682,15 @@ function getDayOfWeekLabel(selectedDate) {
 
             })
 
-            div84.appendChild(div34)
+            divButtons.appendChild(div34)
+                div84.appendChild(divButtons)
             }
 
         }
         // quando telefone estiver livre
         else {  
             //div 36
-            const divButtons = document.createElement("div")
-            divButtons.classList.add("flex","justify-center","items-center","gap-1")
+
 
             const div36 = makeButton("","","./images/setDevice.png")
             div36.setAttribute("id", device.hwid)
@@ -1774,6 +1809,7 @@ function getDayOfWeekLabel(selectedDate) {
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
+        containerSchedule.classList.add("md:mx-96")
         document.body.appendChild(containerSchedule)
 
         var avail = availabilities.filter(function (a) {
@@ -2091,5 +2127,104 @@ function getDayOfWeekLabel(selectedDate) {
     }
     //#endregion
 
+
+
+    //#region Opções
+    function makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors) {
+        that.clear();
+        // backButton.addEventListener("click",function(event){
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        //     makeViewRoom(rooms,devices,availabilities,viewers)
+        // })
+        makeHeader(backButton, makeButton("", "", "./images/settings.svg"), texts.text("labelOptions"), function () {
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+        })
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
+        // criar sala
+        //const divMakeRoom = document.createElement("div")
+        //divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        //const plusIcon = document.createElement("img")
+        //plusIcon.src = './images/plus-circle.svg'
+        //const labelMakeRoom = document.createElement("div")
+        //labelMakeRoom.textContent = texts.text("labelCreateRoom")
+        // provisioning code
+        const divProvCode = document.createElement("div")
+        divProvCode.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full", "cursor-pointer")
+        const provIcon = document.createElement("img")
+        provIcon.src = './images/hash.svg'
+        const labelProvCode = document.createElement("div")
+        labelProvCode.setAttribute("id", "labelProvCode")
+        labelProvCode.textContent = texts.text("labelProvCode")
+        // tabela agendamento
+        const divTableSched = document.createElement("div")
+        divTableSched.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full", "cursor-pointer")
+        const schedIcon = document.createElement("img")
+        schedIcon.src = './images/calendar-option.svg'
+        const labelTableSched = document.createElement("div")
+        labelTableSched.textContent = texts.text("labelTableSchedule")
+        //aparencia
+        //const divAppearance = document.createElement("div")
+        //divAppearance.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        //const appearanceIcon = document.createElement("img")
+        //appearanceIcon.src = './images/brush.svg'
+        //const labelAppearance = document.createElement("div")
+        //labelAppearance.setAttribute("id", "labelAppearance")
+        //labelAppearance.textContent = texts.text("labelAppearance")
+
+
+        //divMakeRoom.appendChild(plusIcon)
+        //divMakeRoom.appendChild(labelMakeRoom)
+        divProvCode.appendChild(provIcon)
+        divProvCode.appendChild(labelProvCode)
+        divTableSched.appendChild(schedIcon)
+        divTableSched.appendChild(labelTableSched)
+        //divAppearance.appendChild(appearanceIcon)
+        //divAppearance.appendChild(labelAppearance)
+        //divMain.appendChild(divMakeRoom)
+        divMain.appendChild(divProvCode)
+        divMain.appendChild(divTableSched)
+        //divMain.appendChild(divAppearance)
+        document.body.appendChild(divMain)
+
+        //listeners
+        //divMakeRoom.addEventListener("click", function (event) {
+        //    event.preventDefault
+        //    event.stopPropagation()
+        //    createRoomContext()
+        //})
+        divProvCode.addEventListener("click", function (event) {
+            event.preventDefault
+            event.stopPropagation()
+            getProvisioningCode(userSIP, "inn-lab-ipva IP Phone", "labelProvCode")
+        })
+
+        divTableSched.addEventListener("click", function (event) {
+            event.preventDefault
+            event.stopPropagation()
+
+            myUserGuid = list_tableUsers.filter(function(u){
+                return u.sip == userSIP
+            })[0]
+
+            mySchedules = [schedules.filter(function(s){
+                return  s.user_guid == myUserGuid.guid
+            })][0]
+           
+            nextSchedules(mySchedules)
+            
+        })
+
+        //divAppearance.addEventListener('click', function (event) {
+        //    event.preventDefault
+        //    event.stopPropagation()
+        //    makeDivAppearance()
+        //})
+    }
+    function getProvisioningCode(sip, category, divId) {
+        devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: category, div: divId })
+    }
+    //#endregion
 }
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;

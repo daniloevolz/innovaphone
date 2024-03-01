@@ -247,6 +247,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divTypeRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelTypeRoom = document.createElement("div")
     labelTypeRoom.textContent = texts.text("labelTypeRoom")
+    const divButtons = document.createElement("div")
+    divButtons.classList.add("justify-evenly","flex","gap-1")
     const btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
         btnPeriod.id = "periodType"
     const btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
@@ -314,9 +316,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divNameRoom.appendChild(iptNameRoom)
     divImgRoom.appendChild(labelImgRoom)
     divImgRoom.appendChild(divBtnChoose)
+
+    divButtons.appendChild(btnPeriod)
+    divButtons.appendChild(btnRecurrent)
+
     divTypeRoom.appendChild(labelTypeRoom)
-    divTypeRoom.appendChild(btnPeriod)
-    divTypeRoom.appendChild(btnRecurrent)
+    divTypeRoom.appendChild(divButtons)
+
     // divTypeSchedule.appendChild(labelTypeSchedule) colocar na tela de agendamento
     // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
     // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
@@ -339,14 +345,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     btnCreateRoom.addEventListener("click",function(event){
         const nomeSala = document.getElementById("iptNameRoom").value
-        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+        if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
         makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
             event.preventDefault()
             event.stopPropagation()
             document.body.removeChild(document.getElementById("bcgrd"))
         })      
         }
-        if(typeRoom == "periodType"){
+        else if(typeRoom == "periodType"){
             app.send({ api: "admin", mt: "InsertRoom", 
             name: nomeSala, 
             img: imgRoom, 
@@ -428,7 +434,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
         
         const divMain = document.createElement("div")
-        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3")
+        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3","md:m-96")
 
         const titleUsers = document.createElement("div")
         titleUsers.textContent = texts.text("labelUsers")
@@ -1099,7 +1105,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         });
         const divIptImage = new innovaphone.ui1.Div(null,null,"flex p-1 justify-between items-center rounded-lg bg-dark-200");
         const labelImportImg = new innovaphone.ui1.Div(null, texts.text("labelImportImg"));
-        const customFileInput = new innovaphone.ui1.Node("label",null,texts.text("labelChoose"),"bg-primary-600 hover:bg-primary-500 text-dark-100 font-medium py-1 px-2 rounded-lg primary cursor-pointer");
+        const customFileInput = new innovaphone.ui1.Node("label",null,texts.text("labelChoose"),"bg-dark-300 hover:bg-dark-400 text-primary-600 font-bold py-1 px-2 rounded-lg cursor-pointer");
         inputDbFiles = customFileInput.add(new innovaphone.ui1.Node("input","display:none", "", ""));
         inputDbFiles.setAttribute("id", "fileinput").setAttribute("type", "file");
         inputDbFiles.setAttribute("accept","image/*")
@@ -1153,7 +1159,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
         
         const divMain = document.createElement("div")
-        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3")
+        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3","md:m-96")
 
         const titleDevices = document.createElement("div")
         titleDevices.textContent = texts.text("labelUsers")
@@ -1309,7 +1315,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#region VISUALIZAÇÃO DE SALA
     function makeViewRoom(rooms, devices, availabilities,viewers) {
         that.clear();
-        const btnMenu = makeButton('','',"./images/menu.svg")
+        const btnMenu = makeButton('','',"./images/settings.svg")
         const btnHome = makeButton("","","./images/home.svg")
         btnHome.addEventListener("click",function(event){
             event.preventDefault();
@@ -1324,7 +1330,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         if(rooms.length > 0) {
             const divIptSearch = document.createElement("div")
-            divIptSearch.classList.add("m-1", "flex", "items-center" ,"justify-between" , "p-1" , "rounded-lg")
+            divIptSearch.classList.add("flex", "items-center" ,"justify-between" , "rounded-lg","p-1")
             const inputSearch = makeInput(null,"search",texts.text("labelSearchYourRoom"))
             inputSearch.classList.add("w-full")
             divIptSearch.appendChild(inputSearch)
@@ -1455,7 +1461,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
                 // div disponibilidade periodo
                 const divMainAvailabilityPeriod = document.createElement("div")
-                divMainAvailabilityPeriod.classList.add("flex", "p-1", "items-center", "justify-between", "bg-dark-100", "rounded-lg")
+                divMainAvailabilityPeriod.classList.add("flex", "p-2", "items-center", "justify-between", "bg-dark-100", "rounded-lg")
                 const imgCalendar = document.createElement("img")
                 imgCalendar.setAttribute("src", "./images/calendar-days.svg")
                 divMainAvailabilityPeriod.appendChild(imgCalendar)
@@ -1716,15 +1722,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             
 
             btnUpdateRoom.addEventListener("click",function(){
-                if(avail.type == "periodType"){
-                    app.send({
-                        api: "admin", mt: "UpdateRoomAvailability", 
-                        datastart: dateAvailability[0].start, 
-                        dataend: dateAvailability[0].end,
-                        schedModule: typeSchedule,
-                        roomID: id
-                    })
-                }    
+
+                // if(avail.type == "periodType"){
+                //     app.send({
+                //         api: "admin", mt: "UpdateRoomAvailability", 
+                //         datastart: dateAvailability[0].start, 
+                //         dataend: dateAvailability[0].end,
+                //         schedModule: typeSchedule,
+                //         roomID: id
+                //     })
+                // }    
             })
     }
     function makeAvatar(viewersFilter, divMain) {
@@ -1866,13 +1873,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         switch (variant) {
             case "text":
-                input.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-white","rounded-lg","w-full","text-dark-600")
+                input.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-white","rounded-lg","w-full","text-dark-100")
                 break
             case "file":
                 input.style.display = "none";
                 const customFileInput = document.createElement("label");
                 customFileInput.textContent = text;
-                customFileInput.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded-lg", "primary", "cursor-pointer");
+                customFileInput.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded-lg", "cursor-pointer");
                 customFileInput.appendChild(input);
                 return customFileInput;
             case "time":
@@ -1882,7 +1889,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 input.classList.add("w-[16px]","h-[16px]","rounded-md");
                 break
             case "search":
-                input.classList.add("flex","p-1","justify-between","items-center","rounded-md","bg-white","text-dark-500")
+                input.classList.add("flex","p-1","justify-between","items-center","rounded-md","bg-white","text-dark-100")
 
         }
 
@@ -2408,10 +2415,25 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divCheckbox.classList.add("flex", "gap-1", "items-center");
         const identifyBtn = makeButton(texts.text("labelIdentify"), "primary", "");
         identifyBtn.id = device.hwid;
-        identifyBtn.addEventListener("click", function () {
-            console.log("ID  " + this.id);
-            // apiPhone.send({ mt: "StartCall", sip: "vitor" })
-        });
+        identifyBtn.addEventListener("click",function(){
+            console.log("ID " + this.id)
+
+            var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
+            console.log("URL")
+        
+            fetch( requestURL, {
+                method: 'GET',
+                headers: {}
+            })
+            setTimeout(function(){
+                var stopReq = firstPart + this.id + "/" + secondPartFinal[1] + endPointStopEvent
+                fetch( stopReq, {
+                    method: 'GET',
+                    headers: {}
+                })
+            },500)
+        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+    })
         const checkboxDevice = makeInput("", "checkbox", "");
         checkboxDevice.setAttribute("id", 'checkboxDev_' + device.hwid);
         checkboxDevice.classList.add("checkboxDev");
@@ -2746,14 +2768,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
         // criar sala
         const divMakeRoom = document.createElement("div")
-        divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full","cursor-pointer")
         const plusIcon = document.createElement("img")
         plusIcon.src = './images/plus-circle.svg'
         const labelMakeRoom = document.createElement("div")
         labelMakeRoom.textContent = texts.text("labelCreateRoom")
         // provisioning code
         const divProvCode = document.createElement("div")
-        divProvCode.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        divProvCode.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full","cursor-pointer")
         const provIcon = document.createElement("img")
         provIcon.src = './images/hash.svg'
         const labelProvCode = document.createElement("div")
@@ -2761,14 +2783,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         labelProvCode.textContent = texts.text("labelProvCode")
         // tabela agendamento
         const divTableSched = document.createElement("div")
-        divTableSched.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        divTableSched.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full","cursor-pointer")
         const schedIcon = document.createElement("img")
         schedIcon.src = './images/calendar-option.svg'
         const labelTableSched = document.createElement("div")
         labelTableSched.textContent = texts.text("labelTableSchedule")
         //aparencia
         const divAppearance = document.createElement("div")
-        divAppearance.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        divAppearance.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full","cursor-pointer")
         const appearanceIcon = document.createElement("img")
         appearanceIcon.src = './images/brush.svg'
         const labelAppearance= document.createElement("div")
@@ -2819,6 +2841,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         })
         const divMain = document.createElement("div")
         divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        
+          // div criar do zero 
+          const makeFromZero = document.createElement("div")
+          makeFromZero.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full","justify-center","cursor-pointer")
+          makeFromZero.textContent = texts.text("labelmakeFromZero")
+  
+          divMain.appendChild(makeFromZero)
+        
         // SALA SIMPLES
         const divSimpleRoom = document.createElement("div")
         divSimpleRoom.classList.add("flex","p-3","flex-col","items-center","gap-1","rounded-lg","bg-dark-200","w-full")
@@ -2876,12 +2906,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divComplexRoom.appendChild(textComplexRoom1)
         divComplexRoom.appendChild(textComplexRoom2)
         divMain.appendChild(divComplexRoom)
-        // div criar do zero 
-        const makeFromZero = document.createElement("div")
-        makeFromZero.classList.add("flex","p-1","items-center","gap-1","rounded-lg","bg-dark-200","w-full","justify-center")
-        makeFromZero.textContent = texts.text("labelmakeFromZero")
-
-        divMain.appendChild(makeFromZero)
+    
         document.body.appendChild(divMain) 
 
         makeFromZero.addEventListener("click",function(){
@@ -3161,6 +3186,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         })
         }
     //#endregion
+    
+    //#region Drag and Drop Functions
     function clickedPhone(hwId, colDireita, e){
         console.log("Clicked Phone", hwId)
         var x = e.clientX;
@@ -3313,7 +3340,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
                     }, rvButton));
     }
-
     function allowDrop(ev) {
         ev.stopPropagation();
         ev.preventDefault();
@@ -3325,78 +3351,81 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         console.log("Drag")
     }
 
-    
- function drop(ev) {
+
+    function drop(ev) {
         ev.stopPropagation();
         ev.preventDefault();
         var data = ev.dataTransfer.getData("text");
         var draggedElement = document.getElementById(data);
-
-        // Atualize a posição do elemento arrastado para as coordenadas do evento de soltura
-        
-        draggedElement.style.left = (ev.clientX - document.getElementById("divImg").offsetLeft) + "px";
-        draggedElement.style.top = (ev.clientY - document.getElementById("divImg").offsetTop) + "px";
-
-        // draggedElement.style.left = ((ev.clientX - document.getElementById("divImg").offsetLeft) / window.innerWidth * 100) + "%";
-        // draggedElement.style.top = ((ev.clientY - document.getElementById("divImg").offsetTop) / window.innerHeight * 100) + "%";
-
-
+    
+        // Obtenha as coordenadas do mouse em relação à div "divImg"
+        var rect = document.getElementById("divImg").getBoundingClientRect();
+        var offsetX = ((ev.clientX - rect.left) / rect.width) * 100;
+        var offsetY = ((ev.clientY - rect.top) / rect.height) * 100;
+    
+        // Ajuste as coordenadas do elemento para as coordenadas do mouse em porcentagem
+        draggedElement.style.left = offsetX + "%";
+        draggedElement.style.top = offsetY + "%";
+    
         // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
         draggedElement.style.zIndex = "2000";
-
+    
         // Defina a posição como absoluta para garantir o posicionamento correto
         draggedElement.style.position = "absolute";
-
+    
         // Anexe o elemento à div "divImg"
         document.getElementById("divImg").appendChild(draggedElement);
     }
-
-function resetPhonesDrop(ev){
-    ev.stopPropagation();
-    ev.preventDefault();
-
-    var data = ev.dataTransfer.getData("text");
-    var draggedElement = document.getElementById(data);
-    var divPhones = document.getElementById("divMainImg");
-
-    document.getElementById("imgBD").removeChild(draggedElement)
-    draggedElement.style.position = 'static'
-    draggedElement.name = '';
-    draggedElement.classList.remove("DeviceActive")
-    draggedElement.classList.add("DeviceRemoved")
     
-    // Remova o dispositivo da lista de dispositivos ativos
-var deviceId = draggedElement.id; // Supondo que o ID do dispositivo corresponda ao ID na lista de dispositivos ativos
-var indexToRemove = -1;
 
-for (var i = 0; i < ativos.length; i++) {
-    if (ativos[i].hwid === deviceId) {
-        indexToRemove = i;
-        break;
+    function resetPhonesDrop(ev){
+        ev.stopPropagation();
+        ev.preventDefault();
+
+        var data = ev.dataTransfer.getData("text");
+        var draggedElement = document.getElementById(data);
+        var divPhones = document.getElementById("divMainImg");
+
+        document.getElementById("imgBD").removeChild(draggedElement)
+        draggedElement.style.position = 'static'
+        draggedElement.name = '';
+        draggedElement.classList.remove("DeviceActive")
+        draggedElement.classList.add("DeviceRemoved")
+        
+        // Remova o dispositivo da lista de dispositivos ativos
+    var deviceId = draggedElement.id; // Supondo que o ID do dispositivo corresponda ao ID na lista de dispositivos ativos
+    var indexToRemove = -1;
+
+    for (var i = 0; i < ativos.length; i++) {
+        if (ativos[i].hwid === deviceId) {
+            indexToRemove = i;
+            break;
+        }
     }
-}
 
-if (indexToRemove >= 0) {
-    ativos.splice(indexToRemove, 1);
-}
-
-for (var i = 0; i < listDeviceRoom.length; i++) {
-    if (listDeviceRoom[i].hwid === deviceId) {
-        indexToRemove = i;
-        break;
+    if (indexToRemove >= 0) {
+        ativos.splice(indexToRemove, 1);
     }
-}
 
-if (indexToRemove >= 0) {
-    listDeviceRoom.splice(indexToRemove, 1);
-}
-app.send({api:"admin", mt:"DeleteDeviceFromRoom" , hwid: String(deviceId)})
+    for (var i = 0; i < listDeviceRoom.length; i++) {
+        if (listDeviceRoom[i].hwid === deviceId) {
+            indexToRemove = i;
+            break;
+        }
+    }
 
-console.log("DEVICES QUE ESTÃO ATIVOS" + JSON.stringify(listDeviceRoom))
-    console.log("ativos after reset " + JSON.stringify(ativos))
-    divPhones.appendChild(draggedElement);
+    if (indexToRemove >= 0) {
+        listDeviceRoom.splice(indexToRemove, 1);
+    }
+    app.send({api:"admin", mt:"DeleteDeviceFromRoom" , hwid: String(deviceId)})
 
-}
+    console.log("DEVICES QUE ESTÃO ATIVOS" + JSON.stringify(listDeviceRoom))
+        console.log("ativos after reset " + JSON.stringify(ativos))
+        divPhones.appendChild(draggedElement);
+
+    }
+    //#endregion
+
 // db files
 // container
 var folder = null;

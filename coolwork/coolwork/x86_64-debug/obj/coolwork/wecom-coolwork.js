@@ -1532,6 +1532,8 @@ function getDayOfWeekLabel(selectedDate) {
         divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
 
+        const divButtons = document.createElement("div")
+            divButtons.classList.add("flex","justify-center","items-center","gap-1")
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -1570,7 +1572,7 @@ function getDayOfWeekLabel(selectedDate) {
         div84.classList.add("div84")
 
         const divNumberPosition = document.createElement("div")
-        divNumberPosition.textContent = device.name
+        divNumberPosition.textContent = "00"
         const div82 = document.createElement("div")
         div82.classList.add("inline-flex","gap-2","items-center")
         var deviceIcon = document.createElement("img")
@@ -1622,7 +1624,8 @@ function getDayOfWeekLabel(selectedDate) {
                         })
                     })
                 })
-                div84.appendChild(div36)
+                divButtons.appendChild(div36)
+                div84.appendChild(divButtons)
             }
             //se ja tiver um agendamento rolando 
             else if(user.sip != userSIP  && userScheduels && userScheduels.data_start <= formattedDate && userScheduels.data_end >= formattedDate ){
@@ -1647,15 +1650,15 @@ function getDayOfWeekLabel(selectedDate) {
 
             })
 
-            div84.appendChild(div34)
+            divButtons.appendChild(div34)
+            div84.appendChild(divButtons)
             }
 
         }
         // quando telefone estiver livre
         else {  
             //div 36
-            const divButtons = document.createElement("div")
-            divButtons.classList.add("flex","justify-center","items-center","gap-1")
+            
 
             const div36 = makeButton("","","./images/setDevice.png")
             div36.setAttribute("id", device.hwid)
@@ -1774,6 +1777,7 @@ function getDayOfWeekLabel(selectedDate) {
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
+        containerSchedule.classList.add("md:mx-96")
         document.body.appendChild(containerSchedule)
 
         var avail = availabilities.filter(function (a) {
