@@ -105,6 +105,36 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
 
             app.send({ api: "user", mt: "PhoneList", devices: phones })
         }
+        if (obj.msg.mt == "GetProvisioningCodeResult") {
+            var code = obj.msg.code;
+            var now = new Date()
+            var validUntil = now.setMinutes(now.getMinutes() + 10)
+            console.log("devicesApi_onmessage:GetProvisioningCodeResult " + JSON.stringify(code));
+
+            var btnPopUp = makePopUp(texts.text("provisioningCodeTitle"), texts.text("provisioningCodeMsg") + formatDate(validUntil), code, texts.text("labelOk"))
+            btnPopUp.addEventListener("click", function (event) {
+                event.stopPropagation()
+                event.preventDefault()
+                // Crie um elemento <textarea> temporário
+                var textareaTemporario = document.createElement("textarea");
+                textareaTemporario.value = code;
+
+                // Adicione o elemento <textarea> ao corpo do documento
+                document.body.appendChild(textareaTemporario);
+
+                // Selecione o texto dentro do elemento <textarea>
+                textareaTemporario.select();
+
+                // Copie o texto para a área de transferência
+                document.execCommand("copy");
+
+                // Remova o elemento <textarea> temporário
+                document.body.removeChild(textareaTemporario);
+
+                // O valor foi copiado para a área de transferência
+                console.log("Valor copiado para a área de transferência:", code);
+            })
+        }
 
     }
     function app_message(obj) {
@@ -576,6 +606,7 @@ function makePopUp(title, msg, btn1, btn2){
     const popUp = document.createElement("div")
     popUp.classList.add("inline-flex", "p-3", "flex-col", "items-center", "gap-1", "rounded-lg", "bg-dark-100", "m-1")
     const titlePopUp = document.createElement("div") // aplicar tipografia 
+    titlePopUp.classList.add("font-bold", "[24px]")
     titlePopUp.textContent = title
     const msgPopUp = document.createElement("div")
     msgPopUp.classList.add("text-center")
@@ -819,21 +850,22 @@ function getDayOfWeekLabel(selectedDate) {
         
     }
 
-    var buttonMenu = makeButton('','',"./images/menu.svg")
+    var buttonMenu = makeButton('','',"./images/settings.svg")
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
 
-            myUserGuid = list_tableUsers.filter(function(u){
-                return u.sip == userSIP
-            })[0]
+            //myUserGuid = list_tableUsers.filter(function(u){
+            //    return u.sip == userSIP
+            //})[0]
         
-            mySchedules = [schedules.filter(function(s){
-                return  s.user_guid == myUserGuid.guid
-            })][0]
+            //mySchedules = [schedules.filter(function(s){
+            //    return  s.user_guid == myUserGuid.guid
+            //})][0]
             
-            nextSchedules(mySchedules)
+            //nextSchedules(mySchedules)
+            makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors)
         })
         // div container (scroll)
         const container = document.createElement("div")
@@ -1052,7 +1084,12 @@ function getDayOfWeekLabel(selectedDate) {
         })
         // div container
         const container = document.createElement("div")
-        container.classList.add("overflow-auto", "gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
+        // if (window.matchMedia('(min-width: 480px)').matches){
+        //   container.classList.add("overflow-hidden")
+        // }else{
+        //     container.classList.add("overflow-auto")
+        // }
+        container.classList.add("overflow-auto", "sm:overflow-hidden","gap-1", "grid", "sm:grid-cols-2","sm:grid-rows-2", "m-1","content-start",)
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id", "container")
         document.body.appendChild(container);
@@ -1069,13 +1106,13 @@ function getDayOfWeekLabel(selectedDate) {
 
         //card horarios implementado pelo Pietro
         const divHorario = document.createElement("div")
-        divHorario.classList.add("divHorario","w-full","h-full",)
+        divHorario.classList.add("divHorario","w-full") //"h-full",
         container.appendChild(divHorario)
         makeViewCalendarDetail(divHorario, avail)
 
         // div container (scroll) devices
         const div102 = document.createElement("div")
-        div102.classList.add("div102","sm:col-start-2")
+        div102.classList.add("div102","sm:col-start-2","h-full","sm:overflow-auto","p-1","gap-1","flex","items-start","rounded-lg","bg-dark-200",'flex-col')
         /*div102.style.height = 'calc(100vh - 70px)'*/
         div102.setAttribute("id", "div102")
         container.appendChild(div102);
@@ -1140,7 +1177,7 @@ function getDayOfWeekLabel(selectedDate) {
         div160.appendChild(divOpenTime)
 
         if (window.matchMedia('(min-width: 480px)').matches){
-            divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+            //divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
             var divAvailabilyDetail = document.createElement("div")
             divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
             divAvailabilyDetail.classList.add("divAvailabilyDetail")
@@ -1156,35 +1193,37 @@ function getDayOfWeekLabel(selectedDate) {
                 }
 
                 UpdateAvailability(availability, a.type)     
-        }
-        divOpenTime.addEventListener("click", function (event) {
-            event.stopPropagation()
-            var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
-            var divOpenTime = document.getElementById("divOpenTime")
-            
-            if (divAvailabilyDetail) {
-                divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
-                divMain.removeChild(divAvailabilyDetail)
-
-            } else {
-                divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
-                var divAvailabilyDetail = document.createElement("div")
-                divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                divAvailabilyDetail.classList.add("divAvailabilyDetail")
-                divMain.appendChild(divAvailabilyDetail)
-
+        }else{
+            divOpenTime.addEventListener("click", function (event) {
+                event.stopPropagation()
+                var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
+                var divOpenTime = document.getElementById("divOpenTime")
                 
-                    if (a.type == "periodType") {
-                        makeViewTimePeriod(divAvailabilyDetail, a)
-                    }
+                if (divAvailabilyDetail) {
+                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-down.svg);`);
+                    divMain.removeChild(divAvailabilyDetail)
+    
+                } else {
+                    divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
+                    var divAvailabilyDetail = document.createElement("div")
+                    divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
+                    divAvailabilyDetail.classList.add("divAvailabilyDetail")
+                    divMain.appendChild(divAvailabilyDetail)
+    
+                    
+                        if (a.type == "periodType") {
+                            makeViewTimePeriod(divAvailabilyDetail, a)
+                        }
+    
+                        if (a.type == "recurrentType") {
+                            makeViewTimeRecurrent(divAvailabilyDetail, a)
+                        }
+    
+                        UpdateAvailability(availability, a.type)     
+                }
+            })
+        }
 
-                    if (a.type == "recurrentType") {
-                        makeViewTimeRecurrent(divAvailabilyDetail, a)
-                    }
-
-                    UpdateAvailability(availability, a.type)     
-            }
-        })
     })
 
     }
@@ -1344,10 +1383,7 @@ function getDayOfWeekLabel(selectedDate) {
                 });
             });
         }
-        
-        
-        
-    
+          
     }
     function makeViewTimePeriod(divMain, availability) {
         //dias
@@ -1533,7 +1569,7 @@ function getDayOfWeekLabel(selectedDate) {
         //div retangle 1396
 
         const divButtons = document.createElement("div")
-            divButtons.classList.add("flex","justify-center","items-center","gap-1")
+        divButtons.classList.add("flex","justify-end","items-center","gap-1","w-full","pr-1")
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -1567,24 +1603,22 @@ function getDayOfWeekLabel(selectedDate) {
             return device.room_id == room.id
         })[0];
 
-        //div 84
-        const div84 = document.createElement("div")
-        div84.classList.add("div84")
+        //div Left
+        const divLeft = document.createElement("div")
+        divLeft.classList.add("w-full","flex","justify-start","gap-1","items-center","pl-1")
 
         const divNumberPosition = document.createElement("div")
         divNumberPosition.textContent = "00"
-        const div82 = document.createElement("div")
-        div82.classList.add("inline-flex","gap-2","items-center")
         var deviceIcon = document.createElement("img")
         deviceIcon.classList.add("deviceIcon")
         deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
-        div82.appendChild(divNumberPosition)
-        div82.appendChild(deviceIcon)
-        div84.appendChild(div82)
-
+        divLeft.appendChild(divNumberPosition)
+        divLeft.appendChild(deviceIcon)
         div100.appendChild(div100User)
         div100.appendChild(div100Status)
-        div84.appendChild(div100)
+        divLeft.appendChild(div100)
+
+        divMainViewDevice.appendChild(divLeft)
 
         // se tiver alguem usando o telefone
         if (viewer.length > 0) {
@@ -1604,12 +1638,33 @@ function getDayOfWeekLabel(selectedDate) {
             div100User.textContent = user.cn 
 
             //div 100
+            console.log("UserSchedules"  + JSON.stringify(userScheduels) + "My User " + JSON.stringify(myUser))
             
+            // se eu estiver usando o telefone por agendamento
+            if(user.sip == userSIP && userScheduels && moment(userScheduels.data_start).format('YYYY-MM-DDTHH:mm') <= formattedDate ){
+            const div36 = makeButton('',"secundary","./images/pencil.svg")
+            div36.setAttribute("id", device.hwid)
+            div36.addEventListener("click", function (event) {
+                // var dev = event.currentTarget.id;
+                // event.stopPropagation()
+                // app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
+                //     app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
+                //         devices = JSON.parse(obj.result)
+                //         var devs = devices.filter(function (dev) {
+                //             return dev.room_id == room.id
+                //         })
+                //         makeViewRoomDetail(room.id)
+                //     })
+                // })
+            })
+            divButtons.appendChild(div36)
+            divMainViewDevice.appendChild(divButtons)
+            }
             // se eu estiver usando o telefone
-            if (user.sip == userSIP) {  
+            else if (user.sip == userSIP ) {  
                 //div 36
                 // const div36 = makeButton(texts.text("deletePhoneUseButton"), "secundary")
-                const div36 = makeButton('','',"./images/frame-36.png")
+                const div36 = makeButton('','secundary',"./images/reply.svg")
                 div36.setAttribute("id", device.hwid)
                 div36.addEventListener("click", function (event) {
                     var dev = event.currentTarget.id;
@@ -1625,7 +1680,8 @@ function getDayOfWeekLabel(selectedDate) {
                     })
                 })
                 divButtons.appendChild(div36)
-                div84.appendChild(divButtons)
+                divMainViewDevice.appendChild(divButtons)
+                
             }
             //se ja tiver um agendamento rolando 
             else if(user.sip != userSIP  && userScheduels && userScheduels.data_start <= formattedDate && userScheduels.data_end >= formattedDate ){
@@ -1651,16 +1707,14 @@ function getDayOfWeekLabel(selectedDate) {
             })
 
             divButtons.appendChild(div34)
-            div84.appendChild(divButtons)
+            divMainViewDevice.appendChild(divButtons)
             }
 
         }
         // quando telefone estiver livre
         else {  
             //div 36
-            
-
-            const div36 = makeButton("","","./images/setDevice.png")
+            const div36 = makeButton('','secundary',"./images/hand.svg")
             div36.setAttribute("id", device.hwid)
             //div36.innerHTML = texts.text("makePhoneUseButton")
             div36.addEventListener("click", function (event) {
@@ -1699,9 +1753,9 @@ function getDayOfWeekLabel(selectedDate) {
             })
             divButtons.appendChild(div36)
             divButtons.appendChild(div34)
-            div84.appendChild(divButtons)
+            divMainViewDevice.appendChild(divButtons)
         }
-        divMainViewDevice.appendChild(div84)
+
         divMain.appendChild(divMainViewDevice)
 
     }
@@ -2095,5 +2149,104 @@ function getDayOfWeekLabel(selectedDate) {
     }
     //#endregion
 
+
+
+    //#region Opções
+    function makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors) {
+        that.clear();
+        // backButton.addEventListener("click",function(event){
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        //     makeViewRoom(rooms,devices,availabilities,viewers)
+        // })
+        makeHeader(backButton, makeButton("", "", "./images/settings.svg"), texts.text("labelOptions"), function () {
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+        })
+        const divMain = document.createElement("div")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
+        // criar sala
+        //const divMakeRoom = document.createElement("div")
+        //divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        //const plusIcon = document.createElement("img")
+        //plusIcon.src = './images/plus-circle.svg'
+        //const labelMakeRoom = document.createElement("div")
+        //labelMakeRoom.textContent = texts.text("labelCreateRoom")
+        // provisioning code
+        const divProvCode = document.createElement("div")
+        divProvCode.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full", "cursor-pointer")
+        const provIcon = document.createElement("img")
+        provIcon.src = './images/hash.svg'
+        const labelProvCode = document.createElement("div")
+        labelProvCode.setAttribute("id", "labelProvCode")
+        labelProvCode.textContent = texts.text("labelProvCode")
+        // tabela agendamento
+        const divTableSched = document.createElement("div")
+        divTableSched.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full", "cursor-pointer")
+        const schedIcon = document.createElement("img")
+        schedIcon.src = './images/calendar-option.svg'
+        const labelTableSched = document.createElement("div")
+        labelTableSched.textContent = texts.text("labelTableSchedule")
+        //aparencia
+        //const divAppearance = document.createElement("div")
+        //divAppearance.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
+        //const appearanceIcon = document.createElement("img")
+        //appearanceIcon.src = './images/brush.svg'
+        //const labelAppearance = document.createElement("div")
+        //labelAppearance.setAttribute("id", "labelAppearance")
+        //labelAppearance.textContent = texts.text("labelAppearance")
+
+
+        //divMakeRoom.appendChild(plusIcon)
+        //divMakeRoom.appendChild(labelMakeRoom)
+        divProvCode.appendChild(provIcon)
+        divProvCode.appendChild(labelProvCode)
+        divTableSched.appendChild(schedIcon)
+        divTableSched.appendChild(labelTableSched)
+        //divAppearance.appendChild(appearanceIcon)
+        //divAppearance.appendChild(labelAppearance)
+        //divMain.appendChild(divMakeRoom)
+        divMain.appendChild(divProvCode)
+        divMain.appendChild(divTableSched)
+        //divMain.appendChild(divAppearance)
+        document.body.appendChild(divMain)
+
+        //listeners
+        //divMakeRoom.addEventListener("click", function (event) {
+        //    event.preventDefault
+        //    event.stopPropagation()
+        //    createRoomContext()
+        //})
+        divProvCode.addEventListener("click", function (event) {
+            event.preventDefault
+            event.stopPropagation()
+            getProvisioningCode(userSIP, "inn-lab-ipva IP Phone", "labelProvCode")
+        })
+
+        divTableSched.addEventListener("click", function (event) {
+            event.preventDefault
+            event.stopPropagation()
+
+            myUserGuid = list_tableUsers.filter(function(u){
+                return u.sip == userSIP
+            })[0]
+
+            mySchedules = [schedules.filter(function(s){
+                return  s.user_guid == myUserGuid.guid
+            })][0]
+           
+            nextSchedules(mySchedules)
+            
+        })
+
+        //divAppearance.addEventListener('click', function (event) {
+        //    event.preventDefault
+        //    event.stopPropagation()
+        //    makeDivAppearance()
+        //})
+    }
+    function getProvisioningCode(sip, category, divId) {
+        devicesApi.send({ mt: "GetProvisioningCode", sip: sip, category: category, div: divId })
+    }
+    //#endregion
 }
 Wecom.coolwork.prototype = innovaphone.ui1.nodePrototype;

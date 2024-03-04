@@ -116,7 +116,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             secondPartFinal = secondPart.split("/")
             endPointEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=mezzo&tag=n:1"
 
-            endPointStopEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=stop&tag=n:0"
+            endPointStopEvent = "/PHONE/CONF-UI/mod_cmd.xml?xsl=phone_ring.xsl&cmd=phone-ring&op=stop&tag=n:1"
 
             console.log("Primeira parte:", firstPart);
             console.log("Segunda parte:", secondPartFinal);
@@ -206,6 +206,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "InsertRoomResult"){ 
             app.send({api:"admin", mt:"SelectAllRoom"})
             filesID = [] // limpeza da variavel para nao excluir a imagem antiga (a que acabou de ser adicionada)
+            checkedUsers = {}
+            checkedDevices = {}
         }
         if(obj.api == "admin" && obj.mt == "DeleteRoomSuccess"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -217,6 +219,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     //#region CRIAÇÃO DE SALA
     function makeDivCreateRoom(){
+    checkedUsers = {} // limpar usuarios
+    checkedDevices = {} // limpar devices
+
     that.clear()
     const btnCreateRoom = makeButton(texts.text("labelCreate"),"primary","")
     makeHeader(backButton,btnCreateRoom,texts.text("labelCreateRoom"))
@@ -494,6 +499,21 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             const checkboxUser = makeInput("","checkbox","")
             checkboxUser.setAttribute("id","viewercheckbox_" + user.guid)
             checkboxUser.classList.add("checkboxUser")
+
+             // Verifica se o usuário está marcado e marca o checkbox, se necessário
+                if (checkedUsers[user.guid]) {
+                    checkboxUser.checked = true;
+                }
+
+                // Event listener para marcar/desmarcar usuários
+                checkboxUser.addEventListener("change", function () {
+                        if (this.checked) {
+                            checkedUsers[user.guid] = true;
+                        } else {
+                            delete checkedUsers[user.guid];
+                        }
+                })
+
             divUsersAvatar.appendChild(imgAvatar);
             divUsersAvatar.appendChild(nameUser);
             divMainUsers.appendChild(divUsersAvatar);
@@ -513,29 +533,30 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
         buttonCancel.addEventListener("click",function(){
             console.log("Fechar Tela")
+            checkedUsers = {}
             document.body.removeChild(insideDiv)
             
         })
-        checkboxAllUsers.addEventListener("click",function(){
-            document.querySelectorAll(".checkboxUser").forEach(function(checkbox){
-                if(!checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else if(checkboxAllUsers.checked || !checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else if(!checkboxAllUsers.checked && checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else{
-                    checkbox.checked = false
-                    this.checked = false
-                }
-            })
-        })
+  
+        checkboxAllUsers.addEventListener("click", function () {
+            // Obtém o estado atual do checkbox "Selecionar Todos os Usuários"
+            const isChecked = this.checked;
+        
+            // Marca ou desmarca todos os checkboxes de usuários dependendo do estado do checkbox "Selecionar Todos os Usuários"
+            document.querySelectorAll(".checkboxUser").forEach(function (checkbox) {
+                checkbox.checked = isChecked;
+            });
+        
+            // Verifica se algum usuário está marcado
+            const algumMarcado = Array.from(document.querySelectorAll(".checkboxUser")).some(checkbox => checkbox.checked);
+        
+            // Se nenhum usuário estiver marcado, desmarca o checkbox "Selecionar Todos os Dispositivos"
+            if (!algumMarcado) {
+                checkboxAllUsers.checked = false;
+            }
+        });
+
+        
         const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
         buttonConfirm.addEventListener("click",function(){
             var viewer = [];
@@ -547,6 +568,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     viewer.push(user.guid);
                 }
                     viewers(viewer)
+                    console.log("VIEWERS " + JSON.stringify(viewer))
             });
                 document.body.removeChild(insideDiv)
         })
@@ -1231,12 +1253,24 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                             method: 'GET',
                             headers: {}
                         })
-                    },500)
+                    },1000)
                 // apiPhone.send({ mt: "StartCall", sip: "vitor" })
             })
             const checkboxDevice = makeInput("","checkbox","")
             checkboxDevice.setAttribute("id",'checkboxDev_' + dev.hwid)
             checkboxDevice.classList.add("checkboxDev")
+
+                if (checkedDevices[dev.hwid]) {
+                    checkboxDevice.checked = true;
+                }
+
+                checkboxDevice.addEventListener("change", function () {
+                    if (this.checked) {
+                        checkedDevices[dev.hwid] = true;
+                    } else {
+                        delete checkedDevices[dev.hwid];
+                    }
+                });
 
             divCheckbox.appendChild(identifyBtn)
             divCheckbox.appendChild(checkboxDevice)
@@ -1247,31 +1281,50 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             scrollDevices.appendChild(divMainDevices)
         }) 
 
-        checkboxAllDevices.addEventListener("click",function(){
-            document.querySelectorAll(".checkboxDev").forEach(function(checkbox){
-                if(!checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else if(checkboxAllDevices.checked || !checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else if(!checkboxAllDevices.checked && checkbox.checked){
-                    checkbox.checked = true
-                    this.checked = true
-                }
-                else{
-                    checkbox.checked = false
-                    this.checked = false
-                }
-            })
-        })
+        // checkboxAllDevices.addEventListener("click",function(){
+        //     document.querySelectorAll(".checkboxDev").forEach(function(checkbox){
+        //         if(!checkbox.checked){
+        //             checkbox.checked = true
+        //             this.checked = true
+        //         }
+        //         else if(checkboxAllDevices.checked || !checkbox.checked){
+        //             checkbox.checked = true
+        //             this.checked = true
+        //         }
+        //         else if(!checkboxAllDevices.checked && checkbox.checked){
+        //             checkbox.checked = true
+        //             this.checked = true
+        //         }
+        //         else{
+        //             checkbox.checked = false
+        //             this.checked = false
+        //         }
+        //     })
+        // })
 
+        checkboxAllDevices.addEventListener("click", function () {
+            // Obtém o estado atual do checkbox "Selecionar Todos os Dispositivos"
+            const isChecked = this.checked;
+        
+            // Marca ou desmarca todos os checkboxes de dispositivos dependendo do estado do checkbox "Selecionar Todos os Dispositivos"
+            document.querySelectorAll(".checkboxDev").forEach(function (checkbox) {
+                checkbox.checked = isChecked;
+            });
+        
+            // Verifica se algum dispositivo está marcado
+            const algumMarcado = Array.from(document.querySelectorAll(".checkboxDev")).some(checkbox => checkbox.checked);
+        
+            // Se nenhum dispositivo estiver marcado, desmarca o checkbox "Selecionar Todos os Usuários"
+            if (!algumMarcado) {
+                checkboxAllUsers.checked = false;
+            }
+        });
+        
         const divButtons = document.createElement("div")
         divButtons.classList.add("flex","justify-between","items-center","rounded-md")
         const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
         buttonCancel.addEventListener("click",function(){
+            checkedDevices = {}
             console.log("Fechar Tela")
             document.body.removeChild(insideDiv)
             
@@ -1583,7 +1636,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const btnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
        // btnRecurrent.id = "recurrentType"
         const divAllDevices = document.createElement("div")
-        divAllDevices.classList.add("flex","justify-center","items-center","gap-2")
+        divAllDevices.classList.add("flex","justify-center","items-center","gap-2","flex-wrap","overflow-auto")
 
        divButtonsOpt.appendChild(btnIdentify)
        divButtonsOpt.appendChild(btnAddDevices)
@@ -2347,6 +2400,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     // função genérica para busca de usuarios e devices no input search
 
     let checkedUsers = {}; 
+    let checkedDevices = {}
 
     function searchItems(arrayItems, idTable, itemType, filter = "") {
         const scroll = document.getElementById(idTable);
@@ -2380,12 +2434,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         checkboxUser.setAttribute("id", "viewercheckbox_" + user.guid);
         checkboxUser.classList.add("checkboxUser");
 
-        // Verifica se o usuário está marcado e marca o checkbox, se necessário
         if (checkedUsers[user.guid]) {
             checkboxUser.checked = true;
         }
-
-        // Event listener para marcar/desmarcar usuários
         checkboxUser.addEventListener("change", function () {
             if (this.checked) {
                 checkedUsers[user.guid] = true;
@@ -2415,29 +2466,41 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divCheckbox.classList.add("flex", "gap-1", "items-center");
         const identifyBtn = makeButton(texts.text("labelIdentify"), "primary", "");
         identifyBtn.id = device.hwid;
-        identifyBtn.addEventListener("click",function(){
+        identifyBtn.addEventListener("click", function () {
             console.log("ID " + this.id)
-
+    
             var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
             console.log("URL")
-        
-            fetch( requestURL, {
+    
+            fetch(requestURL, {
                 method: 'GET',
                 headers: {}
             })
-            setTimeout(function(){
+            setTimeout(function () {
                 var stopReq = firstPart + this.id + "/" + secondPartFinal[1] + endPointStopEvent
-                fetch( stopReq, {
+                fetch(stopReq, {
                     method: 'GET',
                     headers: {}
                 })
-            },500)
-        // apiPhone.send({ mt: "StartCall", sip: "vitor" })
-    })
+            }, 500)
+            // apiPhone.send({ mt: "StartCall", sip: "vitor" })
+        })
         const checkboxDevice = makeInput("", "checkbox", "");
         checkboxDevice.setAttribute("id", 'checkboxDev_' + device.hwid);
         checkboxDevice.classList.add("checkboxDev");
-
+    
+        if (checkedDevices[device.hwid]) {
+            checkboxDevice.checked = true;
+        }
+    
+        checkboxDevice.addEventListener("change", function () {
+            if (this.checked) {
+                checkedDevices[device.hwid] = true;
+            } else {
+                delete checkedDevices[device.hwid];
+            }
+        });
+    
         divCheckbox.appendChild(identifyBtn);
         divCheckbox.appendChild(checkboxDevice);
         divImgDevice.appendChild(imgDevice);
@@ -2446,6 +2509,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMainDevices.appendChild(divCheckbox);
         return divMainDevices;
     }
+    
 
     //função REUTILIZAVEL para enviar as datas recorrentes para o banco 
     function recurrentDatesAvail(dataDay,datesRecurrent,startTime,endTime){
@@ -3360,12 +3424,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     
         // Obtenha as coordenadas do mouse em relação à div "divImg"
         var rect = document.getElementById("divImg").getBoundingClientRect();
-        var offsetX = ((ev.clientX - rect.left) / rect.width) * 100;
-        var offsetY = ((ev.clientY - rect.top) / rect.height) * 100;
+        var offsetX = ev.clientX - rect.left;
+        var offsetY = ev.clientY - rect.top;
     
-        // Ajuste as coordenadas do elemento para as coordenadas do mouse em porcentagem
-        draggedElement.style.left = offsetX + "%";
-        draggedElement.style.top = offsetY + "%";
+        // Ajuste as coordenadas do elemento para as coordenadas do mouse
+        draggedElement.style.left = offsetX + "px";
+        draggedElement.style.top = offsetY + "px";
     
         // Defina o z-index para garantir que o elemento seja exibido na frente de outros elementos
         draggedElement.style.zIndex = "2000";
