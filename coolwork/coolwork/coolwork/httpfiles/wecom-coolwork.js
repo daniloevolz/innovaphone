@@ -902,7 +902,7 @@ function getDayOfWeekLabel(selectedDate) {
         rooms.forEach(function(room){
             //div principal
             const divMain =  document.createElement("div")
-            divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex", "h-fit", "cursor-pointer")
+            divMain.classList.add("rounded-lg","p-1","mx-1","bg-dark-200","gap-2","flex-col","flex", "h-fit", "cursor-pointer")
             divMain.setAttribute("room",room.id)
             divMain.setAttribute("id", room.id)
             container.appendChild(divMain)
@@ -1205,10 +1205,10 @@ function getDayOfWeekLabel(selectedDate) {
             //divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
             var divAvailabilyDetail = document.createElement("div")
             divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-            divAvailabilyDetail.classList.add("divAvailabilyDetail")
+            divAvailabilyDetail.classList.add("divAvailabilyDetail","flex","items-center","justify-start","gap-1",)
             divMain.appendChild(divAvailabilyDetail)
 
-            
+            //desktop
                 if (a.type == "periodType") {
                     makeViewTimePeriod(divAvailabilyDetail, a)
                 }
@@ -1219,6 +1219,7 @@ function getDayOfWeekLabel(selectedDate) {
 
                 UpdateAvailability(availability, a.type)     
         }else{
+            //mobile
             divOpenTime.addEventListener("click", function (event) {
                 event.stopPropagation()
                 var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
@@ -1232,7 +1233,7 @@ function getDayOfWeekLabel(selectedDate) {
                     divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
                     var divAvailabilyDetail = document.createElement("div")
                     divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                    divAvailabilyDetail.classList.add("divAvailabilyDetail")
+                    divAvailabilyDetail.classList.add("divAvailabilyDetail","flex","items-center","justify-start","gap-1")
                     divMain.appendChild(divAvailabilyDetail)
     
                     
@@ -1414,7 +1415,7 @@ function getDayOfWeekLabel(selectedDate) {
         //dias
         var div180 = document.createElement("div")
         div180.setAttribute("id", "div180")
-        div180.classList.add("div180Period")
+        div180.classList.add("div180Period","flex","flex-row","gap-3","justify-start","w-full")
         divMain.appendChild(div180)
 
         //Start Date and time
@@ -1501,7 +1502,7 @@ function getDayOfWeekLabel(selectedDate) {
         
         var div180 = document.createElement("div");
         div180.setAttribute("id", "div180");
-        div180.classList.add("div180");
+        div180.classList.add("flex","flex-row","gap-1","justify-start","w-full");
         div180.style.display = 'none';
         divMain.appendChild(divMainAvailabilityRecurrent);
         divMain.appendChild(div180);
@@ -1539,7 +1540,8 @@ function getDayOfWeekLabel(selectedDate) {
         //dias
         var div180 = document.getElementById("div180");
         div180.innerHTML = '';
-        div180.style.display = 'block';
+        div180.classList.add("div180Period","flex","flex-col","gap-1","justify-start","w-full");
+        div180.style.display = 'flex';
 
         var divDayLabel = document.createElement("div");
         //divDayLabel.setAttribute("id", "div180");
@@ -1550,7 +1552,7 @@ function getDayOfWeekLabel(selectedDate) {
         //div182
         var div182 = document.createElement("div");
         div182.setAttribute("id", "div182");
-        div182.classList.add("div182");
+        div182.classList.add("div182","flex","flex-row","gap-3","justify-start","w-full");
         div180.appendChild(div182);
 
         //time start

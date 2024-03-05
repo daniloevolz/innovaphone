@@ -126,28 +126,8 @@ body {
     align-self: stretch;
 }
 
-.div180 {
-    align-items: flex-start;
-    display: flex;
-    padding: 10px;
-    /*align-items: center;*/
-    gap: 10px;
-    align-self: stretch;
-    flex-direction: column;
-    border-radius: 8px;
-    background: var(--Dark-100, #0B2E46);
-}
 
-.div180Period {
-    flex-direction: row;
-    display: flex;
-    padding: 10px;
-    align-items: center;
-    gap: 10px;
-    align-self: stretch;
-    border-radius: 8px;
-    background: var(--Dark-100, #0B2E46);
-}
+
 
 .divAvailabilyDetail {
     display: flex;
@@ -188,7 +168,7 @@ body {
 
 .divDate {
     display: flex;
-    padding: 10px;
+    padding: 10px 24px 10px 24px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -247,11 +227,6 @@ body {
     line-height: normal;
 }
 
-.div182 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
 
 .divDayLabel {
     color: #FFF;
