@@ -728,7 +728,7 @@ function getDayOfWeekLabel(selectedDate) {
             var nameRoom = rooms.filter(function(r){
                 return r.id === s.device_room_id
             })[0]
-            
+
             var oldNameRoom = nameRoom.name
             
             var oldNameRoom = nameRoom.name
@@ -880,21 +880,21 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
-
-            //myUserGuid = list_tableUsers.filter(function(u){
-            //    return u.sip == userSIP
-            //})[0]
-        
-            //mySchedules = [schedules.filter(function(s){
-            //    return  s.user_guid == myUserGuid.guid
-            //})][0]
-            
             //nextSchedules(mySchedules)
             makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors)
         })
+
+        myUserGuid = list_tableUsers.filter(function(u){
+            return u.sip == userSIP
+        })[0]
+    
+        mySchedules = [schedules.filter(function(s){
+            return  s.user_guid == myUserGuid.guid
+        })][0]
+
         // div container (scroll)
         const container = document.createElement("div")
-        container.classList.add("overflow-auto","grid","gap-1","sm:grid-cols-2","md:grid-cols-4")
+        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
@@ -1591,7 +1591,7 @@ function getDayOfWeekLabel(selectedDate) {
             const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
 
         const divMainViewDevice = document.createElement("div")
-        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-[50px]")
+        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-start")
         divMainViewDevice.setAttribute("id", device.id)
         //div retangle 1396
 
@@ -1608,7 +1608,8 @@ function getDayOfWeekLabel(selectedDate) {
         var state;
         if(!device.guid){
             state = "bg-[#2AFF9C]" ;
-            div100User.innerHTML = texts.text("labelFree")
+            div100User.textContent = texts.text("labelFree")
+            div100User.style.color = state
         }else if(device.guid == myUser.guid){
             state = "bg-[#26CAFF]"
             div100Status.innerHTML = texts.text("labelInUseByMe")
@@ -1617,8 +1618,12 @@ function getDayOfWeekLabel(selectedDate) {
             state = "bg-[#FFC107]"
         }
 
+        const div100NameDevice = document.createElement("div")
+        div100NameDevice.classList.add("text-white" , "opacity-50","font-normal", "text-sm")
+        div100NameDevice.textContent = device.name
+
         const div100 = document.createElement("div")
-        div100.classList.add("div100")
+        div100.classList.add("div100", "p-1")
 
        // var state = device.guid ? "bg-[#FFC107]" : "bg-[#2AFF9C]";
         const divStatusColor = document.createElement("div")
@@ -1643,6 +1648,7 @@ function getDayOfWeekLabel(selectedDate) {
         divLeft.appendChild(deviceIcon)
         div100.appendChild(div100User)
         div100.appendChild(div100Status)
+        div100.appendChild(div100NameDevice)
         divLeft.appendChild(div100)
 
         divMainViewDevice.appendChild(divLeft)
@@ -1672,20 +1678,21 @@ function getDayOfWeekLabel(selectedDate) {
             const div36 = makeButton('',"secundary","./images/pencil.svg")
             div36.setAttribute("id", device.hwid)
             div36.addEventListener("click", function (event) {
-                // var dev = event.currentTarget.id;
-                // event.stopPropagation()
-                // app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
-                //     app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
-                //         devices = JSON.parse(obj.result)
-                //         var devs = devices.filter(function (dev) {
-                //             return dev.room_id == room.id
-                //         })
-                //         makeViewRoomDetail(room.id)
-                //     })
-                // })
+                
+            // var nameRoom = rooms.filter(function(r){
+            //     return r.id === schedule.device_room_id
+            // })[0]
+            
+            // var nameDevice = devices.filter(function(d){
+            //     return d.hwid === schedule.device_id
+                
+            // })[0]
+
+            // makeScheduleContainer(nameDevice.hwid, nameRoom.id, mySchedules,schedule,"update")
+
             })
             divButtons.appendChild(div36)
-            divMainViewDevice.appendChild(divButtons)
+            //divMainViewDevice.appendChild(divButtons)
             }
             // se eu estiver usando o telefone
             else if (user.sip == userSIP ) {  
@@ -1734,7 +1741,7 @@ function getDayOfWeekLabel(selectedDate) {
             })
 
             divButtons.appendChild(div34)
-            divMainViewDevice.appendChild(divButtons)
+            // divMainViewDevice.appendChild(divButtons)
             }
 
         }
@@ -1780,9 +1787,10 @@ function getDayOfWeekLabel(selectedDate) {
             })
             divButtons.appendChild(div36)
             divButtons.appendChild(div34)
-            divMainViewDevice.appendChild(divButtons)
+           // divMainViewDevice.appendChild(divButtons)
         }
-
+        
+        divMainViewDevice.appendChild(divButtons)
         divMain.appendChild(divMainViewDevice)
 
     }
@@ -2179,6 +2187,7 @@ function getDayOfWeekLabel(selectedDate) {
 
 
     //#region Opções
+
     function makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         // backButton.addEventListener("click",function(event){
@@ -2253,14 +2262,6 @@ function getDayOfWeekLabel(selectedDate) {
             event.preventDefault
             event.stopPropagation()
 
-            myUserGuid = list_tableUsers.filter(function(u){
-                return u.sip == userSIP
-            })[0]
-
-            mySchedules = [schedules.filter(function(s){
-                return  s.user_guid == myUserGuid.guid
-            })][0]
-           
             nextSchedules(mySchedules)
             
         })
