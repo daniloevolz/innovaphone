@@ -677,24 +677,32 @@ function getDayOfWeekLabel(selectedDate) {
             //div principal
 
             const divMain = document.createElement('div')
-            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
-            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
+            divMain.classList.add('m-1', 'flex',"flex-col", 'items-center', 'rounded-lg',)
+            
             divMain.setAttribute("id","divMain")
-            //div dos elementos1 device e schedule
+            //div da parte de cima user e device
+            const divUp = document.createElement('div')
+            divUp.classList.add("justify-start","flex","items-center","gap-1","w-full","bg-dark-300",'rounded-t-lg',"px-2","py-1")
+            //div da parte de baixo device e botoes, edit e delete
+            const divDown = document.createElement('div')
+            divDown.classList.add("justify-between","flex","items-beatween","gap-1","w-full","bg-dark-200",'rounded-b-lg',"p-2")
+            //divs dos elementos da paret de baixo
+            //div elemento 1 room e data
             const divE1 = document.createElement('div')
-            divE1.classList.add("justify-start","flex","items-center","gap-3")
-            //div dos elementos2 edit e delete
+            divE1.classList.add("flex","flex-col","items-start", "gap-1", "justify-center",)
+            //div elemento 2 user e botões
             const divE2 = document.createElement('div')
-            divE2.classList.add("justify-end","flex","items-center","gap-3")
+            divE2.classList.add("flex","flex-row","items-end", "gap-1", "justify-center","items-center")
+            
          
             const div185 = document.createElement('div')
             div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
-            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
+        
             div185.setAttribute("id","div185")
             //div imagem e nome do device
             //div imagem e nome do device
             const divDevice = document.createElement('div')
-            divDevice.classList.add("flex","flex-col","items-center", "gap-1", "justify-center",)
+            divDevice.classList.add("flex","flex-row","items-center", "gap-1", "justify-center",)
             const divImg = document.createElement('img')
             divImg.classList.add("divImg","h-[45px]","w-[45px]",)
             divImg.setAttribute("src", "../images/IP112.png")
@@ -703,8 +711,7 @@ function getDayOfWeekLabel(selectedDate) {
                 return d.hwid === s.device_id
                 
             })[0]
-            nameDevice.name = truncateString(nameDevice.name, 10);
-            nameDevice.name = truncateString(nameDevice.name, 10);
+        
             
             console.log("Erick nameDevice", nameDevice)
             const deviceHw = document.createElement('div')
@@ -727,8 +734,6 @@ function getDayOfWeekLabel(selectedDate) {
             var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
-            nameRoom.name = truncateString(nameRoom.name, 10);
-            nameRoom.name = truncateString(nameRoom.name, 10);
             roomSched.classList.add("nameroom", "font-medium", "text-xl")
             roomSched.textContent = nameRoom.name
             const formDate = s.data_end.split("T")
@@ -740,7 +745,7 @@ function getDayOfWeekLabel(selectedDate) {
             dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
 
             const divUser = document.createElement("div")
-            divUser.classList.add("flex-col","flex","gap-1")
+            divUser.classList.add("flex-row","flex","gap-1","items-center")
 
             let avatar = new innovaphone.Avatar(start, userSIP, userDomain);
             let UIuserPicture = avatar.url(userSIP, 120, userDN);
@@ -818,10 +823,13 @@ function getDayOfWeekLabel(selectedDate) {
                 divE2.appendChild(editBtn)
                 divE2.appendChild(delBtn)
             }
-            div185.appendChild(divE1)
-            div185.appendChild(divE2)
-            divMain.appendChild(div185)
-            divMain.appendChild(divUser)
+        
+            divMain.appendChild(divUp)
+            divMain.appendChild(divDown)
+            divUp.appendChild(divUser)
+            divUp.appendChild(divDevice)
+            divDown.appendChild(divE1)
+            divDown.appendChild(divE2)
             container.appendChild(divMain)
             
             nameRoom.name = oldNameRoom
