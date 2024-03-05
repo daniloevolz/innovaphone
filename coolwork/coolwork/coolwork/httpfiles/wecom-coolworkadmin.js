@@ -33,6 +33,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var viewers = []
     //var devHwid = []
 
+    var checkedUsers = []; 
+    var checkedDevices = []
+
     var colorSchemes = {
         dark: {
             "--bg": "#0B2E46",
@@ -82,6 +85,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         //apiPhone = start.consumeApi("com.innovaphone.events") // testes pietro
 
         app.send({api:"admin", mt:"SelectAllRoom"})
+        app.send({api:"admin", mt:"SelectDevices"})
     }
 
     
@@ -123,68 +127,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             console.log("Endpoint EventoURL", endPointEvent )
         }
     }
-    // function app_message(obj) {
-    //     if (obj.api === "user" && obj.mt === "SelectMyRoomsViewerResult") {
-    //         app.send({ api: "user", mt: "SelectRooms", ids: obj.result })
-    //         // that.clear()
-    //         // // list_MyRooms = JSON.parse(obj.result)
-    //     }
-    //     if (obj.api == "user" && obj.mt == "TableUsersResult") {
-    //         list_tableUsers = JSON.parse(obj.result);     
-    //         console.log("table-users " + JSON.stringify(list_tableUsers))      
-    //     }
-    //     //Retorna todas as salas solicitadas
-    //     if (obj.api === "user" && obj.mt === "SelectRoomsResult") {
-    //         rooms = JSON.parse(obj.result);
-    //         app.sendSrc({ api: "user", mt: "SelectDevices", ids: obj.ids, src: obj.ids}, function (obj) {
-    //             app.send({ api: "user", mt: "SelectRoomsEditors", ids: obj.ids })
-    //             app.send({ api: "user", mt: "SelectRoomsViewers", ids: obj.ids })
-    //             devices = JSON.parse(obj.result);
-    //             app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
-    //         })
-            
-    //     }
-    //     //Retorna todas os devices de todas as salas solicitadas
-    //     //if (obj.api === "user" && obj.mt === "SelectDevicesResult") {
-    //     //    devices = JSON.parse(obj.result);
-    //     //    app.send({ api: "user", mt: "SelectRoomsAvailabilities", ids: obj.ids })
-    //     //}
-    //     //Retorna todas as disponibilidades de todas as salas solicitadas
-    //     if (obj.api === "user" && obj.mt === "SelectRoomsAvailabilitiesResult") {
-    //         availabilities = JSON.parse(obj.result);
-    //         app.send({ api: "user", mt: "SelectDevicesSchedule", ids: obj.ids })
-    //         console.log("ERICK TESTE MADRUGADA", availabilities)
-    //     }
-    //     //Retorna todos os agendamentos de todas as salas solicitadas
-    //     if (obj.api === "user" && obj.mt === "SelectDevicesScheduleResult") {
-    //         schedules = JSON.parse(obj.result);
 
-    //         //Todos os dados carregados, vamos abrir a tela visual do App!!!!!!
-    //         console.info("Todos os dados carregados, vamos abrir a tela visual do App!!!!!!");
-    //         makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-    //     }
-    //     //Retorna todos os usuários visualizadores das salas solicitadas
-    //     if (obj.api === "user" && obj.mt === "SelectRoomsViewersResult") {
-    //         viewers = JSON.parse(obj.result);  
-    //     }
-    //     //Retorna todos os usuários editores das salas solicitadas
-    //     if (obj.api === "user" && obj.mt === "SelectRoomsEditorsResult") {
-    //         editors = JSON.parse(obj.result);
-    //     }
-    //     // if(obj.api === "user" && obj.mt === "DeviceScheduleSuccess"){
-    //     //     app.send({ api: "user", mt: "SelectMyRooms" })
-
-    //     //     // setTimeout(function(){
-    //     //     //     makePopUp(texts.text("labelWarning"), texts.text("labelScheduleDone"), texts.text("labelOk"))
-    //     //     // },1000)
-
-    //     // }
-    // } 
     function app_message(obj) {
         // chamar todos que nao estão vinculados a uma sala para serem adicionados em outra
         if (obj.api === "admin" && obj.mt === "SelectDevicesResult") {
             phone_list = JSON.parse(obj.result)
-            makeDivAddDevices(phone_list)
+            //makeDivAddDevices(phone_list)
         }
         // if (obj.api === "admin" && obj.mt === "SelectAllRoomResult") {
         //     list_AllRoom = JSON.parse(obj.result)
@@ -206,8 +154,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "InsertRoomResult"){ 
             app.send({api:"admin", mt:"SelectAllRoom"})
             filesID = [] // limpeza da variavel para nao excluir a imagem antiga (a que acabou de ser adicionada)
-            checkedUsers = {}
-            checkedDevices = {}
+            checkedUsers = []
+            checkedDevices = []
         }
         if(obj.api == "admin" && obj.mt == "DeleteRoomSuccess"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
@@ -219,8 +167,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     //#region CRIAÇÃO DE SALA
     function makeDivCreateRoom(){
-    checkedUsers = {} // limpar usuarios
-    checkedDevices = {} // limpar devices
+    checkedUsers = [] // limpar usuarios
+    checkedDevices = [] // limpar devices
 
     that.clear()
     const btnCreateRoom = makeButton(texts.text("labelCreate"),"primary","")
@@ -313,8 +261,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
     divBtnAddDevices.addEventListener("click",function(){
         console.log("Abrir div add devices")
-        app.send({api:"admin", mt:"SelectDevices"})
-        // makeDivAddDevices()
+        makeDivAddDevices(phone_list)
     })
     //appends
     divNameRoom.appendChild(labelNameRoom)
@@ -434,163 +381,117 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         // viewer: viewer });
     })
     }
-    function makeDivAddUsers(viewers){
-        const insideDiv = document.createElement("div")
-        insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
-        
-        const divMain = document.createElement("div")
-        divMain.classList.add("inline-flex","p-3","flex-col","flex-start","gap-1","rounded-lg","bg-dark-100","w-full","m-3","md:m-96")
-
-        const titleUsers = document.createElement("div")
-        titleUsers.textContent = texts.text("labelUsers")
-        titleUsers.classList.add("text-3","text-white" ,"font-bold")
-
-        const iptSearch = makeInput("","search",texts.text("labelIptSearch"))
-        iptSearch.classList.add("w-full")
+    function makeDivAddUsers(viewers) {
+        const insideDiv = document.createElement("div");
+        insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center", "items-center", "absolute", "h-full", "w-full", "top-0", "flex");
+    
+        const divMain = document.createElement("div");
+        divMain.classList.add("inline-flex", "p-3", "flex-col", "flex-start", "gap-1", "rounded-lg", "bg-dark-100", "w-full", "m-3", "md:m-96");
+    
+        const titleUsers = document.createElement("div");
+        titleUsers.textContent = texts.text("labelUsers");
+        titleUsers.classList.add("text-3", "text-white", "font-bold");
+    
+        const iptSearch = makeInput("", "search", texts.text("labelIptSearch"));
+        iptSearch.classList.add("w-full");
         iptSearch.addEventListener("input", function () {
             const filter = this.value.trim();
             if (filter === "") {
-                searchItems(list_tableUsers,'scrollUsers','user',filter);
+                searchItems(list_tableUsers, 'scrollUsers', 'user', filter);
             } else {
                 const filteredUsers = list_tableUsers.filter(user => user.cn.toLowerCase().includes(filter.toLowerCase()));
                 searchItems(filteredUsers, 'scrollUsers', 'user', filter);
-
             }
         });
-        
-        
-
-        const selectAllUsers = document.createElement("div")
-        selectAllUsers.classList.add("flex","justify-between","items-center")
-
-        const nameOfUsers = document.createElement("div")
-        nameOfUsers.classList.add("text-3","text-white" ,"font-bold")
-        nameOfUsers.textContent = texts.text("labelNameOfUsers")
-
-        const divLabelandCheckbox = document.createElement("div")
-        divLabelandCheckbox.classList.add("flex","w-[145px]","p-1","justify-between","items-center")
-        const labelSelectAllUsers = document.createElement("div")
-        labelSelectAllUsers.textContent = texts.text("labelSelectAll")
-        labelSelectAllUsers.classList.add("text-3","text-white" ,"font-bold")
-
-        const checkboxAllUsers = makeInput("","checkbox","")
-
-        const scrollUsers = document.createElement("div")
-        scrollUsers.id = 'scrollUsers'
-        scrollUsers.classList.add("overflow-y-auto","h-[200px]","gap-1","flex-col","flex")
-
+    
+        const selectAllUsers = document.createElement("div");
+        selectAllUsers.classList.add("flex", "justify-between", "items-center");
+    
+        const nameOfUsers = document.createElement("div");
+        nameOfUsers.classList.add("text-3", "text-white", "font-bold");
+        nameOfUsers.textContent = texts.text("labelNameOfUsers");
+    
+        const divLabelandCheckbox = document.createElement("div");
+        divLabelandCheckbox.classList.add("flex", "w-[145px]", "p-1", "justify-between", "items-center");
+        const labelSelectAllUsers = document.createElement("div");
+        labelSelectAllUsers.textContent = texts.text("labelSelectAll");
+        labelSelectAllUsers.classList.add("text-3", "text-white", "font-bold");
+    
+        const checkboxAllUsers = makeInput("", "checkbox", "");
+    
+        const scrollUsers = document.createElement("div");
+        scrollUsers.id = 'scrollUsers';
+        scrollUsers.classList.add("overflow-y-auto", "h-[200px]", "gap-1", "flex-col", "flex");
+    
         // ordem alfabética
-        list_tableUsers.sort((a,b) => a.cn.localeCompare(b.cn))
-
-        list_tableUsers.forEach(function(user){
-            
-            const divMainUsers = document.createElement("div")
-            divMainUsers.classList.add("flex","gap-1","justify-between","items-center","border-b-2","border-dark-400","p-1")
-            const divUsersAvatar = document.createElement("div")
-            divUsersAvatar.classList.add("flex","gap-1","items-center")
-            let avatar = new innovaphone.Avatar(start, user.sip, userDomain);
-            let UIuserPicture = avatar.url(user.sip, 120, userDN);
-            const imgAvatar = document.createElement("img");
-            imgAvatar.setAttribute("src", UIuserPicture);
-            imgAvatar.setAttribute("id", "divAvatar");
-            imgAvatar.classList.add("w-5", "h-5", "rounded-full");
-            const nameUser = document.createElement("div")
-            nameUser.textContent = user.cn
-            const checkboxUser = makeInput("","checkbox","")
-            checkboxUser.setAttribute("id","viewercheckbox_" + user.guid)
-            checkboxUser.classList.add("checkboxUser")
-
-             // Verifica se o usuário está marcado e marca o checkbox, se necessário
-                if (checkedUsers[user.guid]) {
-                    checkboxUser.checked = true;
-                }
-
-                // Event listener para marcar/desmarcar usuários
-                checkboxUser.addEventListener("change", function () {
-                        if (this.checked) {
-                            checkedUsers[user.guid] = true;
-                        } else {
-                            delete checkedUsers[user.guid];
-                        }
-                })
-
-            divUsersAvatar.appendChild(imgAvatar);
-            divUsersAvatar.appendChild(nameUser);
-            divMainUsers.appendChild(divUsersAvatar);
-            divMainUsers.appendChild(checkboxUser);
-            scrollUsers.appendChild(divMainUsers)
-        })
-        
-        const divManage = document.createElement("div")
-        divManage.classList.add("flex","p-1","justify-between","items-center","rounded-lg","bg-dark-200")
-        const textManage = document.createElement("div")
-        textManage.classList.add("text-3","font-bold","text-white")
-        textManage.textContent = texts.text("labelManageFunctions")
-        const btnManage = makeButton(texts.text("labelEdit"),"secundary","")
-
-        const divButtons = document.createElement("div")
-        divButtons.classList.add("flex","justify-between","items-center","rounded-md")
-        const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
-        buttonCancel.addEventListener("click",function(){
-            console.log("Fechar Tela")
-            checkedUsers = {}
-            document.body.removeChild(insideDiv)
-            
-        })
-  
+        list_tableUsers.sort((a, b) => a.cn.localeCompare(b.cn));
+    
+        list_tableUsers.forEach(function (user) {
+            const divMainUsers = createUserElement(user); // Use a função createUserElement para criar elementos de usuário
+            scrollUsers.appendChild(divMainUsers);
+        });
+    
+        const divManage = document.createElement("div");
+        divManage.classList.add("flex", "p-1", "justify-between", "items-center", "rounded-lg", "bg-dark-200");
+        const textManage = document.createElement("div");
+        textManage.classList.add("text-3", "font-bold", "text-white");
+        textManage.textContent = texts.text("labelManageFunctions");
+        const btnManage = makeButton(texts.text("labelEdit"), "secundary", "");
+    
+        const divButtons = document.createElement("div");
+        divButtons.classList.add("flex", "justify-between", "items-center", "rounded-md");
+        const buttonCancel = makeButton(texts.text("labelBtnCancel"), "secundary", "");
+        buttonCancel.addEventListener("click", function () {
+            console.log("Fechar Tela");
+            checkedUsers = [];
+            document.body.removeChild(insideDiv);
+        });
+    
         checkboxAllUsers.addEventListener("click", function () {
             // Obtém o estado atual do checkbox "Selecionar Todos os Usuários"
             const isChecked = this.checked;
-        
+    
             // Marca ou desmarca todos os checkboxes de usuários dependendo do estado do checkbox "Selecionar Todos os Usuários"
             document.querySelectorAll(".checkboxUser").forEach(function (checkbox) {
                 checkbox.checked = isChecked;
             });
-        
+    
             // Verifica se algum usuário está marcado
             const algumMarcado = Array.from(document.querySelectorAll(".checkboxUser")).some(checkbox => checkbox.checked);
-        
+    
             // Se nenhum usuário estiver marcado, desmarca o checkbox "Selecionar Todos os Dispositivos"
             if (!algumMarcado) {
                 checkboxAllUsers.checked = false;
             }
         });
-
-        
-        const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
-        buttonConfirm.addEventListener("click",function(){
-            var viewer = [];
-            // viewer = [];
-
-            list_tableUsers.forEach(function (user) {
-                var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
-                if (viewerCheckbox && viewerCheckbox.checked) {
-                    viewer.push(user.guid);
-                }
-                    viewers(viewer)
-                    console.log("VIEWERS " + JSON.stringify(viewer))
-            });
-                document.body.removeChild(insideDiv)
-        })
-
+    
+        const buttonConfirm = makeButton(texts.text("labelConfirm"), "primary", "");
+        buttonConfirm.addEventListener("click", function () {
+            // var viewer = [];
+            viewers(checkedUsers);
+            document.body.removeChild(insideDiv);
+             
+        });
+    
         //appends
-        divButtons.appendChild(buttonCancel)
-        divButtons.appendChild(buttonConfirm)
-        divManage.appendChild(textManage)
-        divManage.appendChild(btnManage)
-        divLabelandCheckbox.appendChild(labelSelectAllUsers)
-        divLabelandCheckbox.appendChild(checkboxAllUsers)
-        selectAllUsers.appendChild(nameOfUsers)
-        selectAllUsers.appendChild(divLabelandCheckbox)
-        divMain.appendChild(titleUsers)
-        divMain.appendChild(iptSearch)
-        divMain.appendChild(selectAllUsers)
-        divMain.appendChild(scrollUsers)
-        divMain.appendChild(divManage)
-        divMain.appendChild(divButtons)
-        insideDiv.appendChild(divMain)
-        document.body.appendChild(insideDiv)
+        divButtons.appendChild(buttonCancel);
+        divButtons.appendChild(buttonConfirm);
+        divManage.appendChild(textManage);
+        divManage.appendChild(btnManage);
+        divLabelandCheckbox.appendChild(labelSelectAllUsers);
+        divLabelandCheckbox.appendChild(checkboxAllUsers);
+        selectAllUsers.appendChild(nameOfUsers);
+        selectAllUsers.appendChild(divLabelandCheckbox);
+        divMain.appendChild(titleUsers);
+        divMain.appendChild(iptSearch);
+        divMain.appendChild(selectAllUsers);
+        divMain.appendChild(scrollUsers);
+        divMain.appendChild(divManage);
+        divMain.appendChild(divButtons);
+        insideDiv.appendChild(divMain);
+        document.body.appendChild(insideDiv);
     }
+    
     function makeDivAddAvailability(update,avail,typeRoom,dateTime,typeSchedule){
         getAllClickedWeekDaysActive = true
         // mudará conforme o tipo de sala ( RECORRENTE OU PERÍODO )
@@ -1176,7 +1077,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function makeDivAddDevices(devices){
         // consultar os devices  
         
-
         const insideDiv = document.createElement("div")
         insideDiv.classList.add("bg-black", "bg-opacity-50", "justify-center","items-center","absolute","h-full","w-full","top-0","flex");
         
@@ -1260,18 +1160,21 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             checkboxDevice.setAttribute("id",'checkboxDev_' + dev.hwid)
             checkboxDevice.classList.add("checkboxDev")
 
-                if (checkedDevices[dev.hwid]) {
+            // Verificar se o usuário está marcado e marcar o checkbox, se necessário
+                if (checkedDevices.includes(dev.hwid)) {
                     checkboxDevice.checked = true;
                 }
 
+                // Event listener para marcar/desmarcar usuários
                 checkboxDevice.addEventListener("change", function () {
                     if (this.checked) {
-                        checkedDevices[dev.hwid] = true;
+                        checkedDevices.push(dev.hwid);
                     } else {
-                        delete checkedDevices[dev.hwid];
+                        checkedDevices = checkedDevices.filter(hwid => hwid !== dev.hwid);
                     }
                 });
 
+            
             divCheckbox.appendChild(identifyBtn)
             divCheckbox.appendChild(checkboxDevice)
             divImgDevice.appendChild(imgDevice)
@@ -1316,34 +1219,24 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         
             // Se nenhum dispositivo estiver marcado, desmarca o checkbox "Selecionar Todos os Usuários"
             if (!algumMarcado) {
-                checkboxAllUsers.checked = false;
+                checkboxAllDevices.checked = false;
             }
         });
+        
         
         const divButtons = document.createElement("div")
         divButtons.classList.add("flex","justify-between","items-center","rounded-md")
         const buttonCancel = makeButton(texts.text("labelBtnCancel"),"secundary","")
         buttonCancel.addEventListener("click",function(){
-            checkedDevices = {}
+            checkedDevices = []
             console.log("Fechar Tela")
             document.body.removeChild(insideDiv)
             
         })
         const buttonConfirm = makeButton(texts.text("labelConfirm"),"primary","")
-        buttonConfirm.addEventListener("click",function(){
-            var devArray = [];
-           
-            devices.forEach(function (dev) {
-                var devCheckbox = document.getElementById("checkboxDev_" + dev.hwid);
-                if (devCheckbox && devCheckbox.checked) {
-                    devArray.push(dev.hwid);
-                }
-                devHwId = devArray 
-                console.log(devHwId)
-                // ajustar para usar callBack caso funcione assim  ~~ Pietro
-            }); 
-
-                 
+        buttonConfirm.addEventListener("click",function(){ 
+                devHwId = checkedDevices 
+                console.log(JSON.stringify(devHwId))
                 document.body.removeChild(insideDiv)
         })
 
@@ -2399,8 +2292,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     }
     // função genérica para busca de usuarios e devices no input search
 
-    let checkedUsers = {}; 
-    let checkedDevices = {}
+
 
     function searchItems(arrayItems, idTable, itemType, filter = "") {
         const scroll = document.getElementById(idTable);
@@ -2433,82 +2325,71 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const checkboxUser = makeInput("", "checkbox", "");
         checkboxUser.setAttribute("id", "viewercheckbox_" + user.guid);
         checkboxUser.classList.add("checkboxUser");
-
-        if (checkedUsers[user.guid]) {
+    
+        // Verificar se o usuário está marcado e marcar o checkbox, se necessário
+        if (checkedUsers.includes(user.guid)) {
             checkboxUser.checked = true;
         }
+    
+        // Event listener para marcar/desmarcar usuários
         checkboxUser.addEventListener("change", function () {
             if (this.checked) {
-                checkedUsers[user.guid] = true;
+                // Adicionar o user.guid a checkedUsers quando o checkbox for marcado
+                checkedUsers.push(user.guid);
             } else {
-                delete checkedUsers[user.guid];
+                // Remover o user.guid de checkedUsers quando o checkbox for desmarcado
+                checkedUsers = checkedUsers.filter(guid => guid !== user.guid);
             }
         });
-
+    
         divUsersAvatar.appendChild(imgAvatar);
         divUsersAvatar.appendChild(nameUser);
         divMainUsers.appendChild(divUsersAvatar);
         divMainUsers.appendChild(checkboxUser);
         return divMainUsers;
     }
-
+    
+    
     function createDeviceElement(device) {
-        const divMainDevices = document.createElement("div");
-        divMainDevices.setAttribute("id", device.hwid);
-        divMainDevices.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
-        const divImgDevice = document.createElement("div");
-        divImgDevice.classList.add("flex", "items-center", "gap-1");
-        const imgDevice = document.createElement("img");
-        imgDevice.src = './images/device-admin.png';
+        const divMainDevice = document.createElement("div");
+        divMainDevice.classList.add("flex", "gap-1", "justify-between", "items-center", "border-b-2", "border-dark-400", "p-1");
+        const divDeviceIcon = document.createElement("div");
+        divDeviceIcon.classList.add("flex", "gap-1", "items-center");
+        // Suponha que você tenha uma função para obter o ícone do dispositivo com base em seu tipo
+        const imgDeviceIcon = document.createElement("img");
+        imgDeviceIcon.src = './images/device-admin.png'
+        imgDeviceIcon.setAttribute("id", "divDeviceIcon");
+        //imgDeviceIcon.classList.add("w-5", "h-5", "rounded-full");
+
         const nameDevice = document.createElement("div");
         nameDevice.textContent = device.name;
-        const divCheckbox = document.createElement("div");
-        divCheckbox.classList.add("flex", "gap-1", "items-center");
-        const identifyBtn = makeButton(texts.text("labelIdentify"), "primary", "");
-        identifyBtn.id = device.hwid;
-        identifyBtn.addEventListener("click", function () {
-            console.log("ID " + this.id)
-    
-            var requestURL = firstPart + this.id + "/" + secondPartFinal[1] + endPointEvent
-            console.log("URL")
-    
-            fetch(requestURL, {
-                method: 'GET',
-                headers: {}
-            })
-            setTimeout(function () {
-                var stopReq = firstPart + this.id + "/" + secondPartFinal[1] + endPointStopEvent
-                fetch(stopReq, {
-                    method: 'GET',
-                    headers: {}
-                })
-            }, 500)
-            // apiPhone.send({ mt: "StartCall", sip: "vitor" })
-        })
         const checkboxDevice = makeInput("", "checkbox", "");
-        checkboxDevice.setAttribute("id", 'checkboxDev_' + device.hwid);
-        checkboxDevice.classList.add("checkboxDev");
+        checkboxDevice.setAttribute("id", "viewercheckbox_" + device.hwid);
+        checkboxDevice.classList.add("checkboxDevice");
     
-        if (checkedDevices[device.hwid]) {
+        // Verificar se o dispositivo está marcado e marcar o checkbox, se necessário
+        if (checkedDevices.includes(device.hwid)) {
             checkboxDevice.checked = true;
         }
     
+        // Event listener para marcar/desmarcar dispositivos
         checkboxDevice.addEventListener("change", function () {
             if (this.checked) {
-                checkedDevices[device.hwid] = true;
+                // Adicionar o device.id a checkedDevices quando o checkbox for marcado
+                checkedDevices.push(device.hwid);
             } else {
-                delete checkedDevices[device.hwid];
+                // Remover o device.id de checkedDevices quando o checkbox for desmarcado
+                checkedDevices = checkedDevices.filter(hwid => hwid !== device.hwid);
             }
         });
     
-        divCheckbox.appendChild(identifyBtn);
-        divCheckbox.appendChild(checkboxDevice);
-        divImgDevice.appendChild(imgDevice);
-        divImgDevice.appendChild(nameDevice);
-        divMainDevices.appendChild(divImgDevice);
-        divMainDevices.appendChild(divCheckbox);
-        return divMainDevices;
+        divDeviceIcon.appendChild(imgDeviceIcon);
+        divDeviceIcon.appendChild(nameDevice);
+        divMainDevice.appendChild(divDeviceIcon);
+        divMainDevice.appendChild(checkboxDevice);
+        return divMainDevice;
     }
+    
     
 
     //função REUTILIZAVEL para enviar as datas recorrentes para o banco 
@@ -3132,7 +3013,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddDevices.addEventListener("click",function(){
             console.log("Abrir div add devices")
-            app.send({api:"admin", mt:"SelectDevices"})
+            makeDivAddDevices(phone_list)
             // makeDivAddDevices()
         })
         //appends
@@ -3248,7 +3129,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         //     // editor: editor, 
         //     // viewer: viewer });
         // })
-        
         }
     //#endregion
     
