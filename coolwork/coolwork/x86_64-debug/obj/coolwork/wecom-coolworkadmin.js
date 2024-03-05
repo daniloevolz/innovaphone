@@ -3163,91 +3163,92 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     
         document.body.appendChild(divMain)
     
-        btnUpdateRoom.addEventListener("click",function(event){
-            const nomeSala = document.getElementById("iptNameRoom").value
-            if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
-            makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
-                event.preventDefault()
-                event.stopPropagation()
-                document.body.removeChild(document.getElementById("bcgrd"))
-            })      
-            }
-            if(typeRoom == "periodType"){
-                app.send({ api: "admin", mt: "InsertRoom", 
-                name: nomeSala, 
-                img: imgRoom, 
-                dateStart: dateAvailability[0].start, 
-                dateEnd: dateAvailability[0].end, 
-                type: typeRoom, 
-                schedule: typeSchedule, 
-                viewer: viewers,
-                device : devHwId
-                }); //viewer: viewer 
-            }else if (typeRoom == "recurrentType") {
-                console.log("dateAvailability " + JSON.stringify(dateAvailability));
+        // btnUpdateRoom.addEventListener("click",function(event){
+        //     const nomeSala = document.getElementById("iptNameRoom").value
+        //     if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+        //     makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
+        //         event.preventDefault()
+        //         event.stopPropagation()
+        //         document.body.removeChild(document.getElementById("bcgrd"))
+        //     })      
+        //     }
+        //     if(typeRoom == "periodType"){
+        //         app.send({ api: "admin", mt: "InsertRoom", 
+        //         name: nomeSala, 
+        //         img: imgRoom, 
+        //         dateStart: dateAvailability[0].start, 
+        //         dateEnd: dateAvailability[0].end, 
+        //         type: typeRoom, 
+        //         schedule: typeSchedule, 
+        //         viewer: viewers,
+        //         device : devHwId
+        //         }); //viewer: viewer 
+        //     }else if (typeRoom == "recurrentType") {
+        //         console.log("dateAvailability " + JSON.stringify(dateAvailability));
             
-                // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
-                let combinedAvailability = {
-                    startMonday: [],
-                    startTuesday: [],
-                    startWednesday: [],
-                    startThursday: [],
-                    startFriday: [],
-                    startSaturday: [],
-                    startSunday: [],
-                    endMonday: [],
-                    endTuesday: [],
-                    endWednesday: [],
-                    endThursday: [],
-                    endFriday: [],
-                    endSaturday: [],
-                    endSunday: []
-                };
+        //         // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
+        //         let combinedAvailability = {
+        //             startMonday: [],
+        //             startTuesday: [],
+        //             startWednesday: [],
+        //             startThursday: [],
+        //             startFriday: [],
+        //             startSaturday: [],
+        //             startSunday: [],
+        //             endMonday: [],
+        //             endTuesday: [],
+        //             endWednesday: [],
+        //             endThursday: [],
+        //             endFriday: [],
+        //             endSaturday: [],
+        //             endSunday: []
+        //         };
             
-                // Combine os horários de disponibilidade de todas as salas
-                dateAvailability.forEach(function(availability) {
-                    for (let key in availability) {
-                        combinedAvailability[key].push(availability[key]);
-                    }
-                });
+        //         // Combine os horários de disponibilidade de todas as salas
+        //         dateAvailability.forEach(function(availability) {
+        //             for (let key in availability) {
+        //                 combinedAvailability[key].push(availability[key]);
+        //             }
+        //         });
             
-                // Envie uma única mensagem com todos os horários de disponibilidade combinados
-                app.send({
-                    api: "admin",
-                    mt: "InsertRoom",
-                    name: nomeSala,
-                    img: imgRoom,
-                    type: typeRoom,
-                    schedule: typeSchedule,
-                    startMonday: combinedAvailability.startMonday.join(", "),
-                    startTuesday: combinedAvailability.startTuesday.join(", "),
-                    startWednesday: combinedAvailability.startWednesday.join(", "),
-                    startThursday: combinedAvailability.startThursday.join(", "),
-                    startFriday: combinedAvailability.startFriday.join(", "),
-                    startSaturday: combinedAvailability.startSaturday.join(", "),
-                    startSunday: combinedAvailability.startSunday.join(", "),
-                    endMonday: combinedAvailability.endMonday.join(", "),
-                    endTuesday: combinedAvailability.endTuesday.join(", "),
-                    endWednesday: combinedAvailability.endWednesday.join(", "),
-                    endThursday: combinedAvailability.endThursday.join(", "),
-                    endFriday: combinedAvailability.endFriday.join(", "),
-                    endSaturday: combinedAvailability.endSaturday.join(", "),
-                    endSunday: combinedAvailability.endSunday.join(", "),
-                    viewer: viewers,
-                    device: devHwId
-                });
-            }
+        //         // Envie uma única mensagem com todos os horários de disponibilidade combinados
+        //         app.send({
+        //             api: "admin",
+        //             mt: "InsertRoom",
+        //             name: nomeSala,
+        //             img: imgRoom,
+        //             type: typeRoom,
+        //             schedule: typeSchedule,
+        //             startMonday: combinedAvailability.startMonday.join(", "),
+        //             startTuesday: combinedAvailability.startTuesday.join(", "),
+        //             startWednesday: combinedAvailability.startWednesday.join(", "),
+        //             startThursday: combinedAvailability.startThursday.join(", "),
+        //             startFriday: combinedAvailability.startFriday.join(", "),
+        //             startSaturday: combinedAvailability.startSaturday.join(", "),
+        //             startSunday: combinedAvailability.startSunday.join(", "),
+        //             endMonday: combinedAvailability.endMonday.join(", "),
+        //             endTuesday: combinedAvailability.endTuesday.join(", "),
+        //             endWednesday: combinedAvailability.endWednesday.join(", "),
+        //             endThursday: combinedAvailability.endThursday.join(", "),
+        //             endFriday: combinedAvailability.endFriday.join(", "),
+        //             endSaturday: combinedAvailability.endSaturday.join(", "),
+        //             endSunday: combinedAvailability.endSunday.join(", "),
+        //             viewer: viewers,
+        //             device: devHwId
+        //         });
+        //     }
             
-            // app.send({ api: "admin", mt: "InsertRoom", 
-            // name: nameRoom, 
-            // img: srcDaImagem, 
-            // dateStart: dateStart, 
-            // dateEnd: dateEnd, 
-            // type: optType, 
-            // schedule: optModule, 
-            // editor: editor, 
-            // viewer: viewer });
-        })
+        //     // app.send({ api: "admin", mt: "InsertRoom", 
+        //     // name: nameRoom, 
+        //     // img: srcDaImagem, 
+        //     // dateStart: dateStart, 
+        //     // dateEnd: dateEnd, 
+        //     // type: optType, 
+        //     // schedule: optModule, 
+        //     // editor: editor, 
+        //     // viewer: viewer });
+        // })
+        
         }
     //#endregion
     

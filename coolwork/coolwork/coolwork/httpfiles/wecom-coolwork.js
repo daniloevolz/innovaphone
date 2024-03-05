@@ -739,6 +739,22 @@ function getDayOfWeekLabel(selectedDate) {
             dateHour.classList.add("dateHour")
             dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
 
+            const divUser = document.createElement("div")
+            divUser.classList.add("flex-col","flex","gap-1")
+
+            let avatar = new innovaphone.Avatar(start, userSIP, userDomain);
+            let UIuserPicture = avatar.url(userSIP, 120, userDN);
+            const imgAvatar = document.createElement("img");
+            imgAvatar.setAttribute("src", UIuserPicture);
+            imgAvatar.setAttribute("id", "divAvatar");
+            imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+
+            const nameUser = document.createElement("div")
+            nameUser.textContent = myUserGuid.cn
+
+            divUser.appendChild(imgAvatar)
+            divUser.appendChild(nameUser)
+
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
             editBtn.setAttribute("id",parseInt(s.id))
             editBtn.addEventListener('click', function(event){
@@ -805,6 +821,7 @@ function getDayOfWeekLabel(selectedDate) {
             div185.appendChild(divE1)
             div185.appendChild(divE2)
             divMain.appendChild(div185)
+            divMain.appendChild(divUser)
             container.appendChild(divMain)
             
             nameRoom.name = oldNameRoom
