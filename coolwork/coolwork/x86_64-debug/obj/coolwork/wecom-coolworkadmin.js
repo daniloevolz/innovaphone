@@ -9,6 +9,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var that = this;
     var devHwId = [];
     var filesID = [];
+    var filesURL = []
     var getAllClickedWeekDaysActive = true;
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
@@ -187,12 +188,17 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelImgRoom = document.createElement("div")
     labelImgRoom.textContent = texts.text("labelImageRoom")
+    const nameImgDiv = document.createElement("div")
+    nameImgDiv.textContent = texts.text("labelNoImageSelected")
     const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
     var imgRoom;
+
     divBtnChoose.addEventListener("click",function(){
         console.log("Abrir Div Escolher Imagem")
-        makeDivChooseImage(function(selectedImg){
+        makeDivChooseImage(function(selectedImg){ //callback da função
             imgRoom = selectedImg
+        },function(name){
+            nameImgDiv.textContent = name
         })
     })
     // tipo de sala
@@ -226,11 +232,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelUsersRoom = document.createElement("div")
     labelUsersRoom.textContent = texts.text("labelUsers")
+    const divUsersToAdd = document.createElement("div")
+    divUsersToAdd.id = "divUsersToAdd"
     const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
     divBtnAddUsers.addEventListener("click",function(){
         console.log("Abrir Div Add Usuários")
-        makeDivAddUsers(function(viewer){
+        makeDivAddUsers(function(viewer){ //callback da função 
             viewers = viewer
+            console.log("Variavel Viewers para envio ao banco" + "\n" + JSON.stringify(viewers))
+            divUsersToAdd.innerHTML = ''
+            makeAvatar(viewer,divUsersToAdd)
         })
     })
     //horario agendamento 
@@ -238,16 +249,21 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelHourSchedule = document.createElement("div")
     labelHourSchedule.textContent = texts.text("labelHourSchedule")
+    const divShowHourAvailability = document.createElement("div")
+    divShowHourAvailability.textContent = texts.text("NoHourSelected")
+    divShowHourAvailability.classList.add("flex")
     const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
     var typeSchedule;
     var dateAvailability;
     btnMakeCalendar.addEventListener("click",function(){
-        makeDivAddAvailability(null,null,typeRoom,function(date){
+        makeDivAddAvailability(null,null,typeRoom,function(date){ //callback da função 
             dateAvailability;
             dateAvailability = date
             console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
             //console.log(date)
             //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
+            divShowHourAvailability.textContent = moment(dateAvailability[0].start).format("YYYY-MM-DD HH:mm") + " " + 
+            moment(dateAvailability[0].end).format("YYYY-MM-DD HH:mm")
         },function(sched){
             typeSchedule = sched
         })
@@ -267,6 +283,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divNameRoom.appendChild(labelNameRoom)
     divNameRoom.appendChild(iptNameRoom)
     divImgRoom.appendChild(labelImgRoom)
+    divImgRoom.appendChild(nameImgDiv)
     divImgRoom.appendChild(divBtnChoose)
 
     divButtons.appendChild(btnPeriod)
@@ -279,8 +296,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
     // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
     divUsersRoom.appendChild(labelUsersRoom)
+    divUsersRoom.appendChild(divUsersToAdd)
     divUsersRoom.appendChild(divBtnAddUsers)
     divHourSchedule.appendChild(labelHourSchedule)
+    divHourSchedule.appendChild(divShowHourAvailability)
     divHourSchedule.appendChild(btnMakeCalendar)
     divAddDevices.appendChild(labelAddDevices)
     divAddDevices.appendChild(divBtnAddDevices)
@@ -296,8 +315,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     document.body.appendChild(divMain)
 
     btnCreateRoom.addEventListener("click",function(event){
+        var viewerGuids = viewers.map(viewer => viewer.viewer_guid);
+
         const nomeSala = document.getElementById("iptNameRoom").value
-        if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+        if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == "" || dateAvailability == ""){
         makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
             event.preventDefault()
             event.stopPropagation()
@@ -305,6 +326,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         })      
         }
         else if(typeRoom == "periodType"){
+            
             app.send({ api: "admin", mt: "InsertRoom", 
             name: nomeSala, 
             img: imgRoom, 
@@ -312,7 +334,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             dateEnd: dateAvailability[0].end, 
             type: typeRoom, 
             schedule: typeSchedule, 
-            viewer: viewers,
+            viewer: viewerGuids,
             device : devHwId
             }); //viewer: viewer 
         }else if (typeRoom == "recurrentType") {
@@ -365,7 +387,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 endFriday: combinedAvailability.endFriday.join(", "),
                 endSaturday: combinedAvailability.endSaturday.join(", "),
                 endSunday: combinedAvailability.endSunday.join(", "),
-                viewer: viewers,
+                viewer: viewerGuids,
                 device: devHwId
             });
         }
@@ -444,6 +466,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         buttonCancel.addEventListener("click", function () {
             console.log("Fechar Tela");
             checkedUsers = [];
+            document.getElementById("divUsersToAdd").innerHTML = ''
             document.body.removeChild(insideDiv);
         });
     
@@ -463,6 +486,22 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             if (!algumMarcado) {
                 checkboxAllUsers.checked = false;
             }
+
+             // Adiciona ou remove todos os usuários da lista de usuários selecionados
+                if (isChecked) {
+                    // Se o checkbox "Selecionar Todos os Usuários" está marcado, adiciona todos os usuários ao checkedUsers
+                    checkedUsers = list_tableUsers.map(user => {
+                        return {
+                            viewer_guid: user.guid,
+                            sip: user.sip,
+                            cn: user.cn
+                        };
+                    });
+                } else {
+                    // Se o checkbox "Selecionar Todos os Usuários" está desmarcado, limpa o checkedUsers
+                    checkedUsers = [];
+                }
+
         });
     
         const buttonConfirm = makeButton(texts.text("labelConfirm"), "primary", "");
@@ -996,7 +1035,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         getAllClickedWeekDays(daysSelected);
         
     }
-    function makeDivChooseImage(callback){
+    function makeDivChooseImage(callback,nameImg){
         // filesID = [] // limpeza
         controlDB = false
         const insideDiv = new innovaphone.ui1.Div(null, null, "bg-black bg-opacity-50 justify-center items-center absolute h-full w-full top-0 flex");
@@ -1011,21 +1050,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     
         const divSelectImgs = new innovaphone.ui1.Div(null,null,"flex w-full items-start gap-1 flex-row");
 
-        const img1 = createImage('./images/MESA-1.png');
-        const img2 = createImage('./images/MESA-2.png');
-        const img3 = createImage('./images/MESA-3.png');
+        const imgNameMap = [
+            {src: './images/MESA-1.png' , imgName: "MESA-1" },
+            {src: './images/MESA-2.png' , imgName: "MESA-2" },
+            {src: './images/MESA-3.png' , imgName: "MESA-3" }
+        ]
+        
+        const img1 = createImage(imgNameMap[0].src);
+        const img2 = createImage(imgNameMap[1].src);
+        const img3 = createImage(imgNameMap[2].src);
 
         img1.addEvent("click", function (event) {
-            addBorderAndChangeImage(img1, mainImg, './images/MESA-1.png');
+            addBorderAndChangeImage(img1, mainImg, imgNameMap[0].src);
         });
     
         img2.addEvent("click", function (event) {
-            addBorderAndChangeImage(img2, mainImg, './images/MESA-2.png');
+            addBorderAndChangeImage(img2, mainImg, imgNameMap[1].src);
         });
     
         img3.addEvent("click", function (event) {
-            addBorderAndChangeImage(img3, mainImg, './images/MESA-3.png');
+            addBorderAndChangeImage(img3, mainImg, imgNameMap[2].src);
         });
+
         const divIptImage = new innovaphone.ui1.Div(null,null,"flex p-1 justify-between items-center rounded-lg bg-dark-200");
         const labelImportImg = new innovaphone.ui1.Div(null, texts.text("labelImportImg"));
         const customFileInput = new innovaphone.ui1.Node("label",null,texts.text("labelChoose"),"bg-dark-300 hover:bg-dark-400 text-primary-600 font-bold py-1 px-2 rounded-lg cursor-pointer");
@@ -1051,8 +1097,22 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         });
         const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
         buttonConfirm.addEvent("click", function () {
-            var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")
+            var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")  
+            var foundMatch = false  
+            for (const item of imgNameMap) {
+                if(item.src == mainImgSrc){
+                    nameImg(item.imgName)
+                    foundMatch = true 
+                    break;
+                }
+                
+            }
+            if (!foundMatch) {
+                nameImg(mainImgSrc);
+            }
+
             callback(mainImgSrc);
+
             that.rem(insideDiv);
             filesID = []
         });
@@ -1221,6 +1281,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             if (!algumMarcado) {
                 checkboxAllDevices.checked = false;
             }
+
+            if (isChecked) {
+                // Se o checkbox "Selecionar Todos os Dispositivos" está marcado, adiciona todos os dispositivos ao checkedDevices
+                checkedDevices = devices.map(dev => dev.hwid);
+            } else {
+                // Se o checkbox "Selecionar Todos os Dispositivos" está desmarcado, limpa o checkedDevices
+                checkedDevices = [];
+            }
+
+            
         });
         
         
@@ -1370,7 +1440,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 return v.room_id == room.id
             })
             //componente avatar
-            makeAvatar(viewersFilter,divMain,room)
+            makeAvatar(viewersFilter,divMain)
 
             //todas as divs com o atributo "room"
             const divsRoom = document.querySelectorAll('[room]');
@@ -1696,7 +1766,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
                 viewersUsers.slice(0, 6).forEach(function (view) {
                     let avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                    let UIuserPicture = avatar.url(view.sip, 120, userDN);
+                    let UIuserPicture = avatar.url(view.sip, 120, view.cn);
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
@@ -2315,7 +2385,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const divUsersAvatar = document.createElement("div");
         divUsersAvatar.classList.add("flex", "gap-1", "items-center");
         let avatar = new innovaphone.Avatar(start, user.sip, userDomain);
-        let UIuserPicture = avatar.url(user.sip, 120, userDN);
+        let UIuserPicture = avatar.url(user.sip, 120, user.cn);
         const imgAvatar = document.createElement("img");
         imgAvatar.setAttribute("src", UIuserPicture);
         imgAvatar.setAttribute("id", "divAvatar");
@@ -2325,23 +2395,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const checkboxUser = makeInput("", "checkbox", "");
         checkboxUser.setAttribute("id", "viewercheckbox_" + user.guid);
         checkboxUser.classList.add("checkboxUser");
-    
+
         // Verificar se o usuário está marcado e marcar o checkbox, se necessário
-        if (checkedUsers.includes(user.guid)) {
+        if (checkedUsers.find(u => u.viewer_guid === user.guid)) {
             checkboxUser.checked = true;
         }
-    
+
         // Event listener para marcar/desmarcar usuários
         checkboxUser.addEventListener("change", function () {
             if (this.checked) {
                 // Adicionar o user.guid a checkedUsers quando o checkbox for marcado
-                checkedUsers.push(user.guid);
+                checkedUsers.push({ viewer_guid: user.guid, sip: user.sip, cn: user.cn });
             } else {
                 // Remover o user.guid de checkedUsers quando o checkbox for desmarcado
-                checkedUsers = checkedUsers.filter(guid => guid !== user.guid);
+                checkedUsers = checkedUsers.filter(u => u.viewer_guid !== user.guid);
             }
         });
-    
+        
         divUsersAvatar.appendChild(imgAvatar);
         divUsersAvatar.appendChild(nameUser);
         divMainUsers.appendChild(divUsersAvatar);
@@ -2909,227 +2979,230 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion FUNÇÕES INTERNAS
 
     //#region EDIÇÃO DE SALA
-    function makeDivEditRoom(nameRoom,type){
-        that.clear()
-        const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
-        makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
-        const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
-        //nome da sala
-        const divNameRoom = document.createElement("div")
-        divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
-        const labelNameRoom = document.createElement("div")
-        labelNameRoom.textContent = texts.text("labelNameRoom")
-        const iptNameRoom = makeInput(nameRoom,"text","")
-        iptNameRoom.value = nameRoom
-        iptNameRoom.id = "iptNameRoom"
-        // imagem da sala
-        const divImgRoom = document.createElement("div")
-        divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelImgRoom = document.createElement("div")
-        labelImgRoom.textContent = texts.text("labelImageRoom")
-        const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
-        var imgRoom;
-        divBtnChoose.addEventListener("click",function(){
-            console.log("Abrir Div Escolher Imagem")
-            makeDivChooseImage(function(selectedImg){
-                imgRoom = selectedImg
-            })
-        })
-        // tipo de sala
-        const divTypeRoom = document.createElement("div")
-        divTypeRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelTypeRoom = document.createElement("div")
-        labelTypeRoom.textContent = texts.text("labelTypeRoom")
+    // function makeDivEditRoom(nameRoom,type){
+    //     that.clear()
+    //     const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
+    //     makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
+    //     const divMain = document.createElement("div")
+    //     divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+    //     //nome da sala
+    //     const divNameRoom = document.createElement("div")
+    //     divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
+    //     const labelNameRoom = document.createElement("div")
+    //     labelNameRoom.textContent = texts.text("labelNameRoom")
+    //     const iptNameRoom = makeInput(nameRoom,"text","")
+    //     iptNameRoom.value = nameRoom
+    //     iptNameRoom.id = "iptNameRoom"
+    //     // imagem da sala
+    //     const divImgRoom = document.createElement("div")
+    //     divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+    //     const labelImgRoom = document.createElement("div")
+    //     labelImgRoom.textContent = texts.text("labelImageRoom")
+    //     const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+    //     var imgRoom;
+    //     divBtnChoose.addEventListener("click",function(){
+    //         console.log("Abrir Div Escolher Imagem")
+    //         makeDivChooseImage(function(selectedImg){ //callback da função 
+    //             imgRoom = selectedImg
+    //         })
+    //     })
+    //     // tipo de sala
+    //     const divTypeRoom = document.createElement("div")
+    //     divTypeRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+    //     const labelTypeRoom = document.createElement("div")
+    //     labelTypeRoom.textContent = texts.text("labelTypeRoom")
 
-        var typeRoom = type;
+    //     var typeRoom = type;
 
-        var btnPeriod;
-        var btnRecurrent;
+    //     var btnPeriod;
+    //     var btnRecurrent;
 
-        if(type == 'periodType'){
-            btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
-            btnPeriod.id = "periodType"
-            btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
-            btnRecurrent.id = "recurrentType"
-        }else{
-            btnPeriod = makeButton(texts.text("labelPeriod"),"tertiary","")
-            btnPeriod.id = "periodType"
-            btnRecurrent = makeButton(texts.text("labelRecurrent"),"secundary","")
-            btnRecurrent.id = "recurrentType"
-        }
+    //     if(type == 'periodType'){
+    //         btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
+    //         btnPeriod.id = "periodType"
+    //         btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
+    //         btnRecurrent.id = "recurrentType"
+    //     }else{
+    //         btnPeriod = makeButton(texts.text("labelPeriod"),"tertiary","")
+    //         btnPeriod.id = "periodType"
+    //         btnRecurrent = makeButton(texts.text("labelRecurrent"),"secundary","")
+    //         btnRecurrent.id = "recurrentType"
+    //     }
 
-        btnPeriod.addEventListener("click", function(event) {
-            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
-                typeRoom = selectedButton.id
-            });
-        });
+    //     btnPeriod.addEventListener("click", function(event) {
+    //         typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+    //             typeRoom = selectedButton.id
+    //         });
+    //     });
 
-        btnRecurrent.addEventListener("click", function(event) {
-            typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
-                typeRoom = selectedButton.id
-            });
-        });
+    //     btnRecurrent.addEventListener("click", function(event) {
+    //         typeOfRoomButtons(event, btnPeriod, btnRecurrent,function(selectedButton){
+    //             typeRoom = selectedButton.id
+    //         });
+    //     });
                 
     
-        // usuarios
-        var viewers = []
-        const divUsersRoom = document.createElement("div")
-        divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelUsersRoom = document.createElement("div")
-        labelUsersRoom.textContent = texts.text("labelUsers")
-        const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
-        divBtnAddUsers.addEventListener("click",function(){
-            console.log("Abrir Div Add Usuários")
-            makeDivAddUsers(function(viewer){
-                viewers = viewer
-            })
-        })
-        //horario agendamento 
-        const divHourSchedule = document.createElement("div")
-        divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelHourSchedule = document.createElement("div")
-        labelHourSchedule.textContent = texts.text("labelHourSchedule")
-        const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
-        var typeSchedule;
-        var dateAvailability;
-        btnMakeCalendar.addEventListener("click",function(){
-            makeDivAddAvailability(null,null,typeRoom,function(date){
-                dateAvailability;
-                dateAvailability = date
-                console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
-                //console.log(date)
-                //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
-            },function(sched){
-                typeSchedule = sched
-            })
-            console.log("Abrir Calendario")
-        })
-        // devices
-        const divAddDevices = document.createElement("div")
-        divAddDevices.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
-        const labelAddDevices = document.createElement("div")
-        labelAddDevices.textContent = texts.text("labelDevices")
-        const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
-        divBtnAddDevices.addEventListener("click",function(){
-            console.log("Abrir div add devices")
-            makeDivAddDevices(phone_list)
-            // makeDivAddDevices()
-        })
-        //appends
-        divNameRoom.appendChild(labelNameRoom)
-        divNameRoom.appendChild(iptNameRoom)
-        divImgRoom.appendChild(labelImgRoom)
-        divImgRoom.appendChild(divBtnChoose)
-        divTypeRoom.appendChild(labelTypeRoom)
-        divTypeRoom.appendChild(btnPeriod)
-        divTypeRoom.appendChild(btnRecurrent)
-        // divTypeSchedule.appendChild(labelTypeSchedule) colocar na tela de agendamento
-        // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
-        // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
-        divUsersRoom.appendChild(labelUsersRoom)
-        divUsersRoom.appendChild(divBtnAddUsers)
-        divHourSchedule.appendChild(labelHourSchedule)
-        divHourSchedule.appendChild(btnMakeCalendar)
-        divAddDevices.appendChild(labelAddDevices)
-        divAddDevices.appendChild(divBtnAddDevices)
+    //     // usuarios
+    //     var viewers = []
+    //     const divUsersRoom = document.createElement("div")
+    //     divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+    //     const labelUsersRoom = document.createElement("div")
+    //     labelUsersRoom.textContent = texts.text("labelUsers")
+    //     const divUsersToAdd = document.createElement("div")
+    //     const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
+    //     divBtnAddUsers.addEventListener("click",function(){
+    //         console.log("Abrir Div Add Usuários")
+    //         makeDivAddUsers(function(viewer){ //callback da função 
+    //             viewers = viewer
+    //             makeAvatar(viewer,divUsersToAdd)
+    //         })
+    //     })
+    //     //horario agendamento 
+    //     const divHourSchedule = document.createElement("div")
+    //     divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+    //     const labelHourSchedule = document.createElement("div")
+    //     labelHourSchedule.textContent = texts.text("labelHourSchedule")
+    //     const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
+    //     var typeSchedule;
+    //     var dateAvailability;
+    //     btnMakeCalendar.addEventListener("click",function(){
+    //         makeDivAddAvailability(null,null,typeRoom,function(date){
+    //             dateAvailability;
+    //             dateAvailability = date
+    //             console.log("DATE AVAILABILITY: " + JSON.stringify(dateAvailability))
+    //             //console.log(date)
+    //             //console.log("Hora inicio: " , date[0].start , "Hora Fim: " , date[0].end)
+    //         },function(sched){
+    //             typeSchedule = sched
+    //         })
+    //         console.log("Abrir Calendario")
+    //     })
+    //     // devices
+    //     const divAddDevices = document.createElement("div")
+    //     divAddDevices.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
+    //     const labelAddDevices = document.createElement("div")
+    //     labelAddDevices.textContent = texts.text("labelDevices")
+    //     const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
+    //     divBtnAddDevices.addEventListener("click",function(){
+    //         console.log("Abrir div add devices")
+    //         makeDivAddDevices(phone_list)
+    //         // makeDivAddDevices()
+    //     })
+    //     //appends
+    //     divNameRoom.appendChild(labelNameRoom)
+    //     divNameRoom.appendChild(iptNameRoom)
+    //     divImgRoom.appendChild(labelImgRoom)
+    //     divImgRoom.appendChild(divBtnChoose)
+    //     divTypeRoom.appendChild(labelTypeRoom)
+    //     divTypeRoom.appendChild(btnPeriod)
+    //     divTypeRoom.appendChild(btnRecurrent)
+    //     // divTypeSchedule.appendChild(labelTypeSchedule) colocar na tela de agendamento
+    //     // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
+    //     // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
+    //     divUsersRoom.appendChild(labelUsersRoom)
+    //     divUsersRoom.appendChild(divUsersToAdd)
+    //     divUsersRoom.appendChild(divBtnAddUsers)
+    //     divHourSchedule.appendChild(labelHourSchedule)
+    //     divHourSchedule.appendChild(btnMakeCalendar)
+    //     divAddDevices.appendChild(labelAddDevices)
+    //     divAddDevices.appendChild(divBtnAddDevices)
     
-        divMain.appendChild(divNameRoom)
-        divMain.appendChild(divImgRoom)
-        divMain.appendChild(divTypeRoom)
-        // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
-        divMain.appendChild(divUsersRoom)
-        divMain.appendChild(divHourSchedule)
-        divMain.appendChild(divAddDevices)
+    //     divMain.appendChild(divNameRoom)
+    //     divMain.appendChild(divImgRoom)
+    //     divMain.appendChild(divTypeRoom)
+    //     // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
+    //     divMain.appendChild(divUsersRoom)
+    //     divMain.appendChild(divHourSchedule)
+    //     divMain.appendChild(divAddDevices)
     
-        document.body.appendChild(divMain)
+    //     document.body.appendChild(divMain)
     
-        // btnUpdateRoom.addEventListener("click",function(event){
-        //     const nomeSala = document.getElementById("iptNameRoom").value
-        //     if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
-        //     makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
-        //         event.preventDefault()
-        //         event.stopPropagation()
-        //         document.body.removeChild(document.getElementById("bcgrd"))
-        //     })      
-        //     }
-        //     if(typeRoom == "periodType"){
-        //         app.send({ api: "admin", mt: "InsertRoom", 
-        //         name: nomeSala, 
-        //         img: imgRoom, 
-        //         dateStart: dateAvailability[0].start, 
-        //         dateEnd: dateAvailability[0].end, 
-        //         type: typeRoom, 
-        //         schedule: typeSchedule, 
-        //         viewer: viewers,
-        //         device : devHwId
-        //         }); //viewer: viewer 
-        //     }else if (typeRoom == "recurrentType") {
-        //         console.log("dateAvailability " + JSON.stringify(dateAvailability));
+    //     // btnUpdateRoom.addEventListener("click",function(event){
+    //     //     const nomeSala = document.getElementById("iptNameRoom").value
+    //     //     if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+    //     //     makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
+    //     //         event.preventDefault()
+    //     //         event.stopPropagation()
+    //     //         document.body.removeChild(document.getElementById("bcgrd"))
+    //     //     })      
+    //     //     }
+    //     //     if(typeRoom == "periodType"){
+    //     //         app.send({ api: "admin", mt: "InsertRoom", 
+    //     //         name: nomeSala, 
+    //     //         img: imgRoom, 
+    //     //         dateStart: dateAvailability[0].start, 
+    //     //         dateEnd: dateAvailability[0].end, 
+    //     //         type: typeRoom, 
+    //     //         schedule: typeSchedule, 
+    //     //         viewer: viewers,
+    //     //         device : devHwId
+    //     //         }); //viewer: viewer 
+    //     //     }else if (typeRoom == "recurrentType") {
+    //     //         console.log("dateAvailability " + JSON.stringify(dateAvailability));
             
-        //         // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
-        //         let combinedAvailability = {
-        //             startMonday: [],
-        //             startTuesday: [],
-        //             startWednesday: [],
-        //             startThursday: [],
-        //             startFriday: [],
-        //             startSaturday: [],
-        //             startSunday: [],
-        //             endMonday: [],
-        //             endTuesday: [],
-        //             endWednesday: [],
-        //             endThursday: [],
-        //             endFriday: [],
-        //             endSaturday: [],
-        //             endSunday: []
-        //         };
+    //     //         // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
+    //     //         let combinedAvailability = {
+    //     //             startMonday: [],
+    //     //             startTuesday: [],
+    //     //             startWednesday: [],
+    //     //             startThursday: [],
+    //     //             startFriday: [],
+    //     //             startSaturday: [],
+    //     //             startSunday: [],
+    //     //             endMonday: [],
+    //     //             endTuesday: [],
+    //     //             endWednesday: [],
+    //     //             endThursday: [],
+    //     //             endFriday: [],
+    //     //             endSaturday: [],
+    //     //             endSunday: []
+    //     //         };
             
-        //         // Combine os horários de disponibilidade de todas as salas
-        //         dateAvailability.forEach(function(availability) {
-        //             for (let key in availability) {
-        //                 combinedAvailability[key].push(availability[key]);
-        //             }
-        //         });
+    //     //         // Combine os horários de disponibilidade de todas as salas
+    //     //         dateAvailability.forEach(function(availability) {
+    //     //             for (let key in availability) {
+    //     //                 combinedAvailability[key].push(availability[key]);
+    //     //             }
+    //     //         });
             
-        //         // Envie uma única mensagem com todos os horários de disponibilidade combinados
-        //         app.send({
-        //             api: "admin",
-        //             mt: "InsertRoom",
-        //             name: nomeSala,
-        //             img: imgRoom,
-        //             type: typeRoom,
-        //             schedule: typeSchedule,
-        //             startMonday: combinedAvailability.startMonday.join(", "),
-        //             startTuesday: combinedAvailability.startTuesday.join(", "),
-        //             startWednesday: combinedAvailability.startWednesday.join(", "),
-        //             startThursday: combinedAvailability.startThursday.join(", "),
-        //             startFriday: combinedAvailability.startFriday.join(", "),
-        //             startSaturday: combinedAvailability.startSaturday.join(", "),
-        //             startSunday: combinedAvailability.startSunday.join(", "),
-        //             endMonday: combinedAvailability.endMonday.join(", "),
-        //             endTuesday: combinedAvailability.endTuesday.join(", "),
-        //             endWednesday: combinedAvailability.endWednesday.join(", "),
-        //             endThursday: combinedAvailability.endThursday.join(", "),
-        //             endFriday: combinedAvailability.endFriday.join(", "),
-        //             endSaturday: combinedAvailability.endSaturday.join(", "),
-        //             endSunday: combinedAvailability.endSunday.join(", "),
-        //             viewer: viewers,
-        //             device: devHwId
-        //         });
-        //     }
+    //     //         // Envie uma única mensagem com todos os horários de disponibilidade combinados
+    //     //         app.send({
+    //     //             api: "admin",
+    //     //             mt: "InsertRoom",
+    //     //             name: nomeSala,
+    //     //             img: imgRoom,
+    //     //             type: typeRoom,
+    //     //             schedule: typeSchedule,
+    //     //             startMonday: combinedAvailability.startMonday.join(", "),
+    //     //             startTuesday: combinedAvailability.startTuesday.join(", "),
+    //     //             startWednesday: combinedAvailability.startWednesday.join(", "),
+    //     //             startThursday: combinedAvailability.startThursday.join(", "),
+    //     //             startFriday: combinedAvailability.startFriday.join(", "),
+    //     //             startSaturday: combinedAvailability.startSaturday.join(", "),
+    //     //             startSunday: combinedAvailability.startSunday.join(", "),
+    //     //             endMonday: combinedAvailability.endMonday.join(", "),
+    //     //             endTuesday: combinedAvailability.endTuesday.join(", "),
+    //     //             endWednesday: combinedAvailability.endWednesday.join(", "),
+    //     //             endThursday: combinedAvailability.endThursday.join(", "),
+    //     //             endFriday: combinedAvailability.endFriday.join(", "),
+    //     //             endSaturday: combinedAvailability.endSaturday.join(", "),
+    //     //             endSunday: combinedAvailability.endSunday.join(", "),
+    //     //             viewer: viewers,
+    //     //             device: devHwId
+    //     //         });
+    //     //     }
             
-        //     // app.send({ api: "admin", mt: "InsertRoom", 
-        //     // name: nameRoom, 
-        //     // img: srcDaImagem, 
-        //     // dateStart: dateStart, 
-        //     // dateEnd: dateEnd, 
-        //     // type: optType, 
-        //     // schedule: optModule, 
-        //     // editor: editor, 
-        //     // viewer: viewer });
-        // })
-        }
+    //     //     // app.send({ api: "admin", mt: "InsertRoom", 
+    //     //     // name: nameRoom, 
+    //     //     // img: srcDaImagem, 
+    //     //     // dateStart: dateStart, 
+    //     //     // dateEnd: dateEnd, 
+    //     //     // type: optType, 
+    //     //     // schedule: optModule, 
+    //     //     // editor: editor, 
+    //     //     // viewer: viewer });
+    //     // })
+    //     }
     //#endregion
     
     //#region Drag and Drop Functions
@@ -3490,6 +3563,15 @@ function startfileUpload() {
             var divMainImg = document.getElementById("divMainImg")
             divMainImg.setAttribute("src",start.originalUrl + "/files/" + file.id)
             filesID = file.id
+            
+            filesURL = file.url
+        
+            const parts = filesURL.split('?');
+            const path = parts[0];
+            const pathParts = path.split('/');
+            const filesURLFinal = pathParts[pathParts.length - 1];
+            console.log("URL CORRETA " + filesURLFinal); 
+
             // var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
             // imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
             // var delButton = new innovaphone.ui1.Div(null, null, "button")
