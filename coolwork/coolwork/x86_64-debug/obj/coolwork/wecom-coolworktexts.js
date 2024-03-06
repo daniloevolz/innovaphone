@@ -164,6 +164,8 @@ Wecom.coolworkTexts = {
         labelFree: "Livre",
         labelInUse: "Em uso",
         labelInUseByMe: "Estou Usando",
-        labelAssumed: "Assumido"
+        labelAssumed: "Assumido",
+        provisioningCodeTitle: "Provisionamento",
+        provisioningCodeMsg: "Válido até ",
     }
 }

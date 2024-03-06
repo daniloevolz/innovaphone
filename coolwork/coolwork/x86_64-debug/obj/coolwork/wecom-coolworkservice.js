@@ -1117,8 +1117,15 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         }
         if (obj.mt == "ReplicateNextResult" && obj.columns) {
             try {
-                obj.badge = 0;
-                pbxTableUsers.push(obj);
+                var userExists = pbxTableUsers.some(function (u) {
+                    return u.columns.guid == obj.columns.guid;
+                });
+                log("ReplicateNextResult:user=" + userExists)
+
+                if (!userExists) {
+                    obj.badge = 0;
+                    pbxTableUsers.push(obj);
+                }
                 conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
             } finally {
             }
