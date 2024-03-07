@@ -894,7 +894,7 @@ function getDayOfWeekLabel(selectedDate) {
 
         // div container (scroll)
         const container = document.createElement("div")
-        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
+        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","lg:grid-cols-4")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
@@ -1591,8 +1591,10 @@ function getDayOfWeekLabel(selectedDate) {
             const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
 
         const divMainViewDevice = document.createElement("div")
-        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-start")
+        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-start","focus:ring-2","focus:ring-primary-100")
         divMainViewDevice.setAttribute("id", device.id)
+        divMainViewDevice.setAttribute("tabindex", "0")
+       
         //div retangle 1396
 
         const divButtons = document.createElement("div")
@@ -1798,6 +1800,7 @@ function getDayOfWeekLabel(selectedDate) {
         //div 93
         const div93 = document.createElement("div")
         div93.classList.add("div93")
+        div93.setAttribute("tabindex","0")
         div93.setAttribute("id", device.id)
         div93.style.top = device.topoffset
         div93.style.left = device.leftoffset

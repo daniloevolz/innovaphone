@@ -330,10 +330,18 @@ cells.forEach(function (cell) {
         cell.classList.remove("selected");
         cell.classList.remove("selectedCellFocus");
     
-        selectedCells = selectedCells.filter(function(selectedCell) {
-            return selectedCell !== cell;
+        // const indexToRemove = selectedCells.indexOf(cell);
+        // if (indexToRemove !== -1) {
+        //     selectedCells.splice(indexToRemove, 1);
+        // }
+      
+          // selectedCells = selectedCells.filter(function (selectedCell) {
+          //   return selectedCell !== cell;
+          // });
+
+          selectedCells = selectedCells.filter(function (selectedCell) {
+            return selectedCell.getAttribute("data-date") !== cell.getAttribute("data-date");
         });
-        
 
     }
     // Verifica se há apenas uma célula selecionada, permitindo que ela permaneça na lista
@@ -365,8 +373,6 @@ cells.forEach(function (cell) {
     }
 
     }
-
-
   });
 
   selectedCells.forEach(function(selectedCell) {
