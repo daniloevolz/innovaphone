@@ -1580,6 +1580,24 @@ function getDayOfWeekLabel(selectedDate) {
 
     //console.log("MyUseVar " + JSON.stringify(myUser))
 
+    function addOutlineOnClick(div1, div2) {
+        if (div1 && div2) {
+            // Adicione um ouvinte de eventos para adicionar o contorno à div1 e div2 quando a div1 for clicada
+            div1.addEventListener("click", function() {
+                div1.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+                div2.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+            });
+    
+            // Adicione um ouvinte de eventos para adicionar o contorno à div1 e div2 quando a div2 for clicada
+            div2.addEventListener("click", function() {
+                div1.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+                div2.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+            });
+        } else {
+            console.log('One or both of the divs do not exist');
+        }
+    }
+
 
     function makeViewDevice(divMain, device, availability, schedule, viewer) {
         //div 101
@@ -1598,7 +1616,7 @@ function getDayOfWeekLabel(selectedDate) {
         //div retangle 1396
 
         const divButtons = document.createElement("div")
-        divButtons.classList.add("flex","justify-end","items-center","gap-1","w-full","pr-1")
+        divButtons.classList.add("flex","justify-end","items-center","gap-1","w-fit","pr-1")
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -1631,7 +1649,6 @@ function getDayOfWeekLabel(selectedDate) {
         const divStatusColor = document.createElement("div")
         divStatusColor.classList.add(state, "h-[100%]", "w-[12px]","rounded-l-lg")
         divStatusColor.setAttribute("id", device.hwid)
-        divMainViewDevice.appendChild(divStatusColor)
 
         var room = rooms.filter(function (room) {
             return device.room_id == room.id
@@ -1639,13 +1656,14 @@ function getDayOfWeekLabel(selectedDate) {
 
         //div Left
         const divLeft = document.createElement("div")
-        divLeft.classList.add("w-full","flex","justify-start","gap-1","items-center","pl-1")
+        divLeft.classList.add("w-fit","flex","justify-start","gap-1","items-center")
 
         const divNumberPosition = document.createElement("div")
         divNumberPosition.textContent = "00"
         var deviceIcon = document.createElement("img")
         deviceIcon.classList.add("deviceIcon")
         deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
+        divLeft.appendChild(divStatusColor) 
         divLeft.appendChild(divNumberPosition)
         divLeft.appendChild(deviceIcon)
         div100.appendChild(div100User)
@@ -1654,6 +1672,7 @@ function getDayOfWeekLabel(selectedDate) {
         divLeft.appendChild(div100)
 
         divMainViewDevice.appendChild(divLeft)
+        
 
         // se tiver alguem usando o telefone
         if (viewer.length > 0) {
@@ -1794,6 +1813,8 @@ function getDayOfWeekLabel(selectedDate) {
         
         divMainViewDevice.appendChild(divButtons)
         divMain.appendChild(divMainViewDevice)
+        addOutlineOnClick(divMainViewDevice, div93);
+        
 
     }
     function makeDeviceIcon(divMain, device, viewer) {
@@ -1804,6 +1825,10 @@ function getDayOfWeekLabel(selectedDate) {
         div93.setAttribute("id", device.id)
         div93.style.top = device.topoffset
         div93.style.left = device.leftoffset
+        div93.setAttribute("tabindex", "0");
+        const divMainViewDevice = document.getElementById(device.id);
+    
+        
         //div retangle 1396
 
         var myUser = list_tableUsers.filter(function(u){
@@ -1854,6 +1879,7 @@ function getDayOfWeekLabel(selectedDate) {
             //div93.appendChild(imgAvatar)
         }
         divMain.appendChild(div93)
+        addOutlineOnClick(divMainViewDevice, div93);
     }
     //Função para criar a tela de seleção para o agendamento
     //chamar no click da div34
