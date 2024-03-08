@@ -311,69 +311,50 @@ cells.forEach(function (cell) {
     // colocar modo Edição junto com schedule
 
     else if (module === "availability") {
-
       // Lógica para modo de disponibilidade
-      if (!cell.classList.contains("selected")) {
-        // Selecionar a data clicada
-        if (selectedCells.length < 2) {
-          cell.classList.add("selected");
-          cell.classList.add("selectedCellFocus");
-          selectedCells.push(cell);
-        } 
-
-        // else if(selectedCells.length < 1){
-        //   selectedCells = []
-        //   console.log("SelectedCells Vazia , Nenhuma Data Escolhida")
-        // }
-      } else {
-        // Desselecionar a data clicada se já estiver selecionada
-        cell.classList.remove("selected");
-        cell.classList.remove("selectedCellFocus");
-    
-        // const indexToRemove = selectedCells.indexOf(cell);
-        // if (indexToRemove !== -1) {
-        //     selectedCells.splice(indexToRemove, 1);
-        // }
+      var isSelected = this.classList.contains("selected");
       
-          // selectedCells = selectedCells.filter(function (selectedCell) {
-          //   return selectedCell !== cell;
-          // });
-
+      // Se a célula já estiver selecionada, desselecione-a
+      if (isSelected) {
+          this.classList.remove("selected");
+          this.classList.remove("selectedCellFocus");
           selectedCells = selectedCells.filter(function (selectedCell) {
-            return selectedCell.getAttribute("data-date") !== cell.getAttribute("data-date");
-        });
-
-    }
-    // Verifica se há apenas uma célula selecionada, permitindo que ela permaneça na lista
-    if (selectedCells.length === 1) {
-        var selectedDate = moment(selectedCells[0].getAttribute("data-date"));
-        console.log("Lista com apenas 1 cell \n Data selecionada: " + selectedDate.format("YYYY-MM-DD"));
-    }
-    
-    //Limpa a lista se não houver células selecionadas ou se houver mais de duas células selecionadas
-    if (selectedCells.length !== 1 && selectedCells.length !== 2) {
-        console.log("LISTA LIMPA")
-        selectedCells = [];
-    }
-
+              return selectedCell.getAttribute("data-date") !== cell.getAttribute("data-date");
+          });
+       } else if(selectedCells.length < 2){
+              this.classList.add("selected");
+              this.classList.add("selectedCellFocus");
+              selectedCells.push(cell);
+       }  
+      //else {
+      //     // Se já houver 2 células selecionadas, remova a seleção da primeira
+      //     if (selectedCells.length === 2) {
+      //         var firstSelectedCell = selectedCells.shift();
+      //         firstSelectedCell.classList.remove("selected");
+      //         firstSelectedCell.classList.remove("selectedCellFocus");
+      //     }
+      //     // Seleciona a célula atual
+      //     this.classList.add("selected");
+      //     this.classList.add("selectedCellFocus");
+      //     selectedCells.push(cell);
+      // }
+      
+      // Verifica se duas células foram selecionadas para disponibilidade
       if (selectedCells.length === 2) {
-        var startDate = moment(selectedCells[0].getAttribute("data-date"));
-        var endDate = moment(selectedCells[1].getAttribute("data-date"));
+          var startDate = moment(selectedCells[0].getAttribute("data-date"));
+          var endDate = moment(selectedCells[1].getAttribute("data-date"));
 
-        console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
-        console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
+          console.log("Data de início: " + startDate.format("YYYY-MM-DD"));
+          console.log("Data de fim: " + endDate.format("YYYY-MM-DD"));
 
-        // Enviar os dados por meio do callback
-        callback({
-            startDate: startDate.format("YYYY-MM-DD"),
-            endDate: endDate.format("YYYY-MM-DD")
-        });
-
-
-    }
-
-    }
-  });
+          // Enviar os dados por meio do callback
+          callback({
+              startDate: startDate.format("YYYY-MM-DD"),
+              endDate: endDate.format("YYYY-MM-DD")
+          });
+      }
+  }
+});
 
   selectedCells.forEach(function(selectedCell) {
 

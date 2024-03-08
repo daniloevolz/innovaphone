@@ -894,11 +894,7 @@ function getDayOfWeekLabel(selectedDate) {
 
         // div container (scroll)
         const container = document.createElement("div")
-<<<<<<< HEAD
         container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","lg:grid-cols-4")
-=======
-        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2",":grid-cols-4")
->>>>>>> 5873d27b1b63211e0e477fad92d15e89c53f180f
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
@@ -1613,17 +1609,10 @@ function getDayOfWeekLabel(selectedDate) {
             const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
 
         const divMainViewDevice = document.createElement("div")
-<<<<<<< HEAD
         divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-start","focus:ring-2","focus:ring-primary-100")
         divMainViewDevice.setAttribute("id", device.id)
         divMainViewDevice.setAttribute("tabindex", "0")
        
-=======
-        divMainViewDevice.setAttribute("tabindex", "0");
-        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-between","hover:bg-dark-100/50","active:bg-dark-100/75","focus:ring-2","focus:ring-primary-100/50","cursor-pointer")
-        divMainViewDevice.setAttribute("id", device.id)
-        const div93 = document.getElementById(device.id);
->>>>>>> 5873d27b1b63211e0e477fad92d15e89c53f180f
         //div retangle 1396
 
         const divButtons = document.createElement("div")

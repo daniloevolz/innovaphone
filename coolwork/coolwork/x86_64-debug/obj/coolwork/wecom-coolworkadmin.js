@@ -9,7 +9,9 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var that = this;
     var devHwId = [];
     var filesID = [];
-    var filesURL = []
+    var filesURL = [];
+    var filesURLFinal;
+
     var getAllClickedWeekDaysActive = true;
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
@@ -1103,18 +1105,20 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 if(item.src == mainImgSrc){
                     nameImg(item.imgName)
                     foundMatch = true 
+                    filesID = []
                     break;
                 }
                 
             }
             if (!foundMatch) {
-                nameImg(mainImgSrc);
+                //nameImg(mainImgSrc);
+                nameImg(filesURLFinal)
             }
 
             callback(mainImgSrc);
 
             that.rem(insideDiv);
-            filesID = []
+            //filesID = []
         });
 
         divSelectImgs.add(img1);
@@ -1132,6 +1136,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         insideDiv.add(divMain);
 
         that.add(insideDiv);
+
+        if (filesID != "") {
+            mainImg.setAttribute("src", start.originalUrl + "/files/" + filesID);
+        }
 
     }
     function makeDivAddDevices(devices){
@@ -3558,6 +3566,9 @@ function startfileUpload() {
     function addFileToFileList(file) {
         // filesID = file.id
 
+        //filesID = []
+        //filesURL = []
+
         if(controlDB){
             // document.getElementById("imgBD").innerHTML = ''
             var divMainImg = document.getElementById("divMainImg")
@@ -3569,7 +3580,8 @@ function startfileUpload() {
             const parts = filesURL.split('?');
             const path = parts[0];
             const pathParts = path.split('/');
-            const filesURLFinal = pathParts[pathParts.length - 1];
+            filesURLFinal = pathParts[pathParts.length - 1];
+            console.log("FILES ID " + filesID)
             console.log("URL CORRETA " + filesURLFinal); 
 
             // var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
