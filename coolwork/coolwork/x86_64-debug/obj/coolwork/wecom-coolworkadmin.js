@@ -361,7 +361,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         btnCreateRoom.addEventListener("click",function(event){
             var viewerGuids = viewers.map(viewer => viewer.viewer_guid);
 
-            const nomeSala = document.getElementById("iptNameRoom").value
+            const nomeSala = iptNameRoom.value
             if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
             makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
                 event.preventDefault()

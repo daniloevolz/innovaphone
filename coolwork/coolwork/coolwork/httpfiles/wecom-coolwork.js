@@ -1017,7 +1017,7 @@ function getDayOfWeekLabel(selectedDate) {
 
                 viewersUsers.slice(0, 6).forEach(function (view) {
                     let avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                    let UIuserPicture = avatar.url(view.sip, 120, userDN);
+                    let UIuserPicture = avatar.url(view.sip, 120, view.cn);
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
