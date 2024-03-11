@@ -169,5 +169,6 @@ Wecom.coolworkTexts = {
         labelAssumed: "Assumido",
         provisioningCodeTitle: "Provisionamento",
         provisioningCodeMsg: "Válido até ",
+        updateRoom: "Sala Atualizada"
     }
 }
