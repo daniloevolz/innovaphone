@@ -609,7 +609,7 @@ new JsonApi("admin").onconnected(function(conn) {
                 });
             }
             if (obj.mt == "InsertRoom") {
-                Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
+                Database.exec("INSERT INTO tbl_room (name, img, creator_guid) VALUES ('" + obj.name + "','" + obj.img + "','" + conn.guid + "') RETURNING id")
                     .oncomplete(function (roomData) {
                         var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
 
@@ -629,10 +629,10 @@ new JsonApi("admin").onconnected(function(conn) {
                                 var queryUpdateDevices = "UPDATE tbl_devices SET room_id = '" + roomID + "' WHERE hwid = '" + d + "'";
                                 //var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
 
-                                Database.exec(queryUpdateDevices)
-                                .oncomplete(function (){
-                                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", result: JSON.stringify(data), src: data.src }));
-                                })
+                                // Database.exec(queryUpdateDevices)
+                                // .oncomplete(function (){
+
+                                // })
                             })
 
                         //     var editors = obj.editor
@@ -644,7 +644,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         // })
                     
                     })
-                    conn.send(JSON.stringify({api: "admin" , mt: "InsertRoomResult"}))
+                    conn.send(JSON.stringify({ api: "admin", mt: "InsertRoomResult", result: JSON.stringify(data), src: data.src }));
                 })
 
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -652,7 +652,14 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
             }
             if (obj.mt == "SelectAllRoom") { 
-                var querySelectRoom = "SELECT * FROM tbl_room ";
+                //var querySelectRoom = "SELECT * FROM tbl_room ";
+                var querySelectRoom;
+                if (obj.deleted) {
+                    querySelectRoom = "SELECT * FROM tbl_room ";
+                } else {
+                    //Query para Salas Não Excluídas
+                    querySelectRoom = "SELECT * FROM tbl_room WHERE deleted IS NULL;";
+                }
                 var querySelectDevices = "SELECT * FROM tbl_devices";
                 var querySelectRoomAvailability = "SELECT * FROM tbl_room_availability"; 
                 var queryEditorsRoom = "SELECT * FROM tbl_room_editors"; 
@@ -719,12 +726,13 @@ new JsonApi("admin").onconnected(function(conn) {
                     });
             } 
             if (obj.mt == "DeleteRoom") {
+                var now = getDateNow();
                 var roomId = obj.id;
                 var queryUpdateDevices = "UPDATE tbl_devices SET room_id = NULL WHERE room_id = " + roomId + ";";
                 Database.exec(queryUpdateDevices)
                     .oncomplete(function (updateResult) {
                         if (updateResult) {
-                            Database.exec("DELETE FROM tbl_room WHERE id = " + roomId)
+                            Database.exec("UPDATE tbl_room SET deleted_guid = '"+ conn.guid + "', deleted = '"+ now + "' WHERE id = " + roomId)
                                 .oncomplete(function (deleteResult) {
                                     log("DeleteRoom: Sala excluída com sucesso");
                                     conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomSuccess" }));
@@ -754,45 +762,88 @@ new JsonApi("admin").onconnected(function(conn) {
                 });
             }
             if (obj.mt == "UpdateRoom") {
-                var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
-                Database.exec(sqlUpdate)
-                    .oncomplete(function (data) {
-
-                        var viewers = obj.viewer;
-                        var editors = obj.editor;
-
-                        Database.exec("DELETE FROM tbl_room_viewers WHERE room_id = " + obj.roomID)
-                            .oncomplete(function () {
-                                viewers.forEach(function (v) {
-                                    Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + v + "','" + obj.roomID + "')")
-                                        .oncomplete(function () {
-                                            log("InsertViewer:result=success");
-                                        })
-                                });
-
-                                Database.exec("DELETE FROM tbl_room_editors WHERE room_id = " + obj.roomID)
-                                    .oncomplete(function () {
-                                        editors.forEach(function (e) {
-                                            Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + obj.roomID + "')")
-                                                .oncomplete(function () {
-                                                    log("InsertEditor:result=success");
-                                                })
-                                                .onerror(function (error, errorText, dbErrorCode) {
-                                                    log("InsertEditor Result: " + String(errorText));
-                                                });
-                                        });
-
-                                        conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomResult" }));
-                                    })
-                                    .onerror(function (error, errorText, dbErrorCode) {
-                                        log("DeleteEditorsViewers:result=Error " + String(errorText));
-                                    });
+                log("OBJ UPDATE ROOM",JSON.stringify(obj))
+                Database.exec("UPDATE tbl_room SET name = '" + obj.name + "', img = '" + obj.img + "' WHERE id = " + obj.id)
+                .oncomplete(function () {
+                    Database.exec("DELETE FROM tbl_room_viewers WHERE room_id=" + obj.id)
+                    .oncomplete(function(){
+                        var viewers = obj.viewer
+                    
+                        viewers.forEach(function(v){
+                            Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + v + "','" + obj.id + "')")
+                            .oncomplete(function (viewersData){
+                                log("UpdateViewers Success")
                             })
+                        })
                     })
+                        
+                    Database.exec("DELETE FROM tbl_devices WHERE room_id=" + obj.id)
+                    .oncomplete(function(){
+                        var devices = obj.device
+                        devices.forEach(function(d){
+                            Database.exec( "INSERT INTO tbl_devices SET room_id = '" + obj.id + "' WHERE hwid = '" + d + "'")
+                            //var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
+
+                            // Database.exec(queryUpdateDevices)
+                            // .oncomplete(function (){
+
+                            // })
+                        })
+                    })
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomResult" }));
+                    // var roomID = roomData[0].id;  // revisar essa parte dos viewers e editors e refazer
+
+                    // Database.exec("UPDATE INTO tbl_room_availability (type, data_start, data_end, schedule_module, timestart_monday, timeend_monday, timestart_tuesday ,timeend_tuesday, timestart_wednesday, timeend_wednesday, timestart_thursday, timeend_thursday, timestart_friday, timeend_friday, timestart_saturday, timeend_saturday, timestart_sunday, timeend_sunday , room_id ) VALUES ('" + obj.type + "','" + obj.dateStart + "','" + obj.dateEnd + "','" + obj.schedule + "','" + obj.startMonday + "','" + obj.endMonday + "','" + obj.startTuesday + "','" + obj.endTuesday + "','" + obj.startWednesday + "','" +  obj.endWednesday + "','" + obj.startThursday + "','" + obj.endThursday + "','"  + obj.startFriday + "','" + obj.endFriday + "','" + obj.startSaturday + "','" +  obj.endSaturday + "','" + obj.startSunday + "','" + obj.endSunday + "','" + roomID + "')")
+                    // .oncomplete(function (scheduleData) {
+                        
+                    // })
+
+                })
+
                     .onerror(function (error, errorText, dbErrorCode) {
-                        log("UpdateRoomResult:result=Error " + String(errorText));
+                        log("Erro ao inserir na tbl_room: " + String(errorText));
                     });
             }
+            // if (obj.mt == "UpdateRoom") {
+            //     var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "' WHERE room_id = '" + obj.roomID + "'";
+            //     Database.exec(sqlUpdate)
+            //         .oncomplete(function (data) {
+
+            //             var viewers = obj.viewer;
+            //             var editors = obj.editor;
+
+            //             Database.exec("DELETE FROM tbl_room_viewers WHERE room_id = " + obj.roomID)
+            //                 .oncomplete(function () {
+            //                     viewers.forEach(function (v) {
+            //                         Database.exec("INSERT INTO tbl_room_viewers (viewer_guid, room_id) VALUES ('" + v + "','" + obj.roomID + "')")
+            //                             .oncomplete(function () {
+            //                                 log("InsertViewer:result=success");
+            //                             })
+            //                     });
+
+            //                     Database.exec("DELETE FROM tbl_room_editors WHERE room_id = " + obj.roomID)
+            //                         .oncomplete(function () {
+            //                             editors.forEach(function (e) {
+            //                                 Database.exec("INSERT INTO tbl_room_editors (editor_guid, room_id) VALUES ('" + e + "','" + obj.roomID + "')")
+            //                                     .oncomplete(function () {
+            //                                         log("InsertEditor:result=success");
+            //                                     })
+            //                                     .onerror(function (error, errorText, dbErrorCode) {
+            //                                         log("InsertEditor Result: " + String(errorText));
+            //                                     });
+            //                             });
+
+            //                             conn.send(JSON.stringify({ api: "admin", mt: "UpdateRoomResult" }));
+            //                         })
+            //                         .onerror(function (error, errorText, dbErrorCode) {
+            //                             log("DeleteEditorsViewers:result=Error " + String(errorText));
+            //                         });
+            //                 })
+            //         })
+            //         .onerror(function (error, errorText, dbErrorCode) {
+            //             log("UpdateRoomResult:result=Error " + String(errorText));
+            //         });
+            // }
             if (obj.mt == "UpdateRoomAvailability") {
                 var sqlUpdate = "UPDATE tbl_room_availability SET data_start = '" + obj.datastart + "', data_end = '" + obj.dataend + "', schedule_module = '" + obj.schedModule +  "' WHERE room_id = '" + obj.roomID + "'";
                 Database.exec(sqlUpdate)

@@ -215,6 +215,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "UpdateRoomAvailabilityResult"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
+        if(obj.api == "admin" && obj.mt == "UpdateRoomResult"){
+            console.log("OBJ Update Room",obj)
+            makePopUp("Aviso","A sala XXX foi atualizada",texts.text("labelOk")).addEventListener("click",function(event){
+                event.preventDefault()
+                event.stopPropagation()
+                app.send({api:"admin", mt:"SelectAllRoom"})
+            })
+            
+        }
     } 
 
     //#region CRIAÇÃO DE SALA
@@ -1694,8 +1703,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
          labelEditRoom.textContent = texts.text("labelEditRoom")
          const btnEditRoom = makeButton(texts.text("labelEdit"),"primary","")
          btnEditRoom.addEventListener("click",function(ev){
-            makeDivEditRoom(room.name,avail.type)
-            console.log("EDITAR A SALA TODA")
+            makeDivEditRoom(room,avail, devices, viewers)
+            console.log("EDITAR A room TODA", room)
+            console.log("EDITAR A avail TODA", avail)
+            console.log("EDITAR A devices TODA", devices)
+            console.log("EDITAR A viewers TODA", viewers)
          })
 
         divHourSchedule.appendChild(labelHourSchedule)
@@ -3028,7 +3040,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //#endregion FUNÇÕES INTERNAS
 
     //#region EDIÇÃO DE SALA
-    function makeDivEditRoom(nameRoom,type){
+    function makeDivEditRoom(room, avail, devices, viewers){
         that.clear()
         const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
         makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
@@ -3039,8 +3051,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
         const labelNameRoom = document.createElement("div")
         labelNameRoom.textContent = texts.text("labelNameRoom")
-        const iptNameRoom = makeInput(nameRoom,"text","")
-        iptNameRoom.value = nameRoom
+        const iptNameRoom = makeInput(room.name,"text","")
+        iptNameRoom.value = room.name
         iptNameRoom.id = "iptNameRoom"
         // imagem da sala
         const divImgRoom = document.createElement("div")
@@ -3061,12 +3073,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const labelTypeRoom = document.createElement("div")
         labelTypeRoom.textContent = texts.text("labelTypeRoom")
 
-        var typeRoom = type;
+        var typeRoom = avail.type;
 
         var btnPeriod;
         var btnRecurrent;
 
-        if(type == 'periodType'){
+        if(typeRoom == 'periodType'){
             btnPeriod = makeButton(texts.text("labelPeriod"),"secundary","")
             btnPeriod.id = "periodType"
             btnRecurrent = makeButton(texts.text("labelRecurrent"),"tertiary","")
@@ -3089,10 +3101,17 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 typeRoom = selectedButton.id
             });
         });
-                
-    
+        var filtredView = viewers.filter(function(v){
+            return v.room_id === room.id
+        })
+        var filtredDev = devices.filter(function(d){
+            return d.room_id === room.id
+        })
+        console.log("Erick edit View",filtredView)
+        console.log("Erick edit Dev",filtredDev)
+
         // usuarios
-        var viewers = []
+        var viewers = filtredView
         const divUsersRoom = document.createElement("div")
         divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         const labelUsersRoom = document.createElement("div")
@@ -3133,7 +3152,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divBtnAddDevices.addEventListener("click",function(){
             console.log("Abrir div add devices")
             app.send({api:"admin", mt:"SelectDevices"})
-            // makeDivAddDevices()
+            makeDivAddDevices(filtredDev)
         })
         //appends
         divNameRoom.appendChild(labelNameRoom)
@@ -3173,7 +3192,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             })      
             }
             if(typeRoom == "periodType"){
-                app.send({ api: "admin", mt: "InsertRoom", 
+                app.send({ api: "admin", mt: "UpdateRoom", 
+                id: room.id,
                 name: nomeSala, 
                 img: imgRoom, 
                 dateStart: dateAvailability[0].start, 
@@ -3214,7 +3234,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 // Envie uma única mensagem com todos os horários de disponibilidade combinados
                 app.send({
                     api: "admin",
-                    mt: "InsertRoom",
+                    mt: "UpdateRoom",
                     name: nomeSala,
                     img: imgRoom,
                     type: typeRoom,
