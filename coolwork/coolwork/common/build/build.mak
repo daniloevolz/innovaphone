@@ -7,4 +7,3 @@ endif
 
 temp = $(subst -,_,$(RELEASESTATE))
 cflags += -DDBG_FLAG_$(subst :, -DDBG_FLAG_,$(temp))
-CFLAGS += -DDBG_FLAG_$(subst :, -DDBG_FLAG_,$(temp))

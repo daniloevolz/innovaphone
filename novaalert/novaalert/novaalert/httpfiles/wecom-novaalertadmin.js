@@ -14,7 +14,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var that = this;
     var avatar = start.consumeApi("com.innovaphone.avatar");
 
+
     var iptUrl = "";
+    var iptServerEnable = "";
+    var iptMethod = "";
     var googlekey = "";
     var list_buttons = [];
     var list_actions = [];
@@ -92,6 +95,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "AdminMessageResult") {
             iptUrl = obj.urlalert;
             googlekey = obj.googlekey;
+            iptServerEnable = obj.urlenable;
+            iptMethod = obj.method;
 
         }
         if (obj.api == "admin" && obj.mt == "MessageError") {
@@ -1639,11 +1644,22 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         //Título
         t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
-        
-        t.add(new innovaphone.ui1.Div(null, texts.text("labelURLNovaAlert"),"labelUrlNovaAlert"));
-        var iptUrlNovaAlert = t.add(new innovaphone.ui1.Input(null, null, texts.text("urlText"), 255, "url","iptUrlNovaAlert"));
-        iptUrlNovaAlert.setAttribute("id", "inputNovaAlert")
-        iptUrlNovaAlert.setValue(iptUrl);
+        // chekbox
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelServerEnable"), "labelServerEnable"));
+        var inputptServerEnable = t.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "iptServerEnable"));
+        inputptServerEnable.setAttribute("id", "iptServerEnable")
+        inputptServerEnable.setValue(iptServerEnable);
+        // url
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelURL"),"labelUrl"));
+        var inputUrl = t.add(new innovaphone.ui1.Input(null, null, texts.text("urlText"), 255, "url","iptUrl"));
+        inputUrl.setAttribute("id", "inputUrl")
+        inputUrl.setValue(iptUrl);
+        // metodo
+        t.add(new innovaphone.ui1.Div(null, texts.text("labelMethod"), "labelMethod"));
+        var inputMethod = t.add(new innovaphone.ui1.Input(null, null, texts.text("urlText"), 10, "text", "inputMethod"));
+        inputMethod.setAttribute("id", "inputMethod")
+        inputMethod.setValue(iptMethod);
+        // chave google
         t.add(new innovaphone.ui1.Div(null, texts.text("labelGoogleKey"),"labelGoogleKey"));
         var iptGoogleKey = t.add(new innovaphone.ui1.Input(null, null, texts.text("urlText"), 255, "url", "iptGoogleKey"));
         iptGoogleKey.setAttribute("id", "inputGoogle")
@@ -1651,8 +1667,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:30%; top:90%; font-size:12px; text-align:center", null, "button-inn")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "googlekey", vl: String(iptGoogleKey.getValue()) });
-            app.send({ api: "admin", mt: "UpdateConfig", prt: "urlalert", vl: String(iptUrlNovaAlert.getValue()) });
-            iptUrl = String(iptGoogleKey.getValue());
+            app.send({ api: "admin", mt: "UpdateConfig", prt: "urlalert", vl: String(inputUrl.getValue()), method: inputMethod.getValue(), urlenable: inputptServerEnable.getValue() });
+            //iptUrl = String(iptGoogleKey.getValue());
         });
         
     }

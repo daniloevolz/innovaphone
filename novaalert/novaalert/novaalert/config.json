@@ -17,6 +17,11 @@
           },
           {
             "cmd": "column",
+            "name": "from",
+            "type": "VARCHAR(120)"
+          },
+          {
+            "cmd": "column",
             "name": "name",
             "type": "VARCHAR(120)"
 
@@ -264,6 +269,20 @@
         "name": "urlalert",
         "type": "STRING",
         "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlmethod",
+        "type": "STRING",
+        "default": "POST",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlenable",
+        "type": "BOOLEAN",
+        "default": "false",
         "password": false
       },
       {

@@ -8,6 +8,8 @@ if (licenseAppToken == "") {
 var license = getLicense();
 
 var urlalert = Config.urlalert;
+var urlmethod = Config.urlmethod;
+var urlenable = Config.urlenable;
 var urlPhoneApiEvents = Config.urlPhoneApiEvents;
 var sendCallEvents = Config.sendCallEvents;
 var google_api_key = Config.googleApiKey;
@@ -33,6 +35,8 @@ var count = 0;
 
 Config.onchanged(function () {
     urlalert = Config.urlalert;
+    urlmethod = Config.urlmethod;
+    urlenable = Config.urlenable;
     sendCallEvents = Config.sendCallEvents;
     urlPhoneApiEvents = Config.urlPhoneApiEvents;
     google_api_key = Config.googleApiKey;
@@ -124,7 +128,7 @@ new JsonApi("user").onconnected(function (conn) {
                     log("connectionsUser: connectionsUser.length " + connectionsUser.length);
                     if (connectionsUser.length > 0) {
                         var foundConn = connectionsUser.filter(function (c) { return c.session == obj.session });
-                        if (!foundConn) {
+                        if (foundConn == "") {
                             log("connectionsUser: not found conn");
                             conn["session"] = obj.session;
                             connectionsUser.push(conn);
@@ -326,7 +330,18 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "TriggerAlert") {
                     //trigger the Novalink server
-                    callNovaAlert(parseInt(obj.prt), conn.sip);
+                    if (urlenable == true) {
+                        callHTTPSServer(parseInt(obj.prt), conn.sip);
+                    }
+                    
+
+                    // Tratar o evento internamente
+                    //var value = '{"From":"${conn.sip}","AlarmID":"${obj.AlarmID}"}'
+                    //ECMA5
+                    // Criar a string JSON substituindo as variáveis manualmente
+                    var value = '{"From":"' + conn.sip + '", "AlarmID":"' + obj.prt + '"}';
+
+                    alarmReceived(value);
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
              
@@ -497,7 +512,7 @@ new JsonApi("admin").onconnected(function (conn) {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src, urlalert: urlalert, googlekey: google_api_key }));
+                conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src, urlalert: urlalert, urlmethod: urlmethod, urlenable: urlenable, googlekey: google_api_key }));
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
@@ -508,6 +523,8 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "UpdateConfig") {
                 if (obj.prt == "urlalert") {
                     Config.urlalert = obj.vl;
+                    Config.urlmethod = obj.method;
+                    Config.urlenable = obj.urlenable;
                     Config.save();
                 }
                 if (obj.prt == "googlekey") {
@@ -1911,9 +1928,10 @@ function handleDisconnect(callid, state, timeNow, sip, sendCallEvents) {
     })
 }        
 
-function callNovaAlert(alert, sip) {
-    log("callNovaAlert::");
+function callHTTPSServer(alert, sip) {
+    log("callHTTPSServer::");
     var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(sip), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
+    //var msg = urlbody;
     httpClient(urlalert, msg);
 }
 
@@ -2059,8 +2077,8 @@ function alarmReceived(value) {
     try {
         var obj = JSON.parse(bodyDecoded);
         var location = "";
-        if (obj.User) {
-            obj.User.forEach(function (user) {
+        if (obj.To) {
+            obj.To.forEach(function (user) {
                 //USER PARAMETER PRESENT
                 if (obj.Location) {
                     try {
@@ -2075,7 +2093,7 @@ function alarmReceived(value) {
                         connectionsUser.forEach(function (conn) {
                             //var ws = conn.ws;
                             log("danilo-req alarmReceived:Location conn.sip " + String(conn.sip));
-                            log("danilo-req alarmReceived:Location obj.User " + String(user));
+                            log("danilo-req alarmReceived:Location obj.To " + String(user));
                             if (String(conn.sip) == String(user)) {
                                 
                                 //Send notifications
@@ -2099,7 +2117,7 @@ function alarmReceived(value) {
                         log("danilo-req alarmReceived:Location1 User " + String(user));
                         connectionsUser.forEach(function (conn) {
                             log("danilo-req alarmReceived:Location1 conn.sip " + String(conn.sip));
-                            log("danilo-req alarmReceived:Location1 obj.User " + String(user));
+                            log("danilo-req alarmReceived:Location1 obj.To " + String(user));
                             if (String(conn.sip) == String(user)) {
                                 //Send notifications
                                 conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
@@ -2113,16 +2131,16 @@ function alarmReceived(value) {
                 //Intert into DB the event
                 log("danilo req: insert into DB = user " + user);
                 var today = getDateNow();
-                var msg = { sip: user, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
+                var msg = { sip: user, from: obj.From, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
                 log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                 insertTblActivities(msg);
 
                 connectionsUser.forEach(function (conn) {
                     //Send notifications
                     log("danilo-req alarmReceived:conn.sip " + String(conn.sip));
-                    log("danilo-req alarmReceived:obj.User " + String(user));
+                    log("danilo-req alarmReceived:obj.To " + String(user));
                     if (String(conn.sip) == String(user)) {
-                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.Sip }));
+                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.From }));
                         //update badge Icon
                         updateTableBadgeCount(user, "IncrementCount");
                     }
@@ -2131,10 +2149,9 @@ function alarmReceived(value) {
                 triggerAction(user, obj.AlarmID, "alarm");
  
             })
-            
         }
         else {
-            //SEM USUÁRIO DEFINIDO
+            //SEM USUÁRIO DESTINO DEFINIDO
             var found;
             if (obj.Location) {
                 try {
@@ -2145,7 +2162,7 @@ function alarmReceived(value) {
                     var locationarray = myArray[1].split(",");
                     var x = locationarray[0];
                     var y = locationarray[1];
-                    //log("danilo-req alarmReceived:Location User " + String(obj.User));
+                    //log("danilo-req alarmReceived:Location User " + String(obj.To));
                     connectionsUser.forEach(function (conn) {
                         //Intert into DB the event
                         log("danilo req: insert into DB = user " + conn.sip);
@@ -2157,7 +2174,7 @@ function alarmReceived(value) {
                         //Send notifications
                         //updateTableBadgeCount(conn.sip, "IncrementCount");
                         log("danilo-req alarmReceived:Location conn.sip " + String(conn.sip));
-                        //log("danilo-req alarmReceived:Location obj.User " + String(obj.User));
+                        //log("danilo-req alarmReceived:Location obj.To " + String(obj.To));
                         conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
 
                     });
@@ -2175,7 +2192,7 @@ function alarmReceived(value) {
                     var locationarray = myArray[1].split(",");
                     var x = locationarray[0];
                     var y = locationarray[1];
-                    //log("danilo-req alarmReceived:Location1 User " + String(obj.User));
+                    //log("danilo-req alarmReceived:Location1 User " + String(obj.To));
                     connectionsUser.forEach(function (conn) {
                         //Intert into DB the event
                         log("danilo req: insert into DB = user " + conn.sip);
@@ -2187,7 +2204,7 @@ function alarmReceived(value) {
                         //Send notifications
                         //updateTableBadgeCount(conn.sip, "IncrementCount");
                         log("danilo-req alarmReceived:Location1 notifing user conn.sip " + String(conn.sip));
-                        //log("danilo-req alarmReceived:Location1 obj.User " + String(obj.User));
+                        //log("danilo-req alarmReceived:Location1 obj.To " + String(obj.To));
                         conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
 
                     });
@@ -2201,14 +2218,16 @@ function alarmReceived(value) {
                 if (!found) {
                     log("danilo req: insert into DB = user " + conn.sip);
                     var today = getDateNow();
-                    var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: obj.AlarmID }
+                    var msg = { sip: conn.sip, from: obj.From, name: "alarm", date: today, status: "inc", details: obj.AlarmID, user: obj.To }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
                 //Send notifications
                 log("danilo-req alarmReceived:without User Paramter, notifing all users logged in now " + String(conn.sip));
                 updateTableBadgeCount(conn.sip, "IncrementCount");
-                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.Sip }));
+                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.From }));
+                //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
+                triggerAction(conn.sip, parseInt(obj.AlarmID), "alarm");
             });
         }  
     } catch (e) {
@@ -2398,7 +2417,17 @@ function comboManager(combo, sip, mt) {
                 connectionsUser.forEach(function (conn) {
                     if (String(conn.sip) == String(sip)) {
                         log("danilo-req comboDispatcher:alarm found conn.sip " + String(conn.sip));
-                        callNovaAlert(parseInt(button.button_prt), conn.sip);
+                        if (urlenable == true) {
+                            callHTTPSServer(parseInt(button.button_prt), conn.sip);
+                        }
+                        // Tratar o evento internamente
+                        //var value = '{"From":"${conn.sip}","AlarmID":"${button.button_prt}"}'
+                        //ECMA5
+                        // Criar a string JSON substituindo as variáveis manualmente
+                        var value = '{"From":"' + conn.sip + '", "AlarmID":"' + button.button_prt + '"}';
+
+                        alarmReceived(value);
+                        //triggerAction(conn.sip, parseInt(button.button_prt), button.button_type)
                         conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: button.button_prt, btn_id: button.id }));
                     }
                 });

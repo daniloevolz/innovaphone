@@ -42,6 +42,7 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
     wait();
     var session;
 
+
     function wait() {
         //that.clear();
         //var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center;", null, "bodywaitconnection")

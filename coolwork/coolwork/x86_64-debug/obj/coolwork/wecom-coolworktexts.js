@@ -65,8 +65,6 @@ Wecom.coolworkTexts = {
         labelModuleRoom: "Modelo de Agendamento dos Telefones",
         labelTypeRoom: "Tipo de Sala",
         labelRecurrent: "Recorrente",
-        NoHourSelected: "Nenhum Horário Selecionado",
-        labelNoImageSelected: "Nenhuma Imagem Selecionada",
         labelPeriod: "Período",
         periodModule: "Período do Dia",
         labelScheduleDeleted: "Agendamento Deletado",

@@ -275,7 +275,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
-                makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.Sip +"</p>", 500, 200);
+                makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
                 addNotification('inc', "Alarme " + obj.alarm +" de "+obj.src)
