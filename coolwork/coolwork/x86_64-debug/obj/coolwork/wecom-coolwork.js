@@ -1017,11 +1017,11 @@ function getDayOfWeekLabel(selectedDate) {
 
                 viewersUsers.slice(0, 6).forEach(function (view) {
                     let avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                    let UIuserPicture = avatar.url(view.sip, 120, userDN);
+                    let UIuserPicture = avatar.url(view.sip, 120, view.cn);
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
-                    imgAvatar.classList.add("w-3", "h-3", "sm:w-5", "sm:h-5" ,"rounded-full");
+                    imgAvatar.classList.add("w-4", "h-4", "sm:w-5", "sm:h-5" ,"rounded-full");
                     divUsersAvatar.appendChild(imgAvatar);
                     divMain.appendChild(divUsersAvatar);
                 });

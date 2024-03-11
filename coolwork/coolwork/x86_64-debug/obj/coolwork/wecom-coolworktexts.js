@@ -33,6 +33,8 @@ Wecom.coolworkTexts = {
         labelSelectHour: "Selecione seu horário",
         labelBttCancel: "Cancelar",
         labelTxtCancel: "Cancelar o agendamento",
+        labelNoImageSelected : "Nenhuma Imagem Selecionada",
+        NoHourSelected: "Nenhum Horário Selecionado",
         labelCreateRoom: "Criar Sala",
         labelCreate: "Criar",
         labelSimpleRoomTxt1 : "Entre 2 a 6 dispositivos",
