@@ -8,7 +8,11 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
     var devHwId = [];
+
     var filesID = [];
+    var filesURL = [];
+    var filesURLFinal;
+
     var getAllClickedWeekDaysActive = true;
     var imgBD; // db files variaveis
     var controlDB = false ; // db files variaveis
@@ -18,8 +22,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var phone_list = [] // todos os devices
     var listDeviceRoom = []; 
     var list_AllRoom = []
-    var editors = [];
-    var viewers = [];
+
     var list_RoomSchedule = []
     var list_tableUsers = []
     var userSIP;
@@ -30,6 +33,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     var devices = []
     var availabilities = []
     var schedules = []
+    var editors = [];
+    var viewers = [];
     //var devHwid = []
 
     var checkedUsers = []; 
@@ -180,8 +185,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         if(obj.api == "admin" && obj.mt == "DeleteRoomSuccess"){  
             app.send({api:"admin", mt:"SelectAllRoom"})
         }
-        if(obj.api == "admin" && obj.mt == "UpdateRoomAvailabilityResult"){  
-            app.send({api:"admin", mt:"SelectAllRoom"})
+        if(obj.api == "admin" && obj.mt == "UpdateRoomResult"){
+            console.log("OBJ Update Room",obj)
+            makePopUp("Aviso","A sala XXX foi atualizada",texts.text("labelOk")).addEventListener("click",function(event){
+                event.preventDefault()
+                event.stopPropagation()
+                app.send({api:"admin", mt:"SelectAllRoom"})
+            })
+            
         }
     } 
 
@@ -192,7 +203,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
     that.clear()
     const btnCreateRoom = makeButton(texts.text("labelCreate"),"primary","")
-    makeHeader(backButton,btnCreateRoom,texts.text("labelCreateRoom"))
+    makeHeader(backButton, btnCreateRoom, texts.text("labelCreateRoom"), callbackParaCreateRoomContext, callbackParaMakeDivOptions)
     const divMain = document.createElement("div")
     divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]","gap-1")
     //nome da sala
@@ -498,6 +509,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         buttonCancel.addEventListener("click", function () {
             console.log("Fechar Tela");
             checkedUsers = [];
+            document.getElementById("divUsersToAdd").innerHTML = ''
             document.body.removeChild(insideDiv);
         });
     
@@ -517,6 +529,22 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             if (!algumMarcado) {
                 checkboxAllUsers.checked = false;
             }
+
+             // Adiciona ou remove todos os usuários da lista de usuários selecionados
+                if (isChecked) {
+                    // Se o checkbox "Selecionar Todos os Usuários" está marcado, adiciona todos os usuários ao checkedUsers
+                    checkedUsers = list_tableUsers.map(user => {
+                        return {
+                            viewer_guid: user.guid,
+                            sip: user.sip,
+                            cn: user.cn
+                        };
+                    });
+                } else {
+                    // Se o checkbox "Selecionar Todos os Usuários" está desmarcado, limpa o checkedUsers
+                    checkedUsers = [];
+                }
+
         });
     
         const buttonConfirm = makeButton(texts.text("labelConfirm"), "primary", "");
@@ -1050,7 +1078,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         getAllClickedWeekDays(daysSelected);
         
     }
-    function makeDivChooseImage(callback){
+    function makeDivChooseImage(callback,nameImg){
         // filesID = [] // limpeza
         controlDB = false
         const insideDiv = new innovaphone.ui1.Div(null, null, "bg-black bg-opacity-50 justify-center items-center absolute h-full w-full top-0 flex");
@@ -1065,21 +1093,28 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     
         const divSelectImgs = new innovaphone.ui1.Div(null,null,"flex w-full items-start gap-1 flex-row");
 
-        const img1 = createImage('./images/MESA-1.png');
-        const img2 = createImage('./images/MESA-2.png');
-        const img3 = createImage('./images/MESA-3.png');
+        const imgNameMap = [
+            {src: './images/MESA-1.png' , imgName: "MESA-1" },
+            {src: './images/MESA-2.png' , imgName: "MESA-2" },
+            {src: './images/MESA-3.png' , imgName: "MESA-3" }
+        ]
+        
+        const img1 = createImage(imgNameMap[0].src);
+        const img2 = createImage(imgNameMap[1].src);
+        const img3 = createImage(imgNameMap[2].src);
 
         img1.addEvent("click", function (event) {
-            addBorderAndChangeImage(img1, mainImg, './images/MESA-1.png');
+            addBorderAndChangeImage(img1, mainImg, imgNameMap[0].src);
         });
     
         img2.addEvent("click", function (event) {
-            addBorderAndChangeImage(img2, mainImg, './images/MESA-2.png');
+            addBorderAndChangeImage(img2, mainImg, imgNameMap[1].src);
         });
     
         img3.addEvent("click", function (event) {
-            addBorderAndChangeImage(img3, mainImg, './images/MESA-3.png');
+            addBorderAndChangeImage(img3, mainImg, imgNameMap[2].src);
         });
+
         const divIptImage = new innovaphone.ui1.Div(null,null,"flex p-1 justify-between items-center rounded-lg bg-dark-200");
         const labelImportImg = new innovaphone.ui1.Div(null, texts.text("labelImportImg"));
         const customFileInput = new innovaphone.ui1.Node("label",null,texts.text("labelChoose"),"bg-dark-300 hover:bg-dark-400 text-primary-600 font-bold py-1 px-2 rounded-lg cursor-pointer");
@@ -1102,13 +1137,30 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             that.rem(insideDiv);
             console.log("Files ID " + filesID)
             deleteFile(filesID) 
+            filesID = []
         });
         const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
         buttonConfirm.addEvent("click", function () {
-            var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")
+            var mainImgSrc = document.getElementById("divMainImg").getAttribute("src")  
+            var foundMatch = false  
+            for (const item of imgNameMap) {
+                if(item.src == mainImgSrc){
+                    nameImg(item.imgName)
+                    foundMatch = true 
+                    filesID = []
+                    break;
+                }
+                
+            }
+            if (!foundMatch) {
+                //nameImg(mainImgSrc);
+                nameImg(filesURLFinal)
+            }
+
             callback(mainImgSrc);
+
             that.rem(insideDiv);
-            filesID = []
+            //filesID = []
         });
 
         divSelectImgs.add(img1);
@@ -1126,6 +1178,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         insideDiv.add(divMain);
 
         that.add(insideDiv);
+
+        if (filesID != "") {
+            mainImg.setAttribute("src", start.originalUrl + "/files/" + filesID);
+        }
 
     }
     function makeDivAddDevices(devices){
@@ -1275,6 +1331,16 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             if (!algumMarcado) {
                 checkboxAllDevices.checked = false;
             }
+
+            if (isChecked) {
+                // Se o checkbox "Selecionar Todos os Dispositivos" está marcado, adiciona todos os dispositivos ao checkedDevices
+                checkedDevices = devices.map(dev => dev.hwid);
+            } else {
+                // Se o checkbox "Selecionar Todos os Dispositivos" está desmarcado, limpa o checkedDevices
+                checkedDevices = [];
+            }
+
+            
         });
         
         
@@ -2604,10 +2670,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
 
         return
     }
-
-
-
-
     // função de visualização dos devices da sala
     function makeViewDevice(divMain,device){
          //div 93
@@ -2767,7 +2829,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divMainUsers.appendChild(checkboxUser);
         return divMainUsers;
     }
-    
     
     function createDeviceElement(device) {
         const divMainDevice = document.createElement("div");
