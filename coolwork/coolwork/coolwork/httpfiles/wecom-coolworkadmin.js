@@ -348,6 +348,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         document.body.appendChild(divMain)
 
         btnCreateRoom.addEventListener("click",function(event){
+            var viewerGuids = viewers.map(viewer => viewer.viewer_guid);
+
             const nomeSala = document.getElementById("iptNameRoom").value
             if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
             makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
@@ -364,7 +366,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 dateEnd: dateAvailability[0].end, 
                 type: typeRoom, 
                 schedule: typeSchedule, 
-                viewer: viewers,
+                viewer: viewerGuids,
                 device : devHwId
                 }); //viewer: viewer 
             }else if (typeRoom == "recurrentType") {
@@ -403,20 +405,6 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     img: imgRoom,
                     type: typeRoom,
                     schedule: typeSchedule,
-                    //startMonday: combinedAvailability.startMonday.join(", "),
-                    //startTuesday: combinedAvailability.startTuesday.join(", "),
-                    //startWednesday: combinedAvailability.startWednesday.join(", "),
-                    //startThursday: combinedAvailability.startThursday.join(", "),
-                    //startFriday: combinedAvailability.startFriday.join(", "),
-                    //startSaturday: combinedAvailability.startSaturday.join(", "),
-                    //startSunday: combinedAvailability.startSunday.join(", "),
-                    //endMonday: combinedAvailability.endMonday.join(", "),
-                    //endTuesday: combinedAvailability.endTuesday.join(", "),
-                    //endWednesday: combinedAvailability.endWednesday.join(", "),
-                    //endThursday: combinedAvailability.endThursday.join(", "),
-                    //endFriday: combinedAvailability.endFriday.join(", "),
-                    //endSaturday: combinedAvailability.endSaturday.join(", "),
-                    //endSunday: combinedAvailability.endSunday.join(", "),
                     startMonday: combinedAvailability.startMonday,
                     startTuesday: combinedAvailability.startTuesday,
                     startWednesday: combinedAvailability.startWednesday,
@@ -431,7 +419,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     endFriday: combinedAvailability.endFriday,
                     endSaturday: combinedAvailability.endSaturday,
                     endSunday: combinedAvailability.endSunday,
-                    viewer: viewers,
+                    viewer: viewerGuids,
                     device: devHwId
                 });
             }
