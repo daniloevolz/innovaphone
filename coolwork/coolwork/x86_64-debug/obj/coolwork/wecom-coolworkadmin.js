@@ -190,12 +190,14 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelImgRoom = document.createElement("div")
     labelImgRoom.textContent = texts.text("labelImageRoom")
+    const divBtnChoose = document.createElement("div")
+    divBtnChoose.classList.add("flex") 
     const nameImgDiv = document.createElement("div")
     nameImgDiv.textContent = texts.text("labelNoImageSelected")
-    const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+    const BtnChoose = makeButton(texts.text("labelChoose"),"primary","")
     var imgRoom;
 
-    divBtnChoose.addEventListener("click",function(){
+    BtnChoose.addEventListener("click",function(){
         console.log("Abrir Div Escolher Imagem")
         makeDivChooseImage(function(selectedImg){ //callback da função
             imgRoom = selectedImg
@@ -285,8 +287,10 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divNameRoom.appendChild(labelNameRoom)
     divNameRoom.appendChild(iptNameRoom)
     divImgRoom.appendChild(labelImgRoom)
-    divImgRoom.appendChild(nameImgDiv)
+    divBtnChoose.appendChild(nameImgDiv)
+    divBtnChoose.appendChild(BtnChoose)
     divImgRoom.appendChild(divBtnChoose)
+  
 
     divButtons.appendChild(btnPeriod)
     divButtons.appendChild(btnRecurrent)
@@ -1096,6 +1100,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             that.rem(insideDiv);
             console.log("Files ID " + filesID)
             deleteFile(filesID) 
+            filesID = []
         });
         const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
         buttonConfirm.addEvent("click", function () {
