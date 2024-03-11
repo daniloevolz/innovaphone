@@ -186,7 +186,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     const btnCreateRoom = makeButton(texts.text("labelCreate"),"primary","")
     makeHeader(backButton,btnCreateRoom,texts.text("labelCreateRoom"))
     const divMain = document.createElement("div")
-    divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+    divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]","gap-1")
     //nome da sala
     const divNameRoom = document.createElement("div")
     divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
@@ -200,7 +200,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     const labelImgRoom = document.createElement("div")
     labelImgRoom.textContent = texts.text("labelImageRoom")
     const divBtnChoose = document.createElement("div")
-    divBtnChoose.classList.add("flex") 
+    divBtnChoose.classList.add("flex","items-center","gap-1") 
     const nameImgDiv = document.createElement("div")
     nameImgDiv.textContent = texts.text("labelNoImageSelected")
     const BtnChoose = makeButton(texts.text("labelChoose"),"primary","")
@@ -245,6 +245,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelUsersRoom = document.createElement("div")
     labelUsersRoom.textContent = texts.text("labelUsers")
+    const divShowUsers = document.createElement("div")
+    divShowUsers.classList.add("flex","items-center","gap-1") 
     const divUsersToAdd = document.createElement("div")
     divUsersToAdd.id = "divUsersToAdd"
     const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
@@ -262,9 +264,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     divHourSchedule.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
     const labelHourSchedule = document.createElement("div")
     labelHourSchedule.textContent = texts.text("labelHourSchedule")
+
+    const divShowHour = document.createElement("div")
+    divShowHour.classList.add("flex","items-center","gap-1") 
+
     const divShowHourAvailability = document.createElement("div")
     divShowHourAvailability.textContent = texts.text("NoHourSelected")
-    divShowHourAvailability.classList.add("flex")
+    divShowHourAvailability.classList.add("flex","items-center","gap-1")
     const btnMakeCalendar = makeButton(texts.text("labelEdit"),"primary","")
     var typeSchedule;
     var dateAvailability;
@@ -311,11 +317,15 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     // divTypeSchedule.appendChild(btnDaySchedule) colocar na tela de agendamento
     // divTypeSchedule.appendChild(btnHourSchedule) colocar na tela de agendamento
     divUsersRoom.appendChild(labelUsersRoom)
-    divUsersRoom.appendChild(divUsersToAdd)
-    divUsersRoom.appendChild(divBtnAddUsers)
+    divShowUsers.appendChild(divUsersToAdd)
+    divShowUsers.appendChild(divBtnAddUsers)
+    divUsersRoom.appendChild(divShowUsers)
     divHourSchedule.appendChild(labelHourSchedule)
-    divHourSchedule.appendChild(divShowHourAvailability)
-    divHourSchedule.appendChild(btnMakeCalendar)
+
+    divShowHour.appendChild(divShowHourAvailability)
+    divShowHour.appendChild(btnMakeCalendar)
+    divHourSchedule.appendChild(divShowHour)
+
     divAddDevices.appendChild(labelAddDevices)
     divAddDevices.appendChild(divBtnAddDevices)
 
@@ -1795,7 +1805,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
-                    imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+                    imgAvatar.classList.add("w-3", "h-3", "sm:w-5", "sm:h-5" ,"rounded-full");
                     divUsersAvatar.appendChild(imgAvatar);
                     divMain.appendChild(divUsersAvatar);
                 });
@@ -2721,7 +2731,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             makeDivOptions()
         })
         const divMain = document.createElement("div")
-        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]", "gap-1")
         // cor primária
         const divPrimaryColor = document.createElement("div")
         divPrimaryColor.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full")
@@ -2805,7 +2815,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             makeViewRoom(rooms, devices, availabilities, viewers)
         })
         const divMain = document.createElement("div")
-        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
+        divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]", "gap-1")
         // criar sala
         const divMakeRoom = document.createElement("div")
         divMakeRoom.classList.add("flex", "p-1", "items-center", "gap-1", "rounded-lg", "bg-dark-200", "w-full","cursor-pointer")
@@ -2880,7 +2890,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             makeDivOptions()
         })
         const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]","gap-1")
         
           // div criar do zero 
           const makeFromZero = document.createElement("div")
@@ -3009,7 +3019,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
         makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
         const divMain = document.createElement("div")
-        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
+        divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[20px]" ,"md:mx-[100px]" ,"lg:mx-[200px]","gap-1")
         //nome da sala
         const divNameRoom = document.createElement("div")
         divNameRoom.classList.add("flex","p-1","flex-col","items-start","gap-1","bg-dark-200","rounded-lg","w-full")
@@ -3116,7 +3126,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divBtnAddDevices.addEventListener("click",function(){
             console.log("Abrir div add devices")
             app.send({api:"admin", mt:"SelectDevices"})
-            makeDivAddDevices(filtredDev)
+            //makeDivAddDevices(filtredDev)
         })
         //appends
         divNameRoom.appendChild(labelNameRoom)
@@ -3220,7 +3230,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                     viewer: viewers,
                     device: devHwId
                 });
-            }
+        }
             
     //     //     // app.send({ api: "admin", mt: "InsertRoom", 
     //     //     // name: nameRoom, 
@@ -3231,8 +3241,8 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     //     //     // schedule: optModule, 
     //     //     // editor: editor, 
     //     //     // viewer: viewer });
-    //     // })
-    //     }
+             })
+        }
     //#endregion
     
     //#region Drag and Drop Functions
