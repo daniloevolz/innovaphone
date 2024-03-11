@@ -1138,6 +1138,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             console.log("Files ID " + filesID)
             deleteFile(filesID) 
             filesID = []
+            nameImg("")
         });
         const buttonConfirm = new innovaphone.ui1.Node("button","",texts.text("labelConfirm"),"bg-primary-600 hover:bg-primary-500  text-dark-100  font-medium  py-1 px-2 rounded-lg primary")
         buttonConfirm.addEvent("click", function () {
@@ -4014,11 +4015,24 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function addFileToFileList(file) {
         // filesID = file.id
 
+        //filesID = []
+        //filesURL = []
+
         if(controlDB){
             // document.getElementById("imgBD").innerHTML = ''
             var divMainImg = document.getElementById("divMainImg")
             divMainImg.setAttribute("src",start.originalUrl + "/files/" + file.id)
             filesID = file.id
+            
+            filesURL = file.url
+        
+            const parts = filesURL.split('?');
+            const path = parts[0];
+            const pathParts = path.split('/');
+            filesURLFinal = pathParts[pathParts.length - 1];
+            console.log("FILES ID " + filesID)
+            console.log("URL CORRETA " + filesURLFinal); 
+
             // var imgFile = imgBD.add(new innovaphone.ui1.Node("img","width:100%;height:200px",null,null).setAttribute("id","imgBDFile"))
             // imgFile.setAttribute("src",start.originalUrl + "/files/" + file.id)
             // var delButton = new innovaphone.ui1.Div(null, null, "button")
