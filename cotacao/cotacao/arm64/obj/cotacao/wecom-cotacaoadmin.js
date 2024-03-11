@@ -36,7 +36,7 @@ Wecom.cotacaoAdmin = Wecom.cotacaoAdmin || function (start, args) {
 
     //B3
     var labelB3 = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelB3Admin")))
-    var labelChkB3 = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:15%; font-size:15px; text-align:right", texts.text("labelCheckLink")));
+    //var labelChkB3 = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:15%; font-size:15px; text-align:right", texts.text("labelCheckLink")));
 
     var labelURLB3 = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:20%; font-size:15px; text-align:right", texts.text("labelURLb3")));
     var iptUrlB3 = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:20%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));
@@ -48,7 +48,7 @@ Wecom.cotacaoAdmin = Wecom.cotacaoAdmin || function (start, args) {
     
     // Todas as Fontes
     var labelTodasFontes = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:40%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTodasFontes")));
-    var labelChk = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:45%; font-size:15px; text-align:right", texts.text("labelCheckLink")));
+    //var labelChk = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:45%; font-size:15px; text-align:right", texts.text("labelCheckLink")));
   
     var labelURLTodas = that.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:50%; top:50%; font-size:15px; text-align:right", texts.text("labelURLTodas")));
     var iptUrlTodas = that.add(new innovaphone.ui1.Input("position:absolute; left:50%; width:30%; top:50%; font-size:12px; text-align:center", null, texts.text("urlText"), 255, "url", null));

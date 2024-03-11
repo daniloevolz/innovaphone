@@ -677,24 +677,32 @@ function getDayOfWeekLabel(selectedDate) {
             //div principal
 
             const divMain = document.createElement('div')
-            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
-            divMain.classList.add("bg-dark-200", 'm-1', 'flex', 'items-center', 'justify-between', 'p-3', 'rounded-lg',"margin-1","gap-2")
+            divMain.classList.add('m-1', 'flex',"flex-col", 'items-center', 'rounded-lg',)
+            
             divMain.setAttribute("id","divMain")
-            //div dos elementos1 device e schedule
+            //div da parte de cima user e device
+            const divUp = document.createElement('div')
+            divUp.classList.add("justify-start","flex","items-center","gap-2","w-full","bg-dark-300",'rounded-t-lg',"px-2","py-1")
+            //div da parte de baixo device e botoes, edit e delete
+            const divDown = document.createElement('div')
+            divDown.classList.add("justify-between","flex","items-beatween","gap-1","w-full","bg-dark-200",'rounded-b-lg',"p-2")
+            //divs dos elementos da paret de baixo
+            //div elemento 1 room e data
             const divE1 = document.createElement('div')
-            divE1.classList.add("justify-start","flex","items-center","gap-3")
-            //div dos elementos2 edit e delete
+            divE1.classList.add("flex","flex-col","items-start", "gap-1", "justify-center",)
+            //div elemento 2 user e botões
             const divE2 = document.createElement('div')
-            divE2.classList.add("justify-end","flex","items-center","gap-3")
+            divE2.classList.add("flex","flex-row","items-end", "gap-1", "justify-center","items-center")
+            
          
             const div185 = document.createElement('div')
             div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
-            div185.classList.add("bg-dark-200", 'flex', "w-full",'items-center', 'justify-between','rounded-lg')
+        
             div185.setAttribute("id","div185")
             //div imagem e nome do device
             //div imagem e nome do device
             const divDevice = document.createElement('div')
-            divDevice.classList.add("flex","flex-col","items-center", "gap-1", "justify-center",)
+            divDevice.classList.add("flex","flex-row","items-center", "gap-1", "justify-center",)
             const divImg = document.createElement('img')
             divImg.classList.add("divImg","h-[45px]","w-[45px]",)
             divImg.setAttribute("src", "../images/IP112.png")
@@ -703,8 +711,7 @@ function getDayOfWeekLabel(selectedDate) {
                 return d.hwid === s.device_id
                 
             })[0]
-            nameDevice.name = truncateString(nameDevice.name, 10);
-            nameDevice.name = truncateString(nameDevice.name, 10);
+        
             
             console.log("Erick nameDevice", nameDevice)
             const deviceHw = document.createElement('div')
@@ -721,14 +728,12 @@ function getDayOfWeekLabel(selectedDate) {
             var nameRoom = rooms.filter(function(r){
                 return r.id === s.device_room_id
             })[0]
-            
+
             var oldNameRoom = nameRoom.name
             
             var oldNameRoom = nameRoom.name
 
             const roomSched = document.createElement('div')
-            nameRoom.name = truncateString(nameRoom.name, 10);
-            nameRoom.name = truncateString(nameRoom.name, 10);
             roomSched.classList.add("nameroom", "font-medium", "text-xl")
             roomSched.textContent = nameRoom.name
             const formDate = s.data_end.split("T")
@@ -738,6 +743,22 @@ function getDayOfWeekLabel(selectedDate) {
             const dateHour = document.createElement('div')
             dateHour.classList.add("dateHour")
             dateHour.textContent = formatDate(s.data_start).slice(0, -3) + " - " + formDate[1];
+
+            const divUser = document.createElement("div")
+            divUser.classList.add("flex-row","flex","gap-1","items-center")
+
+            let avatar = new innovaphone.Avatar(start, userSIP, userDomain);
+            let UIuserPicture = avatar.url(userSIP, 120, userDN);
+            const imgAvatar = document.createElement("img");
+            imgAvatar.setAttribute("src", UIuserPicture);
+            imgAvatar.setAttribute("id", "divAvatar");
+            imgAvatar.classList.add("w-5", "h-5", "rounded-full");
+
+            const nameUser = document.createElement("div")
+            nameUser.textContent = myUserGuid.cn
+
+            divUser.appendChild(imgAvatar)
+            divUser.appendChild(nameUser)
 
             const editBtn = makeButton(texts.text("labelEdit"), "secundary", "");
             editBtn.setAttribute("id",parseInt(s.id))
@@ -802,9 +823,13 @@ function getDayOfWeekLabel(selectedDate) {
                 divE2.appendChild(editBtn)
                 divE2.appendChild(delBtn)
             }
-            div185.appendChild(divE1)
-            div185.appendChild(divE2)
-            divMain.appendChild(div185)
+        
+            divMain.appendChild(divUp)
+            divMain.appendChild(divDown)
+            divUp.appendChild(divUser)
+            divUp.appendChild(divDevice)
+            divDown.appendChild(divE1)
+            divDown.appendChild(divE2)
             container.appendChild(divMain)
             
             nameRoom.name = oldNameRoom
@@ -855,21 +880,21 @@ function getDayOfWeekLabel(selectedDate) {
         that.clear();
         makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
         buttonMenu.addEventListener("click",function(){
-
-            //myUserGuid = list_tableUsers.filter(function(u){
-            //    return u.sip == userSIP
-            //})[0]
-        
-            //mySchedules = [schedules.filter(function(s){
-            //    return  s.user_guid == myUserGuid.guid
-            //})][0]
-            
             //nextSchedules(mySchedules)
             makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors)
         })
+
+        myUserGuid = list_tableUsers.filter(function(u){
+            return u.sip == userSIP
+        })[0]
+    
+        mySchedules = [schedules.filter(function(s){
+            return  s.user_guid == myUserGuid.guid
+        })][0]
+
         // div container (scroll)
         const container = document.createElement("div")
-        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","md:grid-cols-4")
+        container.classList.add("overflow-auto","grid","gap-2","sm:grid-cols-2","lg:grid-cols-4")
         container.style.height = 'calc(100vh - 70px)'
         container.setAttribute("id","container")
         document.body.appendChild(container);
@@ -877,7 +902,7 @@ function getDayOfWeekLabel(selectedDate) {
         rooms.forEach(function(room){
             //div principal
             const divMain =  document.createElement("div")
-            divMain.classList.add("rounded-lg","p-1","m-1","bg-dark-200","gap-2","flex-col","flex", "h-fit", "cursor-pointer")
+            divMain.classList.add("rounded-lg","p-1","mx-1","bg-dark-200","gap-2","flex-col","flex", "h-fit", "cursor-pointer")
             divMain.setAttribute("room",room.id)
             divMain.setAttribute("id", room.id)
             container.appendChild(divMain)
@@ -938,7 +963,7 @@ function getDayOfWeekLabel(selectedDate) {
                 return v.room_id == room.id
             })
             //componente avatar
-            makeAvatar(viewersFilter,divMain,room)
+            makeAvatar(viewersFilter,divMain)
 
             //todas as divs com o atributo "room"
             const divsRoom = document.querySelectorAll('[room]');
@@ -983,7 +1008,7 @@ function getDayOfWeekLabel(selectedDate) {
 
                 viewersUsers.slice(0, 6).forEach(function (view) {
                     let avatar = new innovaphone.Avatar(start, view.sip, userDomain);
-                    let UIuserPicture = avatar.url(view.sip, 120, userDN);
+                    let UIuserPicture = avatar.url(view.sip, 120, view.cn);
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
@@ -1180,10 +1205,10 @@ function getDayOfWeekLabel(selectedDate) {
             //divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
             var divAvailabilyDetail = document.createElement("div")
             divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-            divAvailabilyDetail.classList.add("divAvailabilyDetail")
+            divAvailabilyDetail.classList.add("divAvailabilyDetail","flex","items-center","justify-start","gap-1",)
             divMain.appendChild(divAvailabilyDetail)
 
-            
+            //desktop
                 if (a.type == "periodType") {
                     makeViewTimePeriod(divAvailabilyDetail, a)
                 }
@@ -1194,6 +1219,7 @@ function getDayOfWeekLabel(selectedDate) {
 
                 UpdateAvailability(availability, a.type)     
         }else{
+            //mobile
             divOpenTime.addEventListener("click", function (event) {
                 event.stopPropagation()
                 var divAvailabilyDetail = document.getElementById("divAvailabilyDetail")
@@ -1207,7 +1233,7 @@ function getDayOfWeekLabel(selectedDate) {
                     divOpenTime.setAttribute("style", `background-image: url(./images/chevron-up.svg);`);
                     var divAvailabilyDetail = document.createElement("div")
                     divAvailabilyDetail.setAttribute("id", "divAvailabilyDetail")
-                    divAvailabilyDetail.classList.add("divAvailabilyDetail")
+                    divAvailabilyDetail.classList.add("divAvailabilyDetail","flex","items-center","justify-start","gap-1")
                     divMain.appendChild(divAvailabilyDetail)
     
                     
@@ -1389,7 +1415,7 @@ function getDayOfWeekLabel(selectedDate) {
         //dias
         var div180 = document.createElement("div")
         div180.setAttribute("id", "div180")
-        div180.classList.add("div180Period")
+        div180.classList.add("div180Period","flex","flex-row","gap-3","justify-start","w-full")
         divMain.appendChild(div180)
 
         //Start Date and time
@@ -1476,7 +1502,7 @@ function getDayOfWeekLabel(selectedDate) {
         
         var div180 = document.createElement("div");
         div180.setAttribute("id", "div180");
-        div180.classList.add("div180");
+        div180.classList.add("flex","flex-row","gap-1","justify-start","w-full");
         div180.style.display = 'none';
         divMain.appendChild(divMainAvailabilityRecurrent);
         divMain.appendChild(div180);
@@ -1514,7 +1540,8 @@ function getDayOfWeekLabel(selectedDate) {
         //dias
         var div180 = document.getElementById("div180");
         div180.innerHTML = '';
-        div180.style.display = 'block';
+        div180.classList.add("div180Period","flex","flex-col","gap-1","justify-start","w-full");
+        div180.style.display = 'flex';
 
         var divDayLabel = document.createElement("div");
         //divDayLabel.setAttribute("id", "div180");
@@ -1525,7 +1552,7 @@ function getDayOfWeekLabel(selectedDate) {
         //div182
         var div182 = document.createElement("div");
         div182.setAttribute("id", "div182");
-        div182.classList.add("div182");
+        div182.classList.add("div182","flex","flex-row","gap-3","justify-start","w-full");
         div180.appendChild(div182);
 
         //time start
@@ -1553,6 +1580,24 @@ function getDayOfWeekLabel(selectedDate) {
 
     //console.log("MyUseVar " + JSON.stringify(myUser))
 
+    function addOutlineOnClick(div1, div2) {
+        if (div1 && div2) {
+            // Adicione um ouvinte de eventos para adicionar o contorno à div1 e div2 quando a div1 for clicada
+            div1.addEventListener("click", function() {
+                div1.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+                div2.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+            });
+    
+            // Adicione um ouvinte de eventos para adicionar o contorno à div1 e div2 quando a div2 for clicada
+            div2.addEventListener("click", function() {
+                div1.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+                div2.style.outline = "2px solid primary-100/50"; // Altere a cor e o tamanho do contorno conforme necessário
+            });
+        } else {
+            console.log('One or both of the divs do not exist');
+        }
+    }
+
 
     function makeViewDevice(divMain, device, availability, schedule, viewer) {
         //div 101
@@ -1564,12 +1609,14 @@ function getDayOfWeekLabel(selectedDate) {
             const formattedDate = dateNow.format('YYYY-MM-DDTHH:mm');
 
         const divMainViewDevice = document.createElement("div")
-        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-[50px]")
+        divMainViewDevice.classList.add("bg-dark-100","flex","flex-row","rounded-lg","w-full","h-fit","justify-start","focus:ring-2","focus:ring-primary-100")
         divMainViewDevice.setAttribute("id", device.id)
+        divMainViewDevice.setAttribute("tabindex", "0")
+       
         //div retangle 1396
 
         const divButtons = document.createElement("div")
-        divButtons.classList.add("flex","justify-end","items-center","gap-1","w-full","pr-1")
+        divButtons.classList.add("flex","justify-end","items-center","gap-1","w-fit","pr-1")
 
         const div100User = document.createElement("div")
         div100User.classList.add("div100User") 
@@ -1581,7 +1628,8 @@ function getDayOfWeekLabel(selectedDate) {
         var state;
         if(!device.guid){
             state = "bg-[#2AFF9C]" ;
-            div100User.innerHTML = texts.text("labelFree")
+            div100User.textContent = texts.text("labelFree")
+            div100User.style.color = state
         }else if(device.guid == myUser.guid){
             state = "bg-[#26CAFF]"
             div100Status.innerHTML = texts.text("labelInUseByMe")
@@ -1590,14 +1638,17 @@ function getDayOfWeekLabel(selectedDate) {
             state = "bg-[#FFC107]"
         }
 
+        const div100NameDevice = document.createElement("div")
+        div100NameDevice.classList.add("text-white" , "opacity-50","font-normal", "text-sm")
+        div100NameDevice.textContent = device.name
+
         const div100 = document.createElement("div")
-        div100.classList.add("div100")
+        div100.classList.add("div100", "p-1")
 
        // var state = device.guid ? "bg-[#FFC107]" : "bg-[#2AFF9C]";
         const divStatusColor = document.createElement("div")
         divStatusColor.classList.add(state, "h-[100%]", "w-[12px]","rounded-l-lg")
         divStatusColor.setAttribute("id", device.hwid)
-        divMainViewDevice.appendChild(divStatusColor)
 
         var room = rooms.filter(function (room) {
             return device.room_id == room.id
@@ -1605,20 +1656,23 @@ function getDayOfWeekLabel(selectedDate) {
 
         //div Left
         const divLeft = document.createElement("div")
-        divLeft.classList.add("w-full","flex","justify-start","gap-1","items-center","pl-1")
+        divLeft.classList.add("w-fit","flex","justify-start","gap-1","items-center")
 
         const divNumberPosition = document.createElement("div")
         divNumberPosition.textContent = "00"
         var deviceIcon = document.createElement("img")
         deviceIcon.classList.add("deviceIcon")
         deviceIcon.setAttribute("src", "./images/" + device.product + ".png")
+        divLeft.appendChild(divStatusColor) 
         divLeft.appendChild(divNumberPosition)
         divLeft.appendChild(deviceIcon)
         div100.appendChild(div100User)
         div100.appendChild(div100Status)
+        div100.appendChild(div100NameDevice)
         divLeft.appendChild(div100)
 
         divMainViewDevice.appendChild(divLeft)
+        
 
         // se tiver alguem usando o telefone
         if (viewer.length > 0) {
@@ -1645,20 +1699,21 @@ function getDayOfWeekLabel(selectedDate) {
             const div36 = makeButton('',"secundary","./images/pencil.svg")
             div36.setAttribute("id", device.hwid)
             div36.addEventListener("click", function (event) {
-                // var dev = event.currentTarget.id;
-                // event.stopPropagation()
-                // app.sendSrc({ api: "user", mt: "DeleteDeviceToUser", deviceId: dev, src: dev }, function (obj) {
-                //     app.sendSrc({ api: "user", mt: "SelectDevices", ids: rooms, src: obj.src }, function (obj) {
-                //         devices = JSON.parse(obj.result)
-                //         var devs = devices.filter(function (dev) {
-                //             return dev.room_id == room.id
-                //         })
-                //         makeViewRoomDetail(room.id)
-                //     })
-                // })
+                
+            // var nameRoom = rooms.filter(function(r){
+            //     return r.id === schedule.device_room_id
+            // })[0]
+            
+            // var nameDevice = devices.filter(function(d){
+            //     return d.hwid === schedule.device_id
+                
+            // })[0]
+
+            // makeScheduleContainer(nameDevice.hwid, nameRoom.id, mySchedules,schedule,"update")
+
             })
             divButtons.appendChild(div36)
-            divMainViewDevice.appendChild(divButtons)
+            //divMainViewDevice.appendChild(divButtons)
             }
             // se eu estiver usando o telefone
             else if (user.sip == userSIP ) {  
@@ -1707,7 +1762,7 @@ function getDayOfWeekLabel(selectedDate) {
             })
 
             divButtons.appendChild(div34)
-            divMainViewDevice.appendChild(divButtons)
+            // divMainViewDevice.appendChild(divButtons)
             }
 
         }
@@ -1753,19 +1808,27 @@ function getDayOfWeekLabel(selectedDate) {
             })
             divButtons.appendChild(div36)
             divButtons.appendChild(div34)
-            divMainViewDevice.appendChild(divButtons)
+           // divMainViewDevice.appendChild(divButtons)
         }
-
+        
+        divMainViewDevice.appendChild(divButtons)
         divMain.appendChild(divMainViewDevice)
+        addOutlineOnClick(divMainViewDevice, div93);
+        
 
     }
     function makeDeviceIcon(divMain, device, viewer) {
         //div 93
         const div93 = document.createElement("div")
         div93.classList.add("div93")
+        div93.setAttribute("tabindex","0")
         div93.setAttribute("id", device.id)
         div93.style.top = device.topoffset
         div93.style.left = device.leftoffset
+        div93.setAttribute("tabindex", "0");
+        const divMainViewDevice = document.getElementById(device.id);
+    
+        
         //div retangle 1396
 
         var myUser = list_tableUsers.filter(function(u){
@@ -1816,6 +1879,7 @@ function getDayOfWeekLabel(selectedDate) {
             //div93.appendChild(imgAvatar)
         }
         divMain.appendChild(div93)
+        addOutlineOnClick(divMainViewDevice, div93);
     }
     //Função para criar a tela de seleção para o agendamento
     //chamar no click da div34
@@ -2152,6 +2216,7 @@ function getDayOfWeekLabel(selectedDate) {
 
 
     //#region Opções
+
     function makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         // backButton.addEventListener("click",function(event){
@@ -2226,14 +2291,6 @@ function getDayOfWeekLabel(selectedDate) {
             event.preventDefault
             event.stopPropagation()
 
-            myUserGuid = list_tableUsers.filter(function(u){
-                return u.sip == userSIP
-            })[0]
-
-            mySchedules = [schedules.filter(function(s){
-                return  s.user_guid == myUserGuid.guid
-            })][0]
-           
             nextSchedules(mySchedules)
             
         })

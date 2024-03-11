@@ -254,6 +254,9 @@ label {
 .div-dolar {
     margin-top: 1%;
 }
+.tradingview-widget-copyright{
+    display: none;
+}
 
 @media only screen and (max-width: 900px) and (orientation: landscape) {
     .imglogo {
@@ -291,7 +294,7 @@ label {
         float: left;
         font-size: 15px;
         text-align: left;
-  }
+    }
   li{
     font-size: 12px;
   }
@@ -317,12 +320,14 @@ label {
         width: 100%;
         height: 82%;
         position: absolute;
-        top: 18%;
+        /*top: 18%;*/
     }
 
     .colunadireita {
         width: 100%;
-        height: 80%;
+        top:18%;
+        position: relative;
+        height: 82%;
     }
 
     .colunaesquerda {
