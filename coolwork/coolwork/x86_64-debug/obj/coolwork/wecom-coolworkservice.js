@@ -375,6 +375,7 @@ new JsonApi("user").onconnected(function(conn) {
                 
 
             }
+
             if (obj.mt == "GetDeviceSchedules") {
                 var roomId = obj.room;
                 var hwId = obj.dev;
@@ -413,7 +414,6 @@ new JsonApi("user").onconnected(function(conn) {
                     conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                 });
             }
-
             if (obj.mt == "UpdateDeviceSchedule") {
                 var sql = "UPDATE tbl_device_schedule SET data_start = '" + obj.data_start + "', data_end = '" + obj.data_end + "' WHERE id = '" + obj.schedID + "'"; 
                 Database.exec(sql)
@@ -424,7 +424,8 @@ new JsonApi("user").onconnected(function(conn) {
                     log("UpdatDeviceScheduleError:result=Error " + String(errorText));
                     conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                 });
-            }   
+            }
+
             if (obj.mt == "SetDeviceToUser") {
                 log("SetDeviceToUser: device hwid " + String(obj.deviceId));
                 var user = pbxTableUsers.filter(function (item) {
@@ -608,6 +609,25 @@ new JsonApi("admin").onconnected(function(conn) {
                         log("SelectDevicesResult:result=Error " + String(errorText));
                 });
             }
+            if (obj.mt == "SelectDevicesSchedule") {
+                var roomIds = obj.ids
+                log("ROOMIDS", JSON.stringify(roomIds))
+                var ids = extrairValoresId(roomIds);
+
+                var query = "SELECT * " +
+                    "FROM tbl_device_schedule " +
+                    "WHERE " +
+                    "device_room_id IN (" + ids + ");";
+
+                Database.exec(query)
+                    .oncomplete(function (result) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectDevicesScheduleResult", result: JSON.stringify(result), ids: obj.ids, src: obj.src }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("SelectDevicesSchedule: Error ao selecionar tabela: " + String(errorText));
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", message: JSON.stringify(errorText) }));
+                    });
+            }
             if (obj.mt == "InsertRoom") {
                 Database.exec("INSERT INTO tbl_room (name, img) VALUES ('" + obj.name + "','" + obj.img + "') RETURNING id")
                     .oncomplete(function (roomData) {
@@ -743,7 +763,7 @@ new JsonApi("admin").onconnected(function(conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "DeleteRoomError", error: String(errorText) }));
                     });
             }
-            if(obj.mt == "DeleteDeviceFromRoom"){
+            if (obj.mt == "DeleteDeviceFromRoom"){
                 var sql = "UPDATE tbl_devices SET room_id = null WHERE hwid = '" + obj.hwid + "'";
                 Database.exec(sql)
                 .oncomplete(function (updatereulst) {

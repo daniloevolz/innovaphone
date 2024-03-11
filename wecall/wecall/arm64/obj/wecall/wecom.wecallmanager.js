@@ -49,7 +49,7 @@ plugin.wecom.wecallmanager = wecom.wecallmanager || function (start, item, app) 
     var typeUrl = ["/wecom-wecall", "/wecom-wecalladmin", "/wecom-wecalldash"];
     var typeCheckmarks = [
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
-        { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
+        { web: false, websocket: true, hidden: false, pbx: true, pbxsignal: true, epsignal: true, messages: true, tableusers: true, admin: true, services: true, rcc: true },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
     ];
 

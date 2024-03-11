@@ -305,7 +305,7 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
             return badge;
         }
     
-        function makeHeader(imgLeft,imgRight,title){
+        function makeHeader(imgLeft,imgRight,title, callback){
             // construção do header
           
             const header = document.createElement("header")
@@ -317,12 +317,13 @@ Wecom.coolwork = Wecom.coolwork || function (start, args) {
          
             //imgHome
             const leftElement = imgLeft
-            //leftElement.addEventListener("click", function (event) {
-            //    makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-            //    // app.send({ api: "user", mt: "SelectMyRooms" })
-            //    event.stopPropagation()
-            //    event.preventDefault()
-            //})
+            leftElement.addEventListener("click", function (event) {
+                makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+                // app.send({ api: "user", mt: "SelectMyRooms" })
+                event.stopPropagation()
+                event.preventDefault()
+                callback
+            })
          
             //titulo
             const titleRoom = document.createElement("h1")
@@ -663,11 +664,16 @@ function getDayOfWeekLabel(selectedDate) {
     function makeUserSchedules(AllSchedule){
         that.clear()
         addPhonesToDevices()
-        makeHeader(backButton, makeButton('','',"./images/menu.svg"), texts.text("labelMySchedules"));
-        backButton.addEventListener("click",function EvtFunct(){
-            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-            backButton.removeEventListener("click",EvtFunct)
-        })
+        makeHeader(backButton, makeButton('', '', "./images/menu.svg"), texts.text("labelMySchedules"), function (evt) {
+            makeViewRoomDetail(roomId)
+            //makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+
+            backButton.removeEventListener("click", evt)
+        });
+        //backButton.addEventListener("click",function EvtFunct(){
+        //    makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+        //    backButton.removeEventListener("click",EvtFunct)
+        //})
         filterSchedule()
         const container = document.createElement('div')
         container.classList.add('overflow-auto', 'w-full')
@@ -878,7 +884,10 @@ function getDayOfWeekLabel(selectedDate) {
     var buttonMenu = makeButton('','',"./images/settings.svg")
     function makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
-        makeHeader(makeButton("","","./images/home.svg"), buttonMenu, texts.text("labelMyRooms"))
+        makeHeader(makeButton("", "", "./images/home.svg"), buttonMenu, texts.text("labelMyRooms"), function (evt) {
+            makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click", evt)
+        })
         buttonMenu.addEventListener("click",function(){
             //nextSchedules(mySchedules)
             makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors)
@@ -1102,11 +1111,14 @@ function getDayOfWeekLabel(selectedDate) {
         console.log("Sched " + sched)
         that.clear();
 
-        makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name)
-        backButton.addEventListener("click",function EvtFunct(){
+        makeHeader(backButton, makeButton("", "", "./images/menu.svg"), room.name, function (evt) {
             makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
-            backButton.removeEventListener("click",EvtFunct)
+            backButton.removeEventListener("click", evt)
         })
+        //backButton.addEventListener("click",function EvtFunct(){
+        //    makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+        //    backButton.removeEventListener("click",EvtFunct)
+        //})
         // div container
         const container = document.createElement("div")
         // if (window.matchMedia('(min-width: 480px)').matches){
@@ -1858,11 +1870,14 @@ function getDayOfWeekLabel(selectedDate) {
         console.log("MAKESCHEDULECONTAINER")
         that.clear();
         const btnSave = makeButton(texts.text("save"), "primary", "")
-        makeHeader(backButton,btnSave, texts.text("labelSchedule"))
-        backButton.addEventListener("click",function EvtFunct(){
+        makeHeader(backButton, btnSave, texts.text("labelSchedule"), function (evt) {
             makeViewRoomDetail(roomId)
-            backButton.removeEventListener("click",EvtFunct)
+            backButton.removeEventListener("click", evt)
         })
+        //backButton.addEventListener("click",function EvtFunct(){
+        //    makeViewRoomDetail(roomId)
+        //    backButton.removeEventListener("click",EvtFunct)
+        //})
         //makeHeader("./images/arrow-left.svg", "Botão Salvar aqui", texts.text("labelSchedule"))
         const containerSchedule = document.createElement("div")
         containerSchedule.setAttribute("id", "containerSchedule")
@@ -2187,7 +2202,6 @@ function getDayOfWeekLabel(selectedDate) {
 
 
     //#region Opções
-
     function makeDivOptions(rooms, devices, availabilities, schedules, viewers, editors) {
         that.clear();
         // backButton.addEventListener("click",function(event){
@@ -2195,9 +2209,11 @@ function getDayOfWeekLabel(selectedDate) {
         //     event.stopPropagation();
         //     makeViewRoom(rooms,devices,availabilities,viewers)
         // })
-        makeHeader(backButton, makeButton("", "", "./images/settings.svg"), texts.text("labelOptions"), function () {
+        makeHeader(backButton, makeButton("", "", "./images/settings.svg"), texts.text("labelOptions"), function (evt) {
             makeViewRoom(rooms, devices, availabilities, schedules, viewers, editors)
+            backButton.removeEventListener("click", evt)
         })
+
         const divMain = document.createElement("div")
         divMain.classList.add("flex", "h-full", "p-1", "flex-col", "items-start", "sm:mx-[200px]", "gap-1")
         // criar sala
