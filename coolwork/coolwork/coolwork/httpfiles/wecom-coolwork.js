@@ -1021,7 +1021,7 @@ function getDayOfWeekLabel(selectedDate) {
                     const imgAvatar = document.createElement("img");
                     imgAvatar.setAttribute("src", UIuserPicture);
                     imgAvatar.setAttribute("id", "divAvatar");
-                    imgAvatar.classList.add("w-3", "h-3", "sm:w-5", "sm:h-5" ,"rounded-full");
+                    imgAvatar.classList.add("w-4", "h-4", "sm:w-5", "sm:h-5" ,"rounded-full");
                     divUsersAvatar.appendChild(imgAvatar);
                     divMain.appendChild(divUsersAvatar);
                 });
