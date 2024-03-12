@@ -1078,7 +1078,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         getAllClickedWeekDays(daysSelected);
         
     }
-    function makeDivChooseImage(callback,nameImg){
+    function makeDivChooseImage(callback,nameImg, imgRoom){
         // filesID = [] // limpeza
         controlDB = false
         const insideDiv = new innovaphone.ui1.Div(null, null, "bg-black bg-opacity-50 justify-center items-center absolute h-full w-full top-0 flex");
@@ -1088,7 +1088,12 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const titleImg = new innovaphone.ui1.Div(null, texts.text("labelImageRoom"), "text-3 text-white font-bold");
     
         const mainImg = new innovaphone.ui1.Node("img", null,"","h-[260px] rounded-lg aspect-[3/4]");
-        mainImg.setAttribute("src", './images/MESA-1.png');
+
+        if(!imgRoom){
+            mainImg.setAttribute("src", './images/MESA-1.png');
+        }else{
+            mainImg.setAttribute("src", imgRoom);
+        }
         mainImg.setAttribute("id", "divMainImg");
     
         const divSelectImgs = new innovaphone.ui1.Div(null,null,"flex w-full items-start gap-1 flex-row");
@@ -3447,7 +3452,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         that.clear()
         const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
         //makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
-        makeHeader(backButton, btnUpdateRoom, texts.text("labelEditRoom"), callbackParaMakeViewRoomDetail)
+        makeHeader(backButton, btnUpdateRoom, texts.text("labelEditRoom"), callbackParaMakeViewRoomDetail, callbackParaMakeDivOptions)
 
         // Defina as funções de callback
         function callbackParaMakeViewRoomDetail() {
@@ -3473,7 +3478,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         const nameImgDiv = document.createElement("div")
         nameImgDiv.textContent = texts.text("labelNoImageSelected")
         const BtnChoose = makeButton(texts.text("labelChoose"),"primary","")
-        var imgRoom;
+        var imgRoom 
     
         BtnChoose.addEventListener("click",function(){
             console.log("Abrir Div Escolher Imagem")
@@ -3481,7 +3486,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
                 imgRoom = selectedImg
             },function(name){
                 nameImgDiv.textContent = name
-            })
+            }, room.img)
         })
         // tipo de sala
         const divTypeRoom = document.createElement("div")
@@ -3527,16 +3532,23 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         console.log("Erick edit Dev",filtredDev)
     
         // usuarios
-        var viewers = filtredView
+        var viewers = []
         const divUsersRoom = document.createElement("div")
         divUsersRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         const labelUsersRoom = document.createElement("div")
         labelUsersRoom.textContent = texts.text("labelUsers")
+        const divShowUsers = document.createElement("div")
+        divShowUsers.classList.add("flex","items-center","gap-1") 
+        const divUsersToAdd = document.createElement("div")
+        divUsersToAdd.id = "divUsersToAdd"
         const divBtnAddUsers = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddUsers.addEventListener("click",function(){
             console.log("Abrir Div Add Usuários")
-            makeDivAddUsers(function(viewer){
+            makeDivAddUsers(function(viewer){ //callback da função 
                 viewers = viewer
+                console.log("Variavel Viewers para envio ao banco" + "\n" + JSON.stringify(viewers))
+                divUsersToAdd.innerHTML = ''
+                makeAvatar(viewer,divUsersToAdd)
             })
         })
         //horario agendamento 
@@ -3566,13 +3578,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         labelAddDevices.textContent = texts.text("labelDevices")
         const divBtnAddDevices = makeButton(texts.text("labelAdd"),"primary","")
         divBtnAddDevices.addEventListener("click",function(){
-            console.log("Abrir div add devices")
-            app.send({api:"admin", mt:"SelectDevices"})
-            //makeDivAddDevices(filtredDev)
+            console.log("Abrir div add devices", phone_list)
+            makeDivAddDevices(phone_list)
         })
         //appends
         divNameRoom.appendChild(labelNameRoom)
         divNameRoom.appendChild(iptNameRoom)
+        divBtnChoose.appendChild(BtnChoose)
         divImgRoom.appendChild(labelImgRoom)
         divImgRoom.appendChild(divBtnChoose)
         divTypeRoom.appendChild(labelTypeRoom)
@@ -3599,90 +3611,94 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         document.body.appendChild(divMain)
     
         btnUpdateRoom.addEventListener("click",function(event){
-        const nomeSala = document.getElementById("iptNameRoom").value
-        if(nomeSala == "" || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
-        makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
-        event.preventDefault()
-        event.stopPropagation()
-        document.body.removeChild(document.getElementById("bcgrd"))
-        })      
-        }
-        else if(typeRoom == "periodType"){
-            app.send({ api: "admin", mt: "UpdateRoom", 
-            name: nomeSala, 
-            img: imgRoom, 
-            dateStart: dateAvailability[0].start, 
-            dateEnd: dateAvailability[0].end, 
-            type: typeRoom, 
-            schedule: typeSchedule, 
-            viewer: viewers,
-            device : devHwId
-            }); //viewer: viewer 
-        }else if (typeRoom == "recurrentType") {
-            console.log("dateAvailability " + JSON.stringify(dateAvailability));
-    
-            // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
-            let combinedAvailability = {
-                startMonday: [],
-                startTuesday: [],
-                startWednesday: [],
-                startThursday: [],
-                startFriday: [],
-                startSaturday: [],
-                startSunday: [],
-                endMonday: [],
-                endTuesday: [],
-                endWednesday: [],
-                endThursday: [],
-                endFriday: [],
-                endSaturday: [],
-                endSunday: []
-            };
-    
-            // Combine os horários de disponibilidade de todas as salas
-            dateAvailability.forEach(function(availability) {
-                for (let key in availability) {
-                    combinedAvailability[key].push(availability[key]);
-                }
-            });
-    
-            // Envie uma única mensagem com todos os horários de disponibilidade combinados
-            app.send({
-                api: "admin",
-                mt: "UpdateRoom",
-                name: nomeSala,
-                img: imgRoom,
-                type: typeRoom,
-                schedule: typeSchedule,
-                startMonday: combinedAvailability.startMonday,
-                startTuesday: combinedAvailability.startTuesday,
-                startWednesday: combinedAvailability.startWednesday,
-                startThursday: combinedAvailability.startThursday,
-                startFriday: combinedAvailability.startFriday,
-                startSaturday: combinedAvailability.startSaturday,
-                startSunday: combinedAvailability.startSunday,
-                endMonday: combinedAvailability.endMonday,
-                endTuesday: combinedAvailability.endTuesday,
-                endWednesday: combinedAvailability.endWednesday,
-                endThursday: combinedAvailability.endThursday,
-                endFriday: combinedAvailability.endFriday,
-                endSaturday: combinedAvailability.endSaturday,
-                endSunday: combinedAvailability.endSunday,
-                viewer: viewerGuids,
-                device: devHwId
-            });
-        }
-    
-        // app.send({ api: "admin", mt: "InsertRoom", 
-        // name: nameRoom, 
-        // img: srcDaImagem, 
-        // dateStart: dateStart, 
-        // dateEnd: dateEnd, 
-        // type: optType, 
-        // schedule: optModule, 
-        // editor: editor, 
-        // viewer: viewer });
-    })
+            //var viewerGuids = viewers.map(viewer => viewer.viewer_guid);
+
+            const nomeSala = iptNameRoom.value
+            if(nomeSala == "" || nomeSala == null || nomeSala.length < 3 || imgRoom == "" || typeRoom == "" || typeSchedule == "" || viewers == ""){
+            makePopUp(texts.text("labelWarning"), texts.text("labelCompleteAll"), texts.text("labelOk")).addEventListener("click",function(event){
+                event.preventDefault()
+                event.stopPropagation()
+                document.body.removeChild(document.getElementById("bcgrd"))
+            })      
+            }
+            else if(typeRoom == "periodType"){
+                app.send({ api: "admin", mt: "UpdateRoom", 
+                id: room.id,
+                name: nomeSala, 
+                img: imgRoom, 
+                dateStart: dateAvailability[0].start, 
+                dateEnd: dateAvailability[0].end, 
+                type: typeRoom, 
+                schedule: typeSchedule, 
+                viewer: viewers,
+                device : devHwId
+                }); //viewer: viewer 
+            }else if (typeRoom == "recurrentType") {
+                console.log("dateAvailability " + JSON.stringify(dateAvailability));
+        
+                // Inicialize objetos para armazenar todos os horários de disponibilidade combinados
+                let combinedAvailability = {
+                    startMonday: [],
+                    startTuesday: [],
+                    startWednesday: [],
+                    startThursday: [],
+                    startFriday: [],
+                    startSaturday: [],
+                    startSunday: [],
+                    endMonday: [],
+                    endTuesday: [],
+                    endWednesday: [],
+                    endThursday: [],
+                    endFriday: [],
+                    endSaturday: [],
+                    endSunday: []
+                };
+        
+                // Combine os horários de disponibilidade de todas as salas
+                dateAvailability.forEach(function(availability) {
+                    for (let key in availability) {
+                        combinedAvailability[key].push(availability[key]);
+                    }
+                });
+        
+                // Envie uma única mensagem com todos os horários de disponibilidade combinados
+                app.send({
+                    api: "admin",
+                    mt: "UpdateRoom",
+                    id: room.id,
+                    name: nomeSala,
+                    img: imgRoom,
+                    type: typeRoom,
+                    schedule: typeSchedule,
+                    startMonday: combinedAvailability.startMonday,
+                    startTuesday: combinedAvailability.startTuesday,
+                    startWednesday: combinedAvailability.startWednesday,
+                    startThursday: combinedAvailability.startThursday,
+                    startFriday: combinedAvailability.startFriday,
+                    startSaturday: combinedAvailability.startSaturday,
+                    startSunday: combinedAvailability.startSunday,
+                    endMonday: combinedAvailability.endMonday,
+                    endTuesday: combinedAvailability.endTuesday,
+                    endWednesday: combinedAvailability.endWednesday,
+                    endThursday: combinedAvailability.endThursday,
+                    endFriday: combinedAvailability.endFriday,
+                    endSaturday: combinedAvailability.endSaturday,
+                    endSunday: combinedAvailability.endSunday,
+                    viewer: viewerGuids,
+                    device: devHwId
+                });
+            }
+        
+            // app.send({ api: "admin", mt: "InsertRoom", 
+            // name: nameRoom, 
+            // img: srcDaImagem, 
+            // dateStart: dateStart, 
+            // dateEnd: dateEnd, 
+            // type: optType, 
+            // schedule: optModule, 
+            // editor: editor, 
+            // viewer: viewer });
+        })
 }
 
     //#endregion
