@@ -3446,7 +3446,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
     function makeDivEditRoom(room, avail, devices, viewers){
         that.clear()
         const btnUpdateRoom = makeButton(texts.text("save"),"primary","")
-        makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
+        //makeHeader(backButton,btnUpdateRoom,texts.text("labelEditRoom"))
+        makeHeader(backButton, btnUpdateRoom, texts.text("labelEditRoom"), callbackParaMakeViewRoomDetail)
+
+        // Defina as funções de callback
+        function callbackParaMakeViewRoomDetail() {
+            makeViewRoomDetail(room.id);
+        }
         const divMain = document.createElement("div")
         divMain.classList.add("flex","h-full","p-1","flex-col","items-start","sm:mx-[200px]","gap-1")
         //nome da sala
@@ -3462,12 +3468,19 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divImgRoom.classList.add("flex","p-1","items-center","justify-between","bg-dark-200","rounded-lg","w-full")
         const labelImgRoom = document.createElement("div")
         labelImgRoom.textContent = texts.text("labelImageRoom")
-        const divBtnChoose = makeButton(texts.text("labelChoose"),"primary","")
+        const divBtnChoose = document.createElement("div")
+        divBtnChoose.classList.add("flex","items-center","gap-1") 
+        const nameImgDiv = document.createElement("div")
+        nameImgDiv.textContent = texts.text("labelNoImageSelected")
+        const BtnChoose = makeButton(texts.text("labelChoose"),"primary","")
         var imgRoom;
-        divBtnChoose.addEventListener("click",function(){
+    
+        BtnChoose.addEventListener("click",function(){
             console.log("Abrir Div Escolher Imagem")
-            makeDivChooseImage(function(selectedImg){
+            makeDivChooseImage(function(selectedImg){ //callback da função
                 imgRoom = selectedImg
+            },function(name){
+                nameImgDiv.textContent = name
             })
         })
         // tipo de sala
@@ -3575,13 +3588,13 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
         divAddDevices.appendChild(labelAddDevices)
         divAddDevices.appendChild(divBtnAddDevices)
     
-        //     divMain.appendChild(divNameRoom)
-        //     divMain.appendChild(divImgRoom)
-        //     divMain.appendChild(divTypeRoom)
-        //     // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
-        //     divMain.appendChild(divUsersRoom)
-        //     divMain.appendChild(divHourSchedule)
-        //     divMain.appendChild(divAddDevices)
+        divMain.appendChild(divNameRoom)
+        divMain.appendChild(divImgRoom)
+        divMain.appendChild(divTypeRoom)
+        // divMain.appendChild(divTypeSchedule) colocar na tela de agendamento
+        divMain.appendChild(divUsersRoom)
+        divMain.appendChild(divHourSchedule)
+        divMain.appendChild(divAddDevices)
     
         document.body.appendChild(divMain)
     
@@ -3602,7 +3615,7 @@ Wecom.coolworkAdmin = Wecom.coolworkAdmin || function (start, args) {
             dateEnd: dateAvailability[0].end, 
             type: typeRoom, 
             schedule: typeSchedule, 
-            viewer: viewerGuids,
+            viewer: viewers,
             device : devHwId
             }); //viewer: viewer 
         }else if (typeRoom == "recurrentType") {
