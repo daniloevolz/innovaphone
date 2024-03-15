@@ -46,7 +46,7 @@ Config.onchanged(function () {
 
 log("pietro req: License "+JSON.stringify(license));
 if (license != null && license.System==true) {
-    WebServer.onrequest("triggedAlarm", function (req) {
+    WebServer.onrequest("alarmTriggered", function (req) {
         if (req.method == "POST") {
             var newValue = "";
             var value = "";
@@ -60,6 +60,28 @@ if (license != null && license.System==true) {
                     value = newValue;
                     req.sendResponse();
                     alarmReceived(value);
+                }
+            });
+        }
+        else {
+            req.cancel();
+        }
+    });
+
+    WebServer.onrequest("sensorTriggered", function (req) {
+        if (req.method == "POST") {
+            var newValue = "";
+            var value = "";
+            req.onrecv(function (req, data) {
+                //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                if (data) {
+                    newValue += (new TextDecoder("utf-8").decode(data));
+                    req.recv();
+                }
+                else {
+                    value = newValue;
+                    req.sendResponse();
+                    sensorReceived(value);
                 }
             });
         }
@@ -320,6 +342,11 @@ new JsonApi("user").onconnected(function (conn) {
                     var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
+                    connectionsUser.forEach(function (c) {
+                        //respond success to the client
+                        c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(obj.btn_id) }));
+
+                    })
                 }
                 if (obj.mt == "TriggerStartPopup") {
                     //intert into DB the event
@@ -339,7 +366,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //var value = '{"From":"${conn.sip}","AlarmID":"${obj.AlarmID}"}'
                     //ECMA5
                     // Criar a string JSON substituindo as variáveis manualmente
-                    var value = '{"From":"' + conn.sip + '", "AlarmID":"' + obj.prt + '"}';
+                    var value = '{"From":"' + conn.sip + '", "AlarmID":"' + obj.prt + '", "Detail":"'+ obj.btn_name +'"}';
 
                     alarmReceived(value);
                     //intert into DB the event
@@ -349,7 +376,8 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                     //respond success to the client
-                    conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(obj.btn_id)}));
+                    // substituido pela confirmação de algum usuário que recebeu o alerta em TriggerStopAlarm
+                    //conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(obj.btn_id)}));
                 }
                 if (obj.mt == "TriggerCombo") {
                     //trigger the combo function
@@ -511,6 +539,7 @@ new JsonApi("admin").onconnected(function (conn) {
     if (conn.app == "wecom-novaalertadmin") {
         conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
+            //#region TABLE USERS
             if (obj.mt == "AdminMessage") {
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src, urlalert: urlalert, urlmethod: urlmethod, urlenable: urlenable, googlekey: google_api_key }));
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
@@ -520,6 +549,8 @@ new JsonApi("admin").onconnected(function (conn) {
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }
+            //#endregion
+            //#region CONFIG
             if (obj.mt == "UpdateConfig") {
                 if (obj.prt == "urlalert") {
                     Config.urlalert = obj.vl;
@@ -532,7 +563,8 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.save();
                 }
             }
-            // license 
+            //#endregion
+            //#region LICENSE
             if (obj.mt == "ConfigLicense") {
                 var licenseAppToken = Config.licenseAppToken;
                 licenseInstallDate = Config.licenseInstallDate;
@@ -565,9 +597,10 @@ new JsonApi("admin").onconnected(function (conn) {
 
                 }
             }
-
+            //#endregion
+            //#region BUTTONS
             if (obj.mt == "InsertMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -576,9 +609,18 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
 
             }
+            if (obj.mt == "InsertAlarmMessage") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
 
+            }
             if (obj.mt == "InsertNumberMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -597,7 +639,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "InsertComboMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) +"')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -641,6 +683,19 @@ new JsonApi("admin").onconnected(function (conn) {
                 conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess" }));
                 
             }
+            if (obj.mt == "InsertSensorMessage") {
+                //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, sensor_min_threshold, sensor_max_threshold, sensor_type, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.min) + "','" + String(obj.max) + "','" + String(obj.sensorType) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+            //#endregion
+            //#region ACTIONS
             if (obj.mt == "InsertActionMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
                 Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type)+ "','" + String(obj.device) +"')")
@@ -700,6 +755,8 @@ new JsonApi("admin").onconnected(function (conn) {
                 conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess" }));
                 
             }
+            //#endregion
+            //#region REPORTS
             if (obj.mt == "SelectFromReports") {
                 switch (obj.src) {
                     case "RptCalls":
@@ -853,6 +910,7 @@ new JsonApi("admin").onconnected(function (conn) {
                         break;
                 }
             }
+            //#endregion
         });
     }
 });
@@ -1373,7 +1431,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                         log("danilo req : RCC message:CallUpdate: r-setup 2 not found call num"+num);
                         addCall(sip, obj.call, obj.call, num, 1, "out", timeNow, device);
                         sendRingingEvents(sip, num, "IncomingCallRinging");
-                        triggerAction(sip, num, "out-number");
+                        //triggerAction(sip, num, "out-number");
+                        triggerAction2(sip, num, num, "out-number", "CallRinging");
                     }
                     break;
                 case "x-setup":
@@ -1383,7 +1442,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                         log("danilo req : RCC message:CallUpdate: x-setup 2 not found call num "+num);
                         addCall(sip, obj.call, obj.call, num, 129, "inc", timeNow, device);
                         sendRingingEvents(sip, num, "CallRinging");
-                        triggerAction(sip, num, "inc-number");
+                        //triggerAction(sip, num, "inc-number");
+                        triggerAction2(sip, num, num, "inc-number", "CallRinging");
                     }
                     break;
                 case "x-alert":
@@ -1448,7 +1508,9 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 log("danilo-req x-alert: obj.src " + String(obj.src));
                                 conn.send(JSON.stringify({ api: "user", mt: "CallRinging", src: sip, num: num }));
                             });
-                            triggerAction(sip, num, "out-number");
+                            //triggerAction(sip, num, "out-number");
+                            triggerAction2(sip, num, num, "out-number", "CallRinging");
+
                             break;
                         case 129:
                             //Receptiva (Alert)
@@ -1466,7 +1528,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 log("danilo-req x-alert: obj.src " + String(obj.src));
                                 conn.send(JSON.stringify({ api: "user", mt: "IncomingCallRinging", src: sip, num: num }));
                             });
-                            triggerAction(sip, num, "inc-number");
+                            //triggerAction(sip, num, "inc-number");
+                            triggerAction2(sip, num, num, "inc-number", "CallRinging");
                             break;
                     }
                 }
@@ -2076,29 +2139,120 @@ function alarmReceived(value) {
     log("danilo-req alarmReceived:value " + String(bodyDecoded));
     try {
         var obj = JSON.parse(bodyDecoded);
-        var location = "";
-        if (obj.To) {
-            obj.To.forEach(function (user) {
-                //USER PARAMETER PRESENT
+
+        //Criado seletor de servidor para atender tanto NovaAlert quanto Milesight
+        //Entendo que esse parâmetro será obrigatório, até porque o device tem que permitir a configuração do BOBY
+        //de acordo com a necessidade de cada server.
+        if (obj.ServerName == "Novaalert") {
+            log("danilo-req alarmReceived:ServerType Novaalert");
+            //Variaveis presentes no BODY
+            //To
+            //From
+            //Location ou Location1
+            //AlarmID
+
+            var location = "";
+            if (obj.To) {
+                obj.To.forEach(function (user) {
+                    //USER PARAMETER PRESENT
+                    if (obj.Location) {
+                        try {
+                            location = obj.Location;
+                            log("SPLIT8:");
+                            var myArray = location.split(":");
+                            log("SPLIT9:");
+                            var locationarray = myArray[1].split(",");
+                            var x = locationarray[0];
+                            var y = locationarray[1];
+                            log("danilo-req alarmReceived:User " + String(user));
+                            connectionsUser.forEach(function (conn) {
+                                //var ws = conn.ws;
+                                log("danilo-req alarmReceived:Location conn.sip " + String(conn.sip));
+                                log("danilo-req alarmReceived:Location obj.To " + String(user));
+                                if (String(conn.sip) == String(user)) {
+
+                                    //Send notifications
+                                    conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+                                }
+                            });
+                        } catch (e) {
+                            log("danilo-req alarmReceived: Paramter Location not present");
+                        }
+
+                    }
+                    if (obj.Location1) {
+                        try {
+                            location = obj.Location1;
+                            log("SPLIT11:");
+                            var myArray = location.split(":");
+                            log("SPLIT12:");
+                            var location = myArray[1].split(",");
+                            var x = location[0];
+                            var y = location[1];
+                            log("danilo-req alarmReceived:Location1 User " + String(user));
+                            connectionsUser.forEach(function (conn) {
+                                log("danilo-req alarmReceived:Location1 conn.sip " + String(conn.sip));
+                                log("danilo-req alarmReceived:Location1 obj.To " + String(user));
+                                if (String(conn.sip) == String(user)) {
+                                    //Send notifications
+                                    conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+                                }
+                            });
+                        } catch (e) {
+                            log("danilo-req alarmReceived: Paramter Location1 not present");
+                        }
+
+                    }
+                    //Intert into DB the event
+                    log("danilo req: insert into DB = user " + user);
+                    var today = getDateNow();
+                    var msg = { sip: user, from: obj.From, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+
+                    connectionsUser.forEach(function (conn) {
+                        //Send notifications
+                        log("danilo-req alarmReceived:conn.sip " + String(conn.sip));
+                        log("danilo-req alarmReceived:obj.To " + String(user));
+                        if (String(conn.sip) == String(user)) {
+                            conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.From }));
+                            //update badge Icon
+                            updateTableBadgeCount(user, "IncrementCount");
+                        }
+                    });
+                    //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
+                    //triggerAction(user, obj.AlarmID, "alarm");
+                    triggerAction2(obj.From, user, obj.AlarmID, "alarm", location);
+
+                })
+            }
+            else {
+                //SEM USUÁRIO DESTINO DEFINIDO
+                var found;
                 if (obj.Location) {
                     try {
                         location = obj.Location;
-                        log("SPLIT8:");
+                        log("SPLIT13:");
                         var myArray = location.split(":");
-                        log("SPLIT9:");
+                        log("SPLIT14:");
                         var locationarray = myArray[1].split(",");
                         var x = locationarray[0];
                         var y = locationarray[1];
-                        log("danilo-req alarmReceived:User " + String(user));
+                        //log("danilo-req alarmReceived:Location User " + String(obj.To));
                         connectionsUser.forEach(function (conn) {
-                            //var ws = conn.ws;
+                            //Intert into DB the event
+                            log("danilo req: insert into DB = user " + conn.sip);
+                            var today = getDateNow();
+                            var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location }
+                            log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                            insertTblActivities(msg);
+                            found = true;
+                            //Send notifications
+                            //updateTableBadgeCount(conn.sip, "IncrementCount");
                             log("danilo-req alarmReceived:Location conn.sip " + String(conn.sip));
-                            log("danilo-req alarmReceived:Location obj.To " + String(user));
-                            if (String(conn.sip) == String(user)) {
-                                
-                                //Send notifications
-                                conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
-                            }
+                            //log("danilo-req alarmReceived:Location obj.To " + String(obj.To));
+                            conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+
                         });
                     } catch (e) {
                         log("danilo-req alarmReceived: Paramter Location not present");
@@ -2107,134 +2261,125 @@ function alarmReceived(value) {
                 }
                 if (obj.Location1) {
                     try {
-                        location = obj.Location1;
-                        log("SPLIT11:");
+                        location = obj.Location;
+                        log("SPLIT15:");
                         var myArray = location.split(":");
-                        log("SPLIT12:");
-                        var location = myArray[1].split(",");
-                        var x = location[0];
-                        var y = location[1];
-                        log("danilo-req alarmReceived:Location1 User " + String(user));
+                        log("SPLIT16:");
+                        var locationarray = myArray[1].split(",");
+                        var x = locationarray[0];
+                        var y = locationarray[1];
+                        //log("danilo-req alarmReceived:Location1 User " + String(obj.To));
                         connectionsUser.forEach(function (conn) {
-                            log("danilo-req alarmReceived:Location1 conn.sip " + String(conn.sip));
-                            log("danilo-req alarmReceived:Location1 obj.To " + String(user));
-                            if (String(conn.sip) == String(user)) {
-                                //Send notifications
-                                conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
-                            }
+                            //Intert into DB the event
+                            log("danilo req: insert into DB = user " + conn.sip);
+                            var today = getDateNow();
+                            var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location1 }
+                            log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                            insertTblActivities(msg);
+                            found = true;
+                            //Send notifications
+                            //updateTableBadgeCount(conn.sip, "IncrementCount");
+                            log("danilo-req alarmReceived:Location1 notifing user conn.sip " + String(conn.sip));
+                            //log("danilo-req alarmReceived:Location1 obj.To " + String(obj.To));
+                            conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
+
                         });
                     } catch (e) {
                         log("danilo-req alarmReceived: Paramter Location1 not present");
                     }
 
                 }
-                //Intert into DB the event
-                log("danilo req: insert into DB = user " + user);
-                var today = getDateNow();
-                var msg = { sip: user, from: obj.From, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
-                log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                insertTblActivities(msg);
-
                 connectionsUser.forEach(function (conn) {
-                    //Send notifications
-                    log("danilo-req alarmReceived:conn.sip " + String(conn.sip));
-                    log("danilo-req alarmReceived:obj.To " + String(user));
-                    if (String(conn.sip) == String(user)) {
+                    //Intert into DB the event
+                    if (conn.sip != obj.From) {
+                        if (!found) {
+                            log("danilo req: insert into DB = user " + conn.sip);
+                            var today = getDateNow();
+                            var msg = { sip: conn.sip, from: obj.From, name: "alarm", date: today, status: "inc", details: obj.AlarmID, user: obj.To }
+                            log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                            insertTblActivities(msg);
+                        }
+                        //Send notifications
+                        log("danilo-req alarmReceived:without User Paramter, notifing all users logged in now " + String(conn.sip));
+                        updateTableBadgeCount(conn.sip, "IncrementCount");
                         conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.From }));
-                        //update badge Icon
-                        updateTableBadgeCount(user, "IncrementCount");
+                        //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
+                        //triggerAction(conn.sip, parseInt(obj.AlarmID), "alarm");
+                        triggerAction2(obj.From, conn.sip, parseInt(obj.AlarmID), "alarm", location);
                     }
                 });
+            }
+        }
+        else if (obj.ServerName == "Milesight") {
+            log("danilo-req alarmReceived:ServerType Milesight");
+            //Variaveis presentes no BODY
+            //ServerName
+            //DeviceName
+            //AlarmID
+            //Detaill
+            connectionsUser.forEach(function (conn) {
                 //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
-                triggerAction(user, obj.AlarmID, "alarm");
- 
-            })
+                triggerAction2(obj.DeviceName, conn.sip, parseInt(obj.AlarmID), "alarm", obj.Detail);
+                
+            });
         }
         else {
-            //SEM USUÁRIO DESTINO DEFINIDO
-            var found;
-            if (obj.Location) {
-                try {
-                    location = obj.Location;
-                    log("SPLIT13:");
-                    var myArray = location.split(":");
-                    log("SPLIT14:");
-                    var locationarray = myArray[1].split(",");
-                    var x = locationarray[0];
-                    var y = locationarray[1];
-                    //log("danilo-req alarmReceived:Location User " + String(obj.To));
-                    connectionsUser.forEach(function (conn) {
-                        //Intert into DB the event
-                        log("danilo req: insert into DB = user " + conn.sip);
-                        var today = getDateNow();
-                        var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location }
-                        log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                        insertTblActivities(msg);
-                        found = true;
-                        //Send notifications
-                        //updateTableBadgeCount(conn.sip, "IncrementCount");
-                        log("danilo-req alarmReceived:Location conn.sip " + String(conn.sip));
-                        //log("danilo-req alarmReceived:Location obj.To " + String(obj.To));
-                        conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
-
-                    });
-                } catch (e) {
-                    log("danilo-req alarmReceived: Paramter Location not present");
-                }
-
-            }
-            if (obj.Location1) {
-                try {
-                    location = obj.Location;
-                    log("SPLIT15:");
-                    var myArray = location.split(":");
-                    log("SPLIT16:");
-                    var locationarray = myArray[1].split(",");
-                    var x = locationarray[0];
-                    var y = locationarray[1];
-                    //log("danilo-req alarmReceived:Location1 User " + String(obj.To));
-                    connectionsUser.forEach(function (conn) {
-                        //Intert into DB the event
-                        log("danilo req: insert into DB = user " + conn.sip);
-                        var today = getDateNow();
-                        var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location1 }
-                        log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                        insertTblActivities(msg);
-                        found = true;
-                        //Send notifications
-                        //updateTableBadgeCount(conn.sip, "IncrementCount");
-                        log("danilo-req alarmReceived:Location1 notifing user conn.sip " + String(conn.sip));
-                        //log("danilo-req alarmReceived:Location1 obj.To " + String(obj.To));
-                        conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: "Alarme " + String(obj.AlarmID), alarm: "https://www.google.com/maps/embed/v1/place?key=" + google_api_key + "&q=" + x + "," + y + "&zoom=15" }));
-
-                    });
-                } catch (e) {
-                    log("danilo-req alarmReceived: Paramter Location1 not present");
-                }
-
-            }
+            log("danilo-req alarmReceived:NO ServerType present, it is a button!");
             connectionsUser.forEach(function (conn) {
-                //Intert into DB the event
-                if (!found) {
-                    log("danilo req: insert into DB = user " + conn.sip);
-                    var today = getDateNow();
-                    var msg = { sip: conn.sip, from: obj.From, name: "alarm", date: today, status: "inc", details: obj.AlarmID, user: obj.To }
-                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
-                    insertTblActivities(msg);
+                // Impede que o próprio usuário seja notificado e acionado.
+                if (conn.sip != obj.From) {
+                    //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
+                    triggerAction2(obj.From, conn.sip, parseInt(obj.AlarmID), "alarm", obj.Detail);
                 }
-                //Send notifications
-                log("danilo-req alarmReceived:without User Paramter, notifing all users logged in now " + String(conn.sip));
-                updateTableBadgeCount(conn.sip, "IncrementCount");
-                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.AlarmID, src: obj.From }));
-                //VERIFY IF ACTION EXISTS FOR THIS ALARM ID FOR THIS USER
-                triggerAction(conn.sip, parseInt(obj.AlarmID), "alarm");
             });
-        }  
+        }   
     } catch (e) {
         log("danilo-req alarmReceived: Body not present! Erro " + e);
     }
 }
 
+function sensorReceived(value) {
+    var sensors = [];
+    var bodyDecoded = unescape(value);
+    log("danilo-req sensorReceived:value " + String(bodyDecoded));
+    try {
+        var obj = JSON.parse(bodyDecoded);
+        //Get Actions from DB
+        Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';")
+            .oncomplete(function (data) {
+                log("danilo req sensorReceived: select from list_buttons result legth=" + data.length);
+                var str = "";
+                str = JSON.stringify(data);
+                sensors = JSON.parse(String(str));
+                if (sensors.length > 0) {
+                    sensors.forEach(function (bs) {
+                        log("danilo-req sensorReceived: sensors.forEach " + JSON.stringify(bs));
+                        var conns = connectionsUser.filter(function (c) { return c.sip == bs.button_user || bs.button_user == "all" })
+                        conns.forEach(function (conn) {
+                            log("danilo-req sensorReceived: user will be notified " + conn.sip);
+                            conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
+                            if (bs.button_user == conn.sip) {
+
+                            }
+                        })
+                    })
+                }
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                log("danilo-req sensorReceived: Erro DB " + errorText);
+            });
+        
+        // Insere na tabela de histórico
+        obj['date'] = getDateNow();
+        insertTblSensorsHistory(obj)
+        
+
+    } catch (e) {
+        log("danilo-req sensorReceived: Body not present! Erro " + e);
+    }
+}
+
+// not used
 function triggerAction(user, prt, type) {
     try {
         //Get Actions from DB
@@ -2344,7 +2489,152 @@ function triggerAction(user, prt, type) {
     }
 }
 
-function updateBadge(ws, call, count) {
+function triggerAction2(from, to, prt, type, detail) {
+    try {
+        //Get Actions from DB
+        Database.exec("SELECT * FROM list_alarm_actions WHERE action_user ='" + to + "';")
+            .oncomplete(function (data) {
+                log("danilo req triggerAction2: select from list_alarm_actions result legth=" + data.length);
+                var str = "";
+                str = JSON.stringify(data);
+                actions = JSON.parse(String(str));
+
+                if (actions.length > 0) {
+                    log("danilo-req triggerAction2:actions diferent of null " + JSON.stringify(actions));
+
+                    actions.forEach(function (ac) {
+                        log("danilo-req triggerAction2:ac " + JSON.stringify(ac));
+                        if (ac.action_user == to) {
+                            log("danilo-req triggerAction2:actions action_user " + ac.action_user + " == to " + to);
+                            if (ac.action_alarm_code == prt && ac.action_start_type == type) {
+                                log("danilo-req triggerAction2:actions action_alarm_code " + ac.action_alarm_code + " == prt " + prt + " == type " + type);
+
+                                switch (ac.action_type) {
+                                    case "video":
+                                        connectionsUser.forEach(function (conn) {
+                                            log("danilo-req triggerAction2:video conn.sip " + String(conn.sip));
+                                            log("danilo-req triggerAction2:video obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                                conn.send(JSON.stringify({ api: "user", mt: "VideoRequest", name: ac.action_name, alarm: ac.action_prt }));
+                                            }
+                                        });
+                                        break;
+                                    case "alarm":
+                                        connectionsUser.forEach(function (conn) {
+                                            log("danilo-req alarmReceived:alarm conn.sip " + String(conn.sip));
+                                            log("danilo-req alarmReceived:alarm obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                                //conn.send(JSON.stringify({ api: "user", mt: "AlarmRequested", alarm: prt }));
+                                            }
+                                        });
+                                        break;
+                                    case "number":
+                                        var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === to });
+                                        connectionsUser.forEach(function (conn) {
+                                            //var ws = conn.ws;
+                                            log("danilo-req alarmReceived:number conn.sip " + String(conn.sip));
+                                            log("danilo-req alarmReceived:number obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                            }
+                                        });
+                                        //RCC.forEach(function (rcc) {
+                                        //    var temp = rcc[String(foundConnectionUser.sip)];
+                                        //    if (temp != null) {
+                                        //        log("danilo-req alarmReceived:will call callRCC for user " + temp + " Nome " + foundConnectionUser.dn);
+                                        //        callRCC(rcc, temp, "UserCall", ac.action_prt, foundConnectionUser.sip + "," + rcc.pbx);
+                                        //    }
+                                        //})
+                                        log("danilo-req alarmReceived:number pre info ");
+                                        var info = foundConnectionUser[0].info;
+                                        log("danilo-req alarmReceived:number after info ", info);
+                                        RCC.forEach(function (rcc) {
+                                            log("danilo-req alarmReceived:number RCC forEach rcc", JSON.stringify(rcc));
+                                            if (rcc.pbx == info.pbx) {
+                                                log("danilo req alarmReceived:number RCC: found PBX for sip " + foundConnectionUser[0].sip);
+                                                var msg = { api: "RCC", mt: "UserInitialize", cn: foundConnectionUser[0].dn, hw: ac.action_device, src: foundConnectionUser[0].sip + "," + rcc.pbx + "," + ac.action_device + "," + ac.action_prt };
+                                                log("danilo req alarmReceived:number RCC: UserInitialize sent rcc msg " + JSON.stringify(msg));
+                                                rcc.send(JSON.stringify(msg));
+                                            }
+                                        })
+
+                                        break;
+                                    case "page":
+                                        connectionsUser.forEach(function (conn) {
+                                            log("danilo-req alarmReceived:page conn.sip " + String(conn.sip));
+                                            log("danilo-req alarmReceived:page obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                                conn.send(JSON.stringify({ api: "user", mt: "PageRequest", name: ac.action_name, alarm: ac.action_prt }));
+                                            }
+                                        });
+                                        break;
+                                    case "button":
+                                        var btn = buttons.filter(function (btn) { return btn.id == ac.action_prt });
+                                        connectionsUser.forEach(function (conn) {
+                                            log("danilo-req alarmReceived:button conn.sip " + String(conn.sip));
+                                            log("danilo-req alarmReceived:button obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                                conn.send(JSON.stringify({ api: "user", mt: "ButtonRequest", button: JSON.stringify(btn[0]) }));
+                                            }
+                                        });
+                                        break;
+                                    case "popup":
+                                        connectionsUser.forEach(function (conn) {
+                                            log("danilo-req alarmReceived:popup conn.sip " + String(conn.sip));
+                                            log("danilo-req alarmReceived:popup obj.to " + String(to));
+                                            if (String(conn.sip) == String(to)) {
+                                                //Send notifications
+                                                log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                                updateTableBadgeCount(conn.sip, "IncrementCount");
+                                                conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                                conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: ac.action_name, alarm: ac.action_prt }));
+                                            }
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    })
+                    // Ação tratada... Então insere o log no DB para Histórico
+                    log("danilo req: insert into DB = user " + to);
+                    var today = getDateNow();
+                    var msg = { sip: to, from: from, name: type, date: today, status: "inc", prt: prt, details: detail}
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                else {
+                    log("danilo-req triggerAction2:actions is null " + JSON.stringify(actions));
+                }
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                log("danilo-req triggerAction2: Erro DB " + errorText);
+            });
+    }
+    catch (e) {
+        log("danilo-req triggerAction2: Try Body decode Erro " + e);
+    }
+}
+
+function updateBadge(signal, call, count) {
     var msg = {
         "api": "PbxSignal", "mt": "Signaling", "call": call, "src": "badge",
         "sig": {
@@ -2353,7 +2643,7 @@ function updateBadge(ws, call, count) {
         }
     };
 
-    ws.send(JSON.stringify(msg));
+    signal.send(JSON.stringify(msg));
     return;
 }
 
@@ -2577,7 +2867,7 @@ function getDateNow() {
     // Retorna a string no formato "AAAA-MM-DD HH:mm:ss.sss"
     return dateString.slice(0, -5);
 }
-//reports
+// inserts reports
 function insertTblActivities(obj) {
     Database.insert("INSERT INTO tbl_activities (sip, name, date, status, details) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
         .oncomplete(function () {
@@ -2612,6 +2902,32 @@ function insertTblAvailability(obj) {
         })
         .onerror(function (error, errorText, dbErrorCode) {
             log("insertTblAvailability= Erro " + errorText);
+        });
+}
+function insertTblSensorsHistory(obj) {
+    // Construindo a consulta de inserção
+    var query = "INSERT INTO list_sensors_history (";
+    // Obtendo as chaves do objeto (os nomes das colunas)
+    var keys = Object.keys(obj);
+    // Adicionando os nomes das colunas à consulta
+    query += keys.join(", ") + ") VALUES (";
+    // Adicionando placeholders para os valores
+    // Adicionando valores diretamente em vez de placeholders
+    query += keys.map(function (key) {
+        if (typeof obj[key] === 'string') {
+            return "'" + obj[key] + "'";
+        } else {
+            return obj[key];
+        }
+    }).join(", ") + ")";
+
+    Database.insert(query)
+        .oncomplete(function () {
+            log("insertTblSensorHistory= Success");
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblSensorHistory= Erro " + errorText);
         });
 }
 

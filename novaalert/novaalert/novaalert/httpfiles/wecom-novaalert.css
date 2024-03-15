@@ -4,6 +4,468 @@
     margin: 0;
     padding: 0;
 }
+
+:root {
+    --1-font-family: "Montserrat", Helvetica;
+    --1-font-weight: 400;
+    --1-font-size: 20px;
+    --1-letter-spacing: 0px;
+    --1-line-height: normal;
+    --1-font-style: normal;
+    --2-font-family: "Montserrat", Helvetica;
+    --2-font-weight: 400;
+    --2-font-size: 24px;
+    --2-letter-spacing: 0px;
+    --2-line-height: normal;
+    --2-font-style: normal;
+    --3-font-family: "Montserrat", Helvetica;
+    --3-font-weight: 400;
+    --3-font-size: 30px;
+    --3-letter-spacing: 0px;
+    --3-line-height: normal;
+    --3-font-style: normal;
+    --4-font-family: "Montserrat", Helvetica;
+    --4-font-weight: 400;
+    --4-font-size: 36px;
+    --4-letter-spacing: 0px;
+    --4-line-height: normal;
+    --4-font-style: normal;
+    --5-font-family: "Montserrat", Helvetica;
+    --5-font-weight: 400;
+    --5-font-size: 48px;
+    --5-letter-spacing: 0px;
+    --5-line-height: normal;
+    --5-font-style: normal;
+    --6-font-family: "Montserrat", Helvetica;
+    --6-font-weight: 400;
+    --6-font-size: 60px;
+    --6-letter-spacing: 0px;
+    --6-line-height: normal;
+    --6-font-style: normal;
+    --7-font-family: "Montserrat", Helvetica;
+    --7-font-weight: 400;
+    --7-font-size: 72px;
+    --7-letter-spacing: 0px;
+    --7-line-height: normal;
+    --7-font-style: normal;
+    --8-font-family: "Montserrat", Helvetica;
+    --8-font-weight: 400;
+    --8-font-size: 96px;
+    --8-letter-spacing: 0px;
+    --8-line-height: normal;
+    --8-font-style: normal;
+    --9-font-family: "Montserrat", Helvetica;
+    --9-font-weight: 400;
+    --9-font-size: 128px;
+    --9-letter-spacing: 0px;
+    --9-line-height: normal;
+    --9-font-style: normal;
+    --l-font-family: "Montserrat", Helvetica;
+    --l-font-weight: 400;
+    --l-font-size: 18px;
+    --l-letter-spacing: 0px;
+    --l-line-height: normal;
+    --l-font-style: normal;
+    --lg-font-family: "Montserrat", Helvetica;
+    --lg-font-weight: 400;
+    --lg-font-size: 16px;
+    --lg-letter-spacing: 0px;
+    --lg-line-height: normal;
+    --lg-font-style: normal;
+    --xs-font-family: "Montserrat", Helvetica;
+    --xs-font-weight: 400;
+    --xs-font-size: 12px;
+    --xs-letter-spacing: 0px;
+    --xs-line-height: normal;
+    --xs-font-style: normal;
+    --sm-font-family: "Montserrat", Helvetica;
+    --sm-font-weight: 400;
+    --sm-font-size: 14px;
+    --sm-letter-spacing: 0px;
+    --sm-line-height: normal;
+    --sm-font-style: normal;
+    --base-font-family: "Montserrat", Helvetica;
+    --base-font-weight: 400;
+    --base-font-size: 16px;
+    --base-letter-spacing: 0px;
+    --base-line-height: normal;
+    --base-font-style: normal;
+    --body-font-family: "Inter", Helvetica;
+    --body-font-weight: 400;
+    --body-font-size: 14px;
+    --body-letter-spacing: 0px;
+    --body-line-height: normal;
+    --body-font-style: normal;
+    --h3-font-family: "Inter", Helvetica;
+    --h3-font-weight: 400;
+    --h3-font-size: 48px;
+    --h3-letter-spacing: 0px;
+    --h3-line-height: normal;
+    --h3-font-style: normal;
+    --button-font-family: "Inter", Helvetica;
+    --button-font-weight: 500;
+    --button-font-size: 14px;
+    --button-letter-spacing: 0px;
+    --button-line-height: normal;
+    --button-font-style: normal;
+    --h1-font-family: "Inter", Helvetica;
+    --h1-font-weight: 700;
+    --h1-font-size: 24px;
+    --h1-letter-spacing: 0px;
+    --h1-line-height: normal;
+    --h1-font-style: normal;
+    --h2-font-family: "Inter", Helvetica;
+    --h2-font-weight: 300;
+    --h2-font-size: 60px;
+    --h2-letter-spacing: 0px;
+    --h2-line-height: normal;
+    --h2-font-style: normal;
+    --h-1-font-family: "Inter", Helvetica;
+    --h-1-font-weight: 300;
+    --h-1-font-size: 96px;
+    --h-1-letter-spacing: 0px;
+    --h-1-line-height: normal;
+    --h-1-font-style: normal;
+    --h4-font-family: "Inter", Helvetica;
+    --h4-font-weight: 400;
+    --h4-font-size: 34px;
+    --h4-letter-spacing: 0px;
+    --h4-line-height: normal;
+    --h4-font-style: normal;
+    --h5-font-family: "Inter", Helvetica;
+    --h5-font-weight: 500;
+    --h5-font-size: 24px;
+    --h5-letter-spacing: 0px;
+    --h5-line-height: normal;
+    --h5-font-style: normal;
+    --h6-font-family: "Inter", Helvetica;
+    --h6-font-weight: 500;
+    --h6-font-size: 20px;
+    --h6-letter-spacing: 0px;
+    --h6-line-height: normal;
+    --h6-font-style: normal;
+    --sub-1-font-family: "Inter", Helvetica;
+    --sub-1-font-weight: 400;
+    --sub-1-font-size: 16px;
+    --sub-1-letter-spacing: 0px;
+    --sub-1-line-height: normal;
+    --sub-1-font-style: normal;
+    --sub-2-font-family: "Inter", Helvetica;
+    --sub-2-font-weight: 500;
+    --sub-2-font-size: 14px;
+    --sub-2-letter-spacing: 0px;
+    --sub-2-line-height: normal;
+    --sub-2-font-style: normal;
+    --body-1-font-family: "Inter", Helvetica;
+    --body-1-font-weight: 400;
+    --body-1-font-size: 16px;
+    --body-1-letter-spacing: 0px;
+    --body-1-line-height: normal;
+    --body-1-font-style: normal;
+    --body-2-font-family: "Inter", Helvetica;
+    --body-2-font-weight: 500;
+    --body-2-font-size: 14px;
+    --body-2-letter-spacing: 0px;
+    --body-2-line-height: normal;
+    --body-2-font-style: normal;
+    --sombra: 5px 5px 30px 0px rgba(0, 0, 0, 0.25);
+    --colors-vermelho-100: rgba(255, 241, 240, 1);
+    --colors-vermelho-200: rgba(255, 204, 199, 1);
+    --colors-vermelho-300: rgba(255, 163, 158, 1);
+    --colors-vermelho-400: rgba(255, 120, 117, 1);
+    --colors-vermelho-500: rgba(255, 77, 79, 1);
+    --colors-vermelho-600: rgba(245, 34, 45, 1);
+    --colors-vermelho-700: rgba(207, 19, 34, 1);
+    --colors-vermelho-800: rgba(168, 7, 26, 1);
+    --colors-vermelho-900: rgba(130, 0, 20, 1);
+    --colors-vermelho-1000: rgba(92, 0, 17, 1);
+    --colors-neutro-100: rgba(255, 255, 255, 1);
+    --colors-neutro-200: rgba(250, 250, 250, 1);
+    --colors-neutro-300: rgba(245, 245, 245, 1);
+    --colors-neutro-400: rgba(240, 240, 240, 1);
+    --colors-neutro-500: rgba(217, 217, 217, 1);
+    --colors-neutro-600: rgba(191, 191, 191, 1);
+    --colors-neutro-700: rgba(140, 140, 140, 1);
+    --colors-neutro-800: rgba(89, 89, 89, 1);
+    --colors-neutro-900: rgba(67, 67, 67, 1);
+    --colors-neutro-1000: rgba(38, 38, 38, 1);
+    --colors-neutro-1100: rgba(31, 31, 31, 1);
+    --colors-neutro-1200: rgba(20, 20, 20, 1);
+    --colors-neutro-1300: rgba(0, 0, 0, 1);
+    --colors-azul-100: rgba(230, 244, 255, 1);
+    --colors-azul-200: rgba(186, 224, 255, 1);
+    --colors-azul-300: rgba(145, 202, 255, 1);
+    --colors-azul-400: rgba(105, 177, 255, 1);
+    --colors-azul-500: rgba(64, 150, 255, 1);
+    --colors-azul-600: rgba(22, 119, 255, 1);
+    --colors-azul-700: rgba(9, 88, 217, 1);
+    --colors-azul-800: rgba(0, 62, 179, 1);
+    --colors-azul-900: rgba(0, 44, 140, 1);
+    --colors-azul-1000: rgba(0, 29, 102, 1);
+    --colors-verde-50: rgba(240, 253, 246, 1);
+    --colors-verde-100: rgba(221, 251, 236, 1);
+    --colors-verde-200: rgba(217, 247, 190, 1);
+    --colors-verde-300: rgba(183, 235, 143, 1);
+    --colors-verde-400: rgba(149, 222, 100, 1);
+    --colors-verde-500: rgba(115, 209, 61, 1);
+    --colors-verde-600: rgba(82, 196, 26, 1);
+    --colors-verde-700: rgba(56, 158, 13, 1);
+    --colors-verde-800: rgba(35, 120, 4, 1);
+    --colors-verde-900: rgba(19, 82, 0, 1);
+    --colors-verde-1000: rgba(9, 43, 0, 1);
+    --colors-amarelo-100: rgba(254, 255, 230, 1);
+    --colors-amarelo-200: rgba(255, 255, 184, 1);
+    --colors-amarelo-300: rgba(255, 251, 143, 1);
+    --colors-amarelo-400: rgba(255, 245, 102, 1);
+    --colors-amarelo-500: rgba(255, 236, 61, 1);
+    --colors-amarelo-600: rgba(250, 219, 20, 1);
+    --colors-amarelo-700: rgba(212, 177, 6, 1);
+    --colors-amarelo-800: rgba(173, 139, 0, 1);
+    --colors-amarelo-900: rgba(135, 104, 0, 1);
+    --colors-amarelo-1000: rgba(97, 71, 0, 1);
+    --colors-branco: rgba(255, 255, 255, 1);
+    --colors-primario-50: rgba(241, 249, 254, 1);
+    --colors-primario-100: rgba(226, 242, 252, 1);
+    --colors-primario-200: rgba(189, 229, 250, 1);
+    --colors-primario-300: rgba(132, 210, 245, 1);
+    --colors-primario-400: rgba(66, 186, 238, 1);
+    --colors-primario-500: rgba(25, 159, 218, 1);
+    --colors-primario-600: rgba(12, 130, 189, 1);
+    --colors-primario-700: rgba(11, 104, 153, 1);
+    --colors-primario-800: rgba(14, 88, 126, 1);
+    --colors-primario-900: rgba(17, 73, 105, 1);
+    --colors-primario-950: rgba(11, 46, 70, 1);
+    --colors-vulcano-100: rgba(255, 242, 232, 1);
+    --colors-vulcano-200: rgba(255, 216, 191, 1);
+    --colors-vulcano-300: rgba(255, 187, 150, 1);
+    --colors-vulcano-400: rgba(255, 156, 110, 1);
+    --colors-vulcano-500: rgba(255, 122, 69, 1);
+    --colors-vulcano-600: rgba(250, 84, 28, 1);
+    --colors-vulcano-700: rgba(212, 56, 13, 1);
+    --colors-vulcano-800: rgba(173, 33, 2, 1);
+    --colors-vulcano-900: rgba(135, 20, 0, 1);
+    --colors-vulcano-1000: rgba(97, 11, 0, 1);
+    --colors-laranja-100: rgba(253, 230, 231, 1);
+    --colors-laranja-200: rgba(255, 231, 186, 1);
+    --colors-laranja-300: rgba(255, 213, 145, 1);
+    --colors-laranja-400: rgba(255, 192, 105, 1);
+    --colors-laranja-500: rgba(255, 169, 64, 1);
+    --colors-laranja-600: rgba(250, 140, 22, 1);
+    --colors-laranja-700: rgba(212, 107, 8, 1);
+    --colors-laranja-800: rgba(173, 78, 0, 1);
+    --colors-laranja-900: rgba(135, 56, 0, 1);
+    --colors-laranja-1000: rgba(97, 37, 0, 1);
+    --colors-azul-marinho-100: rgba(230, 244, 255, 1);
+    --colors-azul-marinho-200: rgba(186, 224, 255, 1);
+    --colors-azul-marinho-300: rgba(145, 202, 255, 1);
+    --colors-azul-marinho-400: rgba(105, 177, 255, 1);
+    --colors-azul-marinho-500: rgba(64, 150, 255, 1);
+    --colors-azul-marinho-600: rgba(22, 119, 255, 1);
+    --colors-azul-marinho-700: rgba(9, 88, 217, 1);
+    --colors-azul-marinho-800: rgba(0, 62, 179, 1);
+    --colors-azul-marinho-900: rgba(0, 44, 140, 1);
+    --colors-azul-marinho-1000: rgba(0, 29, 102, 1);
+    --colors-gold-100: rgba(255, 251, 230, 1);
+    --colors-gold-200: rgba(255, 241, 184, 1);
+    --colors-gold-300: rgba(255, 229, 143, 1);
+    --colors-gold-400: rgba(255, 214, 102, 1);
+    --colors-gold-500: rgba(255, 197, 61, 1);
+    --colors-gold-600: rgba(250, 173, 20, 1);
+    --colors-gold-700: rgba(212, 136, 6, 1);
+    --colors-gold-800: rgba(173, 104, 0, 1);
+    --colors-gold-900: rgba(135, 77, 0, 1);
+    --colors-gold-1000: rgba(72, 34, 0, 1);
+    --colors-lima-100: rgba(252, 255, 230, 1);
+    --colors-lima-200: rgba(244, 255, 184, 1);
+    --colors-lima-300: rgba(234, 255, 143, 1);
+    --colors-lima-400: rgba(211, 242, 97, 1);
+    --colors-lima-500: rgba(186, 230, 55, 1);
+    --colors-lima-600: rgba(160, 217, 17, 1);
+    --colors-lima-700: rgba(124, 179, 5, 1);
+    --colors-lima-800: rgba(91, 140, 0, 1);
+    --colors-lima-900: rgba(63, 102, 0, 1);
+    --colors-lima-1000: rgba(37, 64, 0, 1);
+    --colors-ciano-100: rgba(230, 255, 251, 1);
+    --colors-ciano-200: rgba(181, 245, 236, 1);
+    --colors-ciano-300: rgba(135, 232, 222, 1);
+    --colors-ciano-400: rgba(92, 219, 211, 1);
+    --colors-ciano-500: rgba(54, 207, 201, 1);
+    --colors-ciano-600: rgba(19, 194, 194, 1);
+    --colors-ciano-700: rgba(8, 151, 156, 1);
+    --colors-ciano-800: rgba(0, 109, 117, 1);
+    --colors-ciano-900: rgba(0, 71, 79, 1);
+    --colors-ciano-1000: rgba(0, 35, 41, 1);
+    --colors-roxo-100: rgba(249, 240, 255, 1);
+    --colors-roxo-200: rgba(239, 219, 255, 1);
+    --colors-roxo-300: rgba(211, 173, 247, 1);
+    --colors-roxo-400: rgba(179, 127, 235, 1);
+    --colors-roxo-500: rgba(146, 84, 222, 1);
+    --colors-roxo-600: rgba(114, 46, 209, 1);
+    --colors-roxo-700: rgba(83, 29, 171, 1);
+    --colors-roxo-800: rgba(57, 16, 133, 1);
+    --colors-roxo-900: rgba(34, 7, 94, 1);
+    --colors-roxo-1000: rgba(18, 3, 56, 1);
+    --colors-magenta-50: rgba(241, 249, 254, 1);
+    --colors-magenta-100: rgba(255, 240, 246, 1);
+    --colors-magenta-200: rgba(255, 214, 231, 1);
+    --colors-magenta-300: rgba(255, 173, 210, 1);
+    --colors-magenta-400: rgba(255, 133, 192, 1);
+    --colors-magenta-500: rgba(247, 89, 171, 1);
+    --colors-magenta-600: rgba(235, 47, 150, 1);
+    --colors-magenta-700: rgba(196, 29, 127, 1);
+    --colors-magenta-800: rgba(158, 16, 104, 1);
+    --colors-magenta-900: rgba(120, 6, 80, 1);
+    --colors-magenta-1000: rgba(82, 3, 57, 1);
+}
+
+/*#region New Layout*/
+
+.divider{
+    border-top: 2px solid var(--colors-neutro-900);
+    border-radius: 8px;
+    margin: 8px;
+  }
+
+.buttons .combobtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    justify-content: center;
+    flex: 1;
+    align-self: stretch;
+    width: 100%;
+    flex-grow: 1;
+    gap: 6px;
+}
+.buttons .combobutton {
+    display: flex;
+    flex-direction: column;
+    height: 90px;
+    align-items: flex-start;
+    /* background-color: #ffffff; */
+    background-color: #595959;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 198px;
+    position: relative;
+  }
+
+  .buttons .iotBtnDiv {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    /* padding: 0px 10px; */
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    flex: 0 0 auto;
+    gap: 6px;
+   
+  }
+  .buttons .optionsDiv{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    /* padding: 0px 10px; */
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+  .buttons .optionsBtn{
+    display: flex;
+    flex-direction: column;
+    height: 105px;
+    align-items: flex-start;
+    /* background-color: #ffffff; */
+    background-color: #595959;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 198px;
+    position: relative;
+    margin-top: 10px;
+  }
+  .buttons .btnEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 75px;
+    background-color: #595959;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 198px;
+    position: relative;
+  }
+
+  .buttons .div-page {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .buttons .allbtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    justify-content: center;
+    flex: 1;
+    align-self: stretch;
+    width: 100%;
+    flex-grow: 1;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.buttons .pagina {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    flex-grow: 1;
+    background-color: #262626bf;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 5px;
+  }
+  
+  .buttons .framePagesText {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    flex: 0 0 auto;
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+  }
+  
+  .buttons .text-wrapper-Pages {
+    position: relative;
+    width: fit-content;
+    margin-top: -1px;
+    font-family: var(--h6-font-family);
+    font-weight: var(--h6-font-weight);
+    color: #ffffff;
+    font-size: var(--h6-font-size);
+    letter-spacing: var(--h6-letter-spacing);
+    line-height: var(--h6-line-height);
+    white-space: nowrap;
+    font-style: var(--h6-font-style);
+  }
+
+
+/*#endregion New Layout*/
+
 /*ADMIN NOVA ALERT*/
 select{
     overflow-y:auto;
@@ -40,6 +502,124 @@ select{
     border: 1px solid #02163F;
     border-radius: 10px;
 }
+/*INPUT sensor*/
+.divAdd9 {
+    position: absolute;
+    top: 54%;
+    left: 28%;
+    width: 38%;
+    padding: 10px;
+}
+
+.divAdd10 {
+    position: absolute;
+    top: 61%;
+    left: 28%;
+    width: 38%;
+    padding: 10px;
+}
+
+.labelValueType {
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 46%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
+}
+
+.iptValueType {
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 46%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+
+/*select página*/
+.labelPageAdd {
+    position: absolute;
+    left: 0%;
+    /* width: 15%; */
+    top: 69%;
+    left: 29%;
+    border-bottom: 2px solid #02163F;
+    font-size: 15px;
+    text-align: right;
+}
+
+.selectPageAdd {
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 69%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+/*select linha*/
+.labelLineAdd {
+    position: absolute;
+    left: 0%;
+    /* width: 15%; */
+    top: 79%;
+    left: 29%;
+    border-bottom: 2px solid #02163F;
+    font-size: 15px;
+    text-align: right;
+}
+
+.selectLineAdd {
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 79%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+/*select coluna*/
+.labelColumnAdd {
+    position: absolute;
+    left: 0%;
+    /* width: 15%; */
+    top: 89%;
+    left: 29%;
+    border-bottom: 2px solid #02163F;
+    font-size: 15px;
+    text-align: right;
+}
+
+.selectColumnAdd {
+    position: absolute;
+    /* left: 16%; */
+    width: 30%;
+    top: 89%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+
 .comboarea{
     position:absolute; 
     left:0%; 
@@ -89,28 +669,28 @@ select{
     width: 38%;
     padding: 10px;
 }
-.iptNameString{
-  width: 100%;
-  border: 0;
-  border-bottom: 2px solid #02163F;
-  outline: 0;
-  font-size: 15px;
-  color: black;
-  padding: 8px 0;
-  background: transparent;
-  transition: border-color 0.2s;
-
+.iptString {
+    text-align: end;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #02163F;
+    outline: 0;
+    font-size: 15px;
+    color: black;
+    padding: 8px 0;
+    background: transparent;
+    transition: border-color 0.2s;
 }
-.iptNameString ::placeholder {
+.iptString ::placeholder {
     display: none;
     color: transparent;
   }
-.iptNameString:placeholder-shown ~ .labelBtnString {
+.iptString:placeholder-shown ~ .labelBtnString {
     font-size: 15px;
     cursor: text;
     top: 20px;
 }
-.iptNameString:focus ~.labelBtnString {
+.iptString:focus ~.labelBtnString {
       position: absolute;
       top: 0;
       display: block;
@@ -119,7 +699,7 @@ select{
       color: #02163F;
       font-weight:bold;    
     }
-.iptNameString:focus {
+.iptString:focus {
         padding-bottom: 6px;  
         font-size: 15px;
         border-width: 3px;
@@ -1223,7 +1803,7 @@ background-color: darkred;
     font-size: 15px;
     background-color: rgba(128, 130, 131, 0.48);
 }
-.combobtn {
+/* .combobtn {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -1232,8 +1812,8 @@ background-color: darkred;
     position: absolute;
     width: 100%;
     height: 16%;
-}
-.allbtn {
+} */
+/* .allbtn {
     top: 16%;
     overflow-y: auto;
     display: flex;
@@ -1243,7 +1823,7 @@ background-color: darkred;
     position: absolute;
     width: 100%;
     height: 68%;
-}
+} */
 .pagebtn {
     display: flex;
     flex-wrap: wrap;
@@ -1258,14 +1838,17 @@ background-color: darkred;
 .buttontop {
     /* top: 5%; */
     /* position: static; */
-    height: 40%;
-    width: 90%;
+    height: 50%;
+    width: 100%;
+    font-size: 16px;
     background-color: rgba(128, 130, 131, 0.48);
     display: inline-flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+    gap: 6px;
 }
+
 .notificationtop {
     /* top: 5%; */
     /* position: static; */
@@ -1285,7 +1868,9 @@ background-color: darkred;
     align-items: center;
     justify-content: center;
     flex-direction: row;
+    font-size: 16px;
 }
+
 .notificationdown {
     height: 50%;
     width: 100%;
@@ -1294,26 +1879,26 @@ background-color: darkred;
     justify-content: center;
     flex-direction: column;
 }
-.combobutton {
+/* .combobutton {
     margin: 5px;
     display: inline-flex;
     min-width: 150px;
     height: 90%;
     border-width: 0px;
-    /* background-color: var(--colbutton); */
-    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    background-color: var(--colbutton);
+    background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
     width: 15%;
     font-weight: bold;
-    color: var(--text-standard); /*white;*/
+    color: var(--text-standard); 
     font-size: 12px;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    background-color: #101e3f; /*#191919;*/
+    background-color: #101e3f; 
     text-align: center;
     cursor: pointer;
     flex-direction: column;
-}
+} */
 
 .allbutton {
     margin: 5px;
@@ -1473,17 +2058,17 @@ width: 100%;
     /* background-color: rgb(12, 12, 12); */
     background-color: #02163F;
   }
-  .scroll-container {
-    position: absolute;
+  /* .scroll-container {
+    /* position: absolute;
     display: inline-flex;
     flex-direction:column-reverse;
     width: 100%;
     height: 90%;
-    /* margin-top:10%; */
+    margin-top:10%; 
     overflow-y: auto;
     background-color: rgb(188, 188, 188); 
-    /*background-color: #02163F;*/
-  }
+    background-color: #02163F; 
+  } */
 .scroll-container-table {
     position: absolute;
     display: block;
@@ -1632,7 +2217,7 @@ width: 100%;
 }
 
 .popup-closer {
-    background-image: url("close.png");
+    background-image: url("./images/close.png");
     top: 0px;
     right: -30px;
     height: 60px;
@@ -1643,13 +2228,15 @@ width: 100%;
     font-size: 25px;
     color:darkred;
 }
+
 body {
     /* background-image: var(--bg); */
-    background-image: url(bg.png);
+    background-image: url(./images/bg2.png);
     background-size: cover;
     background-repeat: no-repeat;
     color: var(--text-standard);
     margin: 0;
+    font-family: 'Inter';
 }
 
 /*div.button {
