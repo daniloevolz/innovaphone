@@ -20,6 +20,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var iptMethod = "";
     var googlekey = "";
     var list_buttons = [];
+    var list_buttons_sensors = [];
     var list_actions = [];
     var list_users = [];
     var colDireita;
@@ -156,6 +157,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "DeleteActionMessageSuccess") {
             app.send({ api: "admin", mt: "SelectActionMessage" });
             makePopup("Sucesso", "Ação excluída com sucesso!");
+        }
+        if (obj.api == "admin" && obj.mt == "SelectSensorsFromButtonsSuccess") {
+            console.log(obj.result);
+            list_buttons_sensors = JSON.parse(obj.result);
+            filterReports(obj.src, colDireita);
         }
         if (obj.api == "admin" && obj.mt == "SelectFromReportsSuccess") {
             receivedFragments.push(obj.result);
@@ -2323,9 +2329,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+        var lirelatorios4 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
         lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptAvailability"), null).setAttribute("id", "RptAvailability"));
         lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptCalls"), null).setAttribute("id", "RptCalls"));
         lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptActivities"), null).setAttribute("id", "RptActivities"));
+        lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptSensors"), null).setAttribute("id", "RptSensors"));
 
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
@@ -2368,6 +2376,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         a.addEventListener("click", function () { filterReports("RptCalls", _colDireita) })
         var a = document.getElementById("RptActivities");
         a.addEventListener("click", function () { filterReports("RptActivities", _colDireita) })
+        var a = document.getElementById("RptSensors");
+        a.addEventListener("click", function () {
+            app.send({ api: "admin", mt: "SelectSensorsFromButtons", src: "RptSensors" });
+            waitConnection(_colDireita)
+                
+        })
 
         colDireita = _colDireita;
     }
@@ -2432,6 +2446,37 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
                 })
                 break;
+            case "RptSensors":
+                var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+                var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+                var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+                var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
+                var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+                var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+                var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+                var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 45.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
+                colDireita.add(SelectRamal);
+                SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+                list_users.forEach(function (user) {
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                })
+                //sensor name
+                colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65.6%; left: 6%; font-weight: bold;", texts.text("labelSensorName"), null));
+                var SelectSensor = new innovaphone.ui1.Node("select", "position: absolute; top: 65.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensor");
+                colDireita.add(SelectSensor);
+                SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
+                list_buttons_sensors.forEach(function (b) {
+                    SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", b.button_prt, null)).setAttribute("id", b.id);
+                })
+                //sensor type
+                colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75.6%; left: 6%; font-weight: bold;", texts.text("labelValueType"), null));
+                var SelectSensorType = new innovaphone.ui1.Node("select", "position: absolute; top: 75.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensorType");
+                colDireita.add(SelectSensorType);
+                SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
+                list_sensor_types.forEach(function (t) {
+                    SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", t.typeName, null)).setAttribute("id", t.id);
+                })
+                break;
         }
         // buttons
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
@@ -2440,6 +2485,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var to = document.getElementById("dateTo").value;
             var event;
             var number;
+            var sensor;
+            var sensor_type;
 
             if (rpt == "RptCalls") {
                 number = document.getElementById("number").value;
@@ -2448,9 +2495,17 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var selectedOption = event.options[event.selectedIndex];
                 event = selectedOption.id;
             }
+            else if (rpt == "RptSensors") {
+                sensor = document.getElementById("selectSensor");
+                var selectedOption = sensor.options[sensor.selectedIndex];
+                sensor = selectedOption.value;
+                sensor_type = document.getElementById("selectSensorType");
+                var selectedOption = sensor_type.options[sensor_type.selectedIndex];
+                sensor_type = selectedOption.id;
+            }
             
 
-            app.send({ api: "admin", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, event: event, src: rpt });
+            app.send({ api: "admin", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
             waitConnection(colDireita);
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
@@ -2490,32 +2545,48 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 ////Título Tabela
                 //t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:30%; top:10%; font-size:17px; text-align:center; font-weight: bold", texts.text(src)).setAttribute("id", "titleReport"));
                 var list = new innovaphone.ui1.Div("position: absolute; left:2px; top:15%; right:2px; height:fit-content", null, "").setAttribute("id", "listReport");
-                //var columns = Object.keys(result[0]).length;
+                var columnsCount = Object.keys(JSON.parse(response)[0]).length;
+                var columnsName = JSON.parse(response)[0]
+                console.log("columnsCount", columnsCount)
                 var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
                 //Cabeçalho
-                switch (src) {
-                    case "RptCalls":
-                        for (i = 0; i < 6; i++) {
-                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
-                        }
-                        break;
-                    case "RptActivities":
-                        for (i = 0; i < 5; i++) {
-                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
-                        }
-                        break;
-                    case "RptAvailability":
-                        for (i = 0; i < 4; i++) {
-                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
-                        }
-                        break;
-                    default:
-                        for (i = 0; i < 1; i++) {
-                            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
-                        }
-                        break;
+                //for (i = 1; i < columnsCount; i++) {
+                //    listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //}
+                for (var key in columnsName) {
+                    if (columnsName.hasOwnProperty(key)) {
+                        listView.addColumn(null, "text", texts.text(key), key, 10, false);
 
+                    }
                 }
+                //switch (src) {
+                //    case "RptCalls":
+                //        for (i = 0; i < 6; i++) {
+                //            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //        }
+                //        break;
+                //    case "RptActivities":
+                //        for (i = 0; i < 5; i++) {
+                //            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //        }
+                //        break;
+                //    case "RptAvailability":
+                //        for (i = 0; i < 4; i++) {
+                //            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //        }
+                //        break;
+                //    case "RptSensors":
+                //        for (i = 0; i < columnsCount; i++) {
+                //            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //        }
+                //        break;
+                //    default:
+                //        for (i = 0; i < 1; i++) {
+                //            listView.addColumn(null, "text", texts.text("cabecalho" + src + + i), i, 10, false);
+                //        }
+                //        break;
+
+                //}
                 
                 //Tabela 
                 try {
@@ -2530,37 +2601,39 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                                 row.push(b.call_ringing);
                                 row.push(b.call_connected);
                                 row.push(b.call_ended);
+                                row.push(b.call_ended);
+                                row.push(texts.text("callStatus"+b.status))
                                 // Substituir valores de b.status por texto correspondente
-                                switch (b.status) {
-                                    case 6:
-                                        row.push("Desc. Realizada");
-                                        break;
-                                    case 7:
-                                        row.push("Desc. Recebida");
-                                        break;
-                                    case 134:
-                                        row.push("Desc. Realizada");
-                                        break;
-                                    case 135:
-                                        row.push("Desc. Recebida");
-                                        break;
-                                    default:
-                                        row.push(b.status);
-                                }
+                                //switch (b.status) {
+                                //    case 6:
+                                //        row.push("Desc. Realizada");
+                                //        break;
+                                //    case 7:
+                                //        row.push("Desc. Recebida");
+                                //        break;
+                                //    case 134:
+                                //        row.push("Desc. Realizada");
+                                //        break;
+                                //    case 135:
+                                //        row.push("Desc. Recebida");
+                                //        break;
+                                //    default:
+                                //        row.push(b.status);
+                                //}
                                 //row.push(b.status);
                                 // Substituir valores de b.direction por texto correspondente
-                                switch (b.direction) {
-                                    case "inc":
-                                        row.push("Entrada");
-                                        break;
-                                    case "out":
-                                        row.push("Saída");
-                                        break;
-                                    default:
-                                        row.push(b.direction);
-                                }
-                                //row.push(b.direction);
-                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                //switch (b.direction) {
+                                //    case "inc":
+                                //        row.push("Entrada");
+                                //        break;
+                                //    case "out":
+                                //        row.push("Saída");
+                                //        break;
+                                //    default:
+                                //        row.push(b.direction);
+                                //}
+                                row.push(b.direction);
+                                listView.addRow(b.id, row, "rowcl", "#A0A0A0", "#82CAE2");
                                 //t.add(list);
                             })
                             break;
@@ -2569,50 +2642,50 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                                 var row = [];
                                 row.push(b.sip);
                                 // Substituir valores de b.name por texto correspondente
-                                switch (b.name) {
-                                    case "video":
-                                        row.push("Vídeo");
-                                        break;
-                                    case "page":
-                                        row.push("Página");
-                                        break;
-                                    case "alarm":
-                                        row.push("Alarme");
-                                        break;
-                                    case "call":
-                                        row.push("Ligação");
-                                        break;
-                                    case "combo":
-                                        row.push("Combo");
-                                        break;
-                                    case "popup":
-                                        row.push("PopUp");
-                                        break;
-                                    default:
-                                        row.push(b.name);
-                                }
-                                //row.push(b.name);
+                                //switch (b.name) {
+                                //    case "video":
+                                //        row.push("Vídeo");
+                                //        break;
+                                //    case "page":
+                                //        row.push("Página");
+                                //        break;
+                                //    case "alarm":
+                                //        row.push("Alarme");
+                                //        break;
+                                //    case "call":
+                                //        row.push("Ligação");
+                                //        break;
+                                //    case "combo":
+                                //        row.push("Combo");
+                                //        break;
+                                //    case "popup":
+                                //        row.push("PopUp");
+                                //        break;
+                                //    default:
+                                //        row.push(b.name);
+                                //}
+                                row.push(texts.text(b.name));
                                 row.push(b.date);
                                 // Substituir valores de b.status por texto correspondente
-                                switch (b.status) {
-                                    case "start":
-                                        row.push("Ínício");
-                                        break;
-                                    case "stop":
-                                        row.push("Fim");
-                                        break;
-                                    case "inc":
-                                        row.push("Entrada");
-                                        break;
-                                    case "out":
-                                        row.push("Saída");
-                                        break;
-                                    default:
-                                        row.push(b.status);
-                                }
-                                //row.push(b.status);
+                                //switch (b.status) {
+                                //    case "start":
+                                //        row.push("Ínício");
+                                //        break;
+                                //    case "stop":
+                                //        row.push("Fim");
+                                //        break;
+                                //    case "inc":
+                                //        row.push("Entrada");
+                                //        break;
+                                //    case "out":
+                                //        row.push("Saída");
+                                //        break;
+                                //    default:
+                                //        row.push(b.status);
+                                //}
+                                row.push(texts.text(b.status));
                                 row.push(b.details);
-                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                listView.addRow(b.id, row, "rowcl", "#A0A0A0", "#82CAE2");
                                 //t.add(list);
                             })
                             break;
@@ -2623,7 +2696,19 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                                 row.push(b.date);
                                 row.push(b.status);
                                 row.push(b.group_name);
-                                listView.addRow(i, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                listView.addRow(b.id, row, "rowcl", "#A0A0A0", "#82CAE2");
+                                //t.add(list);
+                            })
+                            break;
+                        case "RptSensors":
+                            result.forEach(function (b) {
+                                var row = [];
+                                for (var key in b) {
+                                    if (b.hasOwnProperty(key)) {
+                                        row.push(b[key]);
+                                    }
+                                }
+                                listView.addRow(b.id, row, "rowcl", "#A0A0A0", "#82CAE2");
                                 //t.add(list);
                             })
                             break;

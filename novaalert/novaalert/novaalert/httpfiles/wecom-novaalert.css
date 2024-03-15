@@ -1848,6 +1848,24 @@ background-color: darkred;
     align-items: center;
     gap: 6px;
 }
+.neutro-800{
+    background: var(--colors-neutro-800);
+}
+.neutro-900{
+    background: var(--colors-neutro-900);
+}
+.verde-900{
+    background: var(--colors-verde-900);
+}
+.verde-600{
+    background: var(--colors-verde-600);
+}
+.gold-900{
+    background: var(--colors-gold-900);
+}
+.gold-600{
+    background: var(--colors-gold-600);
+}
 
 .notificationtop {
     /* top: 5%; */
@@ -1900,29 +1918,29 @@ background-color: darkred;
     flex-direction: column;
 } */
 
-.allbutton {
+/* .allbutton {
     margin: 5px;
     display: inline-flex;
     min-width: 100px;
     height: 15%;
     border-color: white;
     border-width: 0px;
-    /* background-color: var(--colbutton); */
-    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    /* background-color: var(--colbutton); 
+    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
     width: 15%;
     font-weight: bold;
-    color: var(--text-standard); /*white;*/
+    color: var(--text-standard); 
     font-size: 12px;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    background-color: var(--button); /*#191919;*/
+    background-color: var(--button); 
     text-align: center;
     cursor: pointer;
     flex-direction: column;
-}
+} */
 
-.exnumberbutton {
+/* .exnumberbutton {
     margin: 5px;
     min-width: 100px;
     display: inline-flex;
@@ -1930,10 +1948,10 @@ background-color: darkred;
     border-color: white;
     border-width: 3px;
     background-color: darkgreen;
-    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
+    background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));
     width: 15%;
     font-weight: bold;
-    color: var(--text-standard); /*white;*/
+    color: var(--text-standard); 
     font-size: 12px;
     box-sizing: border-box;
     align-items: center;
@@ -1941,7 +1959,7 @@ background-color: darkred;
     text-align: center;
     cursor: pointer;
     flex-direction: column;
-}
+} */
 .numberbutton {
     min-width: 100px;
     margin: 5px;
