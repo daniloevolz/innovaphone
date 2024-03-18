@@ -215,7 +215,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             try {
                 button_clicked = button_clicked.filter(deleteById(obj.btn_id));
                 var clicked = document.getElementById(obj.btn_id);
-                document.getElementById(obj.btn_id).style.backgroundColor = "var(--button)";
+                var elemento = document.getElementById(obj.btn_id)
+                elemento.children[0].classList.add("gold-900")
+                elemento.children[1].classList.add("gold-600")
             } catch {
                 console.log("danilo req: Alarme acionado não estava ativo no botão.");
                 
@@ -325,14 +327,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.add("gold-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.add("gold-600")
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.src)
@@ -347,14 +351,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.num + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.add("gold-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.add("gold-600")
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.num)
@@ -404,14 +410,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.add("gold-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.add("gold-600")
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.src)
@@ -426,14 +434,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.num + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
-
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(187 205 72 / 84%)";
+    
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.add("gold-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.add("gold-600")
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.num)
@@ -457,14 +467,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.remove("gold-900","verde-900")
+                    primeiroFilho.classList.add("vermelho-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.remove("gold-600","verde-600")
+                    segundoFilho.classList.add("vermelho-600")
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 // addNotification('inc', "Conectado " + obj.src)
@@ -479,14 +493,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.num + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "rgb(231 8 8 / 48%)";
+        
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.remove("gold-900")
+                    primeiroFilho.classList.add("vermelho-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.remove("gold-600")
+                    segundoFilho.classList.add("vermelho-600")
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 // addNotification('inc', "Conectado " + obj.num)
@@ -510,14 +529,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(element);
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.src + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.remove("gold-900","vermelho-900")
+                    primeiroFilho.classList.add("verde-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.remove("vermelho-600","gold-600")
+                    segundoFilho.classList.add("verde-600")
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
                 //var sipButton = document.getElementById(obj.src);
@@ -537,14 +560,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[id="' + obj.num + '-status"]');
+                var elementos = document.querySelectorAll('[button_prtstatus="' + obj.num + '-status"]');
 
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    // Altera as características do elemento
-                    elemento.style.backgroundColor = "";
+                    var primeiroFilho = elemento.children[0];
+                    primeiroFilho.classList.remove("gold-900","vermelho-900")
+                    primeiroFilho.classList.add("verde-900")
+                    var segundoFilho = elemento.children[1];
+                    segundoFilho.classList.remove("vermelho-600","gold-600")
+                    segundoFilho.classList.add("verde-600")
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "";
                 //var sipButton = document.getElementById(obj.btn_);
@@ -643,48 +670,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
          */
     }
 
-    function addNotification(flux, msg) {
-        return new Promise(function (resolve, reject) {
-            try {
-                var alarm = scroll.add(new innovaphone.ui1.Node("scroll-page", null, null, "scroll-page"));
-                var today = new Date();
-                var day = today.getDate() + "";
-                var month = (today.getMonth() + 1) + "";
-                var year = today.getFullYear() + "";
-                var hour = today.getHours() + "";
-                var minutes = today.getMinutes() + "";
-                var seconds = today.getSeconds() + "";
-
-                day = checkZero(day);
-                month = checkZero(month);
-                year = checkZero(year);
-                hour = checkZero(hour);
-                minutes = checkZero(minutes);
-                seconds = checkZero(seconds);
-
-                var div2 = alarm.add(new innovaphone.ui1.Div(null, null, "notificationtop"));
-                div2.addHTML("<img src='clock.png' class='img-icon'>" + day + "/" + month + "/" + year + " " + hour + ":" + minutes + ":" + seconds);
-
-                switch (flux) {
-                    case "inc":
-                        msg = "<img src='right-arrow.png' class='img-icon'><p>" + msg + "</p>";
-                        break;
-                    case "out":
-                        msg = "<img src='left-arrow.png' class='img-icon'><p>" + msg + "</p>";
-                        break;
-                }
-
-                var div = new innovaphone.ui1.Div(null, null, "notificationdown");
-                div.addHTML(msg);
-                var div3 = alarm.add(div);
-
-                resolve('Notification added successfully.');
-            } catch (error) {
-                reject('Error adding notification: ' + error.message);
-            }
-        });
-    }
-
     function checkZero(data) {
         if (data.length == 1) {
             data = "0" + data;
@@ -713,9 +698,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             combobtn.setAttribute("position-y", i); 
           }
 
-              // linha divisória (hr)
-              var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
-        
+        // linha divisória (hr)
+        var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
 
         // div botão iot 😲
             var iotBtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null,null,"iotBtnDiv"))
@@ -763,9 +747,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))     
            }     
        
-         
-   
-
         //var allbtn = document.getElementById("allbtn");
         console.log("TODOS OS BOTÕES " + "\n" + JSON.stringify(buttons))
         buttons.forEach(function (object) {
@@ -809,7 +790,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 // imgTop.setAttribute("src","./images/alarm.svg")
                 // var divTopText = divTop.add(new innovaphone.ui1.Div(null,object.button_name,null))
                 // var divBottom = allbtn.add(new innovaphone.ui1.Div("background: var(--colors-gold-600)", + object.button_prt, "buttondown"));
-                createButtons(object,"allbutton","gold-900","gold-600","./images/alarm.svg","btnEmpty")
+                createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","btnEmpty")
             }
             else if (object.button_type == "video") {
                 var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
@@ -1072,7 +1053,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "alarm") {
                 app.send({ api: "user", mt: "DecrementCount" });
                 app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt), btn_id: String(id) })
-                document.getElementById(id).style.backgroundColor = "var(--button)";
+                var elemento = document.getElementById(id);
+                elemento.children[0].classList.remove("vermelho-900")
+                elemento.children[1].classList.remove("vermelho-600")
+                elemento.children[0].classList.add("gold-900")
+                elemento.children[1].classList.add("gold-600")
             }
             if (type == "video") {
                 try {
@@ -1266,7 +1251,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         .catch(function (error) {
                             console.log(error);
                         });
-                    document.getElementById(id).style.backgroundColor = "darkred";
+                    var elemento = document.getElementById(id)
+                    elemento.children[0].classList.remove("gold-900")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.add("gold-600")
+                    elemento.children[1].classList.remove("vermelho-600")
                 }
             }
             if (type == "popup") {
@@ -1276,19 +1265,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "externalnumber") {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
-                addNotification('out', name)
+                addNotification('out', type)
                     .then(function (message) {
                         console.log(message);
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
-                document.getElementById(id).style.backgroundColor = "darkred";
+                    var elemento = document.getElementById(id)
+                    elemento.children[0].classList.remove("gold-900")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.remove("gold-600")
+                    elemento.children[1].classList.add("vermelho-600")
                 found = 1;
             }
             if (type == "alarm") {
                 app.send({ api: "user", mt: "TriggerAlert", prt: String(prt), btn_id: String(id)})
-                document.getElementById(id).style.backgroundColor = "darkred";
+                var elemento = document.getElementById(id)
+                elemento.children[0].classList.remove("gold-900")
+                elemento.children[1].classList.remove("gold-600")
+                elemento.children[0].classList.add("vermelho-900")
+                elemento.children[1].classList.add("vermelho-600")
                 found = 1;
             }
             if (type == "video") {
@@ -1551,15 +1548,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.setAttribute("button_type", object.button_type);
             allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.add(classButton)
             var divTop = document.createElement("div")
                 divTop.classList.add(bgTop)
                 divTop.classList.add("buttontop")
                 divTop.setAttribute("id", object.id + "-status");
-                divTop.setAttribute("id", object.button_prt + "-status");
+                //divTop.setAttribute("id", object.button_prt + "-status");
                 allBtns.appendChild(divTop)
                 var imgTop = document.createElement("img")
-                imgTop.style.width = "25px";
+                imgTop.style.width = "20px";
                 imgTop.setAttribute("src",srcImg)
                 divTop.appendChild(imgTop)
                 var divTopText = document.createElement("div")
@@ -1572,6 +1570,193 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 allBtns.appendChild(divBottom)
         }
     }
+    function addOnHistory(history, objType, state, text1, text2){
+        console.log("Função addOnHistory")
+        console.log(JSON.stringify(history))
+
+        var msgType = texts.text(history.type)
+        var msgState = texts.text(history.state)
+        var msgText1 = history.alert1
+        var msgText2 = history.alert2
+
+        // if(history = ''){
+        //     msgType = objType
+        //     msgState = state
+        //     msgText1 = text1
+        //     msgText2 = text2
+
+        // }else{
+            
+        //     msgType = history.type
+        //     msgState = history.state
+        //     msgText1 = history.alert1
+        //     msgText2 = history.alert2
+        // }
+
+        var today = new Date();
+        var day = today.getDate() + "";
+        var month = (today.getMonth() + 1) + "";
+        var year = today.getFullYear() + "";
+        var hour = today.getHours() + "";
+        var minutes = today.getMinutes() + "";
+        var seconds = today.getSeconds() + "";
+
+        const histScroll = document.getElementById("scroll-calls")
+
+        const boxDate = document.createElement("div")
+        boxDate.id = "boxDate"
+        boxDate.classList.add("boxDate")
+
+        const boxEvent = document.createElement("div")
+        boxEvent.id = "boxEvent"
+        boxEvent.classList.add("boxEvent", "lastHistory",'toastAnimation')
+
+        const boxEventTypeStatat = document.createElement("div")
+        boxEventTypeStatat.id = "boxEventTypeStatat"
+        boxEventTypeStatat.classList.add("boxEventTypeStatat")
+
+        const eventType = document.createElement("div")
+        eventType.id = "eventType"
+        eventType.classList.add("eventType")
+        eventType.textContent = msgType
+
+        const eventStatus = document.createElement("div")
+        eventStatus.id = "eventStatus"
+        eventStatus.classList.add("eventStatus")
+        eventStatus.textContent = msgState
+
+        const boxEventTexts = document.createElement("div")
+        boxEventTexts.id = "boxEventTexts"
+        boxEventTexts.classList.add("boxEventTexts")
+
+        const eventText1 = document.createElement("div")
+        eventText1.id = "eventText1"
+        eventText1.classList.add("eventText1")
+        eventText1.textContent = msgText1
+
+        const eventText2 = document.createElement("div")
+        eventText2.id = "eventText2"
+        eventText2.classList.add("eventText2")
+        eventText2.textContent = msgText2
+
+        const boxEventDate =document.createElement("div")
+        boxEventDate.id = "boxEventDate"
+        boxEventDate.classList.add("boxEventDate")
+
+        const eventDate =document.createElement("div")
+        eventDate.id = "eventDate"
+        eventDate.classList.add("eventDate")
+        eventDate.textContent = (day  < 10 ? '0' : '') + day + "/" + (month < 10 ? '0' : '') + month 
+
+        const eventHour =document.createElement("div")
+        eventHour.id = "eventHour"
+        eventHour.classList.add("eventHour")
+        eventHour.textContent = (hour  < 10 ? '0' : '') + hour + ":" + (minutes  < 10 ? '0' : '') + minutes
+
+        boxEventTypeStatat.appendChild(eventType)
+        boxEventTypeStatat.appendChild(eventStatus)
+
+        boxEventTexts.appendChild(eventText1)
+        boxEventTexts.appendChild(eventText2)
+
+        boxEventDate.appendChild(eventDate)
+        boxEventDate.appendChild(eventHour)
+
+        boxEvent.appendChild(boxEventTypeStatat)
+        boxEvent.appendChild(boxEventTexts)
+        boxEvent.appendChild(boxEventDate)
+
+        boxDate.appendChild(boxEvent)
+        histScroll.appendChild(boxDate)
+
+    }
+    
+    function addNotification(flux, msg) {
+        return new Promise(function(resolve, reject) {
+            try {
+                var today = new Date();
+                var day = today.getDate() + "";
+                var month = (today.getMonth() + 1) + "";
+                var year = today.getFullYear() + "";
+                var hour = today.getHours() + "";
+                var minutes = today.getMinutes() + "";
+            
+                const histScroll = document.getElementById("scroll-calls");
+            
+                const boxDate = document.createElement("div");
+                boxDate.id = "boxDate";
+                boxDate.classList.add("boxDate");
+            
+                const boxEvent = document.createElement("div");
+                boxEvent.id = "boxEvent";
+                boxEvent.classList.add("boxEvent", "lastHistory", 'toastAnimation');
+            
+                const boxEventTypeStatat = document.createElement("div");
+                boxEventTypeStatat.id = "boxEventTypeStatat";
+                boxEventTypeStatat.classList.add("boxEventTypeStatat");
+            
+                const eventType = document.createElement("div");
+                eventType.id = "eventType";
+                eventType.classList.add("eventType");
+                eventType.textContent = texts.text("labelType");
+            
+                const eventStatus = document.createElement("div");
+                eventStatus.id = "eventStatus";
+                eventStatus.classList.add("eventStatus");
+                eventStatus.textContent = msg;
+            
+                const boxEventTexts = document.createElement("div");
+                boxEventTexts.id = "boxEventTexts";
+                boxEventTexts.classList.add("boxEventTexts");
+            
+                const eventText1 = document.createElement("div");
+                eventText1.id = "eventText1";
+                eventText1.classList.add("eventText1");
+                eventText1.textContent = "DE QUEM";
+            
+                const eventText2 = document.createElement("div");
+                eventText2.id = "eventText2";
+                eventText2.classList.add("eventText2");
+                eventText2.textContent = "PARA QUEM";
+            
+                const boxEventDate = document.createElement("div");
+                boxEventDate.id = "boxEventDate";
+                boxEventDate.classList.add("boxEventDate");
+            
+                const eventDate = document.createElement("div");
+                eventDate.id = "eventDate";
+                eventDate.classList.add("eventDate");
+                eventDate.textContent = (day < 10 ? '0' : '') + day + "/" + (month < 10 ? '0' : '') + month;
+            
+                const eventHour = document.createElement("div");
+                eventHour.id = "eventHour";
+                eventHour.classList.add("eventHour");
+                eventHour.textContent = (hour < 10 ? '0' : '') + hour + ":" + (minutes < 10 ? '0' : '') + minutes;
+            
+                boxEventTypeStatat.appendChild(eventType);
+                boxEventTypeStatat.appendChild(eventStatus);
+            
+                boxEventTexts.appendChild(eventText1);
+                boxEventTexts.appendChild(eventText2);
+            
+                boxEventDate.appendChild(eventDate);
+                boxEventDate.appendChild(eventHour);
+            
+                boxEvent.appendChild(boxEventTypeStatat);
+                boxEvent.appendChild(boxEventTexts);
+                boxEvent.appendChild(boxEventDate);
+            
+                boxDate.appendChild(boxEvent);
+                histScroll.insertBefore(boxDate, histScroll.firstChild); // Adiciona no início da lista
+            
+                resolve('Notification added successfully.');
+            } catch (error) {
+                reject('Error adding notification: ' + error.message);
+            }
+        });
+    }
+    
+
     //#endregion
 }
 

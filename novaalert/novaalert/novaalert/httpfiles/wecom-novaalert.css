@@ -5,86 +5,129 @@
     padding: 0;
 }
 
+body {
+    /* background-image: var(--bg); */
+    background-image: url(./images/bg2.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: var(--text-standard);
+    margin: 0;
+    font-family: 'Inter';
+    overflow: hidden;
+}
+/*#region Alterações erick*/
+.scroll-container {
+    display: flex;
+    flex-direction: column;
+    margin: 3px;
+    overflow-x: auto;
+    height: 66%;
+    background-color: #00000010;
+
+} 
+.btn1{
+    width: 300px;
+    height: 150px;
+    position: absolute;
+    top: 10%;
+    left: 40%;
+    background-color: #1e73be;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.boxEvent{
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    font-size: 14px;
+    width: 100%;
+    height: 80px;
+    align-items: center;
+    border-radius: 8px;
+    /* margin: 10px; */
+}
+.toastAnimation {
+    animation: slideIn 1s forwards; /* duração e direção da animação */
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+.lastHistory{
+    background: #199fda30;
+}
+.boxEventTypeStatat{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 6px;
+    background: gray;
+    width: 100px;
+    height: 50px;
+}
+.eventType{
+    display: flex;
+    text-align: center;
+    justify-items: center;
+    background-color: #00000090;
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    height: 50%;
+    justify-content: center;
+    align-items: center;
+}
+.boxEventTexts{
+    display: flex;
+    width: 50%;
+    justify-content: space-between;
+    height: 100%;
+    align-items: center;
+}
+.boxEventDate{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+
+}
+
+/*#endregion */
+
 :root {
-    --1-font-family: "Montserrat", Helvetica;
-    --1-font-weight: 400;
-    --1-font-size: 20px;
-    --1-letter-spacing: 0px;
-    --1-line-height: normal;
-    --1-font-style: normal;
-    --2-font-family: "Montserrat", Helvetica;
-    --2-font-weight: 400;
-    --2-font-size: 24px;
-    --2-letter-spacing: 0px;
-    --2-line-height: normal;
-    --2-font-style: normal;
-    --3-font-family: "Montserrat", Helvetica;
-    --3-font-weight: 400;
-    --3-font-size: 30px;
-    --3-letter-spacing: 0px;
-    --3-line-height: normal;
-    --3-font-style: normal;
-    --4-font-family: "Montserrat", Helvetica;
-    --4-font-weight: 400;
-    --4-font-size: 36px;
-    --4-letter-spacing: 0px;
-    --4-line-height: normal;
-    --4-font-style: normal;
-    --5-font-family: "Montserrat", Helvetica;
-    --5-font-weight: 400;
-    --5-font-size: 48px;
-    --5-letter-spacing: 0px;
-    --5-line-height: normal;
-    --5-font-style: normal;
-    --6-font-family: "Montserrat", Helvetica;
-    --6-font-weight: 400;
-    --6-font-size: 60px;
-    --6-letter-spacing: 0px;
-    --6-line-height: normal;
-    --6-font-style: normal;
-    --7-font-family: "Montserrat", Helvetica;
-    --7-font-weight: 400;
-    --7-font-size: 72px;
-    --7-letter-spacing: 0px;
-    --7-line-height: normal;
-    --7-font-style: normal;
-    --8-font-family: "Montserrat", Helvetica;
-    --8-font-weight: 400;
-    --8-font-size: 96px;
-    --8-letter-spacing: 0px;
-    --8-line-height: normal;
-    --8-font-style: normal;
-    --9-font-family: "Montserrat", Helvetica;
-    --9-font-weight: 400;
-    --9-font-size: 128px;
-    --9-letter-spacing: 0px;
-    --9-line-height: normal;
-    --9-font-style: normal;
-    --l-font-family: "Montserrat", Helvetica;
+    --l-font-family: "Inter", Helvetica;
     --l-font-weight: 400;
     --l-font-size: 18px;
     --l-letter-spacing: 0px;
     --l-line-height: normal;
     --l-font-style: normal;
-    --lg-font-family: "Montserrat", Helvetica;
+    --lg-font-family: "Inter", Helvetica;
     --lg-font-weight: 400;
     --lg-font-size: 16px;
     --lg-letter-spacing: 0px;
     --lg-line-height: normal;
     --lg-font-style: normal;
-    --xs-font-family: "Montserrat", Helvetica;
+    --xs-font-family: "Inter", Helvetica;
     --xs-font-weight: 400;
     --xs-font-size: 12px;
     --xs-letter-spacing: 0px;
     --xs-line-height: normal;
     --xs-font-style: normal;
-    --sm-font-family: "Montserrat", Helvetica;
+    --sm-font-family: "Inter", Helvetica;
     --sm-font-weight: 400;
     --sm-font-size: 14px;
     --sm-letter-spacing: 0px;
     --sm-line-height: normal;
     --sm-font-style: normal;
-    --base-font-family: "Montserrat", Helvetica;
+    --base-font-family: "Inter", Helvetica;
     --base-font-weight: 400;
     --base-font-size: 16px;
     --base-letter-spacing: 0px;
@@ -168,7 +211,6 @@
     --body-2-letter-spacing: 0px;
     --body-2-line-height: normal;
     --body-2-font-style: normal;
-    --sombra: 5px 5px 30px 0px rgba(0, 0, 0, 0.25);
     --colors-vermelho-100: rgba(255, 241, 240, 1);
     --colors-vermelho-200: rgba(255, 204, 199, 1);
     --colors-vermelho-300: rgba(255, 163, 158, 1);
@@ -341,7 +383,7 @@
 .buttons .combobutton {
     display: flex;
     flex-direction: column;
-    height: 90px;
+    height: 100px !important;
     align-items: flex-start;
     /* background-color: #ffffff; */
     background-color: #595959;
@@ -397,6 +439,8 @@
     overflow: hidden;
     width: 198px;
     position: relative;
+    font-family: 'Inter';
+    
   }
 
   .buttons .div-page {
@@ -1847,6 +1891,8 @@ background-color: darkred;
     justify-content: center;
     align-items: center;
     gap: 6px;
+
+
 }
 .neutro-800{
     background: var(--colors-neutro-800);
@@ -1859,6 +1905,12 @@ background-color: darkred;
 }
 .verde-600{
     background: var(--colors-verde-600);
+}
+.vermelho-900{
+    background: var(--colors-vermelho-900);
+}
+.vermelho-600{
+    background: var(--colors-vermelho-600);
 }
 .gold-900{
     background: var(--colors-gold-900);
@@ -2245,16 +2297,6 @@ width: 100%;
 .popup-alarm-p{
     font-size: 25px;
     color:darkred;
-}
-
-body {
-    /* background-image: var(--bg); */
-    background-image: url(./images/bg2.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    color: var(--text-standard);
-    margin: 0;
-    font-family: 'Inter';
 }
 
 /*div.button {

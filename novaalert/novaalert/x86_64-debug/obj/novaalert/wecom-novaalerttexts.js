@@ -13,6 +13,8 @@ Wecom.novaalertTexts = {
         labelTituloLicense: "Licenciamento do sistema",
         lblLicenseToken: "Token do Sistema:",
         labelLicenseFile: "Chave de Licença:",
+        inputAlert: "Alerta",
+        inputState1: "Ligação",
         labelLicenseInstallDate: "Data de instalação da licença:",
         labelLicenseActive: "Licença Ativa",
         labelTituloEdit: "Edição",
@@ -180,6 +182,7 @@ Wecom.novaalertTexts = {
         labelExternalNumber: "External Call",
         labelAlarm: "Alarm",
         labelFrom: "Start Period:",
+
         labelTo: "End Period:",
         labelAgent: "Agent",
         labelPhone: "Phone:",
