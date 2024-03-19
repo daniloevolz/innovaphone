@@ -50,6 +50,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var coldireita;
     var divButtonsMain;
     var divOptionsMain;
+    var zoneDiv;
 
     var scroll;
     var popup;
@@ -1404,10 +1405,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         that.clear();
         var AllBody = that.add(new innovaphone.ui1.Div("display:flex; flex-direction:row; width:100%; height:100%; justify-content:center",null,null))
         //Coluna Esquerda
-        var col_esquerda = AllBody.add(new innovaphone.ui1.Div("width: 100%; ", null));
+        var col_esquerda = AllBody.add(new innovaphone.ui1.Div("width: 100%; height:100%;", null));
         //colunaesquerda adicionar classe depois
         
-        var _container = col_esquerda.add(new innovaphone.ui1.Div("display: none; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "./images/play.png"), null));
+        //var _container = col_esquerda.add(new innovaphone.ui1.Div("display: none; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "./images/play.png"), null));
         // none > flex 
 
         //Div principal do meio
@@ -1431,12 +1432,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // var _call = col_esquerda.add(new innovaphone.ui1.Div(null, null, "call-container"));
         // var _history = _call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px", texts.text("labelHistorico"), "divhistory"))
         var _scroll = col_esquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
-        _scroll.setAttribute("id", "scroll-calls")
+        _scroll.setAttribute("id", "scroll-calls");
+
+        var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div("height:40%;width:100%;","ZONAS SERÃO AQUI","zoneDiv"))
 
         coldireita = col_direita;
         colesquerda = col_esquerda;
-        container = _container;
+        //container = _container;
         scroll = _scroll;
+        zoneDiv = _zoneDiv
         divButtonsMain = divButtons
         divOptionsMain =  divOptions
         
