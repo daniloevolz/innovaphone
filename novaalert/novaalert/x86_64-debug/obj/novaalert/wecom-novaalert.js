@@ -63,6 +63,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({api: "user", mt: "SelectAllInfo"})
         userUI = user;
         var browserName = navigator.appCodeName;
         console.log("Navegador:", browserName);
@@ -167,7 +168,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             connected();
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
-            popButtons(list_buttons); //Cria os botões na tela
+            popButtons(list_buttons,1); //Cria os botões na tela
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "UserConnected") {
@@ -639,6 +640,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             _popup.content.add(iptDevice);
             _popup.content.add(btnSelectDevice);
         }
+        if (obj.api == "user" && obj.mt == "SensorAllInfoResult") {
+            console.log("list_history " + JSON.stringify(obj.result))
+        }
+        if (obj.api == "user" && obj.mt == "SensorReceived") {
+            //atualizar as divs dos sensores com as novas informações
+            // ~pietro
+        }
+
     }
 
     function colEsquerdaTeclado(){
@@ -683,7 +692,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
 
     }
-    function popButtons(buttons) {
+    function popButtons(buttons,page) {
 
         // var combobtn = coldireita.add(new innovaphone.ui1.Div(null, null, "combobtn"));
         // var allbtn = coldireita.add(new innovaphone.ui1.Div(null, null, "allbtn"));
@@ -694,7 +703,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
           var combobtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "combobtn"));
           for (let i = 1; i < 6 ; i++) {
           var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"btnEmpty combobutton"))
-         
+            
+            combobtn.setAttribute("page",page)
             combobtn.setAttribute("position-x", 1); 
             combobtn.setAttribute("position-y", i); 
           }
@@ -702,23 +712,28 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // linha divisória (hr)
         var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
 
-        // div botão iot 😲
-            var iotBtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null,null,"iotBtnDiv"))
+        // div sensores 💣💣💣
+            var sensoresBtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null,null,"sensorBtnDiv"))
             for (let i = 1; i < 6 ; i++) {
-                var iotBtn = iotBtnDiv.add(new innovaphone.ui1.Div(null,null,"btnEmpty iotBtns"))
+                var sensorBtn = sensoresBtnDiv.add(new innovaphone.ui1.Div(null,null,"btnEmpty sensorButton"))
+                
+                sensorBtn.setAttribute("page",page)
+                sensorBtn.setAttribute("position-x", 2); 
+                sensorBtn.setAttribute("position-y", i); 
         }
 
           // linha divisória (hr)
           var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
    
           var allbtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "allbtn"));
-          for (let i = 1; i < 27; i++) {
+          for (let i = 1; i < 26; i++) {
      
             var positionX = Math.ceil(i / 5) + 2; // 5/5 = 1 + 2  é = 3  e assim vai sempre ate 7
             var positionY = i % 5 === 0 ? 5 : i % 5; // 5%5 = 1 e assim vai 
         
             var allbtn = allbtnDiv.add(new innovaphone.ui1.Div(null, null, "btnEmpty"));
-        
+            
+            allbtn.setAttribute("page",page)
             allbtn.setAttribute("position-x", positionX);
             allbtn.setAttribute("position-y", positionY);
         }
@@ -745,138 +760,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
            for (let i = 1; i < 6 ; i++) {
                var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
                var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
-               var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))     
+               var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
+               pagesBtnDiv.setAttribute("page", i )
            }     
        
         //var allbtn = document.getElementById("allbtn");
         console.log("TODOS OS BOTÕES " + "\n" + JSON.stringify(buttons))
-        buttons.forEach(function (object) {
-
-            if (object.button_type == "combo") {
-                var selector = ".combobutton[position-x='" + object.position_x + "'][position-y='" + object.position_y + "']";
-                var combobtn = document.querySelector(selector);
-                if (combobtn) {
-                    combobtn.setAttribute("id", object.id);
-                    combobtn.setAttribute("button_type", object.button_type);
-                    combobtn.setAttribute("button_prt", object.button_prt);
-                    combobtn.setAttribute("button_id", object.id);
-                    var divTop = document.createElement("div")
-                        divTop.style.backgroundColor = "var(--colors-ciano-900)"
-                        divTop.classList.add("buttontop")
-                        divTop.setAttribute("id", object.id + "-status");
-                        combobtn.appendChild(divTop)
-                        var imgTop = document.createElement("img")
-                        imgTop.style.width = "35px";
-                        imgTop.setAttribute("src","./images/Layer.svg")
-                        divTop.appendChild(imgTop)
-                        var divTopText = document.createElement("div")
-                        divTopText.textContent = object.button_name
-                        divTop.appendChild(divTopText);
-                        var divBottom = document.createElement("div")
-                        divBottom.style.backgroundColor = "var(--colors-ciano-600)"
-                        divBottom.classList.add("buttondown")
-                        divBottom.textContent = object.button_prt
-                        combobtn.appendChild(divBottom)
-                }
-            }
-            if (object.button_type == "alarm") {
-                // allbtn.setAttribute("id", object.id);
-                allbtn.setAttribute("class", "allbutton");
-                // allbtn.setAttribute("button_type", object.button_type);
-                // allbtn.setAttribute("button_prt", object.button_prt);
-                // //combobtn.setAttribute("button_id", object.id);
-                // var divTop = allbtn.add(new innovaphone.ui1.Div("background: var(--colors-gold-900)", null , "buttontop"));
-                // divTop.setAttribute("id", object.id + "-status");
-                // var imgTop = divTop.add(new innovaphone.ui1.Node("img","width:35px",null,null))
-                // imgTop.setAttribute("src","./images/alarm.svg")
-                // var divTopText = divTop.add(new innovaphone.ui1.Div(null,object.button_name,null))
-                // var divBottom = allbtn.add(new innovaphone.ui1.Div("background: var(--colors-gold-600)", + object.button_prt, "buttondown"));
-                createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","btnEmpty")
-            }
-            else if (object.button_type == "video") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
-                div1.setAttribute("button_type", object.button_type);
-                div1.setAttribute("button_prt", object.button_prt);
-                //div1.setAttribute("button_id", object.id);
-                div1.setAttribute("id", object.id);
-
-
-                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-                div2.setAttribute("id", object.button_prt + "-status");
-                div2.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
-
-                var div3 = div1.add(new innovaphone.ui1.Div(null, "CÂMERA", "buttondown"));
-
-                allbtn.add(div1);
-
-            }
-            else if (object.button_type == "number") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
-                div1.setAttribute("button_type", object.button_type);
-                div1.setAttribute("button_prt", object.button_prt);
-                //div1.setAttribute("button_id", object.id);
-                div1.setAttribute("id", object.id);
-                //div1.setAttribute("button_prt_user", object.button_prt_user);
-
-                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-                div2.setAttribute("id", object.button_prt + "-status");
-                div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
-
-                var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
-
-                allbtn.add(div1);
-            }
-            else if (object.button_type == "user") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
-                div1.setAttribute("button_type", object.button_type);
-                div1.setAttribute("button_prt", object.button_prt);
-                //div1.setAttribute("button_id", object.id);
-                div1.setAttribute("id", object.id);
-                //div1.setAttribute("button_prt_user", object.button_prt_user);
-
-                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-                div2.setAttribute("id", object.button_prt + "-status");
-                div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
-
-                var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
-
-                allbtn.add(div1);
-            }
-            else if (object.button_type == "externalnumber") {
-
-                // allbtn.setAttribute("id", object.id);
-                // allbtn.setAttribute("class", "exnumberbutton");
-                // allbtn.setAttribute("button_type", object.button_type);
-                // allbtn.setAttribute("button_prt", object.button_prt);
-                // //combobtn.setAttribute("button_id", object.id);
-                // var divTop = allbtn.add(new innovaphone.ui1.Div("background: var(--colors-verde-900)", null , "buttontop"));
-                // divTop.setAttribute("id", object.id + "-status");
-                // var imgTop = divTop.add(new innovaphone.ui1.Node("img","width:35px",null,null))
-                // imgTop.setAttribute("src","./images/phone.svg.svg")
-                // var divTopText = divTop.add(new innovaphone.ui1.Div(null,object.button_name,null))
-                // var divBottom = allbtn.add(new innovaphone.ui1.Div("background: var(--colors-verde-600)", + object.button_prt, "buttondown"));
-                createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","btnEmpty")
-            }
-            else if (object.button_type == "page") {
-                var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
-                div1.setAttribute("button_type", object.button_type);
-                div1.setAttribute("button_prt", object.button_prt);
-                //div1.setAttribute("button_id", object.id);
-                div1.setAttribute("id", object.id);
-
-
-                var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-                div2.setAttribute("id", object.button_prt + "-status");
-                div2.addHTML("<img src='page.png' class='img-icon'>" + object.button_name);
-
-                var div3 = div1.add(new innovaphone.ui1.Div(null, "PÁGINA", "buttondown"));
-
-                pagebtn.add(div1);
-
-            }
-            
-        });
-
+        makeAllButtons(buttons,page)
         var botoes = document.querySelectorAll(".allbutton");
         for (var i = 0; i < botoes.length; i++) {
             var botao = botoes[i];
@@ -919,6 +809,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+        var pages = document.querySelectorAll(".pagina")
+        pages.forEach(function(page){
+            page.addEventListener("click", function(evt){
+                var divPrincipal = document.getElementById("divMainButtons")
+                var divOptions = document.getElementById("divOptions")
+                var pageAttribute = page.getAttribute("page")
+                divPrincipal.setAttribute("page",pageAttribute)
+                divPrincipal.innerHTML = ''
+                divOptions.innerHTML = ''
+                popButtons(buttons,pageAttribute)
+            });
+        })
+        
 
     }
 
@@ -1416,26 +1319,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         //Botões centrais
         var divButtons = divCenter.add(new innovaphone.ui1.Div("width:100% ",null,"divMainButtons"))
+        divButtons.setAttribute("id","divMainButtons")
+        divButtons.setAttribute("page",1)
     
         //Botões Fixos no final
         var divOptions = divCenter.add(new innovaphone.ui1.Div("position: fixed; bottom: 0",null,null))
+        divOptions.setAttribute("id","divOptions")
         
         //Coluna Direita
         var col_direita = AllBody.add(new innovaphone.ui1.Div("width: 100%; background: var(--colors-neutro-1000) ", "Texto TesTE"));
-        
-        // adicionar classe colunadireita depois
-
-        //var videoPlayer = colesquerda.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:40%; border: 0px;", null, null));
-        //videoPlayer.setAttribute("src", "https://www.youtube.com/embed/gz8tmR43AJE");
-
-        // _container.setAttribute("id", "containerPlayer");
-        // var _call = col_esquerda.add(new innovaphone.ui1.Div(null, null, "call-container"));
-        // var _history = _call.add(new innovaphone.ui1.Div("height: 10%; width: 100%; background-color:black; color:white; text-align: center; font-weight:bold; font-size: 22px", texts.text("labelHistorico"), "divhistory"))
         var _scroll = col_esquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
         _scroll.setAttribute("id", "scroll-calls");
-
-        var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div("height:40%;width:100%;","ZONAS SERÃO AQUI","zoneDiv"))
-
+        var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div("height:40%;width:100%;",null,"zoneDiv").setAttribute("id","zoneDiv"))
         coldireita = col_direita;
         colesquerda = col_esquerda;
         //container = _container;
@@ -1443,94 +1338,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         zoneDiv = _zoneDiv
         divButtonsMain = divButtons
         divOptionsMain =  divOptions
-        
-        // //ARRASTAR E SOLTAR DIMENSÂO COLUNAS
-        // // Obtenha as referências às DIVs que serão redimensionadas
-        // var leftColumn = document.querySelector('.colunaesquerda');
-        // var rightColumn = document.querySelector('.colunadireita');
-
-        // // Crie uma DIV para a barra de divisão
-        // var divider = document.createElement('div');
-        // divider.style.position = 'absolute';
-        // divider.style.width = '5px';
-        // divider.style.left = '15%';
-        // divider.style.height = '100%';
-        // divider.style.cursor = 'ew-resize';
-        // rightColumn.parentNode.insertBefore(divider, rightColumn);
-
-        // // Adicione os manipuladores de eventos
-        // var isDragging = false;
-        // var startX = 0;
-        // var startWidth = 0;
-
-        // divider.addEventListener('mousedown', function (event) {
-        //     isDragging = true;
-        //     startX = event.pageX;
-        //     startWidth = parseInt(getComputedStyle(leftColumn).width, 10);
-        // });
-
-        // document.addEventListener('mousemove', function (event) {
-        //     if (!isDragging) {
-        //         return;
-        //     }
-
-        //     var offset = event.pageX - startX;
-        //     var newWidth = startWidth + offset;
-
-        //     // Verifique se a nova largura está dentro dos limites permitidos
-        //     if (newWidth > 0 && newWidth < window.innerWidth * 0.8) {
-        //         leftColumn.style.width = newWidth + 'px';
-        //         var rightWidth = window.innerWidth - newWidth;
-        //         rightColumn.style.width = rightWidth - 5 + 'px';
-        //         rightColumn.style.left = newWidth + 5 + 'px';
-        //         divider.style.left = newWidth + 'px';
-        //     }
-        // });
-
-        // document.addEventListener('mouseup', function () {
-        //     isDragging = false;
-        // });
-
-
-        // // Obtém a referência ao elemento que você deseja observar eventos de toque
-        // //var elemento = document.getElementById("meu-elemento");
-
-        // // Adiciona um ouvinte de eventos para touchstart
-        // divider.addEventListener("touchstart", function (event) {
-        //     // Lida com o evento touchstart aqui
-        //     isDragging = true;
-        //     //startX = event.pageX;
-        //     //startX = event.changedTouches[0].clientX
-        //     startX = event.touches[0].pageX;
-        //     startWidth = parseInt(getComputedStyle(leftColumn).width, 10);
-        // });
-
-        // // Adiciona um ouvinte de eventos para touchmove
-        // divider.addEventListener("touchmove", function (event) {
-        //     // Lida com o evento touchmove aqui
-        //     if (!isDragging) {
-        //         return;
-        //     }
-
-        //     var offset = event.touches[0].pageX - startX;
-        //     var newWidth = startWidth + offset;
-
-        //     // Verifique se a nova largura está dentro dos limites permitidos
-        //     if (newWidth > 0 && newWidth < window.innerWidth * 0.8) {
-        //         leftColumn.style.width = newWidth + 'px';
-        //         var rightWidth = window.innerWidth - newWidth;
-        //         rightColumn.style.width = rightWidth - 5 + 'px';
-        //         rightColumn.style.left = newWidth + 5 + 'px';
-        //         divider.style.left = newWidth + 'px';
-        //     }
-        // });
-
-        // // Adiciona um ouvinte de eventos para touchend
-        // divider.addEventListener("touchend", function (event) {
-        //     // Lida com o evento touchend aqui
-        //     isDragging = false;
-        // });
-
+        leftBottomButons()
     }
 
     function calllistonmessage(consumer, obj) {
@@ -1541,11 +1349,163 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
-    
-    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
+    function makeAllButtons(buttons,page){
+        buttons.forEach(function (object) {
 
-        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}']`;
+            switch (object.button_type) {
+                case "combo":
+                    var selector = ".combobutton[position-x='" + object.position_x + "'][position-y='" + object.position_y + "'][page='" + object.page + "']";
+                    var combobtn = document.querySelector(selector);
+                    if (combobtn) {
+                        combobtn.setAttribute("id", object.id);
+                        combobtn.setAttribute("button_type", object.button_type);
+                        combobtn.setAttribute("button_prt", object.button_prt);
+                        combobtn.setAttribute("button_id", object.id);
+                        var divTop = document.createElement("div")
+                            divTop.style.backgroundColor = "var(--colors-ciano-900)"
+                            divTop.classList.add("buttontop")
+                            divTop.setAttribute("id", object.id + "-status");
+                            combobtn.appendChild(divTop)
+                            var imgTop = document.createElement("img")
+                            imgTop.style.width = "35px";
+                            imgTop.setAttribute("src","./images/layer.svg")
+                            divTop.appendChild(imgTop)
+                            var divTopText = document.createElement("div")
+                            divTopText.textContent = object.button_name
+                            divTop.appendChild(divTopText);
+                            var divBottom = document.createElement("div")
+                            divBottom.style.backgroundColor = "var(--colors-ciano-600)"
+                            divBottom.classList.add("buttondown")
+                            divBottom.textContent = object.button_prt
+                            combobtn.appendChild(divBottom)
+                    }
+                    //componentizar ~pietro
+                    break;
+                case "alarm":
+                    createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","btnEmpty",null,null,object.page)
+                    break;
+                case "externalnumber":
+                    createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","btnEmpty",null,null,object.page)
+                    break;
+                case "sensor":
+                    app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
+                        console.log("SendSrcResult: " + JSON.stringify(obj))
+                        createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton","sensor", JSON.parse(obj.result) , object.page)     
+                    })            
+                    break;
+                default:
+                    break;
+            }
+            // if (object.button_type == "combo") {
+            //     var selector = ".combobutton[position-x='" + object.position_x + "'][position-y='" + object.position_y + "']";
+            //     var combobtn = document.querySelector(selector);
+            //     if (combobtn) {
+            //         combobtn.setAttribute("id", object.id);
+            //         combobtn.setAttribute("button_type", object.button_type);
+            //         combobtn.setAttribute("button_prt", object.button_prt);
+            //         combobtn.setAttribute("button_id", object.id);
+            //         var divTop = document.createElement("div")
+            //             divTop.style.backgroundColor = "var(--colors-ciano-900)"
+            //             divTop.classList.add("buttontop")
+            //             divTop.setAttribute("id", object.id + "-status");
+            //             combobtn.appendChild(divTop)
+            //             var imgTop = document.createElement("img")
+            //             imgTop.style.width = "35px";
+            //             imgTop.setAttribute("src","./images/layer.svg")
+            //             divTop.appendChild(imgTop)
+            //             var divTopText = document.createElement("div")
+            //             divTopText.textContent = object.button_name
+            //             divTop.appendChild(divTopText);
+            //             var divBottom = document.createElement("div")
+            //             divBottom.style.backgroundColor = "var(--colors-ciano-600)"
+            //             divBottom.classList.add("buttondown")
+            //             divBottom.textContent = object.button_prt
+            //             combobtn.appendChild(divBottom)
+            //     }
+            // }
+            // if (object.button_type == "alarm") {
+            //     // allbtn.setAttribute("id", object.id);
+            //     allbtn.setAttribute("class", "allbutton");
+            //     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","btnEmpty")
+            // }
+            // else if (object.button_type == "video") {
+            //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
+            //     div1.setAttribute("button_type", object.button_type);
+            //     div1.setAttribute("button_prt", object.button_prt);
+            //     //div1.setAttribute("button_id", object.id);
+            //     div1.setAttribute("id", object.id);
 
+
+            //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+            //     div2.setAttribute("id", object.button_prt + "-status");
+            //     div2.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
+
+            //     var div3 = div1.add(new innovaphone.ui1.Div(null, "CÂMERA", "buttondown"));
+
+            //     allbtn.add(div1);
+
+            // }
+            // else if (object.button_type == "number") {
+            //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
+            //     div1.setAttribute("button_type", object.button_type);
+            //     div1.setAttribute("button_prt", object.button_prt);
+            //     //div1.setAttribute("button_id", object.id);
+            //     div1.setAttribute("id", object.id);
+            //     //div1.setAttribute("button_prt_user", object.button_prt_user);
+
+            //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+            //     div2.setAttribute("id", object.button_prt + "-status");
+            //     div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+
+            //     var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
+
+            //     allbtn.add(div1);
+            // }
+            // else if (object.button_type == "user") {
+            //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
+            //     div1.setAttribute("button_type", object.button_type);
+            //     div1.setAttribute("button_prt", object.button_prt);
+            //     //div1.setAttribute("button_id", object.id);
+            //     div1.setAttribute("id", object.id);
+            //     //div1.setAttribute("button_prt_user", object.button_prt_user);
+
+            //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+            //     div2.setAttribute("id", object.button_prt + "-status");
+            //     div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
+
+            //     var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
+
+            //     allbtn.add(div1);
+            // }
+            // else if (object.button_type == "externalnumber") {
+            //     createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","btnEmpty")
+            // }
+            // else if (object.button_type == "page") {
+            //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
+            //     div1.setAttribute("button_type", object.button_type);
+            //     div1.setAttribute("button_prt", object.button_prt);
+            //     //div1.setAttribute("button_id", object.id);
+            //     div1.setAttribute("id", object.id);
+
+
+            //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
+            //     div2.setAttribute("id", object.button_prt + "-status");
+            //     div2.addHTML("<img src='page.png' class='img-icon'>" + object.button_name);
+
+            //     var div3 = div1.add(new innovaphone.ui1.Div(null, "PÁGINA", "buttondown"));
+
+            //     pagebtn.add(div1);
+
+            //  }
+            // else if(object.button_type == "sensor"){
+            //     createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton")
+            // }
+            
+        });
+    }
+    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass,sensor,sensorInfo,page){
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
@@ -1567,10 +1527,20 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var divTopText = document.createElement("div")
                 divTopText.textContent = object.button_name
                 divTop.appendChild(divTopText);
+
                 var divBottom = document.createElement("div")
                 divBottom.classList.add(bgBottom)
                 divBottom.classList.add("buttondown")
-                divBottom.textContent = object.button_prt
+                var divBottomTxt = document.createElement("div")
+                divBottomTxt.textContent = object.button_prt
+                divBottom.appendChild(divBottomTxt)
+                if(sensor == "sensor"){
+                    var divBottomSensorInfo = document.createElement("div")
+                    divBottomSensorInfo.style.fontWeight = "bold;"
+                    divBottom.style.gap = "10px"
+                    divBottomSensorInfo.innerHTML = Object.values(sensorInfo[0])[0];
+                    divBottom.appendChild(divBottomSensorInfo)
+                }
                 allBtns.appendChild(divBottom)
         }
     }
@@ -1759,7 +1729,110 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
         });
     }
-    
+    // apenas para demonstração
+    var zonebuttons = [
+        {
+            "name": "Fabrica",
+            "action": [
+                { "alarm": "FUJAM" }
+            ]
+        },
+        {
+            "name": "Adminstrativo",
+            "action": [
+                { "alarm": "CORRAM" }
+            ]
+        },
+        {
+            "name": "Vendas",
+            "action": [
+                { "alarm": "ADULTOS PRIMEIRO" }
+            ]
+        }
+    ];
+    var helpButton = [{
+        "name": "Bombeiro",
+        "img": "./images/fire.svg"
+    },
+    {
+        "name": "Polícia",
+        "img": "./images/police.svg"
+    },
+    {
+        "name": "Água",
+        "img": "./images/water.svg"
+    },
+    {
+        "name": "Central",
+        "img": "./images/house.svg"
+    },
+    {
+        "name": "Hospital",
+        "img": "./images/hospital.svg"
+    },
+    {
+        "name": "Energia",
+        "img": "./images/light.svg"
+    }]
+    function truncateString(str, maxLength) {
+        if (str.length > maxLength) {
+            return str.substring(0, maxLength) + "...";
+        } else {
+            return str;
+        }
+    }
+    function leftBottomButons(){
+
+        const zoneDiv = document.getElementById("zoneDiv")
+        zonebuttons.forEach(function(zb){
+            const zoneBtn = document.createElement('div')
+            zoneBtn.classList.add("zoneBtn")
+            zoneBtn.id = "zoneBtn"
+            
+            const imgBtn = document.createElement('img')
+            imgBtn.classList.add("imgBtn")
+            imgBtn.id = "imgBtn"
+            imgBtn.setAttribute("src","./images/megaphone.svg")
+
+            const txtBtn = document.createElement('div')
+            txtBtn.classList.add("txtBtn")
+            txtBtn.id = "txtBtn"
+            txtBtn.textContent = truncateString(zb.name, "7")
+
+            zoneBtn.addEventListener("click", function(){
+                console.log("Alarme BTN Clicado", zb.action[0].alarm)
+            })
+            zoneBtn.appendChild(imgBtn)
+            zoneBtn.appendChild(txtBtn)
+            zoneDiv.appendChild(zoneBtn)
+        
+        })
+
+        helpButton.forEach(function(hb){
+            const zoneBtn = document.createElement('div')
+            zoneBtn.classList.add("zoneBtn")
+            zoneBtn.id = "zoneBtn"
+
+            const imgBtn = document.createElement('img')
+            imgBtn.classList.add("imgBtn")
+            imgBtn.id = "imgBtn"
+            imgBtn.setAttribute("src", hb.img)
+
+            const txtBtn = document.createElement('div')
+            txtBtn.classList.add("txtBtn")
+            txtBtn.id = "txtBtn"
+            txtBtn.textContent = hb.name
+
+            zoneBtn.addEventListener("click", function(){
+                console.log("Function do Botão ligar para", hb.name)
+            })
+            zoneBtn.appendChild(imgBtn)
+            zoneBtn.appendChild(txtBtn)
+            zoneDiv.appendChild(zoneBtn)
+        
+        })
+
+    }
 
     //#endregion
 }

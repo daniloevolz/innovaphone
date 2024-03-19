@@ -14,8 +14,35 @@ body {
     margin: 0;
     font-family: 'Inter';
     overflow: hidden;
+    height: 100vh;
 }
 /*#region Alterações erick*/
+.zoneDiv{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.zoneBtn{
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    margin: 6px;
+    padding: 6px;
+    gap: 10px;
+    width: 120px;
+    height: 100px;
+    background-color: #75777691;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+.zoneBtn:hover{
+    background-color: rgba(255, 0, 0, 0.4);
+}
+.lastHistory{
+    background: #199fda30;
+    margin: 6px 0 6px 0;
+}
 .scroll-container {
     display: flex;
     flex-direction: column;
@@ -393,7 +420,7 @@ body {
     position: relative;
   }
 
-  .buttons .iotBtnDiv {
+  .buttons .sensorBtnDiv {
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -479,6 +506,7 @@ body {
     border-radius: 8px;
     overflow: hidden;
     margin: 5px;
+    cursor: pointer;
   }
   
   .buttons .framePagesText {
@@ -1899,6 +1927,9 @@ background-color: darkred;
 }
 .neutro-900{
     background: var(--colors-neutro-900);
+}
+.neutro-1000{
+    background: var(--colors-neutro-1000);
 }
 .verde-900{
     background: var(--colors-verde-900);
