@@ -17,20 +17,21 @@ body {
     height: 100vh;
 }
 /*#region Alterações erick*/
-.zoneDiv{
+.zoneDiv {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
 }
-.zoneBtn{
+.zoneBtn {
     font-size: 20px;
     display: flex;
     flex-direction: column;
     margin: 6px;
     padding: 6px;
     gap: 10px;
-    width: 120px;
-    height: 100px;
+    width: calc(33.33% - 20px);
+    height: 120px;
     background-color: #75777691;
     justify-content: center;
     align-items: center;
@@ -395,7 +396,7 @@ body {
     margin: 8px;
   }
 
-.buttons .combobtn {
+.CenterDiv .combobtn {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -407,7 +408,7 @@ body {
     flex-grow: 1;
     gap: 6px;
 }
-.buttons .combobutton {
+.CenterDiv .combobutton {
     display: flex;
     flex-direction: column;
     height: 100px !important;
@@ -420,7 +421,7 @@ body {
     position: relative;
   }
 
-  .buttons .sensorBtnDiv {
+  .CenterDiv .sensorBtnDiv {
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -432,7 +433,7 @@ body {
     gap: 6px;
    
   }
-  .buttons .optionsDiv{
+  .CenterDiv .optionsDiv{
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -443,7 +444,7 @@ body {
     flex: 0 0 auto;
     gap: 6px;
   }
-  .buttons .optionsBtn{
+  .CenterDiv .optionsBtn{
     display: flex;
     flex-direction: column;
     height: 105px;
@@ -456,7 +457,7 @@ body {
     position: relative;
     margin-top: 10px;
   }
-  .buttons .btnEmpty {
+  .CenterDiv .Button {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -470,7 +471,7 @@ body {
     
   }
 
-  .buttons .div-page {
+  .CenterDiv .div-page {
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -481,7 +482,7 @@ body {
     flex: 0 0 auto;
   }
 
-  .buttons .allbtn {
+  .CenterDiv .allbtnDiv {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -495,7 +496,7 @@ body {
     flex-wrap: wrap;
 }
 
-.buttons .pagina {
+.CenterDiv .pagina {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -509,7 +510,7 @@ body {
     cursor: pointer;
   }
   
-  .buttons .framePagesText {
+  .CenterDiv .framePagesText {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -521,7 +522,7 @@ body {
     width: 100%;
   }
   
-  .buttons .text-wrapper-Pages {
+  .CenterDiv .text-wrapper-Pages {
     position: relative;
     width: fit-content;
     margin-top: -1px;
@@ -1949,6 +1950,12 @@ background-color: darkred;
 .gold-600{
     background: var(--colors-gold-600);
 }
+.ciano-900{
+    background: var(--colors-ciano-900);
+}
+.ciano-600{
+    background: var(--colors-ciano-600);
+}
 
 .notificationtop {
     /* top: 5%; */
@@ -1970,6 +1977,7 @@ background-color: darkred;
     justify-content: center;
     flex-direction: row;
     font-size: 16px;
+    gap: 10px;
 }
 
 .notificationdown {

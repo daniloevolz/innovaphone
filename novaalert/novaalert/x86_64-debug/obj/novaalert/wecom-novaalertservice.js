@@ -496,14 +496,11 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if(obj.mt == "SelectSensorInfo"){
-                    // var querySelect = "SELECT "+ obj.type +" from list_sensors_history WHERE sensor_name = '"+ obj.sensor +"' LIMIT 1"
                     var querySelect = "SELECT " + obj.type + " FROM list_sensors_history WHERE sensor_name = '" + obj.sensor + "' ORDER BY id DESC LIMIT 1";
                     Database.exec(querySelect)
-                    // base = "SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';"
                     .oncomplete(function (data) {
                         conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResult", result: JSON.stringify(data) , src: obj.src }))
                     })
-
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("Erro ao Consultar Info do Sensor " + errorText);
                     });
