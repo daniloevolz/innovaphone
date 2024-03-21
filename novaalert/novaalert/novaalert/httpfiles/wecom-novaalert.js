@@ -225,7 +225,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 
             } finally {
                 //addNotification("out", "Alarme " + obj.alarm);
-                addNotification('out', "Alarme " + obj.alarm)
+                addNotification('out', "Alarme " + obj.alarm, obj.from, obj.to)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -285,7 +285,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification('inc', "Alarme " + obj.alarm +" de "+obj.src)
+                addNotification('inc', "Alarme " + obj.alarm, src, )
                     .then(function (message) {
                         console.log(message);
                     })
@@ -778,8 +778,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
                     break;
-                case "externalnumber":
+                case "number":
                     createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","Button",object.page)
+                    break;
+                case "user":
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
                     break;
                 case "sensor":
                     createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
@@ -1663,7 +1666,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     }
     
-    function addNotification(flux, msg) {
+    function addNotification(flux, msg, from, to) {
         return new Promise(function(resolve, reject) {
             try {
                 var today = new Date();
@@ -1704,12 +1707,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 const eventText1 = document.createElement("div");
                 eventText1.id = "eventText1";
                 eventText1.classList.add("eventText1");
-                eventText1.textContent = "DE QUEM";
+                eventText1.textContent = from;
             
                 const eventText2 = document.createElement("div");
                 eventText2.id = "eventText2";
                 eventText2.classList.add("eventText2");
-                eventText2.textContent = "PARA QUEM";
+                eventText2.textContent = texts.text("to") + to;
             
                 const boxEventDate = document.createElement("div");
                 boxEventDate.id = "boxEventDate";

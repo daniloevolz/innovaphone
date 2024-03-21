@@ -706,7 +706,7 @@ select{
     position: absolute;
     left: 29%;
     /* width: 15%; */
-    top: 26%;
+    /*top: 26%;*/
     /* font-weight: bold; */
     font-size: 15px;
     text-align: right;
@@ -717,7 +717,7 @@ select{
     position: absolute;
     /* left: 16%; */
     width: 30%;
-    top: 26%;
+    /*top: 26%;*/
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -788,7 +788,8 @@ select{
     font-size: 15px;
     /* color: #02163F; */
 }
-.iptValueString{
+.iptValueString {
+    text-align: end;
     width: 100%;
     border: 0;
     border-bottom: 2px solid #02163F;
@@ -1052,6 +1053,7 @@ select{
     /* color: #02163F; */
 }
 .iptNameUsers{
+    text-align:end;
     width: 100%;
     border: 0;
     border-bottom: 2px solid #02163F;
@@ -1159,7 +1161,8 @@ select{
     font-size: 15px;
     /* color: #02163F; */
 }
-.iptNameCombo{
+.iptNameCombo {
+    text-align: end;
     width: 100%;
     border: 0;
     border-bottom: 2px solid #02163F;
@@ -1203,7 +1206,8 @@ select{
     font-size: 15px;
     /* color: #02163F; */
 }
-.iptValueCombo{
+.iptValueCombo {
+    text-align: end;
     width: 100%;
     border: 0;
     border-bottom: 2px solid #02163F;

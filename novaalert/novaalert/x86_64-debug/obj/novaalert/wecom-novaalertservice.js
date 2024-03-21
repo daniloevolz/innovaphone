@@ -618,7 +618,7 @@ new JsonApi("admin").onconnected(function (conn) {
             //#endregion
             //#region BUTTONS
             if (obj.mt == "InsertMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })

@@ -120,9 +120,11 @@ Wecom.novaalertTexts = {
         temperature: "Temperatura (Cº)",
         labelWarning: "Atenção",
         labelFillInputsSensor: "Complete todos os campos para que o botão possa ser criado.",
+        labelFillUser: "Priemiro selecione o usuário para visualizar a tela e as posições vagas",
         labelPage: "Página",
         labelLine: "Linha",
         labelColumn: "Coluna",
+        page0: "Fixado",
         page1: "Página 1",
         page2: "Página 2",
         page3: "Página 3",
@@ -185,7 +187,8 @@ Wecom.novaalertTexts = {
         cabecalhoRptCalls5: "Desligamento", 
         cabecalhoRptCalls6: "Status", 
         cabecalhoRptCalls7: "Direção",
-        
+        labelRadios: "Rádios",
+        to: "para"
     },
     en: {
         promptSelectAction: "Select an action!",
