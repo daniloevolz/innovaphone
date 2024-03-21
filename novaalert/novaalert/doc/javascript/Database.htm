@@ -383,6 +383,28 @@ transaction.begin("LOCK TABLE users IN ACCESS EXCLUSIVE MODE")
     }
 }</code></pre>
 
+<h4>Code example reading and writing bytea (hex) data type values.</h4>
+    <pre><code class="JS">/*
+                          Table "public.binary_data"
+ Column |  Type  | Collation | Nullable |                Default
+--------+--------+-----------+----------+----------------------------------------
+ id     | bigint |           | not null | nextval('files_data_id_seq'::regclass)
+ data   | bytea  |           |          |
+id   | data
+-----+ --------
+1    | \x313233
+*/
+Database.exec("SELECT data FROM binary_data;")
+    .oncomplete(function (dataset) {
+        var string = Encoding.binToString(dataset[0].data);
+        log(string); // 123
+    })
+    .onerror(function (error, errorText, dbErrorCode) { });
+var bin = Encoding.stringToBin("456");
+var hexstring = Encoding.binToHex(bin); // 343536
+Database.insert("INSERT INTO binary_data (data) VALUES ('\\x" + hexstring + "')") // \x343536
+    .oncomplete(function (id) { })
+    .onerror(function (error, errorText, dbErrorCode) { });</pre></code>
     <h4>Code example using nested callback syntax.</h4>
     <pre><code class="JS">function withdraw(userA, userB, amount, success, error) {
     var balanceA = 0;

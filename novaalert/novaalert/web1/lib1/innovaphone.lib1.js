@@ -35,6 +35,10 @@ Node.prototype.isChildOf = function (node) {
     return false;
 }
 
+window.alert = function () { console.warn("alert() must not be used in apps"); };
+window.prompt = function () { console.warn("prompt() must not be used in apps"); };
+window.confirm = function () { console.warn("confirm() must not be used in apps"); };
+
 // static innovaphone.lib functions
 
 var innovaphone = innovaphone || {};

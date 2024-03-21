@@ -156,6 +156,7 @@
         <tr><td class="param">string <b>sip </b></td><td>The SIP name of the provisioning user (optional).</td></tr>
         <tr><td class="param">boolean <b>rollout </b></td><td>If true, the provisioning code will be valid for 7 days, otherwise 15 minutes (optional, default false).</td></tr>
         <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">boolean <b>administrative </b></td><td>If true, the provisioned device will get the domain password as administrative password if the domain checkword to set these passwords is checked. (optional, default false)</td></tr>
     </table>
 
     <h3>GetProvisioningCodeResult</h3>    
@@ -174,7 +175,7 @@
 
     <p>
         Gets the device provisioned with a certain code. This is useful if a provisioning was interrupted and might have been finished in the meantime.<br/>
-        If not, a <a href="#DeviceProvisioned">DeviceProvisioned</a> message will be triggered later.
+        If not yet finished, a <a href="#DeviceProvisioned">DeviceProvisioned</a> message will be triggered on the actual provisioning.
     </p>
     <h4>Parameters</h4>
     <table style="margin-left:-12px">

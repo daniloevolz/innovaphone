@@ -60,7 +60,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_buttons = [];
     var popupOpen = false;
     var session;
-
+    
+    var options = [
+        { id: 'floor', img: './images/map.svg'}, 
+        { id: 'map', img: './images/location.svg'}, 
+        { id: 'sensor', img: './images/wifi.svg'}, 
+        { id: 'radio', img: './images/warning.svg'},
+        { id: 'video', img: './images/camera.svg'}
+    ]
 
     function app_connected(domain, user, dn, appdomain) {
         app.send({api: "user", mt: "SelectAllInfo"})
@@ -724,7 +731,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
           // linha divisória (hr)
           var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
-   
+          
           var allbtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "allbtnDiv"));
           for (let i = 1; i < 26; i++) {
      
@@ -738,22 +745,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allbtn.setAttribute("position-y", positionY);
         }
           // cameras sensores graficos planta baixa
-          var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
-          for (let i = 0; i < 5; i++) {
-
-             var imgAndTexts = {
-                './images/map.svg': texts.text("labelPlantaBaixa") ,'./images/location.svg': texts.text("labelMaps"),
-                './images/wifi.svg': texts.text("labelSensors"),'./images/warning.svg': texts.text("labelPlantaBaixa"),
-                './images/camera.svg': texts.text("labelCams")
-             }
-            
-              var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+        var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
+            options.forEach(function (o) {
+                var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+                optionsDivBtn.setAttribute("id",o.id)
                 var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
-                var imgTop = divTop.add(new innovaphone.ui1.Node("img",null,null,null))
-                imgTop.setAttribute("src",Object.keys(imgAndTexts)[i])
-                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, imgAndTexts[Object.keys(imgAndTexts)[i]], "buttondown neutro-900"));
-              
-          }
+                var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
+                imgTop.setAttribute("src", o.img)
+                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, o.label, "buttondown neutro-900"));
+            })
 
            //paginas de 1 - 5
            var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
@@ -773,7 +773,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createButtons(object,null,"ciano-900","ciano-600","./images/Layer.svg","combobutton",object.page)
+                    createButtons(object,null,"ciano-900","ciano-600","./images/Layer.svg","combobutton")
                     break;
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
@@ -855,6 +855,34 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 popButtons(buttons,pageAttribute)
             });
         })
+        var botoes = document.querySelectorAll(".optionsBtn");
+        for (var i = 0; i < botoes.length; i++) {
+            var botao = botoes[i];
+
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", function(evt){
+                var idBtn = evt.currentTarget.id
+                
+                if(!this.classList.contains("clicked")){
+                    var btnsClick = document.querySelectorAll('.clicked')
+                    btnsClick.forEach(function(b){
+                        b.classList.remove('clicked')
+                        b.children[0].classList.add("neutro-800")
+                        b.children[1].classList.add ("neutro-900")
+                        b.children[0].classList.remove("azul-marinho-400")
+                        b.children[1].classList.remove("azul-500")
+                    })
+                    this.classList.add("clicked")
+                    this.children[0].classList.remove("neutro-800")
+                    this.children[1].classList.remove ("neutro-900")
+                    this.children[0].classList.add("azul-marinho-400")
+                    this.children[1].classList.add("azul-500")
+                    createGridZero(idBtn)
+                }
+
+            });
+        }
         
 
     }
@@ -1361,7 +1389,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divOptions.setAttribute("id","divOptions")
         
         //Coluna Direita
-        var col_direita = AllBody.add(new innovaphone.ui1.Div("width: 100%; background: var(--colors-neutro-1000) ", "Texto TesTE"));
+        var col_direita = AllBody.add(new innovaphone.ui1.Div("width: 100%; background: var(--colors-neutro-1000) ", null).setAttribute("id","colDireita"));
         var _scroll = col_esquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
         _scroll.setAttribute("id", "scroll-calls");
         var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div("height:40%;width:100%;",null,"zoneDiv").setAttribute("id","zoneDiv"))
@@ -1373,6 +1401,94 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divButtonsMain = divButtons
         divOptionsMain =  divOptions
         leftBottomButons()
+
+        // Dados de exemplo
+        var exampleData = [
+            [0, 10],
+            [1, 80],
+            [2, 60],
+            [3, 100],
+            [4, 30],
+            [5, 90]
+        ];
+        //createLineGrafic(exampleData);
+        // Cria o gráfico de barras com os dados de exemplo
+        //createBarGrafic(exampleData);
+        
+    }
+    function createGridZero(type){
+        
+        console.log("createGridZero Acessado")
+        const colRight = document.getElementById("colDireita")
+        colRight.innerHTML = ""
+        const headerTxt = document.createElement("div")
+        headerTxt.id = "headerTxt"
+        headerTxt.classList.add("headerTxt")
+        headerTxt.textContent = texts.text(type)
+
+        const grid = document.createElement("div")
+        grid.id = "gridZero"
+        grid.classList.add("gridZero")
+
+        for (var i = 0; i < 12; i++) {
+
+            var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
+            var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
+            
+            const buttonGrid = document.createElement("div")
+            buttonGrid.id = "emptyBtn"
+            buttonGrid.classList.add("emptyBtn")
+            buttonGrid.setAttribute("position-x", positionX)
+            buttonGrid.setAttribute("position-y", positionY)
+            buttonGrid.setAttribute("page", "0")
+
+            grid.appendChild(buttonGrid)
+            
+        }
+        
+        list_buttons.forEach(function(b){
+            if (b.page === 0 && b.button_type === type){
+                createOptions(b)
+            }
+        })
+        colRight.appendChild(headerTxt)
+        colRight.appendChild(grid)
+        
+    
+    }
+    function createOptions(object){
+
+        var selector = `.${"emptyBtn"}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.add(classButton)
+            var divTop = document.createElement("div")
+                divTop.classList.add(bgTop)
+                divTop.classList.add("buttontop")
+                divTop.setAttribute("id", object.id + "-status");
+                //divTop.setAttribute("id", object.button_prt + "-status");
+                allBtns.appendChild(divTop)
+                var imgTop = document.createElement("img")
+                imgTop.style.width = "20px";
+                imgTop.setAttribute("src",srcImg)
+                divTop.appendChild(imgTop)
+                var divTopText = document.createElement("div")
+                divTopText.textContent = object.button_name
+                divTop.appendChild(divTopText);
+
+                var divBottom = document.createElement("div")
+                divBottom.classList.add(bgBottom)
+                divBottom.classList.add("buttondown")
+                var divBottomTxt = document.createElement("div")
+                divBottomTxt.textContent = object.button_prt
+                divBottom.appendChild(divBottomTxt)
+                allBtns.appendChild(divBottom)
+        }
     }
 
     function calllistonmessage(consumer, obj) {
@@ -1531,9 +1647,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             buttonDown.appendChild(divInfo)
         }
     }
-    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass,page){
+    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
 
-        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${page}']`;
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
@@ -1855,6 +1971,135 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     }
 
+    function createBarGrafic(data) {
+        const colRight = document.getElementById("colDireita")
+        const canvas = document.createElement('canvas');
+        canvas.id = "grafico"
+        canvas.classList.add("grafico")
+        const ctx = canvas.getContext('2d');
+    
+        var width = canvas.width;
+        var height = canvas.height;
+        var padding = 20;
+    
+        var maxX = Math.max.apply(null, data.map(function(pair) { return pair[0]; }));
+        var maxY = Math.max.apply(null, data.map(function(pair) { return pair[1]; }));
+    
+        var barWidth = (width - 2 * padding) / data.length;
+        var scaleY = (height - 2 * padding) / maxY;
+    
+        // Define os valores para o eixo Y
+        var yValues = [];
+        for (var i = 0; i <= 4; i++) {
+            yValues.push(Math.round(i * (maxY / 4)));
+        }
+    
+        function drawBarGraph() {
+            ctx.clearRect(0, 0, width, height);
+    
+            // Desenha os eixos X e Y
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.strokeStyle = 'white'; // Define a cor dos eixos
+            ctx.stroke();
+    
+            // Desenha os rótulos dos eixos X e Y
+            ctx.fillStyle = 'white'; // Define a cor dos rótulos
+            ctx.fillText('X', width - padding + 5, height - padding + 5);
+            ctx.fillText('Y', padding - 10, padding - 5);
+    
+            // Define a cor das barras
+            ctx.fillStyle = 'green';
+    
+            // Desenha as barras do gráfico
+            data.forEach(function(pair, index) {
+                var x = index * barWidth + padding;
+                var barHeight = pair[1] * scaleY;
+                var y = height - barHeight - padding;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                ctx.fillText(pair[1], x + barWidth / 2 - 10, y - 5); // Adiciona o valor da barra
+            });
+    
+            // Desenha os valores no eixo Y
+            ctx.fillStyle = 'white'; // Define a cor dos valores do eixo Y
+            yValues.forEach(function(value, index) {
+                var y = height - index * (height - 2 * padding) / 4 - padding;
+                ctx.fillText(value, padding - 20, y + 5);
+            });
+        }
+        colRight.appendChild(canvas)
+        drawBarGraph();
+    }
+
+    // Dados de exemplo
+    function createLineGrafic(data) {
+        const colRight = document.getElementById("colDireita")
+        const canvas = document.createElement('canvas');
+        canvas.id = "grafico"
+        canvas.classList.add("grafico")
+        const ctx = canvas.getContext('2d');
+    
+        var width = canvas.width;
+        var height = canvas.height;
+        var padding = 20;
+    
+        var maxX = Math.max.apply(null, data.map(function(pair) { return pair[0]; }));
+        var maxY = Math.max.apply(null, data.map(function(pair) { return pair[1]; }));
+    
+        var scaleX = (width - 2 * padding) / maxX;
+        var scaleY = (height - 2 * padding) / maxY;
+    
+        // Define os valores para o eixo Y
+        var yValues = [];
+        for (var i = 0; i <= 4; i++) {
+            yValues.push(Math.round(i * (maxY / 4)));
+        }
+    
+        function drawLineGraph() {
+            ctx.clearRect(0, 0, width, height);
+    
+            // Desenha os eixos X e Y
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.strokeStyle = 'white'; // Define a cor dos eixos
+            ctx.stroke();
+    
+            // Desenha os rótulos dos eixos X e Y
+            ctx.fillStyle = 'white'; // Define a cor dos rótulos
+            ctx.fillText('X', width - padding + 5, height - padding + 5);
+            ctx.fillText('Y', padding - 10, padding - 5);
+    
+            // Define a cor da linha dos dados
+            ctx.strokeStyle = 'green';
+    
+            // Desenha os pontos e linhas do gráfico
+            ctx.beginPath();
+            data.forEach(function(pair) {
+                var x = pair[0] * scaleX + padding;
+                var y = height - pair[1] * scaleY - padding;
+                ctx.lineTo(x, y);
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillText(pair[1], x + 5, y - 5); // Adiciona o valor do ponto
+            });
+            ctx.stroke();
+    
+            // Desenha os valores no eixo Y
+            ctx.fillStyle = 'white'; // Define a cor dos valores do eixo Y
+            yValues.forEach(function(value, index) {
+                var y = height - index * (height - 2 * padding) / 4 - padding;
+                ctx.fillText(value, padding - 20, y + 5);
+            });
+        }
+        colRight.appendChild(canvas)
+        drawLineGraph();
+
+    }
+
+    
     //#endregion
 }
 

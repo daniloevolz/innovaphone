@@ -38,11 +38,20 @@ body {
     border-radius: 8px;
 }
 .zoneBtn:hover{
-    background-color: rgba(255, 0, 0, 0.4);
+    background-color: var(--colors-neutro-1000)
 }
 .lastHistory{
     background: #199fda30;
     margin: 6px 0 6px 0;
+}
+.clicked{
+    background-color: var(--colors-azul-500)
+}
+.azul-500{
+    background-color: var(--colors-azul-500) !important
+}
+.azul-marinho-400{
+    background-color: var(--colors-azul-marinho-400) !important
 }
 .scroll-container {
     display: flex;
@@ -127,7 +136,38 @@ body {
     align-items: center;
 
 }
+.grafico {
+    background-color: black; /* Define o fundo do canvas como preto */
+    width: 100%;
+}
 
+#grafico.axis {
+    stroke: white; /* Define a cor dos eixos como branca */
+}
+
+#grafico.line {
+    stroke: green; /* Define a cor da linha dos dados como verde */
+}
+.headerTxt{
+    background-color: var(--colors-neutro-900)
+}
+.gridZero{
+    display: flex;
+    flex-wrap: wrap;
+    width: 474px;
+    height: 360px;
+    background-color: var(--colors-neutro-1000);
+    gap: 10px;
+    padding: 10px;
+}
+.emptyBtn{
+    border-radius: 6px;
+    display: flex;
+    padding: 8px;
+    width: 106px;
+    height: 106px;
+    background-color: var(--colors-neutro-800);
+}
 /*#endregion */
 
 :root {

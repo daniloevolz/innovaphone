@@ -11,7 +11,7 @@
 <body>
     <h1>Encoding</h1>
     <p>
-        This document describes the Encoding library available in the JavaScript environment for app serivices.
+        This document describes the Encoding library available in the JavaScript environment for app services.
     </p>
 
     <h2>Table of content</h2>
@@ -39,10 +39,10 @@
 
     <a name="binToHex"><div class="fnhead" style="margin-top:5px">binToHex</div></a>
     <dd>
-        Converts from binary data contained in a Uint8Array to a hex string.
+        Converts from binary data contained in an Uint8Array to a hex string.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">Uint8Array <b>data</b></td><td>An Uint8Array containing the data to be converted.</td></tr>
+            <tr><td class="param">Uint8Array <b>data</b></td><td>An Uint8Array containing the data to convert.</td></tr>
         </table>
         <h4>Return value</h4>
         <table style="margin-left:-12px">
@@ -57,7 +57,7 @@ var hexstring = Encoding.binToHex(bin);
 
     <a name="hexToBin"><div class="fnhead" style="margin-top:5px">hexToBin</div></a>
     <dd>
-        Converts a hex string to a Uint8Array containing binary data.
+        Converts a hex string to an Uint8Array containing binary data.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">string <b>hexstring</b></td><td>A hexadecimal string.</td></tr>
@@ -68,7 +68,7 @@ var hexstring = Encoding.binToHex(bin);
         </table>
         <h4>Remarks</h4>
         <p>
-            null will be converted to a Uint8Array of length 0.
+            null is converted to an Uint8Array of length 0.
         </p>
     </dd>
     <dd>
@@ -90,7 +90,7 @@ var bin = Encoding.hexToBin(hexstring);
         </table>
         <h4>Remarks</h4>
         <p>
-            null will be converted to an empty string.
+            null is converted to an empty string.
         </p>
     </dd>
     <dd>
@@ -104,7 +104,7 @@ var string = Encoding.binToString(bin);
         Converts a string to a Uint8Array.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">string <b>data</b></td><td>A string to be converted.</td></tr>
+            <tr><td class="param">string <b>data</b></td><td>A string to convert.</td></tr>
         </table>
         <h4>Return value</h4>
         <table style="margin-left:-12px">
@@ -112,12 +112,12 @@ var string = Encoding.binToString(bin);
         </table>
         <h4>Remarks</h4>
         <p>
-            null will be converted to a Uint8Array of length 0.
+            null is converted to an Uint8Array of length 0.
         </p>
     </dd>
     <dd>
         <pre><code class="JS">var string = "example";
-var bin = Encoding.stringToBin(bin);
+var bin = Encoding.stringToBin(string);
 // bin is equivalent to new Uint8Array([0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65])</code></pre>
     </dd>
 
