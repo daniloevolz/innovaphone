@@ -232,7 +232,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 
             } finally {
                 //addNotification("out", "Alarme " + obj.alarm);
-                addNotification('out', "Alarme " + obj.alarm, obj.from, obj.to)
+                addNotification('out', texts.text("alarm") + " " + obj.alarm, obj.from, obj.to)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -292,7 +292,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification('inc', "Alarme " + obj.alarm, src, )
+                addNotification('inc', texs.text("alarm") + " " + obj.alarm, src, userUI)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -752,7 +752,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
                 var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
                 imgTop.setAttribute("src", o.img)
-                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, o.label, "buttondown neutro-900"));
+                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
             })
 
            //paginas de 1 - 5
@@ -1087,13 +1087,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     colunapage.addHTML("<iframe id='iframepage' class='iframepage' src='" + prt + "' width='100%' height='100%' style='border:0; z-index:-1;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
                     //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
                     //addNotification("out", name);
-                    addNotification('out', name)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    //addNotification('out', name)
+                    //    .then(function (message) {
+                    //        console.log(message);
+                    //    })
+                    //    .catch(function (error) {
+                    //        console.log(error);
+                    //    });
                     app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
                     document.getElementById(id).style.backgroundColor = "darkred";
 
@@ -1210,7 +1210,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 if (found != -1) {
                     app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                     //addNotification("out", name);
-                    addNotification('out', name)
+                    addNotification('out', name, userUI, prt)
                         .then(function (message) {
                             console.log(message);
                         })
@@ -1228,10 +1228,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
                 app.send({ api: "user", mt: "TriggerStartPopup", prt: String(prt) })
             }
-            if (type == "externalnumber") {
+            if (type == "number") {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
-                addNotification('out', type)
+                addNotification('out', type, userUI, prt)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1278,13 +1278,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 }
                 app.send({ api: "user", mt: "TriggerStartVideo", prt: String(prt) })
                 //addNotification("out" , name);
-                addNotification('out', name)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                //addNotification('out', name)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
                 var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
 
                 //document.getElementById("videoPlayer").setAttribute("src", value);
@@ -1326,13 +1326,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "combo") {
                 app.send({ api: "user", mt: "TriggerCombo", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
-                addNotification('out', name)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                //addNotification('out', name)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
                 document.getElementById(id).style.backgroundColor = "darkred";
                 found = 1;
             }
@@ -1436,8 +1436,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
             
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = "emptyBtn"
-            buttonGrid.classList.add("emptyBtn")
+            buttonGrid.id = i
+            buttonGrid.classList.add("optEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
             buttonGrid.setAttribute("page", "0")
@@ -1446,19 +1446,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             
         }
         
-        list_buttons.forEach(function(b){
-            if (b.page === 0 && b.button_type === type){
+        
+        colRight.appendChild(headerTxt)
+        colRight.appendChild(grid)
+        list_buttons.forEach(function (b) {
+            if (b.page === "0" && b.button_type === type) {
                 createOptions(b)
             }
         })
-        colRight.appendChild(headerTxt)
-        colRight.appendChild(grid)
-        
     
     }
     function createOptions(object){
 
-        var selector = `.${"emptyBtn"}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${page}']`;
+        var selector = `.${"optEmpty"}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
@@ -1466,28 +1466,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
             allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
-            allBtns.classList.add(classButton)
-            var divTop = document.createElement("div")
-                divTop.classList.add(bgTop)
-                divTop.classList.add("buttontop")
-                divTop.setAttribute("id", object.id + "-status");
-                //divTop.setAttribute("id", object.button_prt + "-status");
-                allBtns.appendChild(divTop)
-                var imgTop = document.createElement("img")
-                imgTop.style.width = "20px";
-                imgTop.setAttribute("src",srcImg)
-                divTop.appendChild(imgTop)
-                var divTopText = document.createElement("div")
-                divTopText.textContent = object.button_name
-                divTop.appendChild(divTopText);
-
-                var divBottom = document.createElement("div")
-                divBottom.classList.add(bgBottom)
-                divBottom.classList.add("buttondown")
-                var divBottomTxt = document.createElement("div")
-                divBottomTxt.textContent = object.button_prt
-                divBottom.appendChild(divBottomTxt)
-                allBtns.appendChild(divBottom)
+            allBtns.classList.remove("optEmpty")
+            allBtns.classList.add("azul-500", "optFree")
+            allBtns.innerHTML = object.button_name
         }
     }
 
@@ -1824,11 +1805,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 eventText1.id = "eventText1";
                 eventText1.classList.add("eventText1");
                 eventText1.textContent = from;
+
+                const eventImg1 = document.createElement("img");
+                eventImg1.id = "eventImg1";
+                eventImg1.classList.add("eventImg1");
+                eventImg1.src = "./images/right-arrow.png";
             
                 const eventText2 = document.createElement("div");
                 eventText2.id = "eventText2";
                 eventText2.classList.add("eventText2");
-                eventText2.textContent = texts.text("to") + to;
+                eventText2.textContent = to;
             
                 const boxEventDate = document.createElement("div");
                 boxEventDate.id = "boxEventDate";
@@ -1848,6 +1834,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 boxEventTypeStatat.appendChild(eventStatus);
             
                 boxEventTexts.appendChild(eventText1);
+                boxEventTexts.appendChild(eventImg1);
                 boxEventTexts.appendChild(eventText2);
             
                 boxEventDate.appendChild(eventDate);

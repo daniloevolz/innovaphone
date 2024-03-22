@@ -148,22 +148,43 @@ body {
 #grafico.line {
     stroke: green; /* Define a cor da linha dos dados como verde */
 }
-.gridZero{
-    display: flex;
+.headerTxt{
+    font-size: 1rem;
+    display:flex;
+    background-color: var(--colors-neutro-900)
+}
+.gridZero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas com largura igual */
+    grid-auto-rows: auto; /* Altura automática das linhas */
+    gap: 10px; /* Espaçamento entre as divs */
+    align-items: stretch; /* Estica as divs filho para corresponder à altura da maior div */
+    /*display: flex;
     flex-wrap: wrap;
     width: 474px;
-    height: 360px;
+    height: 360px;*/
     background-color: var(--colors-neutro-1000);
-    gap: 10px;
     padding: 10px;
 }
-.emptyBtn{
+.optEmpty{
     border-radius: 6px;
     display: flex;
     padding: 8px;
     width: 106px;
     height: 106px;
     background-color: var(--colors-neutro-800);
+}
+
+.optFree {
+    border-radius: 6px;
+    display: flex;
+    padding: 8px;
+    width: 106px;
+    height: 106px;
+    background-color: var(--colors-azul-500);
+}
+.eventImg1 {
+    width: 50px;
 }
 /*#endregion */
 
