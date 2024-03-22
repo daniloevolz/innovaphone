@@ -336,15 +336,33 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "TriggerStopAlarm") {
                     //intert into DB the event
-                    log("danilo req: insert into DB = user " + conn.sip);
+                    log("danilo req:TriggerStopAlarm insert into DB = user " + conn.sip);
                     var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
-                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    log("danilo req:TriggerStopAlarm will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
-                    connectionsUser.forEach(function (c) {
-                        //respond success to the client
-                        c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(obj.btn_id), from: conn.sip, to: c.sip }));
 
-                    })
+                    Database.exec("SELECT * FROM list_buttons WHERE button_prt = '" + obj.prt + "' AND button_type = 'alarm'")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            var buttons = data
+                            if (buttons.length > 0) {
+                                log("danilo req:TriggerStopAlarm buttons length >0 : ");
+                                buttons.forEach(function (b) {
+                                    var con = connectionsUser.filter(function (c) { return c.sip == b.button_user })
+                                    log("danilo req:TriggerStopAlarm found users connections to notify : "+ JSON.stringify(con));
+                                    con.forEach(function (c) {
+                                        //respond success to the client
+                                        c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.sip, to: c.sip }));
+
+                                    })
+                                })
+
+                            }
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(errorText) }));
+                        });
                 }
                 if (obj.mt == "TriggerStartPopup") {
                     //intert into DB the event
@@ -2363,21 +2381,23 @@ function sensorReceived(value) {
     try {
         var obj = JSON.parse(bodyDecoded);
         //Get Actions from DB
-        Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';")
+        Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "' ORDER BY id DESC LIMIT 1")
             .oncomplete(function (data) {
                 log("danilo req sensorReceived: select from list_buttons result legth=" + data.length);
                 var str = "";
+                var found = false;
                 str = JSON.stringify(data);
                 sensors = JSON.parse(String(str));
                 if (sensors.length > 0) {
                     sensors.forEach(function (bs) {
                         log("danilo-req sensorReceived: sensors.forEach " + JSON.stringify(bs));
-                        var conns = connectionsUser.filter(function (c) { return c.sip == bs.button_user || bs.button_user == "all" })
+                        var conns = connectionsUser.filter(function (c) { return c.sip == bs.button_user  })
                         conns.forEach(function (conn) {
                             log("danilo-req sensorReceived: user will be notified " + conn.sip);
-                            conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
-                            if (bs.button_user == conn.sip) {
-
+                            if (bs.button_user == conn.sip && found == false) {
+                                conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
+                                found = true;
+                                
                             }
                         })
                     })

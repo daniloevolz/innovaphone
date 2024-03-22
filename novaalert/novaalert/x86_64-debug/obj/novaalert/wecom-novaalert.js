@@ -176,6 +176,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             popButtons(list_buttons,1); //Cria os botões na tela
+            createGridZero("floor");
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "UserConnected") {
@@ -264,7 +265,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
             console.log(obj.alarm);
             try {
-                var button_found;
+                var button_found = [];
                 list_buttons.forEach(function (l) {
                     if (l.button_prt == obj.alarm) {
                         button_found.push(l);
@@ -281,18 +282,30 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var elemento = elementos[i];
 
                     // Altera as características do elemento
-                    elemento.style.backgroundColor = "darkred";
-                    button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
+                    if(elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")){
+                        elemento.children[0].classList.remove("vermelho-900")
+                        elemento.children[1].classList.remove("vermelho-600")   
+                        elemento.children[0].classList.add("gold-900")
+                        elemento.children[1].classList.add("gold-600")
+                        button_clicked = button_clicked.filter(button => button.id != elemento.id);
+
+                         //   // selectedCells = selectedCells.filter(function (selectedCell) {
+                        //   //   return selectedCell !== cell;
+                        //   // });
+                    }else{
+                        elemento.children[0].classList.remove("gold-900")
+                        elemento.children[1].classList.remove("gold-600")
+                        elemento.children[0].classList.add("vermelho-900")
+                        elemento.children[1].classList.add("vermelho-600")
+                        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
+                    }
                 }
-
-
-                
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification('inc', texs.text("alarm") + " " + obj.alarm, src, userUI)
+                addNotification('inc', texts.text("alarm") + " " + obj.alarm, obj.src, userUI)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -651,8 +664,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log("list_history " + JSON.stringify(obj.result))
         }
         if (obj.api == "user" && obj.mt == "SensorReceived") {
-            //atualizar as divs dos sensores com as novas informações
-            // ~pietro
+            var sensorButtons = list_buttons.filter(function(object) {
+                return object.button_type == "sensor" && object.page != 0 ;
+            });
+            console.log("SensorButtons " + JSON.stringify(sensorButtons))
+            var info = obj.value; // valor recebido do banco
+            sensorButtons.forEach(function(object) {
+                    var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
+                    updateButtonInfo(divToUpdate, info, object.sensor_type, object.sensor_min_threshold, object.sensor_max_threshold, object.button_prt);
+
+            });
         }
 
     }
@@ -782,18 +803,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","Button",object.page)
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/user.svg", "Button", object.page)
                     break;
                 case "sensor":
                     createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
                     app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
                         console.log("SendSrcResult: " + JSON.stringify(obj))
                         var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
-                        var objParse = JSON.parse(obj.result);
-                        objParse.forEach(function(info) {
-                            updateButtonInfo(divToUpdate, info, null);
-                        });
-                         
+                        var objParse = JSON.parse(obj.result)[0];
+                        updateButtonInfo(divToUpdate, objParse, object.sensor_type , object.sensor_min_threshold, object.sensor_max_threshold, object.button_prt);           
                     })            
                     break;
                 default:
@@ -1219,8 +1237,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         });
                     var elemento = document.getElementById(id)
                     elemento.children[0].classList.remove("gold-900")
-                    elemento.children[0].classList.add("vermelho-900")
-                    elemento.children[1].classList.add("gold-600")
+                    elemento.children[0].classList.remove("gold-900")
+                    elemento.children[1].classList.add("vermelho-600")
                     elemento.children[1].classList.remove("vermelho-600")
                 }
             }
@@ -1368,16 +1386,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     function connected() {
         that.clear();
-        var AllBody = that.add(new innovaphone.ui1.Div("display:flex; flex-direction:row; width:100%; height:100%; justify-content:center",null,null))
+        var AllBody = that.add(new innovaphone.ui1.Div(null,null,"AllBody"))
         //Coluna Esquerda
-        var col_esquerda = AllBody.add(new innovaphone.ui1.Div("width: 100%; height:100%;", null));
+        var col_esquerda = AllBody.add(new innovaphone.ui1.Div(null, null,"colEsquerda"));
         //colunaesquerda adicionar classe depois
         
         //var _container = col_esquerda.add(new innovaphone.ui1.Div("display: none; justify-content: center; position: absolute; height: 40%; width: 100%; align-items: center;", new innovaphone.ui1.Node("img", "width:20%; height:20%;", null, null).setAttribute("src", "./images/play.png"), null));
         // none > flex 
 
         //Div principal do meio
-        var divCenter = AllBody.add(new innovaphone.ui1.Div("width:1014px",null,"CenterDiv"))
+        var divCenter = AllBody.add(new innovaphone.ui1.Div(null,null,"CenterDiv"))
 
         //Botões centrais
         var divButtons = divCenter.add(new innovaphone.ui1.Div("width:100% ",null,"divMainButtons"))
@@ -1389,10 +1407,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divOptions.setAttribute("id","divOptions")
         
         //Coluna Direita
-        var col_direita = AllBody.add(new innovaphone.ui1.Div("width: 100%; background: var(--colors-neutro-1000) ", null).setAttribute("id","colDireita"));
+        var col_direita = AllBody.add(new innovaphone.ui1.Div(null, null,"colDireita").setAttribute("id","colDireita"));
         var _scroll = col_esquerda.add(new innovaphone.ui1.Node("scroll-container", null, null, "scroll-container"));
         _scroll.setAttribute("id", "scroll-calls");
-        var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div("height:40%;width:100%;",null,"zoneDiv").setAttribute("id","zoneDiv"))
+        var _zoneDiv = col_esquerda.add(new innovaphone.ui1.Div(null,null,"zoneDiv").setAttribute("id","zoneDiv"))
         coldireita = col_direita;
         colesquerda = col_esquerda;
         //container = _container;
@@ -1469,9 +1487,82 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.classList.remove("optEmpty")
             allBtns.classList.add("azul-500", "optFree")
             allBtns.innerHTML = object.button_name
+            allBtns.addEventListener("click", function(){
+                console.log("Botão clicado", object.button_name)
+                createDivRightBottom(object)
+                
+            })
         }
     }
+    function createDivRightBottom(obj){
 
+        const colRight = document.getElementById("colDireita")
+        var btmRight = document.getElementById("bottomR")
+
+        if(btmRight){
+            colRight.removeChild(btmRight)
+        }
+        const bottomRight = document.createElement("div")
+        bottomRight.id = "bottomR"
+        bottomRight.classList.add("bottomR")
+        
+        const txtBottom = document.createElement("div")
+        txtBottom.id = "txtBottom"
+        txtBottom.classList.add("headerTxt")
+        txtBottom.textContent = obj.button_name
+        const buttonLink = obj.button_prt
+
+        // Função para verificar o tipo de arquivo com base na extensão do link
+        function getFileType(buttonLink) {
+            var extension = buttonLink.split('.').pop().toLowerCase();
+            if (extension === 'pdf') {
+                return 'pdf';
+            } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
+                return 'image';
+            } else {
+                return 'unknown';
+            }
+        }
+
+        // Função para criar o elemento com base no tipo de arquivo
+        function createFileElement(buttonLink) {
+            var fileType = getFileType(buttonLink);
+            var element;
+
+            if (fileType === 'pdf') {
+                element = document.createElement("embed");
+                element.type = "application/pdf";
+                element.width = "100%";
+                element.height = "400"; // Altura desejada
+            } else if (fileType === 'image') {
+                element = document.createElement("img");
+            } else {
+                console.error("Tipo de arquivo desconhecido.");
+                return null;
+            }
+
+            element.src = buttonLink;
+            return element;
+        }
+        bottomRight.appendChild(txtBottom)
+        
+
+        // Exemplo de uso:
+        var prtBottom = document.createElement("div");
+        prtBottom.id = "prtBottom";
+        prtBottom.classList.add("prtBottom");
+
+        var fileElement = createFileElement(buttonLink);
+        if (fileElement) {
+            prtBottom.appendChild(fileElement);
+            // Adicione prtBottom ao seu documento:
+            bottomRight.appendChild(prtBottom); // Adicione ao corpo do documento ou outro elemento desejado
+        }
+
+        colRight.appendChild(bottomRight)
+
+
+    }
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {
             console.log("::calllistApi::onmessage() msg=" + JSON.stringify(obj.msg));
@@ -1480,154 +1571,83 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
-    // function makeAllButtons(buttons,page){
-    //     buttons.forEach(function (object) {
-
-    //         switch (object.button_type) {
-    //             case "combo":
-    //                 createButtons(object,null,"ciano-900","ciano-600","./images/Layer.svg","combobutton",object.page)
-    //                 break;
-    //             case "alarm":
-    //                 createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
-    //                 break;
-    //             case "externalnumber":
-    //                 createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","Button",object.page)
-    //                 break;
-    //             case "sensor":
-    //                 createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
-
-    //                 // app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
-    //                 //     console.log("SendSrcResult: " + JSON.stringify(obj))
-    //                 //         
-    //                 // })            
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //         // if (object.button_type == "combo") {
-    //         //     var selector = ".combobutton[position-x='" + object.position_x + "'][position-y='" + object.position_y + "']";
-    //         //     var combobtn = document.querySelector(selector);
-    //         //     if (combobtn) {
-    //         //         combobtn.setAttribute("id", object.id);
-    //         //         combobtn.setAttribute("button_type", object.button_type);
-    //         //         combobtn.setAttribute("button_prt", object.button_prt);
-    //         //         combobtn.setAttribute("button_id", object.id);
-    //         //         var divTop = document.createElement("div")
-    //         //             divTop.style.backgroundColor = "var(--colors-ciano-900)"
-    //         //             divTop.classList.add("buttontop")
-    //         //             divTop.setAttribute("id", object.id + "-status");
-    //         //             combobtn.appendChild(divTop)
-    //         //             var imgTop = document.createElement("img")
-    //         //             imgTop.style.width = "35px";
-    //         //             imgTop.setAttribute("src","./images/layer.svg")
-    //         //             divTop.appendChild(imgTop)
-    //         //             var divTopText = document.createElement("div")
-    //         //             divTopText.textContent = object.button_name
-    //         //             divTop.appendChild(divTopText);
-    //         //             var divBottom = document.createElement("div")
-    //         //             divBottom.style.backgroundColor = "var(--colors-ciano-600)"
-    //         //             divBottom.classList.add("buttondown")
-    //         //             divBottom.textContent = object.button_prt
-    //         //             combobtn.appendChild(divBottom)
-    //         //     }
-    //         // }
-    //         // if (object.button_type == "alarm") {
-    //         //     // allbtn.setAttribute("id", object.id);
-    //         //     allbtn.setAttribute("class", "allbutton");
-    //         //     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","btnEmpty")
-    //         // }
-    //         // else if (object.button_type == "video") {
-    //         //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "allbutton"));
-    //         //     div1.setAttribute("button_type", object.button_type);
-    //         //     div1.setAttribute("button_prt", object.button_prt);
-    //         //     //div1.setAttribute("button_id", object.id);
-    //         //     div1.setAttribute("id", object.id);
-
-
-    //         //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-    //         //     div2.setAttribute("id", object.button_prt + "-status");
-    //         //     div2.addHTML("<img src='video.png' class='img-icon'>" + object.button_name);
-
-    //         //     var div3 = div1.add(new innovaphone.ui1.Div(null, "CÂMERA", "buttondown"));
-
-    //         //     allbtn.add(div1);
-
-    //         // }
-    //         // else if (object.button_type == "number") {
-    //         //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
-    //         //     div1.setAttribute("button_type", object.button_type);
-    //         //     div1.setAttribute("button_prt", object.button_prt);
-    //         //     //div1.setAttribute("button_id", object.id);
-    //         //     div1.setAttribute("id", object.id);
-    //         //     //div1.setAttribute("button_prt_user", object.button_prt_user);
-
-    //         //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-    //         //     div2.setAttribute("id", object.button_prt + "-status");
-    //         //     div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
-
-    //         //     var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
-
-    //         //     allbtn.add(div1);
-    //         // }
-    //         // else if (object.button_type == "user") {
-    //         //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "userbutton"));
-    //         //     div1.setAttribute("button_type", object.button_type);
-    //         //     div1.setAttribute("button_prt", object.button_prt);
-    //         //     //div1.setAttribute("button_id", object.id);
-    //         //     div1.setAttribute("id", object.id);
-    //         //     //div1.setAttribute("button_prt_user", object.button_prt_user);
-
-    //         //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-    //         //     div2.setAttribute("id", object.button_prt + "-status");
-    //         //     div2.addHTML("<img src='phone.png' class='img-icon'>" + object.button_name);
-
-    //         //     var div3 = div1.add(new innovaphone.ui1.Div(null, "TELEFONE " + object.button_prt, "buttondown"));
-
-    //         //     allbtn.add(div1);
-    //         // }
-    //         // else if (object.button_type == "externalnumber") {
-    //         //     createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","btnEmpty")
-    //         // }
-    //         // else if (object.button_type == "page") {
-    //         //     var div1 = allbtn.add(new innovaphone.ui1.Div(null, null, "pagebutton"));
-    //         //     div1.setAttribute("button_type", object.button_type);
-    //         //     div1.setAttribute("button_prt", object.button_prt);
-    //         //     //div1.setAttribute("button_id", object.id);
-    //         //     div1.setAttribute("id", object.id);
-
-
-    //         //     var div2 = div1.add(new innovaphone.ui1.Div(null, null, "buttontop"));
-    //         //     div2.setAttribute("id", object.button_prt + "-status");
-    //         //     div2.addHTML("<img src='page.png' class='img-icon'>" + object.button_name);
-
-    //         //     var div3 = div1.add(new innovaphone.ui1.Div(null, "PÁGINA", "buttondown"));
-
-    //         //     pagebtn.add(div1);
-
-    //         //  }
-    //         // else if(object.button_type == "sensor"){
-    //         //     createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton")
-    //         // }
-            
-    //     });
-    // }
-    function updateButtonInfo(mainDiv, info,img) {
+    function updateButtonInfo(mainDiv, info, sensorType, minThreshold, maxThreshold, sensorName) {
+        console.log("MaxThreshold " + maxThreshold);
         if (mainDiv && info) {
-            var buttonDown = mainDiv.children[1]
-            var divInfo = document.createElement("div")
-            divInfo.style.fontWeight = "bold;"
-            divInfo.style.display = "flex"
-            divInfo.style.gap = "4px"
-            var infoBtn = document.createElement("div")
-            infoBtn.textContent = Object.values(info)
-            divInfo.appendChild(infoBtn)
-            // var imgBtn = document.createElement("img")
-            // imgBtn.src = img
-            //divInfo.appendChild(imgBtn)
-            //divBottomSensorInfo.innerHTML = Object.values(sensorInfo[0])[0];
-            buttonDown.appendChild(divInfo)
+            var buttonTop = mainDiv.querySelector('.buttontop');
+            var buttonDown = mainDiv.querySelector('.buttondown');
+            var divInfoId = mainDiv.querySelector('#divInfo');
+            var imgBtn = document.createElement("img");
+    
+            if (divInfoId) {  // quando a mensagem "SensorReceived" é recebida e o botão existe no DOM 
+    
+                // remover a imagem anterior (se existir)
+                var previousImg = divInfoId.querySelector('img');
+                if (previousImg) {
+                    divInfoId.removeChild(previousImg);
+                }
+                // adiciona a seta para cima ou baixo conforme a atualização nova em comparação a anterior 
+                console.log("Info do sensor: " + info[sensorType])
+                console.log("Info Old " + mainDiv.getAttribute("oldInfoSensor"))
+
+                if(parseInt(info[sensorType]) >= parseInt(mainDiv.getAttribute("oldInfoSensor"))){
+                    imgBtn.src = "./images/Arrow-up.svg"
+                }else{
+                    imgBtn.src = "./images/Arrow-down.svg"
+                }
+                //imgBtn.src =  ? "./images/Arrow-up.svg" : "./images/Arrow-down.svg";
+                divInfoId.appendChild(imgBtn);
+
+                // verifica se o threshold foi excedido e atualiza as classes 
+                if (parseInt(info[sensorType]) > parseInt(maxThreshold)) {
+                    buttonTop.classList.add("vermelho-900");
+                    buttonDown.classList.add("vulcano-1000");
+                    buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+
+                    addNotification('out', texts.text("sensor"), sensorName , userUI)
+                    .then(function (message) {
+                        console.log(message);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+                    // registrar no histórico qual sensor que explodiu o threshold junto com o horário
+
+                } else {
+                    buttonTop.classList.remove("vermelho-900");
+                    buttonDown.classList.remove("vulcano-1000");
+                    buttonTop.classList.remove("blinking"); // remover animação do botão piscando
+                }
+                divInfoId.children[0].innerHTML = info[sensorType];  // coloca o novo valor do sensor na div 
+                mainDiv.setAttribute("oldInfoSensor",info[sensorType]) // armazena o valor para quando receber um novo fazer a comparação novamente   
+                                                             
+            } else { // else para quando nao existir o botão no DOM 
+
+                 //verifica se o botão é do tipo "sensor" antes de adicionar as informações
+                if (mainDiv.classList.contains("sensorbutton")) {
+                    var divInfo = document.createElement("div");
+                    divInfo.style.fontWeight = "bold";
+                    divInfo.style.display = "flex";
+                    divInfo.style.gap = "4px";
+                    divInfo.style.alignItems = "center"
+                    divInfo.id = "divInfo";
+                    var infoBtn = document.createElement("div");
+                    infoBtn.textContent = info[sensorType]; // entregar o co2, temp etc, assim fica dinâmico
+                    divInfo.appendChild(infoBtn);
+                    mainDiv.setAttribute("oldInfoSensor",info[sensorType])  // armazenar o antigo dado do sensor
+                    buttonDown.appendChild(divInfo);
+                    // verifica se o limite foi excedido e atualiza as classes para indicar visualmente
+                    if (parseInt(info[sensorType]) > parseInt(maxThreshold)) {
+                        buttonTop.classList.add("vermelho-900");
+                        buttonDown.classList.add("vulcano-1000");
+                        buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+                    }
+                }
+            }
         }
     }
+
     function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
 
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
@@ -1662,6 +1682,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 allBtns.appendChild(divBottom)
         }
     }
+
     function addOnHistory(history, objType, state, text1, text2){
         console.log("Função addOnHistory")
         console.log(JSON.stringify(history))
