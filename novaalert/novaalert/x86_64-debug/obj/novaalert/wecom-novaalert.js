@@ -863,15 +863,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         var pages = document.querySelectorAll(".pagina")
         pages.forEach(function(page){
+            var pageAttribute = page.getAttribute("page")
+            var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
             page.addEventListener("click", function(evt){
                 var divPrincipal = document.getElementById("divMainButtons")
                 var divOptions = document.getElementById("divOptions")
-                var pageAttribute = page.getAttribute("page")
                 divPrincipal.setAttribute("page",pageAttribute)
                 divPrincipal.innerHTML = ''
                 divOptions.innerHTML = ''
                 popButtons(buttons,pageAttribute)
+            
             });
+            if(divMainAttribute == pageAttribute){
+                  page.classList.add("azul-600-bottom")  
+            }
+
         })
         var botoes = document.querySelectorAll(".optionsBtn");
         for (var i = 0; i < botoes.length; i++) {
@@ -1505,7 +1511,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         const bottomRight = document.createElement("div")
         bottomRight.id = "bottomR"
         bottomRight.classList.add("bottomR")
-        
         const txtBottom = document.createElement("div")
         txtBottom.id = "txtBottom"
         txtBottom.classList.add("headerTxt")
@@ -1519,16 +1524,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 return 'pdf';
             } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
                 return 'image';
+            } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
+                return 'video';
+            } else if (buttonLink.includes('google.com/maps/embed')) {
+                return 'google-maps';
             } else {
                 return 'unknown';
             }
-        }
-
+        }      
         // Função para criar o elemento com base no tipo de arquivo
         function createFileElement(buttonLink) {
             var fileType = getFileType(buttonLink);
             var element;
-
+        
             if (fileType === 'pdf') {
                 element = document.createElement("embed");
                 element.type = "application/pdf";
@@ -1536,27 +1544,44 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 element.height = "400"; // Altura desejada
             } else if (fileType === 'image') {
                 element = document.createElement("img");
-            } else {
+                element.src = buttonLink;
+                element.style.width = '100%'
+            } else if (fileType === 'video') {
+                element = document.createElement("video");
+                element.controls = true; // Adiciona controles de vídeo
+                element.style.width = "100%" 
+                element.style.height = "100%" 
+                // Ajuste a altura conforme necessário
+                var source = document.createElement("source");
+                source.src = buttonLink;
+                source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+                element.appendChild(source);
+            } 
+            else if (fileType === 'google-maps') {
+                element = document.createElement("iframe");
+                element.src = buttonLink;
+                element.style.width = "100%";
+                element.style.height = "300px"; // Altura desejada para o mapa
+            }
+            else {
                 console.error("Tipo de arquivo desconhecido.");
                 return null;
             }
-
-            element.src = buttonLink;
+        
             return element;
         }
         bottomRight.appendChild(txtBottom)
         
-
         // Exemplo de uso:
         var prtBottom = document.createElement("div");
         prtBottom.id = "prtBottom";
         prtBottom.classList.add("prtBottom");
 
         var fileElement = createFileElement(buttonLink);
-        if (fileElement) {
+      if (fileElement) {
             prtBottom.appendChild(fileElement);
             // Adicione prtBottom ao seu documento:
-            bottomRight.appendChild(prtBottom); // Adicione ao corpo do documento ou outro elemento desejado
+            bottomRight.appendChild(prtBottom);   // Adicione ao corpo do documento ou outro elemento desejado
         }
 
         colRight.appendChild(bottomRight)
@@ -1611,10 +1636,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     .catch(function (error) {
                         console.log(error);
                     });
+                    // registrar no histórico qual sensor que explodiu o threshold junto com o horário
+
+
+                }  // verifica se o minthreshold foi excedido e atualiza as classes 
+                else if(parseInt(info[sensorType]) < parseInt(minThreshold)){
+                    buttonTop.classList.add("vermelho-900");
+                    buttonDown.classList.add("vulcano-1000");
+                    buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+
+                    addNotification('out', texts.text("sensor"), sensorName , userUI)
+                    .then(function (message) {
+                        console.log(message);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
 
                     // registrar no histórico qual sensor que explodiu o threshold junto com o horário
 
-                } else {
+                }
+                else {
                     buttonTop.classList.remove("vermelho-900");
                     buttonDown.classList.remove("vulcano-1000");
                     buttonTop.classList.remove("blinking"); // remover animação do botão piscando
@@ -1642,6 +1684,22 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         buttonTop.classList.add("vermelho-900");
                         buttonDown.classList.add("vulcano-1000");
                         buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+                    }
+                    else if(parseInt(info[sensorType]) < parseInt(minThreshold)){
+                        buttonTop.classList.add("vermelho-900");
+                        buttonDown.classList.add("vulcano-1000");
+                        buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+    
+                        addNotification('out', texts.text("sensor"), sensorName , userUI)
+                        .then(function (message) {
+                            console.log(message);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+    
+                        // registrar no histórico qual sensor que explodiu o threshold junto com o horário
+    
                     }
                 }
             }
