@@ -7,7 +7,7 @@
 
 body {
     /* background-image: var(--bg); */
-    background-image: url(./images/bg2.png);
+    background-color: var(--colors-neutro-1200);
     background-size: cover;
     background-repeat: no-repeat;
     color: var(--text-standard);
@@ -172,16 +172,15 @@ body {
     stroke: green; /* Define a cor da linha dos dados como verde */
 }
 .headerTxt{
-    font-size: 1rem;
+    font-size: 12px;
+    padding: 6px;
     display:flex;
     background-color: var(--colors-neutro-900)
 }
 .gridZero {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colunas com largura igual */
-    grid-auto-rows: auto; /* Altura automática das linhas */
+    display: flex;
     gap: 5px; /* Espaçamento entre as divs */
-    align-items: stretch; /* Estica as divs filho para corresponder à altura da maior div */
+    align-items: center; /* Estica as divs filho para corresponder à altura da maior div */
     /*display: flex;
     flex-wrap: wrap;
     width: 474px;
@@ -488,17 +487,16 @@ body {
     justify-content: center;
 }
 .colDireita{
-    width: 20%;
-    max-width: 20%; 
+    width: 35%;
     background: var(--colors-neutro-1000) ;
+    height: 100%;
 }
 .colEsquerda{
-    width: 20%;
-    max-width: 20%; 
-    height:100%;
+    width: 18%;
+    height: 100%;
 }
 .CenterDiv{
-    width:60%;
+    width: 47%;
 }
 .zoneDiv{
     height:40%;
@@ -3246,158 +3244,7 @@ table {
         
 } */
 
-/*notebook*/
-@media screen and (max-width: 1599px) {
-    .AllBody {
-        grid-template-columns: auto minmax(600px, 1014px) auto; /* Exemplo de ajuste na largura da coluna central */
-    }
-    .CenterDiv .optionsBtn{
-        display: flex;
-        flex-direction: column;
-        height: 75px;
-        align-items: flex-start;
-        /* background-color: #ffffff; */
-        background-color: #595959;
-        border-radius: 8px;
-        overflow: hidden;
-        width: 120px;
-        position: relative;
-        margin-top: 10px;
-      }
-      .CenterDiv .text-wrapper-Pages {
-        position: relative;
-        width: fit-content;
-        margin-top: -1px;
-        font-family: var(--h6-font-family);
-        font-weight: var(--h6-font-weight);
-        color: #ffffff;
-        /* font-size: var(--h6-font-size); */
-        font-size: var(--sub-2-font-size);
-        letter-spacing: var(--h6-letter-spacing);
-        line-height: var(--h6-line-height);
-        white-space: nowrap;
-        font-style: var(--h6-font-style);
-    }
-    .boxEvent {
-        padding: 6px;
-        display: flex;
-        gap: 6px;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        font-size: 0.43rem;
-        width: 100%;
-        height: 80px;
-        align-items: center;
-        border-radius: 8px;
-        /* margin: 10px; */
-    }
-    .CenterDiv .Button {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        height: 75px;
-        background-color: #595959;
-        border-radius: 6px;
-        overflow: hidden;
-        width: 138px;
-        position: relative;
-        font-family: 'Inter';
-        font-size: 0.44rem;
-    }
-    .CenterDiv .combobutton {
-        display: flex;
-        flex-direction: column;
-        height: 75px ;
-        align-items: flex-start;
-        /* background-color: #ffffff; */
-        background-color: #595959;
-        border-radius: 4px;
-        overflow: hidden;
-        width: 138px;
-        position: relative;
-      }
-    .optEmpty {
-        border-radius: 6px;
-        display: flex;
-        padding: 8px;
-        width: 92px;
-        height: 92px;
-        background-color: var(--colors-neutro-800);
-    }
-    .optFree {
-        font-size: 15px;
-        border-radius: 6px;
-        display: flex;
-        padding: 8px;
-        width: 85px;
-        height: 85px;
-        background-color: var(--colors-azul-500);
-        text-align: center;
-        align-items: center;
-    }
-
-    .buttontop {
-        /* top: 5%; */
-        /* position: static; */
-        height: 50%;
-        width: 100%;
-        font-size: 0.4rem;
-        background-color: rgba(128, 130, 131, 0.48);
-        display: inline-flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-    }
-    .buttondown {
-        height: 50%;
-        width: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: row;
-        font-size: 0.4rem;
-        gap: 10px;
-        }
-
-        .neutro-800{
-            background: var(--colors-neutro-800);
-        }
-        .neutro-900{
-            background: var(--colors-neutro-900);
-        }
-        .neutro-1000{
-            background: var(--colors-neutro-1000);
-        }
-        .verde-900{
-            background: var(--colors-verde-900);
-        }
-        .verde-600{
-            background: var(--colors-verde-600);
-        }
-        .vermelho-900{
-            background: var(--colors-vermelho-900);
-        }
-        .vermelho-600{
-            background: var(--colors-vermelho-600);
-        }
-        .gold-900{
-            background: var(--colors-gold-900);
-        }
-        .gold-600{
-            background: var(--colors-gold-600);
-        }
-        .ciano-900{
-            background: var(--colors-ciano-900);
-        }
-        .ciano-600{
-            background: var(--colors-ciano-600);
-        }
-        .vulcano-1000{
-            background: var(--colors-vulcano-1000);
-        }
-        
-}
+/*  */
   /* @media only screen and (max-width: 1000px) {
     .container {
       width: 60%;

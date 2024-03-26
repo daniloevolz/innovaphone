@@ -2380,32 +2380,27 @@ function sensorReceived(value) {
     log("danilo-req sensorReceived:value " + String(bodyDecoded));
     try {
         var obj = JSON.parse(bodyDecoded);
-        //Get Actions from DB
-        Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "' ORDER BY id DESC LIMIT 1")
-            .oncomplete(function (data) {
-                log("danilo req sensorReceived: select from list_buttons result legth=" + data.length);
-                var str = "";
-                var found = false;
-                str = JSON.stringify(data);
-                sensors = JSON.parse(String(str));
-                if (sensors.length > 0) {
-                    sensors.forEach(function (bs) {
-                        log("danilo-req sensorReceived: sensors.forEach " + JSON.stringify(bs));
-                        var conns = connectionsUser.filter(function (c) { return c.sip == bs.button_user  })
-                        conns.forEach(function (conn) {
-                            log("danilo-req sensorReceived: user will be notified " + conn.sip);
-                            if (bs.button_user == conn.sip && found == false) {
-                                conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
-                                found = true;
-                                
-                            }
+        connectionsUser.forEach(function (conn) {
+            log("danilo-req sensorReceived: user will be notified " + conn.sip);
+
+            //Get Actions from DB
+            Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "' AND button_user = '"+ conn.sip +"' ORDER BY id DESC LIMIT 1")
+                .oncomplete(function (data) {
+                    log("danilo req sensorReceived: select from list_buttons result legth=" + data.length);
+                    var str = "";
+                    str = JSON.stringify(data);
+                    sensors = JSON.parse(String(str));
+                    if (sensors.length > 0) {
+                        sensors.forEach(function (bs) {
+                            log("danilo-req sensorReceived: sensors.forEach " + JSON.stringify(bs));
+                            conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
                         })
-                    })
-                }
-            })
-            .onerror(function (error, errorText, dbErrorCode) {
-                log("danilo-req sensorReceived: Erro DB " + errorText);
-            });
+                    }
+                })
+                .onerror(function (error, errorText, dbErrorCode) {
+                    log("danilo-req sensorReceived: Erro DB " + errorText);
+                });
+        })
 
         // Insere na tabela de histórico
         obj['date'] = getDateNow();
@@ -2416,6 +2411,53 @@ function sensorReceived(value) {
         log("danilo-req sensorReceived: Body not present! Erro " + e);
     }
 }
+
+// function sensorReceived(value) {
+//     var sensors = [];
+//     var bodyDecoded = unescape(value);
+//     log("danilo-req sensorReceived:value " + String(bodyDecoded));
+//     try {
+//         var obj = JSON.parse(bodyDecoded);
+//         //Get Actions from DB
+//         Database.exec("SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "' ORDER BY id DESC LIMIT 1")
+//             .oncomplete(function (data) {
+//                 log("danilo req sensorReceived: select from list_buttons result legth=" + data.length);
+//                 var str = "";
+//                 var found;
+//                 str = JSON.stringify(data);
+//                 sensors = JSON.parse(String(str));
+//                 log("Sensors " + JSON.stringify(sensors))
+//                 if (sensors.length > 0) {
+//                     sensors.forEach(function (bs) {
+//                         log("danilo-req sensorReceived: sensors.forEach " + JSON.stringify(bs));
+//                         log("ConnectionsUser " + JSON.stringify(connectionsUser))
+//                         //found = false;
+//                         var conns = connectionsUser.filter(function (c) { return c.sip == bs.button_user  })
+//                         log("var Conns " + JSON.stringify(conns))
+//                         conns.forEach(function (conn) {
+//                             log("danilo-req sensorReceived: user will be notified " + conn.sip);
+//                             if (bs.button_user == conn.sip && found == false) {
+//                                 conn.send(JSON.stringify({ api: "user", mt: "SensorReceived", value: obj }))
+//                                 found = true;
+                                
+//                             }
+//                         })
+//                     })
+//                 }
+//             })
+//             .onerror(function (error, errorText, dbErrorCode) {
+//                 log("danilo-req sensorReceived: Erro DB " + errorText);
+//             });
+
+//         // Insere na tabela de histórico
+//         obj['date'] = getDateNow();
+//         insertTblSensorsHistory(obj)
+
+
+//     } catch (e) {
+//         log("danilo-req sensorReceived: Body not present! Erro " + e);
+//     }
+// }
 
 //#region Old  triggerAction not used
 function triggerAction(user, prt, type) {
