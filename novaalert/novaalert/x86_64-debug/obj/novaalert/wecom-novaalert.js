@@ -660,8 +660,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             _popup.content.add(iptDevice);
             _popup.content.add(btnSelectDevice);
         }
+        var list_sensors_history = []
         if (obj.api == "user" && obj.mt == "SensorAllInfoResult") {
-            console.log("list_history " + JSON.stringify(obj.result))
+                    console.log("SENSOR list_history " + JSON.stringify(obj.result))
+                    list_sensors_history = obj.result
         }
         if (obj.api == "user" && obj.mt == "SensorReceived") {
             var sensorButtons = list_buttons.filter(function(object) {
@@ -1454,10 +1456,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         grid.id = "gridZero"
         grid.classList.add("gridZero")
 
-        for (var i = 0; i < 12; i++) {
+        for (var i = 1; i < 13; i++) {
 
             var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
-            var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
+            var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
             
             const buttonGrid = document.createElement("div")
             buttonGrid.id = i

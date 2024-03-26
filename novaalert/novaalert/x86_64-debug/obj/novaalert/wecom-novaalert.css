@@ -186,6 +186,8 @@ body {
     width: 474px;
     height: 360px;*/
     background-color: var(--colors-neutro-1000);
+    flex-direction: row;
+    flex-wrap: wrap;
     padding: 5px;
 }
 .optEmpty{
