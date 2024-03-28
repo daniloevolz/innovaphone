@@ -176,6 +176,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             popButtons(list_buttons,1); //Cria os botões na tela
+            leftBottomButons()
             createGridZero("floor");
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
@@ -355,10 +356,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.add("gold-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.add("gold-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.add("gold-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.add("gold-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.src)
@@ -379,10 +383,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.add("gold-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.add("gold-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.add("gold-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.add("gold-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.num)
@@ -438,10 +445,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.add("gold-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.add("gold-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.add("gold-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.add("gold-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.src)
@@ -462,10 +472,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
     
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.add("gold-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.add("gold-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.add("gold-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.add("gold-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
                 // addNotification('inc', "Tocando " + obj.num)
@@ -495,12 +508,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.remove("gold-900","verde-900")
-                    primeiroFilho.classList.add("vermelho-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.remove("gold-600","verde-600")
-                    segundoFilho.classList.add("vermelho-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.remove("gold-900", "verde-900")
+                        primeiroFilho.classList.add("vermelho-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.remove("gold-600", "verde-600")
+                        segundoFilho.classList.add("vermelho-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 // addNotification('inc', "Conectado " + obj.src)
@@ -557,12 +573,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.remove("gold-900","vermelho-900")
-                    primeiroFilho.classList.add("verde-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.remove("vermelho-600","gold-600")
-                    segundoFilho.classList.add("verde-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.remove("gold-900", "vermelho-900")
+                        primeiroFilho.classList.add("verde-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.remove("vermelho-600", "gold-600")
+                        segundoFilho.classList.add("verde-600")
+                    } else {
+                        elemento.classList.remove("vermelho-900")
+                        elemento.classList.add("neutro-800")
+                    }
+
                 }
                 //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "";
                 //var sipButton = document.getElementById(obj.src);
@@ -756,7 +779,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
           var dividerLine = divButtonsMain.add(new innovaphone.ui1.Node("hr",null,null,"divider"))
           
           var allbtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "allbtnDiv"));
-          for (let i = 1; i < 26; i++) {
+          for (let i = 1; i < 31; i++) {
      
             var positionX = Math.ceil(i / 5) + 2; // 5/5 = 1 + 2  é = 3  e assim vai sempre ate 7
             var positionY = i % 5 === 0 ? 5 : i % 5; // 5%5 = 1 e assim vai 
@@ -796,7 +819,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createButtons(object,null,"ciano-900","ciano-600","./images/Layer.svg","combobutton")
+                    createComboButton(object,null,"ciano-600","ciano-900","./images/Layer.svg","combobutton")
                     break;
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
@@ -805,10 +828,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     createButtons(object,"exnumberbutton","verde-900","verde-600","./images/phone.svg","Button",object.page)
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/user.svg", "Button", object.page)
+                    createButtons(object, "userbutton", "verde-900", "verde-600", "./images/user.svg", "Button", object.page)
                     break;
                 case "sensor":
-                    createButtons(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
+                    createSensorButton(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
                     app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
                         console.log("SendSrcResult: " + JSON.stringify(obj))
                         var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
@@ -1038,7 +1061,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     document.getElementById(id).style.backgroundColor = "darkgreen";
                 }
             }
-            if (type == "externalnumber") {
+            if (type == "number") {
                 app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
                 document.getElementById(id).style.backgroundColor = "";
             }
@@ -1068,6 +1091,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             if (type == "combo") {
                 document.getElementById(id).style.backgroundColor = "";
+            }
+            if (type == "dest") {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
+                //addNotification("out", name);
+                addNotification('out', type, userUI, prt)
+                    .then(function (message) {
+                        console.log(message);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                var elemento = document.getElementById(id)
+                elemento.classList.remove("neutro-800")
+                elemento.classList.add("vermelho-900")
+                found = 1;
             }
             //var btn = { id: id, type: type, name: name, prt: prt };
             //button_clicked.splice(button_clicked.indexOf(btn), 1);
@@ -1247,7 +1285,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.children[0].classList.remove("gold-900")
                     elemento.children[0].classList.remove("gold-900")
                     elemento.children[1].classList.add("vermelho-600")
-                    elemento.children[1].classList.remove("vermelho-600")
+                    elemento.children[1].classList.add("vermelho-600")
                 }
             }
             if (type == "popup") {
@@ -1366,7 +1404,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 button_clicked.push({ id: id, type: type, name: name, prt: prt });
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             }
-            
+            if (type == "dest") {
+                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
+                document.getElementById(id).classList.remove("vermelho-900");
+                document.getElementById(id).classList.add("neutro-800");
+            }
         }
     }
 
@@ -1385,11 +1427,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function waitConnection() {
+  function waitConnection() {
         that.clear();
-        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
-        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
-        that.add(bodywait);
+        var div1 = that.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
     }
 
     function connected() {
@@ -1442,8 +1487,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         //createBarGrafic(exampleData);
         
     }
-    function createGridZero(type){
-        
+  function createGridZero(type) {
+
+        var btnOptions = document.getElementById(type)
+        btnOptions.classList.add("clicked")
+        btnOptions.children[0].classList.remove("neutro-800")
+        btnOptions.children[1].classList.remove("neutro-900")
+        btnOptions.children[0].classList.add("azul-marinho-400")
+        btnOptions.children[1].classList.add("azul-500")
+
         console.log("createGridZero Acessado")
         const colRight = document.getElementById("colDireita")
         colRight.innerHTML = ""
@@ -1452,15 +1504,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         headerTxt.classList.add("headerTxt")
         headerTxt.textContent = texts.text(type)
 
+
         const grid = document.createElement("div")
         grid.id = "gridZero"
         grid.classList.add("gridZero")
 
         for (var i = 1; i < 13; i++) {
 
-            var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
+            var positionX = Math.floor(i / 6) + 1; // Calcula a posição X
             var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
-            
+
             const buttonGrid = document.createElement("div")
             buttonGrid.id = i
             buttonGrid.classList.add("optEmpty")
@@ -1469,18 +1522,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             buttonGrid.setAttribute("page", "0")
 
             grid.appendChild(buttonGrid)
-            
+
         }
-        
-        
+
+
         colRight.appendChild(headerTxt)
         colRight.appendChild(grid)
+
         list_buttons.forEach(function (b) {
-            if (b.page === "0" && b.button_type === type) {
+            if (b.page == "0" && b.button_type == type) {
                 createOptions(b)
             }
         })
-    
+
     }
     function createOptions(object){
 
@@ -1544,6 +1598,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 element.type = "application/pdf";
                 element.width = "100%";
                 element.height = "400"; // Altura desejada
+                element.src = buttonLink
             } else if (fileType === 'image') {
                 element = document.createElement("img");
                 element.src = buttonLink;
@@ -1599,6 +1654,38 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
+    function createDests(object) {
+
+        var selector = `.${"destEmpty"}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.remove("destEmpty")
+            allBtns.classList.add("destFree", "neutro-800")
+            const imgBtn = document.createElement('img')
+            imgBtn.classList.add("imgBtn")
+            imgBtn.id = "imgBtn"
+            imgBtn.setAttribute("src", object.img)
+            const txtBtn = document.createElement('div')
+            txtBtn.classList.add("txtBtn")
+            txtBtn.id = "txtBtn"
+            txtBtn.textContent = truncateString(object.button_name, "7")
+
+
+            allBtns.appendChild(imgBtn)
+            allBtns.appendChild(txtBtn)
+
+            allBtns.addEventListener("click", function () {
+                console.log("Function do Botão ligar para", object.button_name)
+                updateScreen(object.id, object.button_name, object.button_type, object.button_prt)
+            })
+        }
+    }
+
     function updateButtonInfo(mainDiv, info, sensorType, minThreshold, maxThreshold, sensorName) {
         console.log("MaxThreshold " + maxThreshold);
         if (mainDiv && info) {
@@ -1672,10 +1759,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                  //verifica se o botão é do tipo "sensor" antes de adicionar as informações
                 if (mainDiv.classList.contains("sensorbutton")) {
                     var divInfo = document.createElement("div");
-                    divInfo.style.fontWeight = "bold";
-                    divInfo.style.display = "flex";
-                    divInfo.style.gap = "4px";
-                    divInfo.style.alignItems = "center"
                     divInfo.id = "divInfo";
                     var infoBtn = document.createElement("div");
                     infoBtn.textContent = info[sensorType]; // entregar o co2, temp etc, assim fica dinâmico
@@ -1741,6 +1824,81 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 divBottomTxt.textContent = object.button_prt
                 divBottom.appendChild(divBottomTxt)
                 allBtns.appendChild(divBottom)
+        }
+    }
+
+    function createSensorButton(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.add(classButton)
+            var divTop = document.createElement("div")
+                divTop.classList.add(bgTop)
+                divTop.classList.add("buttontop")
+                divTop.setAttribute("id", object.id + "-status");
+                //divTop.setAttribute("id", object.button_prt + "-status");
+                allBtns.appendChild(divTop)
+                var imgTop = document.createElement("img")
+                imgTop.style.width = "20px";
+                imgTop.setAttribute("src",srcImg)
+                divTop.appendChild(imgTop)
+                var divTopText = document.createElement("div")
+                divTopText.textContent = object.button_prt // nome do sensor que é o button_prt da list_buttons
+                divTop.appendChild(divTopText);
+
+                var divBottom = document.createElement("div")
+                divBottom.classList.add(bgBottom)
+                divBottom.classList.add("buttondown")
+                var divBottomTxt = document.createElement("div")
+                divBottomTxt.textContent = texts.text(object.sensor_type)
+                divBottomTxt.style.fontSize = "13px";
+                divBottomTxt.style.margin = '8px';
+                divBottomTxt.style.width = "100%"
+                divBottom.appendChild(divBottomTxt)
+                allBtns.appendChild(divBottom)
+        }
+    }
+
+    function createComboButton(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.add(classButton)
+                // div esquerda (imagem do botão)
+            var divImgCombo = document.createElement("div")
+                divImgCombo.classList.add(bgTop)
+                divImgCombo.classList.add("imgComboBtn")
+                divImgCombo.setAttribute("id", object.id + "-status");
+                allBtns.appendChild(divImgCombo)
+                var imgCombo = document.createElement("img")
+                imgCombo.style.width = "40px";
+                imgCombo.setAttribute("src",srcImg)
+                divImgCombo.appendChild(imgCombo)
+                // div direita (nome do botão etc)
+                var divComboName = document.createElement("div")
+                divComboName.classList.add(bgBottom)
+                divComboName.classList.add("divComboName")
+                var divComboTopName = document.createElement("div")
+                divComboTopName.textContent = object.button_type
+                divComboTopName.classList.add("divComboTopName")
+                divComboName.appendChild(divComboTopName)
+                var divComboBottomName = document.createElement("div")
+                divComboBottomName.textContent = object.button_name;
+                divComboBottomName.classList.add("divComboBottomName")
+                divComboName.appendChild(divComboBottomName)
+                allBtns.appendChild(divComboName)
         }
     }
 
@@ -1935,51 +2093,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
         });
     }
-    // apenas para demonstração
-    var zonebuttons = [
-        {
-            "name": "Fabrica",
-            "action": [
-                { "alarm": "FUJAM" }
-            ]
-        },
-        {
-            "name": "Adminstrativo",
-            "action": [
-                { "alarm": "CORRAM" }
-            ]
-        },
-        {
-            "name": "Vendas",
-            "action": [
-                { "alarm": "ADULTOS PRIMEIRO" }
-            ]
-        }
-    ];
-    var helpButton = [{
-        "name": "Bombeiro",
-        "img": "./images/fire.svg"
-    },
-    {
-        "name": "Polícia",
-        "img": "./images/police.svg"
-    },
-    {
-        "name": "Água",
-        "img": "./images/water.svg"
-    },
-    {
-        "name": "Central",
-        "img": "./images/house.svg"
-    },
-    {
-        "name": "Hospital",
-        "img": "./images/hospital.svg"
-    },
-    {
-        "name": "Energia",
-        "img": "./images/light.svg"
-    }]
+  
     function truncateString(str, maxLength) {
         if (str.length > maxLength) {
             return str.substring(0, maxLength) + "...";
@@ -1987,57 +2101,28 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             return str;
         }
     }
-    function leftBottomButons(){
+   function leftBottomButons() {
 
         const zoneDiv = document.getElementById("zoneDiv")
-        zonebuttons.forEach(function(zb){
-            const zoneBtn = document.createElement('div')
-            zoneBtn.classList.add("zoneBtn")
-            zoneBtn.id = "zoneBtn"
-            
-            const imgBtn = document.createElement('img')
-            imgBtn.classList.add("imgBtn")
-            imgBtn.id = "imgBtn"
-            imgBtn.setAttribute("src","./images/megaphone.svg")
+        zoneDiv.innerHTML = ''
 
-            const txtBtn = document.createElement('div')
-            txtBtn.classList.add("txtBtn")
-            txtBtn.id = "txtBtn"
-            txtBtn.textContent = truncateString(zb.name, "7")
+        for (var i = 0; i < 9; i++) {
+            var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
+            var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
+            const buttonGrid = document.createElement("div")
+            buttonGrid.id = i
+            buttonGrid.classList.add("destEmpty")
+            buttonGrid.setAttribute("position-x", positionX)
+            buttonGrid.setAttribute("position-y", positionY)
+            buttonGrid.setAttribute("page", "0")
 
-            zoneBtn.addEventListener("click", function(){
-                console.log("Alarme BTN Clicado", zb.action[0].alarm)
-            })
-            zoneBtn.appendChild(imgBtn)
-            zoneBtn.appendChild(txtBtn)
-            zoneDiv.appendChild(zoneBtn)
-        
+            zoneDiv.appendChild(buttonGrid)
+        }
+        list_buttons.forEach(function (zb) {
+            if (zb.page == "0" && zb.button_type == "dest") {
+                createDests(zb)
+            }
         })
-
-        helpButton.forEach(function(hb){
-            const zoneBtn = document.createElement('div')
-            zoneBtn.classList.add("zoneBtn")
-            zoneBtn.id = "zoneBtn"
-
-            const imgBtn = document.createElement('img')
-            imgBtn.classList.add("imgBtn")
-            imgBtn.id = "imgBtn"
-            imgBtn.setAttribute("src", hb.img)
-
-            const txtBtn = document.createElement('div')
-            txtBtn.classList.add("txtBtn")
-            txtBtn.id = "txtBtn"
-            txtBtn.textContent = hb.name
-
-            zoneBtn.addEventListener("click", function(){
-                console.log("Function do Botão ligar para", hb.name)
-            })
-            zoneBtn.appendChild(imgBtn)
-            zoneBtn.appendChild(txtBtn)
-            zoneDiv.appendChild(zoneBtn)
-        
-        })
-
     }
 
     function createBarGrafic(data) {
