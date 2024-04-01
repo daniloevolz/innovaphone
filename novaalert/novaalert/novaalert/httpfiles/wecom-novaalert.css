@@ -18,14 +18,15 @@ body {
 }
 
 /*ANIMAÇÃO BOTÕES */
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
+
+@keyframes blink-background {
+    0% { background-color: #595959; }
+    50% { background-color: var(--colors-vermelho-900) }
+    100% { background-color: #595959; }
 }
 
 .blinking {
-    animation: blink 1.5s infinite; 
+    animation: blink-background 1.5s infinite; 
 }
 
 
@@ -51,6 +52,9 @@ embed {
     align-items: stretch;
     /* background-color: var(--colors-neutro-1000); */
     padding: 5px;
+    height:auto;
+    width:100%;
+    
 }
 .zoneBtn {
     display: flex;
@@ -95,9 +99,8 @@ embed {
     flex-direction: column;
     margin: 3px;
     overflow-x: auto;
-    height: 60%;
+    height: 66%;
     background-color: #00000010;
-
 } 
 .btn1{
     width: 300px;
@@ -558,10 +561,6 @@ embed {
 }
 .CenterDiv{
     width: 47%;
-}
-.zoneDiv{
-    height:40%;
-    width:100%;
 }
 
 .CenterDiv .combobtn {

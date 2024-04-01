@@ -1586,7 +1586,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 return 'google-maps';
             } else {
                 return 'unknown';
-            }
+            }                 
         }      
         // Função para criar o elemento com base no tipo de arquivo
         function createFileElement(buttonLink) {
@@ -1607,7 +1607,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 element = document.createElement("video");
                 element.controls = true; // Adiciona controles de vídeo
                 element.style.width = "100%" 
-                element.style.height = "100%" 
+                // element.style.height = "100%" 
                 // Ajuste a altura conforme necessário
                 var source = document.createElement("source");
                 source.src = buttonLink;
