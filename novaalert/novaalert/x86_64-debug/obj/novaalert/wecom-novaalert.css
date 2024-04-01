@@ -225,6 +225,7 @@ embed {
     background-color: var(--colors-azul-500);
     text-align: center;
     align-items: center;
+    justify-content: center;
 }
 
 .eventImg1 {
@@ -594,18 +595,22 @@ embed {
     height:100%; 
     justify-content: center;
 }
-.colDireita {
+.colDireita{
     width: 35%;
-    background: var(--colors-neutro-1000);
     height: 100%;
     align-self: flex-start;
+    background: var(--colors-neutro-1000) ;
 }
 .colEsquerda{
     width: 18%;
     height: 100%;
 }
-.CenterDiv{
+.CenterDiv {
     width: 47%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-direction: column;
 }
 
 .CenterDiv .combobtn {
@@ -689,12 +694,13 @@ embed {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
+    margin: 6px;
     position: relative;
     align-self: stretch;
-    width: 100%;
+    width: auto;
     flex: 0 0 auto;
-  }
+}
 
   .CenterDiv .allbtnDiv {
     display: flex;
@@ -715,14 +721,13 @@ embed {
     flex-direction: column;
     align-items: center;
     position: relative;
-    flex: 1;
-    flex-grow: 1;
-    background-color: #262626bf;
+    flex: 1 1 0%;
+    background-color: rgba(38, 38, 38, 0.75);
     border-radius: 8px;
     overflow: hidden;
-    margin: 5px;
+    margin: 0px;
     cursor: pointer;
-  }
+}
   
   .CenterDiv .framePagesText {
     display: flex;

@@ -1463,7 +1463,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divButtons.setAttribute("page",1)
     
         //Botões Fixos no final
-        var divOptions = divCenter.add(new innovaphone.ui1.Div("position: fixed; bottom: 0",null,null))
+        var divOptions = divCenter.add(new innovaphone.ui1.Div(null,null,null))
         divOptions.setAttribute("id","divOptions")
         
         //Coluna Direita
@@ -1679,65 +1679,65 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var prtBottom = document.createElement("div");
             prtBottom.id = "prtBottom";
             prtBottom.classList.add("prtBottom");
-        // Função para verificar o tipo de arquivo com base na extensão do link
-        function getFileType(buttonLink) {
-            var extension = buttonLink.split('.').pop().toLowerCase();
-            if (extension === 'pdf') {
-                return 'pdf';
-            } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
-                return 'image';
-            } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
-                return 'video';
-            } else if (buttonLink.includes('google.com/maps/embed')) {
-                return 'google-maps';
-            } else {
-                return 'unknown';
-            }          
+        // // Função para verificar o tipo de arquivo com base na extensão do link
+        // function getFileType(buttonLink) {
+        //     var extension = buttonLink.split('.').pop().toLowerCase();
+        //     if (extension === 'pdf') {
+        //         return 'pdf';
+        //     } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
+        //         return 'image';
+        //     } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
+        //         return 'video';
+        //     } else if (buttonLink.includes('google.com/maps/embed')) {
+        //         return 'google-maps';
+        //     } else {
+        //         return 'unknown';
+        //     }          
             
 
-        }      
+        // }      
 
 
-        // Função para criar o elemento com base no tipo de arquivo
-        function createFileElement(buttonLink) {
-            var fileType = getFileType(buttonLink);
-            var element;
+        // // Função para criar o elemento com base no tipo de arquivo
+        // function createFileElement(buttonLink) {
+        //     var fileType = getFileType(buttonLink);
+        //     var element;
         
-            if (fileType === 'pdf') {
-                element = document.createElement("embed");
-                element.type = "application/pdf";
-                element.width = "100%";
-                element.height = "400"; // Altura desejada
-                element.src = buttonLink
-            } else if (fileType === 'image') {
-                element = document.createElement("img");
-                element.src = buttonLink;
-                element.style.width = '100%'
-            } else if (fileType === 'video') {
-                element = document.createElement("video");
-                element.controls = true; // Adiciona controles de vídeo
-                element.style.width = "100%" 
-                // element.style.height = "100%" 
-                // Ajuste a altura conforme necessário
-                var source = document.createElement("source");
-                source.src = buttonLink;
-                source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
-                element.appendChild(source);
-            } 
-            else if (fileType === 'google-maps') {
-                element = document.createElement("iframe");
-                element.src = buttonLink;
-                element.style.width = "100%";
-                element.style.height = "100%"; // Altura desejada para o mapa
-                element.style.position = "absolute";
-            }
-            else {
-                console.error("Tipo de arquivo desconhecido.");
-                return null;
-            }
+        //     if (fileType === 'pdf') {
+        //         element = document.createElement("embed");
+        //         element.type = "application/pdf";
+        //         element.width = "100%";
+        //         element.height = "400"; // Altura desejada
+        //         element.src = buttonLink
+        //     } else if (fileType === 'image') {
+        //         element = document.createElement("img");
+        //         element.src = buttonLink;
+        //         element.style.width = '100%'
+        //     } else if (fileType === 'video') {
+        //         element = document.createElement("video");
+        //         element.controls = true; // Adiciona controles de vídeo
+        //         element.style.width = "100%" 
+        //         // element.style.height = "100%" 
+        //         // Ajuste a altura conforme necessário
+        //         var source = document.createElement("source");
+        //         source.src = buttonLink;
+        //         source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+        //         element.appendChild(source);
+        //     } 
+        //     else if (fileType === 'google-maps') {
+        //         element = document.createElement("iframe");
+        //         element.src = buttonLink;
+        //         element.style.width = "100%";
+        //         element.style.height = "100%"; // Altura desejada para o mapa
+        //         element.style.position = "absolute";
+        //     }
+        //     else {
+        //         console.error("Tipo de arquivo desconhecido.");
+        //         return null;
+        //     }
         
-            return element;
-        }
+        //     return element;
+        // }
         bottomRight.appendChild(txtBottom)
         
         // Exemplo de uso:
@@ -2397,4 +2397,3 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
-

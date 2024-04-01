@@ -694,10 +694,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "SelectSensorNameResult") {
             console.log("SENSOR list_sensor" + JSON.stringify(obj.result))
             list_sensors = obj.result
-        var list_sensors_history = []
-        if (obj.api == "user" && obj.mt == "SensorAllInfoResult") {
-                    console.log("SENSOR list_history " + JSON.stringify(obj.result))
-                    list_sensors_history = obj.result
         }
         if (obj.api == "user" && obj.mt == "SensorReceived") {
             var sensorButtons = list_buttons.filter(function(object) {
@@ -899,8 +895,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         var pages = document.querySelectorAll(".pagina")
         pages.forEach(function(page){
-            var pageAttribute = page.getAttribute("page")
-            var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
             var pageAttribute = page.getAttribute("page")
             var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
             page.addEventListener("click", function(evt){
@@ -1469,7 +1463,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divButtons.setAttribute("page",1)
     
         //Botões Fixos no final
-        var divOptions = divCenter.add(new innovaphone.ui1.Div("position: fixed; bottom: 0",null,null))
+        var divOptions = divCenter.add(new innovaphone.ui1.Div(null,null,null))
         divOptions.setAttribute("id","divOptions")
         
         //Coluna Direita
@@ -1510,10 +1504,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         grid.classList.add("gridZero")
 
         for (var i = 1; i < 13; i++) {
-        for (var i = 1; i < 13; i++) {
 
             var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
-            var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
+            var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
             
             const buttonGrid = document.createElement("div")
             buttonGrid.id = i
@@ -1577,67 +1570,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         const buttonLink = obj.button_prt
 
-        // Função para verificar o tipo de arquivo com base na extensão do link
-        function getFileType(buttonLink) {
-            var extension = buttonLink.split('.').pop().toLowerCase();
-            if (extension === 'pdf') {
-                return 'pdf';
-            } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
-                return 'image';
-            } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
-                return 'video';
-            } else if (buttonLink.includes('google.com/maps/embed')) {
-                return 'google-maps';
-            } else {
-                return 'unknown';
-            }                 
-        }      
-        // Função para criar o elemento com base no tipo de arquivo
-        function createFileElement(buttonLink) {
-            var fileType = getFileType(buttonLink);
-            var element;
-        
-            if (fileType === 'pdf') {
-                element = document.createElement("embed");
-                element.type = "application/pdf";
-                element.width = "100%";
-                element.height = "400"; // Altura desejada
-                element.src = buttonLink
-            } else if (fileType === 'image') {
-                element = document.createElement("img");
-                element.src = buttonLink;
-                element.style.width = '100%'
-            } else if (fileType === 'video') {
-                element = document.createElement("video");
-                element.controls = true; // Adiciona controles de vídeo
-                element.style.width = "100%" 
-                // element.style.height = "100%" 
-                // Ajuste a altura conforme necessário
-                var source = document.createElement("source");
-                source.src = buttonLink;
-                source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
-                element.appendChild(source);
-            } 
-            else if (fileType === 'google-maps') {
-                element = document.createElement("iframe");
-                element.src = buttonLink;
-                element.style.width = "100%";
-                element.style.height = "100%"; // Altura desejada para o mapa
-                element.style.position = "absolute";
-            }
-            else {
-                console.error("Tipo de arquivo desconhecido.");
-                return null;
-            }
-        
-            return element;
-        }
-        bottomRight.appendChild(txtBottom)
-        
-        // Exemplo de uso:
-        var prtBottom = document.createElement("div");
-        prtBottom.id = "prtBottom";
-        prtBottom.classList.add("prtBottom");
         if(obj.button_type == "sensor"){
             const unic_sensor = []
             var arrayHistory = JSON.parse(list_sensors_history);
@@ -1747,15 +1679,79 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var prtBottom = document.createElement("div");
             prtBottom.id = "prtBottom";
             prtBottom.classList.add("prtBottom");
+        // // Função para verificar o tipo de arquivo com base na extensão do link
+        // function getFileType(buttonLink) {
+        //     var extension = buttonLink.split('.').pop().toLowerCase();
+        //     if (extension === 'pdf') {
+        //         return 'pdf';
+        //     } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
+        //         return 'image';
+        //     } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
+        //         return 'video';
+        //     } else if (buttonLink.includes('google.com/maps/embed')) {
+        //         return 'google-maps';
+        //     } else {
+        //         return 'unknown';
+        //     }          
+            
+
+        // }      
+
+
+        // // Função para criar o elemento com base no tipo de arquivo
+        // function createFileElement(buttonLink) {
+        //     var fileType = getFileType(buttonLink);
+        //     var element;
+        
+        //     if (fileType === 'pdf') {
+        //         element = document.createElement("embed");
+        //         element.type = "application/pdf";
+        //         element.width = "100%";
+        //         element.height = "400"; // Altura desejada
+        //         element.src = buttonLink
+        //     } else if (fileType === 'image') {
+        //         element = document.createElement("img");
+        //         element.src = buttonLink;
+        //         element.style.width = '100%'
+        //     } else if (fileType === 'video') {
+        //         element = document.createElement("video");
+        //         element.controls = true; // Adiciona controles de vídeo
+        //         element.style.width = "100%" 
+        //         // element.style.height = "100%" 
+        //         // Ajuste a altura conforme necessário
+        //         var source = document.createElement("source");
+        //         source.src = buttonLink;
+        //         source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+        //         element.appendChild(source);
+        //     } 
+        //     else if (fileType === 'google-maps') {
+        //         element = document.createElement("iframe");
+        //         element.src = buttonLink;
+        //         element.style.width = "100%";
+        //         element.style.height = "100%"; // Altura desejada para o mapa
+        //         element.style.position = "absolute";
+        //     }
+        //     else {
+        //         console.error("Tipo de arquivo desconhecido.");
+        //         return null;
+        //     }
+        
+        //     return element;
+        // }
+        bottomRight.appendChild(txtBottom)
+        
+        // Exemplo de uso:
+        var prtBottom = document.createElement("div");
+        prtBottom.id = "prtBottom";
+        prtBottom.classList.add("prtBottom");
 
             var fileElement = createFileElement(buttonLink);
             if (fileElement) {
                 prtBottom.appendChild(fileElement);
                 // Adicione prtBottom ao seu documento:
-                bottomRight.appendChild(prtBottom);   // Adicione ao corpo do documento ou outro elemento desejado
+                bottomRight.appendChild(prtBottom); // Adicione ao corpo do documento ou outro elemento desejado
             }
         }
-
         colRight.appendChild(bottomRight)
 
 
@@ -1829,22 +1825,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                 // verifica se o threshold foi excedido e atualiza as classes 
                 if (parseInt(info[sensorType]) > parseInt(maxThreshold)) {
-                    buttonTop.classList.add("vermelho-900");
-                    buttonDown.classList.add("vulcano-1000");
-                    buttonTop.classList.add("blinking"); // colocar animação do botão piscando
-
-                    addNotification('out', texts.text("sensor"), sensorName , userUI)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    // registrar no histórico qual sensor que explodiu o threshold junto com o horário
-
-
-                }  // verifica se o minthreshold foi excedido e atualiza as classes 
-                else if(parseInt(info[sensorType]) < parseInt(minThreshold)){
                     buttonTop.classList.add("vermelho-900");
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
@@ -2360,7 +2340,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         console.log("MÉDIA GRAFICO Y key.lengt", key.length)
         console.log("MÉDIA GRAFICO Y maxY", maxY)
         console.log("MÉDIA GRAFICO Y", media)
+        
         // Define os valores para o eixo Y
+
         var yValues = [];
         for (var i = 0; i <= 4; i++) {
             yValues.push(Math.round(i * (media / 4)));
@@ -2415,4 +2397,3 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 }
 
 Wecom.novaalert.prototype = innovaphone.ui1.nodePrototype;
-
