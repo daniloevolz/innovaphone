@@ -28,6 +28,20 @@ body {
     animation: blink 1.5s infinite; 
 }
 
+
+
+.bottomR { 
+    height: 100%;
+} 
+
+.prtBottom { 
+    height: 100%;
+}  
+
+embed { 
+    height: 100%;
+}
+
 /*#region Alterações erick*/
 .zoneDiv {
     display: grid;
@@ -52,9 +66,9 @@ body {
 .zoneBtn > img{
     width: 30px;
 }
-.zoneBtn .txtBtn{
+/* .zoneBtn .txtBtn{
     font-size: 0.5rem;
-}
+} */
 .zoneBtn:hover{
     background-color: var(--colors-neutro-1000)
 }
@@ -261,6 +275,50 @@ body {
 }
 /*#endregion */
 
+.divReportOptions {
+    position: relative;
+    background-color: rgb(16, 16, 16);
+    /* color: darkblue; */
+    font-size: 12pt;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    /* top: 19%; */
+    /* left: 29%; */
+    border-bottom: 2px solid #02163F;
+    font-size: 15px;
+    text-align: center;
+    flex-direction: column;
+}
+
+.divReportFilters {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    /* color: darkblue; */
+    font-size: 12pt;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    /* top: 19%; */
+    /* left: 29%; */
+    border-bottom: 2px solid #02163F;
+    font-size: 15px;
+    text-align: justify;
+}
+.addButtonsArea {
+    position: absolute;
+    left: 0%;
+    width: 100%;
+    top: 61px;
+    font-size: 15px;
+    text-align: right;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
 :root {
     --l-font-family: "Inter", Helvetica;
     --l-font-weight: 400;
@@ -533,10 +591,11 @@ body {
     height:100%; 
     justify-content: center;
 }
-.colDireita{
+.colDireita {
     width: 35%;
-    background: var(--colors-neutro-1000) ;
+    background: var(--colors-neutro-1000);
     height: 100%;
+    align-self: flex-start;
 }
 .colEsquerda{
     width: 18%;
@@ -564,7 +623,7 @@ body {
 }
 .CenterDiv .combobutton {
     display: flex;
-    flex-direction: column;
+    flex-direction: row !important;
     height: 100px;
     align-items: flex-start;
     /* background-color: #ffffff; */
@@ -610,6 +669,7 @@ body {
     width: 185px;
     position: relative;
     margin-top: 10px;
+    cursor: pointer;
   }
   .CenterDiv .Button {
     display: flex;
@@ -988,6 +1048,144 @@ select{
     padding: 10px;
     
 }
+
+/*DESTS*/
+.destEmpty {
+    border-radius: 6px;
+    display: flex;
+    padding: 8px;
+    /*width: 92px;*/
+    height: 92px;
+    background-color: var(--colors-neutro-800);
+}
+.txtBtn{
+    font-size: 20px;
+}
+
+.imgBtn {
+    height: 45px;
+}
+
+.destFree {
+    border-radius: 6px;
+    display: flex;
+    padding: 8px;
+    /* width: 92px; */
+    height: 92px;
+    /*background-color: var(--colors-neutro-800);*/
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+    .destFree:hover {
+        background-color: var(--colors-neutro-1000);
+    }
+.labelDestImage {
+    position: absolute;
+    left: 29%;
+    /* width: 15%; */
+    top: 63%;
+    /* font-weight: bold; */
+    font-size: 15px;
+    text-align: right;
+    border-bottom: 2px solid #02163F;
+}
+
+.iptDestImage {
+    position: absolute;
+    width: 30%;
+    top: 62%;
+    font-size: 12px;
+    text-align: center;
+    height: 30px;
+    background-color: #02163F;
+    color: white;
+    border: 1px solid #02163F;
+    border-radius: 10px;
+}
+
+.logos-conteudos {
+    display: none;
+    position: absolute;
+    width: 100%;
+    /*background-color: rgb(236, 235, 234);*/
+}
+
+    .logos-conteudos a {
+        width: 100%;
+        color: black;
+        text-decoration: none;
+        display: block;
+    }
+.btnLogos {
+    background-color: #b3c4bd;
+    color: var(--text-standard);
+    /*padding: 16px;*/
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.logos {
+    position: absolute;
+    display: inline-block;
+}
+
+
+.logos-conteudos a:hover {
+    background-color: rgb(199, 199, 199);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.logos-conteudos a:focus {
+    background-color: rgb(165, 162, 162);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.logos:hover .logos-conteudos {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+.colunaesquerda {
+    background-size: cover;
+    margin-left: 0%;
+    position: absolute;
+    left: 0px;
+    width: 16%;
+    height: 100%;
+    top: 0px;
+    font-size: 15px;
+    background-color: whitesmoke;
+    top: 0px;
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    position: fixed;
+    height: 61px;
+    /*padding: 6px;*/
+    flex-direction: row;
+    background-color: black;
+}
+.colunadireitaadmin {
+    top: 61px;
+    height: 100%;
+    position: relative;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: var(--bg);
+    background-color: rgb(196, 196, 196, 0.5);
+    color: darkblue;
+    font-size: 12pt;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+}
 /*INPUT NUMBER*/
 .divAdd3{
     position: absolute;
@@ -1035,7 +1233,8 @@ select{
     font-size: 15px;
     /* color: #02163F; */
 }
-.iptNameNumber{
+.iptNameNumber {
+    text-align: end;
     width: 100%;
     border: 0;
     border-bottom: 2px solid #02163F;
@@ -1046,6 +1245,7 @@ select{
     background: transparent;
     transition: border-color 0.2s;
 }
+
 .iptNameNumber ::placeholder{
     display: none;
     color: transparent;
@@ -1071,16 +1271,16 @@ select{
     border-image: linear-gradient(to right, #02163F,#0a45bd);
     border-image-slice: 1;
 }
-.labelValueNumber{
+/* .labelValueNumber{
     position: absolute;
     top: 0;
     display: block;
     transition: 0.2s;
     font-size: 15px;
-    /* color: #02163F; */
-}
-.iptValueNumber{
+} */
+.iptValueNumber {
     width: 100%;
+    text-align: end;
     border: 0;
     border-bottom: 2px solid #02163F;
     outline: 0;
@@ -2002,17 +2202,7 @@ background-color: darkred;
     .popup-clear:hover {
         background: #B0132B;
     }
-.colunaesquerda {
-    background-size: cover;
-    margin-left: 0%;
-    position: absolute;
-    left: 0px;
-    width: 16%;
-    height: 100%;
-    top: 0px;
-    font-size: 15px;
-    background-color: whitesmoke;
-}
+
 .colunadireita {
     background-size: cover;
     background-repeat: no-repeat;
@@ -2079,8 +2269,41 @@ background-color: darkred;
     justify-content: center;
     align-items: center;
     gap: 6px;
-
-
+    text-transform: capitalize;
+}
+.imgComboBtn{
+    height: 100%;
+    width: 30%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.divComboName {
+    text-transform: capitalize;
+    width: 80%;
+    flex-direction: column;
+    height: 100%;
+    display: flex;
+}
+.divComboBottomName {
+    height: 80%;
+    width: 90%;
+    padding-top: 5px;
+    padding-left: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--colors-neutro-100);
+}
+.divComboTopName{
+    opacity: 0.6;
+    height: 19%;
+    margin: 5px;
+    margin-top: 5px;
+    width: 90%;
+    font-size: 16px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 .neutro-700{
     background: var(--colors-neutro-700);
@@ -2143,8 +2366,19 @@ background-color: darkred;
     flex-direction: row;
     font-size: 16px;
     gap: 10px;
+    text-transform: capitalize;
 }
 
+#divInfo {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 50%;
+    justify-content: flex-end;
+    margin: 10px;
+}
 .notificationdown {
     height: 50%;
     width: 100%;
@@ -2237,27 +2471,25 @@ background-color: darkred;
     cursor: pointer;
     flex-direction: column;
 }
-.userbutton {
+/* .userbutton {
     margin: 5px;
     min-width: 100px;
     display: inline-flex;
     height: 15%;
     border-color: white;
     border-width: 3px;
-    /* background-color: var(--colbutton); */
-    /*background-image: linear-gradient(rgb(99, 137, 175), rgb(58, 175, 150));*/
-    width: 15%;
     font-weight: bold;
-    color: var(--text-standard); /*white;*/
+    color: var(--text-standard); 
     font-size: 12px;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
-    background-color: var(--button); /*#191919;*/
+    background-color: var(--button); 
     text-align: center;
     cursor: pointer;
-    flex-direction: column;
+    flex-direction: column; 
 }
+*/
 .pageDivider {
     display: none;
     position: absolute;
@@ -2524,38 +2756,25 @@ width: 100%;
     /*visibility: hidden;*/
 }
 
-.colunaesquerda {
-    position: absolute;
-    width: 15%;
-    height: 100%;
-    background-color: #02163F;
-    color: white;
-    /*opacity: 0.9;*/
-}
-
-.colunadireitaadmin {
-    width: 85%;
-    height: 100%;
-    position: absolute;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-image: var(--bg);
-    left: 15%;
-    background-color: rgb(196, 196, 196, 0.5);
-    color: darkblue;
-    font-size: 12pt;
-    overflow-y: auto;
-    display: flex;
-    justify-content: center;
-}
-
 li {
+    height: 61px;
+    width: 235px;
     padding: 1%;
     list-style-type: none;
-    margin-left: 20px;
+    /* margin-left: 20px; */
     font-size: 13pt;
+    text-align: center;
+    align-self: center;
 }
 
+.divConfigs {
+    display: flex;
+    position: absolute;
+    height: 61px;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
 .liOptions:hover {
     background-color: rgba(255, 255, 255, 0.178);
     border-radius: 10px;
@@ -3014,8 +3233,8 @@ table {
         max-width: 350px;
     }
     .colDireita{
-        width: 400px;
-        max-width: 400px;
+        width: 550px;
+        max-width: 550px;
     }
     .CenterDiv .Button {
         display: flex;

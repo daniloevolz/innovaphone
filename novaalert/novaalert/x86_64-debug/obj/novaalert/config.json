@@ -235,6 +235,11 @@
             "cmd": "column",
             "name": "position_y",
             "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "img",
+            "type": "TEXT"
           }
         ]
       },

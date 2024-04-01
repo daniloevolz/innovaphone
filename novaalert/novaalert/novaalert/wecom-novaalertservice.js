@@ -731,6 +731,17 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
 
             }
+            if (obj.mt == "InsertDestMessage") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+
             //#endregion
             //#region ACTIONS
             if (obj.mt == "InsertActionMessage") {
@@ -892,8 +903,48 @@ new JsonApi("admin").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                }
-            }
+                    case "RptSensors":
+                            var query;
+                            if (obj.sensor_type) {
+                                query = "SELECT id, sensor_name, " + obj.sensor_type + ", date FROM list_sensors_history";
+                                var conditions = [];
+                                if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+                                if (obj.from) conditions.push("date >'" + obj.from + "'");
+                                if (obj.to) conditions.push("date <'" + obj.to + "'");
+                                if (conditions.length > 0) {
+                                    query += " AND " + conditions.join(" AND ");
+                                }
+                            } else {
+                                query = "SELECT * FROM list_sensors_history";
+                                var conditions = [];
+                                if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+                                if (obj.from) conditions.push("date >'" + obj.from + "'");
+                                if (obj.to) conditions.push("date <'" + obj.to + "'");
+                                if (conditions.length > 0) {
+                                    query += " WHERE " + conditions.join(" AND ");
+                                }
+                            }
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+    
+                                    var jsonData = JSON.stringify(data, null, 4);
+                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                    var fragments = [];
+                                    for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                        fragments.push(jsonData.substr(i, maxFragmentSize));
+                                    }
+                                    // Enviar cada fragmento separadamente através do websocket
+                                    for (var i = 0; i < fragments.length; i++) {
+                                        var isLastFragment = i === fragments.length - 1;
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                    }})
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                                });
+                        break;
+                    }        
+                }       
             if (obj.mt == "DeleteFromReports") {
                 switch (obj.src) {
                     case "RptCalls":
