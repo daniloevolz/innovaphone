@@ -514,20 +514,21 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "SelectSensorInfo") {
-                    var querySelect = "SELECT " + obj.type + " FROM list_sensors_history WHERE sensor_name = '" + obj.sensor + "' ORDER BY id DESC LIMIT 1";
-                    Database.exec(querySelect)
+                    Database.exec("SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sensor_name ORDER BY id DESC) as row_num FROM list_sensors_history) AS subquery WHERE row_num <= 10")
+                        // base = "SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';"
                         .oncomplete(function (data) {
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResult", result: JSON.stringify(data), src: obj.src }))
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResult", result: JSON.stringify(data) }))
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             log("Erro ao Consultar Info do Sensor " + errorText);
                         });
                 }
-                if (obj.mt == "SelectAllInfo") {
-                    Database.exec("SELECT * FROM list_sensors_history")
+
+                if (obj.mt == "SelectSensorName") {
+                    Database.exec("SELECT DISTINCT sensor_name FROM list_sensors_history")
                         // base = "SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';"
                         .oncomplete(function (data) {
-                            conn.send(JSON.stringify({ api: "user", mt: "SensorAllInfoResult", result: JSON.stringify(data) }))
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorNameResult", result: JSON.stringify(data) }))
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             log("Erro ao Consultar Info do Sensor " + errorText);
