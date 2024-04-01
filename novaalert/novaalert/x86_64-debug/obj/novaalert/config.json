@@ -330,6 +330,11 @@
           },
           {
             "cmd": "column",
+            "name": "light",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
             "name": "tvoc",
             "type": "text"
           },
