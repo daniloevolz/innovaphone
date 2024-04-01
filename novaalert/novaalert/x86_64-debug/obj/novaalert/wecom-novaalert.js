@@ -60,6 +60,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_buttons = [];
     var list_sensors_history = []
     var list_sensors = []
+    var list_sensors_history = []
+    var list_sensors = []
     var popupOpen = false;
     var session;
     
@@ -897,6 +899,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         pages.forEach(function(page){
             var pageAttribute = page.getAttribute("page")
             var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
+            var pageAttribute = page.getAttribute("page")
+            var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
             page.addEventListener("click", function(evt){
                 var divPrincipal = document.getElementById("divMainButtons")
                 var divOptions = document.getElementById("divOptions")
@@ -1480,6 +1484,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divOptionsMain =  divOptions
         leftBottomButons()
 
+
     }
   function createGridZero(type) {
 
@@ -1504,10 +1509,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         grid.classList.add("gridZero")
 
         for (var i = 1; i < 13; i++) {
+        for (var i = 1; i < 13; i++) {
 
-            var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
-            var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
-            
+            var positionX = Math.floor(i / 6) + 1; // Calcula a posição X
+            var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
+
             const buttonGrid = document.createElement("div")
             buttonGrid.id = i
             buttonGrid.classList.add("optEmpty")
@@ -1552,8 +1558,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
     function createDivRightBottom(obj){
         console.log("ERICK OBJ JSON", obj)
+        console.log("ERICK OBJ JSON", obj)
         const colRight = document.getElementById("colDireita")
         var btmRight = document.getElementById("bottomR")
+        var grafico = document.getElementById("grafico")
         var grafico = document.getElementById("grafico")
         if(btmRight){
             colRight.removeChild(btmRight)
@@ -1565,6 +1573,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         txtBottom.id = "txtBottom"
         txtBottom.classList.add("headerTxt")
         txtBottom.textContent = obj.button_name
+
+        bottomRight.appendChild(txtBottom)
+
 
         bottomRight.appendChild(txtBottom)
 
@@ -1718,6 +1729,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 element.controls = true; // Adiciona controles de vídeo
                 element.style.width = "100%" 
                 // element.style.height = "100%" 
+                // element.style.height = "100%" 
                 // Ajuste a altura conforme necessário
                 var source = document.createElement("source");
                 source.src = buttonLink;
@@ -1744,6 +1756,115 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var prtBottom = document.createElement("div");
         prtBottom.id = "prtBottom";
         prtBottom.classList.add("prtBottom");
+        if(obj.button_type == "sensor"){
+            const unic_sensor = []
+            var arrayHistory = JSON.parse(list_sensors_history);
+            
+            var filtredhistory = arrayHistory.filter(function(h){
+                return h.sensor_name == buttonLink;
+            });
+            console.log("FILTRO HIST", filtredhistory)
+            const infoBox = document.createElement("div")
+            infoBox.id = "infoBox"
+            infoBox.classList.add("infobox")
+
+            const sensorInfoBox = document.createElement("div")
+            sensorInfoBox.id = "sensorInfoBox"
+            sensorInfoBox.classList.add("sensorInfoBox")
+            for(let key in filtredhistory[0]){
+                if (filtredhistory[0].hasOwnProperty(key)) {
+                    console.log(key + ': ' + filtredhistory[0][key]);
+                    if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null){
+                        const sensorBox = document.createElement("div")
+                        sensorBox.id = "sensorBox"
+                        sensorBox.classList.add("sensorBox")
+    
+                        const topBox = document.createElement("div")
+                        topBox.id = "topBox"
+                        topBox.classList.add("topBox", "neutro-700")
+                        topBox.textContent = texts.text(key)
+    
+                        const btmBox = document.createElement("div")
+                        btmBox.id = "btmBox"
+                        btmBox.classList.add("btmBox", "neutro-900")
+                        btmBox.textContent = filtredhistory[0][key]
+                        
+                        sensorBox.appendChild(topBox)
+                        sensorBox.appendChild(btmBox)
+                        sensorInfoBox.appendChild(sensorBox)
+
+                        sensorBox.addEventListener("click", function(){
+                           
+                            createLineGrafic(filtredhistory, key)
+                        })
+
+                    }
+                }
+            }
+
+          
+            infoBox.appendChild(sensorInfoBox)
+            bottomRight.appendChild(infoBox)
+
+        
+        }else{
+            function createFileElement(buttonLink) {
+                var fileType = getFileType(buttonLink);
+                var element;
+            
+                if (fileType === 'pdf') {
+                    element = document.createElement("embed");
+                    element.type = "application/pdf";
+                    element.width = "100%";
+                    element.height = "400"; // Altura desejada
+                } else if (fileType === 'image') {
+                    element = document.createElement("img");
+                    element.src = buttonLink;
+                    element.style.width = '100%'
+                } else if (fileType === 'video') {
+                    element = document.createElement("video");
+                    element.controls = true; // Adiciona controles de vídeo
+                    element.style.width = "100%" 
+                    element.style.height = "100%" 
+                    // Ajuste a altura conforme necessário
+                    var source = document.createElement("source");
+                    source.src = buttonLink;
+                    source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+                    element.appendChild(source);
+                } 
+                else if (fileType === 'google-maps') {
+                    element = document.createElement("iframe");
+                    element.src = buttonLink;
+                    element.style.width = "100%";
+                    element.style.height = "100%"; // Altura desejada para o mapa
+                    element.style.position = "absolute";
+                }
+                else {
+                    console.error("Tipo de arquivo desconhecido.");
+                    return null;
+                }
+            
+                return element;
+            }
+            // Função para verificar o tipo de arquivo com base na extensão do link
+            function getFileType(buttonLink) {
+                var extension = buttonLink.split('.').pop().toLowerCase();
+                if (extension === 'pdf') {
+                    return 'pdf';
+                } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
+                    return 'image';
+                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
+                    return 'video';
+                } else if (buttonLink.includes('google.com/maps/embed')) {
+                    return 'google-maps';
+                } else {
+                    return 'unknown';
+                }
+            }      
+            // Exemplo de uso:
+            var prtBottom = document.createElement("div");
+            prtBottom.id = "prtBottom";
+            prtBottom.classList.add("prtBottom");
 
             var fileElement = createFileElement(buttonLink);
             if (fileElement) {
@@ -1825,6 +1946,22 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                 // verifica se o threshold foi excedido e atualiza as classes 
                 if (parseInt(info[sensorType]) > parseInt(maxThreshold)) {
+                    buttonTop.classList.add("vermelho-900");
+                    buttonDown.classList.add("vulcano-1000");
+                    buttonTop.classList.add("blinking"); // colocar animação do botão piscando
+
+                    addNotification('out', texts.text("sensor"), sensorName , userUI)
+                    .then(function (message) {
+                        console.log(message);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                    // registrar no histórico qual sensor que explodiu o threshold junto com o horário
+
+
+                }  // verifica se o minthreshold foi excedido e atualiza as classes 
+                else if(parseInt(info[sensorType]) < parseInt(minThreshold)){
                     buttonTop.classList.add("vermelho-900");
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
@@ -2307,8 +2444,25 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             btmRight.removeChild(grafico)
         }
     
+    function createLineGrafic(data, key) {
+        console.log("Grafico", data)
+        var grafico = document.getElementById("grafico")
+
+        const btmRight = document.getElementById("bottomR")
+        if (grafico) {
+            btmRight.removeChild(grafico)
+        }
+    
         const canvas = document.createElement('canvas');
         canvas.id = "grafico"
+        canvas.classList.add("grafico", "neutro-1000")
+    
+        var ctx = canvas.getContext('2d');
+
+        canvas.width = 700; // Defina a largura desejada
+        canvas.height = 380; // Defina a altura desejada
+
+
         canvas.classList.add("grafico", "neutro-1000")
     
         var ctx = canvas.getContext('2d');
@@ -2320,7 +2474,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var width = canvas.width;
         var height = canvas.height;
         var padding = 40;
+        var padding = 40;
     
+        // Define os valores para o eixo Y
+        var maxY = Math.max.apply(null, data.map(function(item) { return item[key]; }));
         // Define os valores para o eixo Y
         var maxY = Math.max.apply(null, data.map(function(item) { return item[key]; }));
     
@@ -2346,6 +2503,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var yValues = [];
         for (var i = 0; i <= 4; i++) {
             yValues.push(Math.round(i * (media / 4)));
+            yValues.push(Math.round(i * (media / 4)));
         }
     
         function drawLineGraph() {
@@ -2361,6 +2519,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     
             // Desenha os rótulos dos eixos X e Y
             ctx.font = '15px Arial'
+            ctx.font = '15px Arial'
             ctx.fillStyle = 'white'; // Define a cor dos rótulos
             ctx.fillText('X', width - padding + 5, height - padding + 5);
             ctx.fillText('Y', padding - 10, padding - 5);
@@ -2373,8 +2532,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             data.forEach(function(pair, index) {
                 var x = index * intervalWidth + padding;
                 var y = height - pair[key] * scaleY - padding;
+            data.forEach(function(pair, index) {
+                var x = index * intervalWidth + padding;
+                var y = height - pair[key] * scaleY - padding;
                 ctx.lineTo(x, y);
                 ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillText(pair[key], x + 5, y - 5); // Adiciona o valor do ponto
                 ctx.fillText(pair[key], x + 5, y - 5); // Adiciona o valor do ponto
             });
             ctx.stroke();
@@ -2387,9 +2550,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             });
         }
         btmRight.appendChild(canvas)
+        btmRight.appendChild(canvas)
         drawLineGraph();
     
+    
     }
+    
     
 
     
