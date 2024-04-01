@@ -91,9 +91,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         { typeName: texts.text("battery"), id: "battery" },
         { typeName: texts.text("humidity"), id: "humidity" },
         { typeName: texts.text("leak"), id: "leak" },
-        { typeName: texts.text("temperature"), id: "temperature" },
-        { typeName: texts.text("light"), id: "light" },
-        { typeName: texts.text("pir"), id: "pir" }
+        { typeName: texts.text("pir"), id: "pir" },
+        { typeName: texts.text("light"), id: "lightStatus" },
+        { typeName: texts.text("temperature"), id: "temperature" }
+
     ];
     //páginas
     var list_pages = [

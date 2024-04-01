@@ -18,14 +18,15 @@ body {
 }
 
 /*ANIMAÇÃO BOTÕES */
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
+
+@keyframes blink-background {
+    0% { background-color: #595959; }
+    50% { background-color: var(--colors-vermelho-900) }
+    100% { background-color: #595959; }
 }
 
 .blinking {
-    animation: blink 1.5s infinite; 
+    animation: blink-background 1.5s infinite; 
 }
 
 
@@ -51,6 +52,9 @@ embed {
     align-items: stretch;
     /* background-color: var(--colors-neutro-1000); */
     padding: 5px;
+    height:auto;
+    width:100%;
+    
 }
 .zoneBtn {
     display: flex;
@@ -95,9 +99,8 @@ embed {
     flex-direction: column;
     margin: 3px;
     overflow-x: auto;
-    height: 60%;
+    height: 66%;
     background-color: #00000010;
-
 } 
 .btn1{
     width: 300px;
@@ -175,7 +178,6 @@ embed {
 }
 .grafico {
     background-color: black; /* Define o fundo do canvas como preto */
-    width: 100%;
 }
 
 #grafico.axis {
@@ -208,8 +210,8 @@ embed {
     border-radius: 6px;
     display: flex;
     padding: 8px;
-    width: 106px;
-    height: 106px;
+    width: 105px;
+    height: 105px;
     background-color: var(--colors-neutro-800);
 }
 
@@ -218,15 +220,62 @@ embed {
     border-radius: 6px;
     display: flex;
     padding: 8px;
-    width: 106px;
-    height: 106px;
+    width: 105px;
+    height: 105px;
     background-color: var(--colors-azul-500);
     text-align: center;
     align-items: center;
+    justify-content: center;
 }
 
 .eventImg1 {
     width: 50px;
+}
+
+.infobox{
+    width: 100%;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.sensorInfoBox{
+    width: 73%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: 6px;
+}
+.sensorBox{
+    width: 160px;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+}
+.topBox{
+    width: 100%;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-size: 17px;
+    border-radius: 6px 6px 0 0;
+    justify-content: center;
+    font-weight: bold;
+}
+.btmBox{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-size: 30px;
+    border-radius: 0px 0px 6px 6px;
+    justify-content: center;
 }
 /*#endregion */
 
@@ -546,22 +595,22 @@ embed {
     height:100%; 
     justify-content: center;
 }
-.colDireita {
+.colDireita{
     width: 35%;
-    background: var(--colors-neutro-1000);
     height: 100%;
     align-self: flex-start;
+    background: var(--colors-neutro-1000) ;
 }
 .colEsquerda{
     width: 18%;
     height: 100%;
 }
-.CenterDiv{
+.CenterDiv {
     width: 47%;
-}
-.zoneDiv{
-    height:40%;
-    width:100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-direction: column;
 }
 
 .CenterDiv .combobtn {
@@ -645,12 +694,13 @@ embed {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
+    margin: 6px;
     position: relative;
     align-self: stretch;
-    width: 100%;
+    width: auto;
     flex: 0 0 auto;
-  }
+}
 
   .CenterDiv .allbtnDiv {
     display: flex;
@@ -671,14 +721,13 @@ embed {
     flex-direction: column;
     align-items: center;
     position: relative;
-    flex: 1;
-    flex-grow: 1;
-    background-color: #262626bf;
+    flex: 1 1 0%;
+    background-color: rgba(38, 38, 38, 0.75);
     border-radius: 8px;
     overflow: hidden;
-    margin: 5px;
+    margin: 0px;
     cursor: pointer;
-  }
+}
   
   .CenterDiv .framePagesText {
     display: flex;
@@ -2260,6 +2309,9 @@ background-color: darkred;
     justify-content: flex-end;
     align-items: center;
 }
+.neutro-700{
+    background: var(--colors-neutro-700);
+}
 .neutro-800{
     background: var(--colors-neutro-800);
 }
@@ -3183,7 +3235,11 @@ table {
     .colEsquerda{
         width: 350px;
         max-width: 350px;
-
+    }
+    .colDireita{
+        width: 550px;
+        max-width: 550px;
+    }
     .CenterDiv .Button {
         display: flex;
         flex-direction: column;
