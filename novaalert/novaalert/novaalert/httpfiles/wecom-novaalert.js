@@ -1680,13 +1680,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             prtBottom.id = "prtBottom";
             prtBottom.classList.add("prtBottom");
 
-        var fileElement = createFileElement(buttonLink);
-        if (fileElement) {
-            prtBottom.appendChild(fileElement);
-            // Adicione prtBottom ao seu documento:
-            bottomRight.appendChild(prtBottom); // Adicione ao corpo do documento ou outro elemento desejado
+            var fileElement = createFileElement(buttonLink);
+            if (fileElement) {
+                prtBottom.appendChild(fileElement);
+                // Adicione prtBottom ao seu documento:
+                bottomRight.appendChild(prtBottom); // Adicione ao corpo do documento ou outro elemento desejado
+            }
         }
-
         colRight.appendChild(bottomRight)
 
 
