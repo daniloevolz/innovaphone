@@ -94,6 +94,9 @@ embed {
 .azul-marinho-400{
     background-color: var(--colors-azul-marinho-400) !important
 }
+.azul-marinho-1000{
+    background-color: var(--colors-azul-marinho-1000) !important
+}
 .scroll-container {
     display: flex;
     flex-direction: column;
@@ -226,6 +229,7 @@ embed {
     text-align: center;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .eventImg1 {
@@ -755,7 +759,15 @@ embed {
     font-style: var(--h6-font-style);
   }
 
-
+  .allbutton{
+    cursor: pointer;
+  }
+  .exnumberbutton{
+    cursor: pointer;
+  }
+  .userbutton{
+    cursor: pointer;
+  }
 /*#endregion New Layout*/
 
 /*ADMIN NOVA ALERT*/
@@ -1080,6 +1092,7 @@ select{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
     .destFree:hover {
         background-color: var(--colors-neutro-1000);
@@ -2320,6 +2333,9 @@ background-color: darkred;
 }
 .neutro-1000{
     background: var(--colors-neutro-1000);
+}
+.neutro-1100{
+    background: var(--colors-neutro-1100);
 }
 .verde-900{
     background: var(--colors-verde-900);

@@ -60,8 +60,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_buttons = [];
     var list_sensors_history = []
     var list_sensors = []
-    var list_sensors_history = []
-    var list_sensors = []
     var popupOpen = false;
     var session;
     
@@ -176,14 +174,35 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "UserInitializeResultSuccess") {
             app.send({ api: "user", mt: "SelectMessage" }); //Requisita os botões
         }
+
+        if (obj.api == "user" && obj.mt == "SelectSensorInfoResult") {
+            console.log("SENSOR list_history " + JSON.stringify(obj.result))
+            list_sensors_history = obj.result
+        }
+        if (obj.api == "user" && obj.mt == "SelectSensorNameResult") {
+            console.log("SENSOR list_sensor" + JSON.stringify(obj.result))
+            list_sensors = obj.result
+        }
+
         if (obj.api == "user" && obj.mt == "SelectMessageSuccess") {
             connected();
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             popButtons(list_buttons,1); //Cria os botões na tela
             leftBottomButons()
-            createGridZero("floor");
+            createGridZero("floor")
+                .then(function (message) {
+                    console.log("createGridZero" + message);
+                })
+                .catch(function (error) {
+                    console.log("createGridZero" + error);
+                });
+            app.send({api: "user", mt: "TableUsers"}); //Requisita a lista de usuarios do PBX
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
+        }
+        if (obj.api == "user" && obj.mt == "TableUsersResult") {
+            console.log(obj.result);
+            list_users = JSON.parse(obj.result);
         }
         if (obj.api == "user" && obj.mt == "UserConnected") {
             console.log(obj.src);
@@ -295,9 +314,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         elemento.children[1].classList.add("gold-600")
                         button_clicked = button_clicked.filter(button => button.id != elemento.id);
 
-                         //   // selectedCells = selectedCells.filter(function (selectedCell) {
-                        //   //   return selectedCell !== cell;
-                        //   // });
                     }else{
                         elemento.children[0].classList.remove("gold-900")
                         elemento.children[1].classList.remove("gold-600")
@@ -322,19 +338,88 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             
 
         }
-        if (obj.api == "user" && obj.mt == "VideoRequest") {
+        if (obj.api == "user" && obj.mt == "ComboAlarmStarted") {
             console.log(obj.alarm);
-            //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name,"video", obj.alarm);
-            //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
-            //addNotification(">>>  " + obj.alarm);
+            try {
+                var button_found = [];
+                list_buttons.forEach(function (l) {
+                    if (l.button_prt == obj.alarm) {
+                        button_found.push(l);
+                    }
+                })
+                //var clicked = document.getElementById(obj.alarm);
+                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
+
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
+
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+
+                    // Altera as características do elemento
+                    if (elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")) {
+                        elemento.children[0].classList.remove("vermelho-900")
+                        elemento.children[1].classList.remove("vermelho-600")
+                        elemento.children[0].classList.add("gold-900")
+                        elemento.children[1].classList.add("gold-600")
+                        button_clicked = button_clicked.filter(button => button.id != elemento.id);
+
+                    } else {
+                        elemento.children[0].classList.remove("gold-900")
+                        elemento.children[1].classList.remove("gold-600")
+                        elemento.children[0].classList.add("vermelho-900")
+                        elemento.children[1].classList.add("vermelho-600")
+                        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
+                    }
+                }
+                console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
+            } catch (e) {
+                //makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src + "</p>", 500, 200);
+            } finally {
+                //addNotification("inc", "Alarme " + obj.alarm);
+                //addNotification('inc', texts.text("alarm") + " " + obj.alarm, obj.src, userUI)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
+            }
+
+
         }
         if (obj.api == "user" && obj.mt == "PageRequest") {
             console.log(obj.alarm);
             //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name, "page", obj.alarm);
+            //updateScreen(obj.btn_id, obj.name, "page", obj.alarm);
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
+
+            createGridZero(obj.type)
+                .then(function (message) {
+                    console.log("createGridZero" + message);
+                    // Encontre o elemento pelo seu ID
+                    var btnOption = document.getElementById(obj.btn_id);
+
+                    // Verifique se o elemento foi encontrado
+                    if (btnOption) {
+                        // Crie um evento de clique
+                        var eventoClique = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+
+                        // Dispare o evento de clique no elemento
+                        btnOption.dispatchEvent(eventoClique);
+                    } else {
+                        console.log('Elemento não encontrado.');
+                    }
+                })
+                .catch(function (error) {
+                    console.log("createGridZero" + error);
+                });
         }
         if (obj.api == "user" && obj.mt == "PopupRequest") {
             console.log(obj.alarm);
@@ -363,20 +448,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
-                        var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.add("gold-900")
+                        //var primeiroFilho = elemento.children[0];
+                        //primeiroFilho.classList.add("gold-900")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.add("gold-600")
                     }
                 }
-                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                // addNotification('inc', "Tocando " + obj.src)
-                //     .then(function (message) {
-                //         console.log(message);
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
+                
             } catch (e){
                 console.log("CallRinging is not button");
             }
@@ -390,53 +468,16 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
-                        var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.add("gold-900")
+                        //var primeiroFilho = elemento.children[0];
+                        //primeiroFilho.classList.add("gold-900")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.add("gold-600")
                     }
                 }
-                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                // addNotification('inc', "Tocando " + obj.num)
-                //     .then(function (message) {
-                //         console.log(message);
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
+                
             } catch (e){
                 console.log("CallRinging is not button");
             } 
-        }
-        if (obj.api == "user" && obj.mt == "ComboCallStart") {
-            console.log(obj.src);
-            var element = obj.src + "-status";
-            console.log(element);
-            try {
-                var clicked = button_clicked.filter(findById(obj.btn_id));
-                if (clicked.length == 0) {
-                    var button_found;
-                    list_buttons.forEach(function (l) {
-                        if (l.id == obj.btn_id) {
-                            button_found = l;
-                        }
-                    })
-                    //var button = list_buttons.filter(findByPrt(obj.num));
-                    var clicked = document.getElementById(obj.btn_id);
-                    if (clicked.style.backgroundColor != "darkred") {
-                        document.getElementById(obj.btn_id).style.backgroundColor = "darkred";
-                        button_clicked.push({ id: button_found.id, type: button_found.button_type, name: button_found.button_name, prt: obj.num });
-                        console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
-                    }
-                }
-                
-
-            } catch {
-                console.log("CallRinging is not button");
-            } finally {
-                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
-                //addNotification("inc","Tocando " + obj.src);
-            }
         }
         if (obj.api == "user" && obj.mt == "IncomingCallRinging") {
             console.log(obj.src);
@@ -452,21 +493,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
-                        var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.add("gold-900")
+                        //var primeiroFilho = elemento.children[0];
+                        //primeiroFilho.classList.add("gold-900")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.add("gold-600")
                     }
                 }
-                //document.getElementsByTagName("div")[obj.src + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                // addNotification('inc', "Tocando " + obj.src)
-                //     .then(function (message) {
-                //         console.log(message);
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
-            } catch (e){
+                
+            } catch (e) {
                 console.log("CallRinging is not button");
             }
             try {
@@ -476,29 +510,63 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
-    
+
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
-                        var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.add("gold-900")
+                        //var primeiroFilho = elemento.children[0];
+                        //primeiroFilho.classList.add("gold-900")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.add("gold-600")
                     }
                 }
-                //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(187 205 72 / 84%)";
-                // addNotification('inc', "Tocando " + obj.num)
-                //     .then(function (message) {
-                //         console.log(message);
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
-            } catch (e){
+                
+            } catch (e) {
                 console.log("CallRinging is not button");
             }
-            
+
             if (obj.src == userUI && popupOpen == false) {
                 makePopupCall("Chamando", "<button type='button' class='popup-connect'>ATENDER</button><button type='button' class='popup-clear'>RECUSAR</button>", 400, 100, obj.btn_id);
+            }
+        }
+        if (obj.api == "user" && obj.mt == "ComboCallStart") {
+            console.log(obj.src);
+            var element = obj.src + "-status";
+            console.log(element);
+            try {
+                var clicked = button_clicked.filter(findById(obj.btn_id));
+                if (clicked.length == 0) {
+                    var button_found;
+                    list_buttons.forEach(function (l) {
+                        if (l.id == obj.btn_id) {
+                            button_found = l;
+                        }
+                    })
+                    //var button = list_buttons.filter(findByPrt(obj.num));
+                    var elemento = document.getElementById(obj.btn_id);
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.remove("gold-900", "verde-900")
+                        primeiroFilho.classList.add("vermelho-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.remove("verdeo-600", "gold-600")
+                        segundoFilho.classList.add("vermelho-600")
+
+                    } else {
+                        elemento.classList.remove("neutro-800")
+                        elemento.classList.add("vermelho-900")
+                    }
+                    button_clicked.push({ id: button_found.id, type: button_found.button_type, name: button_found.button_name, prt: obj.num });
+                    console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
+
+                }
+                
+
+            } catch {
+                console.log("CallRinging is not button");
+            } finally {
+                //makePopup("Chamada Conectada!!!!", obj.src, 500, 200);
+                //addNotification("inc","Tocando " + obj.src);
             }
         }
         if (obj.api == "user" && obj.mt == "CallConnected") {
@@ -542,13 +610,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
 
-        
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.remove("gold-900")
-                    primeiroFilho.classList.add("vermelho-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.remove("gold-600")
-                    segundoFilho.classList.add("vermelho-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.remove("gold-900")
+                        primeiroFilho.classList.add("vermelho-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.remove("gold-600")
+                        segundoFilho.classList.add("vermelho-600")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "rgb(231 8 8 / 48%)";
                 // addNotification('inc', "Conectado " + obj.num)
@@ -615,13 +685,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 // Percorre cada elemento encontrado
                 for (var i = 0; i < elementos.length; i++) {
                     var elemento = elementos[i];
-
-                    var primeiroFilho = elemento.children[0];
-                    primeiroFilho.classList.remove("gold-900","vermelho-900")
-                    primeiroFilho.classList.add("verde-900")
-                    var segundoFilho = elemento.children[1];
-                    segundoFilho.classList.remove("vermelho-600","gold-600")
-                    segundoFilho.classList.add("verde-600")
+                    var type = elemento.getAttribute("button_type")
+                    if (type != "dest") {
+                        var primeiroFilho = elemento.children[0];
+                        primeiroFilho.classList.remove("gold-900", "vermelho-900")
+                        primeiroFilho.classList.add("verde-900")
+                        var segundoFilho = elemento.children[1];
+                        segundoFilho.classList.remove("vermelho-600", "gold-600")
+                        segundoFilho.classList.add("verde-600")
+                    } else {
+                        elemento.classList.remove("vermelho-900")
+                        elemento.classList.add("neutro-800")
+                    }
                 }
                 //document.getElementsByTagName("div")[obj.num + "-status"].style.backgroundColor = "";
                 //var sipButton = document.getElementById(obj.btn_);
@@ -639,20 +714,21 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             } catch (e){
                 console.log("CallDisconnected not button");
             }
-            try {
-                var user_conn = list_users.filter(function (user) { return user == obj.src });
-                if (obj.src == userUI && user_conn.length > 0) {
-                    document.getElementById(obj.btn_id).style.backgroundColor = "darkgreen";
-                } else {
-                    document.getElementById(obj.btn_id).style.backgroundColor = "";
-                }
-            } catch (e){
-                console.log("CallDisconnected number dialed not button");
-            }
-            if (obj.src == userUI && popupOpen == true) {
-                popup.close();
-                popupOpen = false;
-            }
+            //try {
+            //    var user_conn = list_users.filter(function (user) { return user == obj.src });
+            //    if (obj.src == userUI && user_conn.length > 0) {
+            //        document.getElementById(obj.btn_id).style.backgroundColor = "darkgreen";
+            //    } else {
+            //        document.getElementById(obj.btn_id).style.backgroundColor = "";
+            //    }
+            //} catch (e){
+            //    console.log("CallDisconnected number dialed not button");
+            //}
+            //if (obj.src == userUI && popupOpen == true) {
+            //    popup.close();
+            //    popupOpen = false;
+            //}
+
             button_clicked = button_clicked.filter(deleteById(obj.btn_id));
             console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
         }
@@ -688,14 +764,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             _popup.content.add(iptDevice);
             _popup.content.add(btnSelectDevice);
         }
-
-        if (obj.api == "user" && obj.mt == "SelectSensorInfoResult") {
-            console.log("SENSOR list_history " + JSON.stringify(obj.result))
-            list_sensors_history = obj.result
-        }
-        if (obj.api == "user" && obj.mt == "SelectSensorNameResult") {
-            console.log("SENSOR list_sensor" + JSON.stringify(obj.result))
-            list_sensors = obj.result
+        if (obj.api == "user" && obj.mt == "SensorAllInfoResult") {
+                    console.log("SENSOR list_history " + JSON.stringify(obj.result))
+                    list_sensors_history = obj.result
         }
         if (obj.api == "user" && obj.mt == "SensorReceived") {
             var sensorButtons = list_buttons.filter(function(object) {
@@ -711,6 +782,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
 
     }
+
 
     function colEsquerdaTeclado(){
         
@@ -841,7 +913,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     break;
                 case "sensor":
                     createSensorButton(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton",object.page) 
-                    app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
+                    app.sendSrc({ api: "user", mt: "SelectSensorInfoSrc", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
                         console.log("SendSrcResult: " + JSON.stringify(obj))
                         var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
                         var objParse = JSON.parse(obj.result)[0];
@@ -914,33 +986,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         })
         var botoes = document.querySelectorAll(".optionsBtn");
-        for (var i = 0; i < botoes.length; i++) {
+       for (var i = 0; i < botoes.length; i++) {
             var botao = botoes[i];
 
             // O jeito correto e padronizado de incluir eventos no ECMAScript
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", function(evt){
                 var idBtn = evt.currentTarget.id
-                
+
                 if(!this.classList.contains("clicked")){
-                    var btnsClick = document.querySelectorAll('.clicked')
-                    btnsClick.forEach(function(b){
-                        b.classList.remove('clicked')
-                        b.children[0].classList.add("neutro-800")
-                        b.children[1].classList.add ("neutro-900")
-                        b.children[0].classList.remove("azul-marinho-400")
-                        b.children[1].classList.remove("azul-500")
-                    })
-                    this.classList.add("clicked")
-                    this.children[0].classList.remove("neutro-800")
-                    this.children[1].classList.remove ("neutro-900")
-                    this.children[0].classList.add("azul-marinho-400")
-                    this.children[1].classList.add("azul-500")
                     createGridZero(idBtn)
+                        .then(function (message) {
+                            console.log("createGridZero" + message);
+                        })
+                        .catch(function (error) {
+                            console.log("createGridZero" + error);
+                        });
                 }
 
             });
         }
+        updatePageButtons()
         
 
     }
@@ -1067,12 +1133,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var found = list_users.indexOf(prt);
                 if (found != -1) {
                     app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id)})
-                    document.getElementById(id).style.backgroundColor = "darkgreen";
+                    //document.getElementById(id).style.backgroundColor = "darkgreen";
                 }
             }
             if (type == "number") {
                 app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
-                document.getElementById(id).style.backgroundColor = "";
+                //document.getElementById(id).style.backgroundColor = "";
             }
             if (type == "alarm") {
                 app.send({ api: "user", mt: "DecrementCount" });
@@ -1099,10 +1165,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 document.getElementById(id).style.backgroundColor = "var(--button)";
             }
             if (type == "combo") {
-                document.getElementById(id).style.backgroundColor = "";
+                //document.getElementById(id).style.backgroundColor = "";
             }
             if (type == "dest") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
+                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
                 //addNotification("out", name);
                 addNotification('out', type, userUI, prt)
                     .then(function (message) {
@@ -1112,8 +1178,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         console.log(error);
                     });
                 var elemento = document.getElementById(id)
-                elemento.classList.remove("neutro-800")
-                elemento.classList.add("vermelho-900")
+                elemento.classList.remove("vermelho-900")
+                elemento.classList.add("neutro-800")
                 found = 1;
             }
             //var btn = { id: id, type: type, name: name, prt: prt };
@@ -1131,13 +1197,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                             //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
                             //button_clicked.splice(button_clicked.indexOf(btn), 1);
                             button_clicked = button_clicked.filter(deleteById(b.id));
-                            document.getElementById(b.id).style.backgroundColor = "";
-                            var gfg_down = document.getElementsByClassName("colunapage")[0];
-                            gfg_down.parentNode.removeChild(gfg_down);
-                            document.getElementsByClassName("pageDivider")[0].style.display = "none";
-                            document.getElementsByClassName("combobtn")[0].style.width = "";
-                            document.getElementsByClassName("allbtn")[0].style.width = "";
-                            document.getElementsByClassName("pagebtn")[0].style.width = "";
+                            //document.getElementById(b.id).style.backgroundColor = "";
+                            //var gfg_down = document.getElementsByClassName("colunapage")[0];
+                            //gfg_down.parentNode.removeChild(gfg_down);
+                            //document.getElementsByClassName("pageDivider")[0].style.display = "none";
+                            //document.getElementsByClassName("combobtn")[0].style.width = "";
+                            //document.getElementsByClassName("allbtn")[0].style.width = "";
+                            //document.getElementsByClassName("pagebtn")[0].style.width = "";
                             
                         } catch {
                             console.log("danilo req: Area de page já estava fechada");
@@ -1151,13 +1217,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
                 } else {
 
-                    document.getElementsByClassName("combobtn")[0].style.width = "65%";
-                    document.getElementsByClassName("allbtn")[0].style.width = "65%";
-                    document.getElementsByClassName("pagebtn")[0].style.width = "65%";
-                    document.getElementsByClassName("pageDivider")[0].style.display = "block";
-                    document.getElementsByClassName("pageDivider")[0].style.left = "65%";
-                    var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
-                    colunapage.addHTML("<iframe id='iframepage' class='iframepage' src='" + prt + "' width='100%' height='100%' style='border:0; z-index:-1;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
+                    //document.getElementsByClassName("combobtn")[0].style.width = "65%";
+                    //document.getElementsByClassName("allbtn")[0].style.width = "65%";
+                    //document.getElementsByClassName("pagebtn")[0].style.width = "65%";
+                    //document.getElementsByClassName("pageDivider")[0].style.display = "block";
+                    //document.getElementsByClassName("pageDivider")[0].style.left = "65%";
+                    //var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
+                    //colunapage.addHTML("<iframe id='iframepage' class='iframepage' src='" + prt + "' width='100%' height='100%' style='border:0; z-index:-1;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
                     //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
                     //addNotification("out", name);
                     //addNotification('out', name)
@@ -1168,114 +1234,114 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     //        console.log(error);
                     //    });
                     app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
-                    document.getElementById(id).style.backgroundColor = "darkred";
+                    //document.getElementById(id).style.backgroundColor = "darkred";
 
                     //ARRASTAR E SOLTAR DIMENSÂO COLUNAS
                     // Obtenha as referências às DIVs que serão redimensionadas
-                    var comboBtn = document.querySelector('.combobtn');
-                    var allBtn = document.querySelector('.allbtn');
-                    var pageBtn = document.querySelector('.pagebtn');
-                    var pageColumn = document.querySelector('.colunapage');
+                    //var comboBtn = document.querySelector('.combobtn');
+                    //var allBtn = document.querySelector('.allbtn');
+                    //var pageBtn = document.querySelector('.pagebtn');
+                    //var pageColumn = document.querySelector('.colunapage');
                     //var iframe = document.querySelector('.iframepage');
                     
-                    //// Adicione os manipuladores de eventos
-                    var isDragging = false;
-                    var startX = 0;
-                    var btnWidth = 0;
+                    ////// Adicione os manipuladores de eventos
+                    //var isDragging = false;
+                    //var startX = 0;
+                    //var btnWidth = 0;
 
-                    var pageDivider = document.querySelector('.pageDivider');
+                    //var pageDivider = document.querySelector('.pageDivider');
 
-                    pageDivider.addEventListener('mousedown', function (event) {
-                        isDragging = true;
+                    //pageDivider.addEventListener('mousedown', function (event) {
+                    //    isDragging = true;
 
-                        startX = event.pageX;
-                        btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-                    });
+                    //    startX = event.pageX;
+                    //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
+                    //});
 
-                    document.addEventListener('mousemove', function (event) {
-                        if (!isDragging) {
-                            return;
-                        }
-                        var offset = event.pageX - startX;
-                        var newBtnWidth = btnWidth + offset;
-
-                        // Verifique se a nova largura está dentro dos limites permitidos
-                        if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                            comboBtn.style.width = newBtnWidth - 5 + 'px';
-                            allBtn.style.width = newBtnWidth - 5 + 'px';
-                            pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-                            pageDivider.style.left = newBtnWidth - 5 + 'px';
-                            pageColumn.style.left = newBtnWidth + 5 + 'px';
-                        }
-
-                    });
-
-                    //var iframe = document.getElementById('iframepage');
-                    pageColumn.addEventListener('mousemove', function (event) {
-                        // faça algo quando o mouse se mover dentro do iframe
-                        if (!isDragging) {
-                            return;
-                        }
-                        var offset = event.pageX - startX;
-                        var newBtnWidth = btnWidth + event.pageX;
+                    //document.addEventListener('mousemove', function (event) {
+                    //    if (!isDragging) {
+                    //        return;
+                    //    }
+                    //    var offset = event.pageX - startX;
+                    //    var newBtnWidth = btnWidth + offset;
 
                     //    // Verifique se a nova largura está dentro dos limites permitidos
-                        if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                            comboBtn.style.width = newBtnWidth - 5 + 'px';
-                            allBtn.style.width = newBtnWidth - 5 + 'px';
-                            pageBtn.style.width = newBtnWidth - 5 + 'px';
+                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
+                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
 
-                            pageDivider.style.left = newBtnWidth - 5 + 'px';
-                            pageColumn.style.left = newBtnWidth + 'px';
-                        }
-                    });
-                    pageColumn.addEventListener('mouseup', function () {
-                        isDragging = false;
-                    });
+                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
+                    //        pageColumn.style.left = newBtnWidth + 5 + 'px';
+                    //    }
 
-                    document.addEventListener('mouseup', function () {
-                        isDragging = false;
-                    });
+                    //});
 
-                    // Adiciona um ouvinte de eventos para touchstart
-                    pageDivider.addEventListener("touchstart", function (event) {
-                        // Lida com o evento touchstart aqui
-                        isDragging = true;
-                        //startX = event.pageX;
-                        //startX = event.changedTouches[0].clientX
-                        startX = event.touches[0].pageX;
-                        btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-                    });
+                    ////var iframe = document.getElementById('iframepage');
+                    //pageColumn.addEventListener('mousemove', function (event) {
+                    //    // faça algo quando o mouse se mover dentro do iframe
+                    //    if (!isDragging) {
+                    //        return;
+                    //    }
+                    //    var offset = event.pageX - startX;
+                    //    var newBtnWidth = btnWidth + event.pageX;
 
-                    // Adiciona um ouvinte de eventos para touchmove
-                    pageDivider.addEventListener("touchmove", function (event) {
-                        // Lida com o evento touchmove aqui
-                        if (!isDragging) {
-                            return;
-                        }
-                        var offset = event.touches[0].pageX - startX;
-                        var newBtnWidth = btnWidth + offset;
+                    ////    // Verifique se a nova largura está dentro dos limites permitidos
+                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
+                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
 
-                        // Verifique se a nova largura está dentro dos limites permitidos
-                        if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                            comboBtn.style.width = newBtnWidth - 5 + 'px';
-                            allBtn.style.width = newBtnWidth - 5 + 'px';
-                            pageBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
+                    //        pageColumn.style.left = newBtnWidth + 'px';
+                    //    }
+                    //});
+                    //pageColumn.addEventListener('mouseup', function () {
+                    //    isDragging = false;
+                    //});
 
-                            pageDivider.style.left = newBtnWidth - 5 + 'px';
-                            pageColumn.style.left = newBtnWidth + 5 + 'px';
-                        }
+                    //document.addEventListener('mouseup', function () {
+                    //    isDragging = false;
+                    //});
+
+                    //// Adiciona um ouvinte de eventos para touchstart
+                    //pageDivider.addEventListener("touchstart", function (event) {
+                    //    // Lida com o evento touchstart aqui
+                    //    isDragging = true;
+                    //    //startX = event.pageX;
+                    //    //startX = event.changedTouches[0].clientX
+                    //    startX = event.touches[0].pageX;
+                    //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
+                    //});
+
+                    //// Adiciona um ouvinte de eventos para touchmove
+                    //pageDivider.addEventListener("touchmove", function (event) {
+                    //    // Lida com o evento touchmove aqui
+                    //    if (!isDragging) {
+                    //        return;
+                    //    }
+                    //    var offset = event.touches[0].pageX - startX;
+                    //    var newBtnWidth = btnWidth + offset;
+
+                    //    // Verifique se a nova largura está dentro dos limites permitidos
+                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
+                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
+                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
+
+                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
+                    //        pageColumn.style.left = newBtnWidth + 5 + 'px';
+                    //    }
                         
-                    });
+                    //});
 
-                    // Adiciona um ouvinte de eventos para touchend
-                    pageDivider.addEventListener("touchend", function (event) {
-                        // Lida com o evento touchend aqui
-                        isDragging = false;
-                    });
+                    //// Adiciona um ouvinte de eventos para touchend
+                    //pageDivider.addEventListener("touchend", function (event) {
+                    //    // Lida com o evento touchend aqui
+                    //    isDragging = false;
+                    //});
 
-                    found = 1;
+                    //found = 1;
                 }
             }
             if (type == "user") {
@@ -1291,9 +1357,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                             console.log(error);
                         });
                     var elemento = document.getElementById(id)
-                    elemento.children[0].classList.remove("gold-900")
-                    elemento.children[0].classList.remove("gold-900")
-                    elemento.children[1].classList.add("vermelho-600")
+                    elemento.children[0].classList.remove("verde-900")
+                    elemento.children[1].classList.remove("verde-600")
+                    elemento.children[0].classList.add("vermelho-900")
                     elemento.children[1].classList.add("vermelho-600")
                 }
             }
@@ -1312,10 +1378,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         console.log(error);
                     });
                     var elemento = document.getElementById(id)
-                    elemento.children[0].classList.remove("gold-900")
-                    elemento.children[0].classList.add("vermelho-900")
-                    elemento.children[1].classList.remove("gold-600")
-                    elemento.children[1].classList.add("vermelho-600")
+                elemento.children[0].classList.remove("verde-900")
+                elemento.children[1].classList.remove("verde-600")
+                elemento.children[0].classList.add("vermelho-900")
+                elemento.children[1].classList.add("vermelho-600")
                 found = 1;
             }
             if (type == "alarm") {
@@ -1414,12 +1480,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             }
             if (type == "dest") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
-                document.getElementById(id).classList.remove("vermelho-900");
-                document.getElementById(id).classList.add("neutro-800");
+                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
+                document.getElementById(id).classList.remove("neutro-800");
+                document.getElementById(id).classList.add("vermelho-900");
             }
         }
     }
+
 
     function updateListUsers(sip, mt) {
 
@@ -1482,56 +1549,69 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         divOptionsMain =  divOptions
         leftBottomButons()
 
-
     }
-  function createGridZero(type) {
+    function createGridZero(type) {
+        return new Promise(function (resolve, reject) {
+            try {
+                var btnsClick = document.querySelectorAll('.clicked')
+                btnsClick.forEach(function (b) {
+                    b.classList.remove('clicked')
+                    b.children[0].classList.add("neutro-800")
+                    b.children[1].classList.add("neutro-900")
+                    b.children[0].classList.remove("azul-marinho-400")
+                    b.children[1].classList.remove("azul-500")
+                })
 
-        var btnOptions = document.getElementById(type)
-        btnOptions.classList.add("clicked")
-        btnOptions.children[0].classList.remove("neutro-800")
-        btnOptions.children[1].classList.remove("neutro-900")
-        btnOptions.children[0].classList.add("azul-marinho-400")
-        btnOptions.children[1].classList.add("azul-500")
+                var btnOptions = document.getElementById(type)
+                btnOptions.classList.add("clicked")
+                btnOptions.children[0].classList.remove("neutro-800")
+                btnOptions.children[1].classList.remove("neutro-900")
+                btnOptions.children[0].classList.add("azul-marinho-400")
+                btnOptions.children[1].classList.add("azul-500")
 
-        console.log("createGridZero Acessado")
-        const colRight = document.getElementById("colDireita")
-        colRight.innerHTML = ""
-        const headerTxt = document.createElement("div")
-        headerTxt.id = "headerTxt"
-        headerTxt.classList.add("headerTxt")
-        headerTxt.textContent = texts.text(type)
-
-
-        const grid = document.createElement("div")
-        grid.id = "gridZero"
-        grid.classList.add("gridZero")
-
-        for (var i = 1; i < 13; i++) {
-
-            var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
-            var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
-            
-            const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
-            buttonGrid.classList.add("optEmpty")
-            buttonGrid.setAttribute("position-x", positionX)
-            buttonGrid.setAttribute("position-y", positionY)
-            buttonGrid.setAttribute("page", "0")
-
-            grid.appendChild(buttonGrid)
-
-        }
+                console.log("createGridZero Acessado")
+                const colRight = document.getElementById("colDireita")
+                colRight.innerHTML = ""
+                const headerTxt = document.createElement("div")
+                headerTxt.id = "headerTxt"
+                headerTxt.classList.add("headerTxt")
+                headerTxt.textContent = texts.text(type)
 
 
-        colRight.appendChild(headerTxt)
-        colRight.appendChild(grid)
+                const grid = document.createElement("div")
+                grid.id = "gridZero"
+                grid.classList.add("gridZero")
 
-        list_buttons.forEach(function (b) {
-            if (b.page == "0" && b.button_type == type) {
-                createOptions(b)
+                for (var i = 1; i < 13; i++) {
+
+                    var positionX = Math.floor(i / 6) + 1; // Calcula a posição X
+                    var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
+
+                    const buttonGrid = document.createElement("div")
+                    buttonGrid.id = i
+                    buttonGrid.classList.add("optEmpty")
+                    buttonGrid.setAttribute("position-x", positionX)
+                    buttonGrid.setAttribute("position-y", positionY)
+                    buttonGrid.setAttribute("page", "0")
+
+                    grid.appendChild(buttonGrid)
+
+                }
+
+
+                colRight.appendChild(headerTxt)
+                colRight.appendChild(grid)
+
+                list_buttons.forEach(function (b) {
+                    if (b.page == "0" && b.button_type == type) {
+                        createOptions(b)
+                    }
+                })
+                resolve(true)
+            } catch (e) {
+                reject(false)
             }
-        })
-
+        });
     }
     function createOptions(object){
 
@@ -1548,17 +1628,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.innerHTML = object.button_name
             allBtns.addEventListener("click", function(){
                 console.log("Botão clicado", object.button_name)
+                if(!this.classList.contains("clicked2")){
+                    console.log("Botão clicado", object.button_name)
+                    var btnsClick = document.querySelectorAll('.clicked2')
+                    btnsClick.forEach(function(b){
+                        b.classList.remove('clicked2')
+                        b.classList.remove("azul-marinho-1000")
+                        b.classList.add("azul-500")
+                    })
+                    this.classList.add("clicked2")
+                    this.classList.add("azul-marinho-1000")
+                    this.classList.remove ("azul-500")
+                }
                 createDivRightBottom(object)
-                
+                app.send({api: "user", mt: "SelectSensorInfo"})
             })
         }
     }
     function createDivRightBottom(obj){
         console.log("ERICK OBJ JSON", obj)
-        console.log("ERICK OBJ JSON", obj)
         const colRight = document.getElementById("colDireita")
         var btmRight = document.getElementById("bottomR")
-        var grafico = document.getElementById("grafico")
         var grafico = document.getElementById("grafico")
         if(btmRight){
             colRight.removeChild(btmRight)
@@ -1573,72 +1663,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         bottomRight.appendChild(txtBottom)
 
-
-        bottomRight.appendChild(txtBottom)
-
         const buttonLink = obj.button_prt
 
-        // Função para verificar o tipo de arquivo com base na extensão do link
-        function getFileType(buttonLink) {
-            var extension = buttonLink.split('.').pop().toLowerCase();
-            if (extension === 'pdf') {
-                return 'pdf';
-            } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
-                return 'image';
-            } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
-                return 'video';
-            } else if (buttonLink.includes('google.com/maps/embed')) {
-                return 'google-maps';
-            } else {
-                return 'unknown';
-            }                 
-        }      
-        // Função para criar o elemento com base no tipo de arquivo
-        function createFileElement(buttonLink) {
-            var fileType = getFileType(buttonLink);
-            var element;
-        
-            if (fileType === 'pdf') {
-                element = document.createElement("embed");
-                element.type = "application/pdf";
-                element.width = "100%";
-                element.height = "400"; // Altura desejada
-                element.src = buttonLink
-            } else if (fileType === 'image') {
-                element = document.createElement("img");
-                element.src = buttonLink;
-                element.style.width = '100%'
-            } else if (fileType === 'video') {
-                element = document.createElement("video");
-                element.controls = true; // Adiciona controles de vídeo
-                element.style.width = "100%" 
-                // element.style.height = "100%" 
-                // Ajuste a altura conforme necessário
-                var source = document.createElement("source");
-                source.src = buttonLink;
-                source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
-                element.appendChild(source);
-            } 
-            else if (fileType === 'google-maps') {
-                element = document.createElement("iframe");
-                element.src = buttonLink;
-                element.style.width = "100%";
-                element.style.height = "100%"; // Altura desejada para o mapa
-                element.style.position = "absolute";
-            }
-            else {
-                console.error("Tipo de arquivo desconhecido.");
-                return null;
-            }
-        
-            return element;
-        }
-        bottomRight.appendChild(txtBottom)
-        
-        // Exemplo de uso:
-        var prtBottom = document.createElement("div");
-        prtBottom.id = "prtBottom";
-        prtBottom.classList.add("prtBottom");
         if(obj.button_type == "sensor"){
             const unic_sensor = []
             var arrayHistory = JSON.parse(list_sensors_history);
@@ -1677,7 +1703,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         sensorInfoBox.appendChild(sensorBox)
 
                         sensorBox.addEventListener("click", function(){
-                           
+                            var clickBtm = document.querySelectorAll(".btmBox")
+                            clickBtm.forEach(function(b){
+                                b.classList.remove("neutro-1100")
+                            })
+                            btmBox.classList.add('neutro-1100')
                             createLineGrafic(filtredhistory, key)
                         })
 
@@ -1707,8 +1737,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 } else if (fileType === 'video') {
                     element = document.createElement("video");
                     element.controls = true; // Adiciona controles de vídeo
+                    element.autoplay = true; 
                     element.style.width = "100%" 
-                    element.style.height = "100%" 
+                    element.style.height = "auto" 
                     // Ajuste a altura conforme necessário
                     var source = document.createElement("source");
                     source.src = buttonLink;
@@ -1736,7 +1767,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     return 'pdf';
                 } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
                     return 'image';
-                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
+                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov','m3u8'].includes(extension)) {
                     return 'video';
                 } else if (buttonLink.includes('google.com/maps/embed')) {
                     return 'google-maps';
@@ -1748,71 +1779,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var prtBottom = document.createElement("div");
             prtBottom.id = "prtBottom";
             prtBottom.classList.add("prtBottom");
-        // // Função para verificar o tipo de arquivo com base na extensão do link
-        // function getFileType(buttonLink) {
-        //     var extension = buttonLink.split('.').pop().toLowerCase();
-        //     if (extension === 'pdf') {
-        //         return 'pdf';
-        //     } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
-        //         return 'image';
-        //     } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
-        //         return 'video';
-        //     } else if (buttonLink.includes('google.com/maps/embed')) {
-        //         return 'google-maps';
-        //     } else {
-        //         return 'unknown';
-        //     }          
-            
-
-        // }      
-
-
-        // // Função para criar o elemento com base no tipo de arquivo
-        // function createFileElement(buttonLink) {
-        //     var fileType = getFileType(buttonLink);
-        //     var element;
-        
-        //     if (fileType === 'pdf') {
-        //         element = document.createElement("embed");
-        //         element.type = "application/pdf";
-        //         element.width = "100%";
-        //         element.height = "400"; // Altura desejada
-        //         element.src = buttonLink
-        //     } else if (fileType === 'image') {
-        //         element = document.createElement("img");
-        //         element.src = buttonLink;
-        //         element.style.width = '100%'
-        //     } else if (fileType === 'video') {
-        //         element = document.createElement("video");
-        //         element.controls = true; // Adiciona controles de vídeo
-        //         element.style.width = "100%" 
-        //         // element.style.height = "100%" 
-        //         // Ajuste a altura conforme necessário
-        //         var source = document.createElement("source");
-        //         source.src = buttonLink;
-        //         source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
-        //         element.appendChild(source);
-        //     } 
-        //     else if (fileType === 'google-maps') {
-        //         element = document.createElement("iframe");
-        //         element.src = buttonLink;
-        //         element.style.width = "100%";
-        //         element.style.height = "100%"; // Altura desejada para o mapa
-        //         element.style.position = "absolute";
-        //     }
-        //     else {
-        //         console.error("Tipo de arquivo desconhecido.");
-        //         return null;
-        //     }
-        
-        //     return element;
-        // }
-        bottomRight.appendChild(txtBottom)
-        
-        // Exemplo de uso:
-        var prtBottom = document.createElement("div");
-        prtBottom.id = "prtBottom";
-        prtBottom.classList.add("prtBottom");
 
             var fileElement = createFileElement(buttonLink);
             if (fileElement) {
@@ -1833,6 +1799,43 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
+    function updatePageButtons() {
+        var divPrincipal = document.getElementById("divMainButtons")
+        var page = divPrincipal.getAttribute("page")
+        button_clicked.forEach(function (b) {
+            var btn = list_buttons.filter(function (lb) { return lb.id == b.id })[0]
+            if (btn.page == page) {
+                if (btn.button_type == "user") {
+                    var elemento = document.getElementById(btn.id)
+                    elemento.children[0].classList.remove("verde-900")
+                    elemento.children[1].classList.remove("verde-600")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.add("vermelho-600")
+                }
+                if (btn.button_type == "number") {
+                    var elemento = document.getElementById(btn.id)
+                    elemento.children[0].classList.remove("verde-900")
+                    elemento.children[1].classList.remove("verde-600")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.add("vermelho-600")
+                }
+                if (btn.button_type == "alarm") {
+                    var elemento = document.getElementById(btn.id)
+                    elemento.children[0].classList.remove("gold-900")
+                    elemento.children[1].classList.remove("gold-600")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.add("vermelho-600")
+                }
+                if (btn.button_type == "combo") {
+                    var elemento = document.getElementById(btn.id)
+                    elemento.children[0].classList.remove("ciano-900")
+                    elemento.children[1].classList.remove("ciano-600")
+                    elemento.children[0].classList.add("ciano-900")
+                    elemento.children[1].classList.add("ciano-600")
+                }
+            }
+        })
+    }
     function createDests(object) {
 
         var selector = `.${"destEmpty"}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
@@ -2376,15 +2379,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             btmRight.removeChild(grafico)
         }
     
-    function createLineGrafic(data, key) {
-        console.log("Grafico", data)
-        var grafico = document.getElementById("grafico")
-
-        const btmRight = document.getElementById("bottomR")
-        if (grafico) {
-            btmRight.removeChild(grafico)
-        }
-    
         const canvas = document.createElement('canvas');
         canvas.id = "grafico"
         canvas.classList.add("grafico", "neutro-1000")
@@ -2395,38 +2389,35 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         canvas.height = 380; // Defina a altura desejada
 
 
-        canvas.classList.add("grafico", "neutro-1000")
-    
-        var ctx = canvas.getContext('2d');
-
-        canvas.width = 700; // Defina a largura desejada
-        canvas.height = 380; // Defina a altura desejada
-
-
         var width = canvas.width;
         var height = canvas.height;
-        var padding = 40;
-        var padding = 40;
-    
+        var padding = 30;
+        const resultado = somaGrafico(data, key);
+
+        function somaGrafico(data, chave){
+            let soma = 0;
+            data.forEach(function(item) {
+                soma += parseInt(item[chave]);
+            });
+            return soma;
+        }
+        console.log("MÉDIA GRAFICO Y values", resultado)
+
+        data.sort(function(a, b) {
+            return a.id - b.id;
+        });
+
         // Define os valores para o eixo Y
         var maxY = Math.max.apply(null, data.map(function(item) { return item[key]; }));
-        // Define os valores para o eixo Y
-        var maxY = Math.max.apply(null, data.map(function(item) { return item[key]; }));
-    
-        var scaleY = (height - 2 * padding) / maxY;
+ 
+        const media = Math.round((resultado / data.length) + maxY)
+           
+        var scaleY = (height - 2 * padding) / media;
     
         var maxX = data.length - 1; // O máximo valor de X é o comprimento dos dados menos um
         var intervalWidth = (width - 2 * padding) / maxX;
 
-        const valores = data.map(item => item.value)
-
-        const medY = valores.reduce((acc, curr) => acc + curr, 0);
-
-        const media = Math.round((medY / key.length) + maxY)
-
-        console.log("MÉDIA GRAFICO Y valores", valores)
-        console.log("MÉDIA GRAFICO Y medY", medY)
-        console.log("MÉDIA GRAFICO Y key.lengt", key.length)
+        console.log("MÉDIA GRAFICO Y key.lengt", data.length)
         console.log("MÉDIA GRAFICO Y maxY", maxY)
         console.log("MÉDIA GRAFICO Y", media)
         
@@ -2434,7 +2425,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         var yValues = [];
         for (var i = 0; i <= 4; i++) {
-            yValues.push(Math.round(i * (media / 4)));
             yValues.push(Math.round(i * (media / 4)));
         }
     
@@ -2451,7 +2441,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     
             // Desenha os rótulos dos eixos X e Y
             ctx.font = '15px Arial'
-            ctx.font = '15px Arial'
             ctx.fillStyle = 'white'; // Define a cor dos rótulos
             ctx.fillText('X', width - padding + 5, height - padding + 5);
             ctx.fillText('Y', padding - 10, padding - 5);
@@ -2464,12 +2453,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             data.forEach(function(pair, index) {
                 var x = index * intervalWidth + padding;
                 var y = height - pair[key] * scaleY - padding;
-            data.forEach(function(pair, index) {
-                var x = index * intervalWidth + padding;
-                var y = height - pair[key] * scaleY - padding;
                 ctx.lineTo(x, y);
                 ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fillText(pair[key], x + 5, y - 5); // Adiciona o valor do ponto
                 ctx.fillText(pair[key], x + 5, y - 5); // Adiciona o valor do ponto
             });
             ctx.stroke();
@@ -2482,12 +2467,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             });
         }
         btmRight.appendChild(canvas)
-        btmRight.appendChild(canvas)
         drawLineGraph();
     
-    
     }
-    
     
 
     

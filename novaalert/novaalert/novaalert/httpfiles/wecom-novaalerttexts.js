@@ -28,6 +28,7 @@ Wecom.novaalertTexts = {
         labelAlarm: "Alarme",
         labelFrom: "Início Período:",
         labelTo: "Fim do Período:",
+        labelDestImg: "Imagem",
         labelAgent: "Atendente",
         labelPhone: "Telefone:",
         RptAvailability: "Relatórios de Disponibilidade",
