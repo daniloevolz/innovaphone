@@ -17,6 +17,11 @@
           },
           {
             "cmd": "column",
+            "name": "from",
+            "type": "VARCHAR(120)"
+          },
+          {
+            "cmd": "column",
             "name": "name",
             "type": "VARCHAR(120)"
 
@@ -29,6 +34,11 @@
           {
             "cmd": "column",
             "name": "status",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "prt",
             "type": "text"
           },
           {
@@ -185,6 +195,51 @@
             "cmd": "column",
             "name": "button_device",
             "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "sensor_min_threshold",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "sensor_max_threshold",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "sensor_type",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "create_date",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "create_user",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "page",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "position_x",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "position_y",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "img",
+            "type": "TEXT"
           }
         ]
       },
@@ -233,6 +288,72 @@
             "type": "VARCHAR(50)"
           }
         ]
+      },
+      {
+        "cmd": "table",
+        "name": "list_sensors_history",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "sensor_name",
+            "type": "text NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "battery",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "co2",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "humidity",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "temperature",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "leak",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "pir",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "light",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "tvoc",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "pressure",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "date",
+            "type": "text"
+          }
+        ]
       }
     ]
   },
@@ -264,6 +385,20 @@
         "name": "urlalert",
         "type": "STRING",
         "default": "",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlmethod",
+        "type": "STRING",
+        "default": "POST",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "urlenable",
+        "type": "BOOL",
+        "default": false,
         "password": false
       },
       {
