@@ -584,8 +584,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
                         var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.remove("gold-900", "verde-900")
-                        primeiroFilho.classList.add("vermelho-900")
+                        //primeiroFilho.classList.remove("gold-900", "verde-900","vermelho-900")
+                        // primeiroFilho.classList.add("net")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.remove("gold-600", "verde-600")
                         segundoFilho.classList.add("vermelho-600")
@@ -613,8 +613,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var type = elemento.getAttribute("button_type")
                     if (type != "dest") {
                         var primeiroFilho = elemento.children[0];
-                        primeiroFilho.classList.remove("gold-900")
-                        primeiroFilho.classList.add("vermelho-900")
+                      //primeiroFilho.classList.remove("gold-900", "verde-900","vermelho-900")
+                        // primeiroFilho.classList.add("net")
                         var segundoFilho = elemento.children[1];
                         segundoFilho.classList.remove("gold-600")
                         segundoFilho.classList.add("vermelho-600")
