@@ -296,25 +296,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         button_found.push(l);
                     }
                 })
-                //var clicked = document.getElementById(obj.alarm);
-                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
 
-                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
+                var hasClicked = button_clicked.filter(function (b) { return b.button_prt == obj.alarm })
+                if (hasClicked.length==0) {
+                    // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                    var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
 
-                // Percorre cada elemento encontrado
-                for (var i = 0; i < elementos.length; i++) {
-                    var elemento = elementos[i];
-
-                    // Altera as características do elemento
-                    if(elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")){
-                        elemento.children[0].classList.remove("vermelho-900")
-                        elemento.children[1].classList.remove("vermelho-600")   
-                        elemento.children[0].classList.add("gold-900")
-                        elemento.children[1].classList.add("gold-600")
-                        button_clicked = button_clicked.filter(button => button.id != elemento.id);
-
-                    }else{
+                    // Percorre cada elemento encontrado
+                    for (var i = 0; i < elementos.length; i++) {
+                        var elemento = elementos[i];
                         elemento.children[0].classList.remove("gold-900")
                         elemento.children[1].classList.remove("gold-600")
                         elemento.children[0].classList.add("vermelho-900")
@@ -322,6 +312,32 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
                     }
                 }
+                //var clicked = document.getElementById(obj.alarm);
+                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
+
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                //var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
+
+                //// Percorre cada elemento encontrado
+                //for (var i = 0; i < elementos.length; i++) {
+                //    var elemento = elementos[i];
+
+                //    // Altera as características do elemento
+                //    if(elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")){
+                //        //elemento.children[0].classList.remove("vermelho-900")
+                //        //elemento.children[1].classList.remove("vermelho-600")   
+                //        //elemento.children[0].classList.add("gold-900")
+                //        //elemento.children[1].classList.add("gold-600")
+                //        //button_clicked = button_clicked.filter(button => button.id != elemento.id);
+
+                //    }else{
+                //        elemento.children[0].classList.remove("gold-900")
+                //        elemento.children[1].classList.remove("gold-600")
+                //        elemento.children[0].classList.add("vermelho-900")
+                //        elemento.children[1].classList.add("vermelho-600")
+                //        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
+                //    }
+                //}
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
@@ -1588,7 +1604,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
 
                     const buttonGrid = document.createElement("div")
-                    buttonGrid.id = i
+                    buttonGrid.id = "optEmpty"+i
                     buttonGrid.classList.add("optEmpty")
                     buttonGrid.setAttribute("position-x", positionX)
                     buttonGrid.setAttribute("position-y", positionY)
@@ -2292,7 +2308,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
             var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
+            buttonGrid.id = "destEmpty" + i
             buttonGrid.classList.add("destEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
