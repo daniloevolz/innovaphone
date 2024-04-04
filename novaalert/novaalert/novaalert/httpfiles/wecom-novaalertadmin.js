@@ -1247,7 +1247,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
 
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
+            buttonGrid.id = "optEmpty" + i
             buttonGrid.classList.add("optEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
