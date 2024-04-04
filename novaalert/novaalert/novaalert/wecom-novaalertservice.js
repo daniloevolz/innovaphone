@@ -136,7 +136,7 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo-req TableUsers: reducing the pbxTableUser object to send to user");
                     var list_users = [];
                     pbxTableUsers.forEach(function (u) {
-                        list_users.push(u.columns.h323)
+                        list_users.push(u.columns.h323, u.columns.guid)
                     })
                     conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
                 }
@@ -514,7 +514,7 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "SelectMessage") {
                     conn.send(JSON.stringify({ api: "user", mt: "SelectMessageResult" }));
-                    Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.sip + "' OR button_user = 'all'")
+                    Database.exec("SELECT * FROM list_buttons WHERE button_user = '" + conn.guid + "' OR button_user = 'all'")
                         .oncomplete(function (data) {
                             log("result=" + JSON.stringify(data, null, 4));
                             conn.send(JSON.stringify({ api: "user", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
@@ -604,7 +604,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices })
+                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }
@@ -659,7 +659,7 @@ new JsonApi("admin").onconnected(function (conn) {
             //#endregion
             //#region BUTTONS
             if (obj.mt == "InsertMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -669,7 +669,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "InsertAlarmMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -679,7 +679,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "InsertNumberMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -689,7 +689,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateMessage") {
-                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + "', button_device='" + String(obj.device) + "' WHERE id=" + obj.id)
+                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.guid) + "', button_type='" + String(obj.type) + "', button_device='" + String(obj.device) + "' WHERE id=" + obj.id)
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateMessageSuccess" }));
                     })
@@ -698,7 +698,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "InsertComboMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -708,7 +708,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "UpdateComboMessage") {
-                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.sip) + "', button_type='" + String(obj.type) + "', button_type_1='" + String(obj.type1) + "', button_type_2='" + String(obj.type2) + "', button_type_3='" + String(obj.type3) + "', button_type_4='" + String(obj.type4) + "' WHERE id=" + obj.id)
+                Database.exec("UPDATE list_buttons SET button_name='" + String(obj.name) + "', button_prt='" + String(obj.value) + "', button_prt_user='" + String(obj.user) + "', button_user='" + String(obj.guid) + "', button_type='" + String(obj.type) + "', button_type_1='" + String(obj.type1) + "', button_type_2='" + String(obj.type2) + "', button_type_3='" + String(obj.type3) + "', button_type_4='" + String(obj.type4) + "' WHERE id=" + obj.id)
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "UpdateComboMessageSuccess" }));
                     })
@@ -744,7 +744,7 @@ new JsonApi("admin").onconnected(function (conn) {
             }
             if (obj.mt == "InsertSensorMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, sensor_min_threshold, sensor_max_threshold, sensor_type, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.min) + "','" + String(obj.max) + "','" + String(obj.sensorType) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, sensor_min_threshold, sensor_max_threshold, sensor_type, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.min) + "','" + String(obj.max) + "','" + String(obj.sensorType) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })
@@ -754,7 +754,7 @@ new JsonApi("admin").onconnected(function (conn) {
 
             }
             if (obj.mt == "InsertDestMessage") {
-                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
                     })

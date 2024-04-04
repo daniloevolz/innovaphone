@@ -352,7 +352,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptUser.setAttribute("id", "selectUser");
         iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", "all"));
         list_users.forEach(function (user) {
-            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.guid));
         })
 
 
@@ -719,7 +719,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 } else {
 
-                    app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -743,7 +743,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var iptValue = t.add(new innovaphone.ui1.Node("select", null, null, "selectValueUsers"));
             iptValue.setAttribute("id", "selectValue");
             list_users.forEach(function (user) {
-                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.guid));
             });
 
             //Device
@@ -751,7 +751,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var iptDevice = t.add(new innovaphone.ui1.Node("select", "width:28%;margin-left:2%;", null, "iptDeviceNumber"));
             iptDevice.setAttribute("id", "selectDevice");
             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
-            var u = list_users.filter(function (u) { return u.sip == user })[0]
+            var u = list_users.filter(function (u) { return u.guid == user })[0]
             var devices = u.devices;
             devices.forEach(function (dev) {
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -772,7 +772,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var value = document.getElementById("selectValue");
                     var selectedOption = value.options[value.selectedIndex];
                     var value = selectedOption.id;
-                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(value), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -858,7 +858,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var type4 = document.getElementById("selectType4");
                     var selectedOption = type4.options[type4.selectedIndex];
                     var type4 = selectedOption.id;
-                    app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4), page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4), page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -885,7 +885,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptDevice.setAttribute("id", "selectDevice");
             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
 
-            var u = list_users.filter(function (u) { return u.sip == user })[0]
+            var u = list_users.filter(function (u) { return u.guid == user })[0]
             var devices = u.devices;
             devices.forEach(function (dev) {
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -903,7 +903,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
                 else if (type == "number") {
-                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -955,7 +955,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 if (String(iptName.getValue()) == "" || String(type) == "" || String(iptMin.getValue()) == "" || String(iptMax.getValue()) == "") {
                     makePopup(texts.text("labelWarning"), texts.text("labelFillInputsSensor"));
                 } else {
-                    app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), min: iptMin.getValue(), max: iptMax.getValue(), sensorType: String(valueType), page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), min: iptMin.getValue(), max: iptMax.getValue(), sensorType: String(valueType), page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -1010,7 +1010,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 if (String(iptName.getValue()) == "" || String(type) == "") {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 } else {
-                    app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -1037,7 +1037,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptDevice.setAttribute("id", "selectDevice");
             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
 
-            var u = list_users.filter(function (u) { return u.sip == user })[0]
+            var u = list_users.filter(function (u) { return u.guid == user })[0]
             var devices = u.devices;
             devices.forEach(function (dev) {
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1055,7 +1055,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
                 else if (type == "number") {
-                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -1083,7 +1083,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptDevice.setAttribute("id", "selectDevice");
             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
 
-            var u = list_users.filter(function (u) { return u.sip == user })[0]
+            var u = list_users.filter(function (u) { return u.guid == user })[0]
             var devices = u.devices;
             devices.forEach(function (dev) {
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1144,7 +1144,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 }
                 else if (type == "dest") {
-                    app.send({ api: "admin", mt: "InsertDestMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), device: device, img: img, page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertDestMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), device: device, img: img, page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -1197,7 +1197,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 if (String(iptName.getValue()) == "" || String(type) == "") {
                     makePopup(texts.text("labelWarning"), texts.text("labelFillInputsSensor"));
                 } else {
-                    app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), min: "", max: "", sensorType: "", page: z, x: x, y: y });
+                    app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), min: "", max: "", sensorType: "", page: z, x: x, y: y });
                     waitConnection(t1);
                 }
             });
@@ -1311,7 +1311,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
 
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
+            buttonGrid.id = "destEmpty" + i
             buttonGrid.classList.add("destEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
@@ -1439,11 +1439,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptUser.setAttribute("id", "selectUser");
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
             list_users.forEach(function (user) {
-                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
             })
             //Atualiza valores
             if (button && button.button_user != "all") {
-                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var cn = list_users.filter(function (user) { return guid === button.button_user })[0].cn;
                 var select = document.getElementById('selectUser');
                 select.value = cn;
             } else if (button && button.button_user == "all") {
@@ -1492,11 +1492,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptUser.setAttribute("id", "selectUser");
 
             list_users.forEach(function (user) {
-                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
             })
             //Atualiza valores
             if (button.button_user != "all") {
-                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var cn = list_users.filter(function (user) { return guid === button.button_user })[0].cn;
                 var select = document.getElementById('selectUser');
                 select.value = cn;
             } else if (button && button.button_user == "all") {
@@ -1528,7 +1528,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             try {
                 var devices;
                 list_users.forEach(function (user) {
-                    if (user.sip == button.button_user) {
+                    if (guid == button.button_user) {
                         devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1554,7 +1554,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var sip = selectedOption.id;
                 iptDevice.clear();
                 list_users.forEach(function (user) {
-                    if (user.sip == sip) {
+                    if (guid == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1596,11 +1596,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "iptUserUsers"));
             iptUser.setAttribute("id", "selectUser");
             list_users.forEach(function (user) {
-                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.guid));
             })
             //Atualiza valores
             if (button && button.button_user != "all") {
-                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var cn = list_users.filter(function (user) { return guid === button.button_user })[0].cn;
                 var select = document.getElementById('selectUser');
                 select.value = cn;
             } else if (button && button.button_user == "all") {
@@ -1623,10 +1623,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var iptValue = t.add(new innovaphone.ui1.Node("select", null, null, "selectValueUsers"));
             iptValue.setAttribute("id", "selectValue");
             list_users.forEach(function (user) {
-                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
             });
             if (button.button_type == "user") {
-                var cn = list_users.filter(function (user) { return user.sip === button.button_prt })[0].cn;
+                var cn = list_users.filter(function (user) { return guid === button.button_prt })[0].cn;
                 var select = document.getElementById('selectValue');
                 select.value = cn;
             }
@@ -1641,7 +1641,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             try {
                 var devices;
                 list_users.forEach(function (user) {
-                    if (user.sip == button.button_user) {
+                    if (guid == button.button_user) {
                         devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1666,7 +1666,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var sip = selectedOption.id;
                 iptDevice.clear();
                 list_users.forEach(function (user) {
-                    if (user.sip == sip) {
+                    if (guid == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -1714,11 +1714,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", "none"));
             //iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "TODOS", null).setAttribute("id", "all"));
             list_users.forEach(function (user) {
-                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+                iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
             })
             //Atualiza valores
             if (button && button.button_user != "all") {
-                var cn = list_users.filter(function (user) { return user.sip === button.button_user })[0].cn;
+                var cn = list_users.filter(function (user) { return guid === button.button_user })[0].cn;
                 var select = document.getElementById('selectUser');
                 select.value = cn;
             } else if (button && button.button_user == "all") {
@@ -1858,7 +1858,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var type4 = document.getElementById("selectType4");
                     var selectedOption = type4.options[type4.selectedIndex];
                     var type4 = selectedOption.id;
-                    app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4) });
+                    app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4) });
                     waitConnection(t1);
                 }
             });
@@ -2029,7 +2029,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptUser.setAttribute("id", "selectUser");
         iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
         list_users.forEach(function (user) {
-            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
         })
         //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
@@ -2092,7 +2092,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 iptDevice.clear();
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
                 list_users.forEach(function (user) {
-                    if (user.sip == sip) {
+                    if (guid == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2112,7 +2112,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     if (start == "number") {
                         iptDevice.clear();
                         list_users.forEach(function (user) {
-                            if (user.sip == sip) {
+                            if (guid == sip) {
                                 var devices = user.devices;
                                 devices.forEach(function (dev) {
                                     iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2198,7 +2198,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), value: String(value), sip: String(user), type: String(type), device: device });
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), value: String(value), guid: String(user), type: String(type), device: device });
                 makeTableActions(t);
             }
         });
@@ -2219,10 +2219,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserAction"));
         iptUser.setAttribute("id", "selectUser");
         list_users.forEach(function (user) {
-            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.sip));
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
         })
         if (action) {
-            var cn = list_users.filter(function (user) { return user.sip === action.action_user })[0].cn;
+            var cn = list_users.filter(function (user) { return guid === action.action_user })[0].cn;
             var select = document.getElementById('selectUser');
             select.value = cn;
         }
@@ -2324,7 +2324,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             iptDevice.clear();
             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
             list_users.forEach(function (user) {
-                if (user.sip == sip) {
+                if (guid == sip) {
                     var devices = user.devices;
                     devices.forEach(function (dev) {
                         iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2335,7 +2335,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 try {
                     var devices;
                     list_users.forEach(function (user) {
-                        if (user.sip == action.action_user) {
+                        if (guid == action.action_user) {
                             devices = user.devices;
                             devices.forEach(function (dev) {
                                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2359,7 +2359,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var sip = selectedOption.id;
                 iptDevice.clear();
                 list_users.forEach(function (user) {
-                    if (user.sip == sip) {
+                    if (guid == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2435,7 +2435,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 iptDevice.clear();
                 iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
                 list_users.forEach(function (user) {
-                    if (user.sip == sip) {
+                    if (guid == sip) {
                         var devices = user.devices;
                         devices.forEach(function (dev) {
                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2454,7 +2454,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     if (start == "number") {
                         iptDevice.clear();
                         list_users.forEach(function (user) {
-                            if (user.sip == sip) {
+                            if (guid == sip) {
                                 var devices = user.devices;
                                 devices.forEach(function (dev) {
                                     iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
@@ -2708,7 +2708,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
                 })
                 break;
             case "RptAvailability":
@@ -2723,7 +2723,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
                 })
                 break;
             case "RptActivities":
@@ -2748,7 +2748,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
                 })
                 break;
             case "RptSensors":
@@ -2763,7 +2763,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //colDireita.add(SelectRamal);
                 //SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 //list_users.forEach(function (user) {
-                //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
                 //})
                 //sensor name
                 colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelSensorName"), null));
@@ -2887,7 +2887,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptCalls":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })
                                 row.push(u.cn);
                                 row.push(b.number);
                                 row.push(b.call_started);
@@ -2932,7 +2932,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptActivities":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })
                                 row.push(u.cn);
                                 // Substituir valores de b.name por texto correspondente
                                 //switch (b.name) {
@@ -2985,7 +2985,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptAvailability":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })
                                 row.push(u.cn);
                                 row.push(b.date);
                                 row.push(b.status);

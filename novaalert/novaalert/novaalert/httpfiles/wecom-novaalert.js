@@ -2292,7 +2292,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             var positionX = Math.floor(i / 4) + 1; // Calcula a posição X
             var positionY = (positionX - 1) * 4 + (i % 4) + 1; // Calcula a posição Y
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
+            buttonGrid.id = "destEmpty" + i
             buttonGrid.classList.add("destEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
