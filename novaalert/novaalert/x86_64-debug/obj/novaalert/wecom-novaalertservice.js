@@ -136,7 +136,7 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo-req TableUsers: reducing the pbxTableUser object to send to user");
                     var list_users = [];
                     pbxTableUsers.forEach(function (u) {
-                        list_users.push(u.columns.h323, u.columns.guid)
+                        list_users.push({sip: u.columns.h323, guid: u.columns.guid})
                     })
                     conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
                 }
@@ -346,7 +346,7 @@ new JsonApi("user").onconnected(function (conn) {
                 }
                 if (obj.mt == "TriggerStopAlarm") {
                     //intert into DB the event
-                    log("danilo req:TriggerStopAlarm insert into DB = user " + conn.sip);
+                    log("danilo req:TriggerStopAlarm insert into DB = user " + conn.guid);
                     var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
                     log("danilo req:TriggerStopAlarm will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
@@ -358,12 +358,17 @@ new JsonApi("user").onconnected(function (conn) {
                             if (buttons.length > 0) {
                                 log("danilo req:TriggerStopAlarm buttons length >0 : ");
                                 buttons.forEach(function (b) {
-                                    var con = connectionsUser.filter(function (c) { return c.sip == b.button_user })
+                                    var con = connectionsUser.filter(function (c) { return c.guid == b.button_user })
                                     log("danilo req:TriggerStopAlarm found users connections to notify : "+ JSON.stringify(con));
                                     con.forEach(function (c) {
                                         //respond success to the client
-                                        if (conn.sip != c.sip) {
-                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.sip, to: c.sip }));
+                                        log("Conn.Guid " + JSON.stringify(conn.guid));
+                                        log("C.Guid " + JSON.stringify(c.guid));
+                                        log("C.SIP " + JSON.stringify(c.sip));
+                                        log("Conn.sip " + JSON.stringify(conn.sip));
+                                        log("Connection Inteira " + JSON.stringify(con));
+                                        if (conn.guid != c.guid) { // antigo = conn.sip != c.sip
+                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.dn, to: c.dn })); 
                                         }
                                     })
                                 })
@@ -385,7 +390,7 @@ new JsonApi("user").onconnected(function (conn) {
                 if (obj.mt == "TriggerAlert") {
                     //trigger the Novalink server
                     if (urlenable == true) {
-                        callHTTPSServer(parseInt(obj.prt), conn.sip);
+                        callHTTPSServer(parseInt(obj.prt), conn.guid);
                     }
 
 
@@ -438,6 +443,7 @@ new JsonApi("user").onconnected(function (conn) {
                     try {
                         //Check if the number dialed is one user, then call the user number
                         var user = pbxTableUsers.filter(findBySip(obj.prt));
+                        log("PbxTableUsers " + JSON.stringify(pbxTableUsers));
                         log("danilo req: TriggerCall user " + JSON.stringify(user));
                         if (user.length > 0) {
                             log("danilo req: TriggerCall user e164 " + user[0].columns.e164);
@@ -454,7 +460,8 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
 
-                    var userButtons = buttons.filter(findButtonBySip(conn.sip));
+                    var userButtons = buttons.filter(findButtonByGuid(conn.guid)); //conn.sip
+                    log("User Button " + userButtons)
                     //log("danilo req:TriggerCall userButtons " + JSON.stringify(userButtons));
                     userButtons.forEach(function (user_b) {
                         if (String(user_b.button_prt) == String(obj.prt) && String(user_b.id) == String(obj.btn_id)) {
@@ -1889,9 +1896,9 @@ function handleDisconnect(callid, state, timeNow, sip, sendCallEvents) {
     })
 }
 
-function callHTTPSServer(alert, sip) {
+function callHTTPSServer(alert, guid) {
     log("callHTTPSServer::");
-    var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(sip), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
+    var msg = { Username: "webuser", Password: "Wecom12#", AlarmNr: alert, LocationType: "GEO=47.565055,8.912027", Location: "Wecom", LocationDescription: "Wecom POA", Originator: String(guid), AlarmPinCode: "1234", Alarmtext: "Alarm from Myapps!" };
     //var msg = urlbody;
     httpClient(urlalert, msg);
 }
@@ -1906,9 +1913,9 @@ function findBySip(sip) {
         return false;
     }
 }
-function findButtonBySip(sip) {
+function findButtonByGuid(guid) {
     return function (value) {
-        if (value.button_user == sip) {
+        if (value.button_user == guid) {
             return true;
         }
         //countInvalidEntries++

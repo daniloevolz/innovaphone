@@ -548,19 +548,19 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createButtons(object, null, "ciano-900", "ciano-600", "./images/Layer.svg", "combobutton", object.page)
+                    createComboButton(object,null,"ciano-600","ciano-900","./images/Layer.svg","combobutton")
                     break;
                 case "alarm":
-                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button", object.page)
+                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
                     break;
                 case "number":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "sensor":
-                    createButtons(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton", object.page)
+                    createSensorButton(object,"sensorbutton","neutro-900","neutro-1000","./images/wifi.svg","sensorButton") 
                     //app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
                     //    console.log("SendSrcResult: " + JSON.stringify(obj))
                     //    var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
@@ -1247,7 +1247,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var positionY = i % 6 === 0 ? 6 : i % 6; // 6%6 = 1 e assim vai 
 
             const buttonGrid = document.createElement("div")
-            buttonGrid.id = i
+            buttonGrid.id = "optEmpty" + i
             buttonGrid.classList.add("optEmpty")
             buttonGrid.setAttribute("position-x", positionX)
             buttonGrid.setAttribute("position-y", positionY)
