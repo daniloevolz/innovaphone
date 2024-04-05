@@ -393,18 +393,23 @@ new JsonApi("user").onconnected(function (conn) {
                     //var value = '{"From":"${conn.sip}","AlarmID":"${obj.AlarmID}"}'
                     //ECMA5
                     // Criar a string JSON substituindo as variáveis manualmente
-                    var value = '{"From":"' + conn.sip + '", "AlarmID":"' + obj.prt + '", "Detail":"' + obj.btn_name + '"}';
+                    //var value = '{"From":"' + conn.sip + '", "AlarmID":"' + obj.prt + '", "Detail":"' + obj.btn_name + '"}';
 
-                    alarmReceived(value);
+                    //alarmReceived(value);
+
+                    connectionsUser.forEach(function (c) {
+                        if (c.sip != conn.sip) {
+                            c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.sip}));
+
+                        }
+                    })
+
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
 
                     var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
-                    //respond success to the client
-                    // substituido pela confirmação de algum usuário que recebeu o alerta em TriggerStopAlarm
-                    //conn.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(obj.btn_id)}));
                 }
                 if (obj.mt == "TriggerCombo") {
                     //trigger the combo function
@@ -470,6 +475,8 @@ new JsonApi("user").onconnected(function (conn) {
 
                         }
                     })
+                    //verifica se existe alguma ação iniciada por uma ligação realizada
+                    triggerAction2(conn.sip, num, num, "out-number", "TriggerCall");
                 }
                 if (obj.mt == "UserConnect") {
                     log("danilo req:UserConnect");
@@ -1242,235 +1249,10 @@ new PbxApi("RCC").onconnected(function (conn) {
             var sip;
             if (userFound.length > 0) {
                 sip = userFound[0].columns.h323;
-                addCall(sip, obj.call, obj.call, null, 0, null, null, null);
+                //addCall(sip, obj.call, obj.call, null, 0, null, null, null);
+
             }
         }
-        /*
-        else if (obj.mt === "CallUpdate") {
-            log("danilo req : RCC message:CallUpdate: " + JSON.stringify(obj));
-            var num;
-            var device;
-            var sip;
-            try{
-                if(obj.local.h323 != "" && obj.local.h323 != "undefined") sip = obj.local.h323;
-            }catch(e){
-                if(obj.local.e164 != "" && obj.local.e164 != "undefined") sip = obj.local.e164;
-            }
-            var timeNow = getDateNow();
-
-            var foundCall = calls.filter(function (call) { return call.callid == obj.call });
-
-            switch (obj.msg) {
-                case "r-setup":
-                    //Ativa (Alert)
-                    var e164 = obj.remote.e164;
-                    if (String(foundCall) == "") {
-                        log("danilo-req : RCC message::CallInfo NOT foundCall ");
-
-                        if (e164 == "") {
-                            num = obj.remote.h323;
-                            calls.push({ sip: String(sip), src: obj.call, callid: obj.call, num: num, state: 1, direction: "out", call_started: timeNow, device: device });
-
-                        } else {
-                            num = obj.remote.e164;
-                            calls.push({ sip: String(sip), src: obj.call, callid: obj.call, num: num, state: 1, direction: "out", call_started: timeNow, device: device });
-
-                        }
-                        log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
-                        //Atualiza status Botões Tela NovaAlert All
-                        connectionsUser.forEach(function (conn) {
-                            log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                            log("danilo-req x-alert: obj.call " + String(obj.call));
-                            conn.send(JSON.stringify({ api: "user", mt: "CallRinging", src: sip, num: num }));
-                        });
-                        triggerAction(sip, num, "out-number");
-
-
-                    }
-
-
-                    break;
-                case "x-setup":
-                    //Receptiva (Alert)
-                    var e164 = obj.remote.e164;
-                    if (String(foundCall) == "") {
-                        log("danilo-req : RCC message::CallInfo NOT foundCall ");
-
-                        if (e164 == "") {
-                            num = obj.remote.h323;
-                            calls.push({ sip: String(sip), src: obj.call, callid: obj.call, num: num, state: 129, direction: "inc", call_started: timeNow, device: device });
-                        } else {
-                            num = obj.remote.e164;
-                            calls.push({ sip: String(sip), src: obj.call, callid: obj.call, num: num, state: 129, direction: "inc", call_started: timeNow, device: device });
-                        }
-                        log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
-                        //Atualiza status Botões Tela NovaAlert All
-                        connectionsUser.forEach(function (conn) {
-                            log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                            log("danilo-req x-alert: obj.call " + String(obj.call));
-                            conn.send(JSON.stringify({ api: "user", mt: "IncomingCallRinging", src: sip, num: num }));
-                        });
-                        triggerAction(sip, num, "inc-number");
-                        break;
-                    }
-                case "x-alert":
-                    //Ativa (Alert)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 4;
-                            call.call_ringing = timeNow;
-                            var e164 = obj.remote.e164;
-                            if (e164 == "") {
-                                var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.h323, Status: "out" };
-                            } else {
-                                var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.e164, Status: "out" };
-                            }
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                                log("danilo-req x-alert: obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "CallRinging", src: sip, num: call.num }));
-                            });
-
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                        }
-                    });
-                    break;
-                case "r-alert":
-                    //Receptiva (Alert)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 132;
-                            call.call_ringing = timeNow;
-                            var e164 = obj.remote.e164;
-                            if (e164 == "") {
-                                var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.h323, Status: "inc" };
-                            } else {
-                                var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.e164, Status: "inc" };
-                            }
-
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                                log("danilo-req x-alert: obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "IncomingCallRinging", src: sip, num: call.num }));
-                            });
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                        }
-                    });
-                    break;
-                case "x-conn":
-                    //Ativa (Connected)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 5;
-                            call.call_connected = timeNow;
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                                log("danilo-req x-alert: obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "CallConnected", num: call.num, src: sip }));
-                            });
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                var e164 = obj.peer.e164;
-                                if (e164 == "") {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.h323, Status: "ans" };
-                                } else {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.e164, Status: "ans" };
-                                }
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                        }
-                    });
-                    break;
-                case "r-conn":
-                    //Receptiva (Connected)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 133;
-                            call.call_connected = timeNow;
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req x-alert: conn.sip " + String(conn.sip));
-                                log("danilo-req x-alert: obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "CallConnected", num: call.num, src: sip }));
-                            });
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                var e164 = obj.remote.e164;
-                                if (e164 == "") {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.h323, Status: "ans" };
-                                } else {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: obj.remote.e164, Status: "ans" };
-                                }
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                        }
-                    });
-                    break;
-                case "x-rel":
-                    //Ativa (Disconnect Sent)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 6;
-                            call.call_ended = timeNow;
-                            insertTblCalls(call);
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req deleteCall:del conn.sip " + String(conn.sip));
-                                log("danilo-req deleteCall:del obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "CallDisconnected", num: call.num, src: sip, btn_id: btn_id}));
-
-                            });
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "del" };
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                            //Remove
-                            log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                            calls = calls.filter(function(call){return obj.call != call.callid});
-                            log("danilo req : after deleteCall " + JSON.stringify(calls));
-
-                        }
-                    });
-                    break;
-                case "r-rel":
-                    //Ativa (Disconnect Received)
-                    calls.forEach(function (call) {
-                        if (call.callid == obj.call) {
-                            call.state = 135;
-                            call.call_ended = timeNow;
-                            insertTblCalls(call);
-                            //Atualiza status Botões Tela NovaAlert All
-                            connectionsUser.forEach(function (conn) {
-                                log("danilo-req deleteCall:del conn.sip " + String(conn.sip));
-                                log("danilo-req deleteCall:del obj.call " + String(obj.call));
-                                conn.send(JSON.stringify({ api: "user", mt: "CallDisconnected", num: call.num, src: sip, btn_id: btn_id }));
-
-                            });
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "del" };
-                                httpClient(urlPhoneApiEvents, msg);
-                            }
-                            //Remove
-                            log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                            calls = calls.filter(function(call){return obj.call != call.callid});
-                            log("danilo req : after deleteCall " + JSON.stringify(calls));
-                        }
-                    })
-                    break;
-            }
-        }
-        */
         else if (obj.mt === "CallUpdate") {
             log("danilo req : RCC message:CallUpdate: " + JSON.stringify(obj));
 
@@ -1543,7 +1325,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                         addCall(sip, obj.call, obj.call, num, 1, "out", timeNow, device);
                         sendRingingEvents(sip, num, "IncomingCallRinging");
                         //triggerAction(sip, num, "out-number");
-                        triggerAction2(sip, num, num, "out-number", "CallRinging");
+                        //triggerAction2(sip, num, num, "out-number", "CallRinging");
                     }
                     break;
                 case "x-setup":
@@ -1554,7 +1336,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                         addCall(sip, obj.call, obj.call, num, 129, "inc", timeNow, device);
                         sendRingingEvents(sip, num, "CallRinging");
                         //triggerAction(sip, num, "inc-number");
-                        triggerAction2(sip, num, num, "inc-number", "CallRinging");
+                        //triggerAction2(sip, num, num, "inc-number", "CallRinging");
                     }
                     break;
                 case "x-alert":
@@ -1606,10 +1388,12 @@ new PbxApi("RCC").onconnected(function (conn) {
                         case 1:
                             //Ativa (Alert)
                             if (e164 == "") {
-                                calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
+                                addCall(sip, obj.call, src, num, obj.state, "out", timeNow, device)
+                                //calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
                                 //num = obj.peer.h323;
                             } else {
-                                calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
+                                addCall(sip, obj.call, src, num, obj.state, "out", timeNow, device)
+                                //calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
                                 //num = obj.peer.e164;
                             }
                             log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
@@ -1620,16 +1404,18 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "user", mt: "CallRinging", src: sip, num: num }));
                             });
                             //triggerAction(sip, num, "out-number");
-                            triggerAction2(sip, num, num, "out-number", "CallRinging");
+                            //triggerAction2(sip, num, num, "out-number", "CallRinging");
 
                             break;
                         case 129:
                             //Receptiva (Alert)
                             if (e164 == "") {
-                                calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
+                                addCall(sip, obj.call, src, num, obj.state, "inc", timeNow, device)
+                                //calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
                                 //num = obj.peer.h323;
                             } else {
-                                calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
+                                addCall(sip, obj.call, src, num, obj.state, "inc", timeNow, device)
+                                //calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
                                 //num = obj.peer.e164;
                             }
                             log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
@@ -1888,6 +1674,7 @@ new PbxApi("RCC").onconnected(function (conn) {
         RCC.splice(RCC.indexOf(conn), 1);
     });
 });
+
 
 new PbxApi("PbxSignal").onconnected(function (conn) {
     log("PbxSignal: connected conn " + JSON.stringify(conn));
@@ -2486,7 +2273,7 @@ function sensorReceived(value) {
         log("danilo-req sensorReceived: Body not present! Erro " + e);
     }
 }
-function triggerAction2(from, to, prt, type, detail) {
+function triggerActionOld(from, to, prt, type, detail) {
     try {
         //Get Actions from DB
         Database.exec("SELECT * FROM list_alarm_actions WHERE action_user ='" + to + "';")
@@ -2618,6 +2405,131 @@ function triggerAction2(from, to, prt, type, detail) {
     }
 }
 
+function triggerAction2(from, to, prt, type, detail) {
+    try {
+        //Get Actions from DB
+        Database.exec("SELECT * FROM list_alarm_actions WHERE action_start_type ='" + type + "' AND action_alarm_code = '"+prt+"';")
+            .oncomplete(function (data) {
+                log("danilo req triggerAction2: select from list_alarm_actions result legth=" + data.length);
+                var str = "";
+                str = JSON.stringify(data);
+                actions = JSON.parse(String(str));
+
+                if (actions.length > 0) {
+                    log("danilo-req triggerAction2:actions diferent of null " + JSON.stringify(actions));
+
+                    actions.forEach(function (ac) {
+                        log("danilo-req triggerAction2:ac " + JSON.stringify(ac));
+                        switch (ac.action_type) {
+                            case "alarm":
+                                // Criar a string JSON substituindo as variáveis manualmente
+                                //var value = '{"From":"' + ac.action_user + '", "AlarmID":"' + ac.action_prt + '", "Detail":"' + ac.action_name + '"}';
+
+                                //alarmReceived(value);
+
+                                connectionsUser.forEach(function (conn) {
+                                    log("danilo-req alarmReceived:alarm conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:alarm ac.action_user " + String(ac.action_user));
+                                    if (String(conn.sip) == String(ac.action_user)) {
+                                        //Send notifications
+                                        log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                        updateTableBadgeCount(conn.sip, "IncrementCount");
+                                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                        //conn.send(JSON.stringify({ api: "user", mt: "AlarmRequested", alarm: prt }));
+                                    }
+                                });
+                                break;
+                            case "number":
+                                //var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === to });
+                                connectionsUser.forEach(function (conn) {
+                                    log("danilo-req alarmReceived:number conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:number ac.action_user " + String(ac.action_user));
+                                    if (String(conn.sip) == String(ac.action_user)) {
+                                        //Send notifications
+                                        log("danilo-req alarmReceived:number conn ", JSON.stringify(conn));
+
+                                        log("danilo-req triggerAction2:search rcc connection for user  " + String(conn.sip));
+                                        //updateTableBadgeCount(conn.sip, "IncrementCount");
+                                        //conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+
+                                        var info = JSON.parse(conn.info)
+                                        var pbx = info.pbx;
+                                        RCC.forEach(function (rcc) {
+                                            log("danilo-req alarmReceived:number RCC forEach rcc", JSON.stringify(rcc));
+                                            if (rcc.pbx == pbx) {
+                                                log("danilo req alarmReceived:number RCC: found PBX for sip " + conn.sip);
+                                                var msg = { api: "RCC", mt: "UserInitialize", cn: conn.dn, hw: ac.action_device, src: conn.sip + "," + rcc.pbx + "," + ac.action_device + "," + ac.action_prt };
+                                                log("danilo req alarmReceived:number RCC: UserInitialize sent rcc msg " + JSON.stringify(msg));
+                                                rcc.send(JSON.stringify(msg));
+                                            } else {
+                                                log("rcc.pbx != info.pbx :: " + rcc.pbx + "!=" + pbx)
+                                            }
+                                        })
+
+                                    }
+                                });
+                                break;
+                            case "button":
+                                var btn = buttons.filter(function (btn) { return btn.id == ac.action_prt });
+                                connectionsUser.forEach(function (conn) {
+                                    log("danilo-req alarmReceived:button conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:button obj.to " + String(to));
+                                    if (String(conn.sip) == String(to)) {
+                                        //Send notifications
+                                        log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                        updateTableBadgeCount(conn.sip, "IncrementCount");
+                                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                        conn.send(JSON.stringify({ api: "user", mt: "ButtonRequest", button: JSON.stringify(btn[0]) }));
+                                    }
+                                });
+                                break;
+                            case "popup":
+                                connectionsUser.forEach(function (conn) {
+                                    log("danilo-req alarmReceived:popup conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:popup obj.to " + String(to));
+                                    if (String(conn.sip) == String(to)) {
+                                        //Send notifications
+                                        log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                        updateTableBadgeCount(conn.sip, "IncrementCount");
+                                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                        conn.send(JSON.stringify({ api: "user", mt: "PopupRequest", name: ac.action_name, alarm: ac.action_prt }));
+                                    }
+                                });
+                                break;
+                            default:
+                                connectionsUser.forEach(function (conn) {
+                                    log("danilo-req alarmReceived:" + ac.action_type + " conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:" + ac.action_type + " obj.to " + String(to));
+                                    if (String(conn.sip) == String(to)) {
+                                        //Send notifications
+                                        log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
+                                        updateTableBadgeCount(conn.sip, "IncrementCount");
+                                        conn.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: ac.action_alarm_code, src: from }));
+                                        conn.send(JSON.stringify({ api: "user", mt: "PageRequest", name: ac.action_name, alarm: ac.action_prt, type: ac.action_type }));
+                                    }
+                                });
+                                break;
+                        }
+                    })
+                    // Ação tratada... Então insere o log no DB para Histórico
+                    log("danilo req: insert into DB = user " + to);
+                    var today = getDateNow();
+                    var msg = { sip: to, from: from, name: type, date: today, status: "inc", prt: prt, details: detail }
+                    log("danilo req: will insert it on DB : " + JSON.stringify(msg));
+                    insertTblActivities(msg);
+                }
+                else {
+                    log("danilo-req triggerAction2:actions is null " + JSON.stringify(actions));
+                }
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                log("danilo-req triggerAction2: Erro DB " + errorText);
+            });
+    }
+    catch (e) {
+        log("danilo-req triggerAction2: Try Body decode Erro " + e);
+    }
+}
 
 function updateBadge(signal, call, count) {
     var msg = {
