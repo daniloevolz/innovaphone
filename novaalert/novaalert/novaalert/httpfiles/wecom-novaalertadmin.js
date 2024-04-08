@@ -772,7 +772,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var value = document.getElementById("selectValue");
                     var selectedOption = value.options[value.selectedIndex];
                     var value = selectedOption.id;
-                    app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(value), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                    list_users.forEach(function(u){
+                        if (u.guid == value ) {
+                            app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(u.guid), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                        }
+                    })
+                   
                     waitConnection(t1);
                 }
             });
@@ -2029,7 +2034,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         iptUser.setAttribute("id", "selectUser");
         iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
         list_users.forEach(function (user) {
-            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", guid));
+            iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.guid));
         })
         //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
 
@@ -3125,6 +3130,81 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
         div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+    }
+
+    function createSensorButton(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.add(classButton)
+            var divTop = document.createElement("div")
+                divTop.classList.add(bgTop)
+                divTop.classList.add("buttontop")
+                divTop.setAttribute("id", object.id + "-status");
+                //divTop.setAttribute("id", object.button_prt + "-status");
+                allBtns.appendChild(divTop)
+                var imgTop = document.createElement("img")
+                imgTop.style.width = "20px";
+                imgTop.setAttribute("src",srcImg)
+                divTop.appendChild(imgTop)
+                var divTopText = document.createElement("div")
+                divTopText.textContent = object.button_prt // nome do sensor que é o button_prt da list_buttons
+                divTop.appendChild(divTopText);
+
+                var divBottom = document.createElement("div")
+                divBottom.classList.add(bgBottom)
+                divBottom.classList.add("buttondown")
+                var divBottomTxt = document.createElement("div")
+                divBottomTxt.textContent = texts.text(object.sensor_type)
+                divBottomTxt.style.fontSize = "13px";
+                divBottomTxt.style.margin = '8px';
+                divBottomTxt.style.width = "100%"
+                divBottom.appendChild(divBottomTxt)
+                allBtns.appendChild(divBottom)
+        }
+    }
+
+    function createComboButton(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.add(classButton)
+                // div esquerda (imagem do botão)
+            var divImgCombo = document.createElement("div")
+                divImgCombo.classList.add(bgTop)
+                divImgCombo.classList.add("imgComboBtn")
+                divImgCombo.setAttribute("id", object.id + "-status");
+                allBtns.appendChild(divImgCombo)
+                var imgCombo = document.createElement("img")
+                imgCombo.style.width = "40px";
+                imgCombo.setAttribute("src",srcImg)
+                divImgCombo.appendChild(imgCombo)
+                // div direita (nome do botão etc)
+                var divComboName = document.createElement("div")
+                divComboName.classList.add(bgBottom)
+                divComboName.classList.add("divComboName")
+                var divComboTopName = document.createElement("div")
+                divComboTopName.textContent = object.button_type
+                divComboTopName.classList.add("divComboTopName")
+                divComboName.appendChild(divComboTopName)
+                var divComboBottomName = document.createElement("div")
+                divComboBottomName.textContent = object.button_name;
+                divComboBottomName.classList.add("divComboBottomName")
+                divComboName.appendChild(divComboBottomName)
+                allBtns.appendChild(divComboName)
+        }
     }
 
 }
