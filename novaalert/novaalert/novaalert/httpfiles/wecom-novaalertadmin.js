@@ -616,39 +616,48 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
         })
     }
-    function createButtons(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
+    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
 
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
             allBtns.setAttribute("button_type", object.button_type);
-            allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
-            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
-            allBtns.classList.remove("btnEmpty")
             allBtns.classList.add(classButton)
             var divTop = document.createElement("div")
-            divTop.classList.add(bgTop)
-            divTop.classList.add("buttontop")
-            divTop.setAttribute("id", object.id + "-status");
-            //divTop.setAttribute("id", object.button_prt + "-status");
-            allBtns.appendChild(divTop)
-            var imgTop = document.createElement("img")
-            imgTop.style.width = "20px";
-            imgTop.setAttribute("src", srcImg)
-            divTop.appendChild(imgTop)
-            var divTopText = document.createElement("div")
-            divTopText.textContent = object.button_name
-            divTop.appendChild(divTopText);
-
-            var divBottom = document.createElement("div")
-            divBottom.classList.add(bgBottom)
-            divBottom.classList.add("buttondown")
-            var divBottomTxt = document.createElement("div")
-            divBottomTxt.textContent = object.button_prt
-            divBottom.appendChild(divBottomTxt)
-            allBtns.appendChild(divBottom)
+                divTop.classList.add(bgTop)
+                divTop.classList.add("buttontop")
+                divTop.setAttribute("id", object.id + "-status");
+                //divTop.setAttribute("id", object.button_prt + "-status");
+                allBtns.appendChild(divTop)
+                var imgTop = document.createElement("img")
+                imgTop.style.width = "20px";
+                imgTop.setAttribute("src",srcImg)
+                divTop.appendChild(imgTop)
+                var divTopText = document.createElement("div")
+                divTopText.textContent = object.button_name
+                divTop.appendChild(divTopText);
+                var divBottom = document.createElement("div")
+                divBottom.classList.add(bgBottom)
+                divBottom.classList.add("buttondown")
+                var divBottomTxt = document.createElement("div")
+                divBottom.appendChild(divBottomTxt)
+                allBtns.appendChild(divBottom)
+                allBtns.setAttribute("button_prt", object.button_prt); 
+                allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+                divBottomTxt.textContent = object.button_prt
+                var found = true;
+                list_users.forEach(function(u){
+                    if(object.button_prt == u.guid && found){
+                        allBtns.setAttribute("button_prt", u.e164); 
+                        allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
+                        divBottomTxt.textContent = u.cn
+                        found = false
+                        // se mudar o sip vai refletir aqui 
+                        //pois tratamos tudo com GUID no admin
+                    }
+                })
         }
     }
     function makeDivAddButton3(t1, type, user, x, y, z) {

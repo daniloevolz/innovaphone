@@ -1997,8 +1997,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
+    
     function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
-
+        var found;
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
@@ -2028,7 +2029,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 allBtns.setAttribute("button_prt", object.button_prt); 
                 allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
                 divBottomTxt.textContent = object.button_prt
-                var found = true;
+                found = true;
                 list_users.forEach(function(u){
                     if(object.button_prt == u.guid && found){
                         allBtns.setAttribute("button_prt", u.e164); 
