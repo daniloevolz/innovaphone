@@ -149,7 +149,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //Intert into DB the event of new login
                     log("danilo req: insert into DB = user " + conn.sip);
                     var today = getDateNow();
-                    var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Login", group: "APP " + obj.info }
+                    var msg = { sip: conn.guid, name: conn.dn, date: today, status: "Login", group: "APP " + obj.info }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblAvailability(msg);
 
@@ -587,7 +587,7 @@ new JsonApi("user").onconnected(function (conn) {
             log("danilo req: insert into DB = user " + conn.sip);
             var today = getDateNow();
             var info = JSON.parse(conn.info);
-            var msg = { sip: conn.sip, name: conn.dn, date: today, status: "Logout", group: "APP" }
+            var msg = { sip: conn.guid, name: conn.dn, date: today, status: "Logout", group: "APP" }
             log("danilo req: will insert it on DB : " + JSON.stringify(msg));
             insertTblAvailability(msg);
 
@@ -783,7 +783,7 @@ new JsonApi("admin").onconnected(function (conn) {
             //#region ACTIONS
             if (obj.mt == "InsertActionMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
-                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
+                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertActionMessageSuccess" }));
                     })
@@ -909,9 +909,9 @@ new JsonApi("admin").onconnected(function (conn) {
                             });
                         break;
                     case "RptAvailability":
-                        var query = "SELECT sip, date, status, group_name FROM tbl_availability";
+                        var query = "SELECT guid, date, status, group_name FROM tbl_availability";
                         var conditions = [];
-                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.guid) conditions.push("sip ='" + obj.guid + "'");
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
@@ -1096,12 +1096,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                                     log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
                                                     switch (grps2[j].dyn) {
                                                         case "out":
-                                                            var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
+                                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
                                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                             insertTblAvailability(msg);
                                                             break;
                                                         case "in":
-                                                            var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
+                                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
                                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                             insertTblAvailability(msg);
                                                             break;
@@ -1114,7 +1114,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                         //Sair de todos os grupos existentes
                                         log("ReplicateUpdate= user " + obj.columns.h323 + " group removed!!!");
                                         for (var i = 0; i < grps1.length; i++) {
-                                            var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: grps1[j].name }
+                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps1[j].name }
                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                             insertTblAvailability(msg);
 
@@ -1131,12 +1131,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                     for (var i = 0; i < grps2.length; i++) {
                                         switch (grps2[j].dyn) {
                                             case "out":
-                                                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
+                                                var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
                                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                 insertTblAvailability(msg);
                                                 break;
                                             case "in":
-                                                var msg = { sip: obj.columns.h323, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
+                                                var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
                                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                 insertTblAvailability(msg);
                                                 break;
@@ -1754,6 +1754,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
                         //Intert into DB the event
                         log("PbxSignal= user " + obj.sig.cg.sip + " login");
+                        //log("PbxSignal= GUID " + obj.sig.cg.guid + " login");
                         var today = getDateNow();
                         var msg = { sip: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
                         log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
@@ -2798,7 +2799,7 @@ function insertTblCalls(obj) {
         });
 }
 function insertTblAvailability(obj) {
-    Database.insert("INSERT INTO tbl_availability (sip, name, date, status, group_name) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
+    Database.insert("INSERT INTO tbl_availability (guid, name, date, status, group_name) VALUES ('" + obj.guid + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.group + "')")
         .oncomplete(function () {
             log("insertTblAvailability= Success");
 

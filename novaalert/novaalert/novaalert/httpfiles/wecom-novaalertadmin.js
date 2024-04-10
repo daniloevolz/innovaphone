@@ -2722,7 +2722,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptAvailability":
@@ -2737,7 +2737,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptActivities":
@@ -2762,7 +2762,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.guid, null)).setAttribute("id", "sips");
                 })
                 break;
             case "RptSensors":
@@ -2801,7 +2801,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         // buttons
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            var sip;
+            var guid;
             var from = document.getElementById("dateFrom").value;
             var to = document.getElementById("dateTo").value;
             var event;
@@ -2810,7 +2810,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var sensor_type;
 
             if (rpt == "RptCalls") {
-                sip = document.getElementById("selectUser").value;
+                guid = document.getElementById("selectUser").id;
                 number = document.getElementById("number").value;
             } else if (rpt == "RptActivities") {
                 sip = document.getElementById("selectUser").value;
@@ -2828,7 +2828,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
 
 
-            app.send({ api: "admin", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
+            app.send({ api: "admin", mt: "SelectFromReports", guid: guid, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
             waitConnection(colDireita);
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {

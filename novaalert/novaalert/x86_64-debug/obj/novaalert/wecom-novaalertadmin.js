@@ -2722,7 +2722,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptAvailability":
@@ -2737,7 +2737,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptActivities":
@@ -2762,7 +2762,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.guid, null)).setAttribute("id", "sips");
                 })
                 break;
             case "RptSensors":
