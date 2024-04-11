@@ -845,7 +845,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "SelectFromReports") {
                 switch (obj.src) {
                     case "RptCalls":
-                        var query = "SELECT sip, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
+                        var query = "SELECT guid, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
                         var conditions = [];
                         if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
                         if (obj.number) conditions.push("number ='" + obj.number + "'");
@@ -1387,7 +1387,13 @@ new PbxApi("RCC").onconnected(function (conn) {
             //log("danilo-req : RCC message::CallInfo user src foundIndex " + foundIndex);
 
             var foundCall = calls.filter(function (call) { return call.sip === sip && call.src == src });
-
+            log("CALLS COMPLETA :" + JSON.stringify(calls))
+            log("PBX table completa (columns) :" + JSON.stringify(pbxTableUsers))
+            var objGuid = pbxTableUsers.filter(function(u){
+                return u.columns.h323 == sip
+            })[0]
+            var guid = objGuid.columns.guid;
+            log("GUID DO CARA" + JSON.stringify(objGuid.columns.guid))
             if (String(foundCall) == "") {
                 log("danilo-req : RCC message::CallInfo NOT foundCall ");
                 if (obj.state == 1 || obj.state == 129) {
@@ -1396,11 +1402,11 @@ new PbxApi("RCC").onconnected(function (conn) {
                         case 1:
                             //Ativa (Alert)
                             if (e164 == "") {
-                                addCall(sip, obj.call, src, num, obj.state, "out", timeNow, device)
+                                addCall(guid,sip, obj.call, src, num, obj.state, "out", timeNow, device)
                                 //calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
                                 //num = obj.peer.h323;
                             } else {
-                                addCall(sip, obj.call, src, num, obj.state, "out", timeNow, device)
+                                addCall(guid,sip, obj.call, src, num, obj.state, "out", timeNow, device)
                                 //calls.push({ sip: String(sip), src: src, callid: obj.call, num: num, state: obj.state, direction: "out", call_started: timeNow, device: device });
                                 //num = obj.peer.e164;
                             }
@@ -1418,11 +1424,11 @@ new PbxApi("RCC").onconnected(function (conn) {
                         case 129:
                             //Receptiva (Alert)
                             if (e164 == "") {
-                                addCall(sip, obj.call, src, num, obj.state, "inc", timeNow, device)
+                                addCall(guid,sip, obj.call, src, num, obj.state, "inc", timeNow, device)
                                 //calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
                                 //num = obj.peer.h323;
                             } else {
-                                addCall(sip, obj.call, src, num, obj.state, "inc", timeNow, device)
+                                addCall(guid,sip, obj.call, src, num, obj.state, "inc", timeNow, device)
                                 //calls.push({ sip: String(sip), src: obj.src, callid: obj.call, num: num, state: obj.state, direction: "inc", call_started: timeNow, device: device });
                                 //num = obj.peer.e164;
                             }
@@ -1812,11 +1818,12 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 });
 
 //Funções Internas
-function addCall(sip, callid, src, num, state, direction, call_started, device) {
+function addCall(guid ,sip, callid, src, num, state, direction, call_started, device) {
     var found = false;
     calls.forEach(function (call) {
         if (call.callid == callid) {
             found = true;
+            call.guid = guid,
             call.sip = String(sip),
                 call.src = src,
                 call.callid = callid,
@@ -1830,6 +1837,7 @@ function addCall(sip, callid, src, num, state, direction, call_started, device) 
     })
     if (found == false) {
         var call = {
+            guid: String(guid),
             sip: String(sip),
             src: src,
             callid: callid,
@@ -2773,7 +2781,7 @@ function getDateNow() {
 
 //#region inserts reports
 function insertTblActivities(obj) {
-    Database.insert("INSERT INTO tbl_activities (sip, name, date, status, details) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
+    Database.insert("INSERT INTO tbl_activities (guid, name, date, status, details) VALUES ('" + obj.guid + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
         .oncomplete(function () {
             log("insertTblActivities= Success");
 
@@ -2789,7 +2797,7 @@ function insertTblCalls(obj) {
     if (!obj.call_connected) {
         obj.call_connected = "";
     }
-    Database.insert("INSERT INTO tbl_calls (sip, number, call_started, call_ringing, call_connected, call_ended, status, direction) VALUES ('" + obj.sip + "','" + obj.num + "','" + obj.call_started + "','" + obj.call_ringing + "','" + obj.call_connected + "','" + obj.call_ended + "'," + obj.state + ",'" + obj.direction + "')")
+    Database.insert("INSERT INTO tbl_calls (guid, number, call_started, call_ringing, call_connected, call_ended, status, direction) VALUES ('" + obj.guid + "','" + obj.num + "','" + obj.call_started + "','" + obj.call_ringing + "','" + obj.call_connected + "','" + obj.call_ended + "'," + obj.state + ",'" + obj.direction + "')")
         .oncomplete(function () {
             log("insertTblCalls= Success");
 

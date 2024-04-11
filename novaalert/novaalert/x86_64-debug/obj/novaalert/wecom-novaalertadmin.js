@@ -2801,7 +2801,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         // buttons
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            var sip;
+            var guid;
             var from = document.getElementById("dateFrom").value;
             var to = document.getElementById("dateTo").value;
             var event;
@@ -2810,7 +2810,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var sensor_type;
 
             if (rpt == "RptCalls") {
-                sip = document.getElementById("selectUser").value;
+                var SelectUser = document.getElementById("selectUser");
+                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+                guid = selectedOption.id;
                 number = document.getElementById("number").value;
             } else if (rpt == "RptActivities") {
                 sip = document.getElementById("selectUser").value;
@@ -2828,7 +2830,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
 
 
-            app.send({ api: "admin", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
+            app.send({ api: "admin", mt: "SelectFromReports", guid: guid, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
             waitConnection(colDireita);
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
@@ -2902,7 +2904,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                             result.forEach(function (b) {
                                 var row = [];
                                 var u = list_users.filter(function (u) { return u.guid == b.guid })
-                                row.push(u.cn);
+                                row.push(u.guid);
                                 row.push(b.number);
                                 row.push(b.call_started);
                                 row.push(b.call_ringing);

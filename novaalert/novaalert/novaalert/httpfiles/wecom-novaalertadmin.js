@@ -2810,7 +2810,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var sensor_type;
 
             if (rpt == "RptCalls") {
-                guid = document.getElementById("selectUser").id;
+                var SelectUser = document.getElementById("selectUser");
+                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+                guid = selectedOption.id;
                 number = document.getElementById("number").value;
             } else if (rpt == "RptActivities") {
                 sip = document.getElementById("selectUser").value;
