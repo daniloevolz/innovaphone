@@ -118,6 +118,9 @@ embed {
     justify-content: center;
 
 }
+.eventStatus{
+    text-align: center;
+}
 .boxEvent{
     padding: 6px;
     display: flex;
@@ -126,7 +129,7 @@ embed {
     justify-content: space-between;
     font-size: 14px;
     width: 100%;
-    height: 80px;
+    /* height: 80px; */
     align-items: center;
     border-radius: 8px;
     /* margin: 10px; */
@@ -162,7 +165,7 @@ embed {
     background-color: #00000090;
     width: 100%;
     border-radius: 6px 6px 0 0;
-    height: 50%;
+    height: auto;
     justify-content: center;
     align-items: center;
 }
@@ -266,7 +269,7 @@ embed {
     display: flex;
     align-items: center;
     text-align: center;
-    font-size: 17px;
+    font-size: 14px;
     border-radius: 6px 6px 0 0;
     justify-content: center;
     font-weight: bold;
@@ -824,21 +827,27 @@ select{
 }
 
 .labelValueType {
+    width: 50%;
+    left: 5%;
     position: absolute;
-    left: 29%;
-    /* width: 15%; */
-    top: 46%;
+    font-size: 15px;
+    text-align: left;
+    border-bottom: 2px solid #02163F;
+    position: absolute;
+    left: 5%;
+    width: 38%;
+    top: 50px;
     /* font-weight: bold; */
     font-size: 15px;
-    text-align: right;
+    /* text-align: right; */
     border-bottom: 2px solid #02163F;
 }
 
 .iptValueType {
     position: absolute;
-    /* left: 16%; */
+    left: 50%;
     width: 30%;
-    top: 46%;
+    top: 50px;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -1714,7 +1723,7 @@ select{
     padding: 10px;
 }
 .labelAction {
-    top: 55%;
+    top: 65%;
     width: 50%;
     left: 5%;
     position: absolute;
@@ -1853,7 +1862,7 @@ select{
     left: 17%;
     width: 30%;
     left: 50%;
-    top: 55%;
+    top: 65%;
     font-size: 12px;
     text-align: center;
     height: 30px;
@@ -1877,18 +1886,26 @@ select{
 }
 .divAddAction4 {
     position: absolute;
-    top: 60%;
+    top: 70%;
     left: 4%;
     width: 77%;
     padding: 10px;
 }
-.divAddAction6 {
+.divAddActionSensorName {
+    height: 50px;
+    top: 0px;
     position: absolute;
-    top: 70%;
-    left: 28%;
-    width: 38%;
+    width: 77%;
     padding: 10px;
-    /* display: none; */
+    left:4%;
+}
+.divAddAction6 {
+    height: auto;
+    position: absolute;
+    top: 50%;
+    /* left: 28%; */
+    width: 100%;
+    padding: 10px;
 } 
 .labelValueAction {
     position: absolute;

@@ -74,10 +74,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var list_act_types = [
         { typeName: "Alarme", id: "alarm" },
         { typeName: "Número", id: "number" },
-        { typeName: "Botão", id: "button" },
-        { typeName: "Vídeo", id: "video" },
-        { typeName: "Página Iframe", id: "page" },
-        { typeName: "PopUp Iframe", id: "popup" }
+        { typeName: "Botão", id: "button" }
+        //{ typeName: "Vídeo", id: "video" },
+        //{ typeName: "Página Iframe", id: "page" },
+        //{ typeName: "PopUp Iframe", id: "popup" }
     ];
     var list_start_types = [
         { typeName: "Alarme", id: "alarm" },
@@ -545,36 +545,58 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         // criar todos os botões com a função genérica createButtons e classe btnEmpty
         buttons.forEach(function (object) {
-
             switch (object.button_type) {
                 case "combo":
-                    createButtons(object, null, "ciano-900", "ciano-600", "./images/Layer.svg", "combobutton", object.page)
+                    createComboButton(object, null, "ciano-600", "ciano-900", "./images/Layer.svg", "combobutton")
                     break;
                 case "alarm":
-                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button", object.page)
+                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
                     break;
                 case "number":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "sensor":
-                    createButtons(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton", object.page)
-                    //app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
-                    //    console.log("SendSrcResult: " + JSON.stringify(obj))
-                    //    var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
-                    //    var objParse = JSON.parse(obj.result);
-                    //    objParse.forEach(function (info) {
-                    //        updateButtonInfo(divToUpdate, info, null);
-                    //    });
-
-                    //})
+                    createSensorButton(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton")
                     break;
                 default:
                     break;
             }
         });
+
+        //buttons.forEach(function (object) {
+
+        //    switch (object.button_type) {
+        //        case "combo":
+        //            createButtons(object, null, "ciano-900", "ciano-600", "./images/Layer.svg", "combobutton", object.page)
+        //            break;
+        //        case "alarm":
+        //            createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button", object.page)
+        //            break;
+        //        case "number":
+        //            createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+        //            break;
+        //        case "user":
+        //            createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+        //            break;
+        //        case "sensor":
+        //            createButtons(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton", object.page)
+        //            //app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
+        //            //    console.log("SendSrcResult: " + JSON.stringify(obj))
+        //            //    var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
+        //            //    var objParse = JSON.parse(obj.result);
+        //            //    objParse.forEach(function (info) {
+        //            //        updateButtonInfo(divToUpdate, info, null);
+        //            //    });
+
+        //            //})
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //});
 
         // listner nos botões vagos btnEmpty
         var botoes = document.querySelectorAll(".btnEmpty");
@@ -649,6 +671,81 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             divBottomTxt.textContent = object.button_prt
             divBottom.appendChild(divBottomTxt)
             allBtns.appendChild(divBottom)
+        }
+    }
+    function createSensorButton(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.remove("btnEmpty")
+            allBtns.classList.add(classButton)
+            var divTop = document.createElement("div")
+            divTop.classList.add(bgTop)
+            divTop.classList.add("buttontop")
+            divTop.setAttribute("id", object.id + "-status");
+            //divTop.setAttribute("id", object.button_prt + "-status");
+            allBtns.appendChild(divTop)
+            var imgTop = document.createElement("img")
+            imgTop.style.width = "20px";
+            imgTop.setAttribute("src", srcImg)
+            divTop.appendChild(imgTop)
+            var divTopText = document.createElement("div")
+            divTopText.textContent = object.button_prt // nome do sensor que é o button_prt da list_buttons
+            divTop.appendChild(divTopText);
+
+            var divBottom = document.createElement("div")
+            divBottom.classList.add(bgBottom)
+            divBottom.classList.add("buttondown")
+            var divBottomTxt = document.createElement("div")
+            divBottomTxt.textContent = texts.text(object.sensor_type)
+            divBottomTxt.style.fontSize = "13px";
+            divBottomTxt.style.margin = '8px';
+            divBottomTxt.style.width = "100%"
+            divBottom.appendChild(divBottomTxt)
+            allBtns.appendChild(divBottom)
+        }
+    }
+    function createComboButton(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.remove("btnEmpty")
+            allBtns.classList.add(classButton)
+            // div esquerda (imagem do botão)
+            var divImgCombo = document.createElement("div")
+            divImgCombo.classList.add(bgTop)
+            divImgCombo.classList.add("imgComboBtn")
+            divImgCombo.setAttribute("id", object.id + "-status");
+            allBtns.appendChild(divImgCombo)
+            var imgCombo = document.createElement("img")
+            imgCombo.style.width = "40px";
+            imgCombo.setAttribute("src", srcImg)
+            divImgCombo.appendChild(imgCombo)
+            // div direita (nome do botão etc)
+            var divComboName = document.createElement("div")
+            divComboName.classList.add(bgBottom)
+            divComboName.classList.add("divComboName")
+            var divComboTopName = document.createElement("div")
+            divComboTopName.textContent = object.button_type
+            divComboTopName.classList.add("divComboTopName")
+            divComboName.appendChild(divComboTopName)
+            var divComboBottomName = document.createElement("div")
+            divComboBottomName.textContent = object.button_name;
+            divComboBottomName.classList.add("divComboBottomName")
+            divComboName.appendChild(divComboBottomName)
+            allBtns.appendChild(divComboName)
         }
     }
     function makeDivAddButton3(t1, type, user, x, y, z) {
@@ -2072,6 +2169,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         //Device
         var divDevice = t.add(new innovaphone.ui1.Div(null, null, "divAddAction5"));
 
+        //Sensor
+        var divSensor = t.add(new innovaphone.ui1.Div(null, null, "divAddAction6"));
+
         document.getElementById("selectType").addEventListener("change", function (e) {
             console.log(e.target.value);
             if (e.target.value == "Número") {
@@ -2134,7 +2234,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var selectedOption = user.options[user.selectedIndex];
                 var sip = selectedOption.id;
                 list_buttons.forEach(function (button) {
-                    if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
+                    if (button.button_type != "combo" && button.button_user == sip && button.button_type != "alarm" && button.button_type != "user" && button.button_type != "sensor") {
                         iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
                     }
                 })
@@ -2157,7 +2257,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         })
                     }
                 });
-            } else {
+            }
+            else {
                 divDevice.clear();
                 divAddAction4.clear();
                 divAddAction4 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction4"));
@@ -2166,6 +2267,29 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
             }
         });
+
+        document.getElementById("selectStartType").addEventListener("change", function (e) {
+            console.log(e.target.value);
+            if (e.target.value == "Valor Máximo" || e.target.value == "Valor Mínimo") {
+
+                divSensor.clear();
+                //Sensor Name
+                var divAddAction4 = divSensor.add(new innovaphone.ui1.Div(null, null, "divAddActionSensorName"));
+                divAddAction4.add(new innovaphone.ui1.Input(null, null, null, 500, null, "iptValueAction").setAttribute("id", "sensorName"));
+                divAddAction4.add(new innovaphone.ui1.Div(null, texts.text("labelSensorName"), "labelValueAction"));
+
+                //Tipo de Medida
+                divSensor.add(new innovaphone.ui1.Div(null, texts.text("labelValueType"), "labelValueType"));
+                var iptValueType = divSensor.add(new innovaphone.ui1.Node("select", null, null, "iptValueType"));
+                iptValueType.setAttribute("id", "iptValueType");
+                list_sensor_types.forEach(function (s) {
+                    iptValueType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", texts.text(s.id), null).setAttribute("id", s.id));
+                });
+            } else {
+                divSensor.clear();
+            }
+        })
+        
 
         //Botão Salvar
         t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
@@ -2180,11 +2304,21 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             //var start = document.getElementById("selectType");
             var device;
             var value;
+            var sensorType;
+            var sensorName;
+
+            if (StartOpt == "min-threshold" || StartOpt == "max-threshold") {
+                sensorType = document.getElementById("iptValueType");
+                var selectedOption = sensorType.options[sensorType.selectedIndex];
+                sensorType = selectedOption.id;
+
+                sensorName = document.getElementById("sensorName").value;
+            }
 
             if (type == "number") {
                 device = document.getElementById("selectDevice");
                 var selectedOption = device.options[device.selectedIndex];
-                var device = selectedOption.id;
+                device = selectedOption.id;
             }
             if (type == "button") {
                 value = document.getElementById("selectValue");
@@ -2198,7 +2332,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), value: String(value), sip: String(user), type: String(type), device: device });
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), sensorType: sensorType, sensorName: sensorName, value: String(value), sip: String(user), type: String(type), device: device });
                 makeTableActions(t);
             }
         });

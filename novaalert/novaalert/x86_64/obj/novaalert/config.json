@@ -269,6 +269,16 @@
           },
           {
             "cmd": "column",
+            "name": "action_sensor_name",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
+            "name": "action_sensor_type",
+            "type": "VARCHAR(50)"
+          },
+          {
+            "cmd": "column",
             "name": "action_prt",
             "type": "text"
           },

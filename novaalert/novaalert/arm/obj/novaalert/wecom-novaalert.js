@@ -258,7 +258,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 
             } finally {
                 //addNotification("out", "Alarme " + obj.alarm);
-                addNotification('out', texts.text("alarm") + " " + obj.alarm, obj.from, obj.to)
+                addNotification("alarm", 'out', obj.alarm, obj.from, obj.to)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -343,7 +343,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification('inc', texts.text("alarm") + " " + obj.alarm, obj.src, userUI)
+                addNotification("alarm", 'inc', obj.alarm, obj.src, userUI)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -411,31 +411,53 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             //updateScreen(obj.btn_id, obj.name, "page", obj.alarm);
             //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
             //addNotification(">>>  " + obj.alarm);
+            if (obj.type == "dest") {
 
-            createGridZero(obj.type)
-                .then(function (message) {
-                    console.log("createGridZero" + message);
-                    // Encontre o elemento pelo seu ID
-                    var btnOption = document.getElementById(obj.btn_id);
+                console.log("PageRequest dest" );
+                // Encontre o elemento pelo seu ID
+                var btnOption = document.getElementById(obj.btn_id);
 
-                    // Verifique se o elemento foi encontrado
-                    if (btnOption) {
-                        // Crie um evento de clique
-                        var eventoClique = new MouseEvent('click', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
-                        });
+                // Verifique se o elemento foi encontrado
+                if (btnOption) {
+                    // Crie um evento de clique
+                    var eventoClique = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                    });
 
-                        // Dispare o evento de clique no elemento
-                        btnOption.dispatchEvent(eventoClique);
-                    } else {
-                        console.log('Elemento não encontrado.');
-                    }
-                })
-                .catch(function (error) {
-                    console.log("createGridZero" + error);
-                });
+                    // Dispare o evento de clique no elemento
+                    btnOption.dispatchEvent(eventoClique);
+                } else {
+                    console.log('Elemento não encontrado.');
+                }
+            } else{
+                createGridZero(obj.type)
+                    .then(function (message) {
+                        console.log("createGridZero" + message);
+                        // Encontre o elemento pelo seu ID
+                        var btnOption = document.getElementById(obj.btn_id);
+
+                        // Verifique se o elemento foi encontrado
+                        if (btnOption) {
+                            // Crie um evento de clique
+                            var eventoClique = new MouseEvent('click', {
+                                bubbles: true,
+                                cancelable: true,
+                                view: window
+                            });
+
+                            // Dispare o evento de clique no elemento
+                            btnOption.dispatchEvent(eventoClique);
+                        } else {
+                            console.log('Elemento não encontrado.');
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log("createGridZero" + error);
+                    });
+            }
+            
         }
         if (obj.api == "user" && obj.mt == "PopupRequest") {
             console.log(obj.alarm);
@@ -1186,7 +1208,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "dest") {
                 app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
                 //addNotification("out", name);
-                addNotification('out', type, userUI, prt)
+                addNotification(type, 'out', name, userUI, prt)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1365,7 +1387,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 if (found != -1) {
                     app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                     //addNotification("out", name);
-                    addNotification('out', name, userUI, prt)
+                    addNotification(type, 'out', name, userUI, prt)
                         .then(function (message) {
                             console.log(message);
                         })
@@ -1386,7 +1408,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             if (type == "number") {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
-                addNotification('out', type, userUI, prt)
+                addNotification(type, 'out', name, userUI, prt)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1917,7 +1939,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
 
-                    addNotification('out', texts.text("sensor"), sensorName , userUI)
+                    addNotification('sensor', 'out', sensorType, sensorName , userUI)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1933,7 +1955,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
 
-                    addNotification('out', texts.text("sensor"), sensorName , userUI)
+                    addNotification('sensor','out', sensorType, sensorName , userUI)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1974,7 +1996,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         buttonDown.classList.add("vulcano-1000");
                         buttonTop.classList.add("blinking"); // colocar animação do botão piscando
     
-                        addNotification('out', texts.text("sensor"), sensorName , userUI)
+                        addNotification('sensor', 'out', sensorType, sensorName , userUI)
                         .then(function (message) {
                             console.log(message);
                         })
@@ -2201,7 +2223,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     }
     
-    function addNotification(flux, msg, from, to) {
+    function addNotification(type, flux, msg, from, to) {
         return new Promise(function(resolve, reject) {
             try {
                 var today = new Date();
@@ -2228,7 +2250,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 const eventType = document.createElement("div");
                 eventType.id = "eventType";
                 eventType.classList.add("eventType");
-                eventType.textContent = texts.text("labelType");
+                eventType.textContent = texts.text(type);
             
                 const eventStatus = document.createElement("div");
                 eventStatus.id = "eventStatus";
@@ -2243,11 +2265,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 eventText1.id = "eventText1";
                 eventText1.classList.add("eventText1");
                 eventText1.textContent = from;
-
-                const eventImg1 = document.createElement("img");
-                eventImg1.id = "eventImg1";
-                eventImg1.classList.add("eventImg1");
-                eventImg1.src = "./images/right-arrow.png";
+                if(flux =='inc'){
+                    const eventImg1 = document.createElement("img");
+                    eventImg1.id = "eventImg1";
+                    eventImg1.classList.add("eventImg1");
+                    eventImg1.src = "./images/right-arrow.png";
+                }else{
+                    const eventImg1 = document.createElement("img");
+                    eventImg1.id = "eventImg1";
+                    eventImg1.classList.add("eventImg1");
+                    eventImg1.src = "./images/left-arrow.png";
+                }
+                
             
                 const eventText2 = document.createElement("div");
                 eventText2.id = "eventText2";
@@ -2385,7 +2414,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         drawBarGraph();
     }
 
-    // Dados de exemplo
+    // Cria os gráficos
     function createLineGrafic(data, key) {
         console.log("Grafico", data)
         var grafico = document.getElementById("grafico")
@@ -2394,59 +2423,59 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (grafico) {
             btmRight.removeChild(grafico)
         }
-    
+
         const canvas = document.createElement('canvas');
         canvas.id = "grafico"
         canvas.classList.add("grafico", "neutro-1000")
-    
+
         var ctx = canvas.getContext('2d');
 
-        canvas.width = 700; // Defina a largura desejada
+        canvas.width = 760; // Defina a largura desejada
         canvas.height = 380; // Defina a altura desejada
 
 
         var width = canvas.width;
         var height = canvas.height;
-        var padding = 30;
+        var padding = 50;
         const resultado = somaGrafico(data, key);
 
-        function somaGrafico(data, chave){
+        function somaGrafico(data, chave) {
             let soma = 0;
-            data.forEach(function(item) {
+            data.forEach(function (item) {
                 soma += parseInt(item[chave]);
             });
             return soma;
         }
         console.log("MÉDIA GRAFICO Y values", resultado)
 
-        data.sort(function(a, b) {
+        data.sort(function (a, b) {
             return a.id - b.id;
         });
 
         // Define os valores para o eixo Y
-        var maxY = Math.max.apply(null, data.map(function(item) { return item[key]; }));
- 
+        var maxY = Math.max.apply(null, data.map(function (item) { return item[key]; }));
+
         const media = Math.round((resultado / data.length) + maxY)
-           
+
         var scaleY = (height - 2 * padding) / media;
-    
+
         var maxX = data.length - 1; // O máximo valor de X é o comprimento dos dados menos um
         var intervalWidth = (width - 2 * padding) / maxX;
 
         console.log("MÉDIA GRAFICO Y key.lengt", data.length)
         console.log("MÉDIA GRAFICO Y maxY", maxY)
         console.log("MÉDIA GRAFICO Y", media)
-        
+
         // Define os valores para o eixo Y
 
         var yValues = [];
         for (var i = 0; i <= 4; i++) {
             yValues.push(Math.round(i * (media / 4)));
         }
-    
+
         function drawLineGraph() {
-            ctx.clearRect(0, 0, width, height);
-    
+            ctx.clearRect(0, 0, width + 20, height);
+
             // Desenha os eixos X e Y
             ctx.beginPath();
             ctx.moveTo(padding, padding);
@@ -2454,40 +2483,38 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             ctx.lineTo(width - padding, height - padding);
             ctx.strokeStyle = 'white'; // Define a cor dos eixos
             ctx.stroke();
-    
+
             // Desenha os rótulos dos eixos X e Y
             ctx.font = '15px Arial'
             ctx.fillStyle = 'white'; // Define a cor dos rótulos
             ctx.fillText('X', width - padding + 5, height - padding + 5);
             ctx.fillText('Y', padding - 10, padding - 5);
-    
+
             // Define a cor da linha dos dados
             ctx.strokeStyle = 'green';
-    
+
             // Desenha os pontos e linhas do gráfico
             ctx.beginPath();
-            data.forEach(function(pair, index) {
-                var x = index * intervalWidth + padding;
+            data.forEach(function (pair, index) {
+                var x = index * (intervalWidth - 2) + padding;
                 var y = height - pair[key] * scaleY - padding;
                 ctx.lineTo(x, y);
                 ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fillText(pair[key], x + 5, y - 5); // Adiciona o valor do ponto
+                ctx.fillText(pair[key], x - 5, y - 5); // Adiciona o valor do ponto
             });
             ctx.stroke();
-    
+
             // Desenha os valores no eixo Y
             ctx.fillStyle = 'white'; // Define a cor dos valores do eixo Y
-            yValues.forEach(function(value, index) {
+            yValues.forEach(function (value, index) {
                 var y = height - index * (height - 2 * padding) / 4 - padding;
-                ctx.fillText(value, padding - 20, y + 5);
+                ctx.fillText(value, 5, y + 10); // Ajuste o valor de 30 para aumentar a margem
             });
         }
         btmRight.appendChild(canvas)
         drawLineGraph();
-    
-    }
-    
 
+    }
     
     //#endregion
 }
