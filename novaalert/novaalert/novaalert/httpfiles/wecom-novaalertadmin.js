@@ -2762,7 +2762,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.guid, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptSensors":
@@ -2815,7 +2815,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 guid = selectedOption.id;
                 number = document.getElementById("number").value;
             } else if (rpt == "RptActivities") {
-                sip = document.getElementById("selectUser").value;
+                var SelectUser = document.getElementById("selectUser");
+                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+                guid = selectedOption.id;
                 event = document.getElementById("selectEvent");
                 var selectedOption = event.options[event.selectedIndex];
                 event = selectedOption.id;
@@ -2863,7 +2865,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //}
                 for (var key in columnsName) {
                     if (columnsName.hasOwnProperty(key)) {
-                        listView.addColumn(null, "text", texts.text(key), key, 10, false);
+                        if(key == "guid"){
+                            listView.addColumn(null, "text", texts.text("cabecalho1"), key, 10, false);
+                        }else{
+                            listView.addColumn(null, "text", texts.text(key), key, 10, false);
+                        }
+                        
 
                     }
                 }
@@ -2903,7 +2910,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptCalls":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.guid == b.guid })
+                                var u = list_users.filter(function (u){
+                                    return u.guid == b.guid 
+                                })[0]
                                 row.push(u.cn);
                                 row.push(b.number);
                                 row.push(b.call_started);
@@ -2948,7 +2957,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptActivities":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.guid == b.guid })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })[0]
                                 row.push(u.cn);
                                 // Substituir valores de b.name por texto correspondente
                                 //switch (b.name) {
@@ -3001,7 +3010,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptAvailability":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.guid == b.guid })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })[0]
                                 row.push(u.cn);
                                 row.push(b.date);
                                 row.push(b.status);

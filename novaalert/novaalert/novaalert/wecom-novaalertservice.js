@@ -149,7 +149,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //Intert into DB the event of new login
                     log("danilo req: insert into DB = user " + conn.sip);
                     var today = getDateNow();
-                    var msg = { sip: conn.guid, name: conn.dn, date: today, status: "Login", group: "APP " + obj.info }
+                    var msg = { guid: conn.guid, name: conn.dn, date: today, status: "Login", group: "APP " + obj.info }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblAvailability(msg);
 
@@ -319,35 +319,35 @@ new JsonApi("user").onconnected(function (conn) {
                 if (obj.mt == "TriggerStartPage") {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "page", date: today, status: "start", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "page", date: today, status: "start", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
                 if (obj.mt == "TriggerStopPage") {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "page", date: today, status: "stop", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "page", date: today, status: "stop", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
                 if (obj.mt == "TriggerStartVideo") {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "video", date: today, status: "start", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "video", date: today, status: "start", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
                 if (obj.mt == "TriggerStopVideo") {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "video", date: today, status: "stop", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "video", date: today, status: "stop", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
                 if (obj.mt == "TriggerStopAlarm") {
                     //intert into DB the event
                     log("danilo req:TriggerStopAlarm insert into DB = user " + conn.guid);
-                    var msg = { sip: conn.sip, name: "alarm", date: today, status: "stop", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "alarm", date: today, status: "stop", details: obj.prt }
                     log("danilo req:TriggerStopAlarm will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
 
@@ -383,7 +383,7 @@ new JsonApi("user").onconnected(function (conn) {
                 if (obj.mt == "TriggerStartPopup") {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "popup", date: today, status: "start", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "popup", date: today, status: "start", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
@@ -403,7 +403,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //alarmReceived(value);
 
                     connectionsUser.forEach(function (c) {
-                        if (c.sip != conn.sip) {
+                        if (c.guid != conn.guid) {
                             c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.sip}));
 
                         }
@@ -412,7 +412,7 @@ new JsonApi("user").onconnected(function (conn) {
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
 
-                    var msg = { sip: conn.sip, name: "alarm", date: today, status: "out", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "alarm", date: today, status: "out", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
@@ -456,7 +456,7 @@ new JsonApi("user").onconnected(function (conn) {
                     }
                     //intert into DB the event
                     log("danilo req: insert into DB = user " + conn.sip);
-                    var msg = { sip: conn.sip, name: "call", date: today, status: "start", details: obj.prt }
+                    var msg = { guid: conn.guid, name: "call", date: today, status: "start", details: obj.prt }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
 
@@ -587,7 +587,7 @@ new JsonApi("user").onconnected(function (conn) {
             log("danilo req: insert into DB = user " + conn.sip);
             var today = getDateNow();
             var info = JSON.parse(conn.info);
-            var msg = { sip: conn.guid, name: conn.dn, date: today, status: "Logout", group: "APP" }
+            var msg = { guid: conn.guid, name: conn.dn, date: today, status: "Logout", group: "APP" }
             log("danilo req: will insert it on DB : " + JSON.stringify(msg));
             insertTblAvailability(msg);
 
@@ -847,7 +847,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     case "RptCalls":
                         var query = "SELECT guid, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
                         var conditions = [];
-                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
                         if (obj.number) conditions.push("number ='" + obj.number + "'");
                         if (obj.from) conditions.push("call_started >'" + obj.from + "'");
                         if (obj.to) conditions.push("call_started <'" + obj.to + "'");
@@ -877,9 +877,9 @@ new JsonApi("admin").onconnected(function (conn) {
                             });
                         break;
                     case "RptActivities":
-                        var query = "SELECT sip, name, date, status, details  FROM tbl_activities";
+                        var query = "SELECT guid, name, date, status, details  FROM tbl_activities";
                         var conditions = [];
-                        if (obj.sip) conditions.push("sip ='" + obj.sip + "'");
+                        if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (obj.event) conditions.push("name ='" + obj.event + "'");
@@ -1096,12 +1096,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                                     log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed!!!");
                                                     switch (grps2[j].dyn) {
                                                         case "out":
-                                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
+                                                            var msg = { guid: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
                                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                             insertTblAvailability(msg);
                                                             break;
                                                         case "in":
-                                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
+                                                            var msg = { guid: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
                                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                             insertTblAvailability(msg);
                                                             break;
@@ -1114,7 +1114,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                         //Sair de todos os grupos existentes
                                         log("ReplicateUpdate= user " + obj.columns.h323 + " group removed!!!");
                                         for (var i = 0; i < grps1.length; i++) {
-                                            var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps1[j].name }
+                                            var msg = { guid: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps1[j].name }
                                             log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                             insertTblAvailability(msg);
 
@@ -1131,12 +1131,12 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                     for (var i = 0; i < grps2.length; i++) {
                                         switch (grps2[j].dyn) {
                                             case "out":
-                                                var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
+                                                var msg = { guid: obj.columns.guid, name: obj.columns.cn, date: today, status: "Indisponível", group: grps2[j].name }
                                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                 insertTblAvailability(msg);
                                                 break;
                                             case "in":
-                                                var msg = { sip: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
+                                                var msg = { guid: obj.columns.guid, name: obj.columns.cn, date: today, status: "Disponível", group: grps2[j].name }
                                                 log("ReplicateUpdate= will insert it on DB : " + JSON.stringify(msg));
                                                 insertTblAvailability(msg);
                                                 break;
@@ -1762,7 +1762,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                         log("PbxSignal= user " + obj.sig.cg.sip + " login");
                         //log("PbxSignal= GUID " + obj.sig.cg.guid + " login");
                         var today = getDateNow();
-                        var msg = { sip: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
+                        var msg = { guid: obj.sig.cg.sip, name: name, date: today, status: "Login", group: "PBX" }
                         log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
                         insertTblAvailability(msg);
                     }
@@ -1801,7 +1801,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                         //Intert into DB the event
                         log("PbxSignal= user " + sip + " logout");
                         var today = getDateNow();
-                        var msg = { sip: sip, name: userTable[0].columns.cn, date: today, status: "Logout", group: "PBX" }
+                        var msg = { guid: sip, name: userTable[0].columns.cn, date: today, status: "Logout", group: "PBX" }
                         log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
                         insertTblAvailability(msg);
                     }
@@ -2121,7 +2121,7 @@ function alarmReceived(value) {
                     //Intert into DB the event
                     log("danilo req: insert into DB = user " + user);
                     var today = getDateNow();
-                    var msg = { sip: user, from: obj.From, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
+                    var msg = { guid: user, from: obj.From, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + location }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
 
@@ -2158,7 +2158,7 @@ function alarmReceived(value) {
                             //Intert into DB the event
                             log("danilo req: insert into DB = user " + conn.sip);
                             var today = getDateNow();
-                            var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location }
+                            var msg = { guid: conn.guid, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location }
                             log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                             insertTblActivities(msg);
                             found = true;
@@ -2188,7 +2188,7 @@ function alarmReceived(value) {
                             //Intert into DB the event
                             log("danilo req: insert into DB = user " + conn.sip);
                             var today = getDateNow();
-                            var msg = { sip: conn.sip, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location1 }
+                            var msg = { guid: conn.guid, name: "alarm", date: today, status: "inc", details: "ID:" + obj.AlarmID + " " + obj.Location1 }
                             log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                             insertTblActivities(msg);
                             found = true;
@@ -2210,7 +2210,7 @@ function alarmReceived(value) {
                         if (!found) {
                             log("danilo req: insert into DB = user " + conn.sip);
                             var today = getDateNow();
-                            var msg = { sip: conn.sip, from: obj.From, name: "alarm", date: today, status: "inc", details: obj.AlarmID, user: obj.To }
+                            var msg = { guid: conn.guid, from: obj.From, name: "alarm", date: today, status: "inc", details: obj.AlarmID, user: obj.To }
                             log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                             insertTblActivities(msg);
                         }
@@ -2405,7 +2405,11 @@ function triggerActionOld(from, to, prt, type, detail) {
                     // Ação tratada... Então insere o log no DB para Histórico
                     log("danilo req: insert into DB = user " + to);
                     var today = getDateNow();
-                    var msg = { sip: to, from: from, name: type, date: today, status: "inc", prt: prt, details: detail }
+                    var foundGuid = pbxTableUsers.filter(function(u){
+                        return u.columns.h323 == to
+                    })[0]
+                    log("FOUNDGUID " + foundGuid.columns.guid)
+                    var msg = { sip: foundGuid.columns.guid, from: from, name: type, date: today, status: "inc", prt: prt, details: detail }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
@@ -2531,7 +2535,11 @@ function triggerAction2(from, to, prt, type, detail) {
                     // Ação tratada... Então insere o log no DB para Histórico
                     log("danilo req: insert into DB = user " + to);
                     var today = getDateNow();
-                    var msg = { sip: to, from: from, name: type, date: today, status: "inc", prt: prt, details: detail }
+                    var foundGuid = pbxTableUsers.filter(function(u){
+                        return u.columns.h323 == to
+                    })[0]
+                    log("FOUNDGUID " + foundGuid.columns.guid)
+                    var msg = { sip: foundGuid.columns.guid , from: from, name: type, date: today, status: "inc", prt: prt, details: detail }
                     log("danilo req: will insert it on DB : " + JSON.stringify(msg));
                     insertTblActivities(msg);
                 }
