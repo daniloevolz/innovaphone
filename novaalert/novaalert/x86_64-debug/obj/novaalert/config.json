@@ -12,7 +12,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
@@ -59,7 +59,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
@@ -96,7 +96,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {

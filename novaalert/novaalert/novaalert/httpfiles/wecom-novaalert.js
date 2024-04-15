@@ -73,6 +73,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     ]
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({api: "user", mt: "TableUsers"}); //Requisita a lista de usuarios do PBX
         app.send({api: "user", mt: "SelectSensorInfo"})
         app.send({api: "user", mt: "SelectSensorName"})
         userUI = user;
@@ -128,7 +129,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var buttonClicked = function (evt) {
         // Dentro do objeto evt esta o target, e o target tem um value:
-        
         var type = evt.currentTarget.attributes['button_type'].value;
         var prt = evt.currentTarget.attributes['button_prt'].value;
         //var btn_id = evt.currentTarget.attributes['button_id'].value;
@@ -198,7 +198,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 .catch(function (error) {
                     console.log("createGridZero" + error);
                 });
-            app.send({api: "user", mt: "TableUsers"}); //Requisita a lista de usuarios do PBX
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
@@ -573,6 +572,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             var element = obj.src+"-status";
             console.log(element);
+            console.log("Chamada Conectada")
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
                 var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
@@ -640,6 +640,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             var element = obj.src + "-status";
             console.log(element);
+            console.log("Chamada Disconectada")
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
                 var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
@@ -1111,6 +1112,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             //DESATIVAR
             
             if (type == "user") {
+                // var found = list_users.indexOf(prt);
+                found = list_users.findIndex(function(user) {
+                    return user.e164 == prt;
+                });
                 var found = list_users.findIndex(function(user) {
                     return user.e164 == prt;
                 });
@@ -1695,16 +1700,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
+    
     function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
-
+        var found;
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
             allBtns.setAttribute("button_type", object.button_type);
-            allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
-            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.add(classButton)
             var divTop = document.createElement("div")
                 divTop.classList.add(bgTop)
@@ -1719,14 +1723,26 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var divTopText = document.createElement("div")
                 divTopText.textContent = object.button_name
                 divTop.appendChild(divTopText);
-
                 var divBottom = document.createElement("div")
                 divBottom.classList.add(bgBottom)
                 divBottom.classList.add("buttondown")
                 var divBottomTxt = document.createElement("div")
-                divBottomTxt.textContent = object.button_prt
                 divBottom.appendChild(divBottomTxt)
                 allBtns.appendChild(divBottom)
+                allBtns.setAttribute("button_prt", object.button_prt); 
+                allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+                divBottomTxt.textContent = object.button_prt
+                found = true;
+                list_users.forEach(function(u){
+                    if(object.button_prt == u.guid && found){
+                        allBtns.setAttribute("button_prt", u.e164); 
+                        allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
+                        divBottomTxt.textContent = u.cn
+                        found = false
+                        // se mudar o sip vai refletir aqui 
+                        //pois tratamos tudo com GUID no admin
+                    }
+                })
         }
     }
 

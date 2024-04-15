@@ -120,6 +120,7 @@ Wecom.novaalertTexts = {
         minValue: "Valor Mínimo",
         maxValue: "Valor Máximo",
         labelSensorName: "Nome do Sensor",
+
         labelValueType: "Tipo",
         co2: "CO2 (mg/m3)",
         battery: "Bateria (%)",
