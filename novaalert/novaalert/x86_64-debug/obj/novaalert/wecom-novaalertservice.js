@@ -136,7 +136,7 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo-req TableUsers: reducing the pbxTableUser object to send to user");
                     var list_users = [];
                     pbxTableUsers.forEach(function (u) {
-                        list_users.push({sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid, e164: u.columns.e164})
+                        list_users.push({sip: u.columns.h323, guid: u.columns.guid, e164: u.columns.e164, cn: u.columns.dn, devices: u.columns.devices})
                     })
                     conn.send(JSON.stringify({ api: "user", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
                 }
@@ -619,7 +619,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
-                    list_users.push({sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid, e164: u.columns.e164})
+                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid, e164: u.columns.e164 })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }
@@ -783,7 +783,7 @@ new JsonApi("admin").onconnected(function (conn) {
             //#region ACTIONS
             if (obj.mt == "InsertActionMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
-                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "')")
+                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device, action_sensor_type, action_sensor_name) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(obj.sensorType) + "','" + String(obj.sensorName)+ "')")
                     .oncomplete(function () {
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertActionMessageSuccess" }));
                     })

@@ -299,57 +299,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 list_active_alarms.push(obj.alarm) //insere o alarme na lista para consulta posterior
                 console.log("danilo req:AlarmReceived Alarme incluido da lista list_active_alarms: "+list_active_alarms);
                 updateActiveAlarmButtons()
-
-                // var button_found = [];
-                // list_buttons.forEach(function (l) {
-                //     if (l.button_prt == obj.alarm) {
-                //         button_found.push(l);
-                //     }
-                // })
-
-                // var hasClicked = button_clicked.filter(function (b) { return b.button_prt == obj.alarm })
-                // if (hasClicked.length==0) {
-                //     // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                //     var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
-
-                //     // Percorre cada elemento encontrado
-                //     for (var i = 0; i < elementos.length; i++) {
-                //         var elemento = elementos[i];
-                //         elemento.children[0].classList.remove("gold-900")
-                //         elemento.children[1].classList.remove("gold-600")
-                //         elemento.children[0].classList.add("vermelho-900")
-                //         elemento.children[1].classList.add("vermelho-600")
-                //         button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
-                //     }
-                // }
-
-
-                //var clicked = document.getElementById(obj.alarm);
-                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
-
-                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                //var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
-
-                //// Percorre cada elemento encontrado
-                //for (var i = 0; i < elementos.length; i++) {
-                //    var elemento = elementos[i];
-
-                //    // Altera as características do elemento
-                //    if(elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")){
-                //        //elemento.children[0].classList.remove("vermelho-900")
-                //        //elemento.children[1].classList.remove("vermelho-600")   
-                //        //elemento.children[0].classList.add("gold-900")
-                //        //elemento.children[1].classList.add("gold-600")
-                //        //button_clicked = button_clicked.filter(button => button.id != elemento.id);
-
-                //    }else{
-                //        elemento.children[0].classList.remove("gold-900")
-                //        elemento.children[1].classList.remove("gold-600")
-                //        elemento.children[0].classList.add("vermelho-900")
-                //        elemento.children[1].classList.add("vermelho-600")
-                //        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
-                //    }
-                //}
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
@@ -1161,27 +1110,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         var clicked = button_clicked.filter(findById(id));
         if (clicked.length > 0) {
             //DESATIVAR
-            // if (type == "page") {
-            //     button_clicked.forEach(function (b) {
-            //         if (b.type == "page" && b.prt==prt) {
-            //             document.getElementById(b.id).style.backgroundColor = "";
-            //             try {
-            //                 document.getElementsByClassName("pagebtn")[0].style.width = "";
-            //                 var gfg_down = document.getElementsByClassName("colunapage")[0];
-            //                 gfg_down.parentNode.removeChild(gfg_down);
-            //                 document.getElementsByClassName("pageDivider")[0].style.display = "none";
-            //                 document.getElementsByClassName("combobtn")[0].style.width = "";
-            //                 document.getElementsByClassName("allbtn")[0].style.width = "";
-            //                 document.getElementsByClassName("pagebtn")[0].style.width = "";
-            //             }
-            //             catch {
-            //                 console.log("danilo req: Area de page já estava fechada");
-            //             }
-
-            //         }
-            //     })
-            // }
+            
             if (type == "user") {
+                // var found = list_users.indexOf(prt);
+                found = list_users.findIndex(function(user) {
+                    return user.e164 == prt;
+                });
                 var found = list_users.findIndex(function(user) {
                     return user.e164 == prt;
                 });
@@ -1199,31 +1133,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt), btn_id: String(id) })
                 list_active_alarms = list_active_alarms.filter(function(a){return a != prt})
                 updateDeactiveAlarmButtons()
-                // var elemento = document.getElementById(id);
-                // elemento.children[0].classList.remove("vermelho-900")
-                // elemento.children[1].classList.remove("vermelho-600")
-                // elemento.children[0].classList.add("gold-900")
-                // elemento.children[1].classList.add("gold-600")
-
+                
             }
-            // if (type == "video") {
-            //     try {
-            //         var oldPlayer = document.getElementById('video-js');
-            //         videojs(oldPlayer).dispose();
-            //         container.clear();
-            //     }
-            //     catch {
-            //         container.clear();
-            //     }
-            //     app.send({ api: "user", mt: "TriggerStopVideo", prt: String(prt), btn_id: String(id) })
-            //     container.clear();
-            //     container.add(new innovaphone.ui1.Node("img", "width:20%; height:20%; max-width: 100px;", null, null).setAttribute("src", "./images/play.png"), null);
-
-            //     document.getElementById(id).style.backgroundColor = "var(--button)";
-            // }
-            // if (type == "combo") {
-            //     //document.getElementById(id).style.backgroundColor = "";
-            // }
+            
             if (type == "dest") {
                 app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
                 //addNotification("out", name);
@@ -1247,160 +1159,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         else {
             //ATIVAR
             var found = -1;
-            // if (type == "page") {
-            //     button_clicked.forEach(function (b) {
-            //         if (b.type == "page") {
-            //             try {
-            //                 //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
-            //                 //button_clicked.splice(button_clicked.indexOf(btn), 1);
-            //                 button_clicked = button_clicked.filter(deleteById(b.id));
-            //                 //document.getElementById(b.id).style.backgroundColor = "";
-            //                 //var gfg_down = document.getElementsByClassName("colunapage")[0];
-            //                 //gfg_down.parentNode.removeChild(gfg_down);
-            //                 //document.getElementsByClassName("pageDivider")[0].style.display = "none";
-            //                 //document.getElementsByClassName("combobtn")[0].style.width = "";
-            //                 //document.getElementsByClassName("allbtn")[0].style.width = "";
-            //                 //document.getElementsByClassName("pagebtn")[0].style.width = "";
-                            
-            //             } catch {
-            //                 console.log("danilo req: Area de page já estava fechada");
-            //             }
-            //         }
-            //     })
-
-
-            //     var is_button = document.getElementById(id);
-            //     if (is_button == null) {
-            //         makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
-            //     } else {
-
-            //         //document.getElementsByClassName("combobtn")[0].style.width = "65%";
-            //         //document.getElementsByClassName("allbtn")[0].style.width = "65%";
-            //         //document.getElementsByClassName("pagebtn")[0].style.width = "65%";
-            //         //document.getElementsByClassName("pageDivider")[0].style.display = "block";
-            //         //document.getElementsByClassName("pageDivider")[0].style.left = "65%";
-            //         //var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
-            //         //colunapage.addHTML("<iframe id='iframepage' class='iframepage' src='" + prt + "' width='100%' height='100%' style='border:0; z-index:-1;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
-            //         //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
-            //         //addNotification("out", name);
-            //         //addNotification('out', name)
-            //         //    .then(function (message) {
-            //         //        console.log(message);
-            //         //    })
-            //         //    .catch(function (error) {
-            //         //        console.log(error);
-            //         //    });
-            //         app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
-            //         //document.getElementById(id).style.backgroundColor = "darkred";
-
-            //         //ARRASTAR E SOLTAR DIMENSÂO COLUNAS
-            //         // Obtenha as referências às DIVs que serão redimensionadas
-            //         //var comboBtn = document.querySelector('.combobtn');
-            //         //var allBtn = document.querySelector('.allbtn');
-            //         //var pageBtn = document.querySelector('.pagebtn');
-            //         //var pageColumn = document.querySelector('.colunapage');
-            //         //var iframe = document.querySelector('.iframepage');
-                    
-            //         ////// Adicione os manipuladores de eventos
-            //         //var isDragging = false;
-            //         //var startX = 0;
-            //         //var btnWidth = 0;
-
-            //         //var pageDivider = document.querySelector('.pageDivider');
-
-            //         //pageDivider.addEventListener('mousedown', function (event) {
-            //         //    isDragging = true;
-
-            //         //    startX = event.pageX;
-            //         //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-            //         //});
-
-            //         //document.addEventListener('mousemove', function (event) {
-            //         //    if (!isDragging) {
-            //         //        return;
-            //         //    }
-            //         //    var offset = event.pageX - startX;
-            //         //    var newBtnWidth = btnWidth + offset;
-
-            //         //    // Verifique se a nova largura está dentro dos limites permitidos
-            //         //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-            //         //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        allBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-            //         //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-            //         //        pageColumn.style.left = newBtnWidth + 5 + 'px';
-            //         //    }
-
-            //         //});
-
-            //         ////var iframe = document.getElementById('iframepage');
-            //         //pageColumn.addEventListener('mousemove', function (event) {
-            //         //    // faça algo quando o mouse se mover dentro do iframe
-            //         //    if (!isDragging) {
-            //         //        return;
-            //         //    }
-            //         //    var offset = event.pageX - startX;
-            //         //    var newBtnWidth = btnWidth + event.pageX;
-
-            //         ////    // Verifique se a nova largura está dentro dos limites permitidos
-            //         //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-            //         //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        allBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-            //         //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-            //         //        pageColumn.style.left = newBtnWidth + 'px';
-            //         //    }
-            //         //});
-            //         //pageColumn.addEventListener('mouseup', function () {
-            //         //    isDragging = false;
-            //         //});
-
-            //         //document.addEventListener('mouseup', function () {
-            //         //    isDragging = false;
-            //         //});
-
-            //         //// Adiciona um ouvinte de eventos para touchstart
-            //         //pageDivider.addEventListener("touchstart", function (event) {
-            //         //    // Lida com o evento touchstart aqui
-            //         //    isDragging = true;
-            //         //    //startX = event.pageX;
-            //         //    //startX = event.changedTouches[0].clientX
-            //         //    startX = event.touches[0].pageX;
-            //         //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-            //         //});
-
-            //         //// Adiciona um ouvinte de eventos para touchmove
-            //         //pageDivider.addEventListener("touchmove", function (event) {
-            //         //    // Lida com o evento touchmove aqui
-            //         //    if (!isDragging) {
-            //         //        return;
-            //         //    }
-            //         //    var offset = event.touches[0].pageX - startX;
-            //         //    var newBtnWidth = btnWidth + offset;
-
-            //         //    // Verifique se a nova largura está dentro dos limites permitidos
-            //         //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-            //         //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        allBtn.style.width = newBtnWidth - 5 + 'px';
-            //         //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-            //         //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-            //         //        pageColumn.style.left = newBtnWidth + 5 + 'px';
-            //         //    }
-                        
-            //         //});
-
-            //         //// Adiciona um ouvinte de eventos para touchend
-            //         //pageDivider.addEventListener("touchend", function (event) {
-            //         //    // Lida com o evento touchend aqui
-            //         //    isDragging = false;
-            //         //});
-
-            //         //found = 1;
-            //     }
-            // }
+            
             if (type == "user") {
                 found = list_users.findIndex(function(user) {
                     return user.e164 == prt;
@@ -1422,10 +1181,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.children[1].classList.add("vermelho-600")
                 }
             }
-            // if (type == "popup") {
-            //     makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
-            //     app.send({ api: "user", mt: "TriggerStartPopup", prt: String(prt) })
-            // }
             if (type == "number") {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
                 //addNotification("out", name);
@@ -1448,100 +1203,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
                 list_active_alarms.push(prt)
                 updateActiveAlarmButtons()
-
-                // var elemento = document.getElementById(id)
-                // elemento.children[0].classList.remove("gold-900")
-                // elemento.children[1].classList.remove("gold-600")
-                // elemento.children[0].classList.add("vermelho-900")
-                // elemento.children[1].classList.add("vermelho-600")
                 found = 1;
             }
-            // if (type == "video") {
-            //     button_clicked.forEach(function (b) {
-            //         if (b.type == "video") {
-            //             try {
-            //                 //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
-            //                 //button_clicked.splice(button_clicked.indexOf(btn), 1);
-            //                 button_clicked = button_clicked.filter(deleteById(b.id));
-            //                 document.getElementById(b.id).style.backgroundColor = "";
-
-            //             } catch {
-            //                 console.log("danilo req: Area de video já estava fechada, vamos abrir um novo video");
-            //             }
-            //         }
-            //     })
-            //     try {
-            //         var oldPlayer = document.getElementById('video-js');
-            //         videojs(oldPlayer).dispose();
-            //         container.clear();
-            //     }
-            //     catch {
-            //         container.clear();
-            //     }
-            //     app.send({ api: "user", mt: "TriggerStartVideo", prt: String(prt) })
-            //     //addNotification("out" , name);
-            //     //addNotification('out', name)
-            //     //    .then(function (message) {
-            //     //        console.log(message);
-            //     //    })
-            //     //    .catch(function (error) {
-            //     //        console.log(error);
-            //     //    });
-            //     var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
-
-            //     //document.getElementById("videoPlayer").setAttribute("src", value);
-            //     var source = document.createElement("source");
-            //     source.setAttribute("src", prt);
-            //     source.setAttribute("type", "application/x-mpegURL");
-            //     //document.getElementById("container").appendChild(script);
-            //     //var videoElement = document.createElement("video");
-            //     videoElement.setAttribute("allow", "autoplay");
-            //     videoElement.setAttribute("autoplay", "true");
-            //     videoElement.setAttribute("muted", "muted");
-            //     videoElement.setAttribute("width", "800%");
-            //     videoElement.setAttribute("height", "470%");
-            //     videoElement.setAttribute("controls", "");
-            //     videoElement.setAttribute("class", "video-js vjs-default-skin");
-            //     videoElement.setAttribute("id", "video-js");
-            //     //videoElement.setAttribute("src", url);
-            //     //videoElement.setAttribute("type", type);
-            //     //document.getElementById("container").appendChild(videoElement);
-            //     document.getElementById("video-js").appendChild(source);
-            //     var video = videojs('video-js', {
-            //         html5: {
-            //             vhs: {
-            //                 overrideNative: !videojs.browser.IS_SAFARI
-            //             },
-            //             nativeAudioTracks: false,
-            //             nativeVideoTracks: false
-            //         }
-            //     });
-            //     //video.src({ type: type, src: url });
-            //     video.ready(function () {
-            //         video.src({ type: "application/x-mpegURL", src: prt });
-            //     });
-            //     document.getElementById(id).style.backgroundColor = "darkred";
-            //     found = 1;
-            //             //document.getElementById(value).setAttribute("class", "allbuttonClicked");
-                        
-            // }
-            // if (type == "combo") {
-            //     app.send({ api: "user", mt: "TriggerCombo", prt: String(prt), btn_id: String(id)})
-            //     //addNotification("out", name);
-            //     //addNotification('out', name)
-            //     //    .then(function (message) {
-            //     //        console.log(message);
-            //     //    })
-            //     //    .catch(function (error) {
-            //     //        console.log(error);
-            //     //    });
-            //     document.getElementById(id).style.backgroundColor = "darkred";
-            //     found = 1;
-            // }
-            // if (type != "popup" && found != -1) {
-            //     button_clicked.push({ id: id, type: type, name: name, prt: prt });
-            //     console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
-            // }
             if (type == "dest") {
                 app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
                 document.getElementById(id).classList.remove("neutro-800");
@@ -2320,7 +1983,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             zoneDiv.appendChild(buttonGrid)
         }
         list_buttons.forEach(function (zb) {
-            if (zb.page == "0" && zb.button_type == "dest") {
+            if (zb.page == "0" && zb.button_type == "dest") { 
                 createDests(zb)
             }
         })

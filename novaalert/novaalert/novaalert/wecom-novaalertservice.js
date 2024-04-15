@@ -620,7 +620,6 @@ new JsonApi("admin").onconnected(function (conn) {
                 var list_users = [];
                 pbxTableUsers.forEach(function (u) {
                     list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid, e164: u.columns.e164 })
-                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid })
                 })
                 conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
             }

@@ -551,14 +551,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     break;
                 case "alarm":
                     createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
-                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
                     break;
                 case "number":
                     createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "sensor":
@@ -649,27 +646,31 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             allBtns.setAttribute("id", object.id);
             allBtns.setAttribute("button_type", object.button_type);
             allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.remove("btnEmpty")
             allBtns.classList.add(classButton)
             var divTop = document.createElement("div")
-                divTop.classList.add(bgTop)
-                divTop.classList.add("buttontop")
-                divTop.setAttribute("id", object.id + "-status");
-                //divTop.setAttribute("id", object.button_prt + "-status");
-                allBtns.appendChild(divTop)
-                var imgTop = document.createElement("img")
-                imgTop.style.width = "20px";
-                imgTop.setAttribute("src",srcImg)
-                divTop.appendChild(imgTop)
-                var divTopText = document.createElement("div")
-                divTopText.textContent = object.button_name
-                divTop.appendChild(divTopText);
-                var divBottom = document.createElement("div")
-                divBottom.classList.add(bgBottom)
-                divBottom.classList.add("buttondown")
-                var divBottomTxt = document.createElement("div")
-                divBottom.appendChild(divBottomTxt)
-                allBtns.appendChild(divBottom)
-                allBtns.setAttribute("button_prt", object.button_prt); 
+            divTop.classList.add(bgTop)
+            divTop.classList.add("buttontop")
+            divTop.setAttribute("id", object.id + "-status");
+            //divTop.setAttribute("id", object.button_prt + "-status");
+            allBtns.appendChild(divTop)
+            var imgTop = document.createElement("img")
+            imgTop.style.width = "20px";
+            imgTop.setAttribute("src", srcImg)
+            divTop.appendChild(imgTop)
+            var divTopText = document.createElement("div")
+            divTopText.textContent = object.button_name
+            divTop.appendChild(divTopText);
+
+            var divBottom = document.createElement("div")
+            divBottom.classList.add(bgBottom)
+            divBottom.classList.add("buttondown")
+            var divBottomTxt = document.createElement("div")
+            divBottomTxt.textContent = object.button_prt
+            divBottom.appendChild(divBottomTxt)
+            allBtns.appendChild(divBottom)
+            allBtns.setAttribute("button_prt", object.button_prt); 
                 allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
                 divBottomTxt.textContent = object.button_prt
                 var found = true;
@@ -2349,7 +2350,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), value: String(value), sip: String(user), type: String(type), device: device });
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName.getValue()), alarm: String(iptAlarmCode.getValue()), start: String(StartOpt), sensorType: sensorType, sensorName: sensorName, value: String(value), guid: String(user), type: String(type), device: device });
                 makeTableActions(t);
             }
         });

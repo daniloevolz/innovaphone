@@ -551,14 +551,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     break;
                 case "alarm":
                     createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
-                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
                     break;
                 case "number":
                     createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "sensor":

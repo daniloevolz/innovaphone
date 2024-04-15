@@ -1983,7 +1983,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             zoneDiv.appendChild(buttonGrid)
         }
         list_buttons.forEach(function (zb) {
-            if (zb.page == "0" && zb.button_type == "dest") {
+            if (zb.page == "0" && zb.button_type == "dest") { 
                 createDests(zb)
             }
         })
