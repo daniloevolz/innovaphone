@@ -5,3 +5,12 @@
 /novaalert/novaalert/obj/x64/Debug/novaalert.builduptodate
 /novaalert/novaalert/obj/x64/Debug/novaalert.log
 /novaalert/novaalert/x86_64-debug/obj/novaalert/build.txt
+/novaalert/novaalert/obj/*
+/novaalert/novaalert/arm/*
+/novaalert/novaalert/arm64/*
+/novaalert/novaalert/arm-debug/*
+/novaalert/novaalert/arm64-debug/*
+/novaalert/novaalert/x86_64/*
+/novaalert/novaalert/x86_64-debug/*
+
+
