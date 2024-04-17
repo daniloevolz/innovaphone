@@ -16,6 +16,80 @@ body {
     overflow: hidden;
     height: 100vh;
 }
+/*#region LAYOUT VITOR ADMIN */
+.divMainCreateButtons{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 500px;
+    background-color: var(--colors-neutro-1100);
+    height: 500px;
+}
+.divTitleCreateButtons{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--colors-neutro-800);
+    width: 100%;
+    color: white;
+}
+.divSelectTypeButton {
+    display: flex;
+    padding: 10px;
+    /* justify-content: flex-end; */
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    width: 100%;
+}
+.divTitleTypeButton{
+    color: #FFF;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+.selectTypeButton{
+    border-radius: 6px;
+    background: var(--colors-neutro-1200);
+    width: 100%;
+    padding: 12px;
+    color: white;
+}
+.divNameButton , .divParamButton{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+}
+.labelNameButton, .labelParamButton{
+    /* Sub1 */
+font-family: Inter;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+color: white;
+}
+.iptNameButton, .iptParamButton{
+    display: flex;
+    padding: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 6px;
+    background-color: var(--colors-neutro-1200);
+    color: white;
+}
+/*#endregion*/
+
 
 /*ANIMAÇÃO BOTÕES */
 

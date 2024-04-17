@@ -63,7 +63,7 @@ Wecom.novaalertTexts = {
         labelUserName: "Número:",
         iptText: "...",
         labelName: "Nome:",
-        labelButtonName: "Nome do Botão:",
+        labelButtonName: "Nome do Botão",
         labelUser: "Usuário:",
         labelDestinationNumber: "Número Destino",
         labelOriginNumber: "Número Origem",
