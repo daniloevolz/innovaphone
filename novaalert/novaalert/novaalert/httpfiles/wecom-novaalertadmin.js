@@ -614,17 +614,18 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var position_y = this.getAttribute("position-y");
 
                     var z = document.getElementById("divMainButtons")
+                    
                     z = z.getAttribute("page");
                     if (position_x == 1) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(colDireita, "combo", user, position_x, position_y, z);
+                        makeDivAddButton3("combo", user, position_x, position_y, z);
                     }
                     else if (position_x == 2) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(colDireita, "sensor", user, position_x, position_y, z);
+                        makeDivAddButton3( "sensor", user, position_x, position_y, z);
                     } else if (position_x >= 3 && position_x <= 7) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(colDireita, "center", user, position_x, position_y, z);
+                        makeDivAddButton3("center", user, position_x, position_y, z);
                     }
                 }
             });
@@ -761,14 +762,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             allBtns.appendChild(divComboName)
         }
     }
-    function makeDivAddButton3(t1, type, user, x, y, z) {
-        t1.clear();
+    function makeDivAddButton3(type, user, x, y, z) {
         //Título
         //t1.add(new innovaphone.ui1.Div(null, texts.text("labelTituloAdd"), "tituloAdd"));
+        //var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
 
-
-        var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
-
+        
         switch (type) {
             case "combo":
                 addComboParamters(comboarea, type);
@@ -777,89 +776,25 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 addSensorParamters(comboarea, type);
                 break;
             case "center":
-                //Tipo
-                var colDireita = document.getElementById("colunadireitaadmin")
-                var divMain = document.createElement("div")
-                divMain.classList.add("divMainCreateButtons")
-                var divTitleCreateButton = document.createElement("div")
-                divTitleCreateButton.textContent = texts.text("labelButtonAdd")
-                divTitleCreateButton.classList.add("divTitleCreateButtons")
-                divMain.appendChild(divTitleCreateButton)
-                //tipo do botão
-                var divSelectTypeButton = document.createElement("div")
-                divSelectTypeButton.classList.add("divSelectTypeButton")
-                divMain.appendChild(divSelectTypeButton)
-                var divTitleTypeButton = document.createElement("div")
-                divTitleTypeButton.classList.add("divTitleTypeButton")
-                divTitleTypeButton.textContent =  texts.text("labelType")
-                divSelectTypeButton.appendChild(divTitleTypeButton)
-                var selectTypeButton = document.createElement("select")
-                selectTypeButton.classList.add("selectTypeButton")
-                selectTypeButton.id = "selectTypeButton"
-                divSelectTypeButton.appendChild(selectTypeButton)
-                list_types_center.forEach(function (t) {
-                    var opts = document.createElement("option")
-                    opts.textContent =  texts.text(t.id)
-                    opts.id = t.id;
-                    opts.style.fontSize = '12px';
-                    opts.style.textAlign = "center";
-                    opts.style.color = "white";
-                    selectTypeButton.appendChild(opts)
-                })
-                // nome do botão
-                var divNameButton = document.createElement("div")
-                divNameButton.classList.add("divNameButton")
-                divMain.appendChild(divNameButton)
-                var labelNameButton = document.createElement("div")
-                labelNameButton.classList.add("labelNameButton")
-                labelNameButton.textContent = texts.text("labelNameButton")
-                divNameButton.appendChild(labelNameButton)
-                var iptNameButton = document.createElement("input")
-                iptNameButton.type = 'text';
-                iptNameButton.placeholder = texts.text("labelNameButton")
-                iptNameButton.classList.add("iptNameButton")
-                divNameButton.appendChild(iptNameButton)
-                divMain.appendChild(divNameButton)
-                //parametro
-                // var divParamButton = document.createElement("div")
-                // divParamButton.classList.add("divParamButton")
-                // divMain.appendChild(divParamButton)
-                // var labelParamButton = document.createElement("div")
-                // labelParamButton.classList.add("labelParamButton")
-                // labelParamButton.textContent = "Parametro"
-                // divParamButton.appendChild(labelParamButton)
-                // var iptParamButton = document.createElement("input")
-                // iptParamButton.type = 'text';
-                // iptParamButton.placeholder = "Nome do botão"
-                // iptParamButton.classList.add("iptParamButton")
-                // divParamButton.appendChild(iptParamButton)
-                // divMain.appendChild(divParamButton)
-            
-                // div Adicional type number , user 
-                var divNumberUser = document.createElement("div")
-                divNumberUser.classList.add("divNumberUser")
-                divMain.appendChild(divNumberUser)
-                //adicionar na div principal
-                colDireita.appendChild(divMain)
-            
+                addAlarmParamters(type,user, x, y, z) // o select com alarme por default entao essa função é chamada
+                var insideDiv = document.getElementById("insideDiv")            
                    document.getElementById("selectTypeButton").addEventListener("change", function (e) {
                                 console.log(e.target.value);
-            
                                 var type = document.getElementById("selectTypeButton");
                                 var selectedOption = type.options[type.selectedIndex];
                                 var type = selectedOption.id;
-            
                                 console.log(type);
-            
                                 if (type == "user") {
-                                    addUserParamters(divNumberUser, type);
+                                    document.body.removeChild(insideDiv)
+                                    addUserParamters(type,user, x, y, z);
                                 }
                                 else if (type == "number") {
                                     //addNumberParamters(comboarea);
-                                    addNumberParamtersMultiDevice(divNumberUser, type);
+                                    addNumberParamtersMultiDevice(type,user, x, y, z);
                                 }
                                 else if (type == "alarm") {
-                                    addAlarmParamters(divNumberUser, type);
+                                    document.body.removeChild(insideDiv)
+                                    addAlarmParamters(type,user, x, y, z);
                                 }
                             }); 
             
@@ -874,35 +809,61 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //     iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", texts.text(t.id), null).setAttribute("id", t.id));
                 // })
 
-                // document.getElementById("selectType").addEventListener("change", function (e) {
-                //     console.log(e.target.value);
-
-                //     var type = document.getElementById("selectType");
-                //     var selectedOption = type.options[type.selectedIndex];
-                //     var type = selectedOption.id;
-
-                //     console.log(type);
-
-                //     if (type == "user") {
-                //         addUserParamters(comboarea, type);
-                //     }
-                //     else if (type == "number") {
-                //         //addNumberParamters(comboarea);
-                //         addNumberParamtersMultiDevice(comboarea, type);
-                //     }
-                //     else if (type == "alarm") {
-                //         addAlarmParamters(comboarea, type);
-                //     }
-                // }); 
+            
                 break;
             default:
                 break;
         }
 
     }
-    function addUserParamters(divMain, type) {
-        divMain.innerHTML = ''
-        console.log("Type:" + type)
+    function addUserParamters(type,user, x, y, z) {
+      //Tipo
+      var insideDiv = document.createElement("div");
+      insideDiv.classList.add("insideDiv")
+      insideDiv.id = 'insideDiv'
+
+      var divMainButtons = document.createElement("div")
+      divMainButtons.classList.add("divMainCreateButtons")
+      var divTitleCreateButton = document.createElement("div")
+      divTitleCreateButton.textContent = texts.text("btnAddButton")
+      divTitleCreateButton.classList.add("divTitleCreateButtons")
+      divMainButtons.appendChild(divTitleCreateButton)
+      //tipo do botão
+      var divSelectTypeButton = document.createElement("div")
+      divSelectTypeButton.classList.add("divSelectTypeButton")
+      divSelectTypeButton.id = 'divSelectTypeButton'
+      divMainButtons.appendChild(divSelectTypeButton)
+      var divTitleTypeButton = document.createElement("div")
+      divTitleTypeButton.classList.add("divTitleTypeButton")
+      divTitleTypeButton.textContent =  texts.text("labelType")
+      divSelectTypeButton.appendChild(divTitleTypeButton)
+      var selectTypeButton = document.createElement("select")
+      selectTypeButton.classList.add("selectTypeButton")
+      selectTypeButton.id = "selectTypeButton"
+      divSelectTypeButton.appendChild(selectTypeButton)
+      list_types_center.forEach(function (t) {
+          var opts = document.createElement("option")
+          opts.textContent =  texts.text(t.id)
+          opts.id = t.id;
+          opts.style.fontSize = '12px';
+          opts.style.textAlign = "center";
+          opts.style.color = "white";
+          selectTypeButton.appendChild(opts)
+      })
+      // nome do botão
+      var divNameButton = document.createElement("div")
+      divNameButton.classList.add("divNameButton")
+      divMainButtons.appendChild(divNameButton)
+      var labelNameButton = document.createElement("div")
+      labelNameButton.classList.add("labelNameButton")
+      labelNameButton.textContent = texts.text("labelButtonName")
+      divNameButton.appendChild(labelNameButton)
+      var iptNameButton = document.createElement("input")
+      iptNameButton.type = 'text';
+      iptNameButton.placeholder = texts.text("labelButtonName")
+      iptNameButton.classList.add("iptNameButton")
+      divNameButton.appendChild(iptNameButton)
+      divMainButtons.appendChild(divNameButton)
         //Parametro (selecionar usuario)
         var divSelectUser = document.createElement("div")
         divSelectUser.classList.add("divSelectTypeButton")
@@ -914,7 +875,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         selectUser.classList.add("selectTypeButton")
         selectUser.id = "selectUser"
         divSelectUser.appendChild(selectUser)
-        divMain.appendChild(divSelectUser)
+        divMainButtons.appendChild(divSelectUser)
         // selecionar dispositivo
         var divSelectDevice = document.createElement("div")
         divSelectDevice.classList.add("divSelectTypeButton")
@@ -926,7 +887,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         selectDevice.classList.add("selectTypeButton")
         selectDevice.id = "selectDevice"
         divSelectDevice.appendChild(selectDevice)
-        divMain.appendChild(divSelectDevice)
+        divMainButtons.appendChild(divSelectDevice)
         list_users.forEach(function (user) {
             var opts = document.createElement("option")
             opts.textContent =  user.cn
@@ -947,91 +908,135 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             opts.style.color = "white";
             selectDevice.appendChild(opts)
         })
-        //Botão Salvar
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
-            //device
-            var device = document.getElementById("selectDevice");
-            var selectedOption = device.options[device.selectedIndex];
-            var device = selectedOption.id;
+        insideDiv.appendChild(divMainButtons)
+        document.body.appendChild(insideDiv)
 
-            if (String(iptName.getValue()) == "" || String(type) == "") {
-                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+        insideDiv.addEventListener("click",function(event){
+            if(event.target.id == "insideDiv"){
+                document.body.removeChild(insideDiv)
             }
-            if (type == "user") {
-                var value = document.getElementById("selectValue");
-                var selectedOption = value.options[value.selectedIndex];
-                var value = selectedOption.id;
-                list_users.forEach(function(u){
-                    if (u.guid == value ) {
-                        app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(u.guid), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
-                    }
-                })
-               
-                waitConnection(t1);
-            }
-        });
-        //Botão Cancelar   
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            makeTableButtons(t1);
-        });
-    }
-    function addAlarmParamters(divMain, type) {
-        divMain.innerHTML = ''
-        var colDireita = document.getElementById("colunadireitaadmin")
-        var divMain = document.createElement("div")
-        divMain.classList.add("divMainCreateButtons")
-        var divTitleCreateButton = document.createElement("div")
-        divTitleCreateButton.textContent = texts.text("btnAddButton")
-        divTitleCreateButton.classList.add("divTitleCreateButtons")
-        divMain.appendChild(divTitleCreateButton)
-        var divSelectTypeButton = document.createElement("div")
-        divSelectTypeButton.classList.add("divSelectTypeButton")
-        divMain.appendChild(divSelectTypeButton)
-        var divTitleTypeButton = document.createElement("div")
-        divTitleTypeButton.classList.add("divTitleTypeButton")
-        divTitleTypeButton.textContent = texts.text("labelType")
-        divSelectTypeButton.appendChild(divTitleTypeButton)
-        var selectTypeButton = document.createElement("select")
-        selectTypeButton.classList.add("selectTypeButton")
-        selectTypeButton.id = "selectTypeButton"
-        divSelectTypeButton.appendChild(selectTypeButton)
-        list_types_center.forEach(function (t) {
-            var opts = document.createElement("option")
-            opts.textContent =  texts.text(t.id);
-            opts.id = t.id;
-            opts.style.fontSize = '12px';
-            opts.style.textAlign = "center";
-            opts.style.color = "white";
-            selectTypeButton.appendChild(opts)
         })
-        var divNameButton = document.createElement("div")
-        divNameButton.classList.add("divNameButton")
-        divMain.appendChild(divNameButton)
-        var labelNameButton = document.createElement("div")
-        labelNameButton.classList.add("labelNameButton")
-        labelNameButton.textContent = texts.text("labelButtonName")
-        divNameButton.appendChild(labelNameButton)
-        var iptNameButton = document.createElement("input")
-        iptNameButton.type = 'text';
-        iptNameButton.placeholder = texts.text("labelButtonName");
-        iptNameButton.classList.add("iptNameButton")
-        divNameButton.appendChild(iptNameButton)
 
-        //Botão Salvar
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+        // //Botão Salvar
+        // t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+        //     //device
+        //     var device = document.getElementById("selectDevice");
+        //     var selectedOption = device.options[device.selectedIndex];
+        //     var device = selectedOption.id;
 
-            if (String(iptName.getValue()) == "" || String(type) == "") {
-                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
-            } else {
+        //     if (String(iptName.getValue()) == "" || String(type) == "") {
+        //         makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+        //     }
+        //     if (type == "user") {
+        //         var value = document.getElementById("selectValue");
+        //         var selectedOption = value.options[value.selectedIndex];
+        //         var value = selectedOption.id;
+        //         list_users.forEach(function(u){
+        //             if (u.guid == value ) {
+        //                 app.send({ api: "admin", mt: "InsertNumberMessage", name: String(iptName.getValue()), user: String(""), value: String(u.guid), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
+        //             }
+        //         })
+               
+        //         waitConnection(t1);
+        //     }
+        // });
+        // //Botão Cancelar   
+        // t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+        //     makeTableButtons(t1);
+        // });
+    }
+    function addAlarmParamters(type,user,x,y,z) {
+            //Tipo
+            var insideDiv = document.createElement("div");
+            insideDiv.classList.add("insideDiv")
+            insideDiv.id = 'insideDiv'
 
-                app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
-                waitConnection(t1);
-            }
-        });
-        //Botão Cancelar   
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            makeTableButtons(t1);
-        });
+            var divMainButtons = document.createElement("div")
+            divMainButtons.classList.add("divMainCreateButtons")
+            var divTitleCreateButton = document.createElement("div")
+            divTitleCreateButton.textContent = texts.text("btnAddButton")
+            divTitleCreateButton.classList.add("divTitleCreateButtons")
+            divMainButtons.appendChild(divTitleCreateButton)
+            //tipo do botão
+            var divSelectTypeButton = document.createElement("div")
+            divSelectTypeButton.classList.add("divSelectTypeButton")
+            divMainButtons.appendChild(divSelectTypeButton)
+            divSelectTypeButton.id = 'divSelectTypeButton'
+            var divTitleTypeButton = document.createElement("div")
+            divTitleTypeButton.classList.add("divTitleTypeButton")
+            divTitleTypeButton.textContent =  texts.text("labelType")
+            divSelectTypeButton.appendChild(divTitleTypeButton)
+            var selectTypeButton = document.createElement("select")
+            selectTypeButton.classList.add("selectTypeButton")
+            selectTypeButton.id = "selectTypeButton"
+            divSelectTypeButton.appendChild(selectTypeButton)
+            list_types_center.forEach(function (t) {
+                var opts = document.createElement("option")
+                opts.textContent =  texts.text(t.id)
+                opts.id = t.id;
+                opts.style.fontSize = '12px';
+                opts.style.textAlign = "center";
+                opts.style.color = "white";
+                selectTypeButton.appendChild(opts)
+            })
+            // nome do botão
+            var divNameButton = document.createElement("div")
+            divNameButton.classList.add("divNameButton")
+            divMainButtons.appendChild(divNameButton)
+            var labelNameButton = document.createElement("div")
+            labelNameButton.classList.add("labelNameButton")
+            labelNameButton.textContent = texts.text("labelButtonName")
+            divNameButton.appendChild(labelNameButton)
+            var iptNameButton = document.createElement("input")
+            iptNameButton.type = 'text';
+            iptNameButton.placeholder = texts.text("labelButtonName")
+            iptNameButton.classList.add("iptNameButton")
+            divNameButton.appendChild(iptNameButton)
+            divMainButtons.appendChild(divNameButton)
+            //parametro
+            var divParamButton = document.createElement("div")
+            divParamButton.classList.add("divParamButton")
+            divMainButtons.appendChild(divParamButton)
+            var labelParamButton = document.createElement("div")
+            labelParamButton.classList.add("labelParamButton")
+            labelParamButton.textContent = "Parametro"
+            divParamButton.appendChild(labelParamButton)
+            var iptParamButton = document.createElement("input")
+            iptParamButton.type = 'text';
+            iptParamButton.placeholder = "Nome do botão"
+            iptParamButton.classList.add("iptParamButton")
+            divParamButton.appendChild(iptParamButton)
+            divMainButtons.appendChild(divParamButton)
+            // div Adicional type number , user 
+            var divNumberUser = document.createElement("div")
+            divNumberUser.classList.add("divNumberUser")
+            divMainButtons.appendChild(divNumberUser)
+            insideDiv.appendChild(divMainButtons)
+            document.body.appendChild(insideDiv)
+
+            insideDiv.addEventListener("click",function(event){
+                if(event.target.id == "insideDiv"){
+                    document.body.removeChild(insideDiv)
+                }
+                
+            })
+            //adicionar na div principal
+
+        // //Botão Salvar
+        // t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+
+        //     if (String(iptNameButton.getValue()) == "" || String(type) == "") {
+        //         makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+        //     } else {
+
+        //         app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptNameButton.getValue()), user: String(""), value: String(iptParamButton.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
+        //         waitConnection(colDireita);
+        //     }
+        // });
+        // //Botão Cancelar   
+        // t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+        //     makeTableButtons(colDireita);
+        // });
     }
     function addComboParamters(t, type) {
         t.clear();
@@ -3502,6 +3507,43 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
     }
 
+    function makeButton(text, variant, iconSVG) {
+        const button = document.createElement("button");
+        button.textContent = text;
+
+        if (iconSVG) {
+            const icon = document.createElement("img");
+            icon.src = iconSVG;
+            button.prepend(icon);
+        }
+
+        switch (variant) {
+            case "primary":
+                button.classList.add("bg-primary-600", "hover:bg-primary-500", "text-dark-100", "font-medium", "py-1", "px-2", "rounded","primary");
+                break;
+            case "secundary":
+                button.classList.add("bg-dark-300", "hover:bg-dark-400", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            case "tertiary":
+                button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                break
+            case "destructive":
+                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            case "transparent":
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            case "ghost":
+                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                break;
+            default:
+                button.classList.add("hover:bg-dark-300", "rounded");
+                break;
+        }
+
+        return button;
+    }
+    
 }
 
 Wecom.novaalertAdmin.prototype = innovaphone.ui1.nodePrototype;
