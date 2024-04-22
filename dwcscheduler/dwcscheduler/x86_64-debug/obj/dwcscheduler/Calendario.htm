@@ -542,10 +542,20 @@
 
         function sendAgenda(id,name, email,start,end){
             document.getElementById("MyModal").style.display = 'none';
+            var language = navigator.language || navigator.userLanguage;
+            
+            try{
+              language = language.split("-")[0]
+            }
+            catch(e){
+                
+            }
             console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
             "end " + end + "\n" + "email " + email)
                             if (name && email) {
-                
+                                var clientTimeZoneOffset = new Date().getTimezoneOffset();
+                                var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
+
                                 var eventData;
                                 eventData = {
                                     id: '',
@@ -554,7 +564,9 @@
                                     email: email,
                                     date: '',
                                     time_start: start,
-                                    time_end: end
+                                    time_end: end,
+                                    language: language,
+                                    timeZone: clientTimeZone
                                 };
                                 fetch(url+'/salvar-evento', {
                                     method: 'POST',
@@ -611,6 +623,20 @@
         console.log("MSG ENVIADA")
     }
 
+    // Função para formatar o deslocamento do fuso horário em uma string 'HH:mm'
+function formatTimezoneOffset(offset) {
+    var hours = Math.abs(Math.floor(offset / 60));
+    var minutes = Math.abs(offset % 60);
+    var sign = offset > 0 ? '-' : '+';
+    return sign + pad(hours, 2) + ':' + pad(minutes, 2);
+}
+
+// Função auxiliar para adicionar zeros à esquerda para preencher a string
+function pad(num, size) {
+    var s = num + "";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
     </script>
 </head>
 <body>

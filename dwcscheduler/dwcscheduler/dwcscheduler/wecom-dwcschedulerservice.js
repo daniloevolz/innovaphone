@@ -30,6 +30,42 @@ var google_api_key = Config.googleApiKey;
 var sendLocation = Config.sendLocation;
 var licenseAppFile = Config.licenseAppFile;
 var licenseInstallDate = Config.licenseInstallDate;
+var lang; // idioma do navegador do cliente
+var timeZone;
+var langMyApps; // idioma do myapps do usuario DWC 
+
+ var  WecomDwcschedulerTexts = [{
+    pt: {
+        labelEventWhen: "Quando",
+        labelJoinConf: "Entrar na reunião",
+        labelMembers: "Participantes",
+        labelHost: "Organizador",
+        labelConfUrl: "Link do evento: ",
+        labelEventScheduled : "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!",
+        labelHello: "Olá",
+        labelName: "Nome",
+        labelHour: "Horário",
+        labelMail: "E-mail",
+        labelNewSchedule: "um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.",
+        labelBestRegards: "Atenciosamente"
+    },
+    en:{
+        labelEventWhen: "When:",
+        labelJoinConf: "Join Conference",
+        labelMembers: "Members",
+        labelHost: "Host",
+        labelConfUrl: "Event Link: ",
+        labelEventScheduled: "Event scheduled, You will soon receive an email with the conference invitation.\nDon't forget to check your SPAM folder!\nThank you!",
+        labelHello: "Hello",
+        labelName: "Name",
+        labelHour: "Hour",
+        labelMail: "Mail",
+        labelNewSchedule: "A new appointment was made for its users via DWC, follow the requestor's contact information below.",
+        labelBestRegards: "Best Regards"
+    }
+    
+}]
+
 
 Config.onchanged(function () {
     from = Config.from;
@@ -135,6 +171,8 @@ if (license != null && license.System==true) {
                             var day = arrayToday[0];
                             var time = arrayToday[1];
                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
+                            lang = obj.language
+                            timeZone = obj.timeZone
 
                             //Início teste url temporária
                             function creationDate(date) {
@@ -231,8 +269,16 @@ if (license != null && license.System==true) {
                                                 log("danilo req: erro send badge: " + e);
                                             }
                                             //Send e-mails to users
+                                   
                                             try {
-                                                //Email Cliente
+                                                log("TimeZoneDiff " + timeZone)
+                                                log("First Language " + lang)
+                                                if(lang != "en" && lang != "pt"){
+                                                    lang = "en"
+                                                }
+                                                log("New Navigator Language " + lang)
+                                                log("Language MyApps " + JSON.stringify(langMyApps))
+                                                //Email Client
                                                 var dataClient = "<!DOCTYPE html>"
                                                     + "<html>"
                                                     + "<head></head>"
@@ -242,10 +288,10 @@ if (license != null && license.System==true) {
                                                     + "<p></p>"
                                                     + "<table style='width: 100%;'>"
                                                     + "<tr style='width: 100%;'>"
-                                                    + "<td style ='width: 50%'><b>Quando</b>" + "<br>" + day + '&nbsp;' + time
+                                                    + "<td style ='width: 50%'>" + "<b>" + WecomDwcschedulerTexts[0][lang]['labelEventWhen'] + "</b><br>" + day + '&nbsp;' + time
                                                     + "</td>"
                                                     + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' > Entrar na reunião"
+                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' >" + WecomDwcschedulerTexts[0][lang]['labelJoinConf']
                                                     + "</span>"
                                                     + "</a>"
                                                     + "</td>"
@@ -254,11 +300,11 @@ if (license != null && license.System==true) {
                                                     + "</tr>"
                                                     + "<tr>"
                                                     + "<td>"
-                                                    + "<b>Participantes</b>"
-                                                    + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'> - organizador </span>"
+                                                    + "<b>" +  WecomDwcschedulerTexts[0][lang]['labelMembers'] + "</b>"
+                                                    + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'>" + "-" +  WecomDwcschedulerTexts[0][lang]['labelHost'] + "</span>"
                                                     + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
                                                     + "</td>"
-                                                    + "<td><b>Url da Reunião</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
+                                                    + "<td>" + WecomDwcschedulerTexts[0][lang]['labelConfUrl'] + "</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
                                                     + "</tr>"
                                                     + "</table>"
                                                     + "</div>"
@@ -270,13 +316,13 @@ if (license != null && license.System==true) {
                                                     + "<html>"
                                                     + "<head></head>"
                                                     + "<body>"
-                                                    + "<h3>Olá " + name + ", um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.</h3><br/>"
-                                                    + "<b>Nome: " + obj.name + "</b><br/>"
-                                                    + "<b>E-mail:</b> " + obj.email + "<br/>"
-                                                    + "<b>Quando:</b> " + day + "<br/>"
-                                                    + "<b>Horário:</b> " + time + "<br/><br/>"
-                                                    + "<b>URL Conferência:</b> " + conferenceLink + "<br/><br/>"
-                                                    + "Atenciosamente<br/>"
+                                                    + "<h3>" + WecomDwcschedulerTexts[0][langMyApps]['labelHello'] + " " + name + "," + WecomDwcschedulerTexts[0][langMyApps]["labelNewSchedule"] + "</h3><br/>"
+                                                    + "<b>"+  WecomDwcschedulerTexts[0][langMyApps]['labelName'] + " " + obj.name + "</b><br/>"
+                                                    + "<b>" +  WecomDwcschedulerTexts[0][langMyApps]['labelMail'] + " " + "</b> " + obj.email + "<br/>"
+                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelEventWhen'] + " " + "</b> " + day + "<br/>"
+                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelHour'] + " " + "</b> " + time + "<br/><br/>"
+                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelConfUrl'] + " " + "</b> " + conferenceLink + "<br/><br/>"
+                                                    + WecomDwcschedulerTexts[0][langMyApps]['labelBestRegards'] + "<br/>"
                                                     + "<i>DWC Wecom</i>"
                                                     + "</body>"
                                                     + "</html>";
@@ -486,6 +532,7 @@ new JsonApi("user").onconnected(function(conn) {
                 
                 var obj = JSON.parse(msg);
                 if (obj.mt == "UserMessage") {
+                 langMyApps = obj.lang //obter o idioma do my apps do Usuario que criou a conf 
                     try {
                         var count = 0;
                         count = pbxTableUsers.filter(findBySip(conn.sip))[0].badge;
@@ -1333,7 +1380,7 @@ function selectUserConfigs(obj, callback){
 function insertConferenceSchedule(obj, conferenceLink, callback){
     Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end, conf_link) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "','" + conferenceLink + "')")
     .oncomplete(function (id) {
-        msg = { status: 200, msg: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!",id:id };
+        msg = { status: 200, msg:  WecomDwcschedulerTexts[0][lang]['labelEventScheduled'] ,id:id };
         callback(null, msg);
     })
     .onerror(function (error, errorText, dbErrorCode) {

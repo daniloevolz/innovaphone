@@ -15,6 +15,7 @@ Wecom.novaalertTexts = {
         labelLicenseInstallDate: "Data de instalação da licença:",
         labelLicenseActive: "Licença Ativa",
         labelTituloEdit: "Edição",
+        defaultOpt: "Escolha uma opção",
         btnEditButton: "Editar",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
         labelDevice: "Dispositivo:",

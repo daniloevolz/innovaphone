@@ -71,7 +71,16 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Salvar",
         labelAdmin: "Administração",
         labelTituloSmtp:"Configure o servidor de emails",
-        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site"
+        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site",
+        labelWarning: "Atenção",
+        labelNoConfRoom: "Não há Salas disponíveis neste Objeto de Conferências",
+        labelWrongObjectConf: "Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.",
+        labelNoValidDate: "Favor Selecionar uma data válida!",
+        labelMembers: "Participantes",
+        labelConfUrl: "URL da reunião",
+        labelJoinConf: "Entrar na reunião",
+        labelHost: "Organizador"
+    
     },
     en: {
         btnLink: "Link",

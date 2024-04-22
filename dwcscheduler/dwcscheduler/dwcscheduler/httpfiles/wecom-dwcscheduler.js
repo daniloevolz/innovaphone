@@ -62,7 +62,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         UIsip = user;
         appUrl = appUrl+"/Calendario.htm?id="+user;
         constructor();
-        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "user", mt: "UserMessage", lang: start.lang });
         //searchApi = start.provideApi("com.innovaphone.search");
         //searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
@@ -149,7 +149,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 list_rooms = obj.rooms;
                 try {
                     if (list_rooms.length == 0) {
-                        makePopup("ATENÇÃO","Não há Salas disponíveis neste Objeto de Conferências", 500, 200);
+                        makePopup(texts.text("labelWarning"),texts.text("labelNoConfRoom"), 500, 200);
                     }
                     else {
                         key_conference = obj.key;
@@ -172,7 +172,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 
 
             } else {
-                makePopup("ATENÇÃO","Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.", 500, 200);
+                makePopup(texts.text("labelWarning"),texts.text("labelWrongObjectConf"), 500, 200);
             }
         }
     }
@@ -499,9 +499,15 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             //var from = document.getElementById("dateFrom").value;
             var time_start = document.getElementById("timeStart").value;
             var time_end = document.getElementById("timeEnd").value;
-
+            if(time_start > time_end || time_start < getDateNow() ){
+                makePopup(texts.text("labelWarning"),texts.text("labelNoValidDate"), 500, 200);
+            }else{
             app.send({ api: "user", mt: "AddAvailabilityMessage", time_start: time_start, time_end: time_end });
             waitConnection(colDireita);
+            }
+
+           
+           
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeDivAvailabilities(colDireita);
