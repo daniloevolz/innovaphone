@@ -166,13 +166,13 @@ if (license != null && license.System==true) {
                         log("danilo req : received POST data " + value);
                         try {
                             var obj = JSON.parse(String(value));
-                            var today = convertDateTimeLocalToCustomFormat(getDateNow());
                             var arrayToday = obj.time_start.split("T");
                             var day = arrayToday[0];
                             var time = arrayToday[1];
                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
                             lang = obj.language
                             timeZone = obj.timeZone
+                            var today = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZone));
 
                             //Início teste url temporária
                             function creationDate(date) {
@@ -191,13 +191,13 @@ if (license != null && license.System==true) {
                             log("rand" + rand);
 
                             var meetingId = rand;
-                            var startTimestamp = convertDateTimeToTimestamp(obj.time_start);
+                            var startTimestamp = convertDateTimeToTimestamp(obj.time_start,timeZone);
                             log("startTimestamp " + startTimestamp);
-                            var endTimestamp = convertDateTimeToTimestamp(obj.time_end);
+                            var endTimestamp = convertDateTimeToTimestamp(obj.time_end,timeZone);
                             log("endTimestamp " + endTimestamp);
 
                             var timeNow = creationDate(today);
-                            var creationTimestamp = convertDateTimeToTimestamp(timeNow);
+                            var creationTimestamp = convertDateTimeToTimestamp(timeNow,timeZone);
                             log("creationTimestamp " + creationTimestamp);
 
                             selectUserConfigs(obj, function (error, resultConfigs) {
@@ -216,7 +216,7 @@ if (license != null && license.System==true) {
                                     var roomNumber = cfg[0].number_conference;
                                     var md5Hash = decodeURIComponent(cfg[0].key_conference);
                                     var reservedChannels = cfg[0].reserved_conference;
-                                    var conferenceLink = createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    var conferenceLink = createConferenceLink(timeZone,version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
                                     log("conferenceLink" + conferenceLink);
                                     insertConferenceSchedule(obj, conferenceLink, function (error, resultSchedule) {
                                         if (error) {
@@ -1237,23 +1237,27 @@ function getDateNow() {
     // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
     return dateString.slice(0, -5);
 }
-function getDateNow2() {
-    // Cria uma nova data com a data e hora atuais em UTC
-    var date = new Date();
-    // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
-    date.setUTCHours(date.getUTCHours() - 3);
 
-    // Formata a data em uma string no formato "AAAAMMDDTHHmmss"
-    var year = date.getUTCFullYear();
-    var month = padZero(date.getUTCMonth() + 1);
-    var day = padZero(date.getUTCDate());
-    var hours = padZero(date.getUTCHours());
-    var minutes = padZero(date.getUTCMinutes());
-    var seconds = padZero(date.getUTCSeconds());
-    var dateString = year + month + day + "T" + hours + minutes + seconds;
+function getDateTimeZone(timeZone) {
+        var date = new Date()
+        var timeZoneParts = timeZone.split(':');
+        var sign = timeZoneParts[0][0]; 
+        var number = timeZoneParts[0].slice(1);
+        log("SIGN" + sign)
 
-    // Retorna a string no formato "AAAAMMDDTHHmmss"
-    return dateString;
+         timeZone.startsWith('+') ? date.setUTCHours(date.getUTCHours() + parseInt(number)) : date.setUTCHours(date.getUTCHours() - parseInt(number))
+        //  if (timeZone.startsWith('+')) {
+        //     date.setUTCHours(date.getUTCHours() + parseInt(number));  
+        // } else{
+        //     date.setUTCHours(date.getUTCHours() - parseInt(number));  
+        // }
+    // Formata a data e hora em uma string ISO 8601 com o caractere "T"
+        var dateString = date.toISOString();
+    // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
+    log("Hora Criação " + dateString)
+    return dateString.slice(0, -5);
+
+   
 }
 function convertDateTimeLocalToCustomFormat(datetimeLocal) {
     var d = new Date(datetimeLocal);
@@ -1269,8 +1273,16 @@ function convertDateTimeLocalToCustomFormat(datetimeLocal) {
 function padZero(num) {
     return (num < 10 ? "0" : "") + num;
 }
-function createConferenceLink(version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain, obj) {
+function createConferenceLink(timeZone,version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, domain, obj) {
     log("version "+version+", flags "+flags+", roomNumber "+roomNumber+", meetingId "+meetingId+", startTimestamp "+startTimestamp+", endTimestamp "+endTimestamp+", reservedChannels "+reservedChannels+", creationTimestamp "+creationTimestamp+", md5Hash "+md5Hash+", domain "+domain);
+     
+     var adjustedTimeZone = timeZone.startsWith('+') ? timeZone.substring(1) : timeZone;
+     log("AdjustedTimeZone " + adjustedTimeZone)
+
+    //  // Converter o horário de início para o fuso horário correto
+    // var startDateTime = new Date(startTimestamp);
+    // var adjustedStartDateTime = new Date(startDateTime.getTime() + clientTimeZoneOffset * 60000); // 60000 ms em 1 minuto
+
     var conf = {
         version: toUint8Array(version, 1),
         flags: toUint8Array(flags, 1),
@@ -1350,7 +1362,7 @@ function mergeUint8Arrays(arrays) {
 
     return result;
 }    
-function convertDateTimeToTimestamp(dateTimeString) {
+function convertDateTimeToTimestamp(dateTimeString,timeZone) {
     var dateTimeParts = dateTimeString.split('T');
     var dateParts = dateTimeParts[0].split('-');
     var timeParts = dateTimeParts[1].split(':');
@@ -1360,8 +1372,22 @@ function convertDateTimeToTimestamp(dateTimeString) {
     var day = parseInt(dateParts[2]);
     var hours = parseInt(timeParts[0]);
     var minutes = parseInt(timeParts[1]);
+
+    // Extrair o sinal e o número do fuso horário
+    var sign = timeZone.charAt(0);
+    log("sign" + sign)
+    var offset = parseInt(timeZone.slice(1));
+    log("offSet" + offset)
+    var timestamp;
+    // Ajustar as horas de acordo com o fuso horário
+    //hours += (sign === '+') ? -offset : +offset;
+
+     //sign === '+' ? hours - offset  : hours + offset;
+     log("TimeZone" + timeZone)
+     log("HoursCalc" + hours + offset , hours - offset)
+    timeZone.startsWith('+') ? timestamp = new Date(year, month, day, hours - offset, minutes).getTime() / 1000  : timestamp = new Date(year, month, day, hours + offset, minutes).getTime() / 1000
     
-    var timestamp = new Date(year, month, day, hours+3, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
+    //var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
     
     return timestamp;
   }

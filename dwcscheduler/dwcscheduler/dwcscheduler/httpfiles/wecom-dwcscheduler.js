@@ -31,7 +31,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
     var texts = new innovaphone.lib1.Languages(Wecom.dwcschedulerTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
-
     var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
     app.checkBuild = true;
     app.onconnected = app_connected;
