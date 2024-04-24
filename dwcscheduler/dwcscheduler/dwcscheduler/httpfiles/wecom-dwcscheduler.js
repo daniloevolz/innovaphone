@@ -51,9 +51,12 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
     var phoneApi;
     var searchApi;
+  
     
 
     function app_connected(domain, user, dn, appdomain) {
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+        var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
         //avatar
         avatar = new innovaphone.Avatar(start, user, domain);
         UIuserPicture = avatar.url(user, 80, dn);
@@ -61,7 +64,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         UIsip = user;
         appUrl = appUrl+"/Calendario.htm?id="+user;
         constructor();
-        app.send({ api: "user", mt: "UserMessage", lang: start.lang });
+        app.send({ api: "user", mt: "UserMessage", lang: start.lang, timeZone: clientTimeZone });
         //searchApi = start.provideApi("com.innovaphone.search");
         //searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
@@ -174,6 +177,17 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 makePopup(texts.text("labelWarning"),texts.text("labelWrongObjectConf"), 500, 200);
             }
         }
+    }
+    function formatTimezoneOffset(offset) {
+        var hours = Math.abs(Math.floor(offset / 60));
+        var minutes = Math.abs(offset % 60);
+        var sign = offset > 0 ? '-' : '+';
+        return sign + pad(hours, 2) + ':' + pad(minutes, 2);
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
     }
     function makePopup(header, content, width, height) {
         console.log("makePopup");

@@ -31,8 +31,9 @@ var sendLocation = Config.sendLocation;
 var licenseAppFile = Config.licenseAppFile;
 var licenseInstallDate = Config.licenseInstallDate;
 var lang; // idioma do navegador do cliente
-var timeZone;
+var timeZoneClient;
 var langMyApps; // idioma do myapps do usuario DWC 
+var timeZoneMyApps; // timezone do my apps do usuario DWC
 
  var  WecomDwcschedulerTexts = [{
     pt: {
@@ -125,7 +126,7 @@ if (license != null && license.System==true) {
                         Database.exec("SELECT * FROM tbl_schedules WHERE sip ='" + sip + "';")
                             .oncomplete(function (dataschedules) {
                                 log("get-agenda:tbl_schedules result=" + JSON.stringify(dataschedules, null, 4));
-                                msg = { status: 200, dataavailability: JSON.stringify(dataavailability), dataschedules: JSON.stringify(dataschedules) };
+                                msg = { status: 200, dataavailability: JSON.stringify(dataavailability), dataschedules: JSON.stringify(dataschedules), timeZoneMyApps: timeZoneMyApps };
                                 req.responseContentType("application/json")
                                     .sendResponse()
                                     .onsend(function (req) {
@@ -171,8 +172,9 @@ if (license != null && license.System==true) {
                             var time = arrayToday[1];
                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
                             lang = obj.language
-                            timeZone = obj.timeZone
-                            var today = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZone));
+                            timeZoneClient = obj.timeZone
+                            var todayClient = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZoneClient));
+                            var todayMyApps = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZoneMyApps));
 
                             //Início teste url temporária
                             function creationDate(date) {
@@ -191,14 +193,31 @@ if (license != null && license.System==true) {
                             log("rand" + rand);
 
                             var meetingId = rand;
-                            var startTimestamp = convertDateTimeToTimestamp(obj.time_start,timeZone);
-                            log("startTimestamp " + startTimestamp);
-                            var endTimestamp = convertDateTimeToTimestamp(obj.time_end,timeZone);
-                            log("endTimestamp " + endTimestamp);
+                            var timeNowClient = creationDate(todayClient);
+                            var timeNowMyApps = creationDate(todayMyApps);
+                            var timeDiff = 0
+                            if(timeZoneMyApps != timeZoneClient){
+                                timeDiff = calculateTimeZoneDifference(timeZoneClient,timeZoneMyApps)
+                            }
 
-                            var timeNow = creationDate(today);
-                            var creationTimestamp = convertDateTimeToTimestamp(timeNow,timeZone);
-                            log("creationTimestamp " + creationTimestamp);
+                            log("TimeZoneMyApps " + timeZoneMyApps)
+                            log("TimeZoneClient " + timeZoneClient)
+                            log("TimeNowClient " + timeNowClient)
+                            log("TimeNowMyApps " + timeNowMyApps)
+                           
+                            var startTimestampMyApps = convertDateTimeToTimestamp(obj.time_start,timeDiff);
+                            log("startTimestampMyApps " + startTimestampMyApps);
+                            var endTimestampMyApps = convertDateTimeToTimestamp(obj.time_end,timeDiff);
+                            log("endTimestampMyApps  " + endTimestampMyApps);
+                            var creationTimestampMyApps = convertDateTimeToTimestamp(timeNowMyApps,0);
+                            log("creationTimestampMyApps  " + creationTimestampMyApps);
+
+                            var startTimestampClient = convertDateTimeToTimestamp(obj.time_start,0);
+                            log("startTimestampClient " + startTimestampClient);
+                            var endTimestampClient = convertDateTimeToTimestamp(obj.time_end,0);
+                            log("endTimestampClient " + endTimestampClient);
+                            var creationTimestampClient = convertDateTimeToTimestamp(timeNowClient,0);
+                            log("creationTimestampClient " + creationTimestampClient);
 
                             selectUserConfigs(obj, function (error, resultConfigs) {
                                 if (error) {
@@ -216,9 +235,10 @@ if (license != null && license.System==true) {
                                     var roomNumber = cfg[0].number_conference;
                                     var md5Hash = decodeURIComponent(cfg[0].key_conference);
                                     var reservedChannels = cfg[0].reserved_conference;
-                                    var conferenceLink = createConferenceLink(timeZone,version, flags, roomNumber, meetingId, startTimestamp, endTimestamp, reservedChannels, creationTimestamp, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
-                                    log("conferenceLink" + conferenceLink);
-                                    insertConferenceSchedule(obj, conferenceLink, function (error, resultSchedule) {
+                                    var conferenceLinkClient = createConferenceLink(timeZoneClient,version, flags, roomNumber, meetingId, startTimestampClient, endTimestampClient, reservedChannels, creationTimestampClient, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    var conferenceLinkMyApps = createConferenceLink(timeZoneMyApps,version, flags, roomNumber, meetingId, startTimestampMyApps, endTimestampMyApps, reservedChannels, creationTimestampMyApps, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    log("conferenceLinkMyApps" + conferenceLinkMyApps);
+                                    insertConferenceSchedule(obj, conferenceLinkMyApps, function (error, resultSchedule) {
                                         if (error) {
                                             log("selectUserConfigs Ocorreu um erro:", error);
                                             msg = JSON.parse(JSON.stringify(resultSchedule));
@@ -271,11 +291,8 @@ if (license != null && license.System==true) {
                                             //Send e-mails to users
                                    
                                             try {
-                                                log("TimeZoneDiff " + timeZone)
+                                                log("TimeZoneDiff " + timeZoneClient)
                                                 log("First Language " + lang)
-                                                if(lang != "en" && lang != "pt"){
-                                                    lang = "en"
-                                                }
                                                 log("New Navigator Language " + lang)
                                                 log("Language MyApps " + JSON.stringify(langMyApps))
                                                 //Email Client
@@ -291,7 +308,7 @@ if (license != null && license.System==true) {
                                                     + "<td style ='width: 50%'>" + "<b>" + WecomDwcschedulerTexts[0][lang]['labelEventWhen'] + "</b><br>" + day + '&nbsp;' + time
                                                     + "</td>"
                                                     + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLink + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' >" + WecomDwcschedulerTexts[0][lang]['labelJoinConf']
+                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLinkClient + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' >" + WecomDwcschedulerTexts[0][lang]['labelJoinConf']
                                                     + "</span>"
                                                     + "</a>"
                                                     + "</td>"
@@ -304,7 +321,7 @@ if (license != null && license.System==true) {
                                                     + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'>" + "-" +  WecomDwcschedulerTexts[0][lang]['labelHost'] + "</span>"
                                                     + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
                                                     + "</td>"
-                                                    + "<td>" + WecomDwcschedulerTexts[0][lang]['labelConfUrl'] + "</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLink + "</span>" + "</td>"
+                                                    + "<td>" + WecomDwcschedulerTexts[0][lang]['labelConfUrl'] + "</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLinkClient + "</span>" + "</td>"
                                                     + "</tr>"
                                                     + "</table>"
                                                     + "</div>"
@@ -321,7 +338,7 @@ if (license != null && license.System==true) {
                                                     + "<b>" +  WecomDwcschedulerTexts[0][langMyApps]['labelMail'] + " " + "</b> " + obj.email + "<br/>"
                                                     + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelEventWhen'] + " " + "</b> " + day + "<br/>"
                                                     + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelHour'] + " " + "</b> " + time + "<br/><br/>"
-                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelConfUrl'] + " " + "</b> " + conferenceLink + "<br/><br/>"
+                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelConfUrl'] + " " + "</b> " + conferenceLinkMyApps + "<br/><br/>"
                                                     + WecomDwcschedulerTexts[0][langMyApps]['labelBestRegards'] + "<br/>"
                                                     + "<i>DWC Wecom</i>"
                                                     + "</body>"
@@ -329,7 +346,7 @@ if (license != null && license.System==true) {
 
 
                                                 //Anexo
-                                                var attachment = "BEGIN:VCALENDAR\n"
+                                                var attachmentClient = "BEGIN:VCALENDAR\n"
                                                     + "PRODID:-//DWC Wecom//EN\n"
                                                     + "VERSION:2.0\n"
                                                     + "CALSCALE:GREGORIAN\n"
@@ -347,20 +364,20 @@ if (license != null && license.System==true) {
                                                     + "BEGIN:VEVENT\n"
                                                     + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
                                                     + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
-                                                    + "DTSTAMP:" + today + "Z\n"
+                                                    + "DTSTAMP:" + todayClient + "Z\n"
                                                     + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                     + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
                                                     + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                     + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
                                                     + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
-                                                    + "X-GOOGLE-CONFERENCE:" + conferenceLink + "\n"
+                                                    + "X-GOOGLE-CONFERENCE:" + conferenceLinkClient + "\n"
                                                     + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
-                                                    + "CREATED:" + today + "Z\n"
-                                                    + "DESCRIPTION:" + conferenceLink + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
-                                                    + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLink + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                    + "CREATED:" + todayClient + "Z\n"
+                                                    + "DESCRIPTION:" + conferenceLinkClient + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                    + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLinkClient + " \n\nLearn more about Meet at: https://support.google.com/"
                                                     + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
                                                     + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
-                                                    + "LAST-MODIFIED:" + today + "Z\n"
+                                                    + "LAST-MODIFIED:" + todayClient + "Z\n"
                                                     + "LOCATION:\n"
                                                     + "SEQUENCE:0\n"
                                                     + "STATUS:CONFIRMED\n"
@@ -374,7 +391,52 @@ if (license != null && license.System==true) {
                                                     + "END:VEVENT\n"
                                                     + "END:VCALENDAR";
 
-                                                sendEmail(cfg[0].email_title, obj.email, dataClient, attachment, function (error, resultEmail) {
+                                                var attachmentMyApps = "BEGIN:VCALENDAR\n"
+                                                + "PRODID:-//DWC Wecom//EN\n"
+                                                + "VERSION:2.0\n"
+                                                + "CALSCALE:GREGORIAN\n"
+                                                + "METHOD:REQUEST\n"
+                                                + "BEGIN:VTIMEZONE\n"
+                                                + "TZID:America/Sao_Paulo\n"
+                                                + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                + "BEGIN:STANDARD\n"
+                                                + "TZOFFSETFROM:-0300\n"
+                                                + "TZOFFSETTO:-0300\n"
+                                                + "TZNAME:-03\n"
+                                                + "DTSTART:19700101T000000\n"
+                                                + "END:STANDARD\n"
+                                                + "END:VTIMEZONE\n"
+                                                + "BEGIN:VEVENT\n"
+                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
+                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
+                                                + "DTSTAMP:" + todayMyApps + "Z\n"
+                                                + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
+                                                + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
+                                                + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
+                                                + "X-GOOGLE-CONFERENCE:" + conferenceLinkMyApps + "\n"
+                                                + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
+                                                + "CREATED:" + todayMyApps + "Z\n"
+                                                + "DESCRIPTION:" + conferenceLinkMyApps + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLinkMyApps + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
+                                                + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
+                                                + "LAST-MODIFIED:" + todayMyApps + "Z\n"
+                                                + "LOCATION:\n"
+                                                + "SEQUENCE:0\n"
+                                                + "STATUS:CONFIRMED\n"
+                                                + "SUMMARY:" + cfg[0].title_conference + "\n"
+                                                + "TRANSP:OPAQUE\n"
+                                                + "BEGIN:VALARM\n"
+                                                + "DESCRIPTION:REMINDER\n"
+                                                + "TRIGGER;RELATED=START:-PT15M\n"
+                                                + "ACTION:DISPLAY\n"
+                                                + "END:VALARM\n"
+                                                + "END:VEVENT\n"
+                                                + "END:VCALENDAR";
+                                                //Enviar para o Cliente
+                                                sendEmail(cfg[0].email_title, obj.email, dataClient, attachmentClient, function (error, resultEmail) {
                                                     if (error) {
                                                         log("sendEmail Ocorreu um erro:", error);
 
@@ -382,8 +444,8 @@ if (license != null && license.System==true) {
                                                         log("sendEmail:", resultEmail);
                                                     }
                                                 });
-
-                                                sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachment, function (error, resultEmail) {
+                                                //Enviar para o usuário
+                                                sendEmail(cfg[0].email_title, cfg[0].email_contato, dataUser, attachmentMyApps, function (error, resultEmail) {
                                                     if (error) {
                                                         log("sendEmail Ocorreu um erro:", error);
 
@@ -532,8 +594,15 @@ new JsonApi("user").onconnected(function(conn) {
                 
                 var obj = JSON.parse(msg);
                 if (obj.mt == "UserMessage") {
-                 langMyApps = obj.lang //obter o idioma do my apps do Usuario que criou a conf 
-                    try {
+                 langMyApps = obj.lang
+                 timeZoneMyApps = obj.timeZone //obter o idioma do my apps do Usuario que criou a conf 
+                 if(lang != "en" && lang != "pt" ){
+                    lang = "en"
+                }
+                if(langMyApps != "en" && langMyApps != "pt"){
+                    langMyApps = "en"
+                }
+                try {
                         var count = 0;
                         count = pbxTableUsers.filter(findBySip(conn.sip))[0].badge;
                         if (count > 0) {
@@ -1362,7 +1431,7 @@ function mergeUint8Arrays(arrays) {
 
     return result;
 }    
-function convertDateTimeToTimestamp(dateTimeString,timeZone) {
+function convertDateTimeToTimestamp(dateTimeString,timeDiff) {
     var dateTimeParts = dateTimeString.split('T');
     var dateParts = dateTimeParts[0].split('-');
     var timeParts = dateTimeParts[1].split(':');
@@ -1372,25 +1441,32 @@ function convertDateTimeToTimestamp(dateTimeString,timeZone) {
     var day = parseInt(dateParts[2]);
     var hours = parseInt(timeParts[0]);
     var minutes = parseInt(timeParts[1]);
-
-    // Extrair o sinal e o número do fuso horário
-    var sign = timeZone.charAt(0);
-    log("sign" + sign)
-    var offset = parseInt(timeZone.slice(1));
-    log("offSet" + offset)
     var timestamp;
-    // Ajustar as horas de acordo com o fuso horário
-    //hours += (sign === '+') ? -offset : +offset;
 
-     //sign === '+' ? hours - offset  : hours + offset;
-     log("TimeZone" + timeZone)
-     log("HoursCalc" + hours + offset , hours - offset)
-    timeZone.startsWith('+') ? timestamp = new Date(year, month, day, hours - offset, minutes).getTime() / 1000  : timestamp = new Date(year, month, day, hours + offset, minutes).getTime() / 1000
-    
+     log("TimeZone" + timeDiff)
+  
+     String(timeDiff).startsWith('-') ? timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000  : timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000
+     //timestamp = new Date(year, month, day, hours + timeDiff, minutes).getTime() / 1000 
+
     //var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
     
     return timestamp;
   }
+
+  // Função para converter uma string de fuso horário em um número
+function convertTimeZoneToNumber(timeZone) {
+    var sign = timeZone.charAt(0); // Obtém o sinal do fuso horário (+ ou -)
+    var offset = parseInt(timeZone.slice(1)); // Obtém o deslocamento numérico do fuso horário
+    return sign === '+' ? offset : -offset; // Retorna o número de horas com sinal correto
+}
+
+// Função para calcular a diferença entre dois fusos horários
+function calculateTimeZoneDifference(timeZoneClient, timeZoneMyApps) {
+    var timeZone1Offset = convertTimeZoneToNumber(timeZoneClient);
+    var timeZone2Offset = convertTimeZoneToNumber(timeZoneMyApps);
+    return timeZone1Offset - timeZone2Offset; // Retorna a diferença entre os fusos horários
+}
+
 function selectUserConfigs(obj, callback){
     Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
             .oncomplete(function (data) {
@@ -1403,7 +1479,7 @@ function selectUserConfigs(obj, callback){
                 callback(msg);
             });
 }
-function insertConferenceSchedule(obj, conferenceLink, callback){
+function insertConferenceSchedule(obj, conferenceLink,callback){
     Database.insert("INSERT INTO tbl_schedules (sip, name, email, time_start, time_end, conf_link) VALUES ('" + obj.sip + "','" + obj.name + "','" + obj.email + "','" + obj.time_start + "','" + obj.time_end + "','" + conferenceLink + "')")
     .oncomplete(function (id) {
         msg = { status: 200, msg:  WecomDwcschedulerTexts[0][lang]['labelEventScheduled'] ,id:id };
