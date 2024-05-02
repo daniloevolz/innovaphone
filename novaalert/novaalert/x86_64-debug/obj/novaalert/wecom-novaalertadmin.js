@@ -811,12 +811,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
                                 }
                                 else if (type == "number") {
-                                    divMainButtons.removeChild(divSelectTypeButton)
-                                    addNumberParamtersMultiDevice(divMainButtons,type,user, x, y, z);
+                                    //divMainButtons.removeChild(divSelectTypeButton)
+                                    addNumberParamtersMultiDevice(insideDiv,type,user, x, y, z);
                                 }
                                 else if (type == "alarm") {
-                                    divMainButtons.removeChild(divSelectTypeButton)
-                                    addAlarmParamters(divMainButtons,type,user, x, y, z);
+                                    // divMainButtons.removeChild(divSelectTypeButton)
+                                    addAlarmParamters(insideDiv,type,user, x, y, z);
                                 }
                             });   
             
@@ -831,6 +831,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         <html>
             <body>
                 <div class="divMainModal">
+                <h2 class="titleModal">${texts.text("btnAddButton")}</h2>
                     <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelButtonName")}</span>
                         <input type="text" class="genericInputs" placeholder="${texts.text("labelButtonName")}">
@@ -966,61 +967,59 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
   
     }
     function addAlarmParamters(divMain,type,user,x,y,z) {
+        var htmlUser = `
+        <html>
+            <body>
+                <div class="divMainModal">
+                <h2 class="titleModal">${texts.text("btnAddButton")}</h2>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelButtonName")}</span>
+                        <input type="text" class="genericInputs" id = "iptNameButton" placeholder="${texts.text("labelButtonName")}">
+                    </div>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelValue")}</span>
+                        <input type="text" class="genericInputs"  id="iptParam" placeholder="${texts.text("labelValue")}">
+                    </div> 
+                    <div class="divButtonsGeneric">
+                        <div id = "btnCancel">${makeButton(texts.text("labelCancel"),"secundary")}</div>
+                        <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
+                    </div> 
+                </div>
+            </body>
+        </html>
+    `;
 
-            // nome do botão
-            var divNameButton = document.createElement("div")
-            divNameButton.classList.add("divNameButton")
-            divMain.appendChild(divNameButton)
-            var labelNameButton = document.createElement("div")
-            labelNameButton.classList.add("labelNameButton")
-            labelNameButton.textContent = texts.text("labelButtonName")
-            divNameButton.appendChild(labelNameButton)
-            var iptNameButton = document.createElement("input")
-            iptNameButton.type = 'text';
-            iptNameButton.placeholder = texts.text("labelButtonName")
-            iptNameButton.classList.add("iptNameButton")
-            divNameButton.appendChild(iptNameButton)
-            divMain.appendChild(divNameButton)
-            //parametro
-            var divParamButton = document.createElement("div")
-            divParamButton.classList.add("divParamButton")
-            divMain.appendChild(divParamButton)
-            var labelParamButton = document.createElement("div")
-            labelParamButton.classList.add("labelParamButton")
-            labelParamButton.textContent = "Parametro"
-            divParamButton.appendChild(labelParamButton)
-            var iptParamButton = document.createElement("input")
-            iptParamButton.type = 'text';
-            iptParamButton.placeholder = "Nome do botão"
-            iptParamButton.classList.add("iptParamButton")
-            divParamButton.appendChild(iptParamButton)
-            divMain.appendChild(divParamButton)
-        //appends principais
+            divMain.innerHTML = ''
+            divMain.innerHTML += htmlUser
 
             document.body.addEventListener("click",function(event){
                 if(event.target.id == "insideDiv"){
                     var insideDiv = document.getElementById("insideDiv")
                     document.body.removeChild(insideDiv)
                 }
-                
             })
             //adicionar na div principal
 
         // //Botão Salvar
-        // t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn")).addTranslation(texts, "btnSave").addEvent("click", function () {
+        document.getElementById("btnSave").addEventListener("click",function(evt){
+                var iptNameButton = document.getElementById("iptNameButton")
+                var iptParam = document.getElementById("iptParam")
 
-        //     if (String(iptNameButton.getValue()) == "" || String(type) == "") {
-        //         makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
-        //     } else {
+                 if ( iptNameButton.value == "" || String(type) == "") {
+                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+            } else {
 
-        //         app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptNameButton.getValue()), user: String(""), value: String(iptParamButton.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
-        //         waitConnection(colDireita);
-        //     }
-        // });
-        // //Botão Cancelar   
-        // t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:15px; text-align:center", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-        //     makeTableButtons(colDireita);
-        // });
+                app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptNameButton.value), user: String(""), value: String(iptParam.value), guid: String(user), type: String(type), page: z, x: x, y: y });
+                waitConnection(colDireita);
+            }
+        });
+
+        ////Botão Cancelar   
+           document.getElementById("btnCancel").addEventListener("click",function(evt){
+            var insideDiv = document.getElementById("insideDiv")
+            document.body.removeChild(insideDiv)
+        })
+
     }
     function addComboParamters(t, type) {
         t.clear();
@@ -1339,6 +1338,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 } else {
                     app.send({ api: "admin", mt: "InsertMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), guid: String(user), type: String(type), page: z, x: x, y: y });
                     waitConnection(t1);
+                    var insideDiv = document.getElementById("insideDiv")
+                    insideDiv.innerHTML = ''
+                    document.body.remove(insideDiv)
                 }
             });
             //Botão Cancelar   
