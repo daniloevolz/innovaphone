@@ -181,6 +181,7 @@ color: white;
     background-color: rgba(77, 77, 77, 0.377);
     z-index: 20000;
     top: 0;
+    backdrop-filter: blur(5px);
 }
 /*#endregion*/
 
