@@ -7,6 +7,7 @@
 
 var Wecom = Wecom || {};
 Wecom.novaalert = Wecom.novaalert || function (start, args) {
+    
     this.createNode("body");
     var that = this;
 

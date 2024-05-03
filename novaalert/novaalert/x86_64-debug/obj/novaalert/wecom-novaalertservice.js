@@ -732,7 +732,7 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "SelectMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageResult" }));
+                //conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageResult" }));
                 Database.exec("SELECT * FROM list_buttons")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
