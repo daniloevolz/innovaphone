@@ -441,7 +441,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         list_users.forEach(function(user) {
             const optUser = document.createElement("option")
             optUser.textContent = user.cn
-            optUser.id = user.sip
+            optUser.id = user.guid
             selectUser.appendChild(optUser)
         })
 
@@ -641,14 +641,15 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function popButtons(user, page) {
         console.log('ERICK POPBUTTONS', user, page, list_buttons)
         var buttons = [];
-        var filterGuid = list_users.filter(function(u){return u.sip == user})
+        var filterGuid = list_users.filter(function(u){return u.guid == user})
         console.log('ERICK FILTER', filterGuid)
-        if (page) {
-            buttons = list_buttons.filter(function (b) { return b.page == page && b.button_user == filterGuid.guid })
-        } else {
-            buttons = list_buttons;
-            page = "1"
-        }
+        if (page && filterGuid.length > 0 ) {
+            buttons = list_buttons.filter(function (b) { return b.page == page && b.button_user == filterGuid[0].guid })
+        } 
+        // else {
+        //     buttons = list_buttons;
+        //     page = "1"
+        // }
 
         console.log('ERICK buttons', buttons)
         var divMainButtons = document.getElementById("divMainButtons")
@@ -656,7 +657,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         //Botões centrais
         //var divButtonsMain = divCenter.add(new innovaphone.ui1.Div(null, null, "divMainButtons"))
         //divButtonsMain.setAttribute("id", "divMainButtons")
-        //divButtonsMain.setAttribute("page", page)
+        divMainButtons.setAttribute("page", page)
         
 
         // div botão combo
@@ -736,31 +737,21 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         // criar todos os botões com a função genérica createButtons e classe btnEmpty
         buttons.forEach(function (object) {
-
             switch (object.button_type) {
                 case "combo":
-                    createButtons(object, null, "ciano-900", "ciano-600", "./images/Layer.svg", "combobutton", object.page)
+                    createComboButton(object, "comboButton", "ciano-600", "ciano-900", "./images/Layer.svg", "combobutton")
                     break;
                 case "alarm":
-                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button", object.page)
+                    createButtons(object, "allbutton", "gold-900", "gold-600", "./images/warning.svg", "Button")
                     break;
                 case "number":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "user":
-                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button", object.page)
+                    createButtons(object, "exnumberbutton", "verde-900", "verde-600", "./images/phone.svg", "Button")
                     break;
                 case "sensor":
-                    createButtons(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton", object.page)
-                    //app.sendSrc({ api: "user", mt: "SelectSensorInfo", type: object.sensor_type, sensor: object.button_prt, src: object.button_prt }, function (obj) {
-                    //    console.log("SendSrcResult: " + JSON.stringify(obj))
-                    //    var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
-                    //    var objParse = JSON.parse(obj.result);
-                    //    objParse.forEach(function (info) {
-                    //        updateButtonInfo(divToUpdate, info, null);
-                    //    });
-
-                    //})
+                    createSensorButton(object, "sensorbutton", "neutro-900", "neutro-1000", "./images/wifi.svg", "sensorButton")
                     break;
                 default:
                     break;
@@ -786,14 +777,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     z = z.getAttribute("page");
                     if (position_x == 1) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(divMainButtons, "combo", user, position_x, position_y, z);
+                        makeDivAddButton3("combo", user, position_x, position_y, z);
                     }
                     else if (position_x == 2) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(divMainButtons, "sensor", user, position_x, position_y, z);
+                        makeDivAddButton3( "sensor", user, position_x, position_y, z);
                     } else if (position_x >= 3 && position_x <= 7) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
-                        makeDivAddButton3(divMainButtons, "center", user, position_x, position_y, z);
+                        makeDivAddButton3("center", user, position_x, position_y, z);
                     }
                 }
             });
@@ -819,14 +810,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
  
     }
-    function createButtons(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
+    function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
 
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
             allBtns.setAttribute("button_type", object.button_type);
-            allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
             allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.remove("btnEmpty")
@@ -852,6 +842,58 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             divBottomTxt.textContent = object.button_prt
             divBottom.appendChild(divBottomTxt)
             allBtns.appendChild(divBottom)
+            allBtns.setAttribute("button_prt", object.button_prt); 
+                allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+                divBottomTxt.textContent = object.button_prt
+                var found = true;
+                list_users.forEach(function(u){
+                    if(object.button_prt == u.guid && found){
+                        allBtns.setAttribute("button_prt", u.e164); 
+                        allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
+                        divBottomTxt.textContent = u.cn
+                        found = false
+                        // se mudar o sip vai refletir aqui 
+                        //pois tratamos tudo com GUID no admin
+                    }
+                })
+        }
+    }
+    function createSensorButton(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
+
+        var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
+        var allBtns = document.querySelector(selector);
+        if (allBtns) {
+            allBtns.setAttribute("id", object.id);
+            allBtns.setAttribute("button_type", object.button_type);
+            allBtns.setAttribute("button_prt", object.button_prt);
+            allBtns.setAttribute("button_id", object.id);
+            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+            allBtns.classList.remove("btnEmpty")
+            allBtns.classList.add(classButton)
+            var divTop = document.createElement("div")
+            divTop.classList.add(bgTop)
+            divTop.classList.add("buttontop")
+            divTop.setAttribute("id", object.id + "-status");
+            //divTop.setAttribute("id", object.button_prt + "-status");
+            allBtns.appendChild(divTop)
+            var imgTop = document.createElement("img")
+            imgTop.style.width = "20px";
+            imgTop.setAttribute("src", srcImg)
+            divTop.appendChild(imgTop)
+            var divTopText = document.createElement("div")
+            divTopText.textContent = object.button_prt // nome do sensor que é o button_prt da list_buttons
+            divTop.appendChild(divTopText);
+
+            var divBottom = document.createElement("div")
+            divBottom.classList.add(bgBottom)
+            divBottom.classList.add("buttondown")
+            var divBottomTxt = document.createElement("div")
+            divBottomTxt.textContent = texts.text(object.sensor_type)
+            divBottomTxt.style.fontSize = "13px";
+            divBottomTxt.style.margin = '8px';
+            divBottomTxt.style.width = "100%"
+            divBottom.appendChild(divBottomTxt)
+            allBtns.appendChild(divBottom)
         }
     }
     function createComboButton(object, classButton, bgTop, bgBottom, srcImg, mainButtonClass) {
@@ -864,7 +906,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
             allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
-            allBtns.classList.remove("btnEmpty")
+            allBtns.classList.contains("btnEmpty")
             allBtns.classList.add(classButton)
             // div esquerda (imagem do botão)
             var divImgCombo = document.createElement("div")
@@ -892,7 +934,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
     }
     function  makeDivAddButton3(type, user, x, y, z) {
-           //var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
+        //Título
+        //t1.add(new innovaphone.ui1.Div(null, texts.text("labelTituloAdd"), "tituloAdd"));
+        //var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
         var insideDiv = document.createElement("div")
         insideDiv.id = 'insideDiv'
         insideDiv.classList.add("insideDiv")
@@ -903,58 +947,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 addComboParamters(insideDiv,type, user, x, y, z);
                 break;
             case "sensor":
-                addSensorParamters(comboarea, type);
                 document.body.appendChild(insideDiv)
                 addSensorParamters(insideDiv,type, user, x, y, z);
                 break;
             case "center":
                 //Tipo
-                var label = document.createElement('div')
-                label.textContent = texts.text("labelType")
-                label.classList.add("labeltypeAdd")
-
-                var iptType = document.createElement('div')
-                iptType.id = "selectType"
-                iptType.classList.add("selectTypeAdd")
-                
-                var opt = document.createElement('option')
-                opt.id = "selectType"
-                opt.style = "font-size:12px; text-align:center"
-                iptType.appendChild(opt)
-                bc.appendChild(label)
-                bc.appendChild(iptType)
-
-
-                list_types_center.forEach(function (t) {
-
-                    var optType = document.createElement('option')
-                    optType.id = t.id
-                    optType.textContent = texts.text(t.id)
-                    optType.style = "font-size:12px; text-align:center"
-
-                    iptType.appendChild(optType)
-                })
-
-                document.getElementById("selectType").addEventListener("change", function (e) {
-                    console.log(e.target.value);
-
-                    var type = document.getElementById("selectType");
-                    var selectedOption = type.options[type.selectedIndex];
-                    var type = selectedOption.id;
-
-                    console.log(type);
-
-                    if (type == "user") {
-                        addUserParamters(comboarea, type);
-                    }
-                    else if (type == "number") {
-                        //addNumberParamters(comboarea);
-                        addNumberParamtersMultiDevice(comboarea, type);
-                    }
-                    else if (type == "alarm") {
-                        addAlarmParamters(comboarea, type);
-                    }
-                });
                 var html = `
                 <html>
                     <div class="divMainModal">
@@ -1287,13 +1284,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var selectedOption = type1.options[type1.selectedIndex];
                 var type1 = selectedOption.id;
 
-                    var type2 = document.getElementById("selectType2");
-                    var selectedOption = type2.options[type2.selectedIndex];
-                    var type2 = selectedOption.id;
+                var type2 = document.getElementById("selectType2");
+                var selectedOption = type2.options[type2.selectedIndex];
+                var type2 = selectedOption.id;
 
-                    var type3 = document.getElementById("selectType3");
-                    var selectedOption = type3.options[type3.selectedIndex];
-                    var type3 = selectedOption.id;
+                var type3 = document.getElementById("selectType3");
+                var selectedOption = type3.options[type3.selectedIndex];
+                var type3 = selectedOption.id;
 
                 var type4 = document.getElementById("selectType4");
                 var selectedOption = type4.options[type4.selectedIndex];
@@ -1485,6 +1482,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     })
     }
 
+
     function makeDivAddOption(t1, type, user, x, y, z) {
         //t1.clear();
         //Título
@@ -1494,7 +1492,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
         switch (type) {
             case "radio":
-                addNumberParamtersMultiDevice(comboarea, type);
+                addNumberParamtersMultiDevice(comboarea, type); // trocar nome dessa função , tem funções repetidas 
                 break;
             case "dest":
                 addDestParamtersMultiDevice(comboarea, type);
@@ -1774,6 +1772,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             buttonGrid.setAttribute("page", "0")
             const buttonImg = document.createElement("img")
             buttonImg.setAttribute("src", "./images/addButton.svg")
+            buttonImg.setAttribute("id", "buttonImg")
 
             buttonGrid.appendChild(buttonImg)
             grid.appendChild(buttonGrid)
@@ -3270,7 +3269,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptAvailability":
@@ -3285,7 +3284,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptActivities":
@@ -3310,7 +3309,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 colDireita.add(SelectRamal);
                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
                 })
                 break;
             case "RptSensors":
@@ -3325,7 +3324,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //colDireita.add(SelectRamal);
                 //SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
                 //list_users.forEach(function (user) {
-                //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.sip, null)).setAttribute("id", "sips");
+                //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
                 //})
                 //sensor name
                 colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelSensorName"), null));
@@ -3349,7 +3348,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         // buttons
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            var sip;
+            var guid;
             var from = document.getElementById("dateFrom").value;
             var to = document.getElementById("dateTo").value;
             var event;
@@ -3358,10 +3357,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var sensor_type;
 
             if (rpt == "RptCalls") {
-                sip = document.getElementById("selectUser").value;
+                var SelectUser = document.getElementById("selectUser");
+                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+                guid = selectedOption.id;
                 number = document.getElementById("number").value;
             } else if (rpt == "RptActivities") {
-                sip = document.getElementById("selectUser").value;
+                var SelectUser = document.getElementById("selectUser");
+                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+                guid = selectedOption.id;
                 event = document.getElementById("selectEvent");
                 var selectedOption = event.options[event.selectedIndex];
                 event = selectedOption.id;
@@ -3376,7 +3379,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             }
 
 
-            app.send({ api: "admin", mt: "SelectFromReports", sip: sip, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
+            app.send({ api: "admin", mt: "SelectFromReports", guid: guid, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
             waitConnection(colDireita);
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
@@ -3409,7 +3412,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 //}
                 for (var key in columnsName) {
                     if (columnsName.hasOwnProperty(key)) {
-                        listView.addColumn(null, "text", texts.text(key), key, 10, false);
+                        if(key == "guid"){
+                            listView.addColumn(null, "text", texts.text("cabecalho1"), key, 10, false);
+                        }else{
+                            listView.addColumn(null, "text", texts.text(key), key, 10, false);
+                        }
+                        
 
                     }
                 }
@@ -3449,7 +3457,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptCalls":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u){
+                                    return u.guid == b.guid 
+                                })[0]
                                 row.push(u.cn);
                                 row.push(b.number);
                                 row.push(b.call_started);
@@ -3494,7 +3504,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptActivities":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })[0]
                                 row.push(u.cn);
                                 // Substituir valores de b.name por texto correspondente
                                 //switch (b.name) {
@@ -3547,7 +3557,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         case "RptAvailability":
                             result.forEach(function (b) {
                                 var row = [];
-                                var u = list_users.filter(function (u) { return u.sip == b.sip })
+                                var u = list_users.filter(function (u) { return u.guid == b.guid })[0]
                                 row.push(u.cn);
                                 row.push(b.date);
                                 row.push(b.status);
