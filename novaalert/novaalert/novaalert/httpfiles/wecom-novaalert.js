@@ -837,7 +837,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
           // div botão combo
           var combobtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "combobtn"));
           for (let i = 1; i < 6 ; i++) {
-          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button combobutton"))
+          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button comboButton"))
             
             combobtn.setAttribute("page",page)
             combobtn.setAttribute("position-x", 1); 
@@ -901,7 +901,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createComboButton(object,null,"ciano-600","ciano-900","./images/Layer.svg","combobutton")
+                    createComboButton(object,"combobutton","ciano-600","ciano-900","./images/Layer.svg","comboButton")
                     break;
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
