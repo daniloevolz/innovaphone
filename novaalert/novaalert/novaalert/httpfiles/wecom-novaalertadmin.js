@@ -892,22 +892,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
     }
     function  makeDivAddButton3(type, user, x, y, z) {
-    function makeDivAddButton3(t1, type, user, x, y, z) {
-        //t1.clear();
-        //Título
-        //t1.add(new innovaphone.ui1.Div(null, texts.text("labelTituloAdd"), "tituloAdd"));
-        var colDireita = document.getElementById("colDireita")
-        var bc = document.createElement('div')
-        bc.id="bc"
-        bc.classList.add("bc")
-
-        var comboarea = document.createElement('div')
-        comboarea.id="comboarea"
-        comboarea.classList.add("comboarea")
-        bc.appendChild(comboarea)
-        colDireita.appendChild(bc)
-
-        //var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
+           //var comboarea = t1.add(new innovaphone.ui1.Div(null, null, "comboarea"));
         var insideDiv = document.createElement("div")
         insideDiv.id = 'insideDiv'
         insideDiv.classList.add("insideDiv")
