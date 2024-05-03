@@ -74,6 +74,29 @@
             }
     </style>
     <script>
+        /*
+     buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                monthNames: [
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro'
+  ],
+
+        */
         var selectstart ;
         var selectend;
         var dataTime_start;
@@ -86,8 +109,13 @@
         var url = document.URL;
         var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
         var url = url.substring(0, penultimateSlashIndex);
+        var timeZoneMyApps;
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+        var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
+        var differenceInHours = 0 ;
+
         $(document).ready(function () {
-            $.fullCalendar.locale('pt-br');
+            $.fullCalendar.locale(navigator.language);
             var id = $.urlParam('id');
             fetch(url+'/get-agenda?id=' + id, {
                 method: 'GET',
@@ -104,6 +132,7 @@
                         var last_end = "2000-12-30T23:00";
                         dataavailability = JSON.parse(obj.dataavailability);
                         dataschedules = JSON.parse(obj.dataschedules);
+                        timeZoneMyApps = obj.timeZoneMyApps
                         // var dataTime_start;
                         // var dataTime_end;
 
@@ -118,6 +147,7 @@
                         console.log("Data Availability: " + JSON.stringify(dataavailability));
                         console.log("Data Start \n" + dataTime_start)
                         console.log("Data End \n" + dataTime_end)
+                        console.log("TimeZoneMyApps \n" + timeZoneMyApps)
                         
                         console.log("Data Schedules:" + JSON.stringify(dataschedules));
                         console.log("Time Start \n" + timeStart_schedules);
@@ -143,26 +173,7 @@
                    center: 'title , month,agendaDay', //agendaWeek,
                     right: 'prev,next'
                 },
-                buttonText: {
-                    today: 'Hoje',
-                    month: 'Mês',
-                    week: 'Semana',
-                    day: 'Dia'
-                },
-                monthNames: [
-                'Janeiro',
-                'Fevereiro',
-                'Março',
-                'Abril',
-                'Maio',
-                'Junho',
-                'Julho',
-                'Agosto',
-                'Setembro',
-                'Outubro',
-                'Novembro',
-                'Dezembro'
-  ],
+           
                 defaultView: 'month',
                 slotDuration: '01:00:00', 
                 minTime: '00:00:00',
@@ -183,14 +194,25 @@
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
                         var teste = false;
+                        if(clientTimeZone != timeZoneMyApps){
+                                differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                        }
                         dataavailability.forEach(function(dates){
-                                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
-                                if (clickedDate >= datastart && clickedDate <= dataend ) {
-                                        console.log("Elemento clicado está disponível");
-                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                        $('#calendar').fullCalendar('gotoDate', start);
-                                        teste = true;      
+                            var datastart = moment(dates.time_start)
+                            var dataend = moment(dates.time_end)
+                            // Adicionando a diferença de horas às datas de início e fim
+                            datastart.add(differenceInHours, 'hours');
+                            dataend.add(differenceInHours, 'hours');
+
+                            // Formatando as datas novamente, se necessário
+                            datastart = datastart.format('YYYY-MM-DD');
+                            dataend = dataend.format('YYYY-MM-DD');
+
+                            if (clickedDate >= datastart && clickedDate <= dataend ) {
+                                    console.log("Elemento clicado está disponível");
+                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                    $('#calendar').fullCalendar('gotoDate', start);
+                                    teste = true;      
                             } 
                         })
                         if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
@@ -223,12 +245,20 @@
                     else {
                         ///TESTE DANILO
                         var valid = false;
+                        if(clientTimeZone != timeZoneMyApps){
+                                differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                        }
                         if(dataavailability.length>0){
                             dataavailability.forEach(function (dates) {
-                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var datastart = moment(dates.time_start, moment.ISO_8601)
+                                var dataend = moment(dates.time_end, moment.ISO_8601)
+                                // Adicionando a diferença de horas às datas de início e fim
+                                datastart.add(differenceInHours, 'hours');
+                                dataend.add(differenceInHours, 'hours');
+                                // Formatando as datas novamente, se necessário
+                                datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
+                                dataend = dataend.format('YYYY-MM-DDTHH:mm:ss');
                                 console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
-
                                 // Obtém os valores do ano, mês e ano
                                 var year = moment(start).format('YYYY');
                                 var month = moment(start).format('MM');
@@ -323,24 +353,32 @@
                         console.log("View Modo Semana")
                     }
                     else{
-                        dayName = view.title
-                        console.log("View title result = " + dayName)
-                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
-                        // Obtém os valores do dia, mês e ano
-                        var day = String(dateParts[0]).padStart(2, '0');
-                        var month = getMonthIndex(dateParts[1]);
-                        var year = dateParts[2];
+                        // dayName = view.title
+                        // console.log("View title result = " + dayName)
+                        // var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                        // // Obtém os valores do dia, mês e ano
+                        // var day = String(dateParts[0]).padStart(2, '0');
+                        // var month = getMonthIndex(dateParts[1]);
+                        // var year = dateParts[2];
 
-                        // Função auxiliar para obter o índice do mês com base no nome do mês
-                        function getMonthIndex(monthName) {
-                            var months = [
-                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                            ];
-                            var index = months.indexOf(monthName) + 1;
+                        // // Função auxiliar para obter o índice do mês com base no nome do mês
+                        // function getMonthIndex(monthName) {
+                        //     var months = [
+                        //         'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                        //         'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                        //     ];
+                        //     var index = months.indexOf(monthName) + 1;
 
-                            return String(index).padStart(2, '0');
-                        }
+                        //     return String(index).padStart(2, '0');
+                        // }
+                        var startDate = view.intervalStart;
+                        var day = startDate.date(); // Obtém o dia do mês
+                        var month = startDate.month() + 1; // Obtém o mês (adiciona 1 porque o mês é base zero em Moment.js)
+                        var year = startDate.year(); // Obtém o ano
+                        console.log("Dia atual: " + day);
+                        console.log("Mês atual: " + month);
+                        console.log("Ano atual: " + year);
+
                         setTimeout(function() {
                            UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
                         }, 100);
@@ -404,9 +442,21 @@
                 });
             } 
             else {
+                if(clientTimeZone != timeZoneMyApps){
+                    differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                }
                 availability.forEach(function(dates){
-                    var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                    var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+
+                    var datastart = moment(dates.time_start)
+                    var dataend = moment(dates.time_end)
+                    // Adicionando a diferença de horas às datas de início e fim
+                    datastart.add(differenceInHours, 'hours');
+                    dataend.add(differenceInHours, 'hours');
+
+                    // Formatando as datas novamente, se necessário
+                    datastart = datastart.format('YYYY-MM-DD');
+                    dataend = dataend.format('YYYY-MM-DD');
+
                     tds.forEach(function(td) {
                         var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
                         var hourAvail = countTotalHoursAvailability(String(dataDate),availability);
@@ -485,6 +535,9 @@
             } 
             else {
                 
+                if(clientTimeZone != timeZoneMyApps){
+                    differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                }
 
                 //Deixa tudo indisponível
                 trs.forEach(function (tr) {
@@ -494,8 +547,17 @@
                 console.log("UpdateDayAvailability");
 
                 availability.forEach(function(dates) {
-                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                    var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                    var datastart = moment(dates.time_start, moment.ISO_8601)
+                    var dataend = moment(dates.time_end, moment.ISO_8601)
+
+                    // Adicionando a diferença de horas às datas de início e fim
+                    datastart.add(differenceInHours, 'hours');
+                    dataend.add(differenceInHours, 'hours');
+
+                    // Formatando as datas novamente, se necessário
+                    datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
+                    dataend = dataend.format('YYYY-MM-DDTHH:mm:ss')
+
                     trs.forEach(function(tr) {
                         
                         var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
@@ -503,7 +565,7 @@
                         var hour = moment(dataTime).format('HH');
                         var minute = moment(dataTime).format('mm');
                         var second = moment(dataTime).format('ss');
-                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        var date = year + "-" + pad(month,2) + "-" + pad(day,2) + "T" + pad(hour,2) + ":" + minute + ":" + second;
                         // Cria o objeto de data
                         var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
@@ -553,8 +615,6 @@
             console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
             "end " + end + "\n" + "email " + email)
                             if (name && email) {
-                                var clientTimeZoneOffset = new Date().getTimezoneOffset();
-                                var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
 
                                 var eventData;
                                 eventData = {
@@ -598,7 +658,7 @@
                                         });
                                     } else {
                                         response.text().then(function (text) {
-                                            window.alert("Algo saiu errado:\n" + text);
+                                            window.alert("Algo saiu errado:\n" + String(text));
                                         });
                                     }
 
@@ -631,6 +691,19 @@ function formatTimezoneOffset(offset) {
     return sign + pad(hours, 2) + ':' + pad(minutes, 2);
 }
 
+// Função para converter uma string de fuso horário em um número
+function convertTimeZoneToNumber(timeZone) {
+    var sign = timeZone.charAt(0); // Obtém o sinal do fuso horário (+ ou -)
+    var offset = parseInt(timeZone.slice(1)); // Obtém o deslocamento numérico do fuso horário
+    return sign === '+' ? offset : -offset; // Retorna o número de horas com sinal correto
+}
+
+// Função para calcular a diferença entre dois fusos horários
+function calculateTimeZoneDifference(timeZoneClient, timeZoneMyApps) {
+    var timeZone1Offset = convertTimeZoneToNumber(timeZoneClient);
+    var timeZone2Offset = convertTimeZoneToNumber(timeZoneMyApps);
+    return timeZone1Offset - timeZone2Offset; // Retorna a diferença entre os fusos horários
+}
 // Função auxiliar para adicionar zeros à esquerda para preencher a string
 function pad(num, size) {
     var s = num + "";

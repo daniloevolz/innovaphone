@@ -838,7 +838,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
           // div botão combo
           var combobtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "combobtn"));
           for (let i = 1; i < 6 ; i++) {
-          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button combobutton"))
+          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button comboButton"))
             
             combobtn.setAttribute("page",page)
             combobtn.setAttribute("position-x", 1); 
@@ -902,7 +902,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createComboButton(object,null,"ciano-600","ciano-900","./images/Layer.svg","combobutton")
+                    createComboButton(object,"combobutton","ciano-600","ciano-900","./images/Layer.svg","comboButton")
                     break;
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
@@ -1703,7 +1703,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     
     function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
-        var found;
+        var found = false;
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
@@ -1735,7 +1735,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 divBottomTxt.textContent = object.button_prt
                 found = true;
                 list_users.forEach(function(u){
-                    if(object.button_prt == u.guid && found){
+                    if(String(object.button_prt) === String(u.guid) && found){
                         allBtns.setAttribute("button_prt", u.e164); 
                         allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
                         divBottomTxt.textContent = u.cn
