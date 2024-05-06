@@ -20,6 +20,7 @@ Wecom.novaalertTexts = {
         Combo2: "Combo 2",
         Combo3: "Combo 3",
         Combo4: "Combo 4",
+        defaultOpt: "Escolha um opção",
         labelDeviceTitle: "Selecione o dispositivo controlado por essa seção",
         labelDevice: "Dispositivo:",
         labelSelectDevice: "Selecionar Dispositivo",
