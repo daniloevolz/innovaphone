@@ -327,20 +327,26 @@ embed {
     
 }
 
-.optFree {
+.optBusy {
     font-size: 20px;
     border-radius: 6px;
     display: flex;
     padding: 8px;
-    width: 75px;
-    height: 75px;
+    width: 65px;
+    height: 65px;
     background-color: var(--colors-azul-500);
     text-align: center;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
-
+.divHeaderTableActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+}
 .eventImg1 {
     width: 50px;
 }
@@ -1414,7 +1420,7 @@ select {
     align-items: center;
     height: 40px;
     font-size: 14px;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin: 0 0 6px 0;
 }
 .colunadireitaadmin {

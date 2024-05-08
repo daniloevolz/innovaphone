@@ -1351,7 +1351,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.setAttribute("button_id", object.id);
             allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.remove("optEmpty")
-            allBtns.classList.add("azul-500", "optFree")
+            allBtns.classList.add("azul-500", "optBusy")
             allBtns.innerHTML = object.button_name
             allBtns.addEventListener("click", function(){
                 console.log("Botão clicado", object.button_name)
