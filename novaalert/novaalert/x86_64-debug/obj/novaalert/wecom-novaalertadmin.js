@@ -239,7 +239,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectActionMessageSuccess") {
             console.log(obj.result);
             list_actions = JSON.parse(obj.result);
-            makeTableActions(col_direita);
+            makeActionsDiv(col_direita);
             
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
@@ -404,6 +404,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         leftScreen.classList.add("leftScreenAdm")
         leftScreen.id = "leftScreen"
 
+        var addBottonsForm= document.createElement("div")
+        addBottonsForm.classList.add('addBottonsForm')
+        addBottonsForm.id = "addBottonsForm"
+
         var middleScreen = document.createElement("div")
         middleScreen.classList.add("middleScreenAdm")
         middleScreen.id = "middleScreen"
@@ -549,7 +553,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         topMiddleScreen.appendChild(selectUser)
 
         addButtonsArea.appendChild(zoneDiv)
-        
+        leftScreen.appendChild(addBottonsForm)
         leftScreen.appendChild(addButtonsArea)
 
         btmMiddleScreen.appendChild(divButtonsMain)
@@ -1725,8 +1729,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     // Obter os valores de position_x e position_y do elemento clicado
                     var position_x = this.getAttribute("position-x");
                     var position_y = this.getAttribute("position-y");
-
-                    makeDivAddOption(col_direita, "dest", user, position_x, position_y, "0")
+                    addleftbottons("dest", user, position_x, position_y, "0")
+                    //makeDivAddOption(col_direita, "dest", user, position_x, position_y, "0")
                 }
             })
         }
@@ -1738,6 +1742,94 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         } else {
             return str;
         }
+    }
+
+
+    function addleftbottons(type, user, x, y, z) {
+        var addBottonsForm = document.getElementById('addBottonsForm')
+
+        var imgDiv = document.createElement('div');
+        imgDiv.classList.add('imgDiv')
+        var bgimg = document.createElement('div');
+        bgimg.classList.add('bcimg')
+    
+        var bgimgTxt = document.createElement('div');
+        bgimgTxt.classList.add('bgimgTxt')
+        bgimgTxt.textContent = "Selecione"
+    
+        var bgButtons = document.createElement('div');
+        bgButtons.id = 'bgButtons'
+        bgButtons.classList.add('bgButtons')
+    
+        compInputText('Nome do Botão', 'nameInput', addBottonsForm)
+        compInputText('Parâmetro', 'parameterInput', addBottonsForm)
+        compInputText('Dispositivo', 'deviceInput', addBottonsForm)
+        var input1 = document.getElementById('nameInput')
+        var input2 = document.getElementById('parameterInput')
+        var input3 = document.getElementById('deviceInput')
+    
+        dests.forEach(function(imagem) {
+            var imageElement = document.createElement('img');
+            imageElement.src = imagem.src;
+            imageElement.id = imagem.id;
+            imageElement.classList.add('imageSrc');
+            imageElement.addEventListener('click', function(event) {
+                // Remover a classe 'selected' de todas as imagens
+                dests.forEach(function(imgObject) {
+                    var imgToRemoveClass = document.getElementById(imgObject.id);
+                    imgToRemoveClass.classList.remove('selected');
+                });
+    
+                event.target.classList.add('selected');
+            });
+            imgDiv.appendChild(imageElement);
+        });
+    
+        var create = document.createElement('div')
+        create.textContent = "Criar"
+        create.classList.add('btnprimary')
+        create.id = "create"
+        create.addEventListener('click', function(){
+            var imgSelected = document.querySelector('.selected')
+            console.log('TEXTOS', input1.value,input2.value,input3.value, imgSelected.getAttribute("src"))
+            app.send({ api: "admin", mt: "InsertDestMessage", name: String(input1.value), user: String(""), value: String(input2.value), sip: String(user), type: String(type), device: input3.value, img: String(imgSelected.getAttribute("src")), page: z, x: x, y: y }); 
+        })
+    
+        var cancel = document.createElement('div')
+        cancel.textContent = "Cancel"
+        cancel.classList.add('btnsecundary')
+        cancel.id = "cancel"
+        cancel.addEventListener('click', function(){
+            
+            console.log('TEXTOS', input1.value,input2.value,input3.value)
+        })
+    
+        bgimg.appendChild(bgimgTxt);
+        bgimg.appendChild(imgDiv);
+        
+        bgButtons.appendChild(cancel)
+        bgButtons.appendChild(create)
+
+        addBottonsForm.appendChild(bgimg)
+        addBottonsForm.appendChild(bgButtons)
+    }
+    function compInputText(name, id ,addScreen){
+       
+        var bc = document.createElement("div")
+        bc.classList.add('bcInput')
+        
+        var nameInputText = document.createElement("div")
+        nameInputText.classList.add('nameInputText')
+        nameInputText.textContent = name
+        
+        var inputText = document.createElement("input")
+        inputText.id = id
+        inputText.setAttribute('type', 'text');
+        inputText.placeholder = "Insira o texto aqui"
+
+        bc.appendChild(nameInputText)
+        bc.appendChild(inputText)
+        addScreen.appendChild(bc)
     }
     function createDests(object) {
 
@@ -2291,7 +2383,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     }
 
     //actions
-    function makeTableActions(t) {
+    function makeActionsDiv(t) {
         t.clear(); // limpa a coluna direita
 
         var colDireita = document.getElementById("colDireita")
@@ -2322,8 +2414,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         });
 
         document.getElementById("selectUserModal").addEventListener("change", function (evt) {
-            console.log("usuário selecionado" + evt.target.id);
-            // var userSelected 
+            var user = document.getElementById("selectUserModal");
+            var selectedOption = user.options[user.selectedIndex];
+            var user = selectedOption.id;
+            console.log("Usuário Selecionado" + selectUserModal)
+            makeTableActions(user,divMain)
+            
 
         });
 
@@ -2434,6 +2530,12 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         // })
         // scroll_container.add(list);
         // t.add(scroll_container);
+    }
+    function makeTableActions(user){
+        var filteredActionsUser = list_actions.filter(function(u){
+            return u.action_user == user
+        })[0]
+        console.log("Ações do usuário: " + filteredUser)
     }
     function makeDivAddAction(t) {
         t.clear();

@@ -1200,6 +1200,8 @@ embed {
     background-color: rgba(31, 31, 31, 1);
     max-width: 305px;
     border-radius: 10px;
+    justify-content: space-between;
+    flex-direction: column;
 }
 .middleScreenAdm{
     display: flex;
@@ -1279,10 +1281,121 @@ select {
     cursor: pointer;
 }
 /*DESTS*/
+input {
+    align-self: stretch; 
+    height: 39px; 
+    padding: 12px; 
+    background: #1F1F1F; 
+    border-radius: 6px; 
+    overflow: hidden; 
+    border: 1px #262626 solid; 
+    color: white;
+}
+.imageSrc{
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    cursor: pointer;
+}
+.testes{
+    width: 100px;
+    height: 50px;
+    background-color: green;
+}
+#green-box {
+    width: 50px;
+    height: 50px;
+    background-color: green;
+}
+.bcInput{
+    align-self: stretch;
+    height: 75px;
+    padding: 10px;
+    background: #262626;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 4px;
+    display: flex;
+    color: white;
+}
+.btnprimary{
+    padding-left: 16px; 
+    padding-right: 16px; 
+    padding-top: 6px; 
+    padding-bottom: 6px; 
+    background: #199FDA; 
+    border-radius: 4px; 
+    overflow: hidden; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px; 
+    display: inline-flex;
+    color: white;
+    cursor: pointer;
+}
+.btnsecundary{
+    padding-left: 16px; 
+    padding-right: 16px; 
+    padding-top: 6px; 
+    padding-bottom: 6px; 
+    background: #434343; 
+    border-radius: 4px; 
+    overflow: hidden; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px; 
+    display: inline-flex;
+    color: white;
+    cursor: pointer;
+}
+.bcimg{
+    align-self: stretch;
+    height: 75px;
+    padding: 10px;
+    background: #262626;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    display: flex;
+    color: white;
+}
+.bgButtons{
+    align-self: stretch; 
+    padding: 10px; 
+    background: #262626; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    justify-content: space-between; 
+    align-items: center; 
+    display: inline-flex
+}
+.imgDiv{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+.selected{
+    background: #199FDA;
+    border-radius: 10px;
+}
+.addBottonsForm{
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    gap: 8px; 
+    display: inline-flex
+}
 .destEmpty {
     display: flex;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     padding: 8px 33px;
     justify-content: center;
     align-items: center;
