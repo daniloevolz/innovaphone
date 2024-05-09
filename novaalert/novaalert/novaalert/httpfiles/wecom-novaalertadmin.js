@@ -124,7 +124,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         {menu: "labelCfgAcctions", id: "menu_act"},
         //{menu: "labelCfgNovaalert", id: "menu_srv"},
         //{menu: "labelCfgDefaults", id: "menu_dft"},
-        //{menu: "labelCfgLicense", id: "menu_lic"},
+        {menu: "labelCfgLicense", id: "menu_lic"},
         {menu: "labelOption", id: "menu_opt"},
         {menu: "labelReports", id: "menu_rpt"},
     ]
@@ -394,9 +394,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         scroll_container.add(list);
         t.add(scroll_container);
     }
+
     function makeDivAddButton2(t1) {
         t1.clear();
-        console.log("Erick buttons")
         //user
         var codDireita = document.getElementById("colDireita")
         
@@ -1702,6 +1702,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
 
         list_buttons.forEach(function (zb) {
+            console.log('ERICK DEST', zb.button_user , user)
             if (zb.button_type == "dest" && zb.button_user == user && zb.page == "0") {
                 createDests(zb)
             }
@@ -1744,9 +1745,25 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
     }
 
-
+    function selectDevice(bc){
+        var selectDevice = document.getElementById(bc)
+        var u = list_users.filter(function (u) { return u.guid == user })[0]
+        var devices = u.devices;
+        devices.forEach(function (dev) {
+            var opts = document.createElement("option")
+            opts.textContent =  dev.text
+            opts.id = dev.hw;
+            opts.style.fontSize = '12px';
+            opts.style.textAlign = "center";
+            opts.style.color = "white";
+            selectDevice.appendChild(opts)
+        })
+    }
     function addleftbottons(type, user, x, y, z) {
         var addBottonsForm = document.getElementById('addBottonsForm')
+        
+        var u = list_users.filter(function (u) { return u.guid == user })[0]
+        var devices = u.devices;
 
         var imgDiv = document.createElement('div');
         imgDiv.classList.add('imgDiv')
@@ -1763,14 +1780,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     
         compInputText('Nome do Botão', 'nameInput', addBottonsForm)
         compInputText('Parâmetro', 'parameterInput', addBottonsForm)
-        compInputText('Dispositivo', 'deviceInput', addBottonsForm)
+        compInputSelect('Dispositivo', 'deviceSelect', devices, addBottonsForm)
         var input1 = document.getElementById('nameInput')
         var input2 = document.getElementById('parameterInput')
-        var input3 = document.getElementById('deviceInput')
+        var select = document.getElementById('deviceSelect')
     
         dests.forEach(function(imagem) {
             var imageElement = document.createElement('img');
-            imageElement.src = imagem.src;
+            imageElement.src = imagem.img;
             imageElement.id = imagem.id;
             imageElement.classList.add('imageSrc');
             imageElement.addEventListener('click', function(event) {
@@ -1791,8 +1808,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         create.id = "create"
         create.addEventListener('click', function(){
             var imgSelected = document.querySelector('.selected')
-            console.log('TEXTOS', input1.value,input2.value,input3.value, imgSelected.getAttribute("src"))
-            app.send({ api: "admin", mt: "InsertDestMessage", name: String(input1.value), user: String(""), value: String(input2.value), sip: String(user), type: String(type), device: input3.value, img: String(imgSelected.getAttribute("src")), page: z, x: x, y: y }); 
+            console.log('TEXTOS 1', input1.value)
+            console.log('TEXTOS 2', input2.value)
+            console.log('TEXTOS S', select.value)
+            console.log('TEXTOS I', imgSelected.getAttribute("src"))
+            app.send({ api: "admin", mt: "InsertDestMessage", name: String(input1.value), user: String(""), value: String(input2.value), guid: String(user), type: String(type), device: select.value, img: String(imgSelected.getAttribute("src")), page: z, x: x, y: y }); 
         })
     
         var cancel = document.createElement('div')
@@ -1829,6 +1849,32 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         bc.appendChild(nameInputText)
         bc.appendChild(inputText)
+        addScreen.appendChild(bc)
+    }
+    function compInputSelect(name, id, options ,addScreen){
+       
+        var bc = document.createElement("div")
+        bc.classList.add('bcInput')
+        
+        var nameInputText = document.createElement("div")
+        nameInputText.classList.add('nameSelectText')
+        nameInputText.textContent = name
+        
+        var selectOpt = document.createElement("select")
+        selectOpt.classList.add('addSelect')
+        selectOpt.id = id
+        console.log("SELECT", options)
+
+        options.forEach(function(o){
+            var opt = document.createElement("option")
+            opt.id = id
+            opt.textContent = o.text
+            selectOpt.appendChild(opt);
+
+        })
+
+        bc.appendChild(nameInputText)
+        bc.appendChild(selectOpt)
         addScreen.appendChild(bc)
     }
     function createDests(object) {
