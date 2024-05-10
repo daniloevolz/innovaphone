@@ -1735,7 +1735,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 divBottomTxt.textContent = object.button_prt
                 found = true;
                 list_users.forEach(function(u){
-                    if(String(object.button_prt) === String(u.guid) && found){
+                   // && found
+                    if(String(object.button_prt) === String(u.guid)){
                         allBtns.setAttribute("button_prt", u.e164); 
                         allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
                         divBottomTxt.textContent = u.cn

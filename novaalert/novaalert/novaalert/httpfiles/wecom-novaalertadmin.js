@@ -1182,7 +1182,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         <span class="textGeneric">${texts.text("labelValue")}</span>
                         <input type="text" class="genericInputs"  id="iptParam" placeholder="${texts.text("labelValue")}">
                     </div> 
-                    <div class = "scrollComboDiv">
                     <div class="divSelectAndTextModalBig">
                     
                         <span class="textGeneric">${texts.text("Combo1")}</span>
@@ -1213,7 +1212,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                     <div>
-                </div>
+                
             </body>
         </html>
     `;
@@ -2448,13 +2447,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         <table id = "tableAction" >
         <thead>
             <tr>
-            <th class = "thAction">ID</th>
-            <th class = "thAction">Nome</th>
-            <th class = "thAction">Parâmetro</th>
-            <th class = "thAction">Gatilho</th>
-            <th class = "thAction">Valor</th>
-            <th class = "thAction">Ação</th>
-            <th class = "thAction">Usuário</th>
+            <th class = "thAction">${texts.text("labelID")}</th>
+            <th class = "thAction">${texts.text("cabecalho1")}</th>
+            <th class = "thAction">${texts.text("cabecalho2")}</th>
+            <th class = "thAction">${texts.text("cabecalhoAction3")}</th>
+            <th class = "thAction">${texts.text("cabecalhoAction4")}</th>
+            <th class = "thAction">${texts.text("labelAction")}</th>
+            <th class = "thAction">${texts.text("labelUser")}</th>
             <th class = "thAction"><img src = "./images/star.svg" style = "35px" > </img></th>
             </tr>
         </thead>
@@ -2490,7 +2489,11 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         });
 
-        // //Botões Tabela de Ações
+        document.getElementById("btnCreate").addEventListener("click",function(evt){
+            makeDivAddAction(colDireita)
+        })
+
+        //Botões Tabela de Ações
         // t.add(new innovaphone.ui1.Div("position:absolute; left:60%; width:20%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddAction").addEvent("click", function () {
         //     makeDivAddAction(t);
         // });
@@ -2656,20 +2659,21 @@ function makeTableActions(user) {
 function getActionTypeText(actionType) {
     switch (actionType) {
         case "video":
-            return "Vídeo";
+            return texts.text("video");
         case "page":
-            return "Página Iframe";
+            return texts.text("page");
         case "alarm":
-            return "Alarme";
+            return texts.text("alarm");
         case "number":
-            return "Número";
+            return texts.text("number");
         case "popup":
             return "PopUp Iframe";
         case "button":
-            var button = list_buttons.find(function(btn) {
-                return btn.id === parseInt(actionType);
-            });
-            return button ? button.button_name : "";
+            return texts.text("labelButton");
+            // var button = list_buttons.find(function(btn) {
+            //     return btn.id === parseInt(actionType);
+            // });
+            // return button ? button.button_name : "";
         default:
             return actionType;
     }
@@ -2688,45 +2692,49 @@ function getActionStartTypeText(startType) {
     }
 }
     function makeDivAddAction(t) {
-        t.clear();
-        //Título
+        // t.clear();
+        // //Título
 
         var htmlUser = `
         <html>
             <body>
-                <div class="divMainModal">
-                <h2 class="titleModal">${texts.text("btnAddButton")}</h2>
+                <div class="divMainModal" style = "width: 80%; overflow: auto" >
+                <h2 class="titleModal">${texts.text("btnAddAction")}</h2>
                     <div class="divSelectAndTextModal">
-                        <span class="textGeneric">${texts.text("labelValue")}</span>
+                        <span class="textGeneric">${texts.text("labelUser2")}</span>
                         <select id="selectUserModal" class="genericInputs">
                             <option value="selectUser" style = "text-align:center">${texts.text("labelSelectUser")}</option>
                         </select>
                     </div> 
                     <div class="divSelectAndTextModalBig">
-                    <span class="textGeneric">${texts.text("labelButtonName")}</span>
-                    <input type="text" class="genericInputs" id= "iptNameAction" placeholder="${texts.text("labelButtonName")}">
+                    <span class="textGeneric">${texts.text("labelActionName")}</span>
+                    <input type="text" class="genericInputs" id= "iptNameAction" placeholder="${texts.text("labelActionName")}">
                     </div> 
-                    <div class="divSelectAndTextModal">
-                        <span class="textGeneric">${texts.text("cabecalhoAction5")}</span>
-                        <select id="selectDeviceModal" class="genericInputs">
-                            <option value="selectDevice" style = "text-align:center">${texts.text("labelSelectDevice")}</option>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelAlarmeOrCall")}</span>
+                        <select id="selectTypeTrigger" class="genericInputs">
+                            <option value="selectDevice" style = "text-align:center">${texts.text("labelAlarmeOrCall")}</option>
                         </select>
                     </div> 
                     <div class="divSelectAndTextModalBig">
-                    <span class="textGeneric">${texts.text("labelButtonName")}</span>
-                    <input type="text" class="genericInputs" id= "iptNameAction" placeholder="${texts.text("labelButtonName")}">
+                    <span class="textGeneric">${texts.text("labelAlarmCode")}</span>
+                    <input type="text" class="genericInputs" id= "iptAlarmAction" placeholder="${texts.text("labelAlarmCode")}">
                     </div> 
 
                     <div class="divSelectAndTextModalBig">
-                    <span class="textGeneric">${texts.text("labelButtonName")}</span>
-                    <input type="text" class="genericInputs" id= "iptNameAction" placeholder="${texts.text("labelButtonName")}">
-                    </div> 
+                    <span class="textGeneric">${texts.text("labelType")}</span>
+                    <select id="selectTypeAction" class="genericInputs">
+                        <option value="selectDevice" style = "text-align:center">${texts.text("labelSelectTheType")}</option>
+                    </select>
+                     </div> 
 
                     <div class="divSelectAndTextModalBig">
-                    <span class="textGeneric">${texts.text("cabecalhoAction4")}</span>
-                    <input type="text" class="genericInputs" id= "iptNameAction" placeholder="${texts.text("labelButtonName")}">
-                    </div> 
-
+                    <span class="textGeneric">${texts.text("labelValue")}</span>
+                    <input type="text" class="genericInputs" id= "iptValueAction" placeholder="${texts.text("labelValue")}">
+                    </div>  
+                    <div class="divSelectAndTextModalBig" id = "divDevice">
+                  
+                     </div> 
                     <div class="divButtonsGeneric">
                         <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
@@ -2736,120 +2744,153 @@ function getActionStartTypeText(startType) {
         </html>
     `;
     
-    divMain.innerHTML = ''
-    divMain.innerHTML += htmlUser
-        // t.add(new innovaphone.ui1.Div(null, texts.text("btnAddAction"), "btnAddAction"));
+    t.innerHTML = ''
+    t.innerHTML += htmlUser
 
-        // //Usuário
-        // t.add(new innovaphone.ui1.Div(null, texts.text("labelUser"), "labelUser"));
-        // var iptUser = t.add(new innovaphone.ui1.Node("select", null, null, "selectUserAction"));
-        // iptUser.setAttribute("id", "selectUser");
-        // iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
-        // list_users.forEach(function (user) {
-        //     iptUser.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", user.cn, null).setAttribute("id", user.guid));
-        // })
-        // //var iptUser = that.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:10%; font-size:12px; text-align:center", null, texts.text("iptText"), 255, "url", null));
+        var selectUserModal = document.getElementById("selectUserModal");
+        list_users.forEach(function(user) {
+            var option = document.createElement("option");
+            option.value = user.guid; 
+            option.id = user.guid
+            option.textContent = user.cn; 
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectUserModal.appendChild(option);
+        });
 
-        // //Nome
-        // var divAddAction = t.add(new innovaphone.ui1.Div(null, null, "divAddAction"))
-        // var iptName = divAddAction.add(new innovaphone.ui1.Input(null, null, null, 255, "text", "iptNameAction"));
-        // divAddAction.add(new innovaphone.ui1.Div(null, texts.text("labelName"), "labelNameAction"));
-        // iptName.setAttribute("placeholder", " ");
+        var  selectTypeTrigger = document.getElementById("selectTypeTrigger");
+        list_start_types.forEach(function(act) {
+            var option = document.createElement("option");
+            option.value = act.id
+            option.id = act.id
+            option.textContent = act.typeName
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectTypeTrigger.appendChild(option);
+        });
+          
+        var  selectTypeAction = document.getElementById("selectTypeAction");
+        list_act_types.forEach(function(act) {
+            var option = document.createElement("option");
+            option.value = act.id
+            option.id = act.id
+            option.textContent = act.typeName
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectTypeAction.appendChild(option);
+        });
 
-        // //SELECT LIGAÇÃO OU ALARME
-        // //var divAddAction5 = t.add(new innovaphone.ui1.Div(null,null,"divAddAction5")) desnecessário
-        // t.add(new innovaphone.ui1.Div(" border-bottom: 2px solid #02163F;", texts.text("labelAlarmeOrCall"), "labelTypeAction"));
-        // var selectAlarmOrNumber = t.add(new innovaphone.ui1.Node("select", null, "Escolher...", "selectAlarmOrCall").setAttribute("id", "selectStartType"));
-        // list_start_types.forEach(function (act) {
-        //     selectAlarmOrNumber.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", act.typeName, null).setAttribute("id", act.id));
-        // })
+        document.getElementById("btnCancel").addEventListener("click",function(){
+            makeActionsDiv(col_direita)
+        })
 
+        selectTypeAction.addEventListener("change",function(){
+            
+            var selectedGuid = selectUserModal.options[selectUserModal.selectedIndex];
+            var guidUser = selectedGuid.id;
 
-        // //Código Alarme
-        // var divAddAction2 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction2"));
-        // var iptAlarmCode = divAddAction2.add(new innovaphone.ui1.Input(null, null, null, 255, "url", "iptAlarmAction"));
-        // divAddAction2.add(new innovaphone.ui1.Div(null, texts.text("labelAlarmCode"), "labelNameAlarm"));
-        // iptAlarmCode.setAttribute("placeholder", " ");
+            var selectedOption = selectTypeAction.options[selectTypeAction.selectedIndex];
+            var type = selectedOption.id;
 
-        // //Tipo
-        // t.add(new innovaphone.ui1.Div(null, texts.text("labelType"), "labelAction"));
-        // var iptType = t.add(new innovaphone.ui1.Node("select", null, null, "selectTypeAction"));
-        // iptType.setAttribute("id", "selectType");
+            if(type == "number"){
+                list_users.forEach(function (user) {
+                    if (user.guid == guidUser) {
+                        var devices = user.devices;
 
-        // list_act_types.forEach(function (act) {
-        //     iptType.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", act.typeName, null).setAttribute("id", act.id));
-        // })
+                        var divDevice = document.getElementById("divDevice");
+                        divDevice.innerHTML = ''
+                        divDevice.innerHTML += `
+                        <span class="textGeneric">${texts.text("labelDevice")}</span>
+                        <select id="selectDevices" class="genericInputs">
+                            <option value="selectDevice" style = "text-align:center">${texts.text("labelDevice")}</option>
+                        </select>
+                        `
 
-        // //Valor
-        // var divAddAction4 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction4"));
-        // divAddAction4.add(new innovaphone.ui1.Input(null, null, null, 500, null, "iptValueAction").setAttribute("id", "inputValue"));
-        // divAddAction4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueAction"));
+                        devices.forEach(function (dev) {
+                          
+                            var selectDevices = document.getElementById("selectDevices")
+                            var option = document.createElement("option");
+                            option.value = dev.hw
+                            option.id = dev.hw
+                            option.textContent = dev.text
+                            option.style.fontSize = '12px';
+                            option.style.textAlign = "center";
+                            option.style.color = "white";
+                            selectDevices.appendChild(option);
+                        })
+                    }
+                })
+            }
+            if(type == "button"){
 
+                var divDevice = document.getElementById("divDevice");
+                divDevice.innerHTML = ''
+                divDevice.innerHTML += `
+                <span class="textGeneric">${texts.text("labelValue")}</span>
+                <select id="selectDevices" class="genericInputs">
+                    <option value="selectDevice" style = "text-align:center">${texts.text("labelValue")}</option>
+                </select>
+                `
+                list_buttons.forEach(function(button){
+                    if (button.button_type != "combo" && button.button_user == guidUser || button.button_user == "all") {
+                        var selectDevices = document.getElementById("selectDevices")
+                        var option = document.createElement("option");
+                        option.value = button.id
+                        option.id = button.id
+                        option.textContent = button.button_name
+                        option.style.fontSize = '12px';
+                        option.style.textAlign = "center";
+                        option.style.color = "white";
+                        selectDevices.appendChild(option);
+                    }
+                })
+                
+            }
+            if(type == "alarm"){
+                var divDevice = document.getElementById("divDevice");
+                divDevice.innerHTML = ''
+            }
 
-        // //Device
-        // var divDevice = t.add(new innovaphone.ui1.Div(null, null, "divAddAction5"));
+            
+            })
+            
+        document.getElementById("btnSave").addEventListener("click",function(){
+            const iptName = document.getElementById("iptNameAction").value;
+            const iptAlarmAction = document.getElementById("iptAlarmAction").value;
+            const iptValueAction = document.getElementById("iptValueAction").value;
+            const selectTypeTrigger = document.getElementById("selectTypeTrigger");
+            const typetriggerOpt = selectTypeTrigger.options[selectTypeTrigger.selectedIndex];
+            const typeTriggerValue = typetriggerOpt.id;
+            const selectDevices = document.getElementById("selectDevices");
+            var optSelectDevices = selectDevices.options[selectUserModal.selectedIndex];
+            const device = optSelectDevices.id;
 
-        // document.getElementById("selectType").addEventListener("change", function (e) {
-        //     console.log(e.target.value);
-        //     if (e.target.value == "Número") {
-        //         //Valor
-        //         divAddAction4.clear();
-        //         divAddAction4 = t.add(new innovaphone.ui1.Div(null, null, "divAddAction4"));
-        //         divAddAction4.add(new innovaphone.ui1.Input(null, null, null, 500, null, "iptValueAction").setAttribute("id", "inputValue"));
-        //         divAddAction4.add(new innovaphone.ui1.Div(null, texts.text("labelValue"), "labelValueAction"));
+            var selectedGuid = selectUserModal.options[selectUserModal.selectedIndex];
+            var guidUser = selectedGuid.id;
 
-        //         //Device
-        //         divDevice.add(new innovaphone.ui1.Div(null, texts.text("device"), "labelDeviceNumberAction"));
-        //         var iptDevice = divDevice.add(new innovaphone.ui1.Node("select", null, null, "iptDeviceNumberAction").setAttribute("id", "selectDevice"));
-        //         //iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
+            var selectedOption = selectTypeAction.options[selectTypeAction.selectedIndex];
+            const type = selectedOption.id;
 
-        //         var user = document.getElementById("selectUser");
-        //         var selectedOption = user.options[user.selectedIndex];
-        //         var sip = selectedOption.id;
-        //         iptDevice.clear();
-        //         iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
-        //         list_users.forEach(function (user) {
-        //             if (user.sip == sip) {
-        //                 var devices = user.devices;
-        //                 devices.forEach(function (dev) {
-        //                     iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
-        //                 })
-        //             }
-        //         })
+            if (String(iptName) == "" || String(iptAlarmAction) == "") {
+                 makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
+            }
+            else {
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName), alarm: String(iptAlarmAction), start: String(typeTriggerValue), value: String(iptValueAction), guid: String(guidUser), type: String(type), device: device });
+                makeTableActions(t);
+                    
+                        // Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, 
+                        // action_start_type, action_prt, action_user, action_type, action_device, action_sensor_type, action_sensor_name) 
+                        // VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) 
+                        // + "','" + String(obj.guid) + "','" + String(obj.type) + "','" 
+                        // + String(obj.device) + "','" + String(obj.sensorType) + "','" + String(obj.sensorName)+ "')")
+            }
 
-        //         document.getElementById("selectUser").addEventListener("change", function (e) {
-        //             console.log(e.target.value);
-        //             var user = document.getElementById("selectUser");
-        //             var selectedOption = user.options[user.selectedIndex];
-        //             var sip = selectedOption.id;
-
-        //             var start = document.getElementById("selectType");
-        //             var start = start.options[start.selectedIndex].getAttribute("id");
-
-        //             if (start == "number") {
-        //                 iptDevice.clear();
-        //                 list_users.forEach(function (user) {
-        //                     if (user.sip == sip) {
-        //                         var devices = user.devices;
-        //                         devices.forEach(function (dev) {
-        //                             iptDevice.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", dev.text, null).setAttribute("id", dev.hw));
-        //                         })
-        //                     }
-        //                 })
-        //             }
-        //         });
-        //     }
+        })
         //     else if (e.target.value == "Botão") {
-        //         divDevice.clear();
-        //         divAddAction4.clear();
-
-        //         divAddAction4.add(new innovaphone.ui1.Div("width: 60%; font-size: 15px; text-align: left; border-bottom: 2px solid #02163F;", texts.text("labelValue"), "labelValueAction"));
-        //         var iptValue = divAddAction4.add(new innovaphone.ui1.Node("select", null, null, "selectValueAction").setAttribute("id", "selectValue"));
-        //         //iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", null, null).setAttribute("id", ""));
-
-        //         var user = document.getElementById("selectUser");
-        //         var selectedOption = user.options[user.selectedIndex];
-        //         var sip = selectedOption.id;
+        //         
         //         list_buttons.forEach(function (button) {
         //             if (button.button_type != "combo" && button.button_user == sip || button.button_user == "all") {
         //                 iptValue.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", button.button_name, null).setAttribute("id", button.id));
@@ -2926,6 +2967,7 @@ function getActionStartTypeText(startType) {
 
 
     }
+
     function makeDivUpdateAction(t, action) {
         t.clear();
         //Título
@@ -3268,28 +3310,48 @@ function getActionStartTypeText(startType) {
     function makeDivClearDB(t) {
         t.clear();
         //Título
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:25px; text-align:center", texts.text("labelTituloClearDB")));
+        var colDireita = document.getElementById("colDireita")
 
-        var divTo = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
-        var InputTo = t.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
-        var divReport = t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelReports"), null));
-        var SelectReport = new innovaphone.ui1.Node("select", "position: absolute; top: 45%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectReport");
-        t.add(SelectReport);
-        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "Chamadas", null)).setAttribute("id", "RptCalls");
-        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "Disponibilidade", null)).setAttribute("id", "RptAvailability");
-        SelectReport.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", "Atividades", null)).setAttribute("id", "RptActivities");
-        // buttons
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            var to = document.getElementById("dateTo").value;
-            var report = document.getElementById("selectReport");
-            var selectedOption = report.options[report.selectedIndex];
-            var report = selectedOption.id;
-            app.send({ api: "admin", mt: "DeleteFromReports", src: report, to: to });
-            waitConnection(t);
-        });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            constructor();
-        });
+        var htmlReport = `
+        <html>
+            <body>
+                <div class="divMainModal" style = "width: 80%;">
+                <h2 class="titleModal">${texts.text("labelTituloClearDB")}</h2>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelButtonName")}</span>
+                        <input type="date" class="genericInputs" id= "iptDate" placeholder="${texts.text("labelButtonName")}">
+                    </div>
+                    <div class="divSelectAndTextModal">
+                        <span class="textGeneric">${texts.text("labelSelectTheType")}</span>
+                        <select id="selectReport" class="genericInputs">
+                            <option value="selectDevice" style = "text-align:center">${texts.text("labelSelectTheType")}</option>
+                            <option value="RptCalls" style = "text-align:center">${texts.text("labelRptCalls")}</option>
+                            <option value="RptActivities" style = "text-align:center">${texts.text("labelRptActivities")}</option>
+                            <option value="RptAvailability" style = "text-align:center">${texts.text("labelRptAvailability")}</option>
+                        </select>
+                    </div> 
+                    <div class="divButtonsGeneric">
+                        <div id = "btnSave">${makeButton(texts.text("btnOk"),"primary")}</div>
+                    </div> 
+                </div>
+            </body>
+        </html>
+    `;
+    colDireita.innerHTML += htmlReport
+
+    document.getElementById("btnSave").addEventListener("click",function(){
+        const iptDate = document.getElementById("iptDate").value;
+        var report = document.getElementById("selectReport");
+        var selectedOption = report.options[report.selectedIndex];
+        var report = selectedOption.id;
+
+        if(iptDate == ""){
+            makePopup(texts.text("labelWarning"), texts.text("labelFillDate"))
+        }else{
+            app.send({ api: "admin", mt: "DeleteFromReports", src: report, to: iptDate });
+        }
+    })  
+
     }
     function makeDivLicense(t) {
         t.clear();
@@ -3368,10 +3430,10 @@ function getActionStartTypeText(startType) {
                     
                 break;  
                 case "menu_srv":
-                    makeDivAdmin(_colDireita)
+                    //makeDivAdmin(_colDireita)
                     
                 break;
-                case "menu_dft":
+                case "menu_opt":
                     makeDivClearDB(_colDireita)
                 
                 break;    
