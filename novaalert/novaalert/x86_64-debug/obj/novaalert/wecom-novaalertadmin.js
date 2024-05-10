@@ -2389,12 +2389,33 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var colDireita = document.getElementById("colDireita")
 
         var html = `
+        <div class = "mainDivTableAction" style = "width: 100%; ">
         <div class = "divHeaderTableActions">
         <div>${texts.text("labelCfgAcctions")}</div>
         <select id="selectUserModal" class="genericInputs">
         <option value="">${texts.text("labelSelectUser")}</option>
         </select>
         <div id = "btnCreate">${makeButton(texts.text("btnAddAction"),"primary")}</div>
+        </div>
+        <br>
+        <div class = "tableActionDiv" id = "tableActionDiv">
+        <table id = "tableAction" >
+        <thead>
+            <tr>
+            <th class = "thAction">ID</th>
+            <th class = "thAction">Nome</th>
+            <th class = "thAction">Parâmetro</th>
+            <th class = "thAction">Gatilho</th>
+            <th class = "thAction">Valor</th>
+            <th class = "thAction">Ação</th>
+            <th class = "thAction">Usuário</th>
+            <th class = "thAction"><img src = "./images/star.svg" style = "35px" > </img></th>
+            </tr>
+        </thead>
+        <tbody id = "tbodyAction">
+        </tbody>
+        </table>
+        </div>
         </div>
         `
 
@@ -2418,7 +2439,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             var selectedOption = user.options[user.selectedIndex];
             var user = selectedOption.id;
             console.log("Usuário Selecionado" + selectUserModal)
-            makeTableActions(user,divMain)
+            makeTableActions(user)
             
 
         });
@@ -2531,12 +2552,95 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         // scroll_container.add(list);
         // t.add(scroll_container);
     }
-    function makeTableActions(user){
-        var filteredActionsUser = list_actions.filter(function(u){
-            return u.action_user == user
-        })[0]
-        console.log("Ações do usuário: " + filteredUser)
+
+function makeTableActions(user) {
+    var filteredActionsUser = list_actions.filter(function(action) {
+        return action.action_user === user;
+    });
+
+    var tbody = document.getElementById("tbodyAction");
+
+    // Limpa o conteúdo atual do tbody
+    tbody.innerHTML = '';
+    var filteredUserCN = list_users.filter(function(u){
+        return u.guid == filteredActionsUser[0].action_user
+    })[0]
+    console.log("USER CN " + JSON.stringify(filteredUserCN))
+    filteredActionsUser.forEach(function(action) {
+        var newRow = document.createElement("tr");
+
+
+        // Preencha as células conforme necessário
+        var cells = [
+            action.id,
+            action.action_name,
+            getActionStartTypeText(action.action_start_type),
+            action.action_alarm_code,
+            getActionTypeText(action.action_type),
+            action.action_prt,
+            filteredUserCN.cn
+        ];
+
+        cells.forEach(function(cellData) {
+            var newCell = document.createElement("td");
+            newCell.textContent = cellData;
+            newCell.classList.add("tdTableAction")
+            newRow.appendChild(newCell);
+        });
+
+        // Adiciona o ícone de lixeira
+        var deleteIconCell = document.createElement("td");
+        deleteIconCell.innerHTML = `<span class="delete-icon"><img src = "./images/trash.svg"> </img></span>`;
+        deleteIconCell.classList.add("tdTableAction")
+        deleteIconCell.setAttribute("row-id", action.id)
+        deleteIconCell.id = "deleteTrash"
+        newRow.appendChild(deleteIconCell);
+        tbody.appendChild(newRow);
+    });
+    var deleteIconCell = document.getElementById("deleteTrash")
+    if(deleteIconCell){
+        deleteIconCell.addEventListener("click",function(evt){
+            var rowId = this.getAttribute("row-id")
+            app.send({ api: "admin", mt: "DeleteActionMessage", id: parseInt(rowId) });
+        })
     }
+}
+
+// Função para substituir valores específicos por texto correspondente
+function getActionTypeText(actionType) {
+    switch (actionType) {
+        case "video":
+            return "Vídeo";
+        case "page":
+            return "Página Iframe";
+        case "alarm":
+            return "Alarme";
+        case "number":
+            return "Número";
+        case "popup":
+            return "PopUp Iframe";
+        case "button":
+            var button = list_buttons.find(function(btn) {
+                return btn.id === parseInt(actionType);
+            });
+            return button ? button.button_name : "";
+        default:
+            return actionType;
+    }
+}
+
+function getActionStartTypeText(startType) {
+    switch (startType) {
+        case "alarm":
+            return "Alarme";
+        case "out-number":
+            return "Número Destino";
+        case "inc-number":
+            return "Número Origem";
+        default:
+            return startType;
+    }
+}
     function makeDivAddAction(t) {
         t.clear();
         //Título

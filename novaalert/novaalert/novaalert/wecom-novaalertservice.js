@@ -827,18 +827,15 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "DeleteActionMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageResult" }));
-                obj.id.forEach(function (id) {
-                    Database.exec("DELETE FROM list_alarm_actions WHERE id=" + id + ";")
+                    Database.exec("DELETE FROM list_alarm_actions WHERE id=" + obj.id + ";")
                         .oncomplete(function () {
-                            log("DeleteMessage: Delete Success ID " + id);
+                            log("DeleteMessage: Delete Success ID " + obj.id);
+                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess" }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
                         });
-                })
-                conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess" }));
-
+            
             }
             //#endregion
             //#region REPORTS

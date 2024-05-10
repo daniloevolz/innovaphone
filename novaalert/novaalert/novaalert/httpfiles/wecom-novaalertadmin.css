@@ -110,7 +110,8 @@ input[type=number]::-webkit-outer-spin-button {
 /*#endregion*/
 body {
     /* background-image: var(--bg); */
-    background-color: var(--colors-neutro-1200);
+    /* background-color: var(--colors-neutro-1200); */
+    background-color: #000000;
     background-size: cover;
     background-repeat: no-repeat;
     color: var(--text-standard);
@@ -1535,6 +1536,7 @@ input {
     font-size: 14px;
     justify-content: space-between;
     margin: 0 0 6px 0;
+    background-color: #141414;
 }
 .colunadireitaadmin {
 
@@ -3029,9 +3031,16 @@ div.button-inn-del {
 /*End Mobile model */
 
 /*Inicío Tabelas*/
-
-table {
-    border-collapse: collapse; /* CSS2 */
+.tableActionDiv{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+#tableAction{
+    width: 80%;
+    border-collapse: collapse;
+}
+/* table {
     background: #80808096;
     color: #B0132B;
 }
@@ -3047,24 +3056,44 @@ table {
 }
 .table-buttons table td {
     width: 25%;
-}
-
+} */
+/* 
     table tr {
         border: 1px solid #02163F;
         height: 50px;
-        color: white;
+        color: black;
     }
 
     table th {
         border: 1px solid #02163F;
-        background: #F0FFF0;
+        background: var(--colors-neutro-1200);
         height: 50px;
-        color: white;
-    }
+        color: black;
+    } */
 
 .headercl {
     font-size: 12px;
     background-color: #02163F;
+}
+
+.thAction{
+    background-color: var(--colors-neutro-1200);
+    font-weight: 500;
+    color: #FFF;
+    font-family: Inter;
+    height: 45px;
+    text-align: center;
+    align-content: center;
+    
+
+}
+.tdTableAction{
+    background-color: var(--colors-neutro-1000);
+    color: #FFF;
+    font-family: Inter;
+    font-weight: 500;
+    height: 40px;
+    text-align: center;
 }
 /*End Tabelas*/
 
