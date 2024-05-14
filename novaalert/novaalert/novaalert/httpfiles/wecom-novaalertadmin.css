@@ -4,7 +4,7 @@
     margin: 0;
     padding: 0;
 }
-/*#region MODAIS CRIAÇÃO DE BOTÕES ADMIN*/
+/*#region MODAIS CRIAÃ‡ÃƒO DE BOTÃ•ES ADMIN*/
 .divMainModal{
     display: flex;
     width: 80%;
@@ -123,7 +123,7 @@ body {
     height: 100vh;
 }
 
-/*ANIMAÇÃO BOTÕES */
+/*ANIMAÃ‡ÃƒO BOTÃ•ES */
 
 @keyframes blink-background {
     0% { background-color: #595959; }
@@ -149,7 +149,7 @@ embed {
     height: 100%;
 }
 
-/*#region Alterações erick*/
+/*#region AlteraÃ§Ãµes erick*/
 .zoneDiv {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -237,7 +237,7 @@ embed {
     /* margin: 10px; */
 }
 .toastAnimation {
-    animation: slideIn 1s forwards; /* duração e direção da animação */
+    animation: slideIn 1s forwards; /* duraÃ§Ã£o e direÃ§Ã£o da animaÃ§Ã£o */
 }
 
 @keyframes slideIn {
@@ -303,8 +303,8 @@ embed {
 }
 .gridZero {
     display: flex;
-    gap: 5px; /* Espaçamento entre as divs */
-    align-items: center; /* Estica as divs filho para corresponder à altura da maior div */
+    gap: 5px; /* EspaÃ§amento entre as divs */
+    align-items: center; /* Estica as divs filho para corresponder Ã  altura da maior div */
     /*display: flex;
     flex-wrap: wrap;
     width: 474px;
@@ -982,7 +982,7 @@ embed {
     border: 1px solid #02163F;
     border-radius: 10px;
 }
-/*select página*/
+/*select pÃ¡gina*/
 .labelPageAdd {
     position: absolute;
     left: 0%;
@@ -1309,10 +1309,16 @@ input {
     color: white;
 }
 .imageSrc{
-    width: 30px;
-    height: 30px;
-    margin: 5px;
+    width: 20px;
+    height: 20px;
+    margin: 2px;
     cursor: pointer;
+}
+.nameInputText{
+    font-size: 14px;
+}
+.nameSelectText{
+    font-size: 14px;
 }
 .testes{
     width: 100px;
@@ -2037,7 +2043,7 @@ input {
     border: 1px solid #02163F;
     border-radius: 10px;
 }
-/* CSS DA TABELA DE AÇÕES  */
+/* CSS DA TABELA DE AÃ‡Ã•ES  */
 .btnAddAction{
     position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center;
 }
@@ -2294,7 +2300,7 @@ input {
         border-image: linear-gradient(to right, #02163F,#0a45bd);
         border-image-slice: 1;
 }
-/*FIM TABELA DE AÇÕES */
+/*FIM TABELA DE AÃ‡Ã•ES */
 
 /*SERVIDOR NA*/
 .labelServerEnable {
@@ -3046,7 +3052,7 @@ div.button-inn-del {
 
 /*End Mobile model */
 
-/*Inicío Tabelas*/
+/*InicÃ­o Tabelas*/
 .tableActionDiv{
     justify-content: center;
     display: flex;
@@ -3113,7 +3119,7 @@ div.button-inn-del {
 }
 /*End Tabelas*/
 
-/*INÍCIO MESSAGE ALERTS*/
+/*INÃCIO MESSAGE ALERTS*/
   .container {
     width: 38%;
     position: absolute;
