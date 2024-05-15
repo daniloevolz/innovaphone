@@ -36,36 +36,108 @@ var langMyApps; // idioma do myapps do usuario DWC
 var timeZoneMyApps; // timezone do my apps do usuario DWC
 
  var  WecomDwcschedulerTexts = [{
-    pt: {
-        labelEventWhen: "Quando",
-        labelJoinConf: "Entrar na reunião",
-        labelMembers: "Participantes",
-        labelHost: "Organizador",
-        labelConfUrl: "Link do evento: ",
-        labelEventScheduled : "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!",
-        labelHello: "Olá",
-        labelName: "Nome",
-        labelHour: "Horário",
-        labelMail: "E-mail",
-        labelNewSchedule: "um novo agendamento foi realizado para o seu usuários via DWC, seguem informações de contato do solicitante.",
-        labelBestRegards: "Atenciosamente"
-    },
-    en:{
-        labelEventWhen: "When:",
-        labelJoinConf: "Join Conference",
-        labelMembers: "Members",
-        labelHost: "Host",
-        labelConfUrl: "Event Link: ",
-        labelEventScheduled: "Event scheduled, You will soon receive an email with the conference invitation.\nDon't forget to check your SPAM folder!\nThank you!",
-        labelHello: "Hello",
-        labelName: "Name",
-        labelHour: "Hour",
-        labelMail: "Mail",
-        labelNewSchedule: "A new appointment was made for its users via DWC, follow the requestor's contact information below.",
-        labelBestRegards: "Best Regards"
-    }
+     pt: {
+         labelEventWhen: "Quando",
+         labelJoinConf: "Entrar na reunião",
+         labelMembers: "Participantes",
+         labelHost: "Organizador",
+         labelConfUrl: "Link do evento: ",
+         labelEventScheduled: "Evento agendado, Em breve você receberá um e-mail com o convite da conferência.\nNão esqueça de verificar sua caixa de SPAM!\nObrigado!",
+         labelHello: "Olá",
+         labelName: "Nome",
+         labelHour: "Horário",
+         labelMail: "E-mail",
+         labelNewSchedule: "um novo agendamento foi realizado para o seu usuário via DWC, seguem informações de contato do solicitante.",
+         labelBestRegards: "Atenciosamente"
+     },
+     en: {
+         labelEventWhen: "When",
+         labelJoinConf: "Join meeting",
+         labelMembers: "Participants",
+         labelHost: "Host",
+         labelConfUrl: "Event link: ",
+         labelEventScheduled: "Event scheduled, Soon you will receive an email with the conference invitation.\nDon't forget to check your SPAM folder!\nThank you!",
+         labelHello: "Hello",
+         labelName: "Name",
+         labelHour: "Hour",
+         labelMail: "E-mail",
+         labelNewSchedule: "a new schedule has been made for your user via DWC, here are the requester's contact information.",
+         labelBestRegards: "Best regards"
+     },
+     es: {
+         labelEventWhen: "Cuándo",
+         labelJoinConf: "Unirse a la reunión",
+         labelMembers: "Participantes",
+         labelHost: "Organizador",
+         labelConfUrl: "Enlace del evento: ",
+         labelEventScheduled: "Evento programado, Pronto recibirá un correo electrónico con la invitación a la conferencia.\n¡No olvides revisar tu carpeta de SPAM!\n¡Gracias!",
+         labelHello: "Hola",
+         labelName: "Nombre",
+         labelHour: "Hora",
+         labelMail: "Correo electrónico",
+         labelNewSchedule: "se ha realizado un nuevo horario para su usuario a través de DWC, aquí están los datos de contacto del solicitante.",
+         labelBestRegards: "Atentamente"
+     },
+     fr: {
+         labelEventWhen: "Quand",
+         labelJoinConf: "Rejoindre la réunion",
+         labelMembers: "Participants",
+         labelHost: "Organisateur",
+         labelConfUrl: "Lien de l'événement :",
+         labelEventScheduled: "Événement programmé, Bientôt vous recevrez un e-mail avec l'invitation à la conférence.\nN'oubliez pas de vérifier votre dossier SPAM !\nMerci !",
+         labelHello: "Bonjour",
+         labelName: "Nom",
+         labelHour: "Heure",
+         labelMail: "E-mail",
+         labelNewSchedule: "un nouveau calendrier a été établi pour votre utilisateur via DWC, voici les coordonnées du demandeur.",
+         labelBestRegards: "Cordialement"
+     },
+     de: {
+         labelEventWhen: "Wann",
+         labelJoinConf: "An der Sitzung teilnehmen",
+         labelMembers: "Teilnehmer",
+         labelHost: "Veranstalter",
+         labelConfUrl: "Veranstaltungslink: ",
+         labelEventScheduled: "Veranstaltung geplant, Bald erhalten Sie eine E-Mail mit der Konferenzeinladung.\nVergessen Sie nicht, Ihren SPAM-Ordner zu überprüfen!\nVielen Dank!",
+         labelHello: "Hallo",
+         labelName: "Name",
+         labelHour: "Stunde",
+         labelMail: "E-Mail",
+         labelNewSchedule: "Ein neuer Zeitplan wurde für Ihren Benutzer über DWC erstellt. Hier sind die Kontaktdaten des Antragstellers.",
+         labelBestRegards: "Mit freundlichen Grüßen"
+     }
     
 }]
+
+// Objeto de mapeamento de deslocamento horário para TZID
+var timeZoneMapping = {
+    "-12:00": "Pacific/Kwajalein",
+    "-11:00": "Pacific/Midway",
+    "-10:00": "Pacific/Honolulu",
+    "-09:00": "America/Anchorage",
+    "-08:00": "America/Los_Angeles",
+    "-07:00": "America/Denver",
+    "-06:00": "America/Chicago",
+    "-05:00": "America/New_York",
+    "-04:00": "America/Caracas",
+    "-03:00": "America/Sao_Paulo",
+    "-02:00": "Atlantic/Azores",
+    "-01:00": "Atlantic/Cape_Verde",
+    "+00:00": "Europe/London",
+    "+01:00": "Europe/Paris",
+    "+02:00": "Europe/Athens",
+    "+03:00": "Europe/Moscow",
+    "+04:00": "Asia/Dubai",
+    "+05:00": "Asia/Karachi",
+    "+06:00": "Asia/Dhaka",
+    "+07:00": "Asia/Bangkok",
+    "+08:00": "Asia/Hong_Kong",
+    "+09:00": "Asia/Tokyo",
+    "+10:00": "Australia/Sydney",
+    "+11:00": "Pacific/Noumea",
+    "+12:00": "Pacific/Fiji"
+};
+
 
 
 Config.onchanged(function () {
@@ -173,6 +245,7 @@ if (license != null && license.System==true) {
                             var name = pbxTableUsers.filter(findBySip(obj.sip))[0].columns.cn;
                             lang = obj.language
                             timeZoneClient = obj.timeZone
+                            //timeZoneClient = "+2:00"
                             var todayClient = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZoneClient));
                             var todayMyApps = convertDateTimeLocalToCustomFormat(getDateTimeZone(timeZoneMyApps));
 
@@ -195,29 +268,84 @@ if (license != null && license.System==true) {
                             var meetingId = rand;
                             var timeNowClient = creationDate(todayClient);
                             var timeNowMyApps = creationDate(todayMyApps);
-                            var timeDiff = 0
-                            if(timeZoneMyApps != timeZoneClient){
-                                timeDiff = calculateTimeZoneDifference(timeZoneClient,timeZoneMyApps)
-                            }
+                            var timeDiff = "0"
+                            //if(timeZoneMyApps != timeZoneClient){
+                            //    timeDiff = calculateTimeZoneDifference(timeZoneClient,timeZoneMyApps)
+                            //}
 
-                            log("TimeZoneMyApps " + timeZoneMyApps)
+                            log("TimeZoneMyApps " + timeZoneMyApps) //+03:00
                             log("TimeZoneClient " + timeZoneClient)
                             log("TimeNowClient " + timeNowClient)
                             log("TimeNowMyApps " + timeNowMyApps)
-                           
-                            var startTimestampMyApps = convertDateTimeToTimestamp(obj.time_start,timeDiff);
-                            log("startTimestampMyApps " + startTimestampMyApps);
-                            var endTimestampMyApps = convertDateTimeToTimestamp(obj.time_end,timeDiff);
-                            log("endTimestampMyApps  " + endTimestampMyApps);
-                            var creationTimestampMyApps = convertDateTimeToTimestamp(timeNowMyApps,0);
-                            log("creationTimestampMyApps  " + creationTimestampMyApps);
 
-                            var startTimestampClient = convertDateTimeToTimestamp(obj.time_start,0);
-                            log("startTimestampClient " + startTimestampClient);
-                            var endTimestampClient = convertDateTimeToTimestamp(obj.time_end,0);
-                            log("endTimestampClient " + endTimestampClient);
-                            var creationTimestampClient = convertDateTimeToTimestamp(timeNowClient,0);
+
+                            var timeZoneClientShort = timeZoneClient.split(':')[0] 
+                            log("timeZoneClient" + timeZoneClient);
+                            var timeZoneMyAppsShort = timeZoneMyApps.split(":")[0] //+03
+                            log("timeZoneMyApps" + timeZoneMyApps);
+                            //if (timeZoneClientShort < timeZoneMyAppsShort) {
+                            //    log("if 1");
+                            //    timeDiff = calculateTimeZoneDifference(timeZoneClientShort, timeZoneMyAppsShort)
+
+                            //} else if (timeZoneClientShort > timeZoneMyAppsShort) {
+                            //    log("if 2");
+                            //    timeDiff = calculateTimeZoneDifference(timeZoneMyAppsShort, timeZoneClientShort)
+                                
+                            //} else {
+                            //    log("else");
+                            //}
+                            //log("timeDiff" + timeDiff);
+
+                            //// Transforma a string de data em um objeto Date
+                            //var date = new Date(obj.time_start);
+                            //// Adiciona as horas
+                            //date.setHours(date.getHours() - timeZoneClientShort);
+                            //// Ou subtrai as horas
+                            //// date.setHours(date.getHours() - hoursToSubtract);
+                            //// Transforma de volta para uma string de data
+                            //var time_start_utc = date.toISOString();
+                            //obj.time_start_utc = time_start_utc
+
+                            //// Transforma a string de data em um objeto Date
+                            //var date = new Date(obj.time_end);
+                            //// Subtrai as horas
+                            //date.setHours(date.getHours() - timeZoneClientShort);
+                            //// Transforma de volta para uma string de data
+                            //var time_end_utc = date.toISOString();
+                            //obj.time_end_utc = time_end_utc
+                            //// Transforma a string de data em um objeto Date
+                            //var date = new Date(obj.time_start);
+                            //// Adiciona as horas
+                            //date.setHours(date.getHours() + timeDiff);
+                            //// Transforma de volta para uma string de data
+                            //var myapps_time_start = date.toISOString();
+                            //log("myapps_time_start toISOString " + myapps_time_start);
+                            var myapps_time_start = ajustarHora(obj.time_start, timeZoneMyAppsShort)
+                            log("myapps_time_start formated " + myapps_time_start);
+                            var client_time_start = ajustarHora(obj.time_start, timeZoneClientShort)
+                            log("myapps_time_start formated " + client_time_start);
+
+
+                            var myapps_time_end = ajustarHora(obj.time_end, timeZoneMyAppsShort)
+                            log("myapps_time_end formated " + myapps_time_end);
+                            var client_time_end = ajustarHora(obj.time_end, timeZoneClientShort)
+                            log("myapps_time_end formated " + client_time_end);
+
+                            var startTimestampUTC = convertDateTimeToTimestamp(obj.time_start);
+                            log("startTimestampUTC " + startTimestampUTC);
+
+                            var endTimestampUTC = convertDateTimeToTimestamp(obj.time_end);
+                            log("endTimestampUTC  " + endTimestampUTC);
+
+                            var creationTimestampUTC = convertDateTimeToTimestamp(timeNowMyApps);
+                            log("creationTimestampUTC  " + creationTimestampUTC);
+
+
+                            var creationTimestampClient = convertDateTimeToTimestamp(timeNowClient);
                             log("creationTimestampClient " + creationTimestampClient);
+
+                            var timeZoneName = timeZoneMapping[timeZoneMyApps]
+                            log("timeZoneName " + timeZoneName);
 
                             selectUserConfigs(obj, function (error, resultConfigs) {
                                 if (error) {
@@ -235,8 +363,8 @@ if (license != null && license.System==true) {
                                     var roomNumber = cfg[0].number_conference;
                                     var md5Hash = decodeURIComponent(cfg[0].key_conference);
                                     var reservedChannels = cfg[0].reserved_conference;
-                                    var conferenceLinkClient = createConferenceLink(timeZoneClient,version, flags, roomNumber, meetingId, startTimestampClient, endTimestampClient, reservedChannels, creationTimestampClient, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
-                                    var conferenceLinkMyApps = createConferenceLink(timeZoneMyApps,version, flags, roomNumber, meetingId, startTimestampMyApps, endTimestampMyApps, reservedChannels, creationTimestampMyApps, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    //var conferenceLinkClient = createConferenceLink(timeZoneClient,version, flags, roomNumber, meetingId, startTimestampClient, endTimestampClient, reservedChannels, creationTimestampClient, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    var conferenceLinkMyApps = createConferenceLink(timeZoneMyApps,version, flags, roomNumber, meetingId, startTimestampUTC, endTimestampUTC, reservedChannels, creationTimestampUTC, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
                                     log("conferenceLinkMyApps" + conferenceLinkMyApps);
                                     insertConferenceSchedule(obj, conferenceLinkMyApps, function (error, resultSchedule) {
                                         if (error) {
@@ -260,7 +388,7 @@ if (license != null && license.System==true) {
                                             try {
                                                 connectionsUser.forEach(function (conn) {
                                                     if (conn.sip == obj.sip) {
-                                                        conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: obj.time_start }));
+                                                        conn.send(JSON.stringify({ api: "user", mt: "UserEventMessage", name: obj.name, email: obj.email, time_start: formatDate(myapps_time_start) }));
                                                     }
                                                 })
 
@@ -305,10 +433,10 @@ if (license != null && license.System==true) {
                                                     + "<p></p>"
                                                     + "<table style='width: 100%;'>"
                                                     + "<tr style='width: 100%;'>"
-                                                    + "<td style ='width: 50%'>" + "<b>" + WecomDwcschedulerTexts[0][lang]['labelEventWhen'] + "</b><br>" + day + '&nbsp;' + time
+                                                    + "<td style ='width: 50%'>" + "<b>" + WecomDwcschedulerTexts[0][lang]['labelEventWhen'] + "</b><br>" + formatDate(client_time_start)
                                                     + "</td>"
                                                     + "<td style= 'background-color: #1a73e8;border: none; width: 25%; color:white ;padding:15px;border-radius: 5px; display:flex; justify-content: center; align-items: center; text-align: center;' >"
-                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLinkClient + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' >" + WecomDwcschedulerTexts[0][lang]['labelJoinConf']
+                                                    + "<a style='color:white; font-weight:bold; width:100%; height:fit-content; text-decoration: none;' href=" + " ' " + conferenceLinkMyApps + " ' " + ">" + "<span style = 'width: 100%; font-weight: bold;' >" + WecomDwcschedulerTexts[0][lang]['labelJoinConf']
                                                     + "</span>"
                                                     + "</a>"
                                                     + "</td>"
@@ -321,7 +449,7 @@ if (license != null && license.System==true) {
                                                     + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + cfg[0].email_contato + "</span>" + "<span style='color: #70757a;'>" + "-" +  WecomDwcschedulerTexts[0][lang]['labelHost'] + "</span>"
                                                     + "<br>" + "<span style ='text-decoration: none; color: #3c4043'>" + obj.email + "</span>"
                                                     + "</td>"
-                                                    + "<td>" + WecomDwcschedulerTexts[0][lang]['labelConfUrl'] + "</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLinkClient + "</span>" + "</td>"
+                                                    + "<td>" + WecomDwcschedulerTexts[0][lang]['labelConfUrl'] + "</b>" + "<br>" + "<span style = 'color: #70757a'>" + conferenceLinkMyApps + "</span>" + "</td>"
                                                     + "</tr>"
                                                     + "</table>"
                                                     + "</div>"
@@ -336,8 +464,7 @@ if (license != null && license.System==true) {
                                                     + "<h3>" + WecomDwcschedulerTexts[0][langMyApps]['labelHello'] + " " + name + "," + WecomDwcschedulerTexts[0][langMyApps]["labelNewSchedule"] + "</h3><br/>"
                                                     + "<b>"+  WecomDwcschedulerTexts[0][langMyApps]['labelName'] + " " + obj.name + "</b><br/>"
                                                     + "<b>" +  WecomDwcschedulerTexts[0][langMyApps]['labelMail'] + " " + "</b> " + obj.email + "<br/>"
-                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelEventWhen'] + " " + "</b> " + day + "<br/>"
-                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelHour'] + " " + "</b> " + time + "<br/><br/>"
+                                                    + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelEventWhen'] + " " + "</b> " + formatDate(myapps_time_start) + "<br/><br/>"
                                                     + "<b>" + WecomDwcschedulerTexts[0][langMyApps]['labelConfUrl'] + " " + "</b> " + conferenceLinkMyApps + "<br/><br/>"
                                                     + WecomDwcschedulerTexts[0][langMyApps]['labelBestRegards'] + "<br/>"
                                                     + "<i>DWC Wecom</i>"
@@ -345,36 +472,36 @@ if (license != null && license.System==true) {
                                                     + "</html>";
 
 
-                                                //Anexo
+                                                //Anexo Client
                                                 var attachmentClient = "BEGIN:VCALENDAR\n"
                                                     + "PRODID:-//DWC Wecom//EN\n"
                                                     + "VERSION:2.0\n"
                                                     + "CALSCALE:GREGORIAN\n"
                                                     + "METHOD:REQUEST\n"
                                                     + "BEGIN:VTIMEZONE\n"
-                                                    + "TZID:America/Sao_Paulo\n"
-                                                    + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                    + "TZID:" + timeZoneMapping[timeZoneClient] + "\n"
+                                                    + "X-LIC-LOCATION:" + timeZoneMapping[timeZoneClient] + "\n"
                                                     + "BEGIN:STANDARD\n"
-                                                    + "TZOFFSETFROM:-0300\n"
-                                                    + "TZOFFSETTO:-0300\n"
-                                                    + "TZNAME:-03\n"
+                                                    + "TZOFFSETFROM:" + timeZoneClient.replace(":", "") +"\n"
+                                                    + "TZOFFSETTO:" + timeZoneClient.replace(":", "") +"\n"
+                                                    + "TZNAME:" + timeZoneClientShort + "\n"
                                                     + "DTSTART:19700101T000000\n"
                                                     + "END:STANDARD\n"
                                                     + "END:VTIMEZONE\n"
                                                     + "BEGIN:VEVENT\n"
-                                                    + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
-                                                    + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
+                                                    + "DTSTART;TZID=" + timeZoneMapping[timeZoneClient] + ":" + convertDateTimeLocalToCustomFormat(client_time_start) + "\n" //convertDateTimeLocalToCustomFormat(obj.time_start)
+                                                    + "DTEND;TZID=" + timeZoneMapping[timeZoneClient] + ":" + convertDateTimeLocalToCustomFormat(client_time_end) + "\n" //convertDateTimeLocalToCustomFormat(obj.time_end)
                                                     + "DTSTAMP:" + todayClient + "Z\n"
                                                     + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                     + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
                                                     + ";CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                     + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
                                                     + ";CN=" + obj.email + ":mailto:" + obj.email + "\n"
-                                                    + "X-GOOGLE-CONFERENCE:" + conferenceLinkClient + "\n"
+                                                    + "X-GOOGLE-CONFERENCE:" + conferenceLinkMyApps + "\n"
                                                     + "X-MICROSOFT-CDO-OWNERAPPTID:1590702030\n"
                                                     + "CREATED:" + todayClient + "Z\n"
-                                                    + "DESCRIPTION:" + conferenceLinkClient + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
-                                                    + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLinkClient + " \n\nLearn more about Meet at: https://support.google.com/"
+                                                    + "DESCRIPTION:" + conferenceLinkMyApps + "\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~\n"
+                                                    + " :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nJoin with Browser: " + conferenceLinkMyApps + " \n\nLearn more about Meet at: https://support.google.com/"
                                                     + " a/users/answer/9282720\n\nPlease do not edit this section.\n-::~:~::~:~:~:~\n"
                                                     + " :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n"
                                                     + "LAST-MODIFIED:" + todayClient + "Z\n"
@@ -397,18 +524,18 @@ if (license != null && license.System==true) {
                                                 + "CALSCALE:GREGORIAN\n"
                                                 + "METHOD:REQUEST\n"
                                                 + "BEGIN:VTIMEZONE\n"
-                                                + "TZID:America/Sao_Paulo\n"
-                                                + "X-LIC-LOCATION:America/Sao_Paulo\n"
+                                                + "TZID:" + timeZoneMapping[timeZoneMyApps] + "\n"
+                                                + "X-LIC-LOCATION:" + timeZoneMapping[timeZoneMyApps] + "\n"
                                                 + "BEGIN:STANDARD\n"
-                                                + "TZOFFSETFROM:-0300\n"
-                                                + "TZOFFSETTO:-0300\n"
-                                                + "TZNAME:-03\n"
+                                                + "TZOFFSETFROM:" + timeZoneMyApps.replace(":", "")+"\n"
+                                                + "TZOFFSETTO:" + timeZoneMyApps.replace(":", "") +"\n"
+                                                + "TZNAME:" + timeZoneMyAppsShort + "\n"
                                                 + "DTSTART:19700101T000000\n"
                                                 + "END:STANDARD\n"
                                                 + "END:VTIMEZONE\n"
                                                 + "BEGIN:VEVENT\n"
-                                                + "DTSTART;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_start) + "\n"
-                                                + "DTEND;TZID=America/Sao_Paulo:" + convertDateTimeLocalToCustomFormat(obj.time_end) + "\n"
+                                                    + "DTSTART;TZID=" + timeZoneMapping[timeZoneMyApps] + ":" + convertDateTimeLocalToCustomFormat(myapps_time_start)+ "\n" //convertDateTimeLocalToCustomFormat(obj.time_start)
+                                                        + "DTEND;TZID=" + timeZoneMapping[timeZoneMyApps] + ":" + convertDateTimeLocalToCustomFormat(myapps_time_end)+ "\n" //convertDateTimeLocalToCustomFormat(obj.time_end)
                                                 + "DTSTAMP:" + todayMyApps + "Z\n"
                                                 + "ORGANIZER;CN=" + cfg[0].email_contato + ":mailto:" + cfg[0].email_contato + "\n"
                                                 + "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE"
@@ -553,6 +680,61 @@ if (license != null && license.System==true) {
             }
         });
     }
+}
+
+// Exemplo de uso:
+//var dataOriginal = "2024-04-28T03:57";
+//var diferenca = "-03"; // ou "+03" para somar 3 horas
+function ajustarHora(dataString, diferenca) {
+    // Converte a string de data para um objeto Date
+    var data = new Date(dataString);
+
+    // Extrai o valor da diferença de horas da string
+    var diferencaHoras = parseInt(diferenca);
+
+    // Verifica se a diferença é positiva ou negativa e adiciona ou subtrai horas
+    if (diferencaHoras >= 0) {
+        data.setHours(data.getHours() + diferencaHoras);
+    } else {
+        data.setHours(data.getHours() - Math.abs(diferencaHoras));
+    }
+
+    // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm)
+    var ano = data.getFullYear();
+    var mes = padZero(data.getMonth() + 1); // Adiciona 1 porque os meses são indexados a partir de 0
+    var dia = padZero(data.getDate());
+    var horas = padZero(data.getHours());
+    var minutos = padZero(data.getMinutes());
+
+    var novaDataString = ano + "-" + mes + "-" + dia + "T" + horas + ":" + minutos;
+
+    // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm) EM UTC
+    //var novaDataString = new Date(dataString).toISOString().slice(0, 16);
+
+    return novaDataString;
+}
+
+function padZero(num) {
+    return (num < 10 ? "0" : "") + num;
+}
+
+function formatDate(date) {
+    // Cria uma nova data com a data e hora atuais em UTC
+    var date = new Date(date);
+    // Adiciona o deslocamento de GMT-3 �s horas da data atual em UTC
+    //date.setUTCHours(date.getUTCHours() - 3);
+
+    // Formata a data em uma string no formato "AAAAMMDDTHHmmss"
+    var year = date.getUTCFullYear();
+    var month = padZero(date.getUTCMonth() + 1);
+    var day = padZero(date.getUTCDate());
+    var hours = padZero(date.getUTCHours());
+    var minutes = padZero(date.getUTCMinutes());
+    var seconds = padZero(date.getUTCSeconds());
+    var dateString = year + "-" + month + "-" + day + " " + hours + ":" + minutes + "-" + seconds;
+
+    // Retorna a string no formato "AAAAMMDDTHHmmss"
+    return dateString;
 }
 
 function getLicense() {
@@ -1431,40 +1613,49 @@ function mergeUint8Arrays(arrays) {
 
     return result;
 }    
-function convertDateTimeToTimestamp(dateTimeString,timeDiff) {
-    var dateTimeParts = dateTimeString.split('T');
-    var dateParts = dateTimeParts[0].split('-');
-    var timeParts = dateTimeParts[1].split(':');
-    
-    var year = parseInt(dateParts[0]);
-    var month = parseInt(dateParts[1]) - 1; // Month is zero-based in JavaScript
-    var day = parseInt(dateParts[2]);
-    var hours = parseInt(timeParts[0]);
-    var minutes = parseInt(timeParts[1]);
-    var timestamp;
 
-     log("TimeZone" + timeDiff)
-  
-     String(timeDiff).startsWith('-') ? timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000  : timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000
-     //timestamp = new Date(year, month, day, hours + timeDiff, minutes).getTime() / 1000 
 
-    //var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
-    
-    return timestamp;
-  }
-
-  // Função para converter uma string de fuso horário em um número
 function convertTimeZoneToNumber(timeZone) {
     var sign = timeZone.charAt(0); // Obtém o sinal do fuso horário (+ ou -)
     var offset = parseInt(timeZone.slice(1)); // Obtém o deslocamento numérico do fuso horário
     return sign === '+' ? offset : -offset; // Retorna o número de horas com sinal correto
 }
 
-// Função para calcular a diferença entre dois fusos horários
-function calculateTimeZoneDifference(timeZoneClient, timeZoneMyApps) {
-    var timeZone1Offset = convertTimeZoneToNumber(timeZoneClient);
-    var timeZone2Offset = convertTimeZoneToNumber(timeZoneMyApps);
+// Função para calcular a diferença entre dois fusos horários //
+function calculateTimeZoneDifference(timeZoneClient, timeZoneMyApps) { //+2 - -3=5
+    var timeZone1Offset = convertTimeZoneToNumber(String(timeZoneClient));
+    log("timeZone1Offset " + timeZone1Offset);
+    var timeZone2Offset = convertTimeZoneToNumber(String(timeZoneMyApps));
+    log("timeZone2Offset " + timeZone2Offset);
     return timeZone1Offset - timeZone2Offset; // Retorna a diferença entre os fusos horários
+}
+
+function convertDateTimeToTimestamp(dateTimeString) {
+    var dateTimeParts = dateTimeString.split('T');
+    var dateParts = dateTimeParts[0].split('-');
+    var timeParts = dateTimeParts[1].split(':');
+
+    var year = parseInt(dateParts[0]);
+    var month = parseInt(dateParts[1]) - 1; // Month is zero-based in JavaScript
+    var day = parseInt(dateParts[2]);
+    var hours = parseInt(timeParts[0]);
+    var minutes = parseInt(timeParts[1]);
+    var timestamp;
+    //var isNegative = String(timeDiff).startsWith('-')
+    var date;
+    //if (isNegative) {
+    date = new Date(year, month, day, hours, minutes)
+        timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000
+    //} else {
+    //    date = new Date(year, month, day, hours + timeDiff, minutes)
+    //    timestamp = new Date(year, month, day, hours + timeDiff, minutes).getTime() / 1000
+    //}
+    //String(timeDiff).startsWith('-') ? timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000  : timestamp = new Date(year, month, day, hours - timeDiff, minutes).getTime() / 1000
+    //timestamp = new Date(year, month, day, hours + timeDiff, minutes).getTime() / 1000 
+    log("date "+date)
+    //var timestamp = new Date(year, month, day, hours, minutes).getTime() / 1000; // Divide by 1000 to get the timestamp in seconds
+
+    return timestamp;
 }
 
 function selectUserConfigs(obj, callback){

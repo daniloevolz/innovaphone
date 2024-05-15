@@ -31,7 +31,6 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
     var texts = new innovaphone.lib1.Languages(Wecom.dwcschedulerTexts, start.lang);
     start.onlangchanged.attach(function () { texts.activate(start.lang) });
-
     var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
     app.checkBuild = true;
     app.onconnected = app_connected;
@@ -52,9 +51,13 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
 
     var phoneApi;
     var searchApi;
+    var clientTimeZoneOffset = new Date().getTimezoneOffset();
+    var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
+    var timeZoneShort = clientTimeZone.split(':')[0]
     
 
     function app_connected(domain, user, dn, appdomain) {
+        
         //avatar
         avatar = new innovaphone.Avatar(start, user, domain);
         UIuserPicture = avatar.url(user, 80, dn);
@@ -62,7 +65,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         UIsip = user;
         appUrl = appUrl+"/Calendario.htm?id="+user;
         constructor();
-        app.send({ api: "user", mt: "UserMessage" });
+        app.send({ api: "user", mt: "UserMessage", lang: start.lang, timeZone: clientTimeZone });
         //searchApi = start.provideApi("com.innovaphone.search");
         //searchApi.onmessage.attach(onSearchApiMessage);
         // start consume Phone API when AppWebsocket is connected
@@ -149,7 +152,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 list_rooms = obj.rooms;
                 try {
                     if (list_rooms.length == 0) {
-                        makePopup("ATENÇÃO","Não há Salas disponíveis neste Objeto de Conferências", 500, 200);
+                        makePopup(texts.text("labelWarning"),texts.text("labelNoConfRoom"), 500, 200);
                     }
                     else {
                         key_conference = obj.key;
@@ -172,9 +175,20 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
                 
 
             } else {
-                makePopup("ATENÇÃO","Atenção! Não localizado o Objeto de Conferências com o nome informado, por favor, verifique o nome digitado.", 500, 200);
+                makePopup(texts.text("labelWarning"),texts.text("labelWrongObjectConf"), 500, 200);
             }
         }
+    }
+    function formatTimezoneOffset(offset) {
+        var hours = Math.abs(Math.floor(offset / 60));
+        var minutes = Math.abs(offset % 60);
+        var sign = offset > 0 ? '-' : '+';
+        return sign + pad(hours, 2) + ':' + pad(minutes, 2);
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
     }
     function makePopup(header, content, width, height) {
         console.log("makePopup");
@@ -307,6 +321,42 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", msg));
 
     }
+
+    // Exemplo de uso:
+    //var dataOriginal = "2024-04-28T03:57";
+    //var diferenca = "-03"; // ou "+03" para somar 3 horas
+    function ajustarHora(dataString, diferenca) {
+        // Converte a string de data para um objeto Date
+        var data = new Date(dataString);
+
+        // Extrai o valor da diferença de horas da string
+        var diferencaHoras = parseInt(diferenca);
+
+        // Verifica se a diferença é positiva ou negativa e adiciona ou subtrai horas
+        if (diferencaHoras >= 0) {
+            data.setHours(data.getHours() + diferencaHoras);
+        } else {
+            data.setHours(data.getHours() - Math.abs(diferencaHoras));
+        }
+
+        // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm)
+        var ano = data.getFullYear();
+        var mes = padZero(data.getMonth() + 1); // Adiciona 1 porque os meses são indexados a partir de 0
+        var dia = padZero(data.getDate());
+        var horas = padZero(data.getHours());
+        var minutos = padZero(data.getMinutes());
+
+        var novaDataString = ano + "-" + mes + "-" + dia + "T" + horas + ":" + minutos;
+
+        // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm) EM UTC
+        //var novaDataString = new Date(dataString).toISOString().slice(0, 16);
+
+        return novaDataString;
+    }
+
+
+
+
     function makeDivSchedules(t) {
         t.clear();
 
@@ -346,20 +396,25 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             for (i = 0; i < columns; i++) {
                 ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
             }
+            
             //Tabela    
             list_schedules.forEach(function (b) {
                 var row = [];
                 row.push(b.id);
                 row.push(b.name);
                 row.push(b.email);
-                var arrayDate = b.time_start.split("T");
+                
+                var time_start = ajustarHora(b.time_start, timeZoneShort)
+                var arrayDate = time_start.split("T");
                 var day = arrayDate[0];
                 var time = arrayDate[1];
                 row.push(day + " " + time);
-                var arrayDate = b.time_end.split("T");
+                var time_end = ajustarHora(b.time_end, timeZoneShort)
+                var arrayDate = time_end.split("T");
                 var day = arrayDate[0];
                 var time = arrayDate[1];
                 row.push(day + " " + time);
+                
                 var img = new innovaphone.ui1.Div(null, null, "button-link").addTranslation(texts, "btnLink").addEvent("click", function () {
                     newWindow(b.conf_link);
                 });
@@ -381,21 +436,25 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             for (i = 0; i < columns; i++) {
                 ListView.addColumn(null, "text", texts.text("cabecalhoSchedules" + i), i, 10, false);
             }
-            //Tabela    
+            //Tabela
             list_schedules.forEach(function (b) {
                 if (today < b.time_start) {
                     var row = [];
                     row.push(b.id);
                     row.push(b.name);
                     row.push(b.email);
-                    var arrayDate = b.time_start.split("T");
+
+                    var time_start = ajustarHora(b.time_start, timeZoneShort)
+                    var arrayDate = time_start.split("T");
                     var day = arrayDate[0];
                     var time = arrayDate[1];
                     row.push(day + " " + time);
-                    var arrayDate = b.time_end.split("T");
+                    var time_end = ajustarHora(b.time_end, timeZoneShort)
+                    var arrayDate = time_end.split("T");
                     var day = arrayDate[0];
                     var time = arrayDate[1];
                     row.push(day + " " + time);
+
                     var img = new innovaphone.ui1.Div(null, null, "button-link").addTranslation(texts, "btnLink").addEvent("click", function () {
                         newWindow(b.conf_link);
                     });
@@ -465,11 +524,14 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         list_availabilities.forEach(function (a) {
             var row = [];
             row.push(a.id);
-            var arrayDate = a.time_start.split("T");
+
+            var time_start = ajustarHora(a.time_start, timeZoneShort)
+            var arrayDate = time_start.split("T");
             var day = arrayDate[0];
             var time = arrayDate[1];
             row.push(day + " " + time);
-            var arrayDate = a.time_end.split("T");
+            var time_end = ajustarHora(a.time_end, timeZoneShort)
+            var arrayDate = time_end.split("T");
             var day = arrayDate[0];
             var time = arrayDate[1];
             row.push(day + " " + time);
@@ -499,19 +561,36 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
             //var from = document.getElementById("dateFrom").value;
             var time_start = document.getElementById("timeStart").value;
             var time_end = document.getElementById("timeEnd").value;
-
-            app.send({ api: "user", mt: "AddAvailabilityMessage", time_start: time_start, time_end: time_end });
+            if(time_start > time_end || time_start < getDateNow() ){
+                makePopup(texts.text("labelWarning"),texts.text("labelNoValidDate"), 500, 200);
+            } else {
+                var startUTCDataString = new Date(time_start).toISOString().slice(0, 16)
+                var endUTCDataString = new Date(time_end).toISOString().slice(0, 16)
+                console.log("startUTCDataString " + startUTCDataString + " and endUTCDataString " + endUTCDataString)
+                app.send({ api: "user", mt: "AddAvailabilityMessage", time_start: startUTCDataString, time_end: endUTCDataString });
             waitConnection(colDireita);
+            }
+
+           
+           
         });
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
             makeDivAvailabilities(colDireita);
         });
     }
-    function waitConnection(t) {
-        t.clear();
-        var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
-        bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
-        t.add(bodywait);
+    function waitConnection(div) {
+        div.clear();
+        var div1 = div.add(new innovaphone.ui1.Div(null, null, "preloader").setAttribute("id", "preloader"))
+        var div2 = div1.add(new innovaphone.ui1.Div(null, null, "inner"))
+        var div3 = div2.add(new innovaphone.ui1.Div(null, null, "loading"))
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+        div3.add(new innovaphone.ui1.Node("span", null, null, "circle"));
+
+        //t.clear();
+        //var bodywait = new innovaphone.ui1.Div("height: 100%; width: 100%; display: inline-flex; position: absolute;justify-content: center; background-color:rgba(100,100,100,0.5)", null, "bodywaitconnection")
+        //bodywait.addHTML('<svg class="pl" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="hsl(193,90%,55%)" /><stop offset="100%" stop-color="hsl(223,90%,55%)" /></linearGradient></defs>	<circle class="pl__ring" r="56" cx="64" cy="64" fill="none" stroke="hsla(0,10%,10%,0.1)" stroke-width="16" stroke-linecap="round" />	<path class="pl__worm" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" fill="none" stroke="url(#pl-grad)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="44 1111" stroke-dashoffset="10" /></svg >');
+        //t.add(bodywait);
     }
     function makeDivGeral(t){
         t.clear();
@@ -664,11 +743,11 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         // Retorna a string no formato "AAAA-MM-DDTHH:mm:ss.sss"
         return dateString.slice(0, -5);
     }
-    function getDateNow2() {
+    function getDateToDisplay(date) {
         // Cria uma nova data com a data e hora atuais em UTC
-        var date = new Date();
+        var date = new Date(date);
         // Adiciona o deslocamento de GMT-3 �s horas da data atual em UTC
-        date.setUTCHours(date.getUTCHours() - 3);
+        //date.setUTCHours(date.getUTCHours() - 3);
 
         // Formata a data em uma string no formato "AAAAMMDDTHHmmss"
         var year = date.getUTCFullYear();
@@ -677,7 +756,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var hours = padZero(date.getUTCHours());
         var minutes = padZero(date.getUTCMinutes());
         var seconds = padZero(date.getUTCSeconds());
-        var dateString = year + month + day + "T" + hours + minutes + seconds;
+        var dateString = year +"-"+ month +"-"+ day + " " + hours +":"+ minutes +"-"+ seconds;
 
         // Retorna a string no formato "AAAAMMDDTHHmmss"
         return dateString;

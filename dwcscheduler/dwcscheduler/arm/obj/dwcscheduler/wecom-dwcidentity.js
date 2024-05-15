@@ -65,15 +65,17 @@ Wecom.dwcidentity = Wecom.dwcidentity || function (start, args) {
     var phonelookupApi = start.provideApi("com.innovaphone.phonelookup");
 
     phonelookupApi.onmessage.attach(function (sender, phonelookupApiRequest) {
+        //Alterar o nome do Telefone pode ser feito consulta em CRM, ou DB para obter o nome que é desejado visualizar.
+
         // usually the requests should be queued and processed
         // one by one to avoid heavy load, also a local cache can be created
         // we forward them directly to app service to keep it simple
 
-        var response = { mt: "LookupInfo", dn: undefined, link: undefined, contact: {}, photourl: undefined, adjust: true }; //adjust number by a trunk prefix
-        response.dn = "SSSSSSSSSSSS";
-        console.log("phonelookup:obj " + JSON.stringify(response));
-        sender.send(response, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // consumer and src must be returned to sender
-        sender.send({ mt: "LookupResult" }, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // finishing LookupResult message
+    //    var response = { mt: "LookupInfo", dn: undefined, link: undefined, contact: {}, photourl: undefined, adjust: true }; //adjust number by a trunk prefix
+    //    response.dn = "SSSSSSSSSSSS";
+    //    console.log("phonelookup:obj " + JSON.stringify(response));
+    //    sender.send(response, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // consumer and src must be returned to sender
+    //    sender.send({ mt: "LookupResult" }, phonelookupApiRequest.consumer, phonelookupApiRequest.src); // finishing LookupResult message
     });
 
     function changeState(newState) {

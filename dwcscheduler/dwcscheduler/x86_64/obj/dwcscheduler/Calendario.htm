@@ -28,7 +28,7 @@
         }
         /* MODAL SEU NOME */
         .mainModalName {
-            display: none;
+            display: block;
             background-color: white;
             position: fixed;
             left: 15%;
@@ -74,76 +74,8 @@
             }
     </style>
     <script>
-        var selectstart ;
-        var selectend;
-        var dataTime_start;
-        var dataTime_end;
-        var dataavailability;
-        var dataschedules;
-        var timeStart_schedules;
-        var timeEnd_schedules;
-        var dayName;
-        var url = document.URL;
-        var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
-        var url = url.substring(0, penultimateSlashIndex);
-        $(document).ready(function () {
-            $.fullCalendar.locale('pt-br');
-            var id = $.urlParam('id');
-            fetch(url+'/get-agenda?id=' + id, {
-                method: 'GET',
-                headers: {}
-            }).then(function (response) {
-                // Processa a resposta do servidor
-                if (response.status == 200) {
-
-                    response.text().then(function (text) {
-                        var obj = JSON.parse(String(text));
-
-                        console.log("get-agenda result=" + JSON.stringify(obj))
-                        var first_start = "2999-01-01T01:00";
-                        var last_end = "2000-12-30T23:00";
-                        dataavailability = JSON.parse(obj.dataavailability);
-                        dataschedules = JSON.parse(obj.dataschedules);
-                        // var dataTime_start;
-                        // var dataTime_end;
-
-                        if(dataavailability[0])    dataTime_start = dataavailability[0].time_start 
-                        
-                        if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
-
-                        if(dataschedules[0])       timeStart_schedules = dataschedules[0].time_start 
-                        
-                        if(dataschedules[0])       timeEnd_schedules = dataschedules[0].time_end
-                        
-                        console.log("Data Availability: " + JSON.stringify(dataavailability));
-                        console.log("Data Start \n" + dataTime_start)
-                        console.log("Data End \n" + dataTime_end)
-                        
-                        console.log("Data Schedules:" + JSON.stringify(dataschedules));
-                        console.log("Time Start \n" + timeStart_schedules);
-                        console.log("Time End \n" + timeEnd_schedules);
-                
-                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules);
-                        MakeSubtitleDiv();
-                        
-                    });
-                } 
-                // fim da resposta STATUS 200
-                else {
-                    response.text().then(function (text) {
-                        window.alert("Algo saiu errado:\n" + text);
-                    });
-                }
-            }); // final .then (response)
-
-           $('#calendar').fullCalendar({
-            
-                header: {
-                    left: 'today',
-                   center: 'title , month,agendaDay', //agendaWeek,
-                    right: 'prev,next'
-                },
-                buttonText: {
+        /*
+     buttonText: {
                     today: 'Hoje',
                     month: 'Mês',
                     week: 'Semana',
@@ -163,6 +95,200 @@
                 'Novembro',
                 'Dezembro'
   ],
+
+        */
+        var selectstart ;
+        var selectend;
+        var dataTime_start;
+        var dataTime_end;
+        var dataavailability;
+        var dataschedules;
+        var timeStart_schedules;
+        var timeEnd_schedules;
+        var dayName;
+        var url = document.URL;
+        var penultimateSlashIndex = url.lastIndexOf("/", url.lastIndexOf("/") - 1);
+        var url = url.substring(0, penultimateSlashIndex);
+        var timeZoneMyApps;
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+        var clientTimeZone = formatTimezoneOffset(clientTimeZoneOffset);
+        var timeZoneShort = clientTimeZone.split(':')[0]
+        var differenceInHours = 0;
+
+        var language = navigator.language || navigator.userLanguage;
+
+        try {
+            language = language.split("-")[0]
+        }
+        catch (e) {
+
+        }
+
+        var WecomDwcschedulerTexts = [{
+            pt: {
+                labelSometingWrong: "Algo saiu errado: ",
+                labelParcialAvailable: "Poucos Horários",
+                labelAvailable: "Disponível",
+                labelUnavailable: "Indisponível",
+                labelSelectUnavailableTime: "Horário indisponível \n Por favor selecione outro!",
+                labelSelesctDateUnavailable: "Dia indisponível \n Por favor selecione outro!",
+                labelInformName: "Digite seu nome e e-mail",
+                placeholderName: "Seu nome",
+                labelName: "Nome",
+                labelEmail: "E-mail",
+                placeholderEmail: "Seu e-mail",
+                btnSend: "Enviar",
+                labelInformNameToContinue: "Se identifique para continuar",
+                today: 'Hoje',
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia'
+            },
+            es: {
+                labelSometingWrong: "Algo salió mal: ",
+                labelParcialAvailable: "Pocos Horarios Disponibles",
+                labelAvailable: "Disponible",
+                labelUnavailable: "No disponible",
+                labelSelectUnavailableTime: "Hora no disponible \n ¡Por favor seleccione otra!",
+                labelSelesctDateUnavailable: "Día no disponible \n ¡Por favor seleccione otro!",
+                labelInformName: "Ingrese su nombre y correo electrónico",
+                placeholderName: "Su nombre",
+                labelName: "Nombre",
+                labelEmail: "Correo electrónico",
+                placeholderEmail: "Su correo electrónico",
+                btnSend: "Enviar",
+                labelInformNameToContinue: "Identifícate para continuar",
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
+            en: {
+                labelSelectUnavailableTime: "Time unavailable \n Please select another!",
+                labelSelesctDateUnavailable: "Day unavailable \n Please select another!",
+                labelInformNameToContinue: "Inform all data to continue",
+                labelSometingWrong: "Someting wrong: ",
+                labelParcialAvailable: "Parcial Available",
+                labelAvailable: "Available",
+                labelUnavailable: "Unavailable",
+                labelInformName: "Fill your name ans email",
+                placeholderName: "Your name",
+                labelName: "Name",
+                labelEmail: "Email",
+                placeholderEmail: "Your email",
+                btnSend: "Send",
+                today: 'Today',
+                month: 'Month',
+                week: 'Week',
+                day: 'Day' 
+            },
+            fr: {
+                labelSometingWrong: "Quelque chose s'est mal passé : ",
+                labelParcialAvailable: "Quelques heures disponibles",
+                labelAvailable: "Disponible",
+                labelUnavailable: "Indisponible",
+                labelSelectUnavailableTime: "Horaire indisponible \n Veuillez sélectionner un autre !",
+                labelSelesctDateUnavailable: "Jour indisponible \n Veuillez sélectionner un autre !",
+                labelInformName: "Entrez votre nom et votre e-mail",
+                placeholderName: "Votre nom",
+                labelName: "Nom",
+                labelEmail: "E-mail",
+                placeholderEmail: "Votre e-mail",
+                btnSend: "Envoyer",
+                labelInformNameToContinue: "Identifiez-vous pour continuer",
+                today: 'Aujourd\'hui',
+                month: 'Mois',
+                week: 'Semaine',
+                day: 'Jour'
+            },
+            de: {
+                labelSometingWrong: "Etwas ist schief gelaufen: ",
+                labelParcialAvailable: "Wenige Termine verfügbar",
+                labelAvailable: "Verfügbar",
+                labelUnavailable: "Nicht verfügbar",
+                labelSelectUnavailableTime: "Nicht verfügbarer Zeitplan \n Bitte wählen Sie einen anderen!",
+                labelSelesctDateUnavailable: "Nicht verfügbarer Tag \n Bitte wählen Sie einen anderen!",
+                labelInformName: "Geben Sie Ihren Namen und Ihre E-Mail-Adresse ein",
+                placeholderName: "Ihr Name",
+                labelName: "Name",
+                labelEmail: "E-Mail",
+                placeholderEmail: "Ihre E-Mail-Adresse",
+                btnSend: "Senden",
+                labelInformNameToContinue: "Identifizieren Sie sich, um fortzufahren",
+                today: 'Heute',
+                month: 'Monat',
+                week: 'Woche',
+                day: 'Tag'
+            }
+
+        }]
+
+        $(document).ready(function () {
+            $.fullCalendar.locale(navigator.language);
+            var id = $.urlParam('id');
+            fetch(url+'/get-agenda?id=' + id, {
+                method: 'GET',
+                headers: {}
+            }).then(function (response) {
+                // Processa a resposta do servidor
+                if (response.status == 200) {
+
+                    response.text().then(function (text) {
+                        var obj = JSON.parse(String(text));
+
+                        console.log("get-agenda result=" + JSON.stringify(obj))
+                        var first_start = "2999-01-01T01:00";
+                        var last_end = "2000-12-30T23:00";
+                        dataavailability = JSON.parse(obj.dataavailability);
+                        dataschedules = JSON.parse(obj.dataschedules);
+                        timeZoneMyApps = obj.timeZoneMyApps
+                        // var dataTime_start;
+                        // var dataTime_end;
+
+                        if(dataavailability[0])    dataTime_start = dataavailability[0].time_start 
+                        
+                        if(dataavailability[0])    dataTime_end = dataavailability[0].time_end
+
+                        if(dataschedules[0])       timeStart_schedules = dataschedules[0].time_start 
+                        
+                        if(dataschedules[0])       timeEnd_schedules = dataschedules[0].time_end
+                        
+                        console.log("Data Availability: " + JSON.stringify(dataavailability));
+                        console.log("Data Start \n" + dataTime_start)
+                        console.log("Data End \n" + dataTime_end)
+                        console.log("TimeZoneMyApps \n" + timeZoneMyApps)
+                        
+                        console.log("Data Schedules:" + JSON.stringify(dataschedules));
+                        console.log("Time Start \n" + timeStart_schedules);
+                        console.log("Time End \n" + timeEnd_schedules);
+                
+                        UpdateAvailability(dataTime_start,dataTime_end,dataavailability, dataschedules);
+                        MakeSubtitleDiv();
+                        
+                    });
+                } 
+                // fim da resposta STATUS 200
+                else {
+                    response.text().then(function (text) {
+                        window.alert(WecomDwcschedulerTexts[0][language]['labelSometingWrong'] + "\n" + JSON.stringify(text));
+                    });
+                }
+            }); // final .then (response)
+
+           $('#calendar').fullCalendar({
+
+               location: navigator.language,
+                header: {
+                    left: 'today',
+                   center: 'title , month,agendaDay', //agendaWeek,
+                    right: 'prev,next'
+               },
+               buttonText: {
+                   today: WecomDwcschedulerTexts[0][language]['today'],
+                   month: WecomDwcschedulerTexts[0][language]['month'],
+                   week: WecomDwcschedulerTexts[0][language]['week'],
+                   day: WecomDwcschedulerTexts[0][language]['day']
+               },
                 defaultView: 'month',
                 slotDuration: '01:00:00', 
                 minTime: '00:00:00',
@@ -183,17 +309,28 @@
                         var clickedDate = start.format('YYYY-MM-DD');
                         console.log("Data do elemento clicado:", clickedDate);
                         var teste = false;
+                        //if(clientTimeZone != timeZoneMyApps){
+                        //        differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                        //}
                         dataavailability.forEach(function(dates){
-                                var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                                var dataend = moment(dates.time_end).format('YYYY-MM-DD');
-                                if (clickedDate >= datastart && clickedDate <= dataend ) {
-                                        console.log("Elemento clicado está disponível");
-                                        $('#calendar').fullCalendar('changeView', 'agendaDay');
-                                        $('#calendar').fullCalendar('gotoDate', start);
-                                        teste = true;      
+                            var datastart = moment(ajustarHora(dates.time_start, timeZoneShort))
+                            var dataend = moment(ajustarHora(dates.time_end, timeZoneShort))
+                            // Adicionando a diferença de horas às datas de início e fim
+                            //datastart.add(parseInt(timeZoneShort), 'hours');
+                            //dataend.add(parseInt(timeZoneShort), 'hours');
+
+                            // Formatando as datas novamente, se necessário
+                            datastart = datastart.format('YYYY-MM-DD');
+                            dataend = dataend.format('YYYY-MM-DD');
+
+                            if (clickedDate >= datastart && clickedDate <= dataend ) {
+                                    console.log("Elemento clicado está disponível");
+                                    $('#calendar').fullCalendar('changeView', 'agendaDay');
+                                    $('#calendar').fullCalendar('gotoDate', start);
+                                    teste = true;      
                             } 
                         })
-                        if (!teste) window.alert(" Data indisponível \n Por favor, escolha outra data.");
+                        if (!teste) window.alert(WecomDwcschedulerTexts[0][language]['labelSelesctDateUnavailable']);
                         $('#calendar').fullCalendar('unselect'); 
                     }
                     else if (view.name === 'agendaWeek') {
@@ -210,25 +347,32 @@
                                 var dataend = moment(dates.time_end).format('YYYY-MM-DD');
                                 if (clickedDate >= datastart && clickedDate <= dataend ) {
                                     console.log("Elemento clicado está disponível");
-                                    document.getElementById("MyModal").style.display = 'block';
-                                    document.getElementById("iptName").value = '';
-                                    document.getElementById("iptEmail").value = '';
+                                    //document.getElementById("MyModal").style.display = 'block';
+                                    //document.getElementById("iptName").value = '';
+                                    //document.getElementById("iptEmail").value = '';
+
                                     $('#calendar').fullCalendar('unselect');
                                     teste = true;    
                                 } 
                             })
-                            if(!teste) window.alert(" Data indisponível \n Por favor, escolha outro dia.");
+                            if (!teste) window.alert(WecomDwcschedulerTexts[0][language]['labelSelesctDateUnavailable']);
                         }
                     } 
                     else {
                         ///TESTE DANILO
                         var valid = false;
+                        //if(clientTimeZone != timeZoneMyApps){
+                        //        differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                        //}
                         if(dataavailability.length>0){
                             dataavailability.forEach(function (dates) {
-                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var datastart = moment(ajustarHora(dates.time_start,timeZoneShort), moment.ISO_8601)
+                                var dataend = moment(ajustarHora(dates.time_end, timeZoneShort), moment.ISO_8601)
+                                
+                                // Formatando as datas novamente, se necessário
+                                datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
+                                dataend = dataend.format('YYYY-MM-DDTHH:mm:ss');
                                 console.log("Disponibilidade: \n" +datastart + "\n" + dataend);
-
                                 // Obtém os valores do ano, mês e ano
                                 var year = moment(start).format('YYYY');
                                 var month = moment(start).format('MM');
@@ -250,8 +394,14 @@
                         }
                         if(dataschedules.length>0){
                             dataschedules.forEach(function (dates) {
-                                var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                                var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                                var datastart = moment(ajustarHora(dates.time_start, timeZoneShort), moment.ISO_8601)
+                                // Adicionando a diferença de horas às datas de início e fim
+                                //datastart.add(parseInt(timeZoneShort), 'hours');
+                                datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
+                                var dataend = moment(ajustarHora(dates.time_end, timeZoneShort), moment.ISO_8601)
+                                // Adicionando a diferença de horas às datas de início e fim
+                                //dataend.add(parseInt(timeZoneShort), 'hours');
+                                dataend = dataend.format('YYYY-MM-DDTHH:mm:ss');
 
                                 console.log("Agendamento: \n"+datastart + "\n" + dataend);
                                 // Obtém os valores do ano, mês e ano
@@ -287,7 +437,7 @@
 
                         var now = moment().format("YYYY-MM-DDTHH:mm:ss");
                         if (datastart < now) {
-                            console.warn("Data selecionada está no passado.");
+                            console.warn(WecomDwcschedulerTexts[0][language]['labelSelectUnavailableTime']);
                             valid = false;
                         }
 
@@ -300,7 +450,7 @@
                             $('#calendar').fullCalendar('unselect');
 
                         } else {
-                            window.alert(" Horario indisponível \n Por favor, escolha outro horário.");
+                            window.alert(WecomDwcschedulerTexts[0][language]['labelSelectUnavailableTime']);
                             $('#calendar').fullCalendar('unselect');
                         }
                         ///
@@ -323,38 +473,38 @@
                         console.log("View Modo Semana")
                     }
                     else{
-                        dayName = view.title
-                        console.log("View title result = " + dayName)
-                        var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
-                        // Obtém os valores do dia, mês e ano
-                        var day = String(dateParts[0]).padStart(2, '0');
-                        var month = getMonthIndex(dateParts[1]);
-                        var year = dateParts[2];
+                        // dayName = view.title
+                        // console.log("View title result = " + dayName)
+                        // var dateParts = dayName.split(" de "); // Divide a string em partes separadas por " de "
+                        // // Obtém os valores do dia, mês e ano
+                        // var day = String(dateParts[0]).padStart(2, '0');
+                        // var month = getMonthIndex(dateParts[1]);
+                        // var year = dateParts[2];
 
-                        // Função auxiliar para obter o índice do mês com base no nome do mês
-                        function getMonthIndex(monthName) {
-                            var months = [
-                                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-                            ];
-                            var index = months.indexOf(monthName) + 1;
+                        // // Função auxiliar para obter o índice do mês com base no nome do mês
+                        // function getMonthIndex(monthName) {
+                        //     var months = [
+                        //         'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                        //         'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                        //     ];
+                        //     var index = months.indexOf(monthName) + 1;
 
-                            return String(index).padStart(2, '0');
-                        }
+                        //     return String(index).padStart(2, '0');
+                        // }
+                        var startDate = view.intervalStart;
+                        var day = startDate.date(); // Obtém o dia do mês
+                        var month = startDate.month() + 1; // Obtém o mês (adiciona 1 porque o mês é base zero em Moment.js)
+                        var year = startDate.year(); // Obtém o ano
+                        console.log("Dia atual: " + day);
+                        console.log("Mês atual: " + month);
+                        console.log("Ano atual: " + year);
+
                         setTimeout(function() {
                            UpdateDayAvailability(dataTime_start, dataTime_end, dataavailability, dataschedules, day, month, year)
                         }, 100);
                     }
     },
             });
-            document.getElementById("btnSendName").addEventListener("click",function(){
-                            var name = document.getElementById("iptName").value;
-                            var email = document.getElementById("iptEmail").value;
-                            console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
-                            sendAgenda(id,name, email,selectstart,selectend); 
-                           
-        })
-        
         });
         // Função para obter o valor de um parâmetro de URL
         $.urlParam = function (name) {
@@ -368,10 +518,94 @@
         
         function makeModal(day,time){
                 // console.log("START " + start + "\n" + "END " + end)
-                document.getElementById("MyModal").style.display = 'block';
-                document.getElementById("iptName").value = '';
-                document.getElementById("iptEmail").value = '';
-                document.getElementById("DateToday").innerHTML = day + " " + time
+            //    document.getElementById("MyModal").style.display = 'block';
+            //    document.getElementById("iptName").value = '';
+            //    document.getElementById("iptEmail").value = '';
+            //document.getElementById("DateToday").innerHTML = day + " " + time
+
+            // Cria os elementos HTML
+
+            var elementoParaRemover = document.getElementById("MyModal");
+            if (elementoParaRemover) {
+                document.body.removeChild(elementoParaRemover);
+            } else {
+                console.log("O elemento não foi encontrado.");
+            }
+
+            var divMainModalName = document.createElement("div");
+            divMainModalName.className = "mainModalName";
+            divMainModalName.id = "MyModal";
+
+            var divDivSpan = document.createElement("div");
+            divDivSpan.className = "divSpan";
+            var spanSpanX = document.createElement("span");
+            spanSpanX.className = "spanX";
+            spanSpanX.id = "spanX";
+            spanSpanX.textContent = "✕";
+            divDivSpan.appendChild(spanSpanX);
+            divMainModalName.appendChild(divDivSpan);
+
+            var br1 = document.createElement("br");
+            divMainModalName.appendChild(br1);
+
+            var divDataPerson = document.createElement("div");
+            divDataPerson.className = "data-person";
+            var h3DateToday = document.createElement("h3");
+            h3DateToday.id = "DateToday";
+            h3DateToday.innerHTML = day + " " + time
+            divDataPerson.appendChild(h3DateToday);
+            var h2NameEmail = document.createElement("h2");
+            h2NameEmail.textContent = WecomDwcschedulerTexts[0][language]["labelInformName"];
+            h2NameEmail.style.marginBlockEnd = "0";
+            divDataPerson.appendChild(h2NameEmail);
+            var pIdentify = document.createElement("p");
+            pIdentify.className = "identify";
+            pIdentify.textContent = WecomDwcschedulerTexts[0][language]["labelInformNameToContinue"];
+            divDataPerson.appendChild(pIdentify);
+            var pEmpty = document.createElement("p");
+            divDataPerson.appendChild(pEmpty);
+            var pNome = document.createElement("p");
+            pNome.textContent = WecomDwcschedulerTexts[0][language]["labelName"];
+            divDataPerson.appendChild(pNome);
+            var inputNome = document.createElement("input");
+            inputNome.type = "text";
+            inputNome.className = "iptName";
+            inputNome.placeholder = WecomDwcschedulerTexts[0][language]["placeholderName"];
+            inputNome.id = "iptName";
+            divDataPerson.appendChild(inputNome);
+            var br2 = document.createElement("br");
+            divDataPerson.appendChild(br2);
+            var pEmail = document.createElement("p");
+            pEmail.textContent = WecomDwcschedulerTexts[0][language]["labelEmail"];
+            divDataPerson.appendChild(pEmail);
+            var inputEmail = document.createElement("input");
+            inputEmail.type = "text";
+            inputEmail.className = "iptName";
+            inputEmail.placeholder = WecomDwcschedulerTexts[0][language]["placeholderEmail"];
+            inputEmail.id = "iptEmail";
+            divDataPerson.appendChild(inputEmail);
+            var br3 = document.createElement("br");
+            divDataPerson.appendChild(br3);
+            var br4 = document.createElement("br");
+            divDataPerson.appendChild(br4);
+            var buttonEnviar = document.createElement("button");
+            buttonEnviar.className = "btnSendName";
+            buttonEnviar.id = "btnSendName";
+            buttonEnviar.textContent = WecomDwcschedulerTexts[0][language]["btnSend"];
+            divDataPerson.appendChild(buttonEnviar);
+            divMainModalName.appendChild(divDataPerson);
+
+            // Adiciona os elementos ao corpo da página
+            document.body.appendChild(divMainModalName);
+
+            document.getElementById("btnSendName").addEventListener("click", function () {
+                var name = document.getElementById("iptName").value;
+                var email = document.getElementById("iptEmail").value;
+                console.log("Nome enviado: " + name + "\n" + "E-mail Enviado: " + email)
+                var id = $.urlParam('id');
+                sendAgenda(id, name, email, selectstart, selectend);
+
+            })
         }
         
         function MakeSubtitleDiv(){
@@ -381,15 +615,15 @@
                             subtitleDiv.innerHTML = `
                             <div class="subtitle-divs" style = "width: 32%; justify-content: left">
                                 <span style="width: 12px; height: 12px; background: #9DDBBD;"></span>
-                                <span>Disponível</span>
+                                <span>`+ WecomDwcschedulerTexts[0][language]['labelAvailable']+`</span>
                             </div>
                             <div class="subtitle-divs" style = "width: 32%; justify-content: center">
                                 <span style="width: 12px; height: 12px; background: #f89598;"></span>
-                                <span>Indisponível</span>
+                                <span>`+ WecomDwcschedulerTexts[0][language]['labelUnavailable'] +`</span>
                             </div>
                             <div class="subtitle-divs" style = "width: 32%; justify-content: right">
                                 <span style="width: 12px; height: 12px; background: #FFEE92;"></span>
-                                <span>Poucos Horários</span>
+                                <span>`+ WecomDwcschedulerTexts[0][language]['labelParcialAvailable'] +`</span>
                             </div>
                             `;
 
@@ -404,9 +638,19 @@
                 });
             } 
             else {
+                //if(clientTimeZone != timeZoneMyApps){
+                //    differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                //}
                 availability.forEach(function(dates){
-                    var datastart = moment(dates.time_start).format('YYYY-MM-DD');
-                    var dataend = moment(dates.time_end).format('YYYY-MM-DD');
+
+                    var datastart = moment(ajustarHora(dates.time_start, timeZoneShort))
+                    var dataend = moment(ajustarHora(dates.time_end, timeZoneShort))
+                    
+
+                    // Formatando as datas novamente, se necessário
+                    datastart = datastart.format('YYYY-MM-DD');
+                    dataend = dataend.format('YYYY-MM-DD');
+
                     tds.forEach(function(td) {
                         var dataDate = moment(td.getAttribute('data-date')).format('YYYY-MM-DD');
                         var hourAvail = countTotalHoursAvailability(String(dataDate),availability);
@@ -485,6 +729,9 @@
             } 
             else {
                 
+                //if(clientTimeZone != timeZoneMyApps){
+                //    differenceInHours = calculateTimeZoneDifference(clientTimeZone, timeZoneMyApps);
+                //}
 
                 //Deixa tudo indisponível
                 trs.forEach(function (tr) {
@@ -494,8 +741,17 @@
                 console.log("UpdateDayAvailability");
 
                 availability.forEach(function(dates) {
-                    var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
-                    var dataend = moment(dates.time_end, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                    var datastart = moment(ajustarHora(dates.time_start, timeZoneShort), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                    var dataend = moment(ajustarHora(dates.time_end, timeZoneShort), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+
+                    // Adicionando a diferença de horas às datas de início e fim
+                    //datastart.add(parseInt(timeZoneShort), 'hours');
+                    //dataend.add(parseInt(timeZoneShort), 'hours');
+
+                    // Formatando as datas novamente, se necessário
+                    //datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
+                    //dataend = dataend.format('YYYY-MM-DDTHH:mm:ss')
+
                     trs.forEach(function(tr) {
                         
                         var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
@@ -503,7 +759,7 @@
                         var hour = moment(dataTime).format('HH');
                         var minute = moment(dataTime).format('mm');
                         var second = moment(dataTime).format('ss');
-                        var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                        var date = year + "-" + pad(month,2) + "-" + pad(day,2) + "T" + pad(hour,2) + ":" + minute + ":" + second;
                         // Cria o objeto de data
                         var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
@@ -518,14 +774,17 @@
                 console.log("UpdateDayAvailabilitySuccess");
                 if(schedules.length >0){
                     schedules.forEach(function (dates) {
-                        var datastart = moment(dates.time_start, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                        var datastart = moment(ajustarHora(dates.time_start, timeZoneShort), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
+                        // Adicionando a diferença de horas às datas de início e fim
+                        //datastart.add(parseInt(timeZoneShort), 'hours');
+                        //datastart = datastart.format('YYYY-MM-DDTHH:mm:ss');
                         
                         trs.forEach(function (tr) {
                             var dataTime = moment(tr.getAttribute('data-time'), 'HH:mm:ss');
                             var hour = moment(dataTime).format('HH');
                             var minute = moment(dataTime).format('mm');
                             var second = moment(dataTime).format('ss');
-                            var date = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second;
+                            var date = year + "-" + pad(month, 2) + "-" + pad(day, 2) + "T" + pad(hour, 2) + ":" + minute + ":" + second;
                             // Cria o objeto de data
                             var dateView = moment(date, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss');
 
@@ -540,12 +799,19 @@
             }
         }
 
-        function sendAgenda(id,name, email,start,end){
-            document.getElementById("MyModal").style.display = 'none';
+        function sendAgenda(id, name, email, start, end) {
+
+            var elementoParaRemover = document.getElementById("MyModal");
+            if (elementoParaRemover) {
+                document.body.removeChild(elementoParaRemover);
+            } else {
+                console.log("O elemento não foi encontrado.");
+            }
+            
             console.log("EVENT DATA RECEBIDO:" + "\n" + "ID " + id + "\n" + "title(name) " + name + "\n" + "start " + start + "\n" + 
             "end " + end + "\n" + "email " + email)
                             if (name && email) {
-                
+
                                 var eventData;
                                 eventData = {
                                     id: '',
@@ -553,8 +819,10 @@
                                     name: name,
                                     email: email,
                                     date: '',
-                                    time_start: start,
-                                    time_end: end
+                                    time_start: moment(ajustarHoraParaUTC(start, timeZoneShort), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss'),
+                                    time_end: moment(ajustarHoraParaUTC(end, timeZoneShort), moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss'),
+                                    language: language,
+                                    timeZone: clientTimeZone
                                 };
                                 fetch(url+'/salvar-evento', {
                                     method: 'POST',
@@ -586,7 +854,7 @@
                                         });
                                     } else {
                                         response.text().then(function (text) {
-                                            window.alert("Algo saiu errado:\n" + text);
+                                            window.alert(WecomDwcschedulerTexts[0][language]['labelSometingWrong']+"\n" + String(text));
                                         });
                                     }
 
@@ -596,20 +864,113 @@
 
         function closeModal(event){
             if(event.target.id === "spanX"){
-                // limpar as divs
-                document.getElementById("iptName").innerHTML = '';
-                document.getElementById("iptEmail").innerHTML = '';
-                console.log("DIVS LIMPAS")
-                // sumir o modal 
-                document.getElementById("MyModal").style.display = 'none';
+                var elementoParaRemover = document.getElementById("MyModal");
+                if (elementoParaRemover) {
+                    document.body.removeChild(elementoParaRemover);
+                } else {
+                    console.log("O elemento não foi encontrado.");
+                }
             }
     }
         document.addEventListener('click', closeModal);
 
-    function closeAgenda(){
-        window.parent.postMessage('ocultarDiv', '*');
-        console.log("MSG ENVIADA")
-    }
+        function closeAgenda(){
+                window.parent.postMessage('ocultarDiv', '*');
+                console.log("MSG ENVIADA")
+            }
+
+            // Função para formatar o deslocamento do fuso horário em uma string 'HH:mm'
+        function formatTimezoneOffset(offset) {
+            var hours = Math.abs(Math.floor(offset / 60));
+            var minutes = Math.abs(offset % 60);
+            var sign = offset > 0 ? '-' : '+';
+            return sign + pad(hours, 2) + ':' + pad(minutes, 2);
+        }
+
+        // Função para converter uma string de fuso horário em um número
+        function convertTimeZoneToNumber(timeZone) {
+            var sign = timeZone.charAt(0); // Obtém o sinal do fuso horário (+ ou -)
+            var offset = parseInt(timeZone.slice(1)); // Obtém o deslocamento numérico do fuso horário
+            return sign === '+' ? offset : -offset; // Retorna o número de horas com sinal correto
+        }
+
+        // Função para calcular a diferença entre dois fusos horários
+        function calculateTimeZoneDifference(timeZoneClient, timeZoneMyApps) {
+            var timeZone1Offset = convertTimeZoneToNumber(timeZoneClient);
+            var timeZone2Offset = convertTimeZoneToNumber(timeZoneMyApps);
+            return timeZone1Offset - timeZone2Offset; // Retorna a diferença entre os fusos horários
+        }
+        // Função auxiliar para adicionar zeros à esquerda para preencher a string
+        function pad(num, size) {
+            var s = num + "";
+            while (s.length < size) s = "0" + s;
+            return s;
+                }
+
+
+        // Exemplo de uso:
+        //var dataOriginal = "2024-04-28T03:57";
+        //var diferenca = "-03"; // ou "+03" para somar 3 horas
+        function ajustarHora(dataString, diferenca) {
+            // Converte a string de data para um objeto Date
+            var data = new Date(dataString);
+
+            // Extrai o valor da diferença de horas da string
+            var diferencaHoras = parseInt(diferenca);
+
+            // Verifica se a diferença é positiva ou negativa e adiciona ou subtrai horas
+            if (diferencaHoras >= 0) {
+                data.setHours(data.getHours() + diferencaHoras);
+            } else {
+                data.setHours(data.getHours() - Math.abs(diferencaHoras));
+            }
+
+            // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm)
+            var ano = data.getFullYear();
+            var mes = padZero(data.getMonth() + 1); // Adiciona 1 porque os meses são indexados a partir de 0
+            var dia = padZero(data.getDate());
+            var horas = padZero(data.getHours());
+            var minutos = padZero(data.getMinutes());
+
+            var novaDataString = ano + "-" + mes + "-" + dia + "T" + horas + ":" + minutos;
+
+            // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm) EM UTC
+            //var novaDataString = new Date(dataString).toISOString().slice(0, 16);
+
+            return novaDataString;
+        }
+        function ajustarHoraParaUTC(dataString, diferenca) {
+            // Converte a string de data para um objeto Date
+            var data = new Date(dataString);
+
+            // Extrai o valor da diferença de horas da string
+            var diferencaHoras = parseInt(diferenca);
+
+            // Verifica se a diferença é positiva ou negativa e adiciona ou subtrai horas
+            if (diferencaHoras >= 0) {
+                data.setHours(data.getHours() - diferencaHoras);
+            } else {
+                data.setHours(data.getHours() + Math.abs(diferencaHoras));
+            }
+
+            // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm)
+            var ano = data.getFullYear();
+            var mes = padZero(data.getMonth() + 1); // Adiciona 1 porque os meses são indexados a partir de 0
+            var dia = padZero(data.getDate());
+            var horas = padZero(data.getHours());
+            var minutos = padZero(data.getMinutes());
+
+            var novaDataString = ano + "-" + mes + "-" + dia + "T" + horas + ":" + minutos;
+
+            // Formata a nova data para o formato desejado (yyyy-mm-ddThh:mm) EM UTC
+            //var novaDataString = new Date(dataString).toISOString().slice(0, 16);
+
+            return novaDataString;
+        }
+
+        function padZero(num) {
+            return (num < 10 ? "0" : "") + num;
+        }
 
     </script>
 </head>
@@ -623,7 +984,7 @@
       </div>
 
          <!--MODAL DIGITE SEU NOME-->
-         <div class="mainModalName" id="MyModal">
+         <!--<div class="mainModalName" id="MyModal">
             <div class="divSpan">
                 <span class="spanX" id="spanX">✕</span>
             </div>
@@ -642,6 +1003,6 @@
                 <br/>
                 <button class="btnSendName" id="btnSendName" >Enviar</button>
             </div>
-        </div>
+        </div>-->
 </body>
 </html>
