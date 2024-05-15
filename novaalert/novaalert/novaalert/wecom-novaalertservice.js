@@ -744,18 +744,14 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "DeleteMessage") {
-                conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageResult" }));
-                obj.id.forEach(function (id) {
-                    Database.exec("DELETE FROM list_buttons WHERE id=" + id + ";")
+                    Database.exec("DELETE FROM list_buttons WHERE id=" + obj.id + ";")
                         .oncomplete(function () {
-                            log("DeleteMessage: Delete Success ID " + id);
+                            log("DeleteMessage: Delete Success ID " + obj.id);
+                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess" }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
                         });
-                })
-                conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess" }));
-
             }
             if (obj.mt == "InsertSensorMessage") {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")

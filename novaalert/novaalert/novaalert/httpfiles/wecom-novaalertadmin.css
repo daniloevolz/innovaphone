@@ -353,6 +353,17 @@ embed {
     gap: 25px;
     margin-top: 12px;
 }
+
+.divHeaderTableButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    height: 50px;
+    margin: auto;
+    gap: 25px;
+    margin-top: 12px;
+}
 .eventImg1 {
     width: 50px;
 }
@@ -1423,10 +1434,10 @@ input {
     cursor: pointer;
 }
 .txtBtn{
-    font-size: 20px;
+    font-size: 13px;
 }
 .imgBtn {
-    height: 45px;
+    height: 25px;
 }
 .destFree {
     border-radius: 6px;
@@ -3052,7 +3063,15 @@ div.button-inn-del {
     display: flex;
     align-items: center;
 }
+.tableButtonDiv{
+    justify-content: center;
+    display: flex;
+}
 #tableAction{
+    width: 80%;
+    border-collapse: collapse;
+}
+#tableButton{
     width: 80%;
     border-collapse: collapse;
 }

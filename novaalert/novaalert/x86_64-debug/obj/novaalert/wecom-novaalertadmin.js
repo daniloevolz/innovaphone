@@ -330,71 +330,106 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     }
 
     //buttons
-    function makeTableButtons(t) {
-        t.clear();
-        //Botões Tabela de Botões
-        t.add(new innovaphone.ui1.Div("position:absolute; left:60%; width:20%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnAddButton").addEvent("click", function () {
-            makeDivAddButton2(t); //CRIAR BOTÕES
+    function makeButtonsDiv(t) {
+        t.clear(); // limpa a coluna direita
+        var colDireita = document.getElementById("colDireita")
+        var html = `
+        <div class = "mainDivTableButtons" style = "width: 100%; ">
+        <div class = "divHeaderTableButtons">
+        <div>${texts.text("labelCfgButons")}</div>
+        <select id="selectUserModal" class="genericInputs">
+        <option value="">${texts.text("labelSelectUser")}</option>
+        </select>
+        </div>
+        <br>
+        <div class = "tableButtonDiv" id = "tableButtonDiv">
+        <table id = "tableButton">
+        <thead>
+            <tr>
+            <th class = "thAction">${texts.text("labelID")}</th>
+            <th class = "thAction">${texts.text("labelName")}</th>
+            <th class = "thAction">${texts.text("labelType")}</th>
+            <th class = "thAction">${texts.text("labelUser")}</th>
+            <th class = "thAction"><img src = "./images/star.svg" style = "35px" > </img></th>
+            </tr>
+        </thead>
+        <tbody id = "tbodyButton">
+        </tbody>
+        </table>
+        </div>
+        </div>
+        `
+        colDireita.innerHTML += html;
+        
+        var selectUserModal = document.getElementById("selectUserModal");
+        list_users.forEach(function(user) {
+            console.log("user " + user)
+            var option = document.createElement("option");
+            option.value = user.guid; 
+            option.id = user.guid
+            option.textContent = user.cn; 
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectUserModal.appendChild(option);
         });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:40%; width:20%; top:10%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnDelButton").addEvent("click", function () {
-            var selected = listView.getSelectedRows();
-            console.log(selected);
-
-            if (selected.length >= 1) {
-                var selectedrows = [];
-
-                selected.forEach(function (s) {
-                    console.log(s);
-                    selectedrows.push(listView.getRowData(s)[0])
-
-                })
-                app.send({ api: "admin", mt: "DeleteMessage", id: selectedrows });
-            } else {
-                window.alert(texts.text("promptSelectButton"));
-            }
-
+        document.getElementById("selectUserModal").addEventListener("change", function (evt) {
+            var user = document.getElementById("selectUserModal");
+            var selectedOption = user.options[user.selectedIndex];
+            var user = selectedOption.id;
+            console.log("Usuário Selecionado" + selectUserModal)
+            makeTableButtons(user)
         });
-        t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:20%; top:10%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnEditButton").addEvent("click", function () {
-            var selected = listView.getSelectedRows();
-            console.log(selected[0]);
-
-            if (selected.length == 1) {
-                var button = list_buttons.filter(function (btn) { return btn.id === parseInt(listView.getRowData(selected[0])[0]) })[0];
-                makeDivUpdateButton(t, button)
-            } else {
-                window.alert(texts.text("promptSelectButton"));
-            }
-
-        });
-        //Título Tabela Botôes
-        var labelTituloTabeaBotoes = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:20%; font-size:17px; text-align:center; font-weight: bold", texts.text("labelTituloBotoes")));
-
-        var scroll_container = new innovaphone.ui1.Node("scroll-container", "position: absolute; left:1%; top:25%; right:1%; width: 98%; height:-webkit-fill-available;", null, "scroll-container-table");
-
-        var list = new innovaphone.ui1.Div("position: absolute; left:2px; right:2px; height:fit-content", null, "table-buttons");
-        var columns = 4;
-        var rows = list_buttons.length;
-        var listView = new innovaphone.ui1.ListView(list, 50, "headercl", "arrow", false);
-        //Cabeçalho
-        for (i = 0; i < columns; i++) {
-            listView.addColumn(null, "text", texts.text("cabecalho" + i), i, 10, false);
-        }
-        //Tabela    
-        list_buttons.forEach(function (b) {
-            var row = [];
-            row.push(b.id);
-            row.push(b.button_name);
-            // Substituir valores de b.name por texto correspondente
-            row.push(texts.text(b.button_type));
-            row.push(b.button_user);
-
-            listView.addRow(i, row, "rowbutton", "#A0A0A0", "#82CAE2");
-        })
-
-        scroll_container.add(list);
-        t.add(scroll_container);
     }
 
+    function makeTableButtons(user) {
+
+        var tbody = document.getElementById("tbodyButton");
+        tbody.innerHTML = '';
+
+        var filteredUserButtons = list_buttons.filter(function(button){
+            return button.button_user == user
+        })
+        console.log("USER BUTTONS " + JSON.stringify(filteredUserButtons))
+
+        var filteredUserCN = list_users.filter(function(u){
+            return u.guid == user
+        })[0]
+
+        filteredUserButtons.forEach(function(button) {
+            var newRow = document.createElement("tr");
+            // Preencha as células conforme necessário
+            var cells = [
+                button.id,
+                button.button_name,
+                getButtonTypeText(button.button_type),
+                filteredUserCN.cn
+            ];
+    
+            cells.forEach(function(cellData) {
+                var newCell = document.createElement("td");
+                newCell.textContent = cellData;
+                newCell.classList.add("tdTableAction")
+                newRow.appendChild(newCell);
+            });
+    
+            // Adiciona o ícone de lixeira
+            var deleteIconCell = document.createElement("td");
+            deleteIconCell.innerHTML = `<span class="delete-icon"><img src = "./images/trash.svg"> </img></span>`;
+            deleteIconCell.classList.add("tdTableAction")
+            deleteIconCell.setAttribute("row-id", button.id)
+            deleteIconCell.id = "deleteTrash"
+            newRow.appendChild(deleteIconCell);
+            tbody.appendChild(newRow);
+        });
+        var deleteIconCell = document.getElementById("deleteTrash")
+        if(deleteIconCell){
+            deleteIconCell.addEventListener("click",function(evt){
+                var rowId = this.getAttribute("row-id")
+                app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(rowId) });
+            })
+        }
+    }
     function makeDivAddButton2(t1) {
         t1.clear();
         //user
@@ -436,6 +471,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         var selectUser = document.createElement("select")
         selectUser.classList.add("selectUserAdm")
         selectUser.id = "selectUser"
+
+        const buttonTable = document.createElement("div")
+        buttonTable.innerHTML = makeButton(texts.text("labelTable"),"secundary");
 
         const optUser = document.createElement("option")
         optUser.textContent = appText('select', 15)
@@ -548,9 +586,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         })
 
+       buttonTable.addEventListener("click",function(){
+        makeButtonsDiv(t1)
+       })
         
         topMiddleScreen.appendChild(textOpt)
         topMiddleScreen.appendChild(selectUser)
+        topMiddleScreen.appendChild(buttonTable)
 
         addButtonsArea.appendChild(zoneDiv)
         leftScreen.appendChild(addBottonsForm)
@@ -969,6 +1011,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                                 <option value="" id="number">${texts.text("labelNumber")}</option>
                             </select>
                         </div>
+                        <div class="divButtonsGeneric">
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
+                        </div> 
                     </div>
                 </html>
             `;
@@ -998,7 +1043,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                                     addAlarmParamters(insideDiv,type,user, x, y, z);
                                 }
                             });   
-            
+
+                     // //Botão Cancelar   
+                    document.getElementById("btnCancel").addEventListener("click",function(evt){
+                        var insideDiv = document.getElementById("insideDiv")
+                        document.body.removeChild(insideDiv)
+                    })
+                        
                 break;
             default:
                 break;
@@ -1028,7 +1079,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         </select>
                     </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                 </div>
@@ -1124,7 +1175,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         <input type="text" class="genericInputs"  id="iptParam" placeholder="${texts.text("labelValue")}">
                     </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                 </div>
@@ -1208,7 +1259,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                  </select> 
                   </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                     <div>
@@ -1343,7 +1394,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                         </select>
                     </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                 </div>
@@ -1436,7 +1487,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     <input type="number" class="genericInputs" id= "maxThreshold" placeholder="00" style = "text-align:center; width:120px">
                     </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                 </div>
@@ -1514,7 +1565,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">
             </div>
             <div class="divButtonsGeneric">
-                <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                 <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
             </div> 
             `;
@@ -1551,7 +1602,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelSensorName")}">
         </div>
         <div class="divButtonsGeneric">
-            <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+            <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
             <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
         </div> 
         `;
@@ -2679,6 +2730,22 @@ function getActionTypeText(actionType) {
     }
 }
 
+function getButtonTypeText(buttonType) {
+    switch (buttonType) {
+        case "combo":
+            return texts.text("labelCombo");
+        case "number":
+            return texts.text("labelNumber");
+        case "alarm":
+            return texts.text("labelAlarm");
+        case "user":
+            return texts.text("labelUser");
+        case "sensor":
+            return texts.text("labelSensor");
+        default:
+            return buttonType;
+    }
+}
 function getActionStartTypeText(startType) {
     switch (startType) {
         case "alarm":
@@ -2736,7 +2803,7 @@ function getActionStartTypeText(startType) {
                   
                      </div> 
                     <div class="divButtonsGeneric">
-                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"secundary")}</div>
+                        <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                         <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
                     </div> 
                 </div>
@@ -3318,10 +3385,10 @@ function getActionStartTypeText(startType) {
                 <div class="divMainModal" style = "width: 80%;">
                 <h2 class="titleModal">${texts.text("labelTituloClearDB")}</h2>
                     <div class="divSelectAndTextModalBig">
-                        <span class="textGeneric">${texts.text("labelButtonName")}</span>
+                        <span class="textGeneric">${texts.text("labelSelectDate")}</span>
                         <input type="date" class="genericInputs" id= "iptDate" placeholder="${texts.text("labelButtonName")}">
                     </div>
-                    <div class="divSelectAndTextModal">
+                    <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelSelectTheType")}</span>
                         <select id="selectReport" class="genericInputs">
                             <option value="selectDevice" style = "text-align:center">${texts.text("labelSelectTheType")}</option>
@@ -3343,7 +3410,7 @@ function getActionStartTypeText(startType) {
         const iptDate = document.getElementById("iptDate").value;
         var report = document.getElementById("selectReport");
         var selectedOption = report.options[report.selectedIndex];
-        var report = selectedOption.id;
+        var report = selectedOption.value;
 
         if(iptDate == ""){
             makePopup(texts.text("labelWarning"), texts.text("labelFillDate"))
@@ -3355,27 +3422,45 @@ function getActionStartTypeText(startType) {
     }
     function makeDivLicense(t) {
         t.clear();
+        var divMain = document.getElementById("colDireita")
+        var htmlUser = `
+        <html>
+            <body>
+                <div class="divMainModal">
+                <h2 class="titleModal">${texts.text("labelTituloLicense")}</h2>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("lblLicenseToken")}</span>
+                        <div>${licenseToken}</div>
+                    </div>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelLicenseFile")}</span>
+                        <input type="text" class="genericInputs" id= "InputLicenseFile" value = "${licenseFile}" placeholder="${texts.text("labelLicenseFile")}">   
+                    </div> 
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelLicenseActive")}</span>
+                        <div>${licenseActive}</div>
+                    </div> 
+                    <div class="divSelectAndTextModalBig">
+                    <span class="textGeneric">${texts.text("labelLicenseInstallDate")}</span>
+                    <div>${licenseInstallDate}</div>
+                     </div> 
+                     <div class="divSelectAndTextModalBig">
+                     <span class="textGeneric">${texts.text("labelLicenseUsed")}</span>
+                     <div>${String(licenseUsed)}</div>
+                      </div> 
+                    <div class="divButtonsGeneric">
+                        <div id = "btnSave">${makeButton(texts.text("btnOk"),"primary")}</div>
+                    </div> 
+                </div>
+            </body>
+        </html>
+    `;
+    
+    divMain.innerHTML = ''
+    divMain.innerHTML += htmlUser
+        
         //Título
-        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloLicense")));
-
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("lblLicenseToken"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", licenseToken, null));
-
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelLicenseFile"), null));
-        t.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 30px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, null).setAttribute("id", "InputLicenseFile"));
-
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", licenseActive, null));
-
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", licenseInstallDate, null));
-
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), null));
-        t.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), null));
-
-
-        // buttons
-        t.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+        document.getElementById("btnSave").addEventListener("click",function(){
             licenseFile = document.getElementById("InputLicenseFile").value;
             if (licenseFile.length > 0) {
                 app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
@@ -3383,9 +3468,7 @@ function getActionStartTypeText(startType) {
             } else {
                 window.alert("A chave de licença precisa ser informada!");
             }
-
-        });
-
+        })
     }
 
     function constructor() {
@@ -3969,7 +4052,7 @@ function getActionStartTypeText(startType) {
                 button.style.alignItems = 'center';
                 button.style.gap = '10px';
                 button.style.borderRadius = '4px';
-                button.style.background = '#199FDA';
+                button.style.background = '#EA551F';
                 button.style.color = 'white';
                 break;
             case "secundary":
@@ -3980,20 +4063,52 @@ function getActionStartTypeText(startType) {
                 button.style.alignItems = 'center';
                 button.style.gap = '10px';
                 button.style.borderRadius = '4px';
-                button.style.backgroundColor = 'grey';
+                button.style.backgroundColor = '#F4A97D';
                 button.style.color = 'black';
                 break;
             case "tertiary":
-                button.classList.add("border-2","border-dark-400", "hover:bg-dark-500", "text-dark-400", "font-bold", "py-1", "px-2", "rounded-lg");
+                button.style.display = 'flex';
+                button.style.padding = '6px 16px';
+                button.style.flexDirection = 'column';
+                button.style.justifyContent = 'center';
+                button.style.alignItems = 'center';
+                button.style.gap = '10px';
+                button.style.borderRadius = '4px';
+                button.style.backgroundColor = 'grey';
+                button.style.color = 'black';
                 break
             case "destructive":
-                button.classList.add("bg-red-500", "hover:bg-red-700", "text-primary-600", "font-bold", "py-1", "px-2", "rounded");
+                button.style.display = 'flex';
+                button.style.padding = '6px 16px';
+                button.style.flexDirection = 'column';
+                button.style.justifyContent = 'center';
+                button.style.alignItems = 'center';
+                button.style.gap = '10px';
+                button.style.borderRadius = '4px';
+                button.style.backgroundColor = '#F5222D';
+                button.style.color = 'black'
                 break;
             case "transparent":
-                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                button.style.display = 'flex';
+                button.style.padding = '6px 16px';
+                button.style.flexDirection = 'column';
+                button.style.justifyContent = 'center';
+                button.style.alignItems = 'center';
+                button.style.gap = '10px';
+                button.style.borderRadius = '4px';
+                button.style.backgroundColor = '#B62F18';
+                button.style.color = 'black'
                 break;
             case "ghost":
-                button.classList.add("bg-transparent", "hover:bg-gray-100", "text-gray-700", "font-bold", "py-1", "px-2", "rounded");
+                button.style.display = 'flex';
+                button.style.padding = '6px 16px';
+                button.style.flexDirection = 'column';
+                button.style.justifyContent = 'center';
+                button.style.alignItems = 'center';
+                button.style.gap = '10px';
+                button.style.borderRadius = '4px';
+                button.style.backgroundColor = '#595959';
+                button.style.color = 'black'
                 break;
             case  "disable":
                 // valor aqui
