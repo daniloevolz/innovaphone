@@ -9,7 +9,7 @@
     display: flex;
     width: 80%;
     overflow: auto;
-    height: 500px;
+    height: fit-content;
     /* margin-top: 200px; */
     padding: 5px;
     flex-direction: column;
@@ -30,6 +30,13 @@
     /* background-color: var(--colors-neutro-1200); */
     backdrop-filter: blur(5px);
 }
+input[type="date"]::-webkit-calendar-picker-indicator {
+    width: 25px;
+    height: 25px;
+    /* background-color: white;
+    color: white; */
+}
+
 .imageSrc{
     width: 20px;
     height: 20px;
@@ -343,7 +350,7 @@ embed {
 }
 
 .optBusy {
-    font-size: 20px;
+    font-size: 12px;
     border-radius: 6px;
     display: flex;
     padding: 8px;
@@ -1316,7 +1323,7 @@ addSelect input select{
     height: 60px;
     border-radius: 8px;
     overflow: hidden;
-    width: 185px;
+    width: 125px;
     margin: 15px 5px 15px 5px;
     cursor: pointer;
 }
@@ -1446,7 +1453,7 @@ input {
     cursor: pointer;
 }
 .txtBtn{
-    font-size: 13px;
+    font-size: 10px;
 }
 .imgBtn {
     height: 25px;
@@ -2622,7 +2629,7 @@ tr {
     /* position: static; */
     height: 50%;
     width: 100%;
-    font-size: 13px;
+    font-size: 0.45rem;
     background-color: rgba(128, 130, 131, 0.48);
     display: inline-flex;
     flex-direction: row;
@@ -2650,7 +2657,7 @@ tr {
     width: 90%;
     padding-top: 5px;
     padding-left: 10px;
-    font-size: 13px;
+    font-size: 0.45rem;
     font-weight: 600;
     color: var(--colors-neutro-100);
     text-transform: capitalize;
@@ -2729,7 +2736,7 @@ tr {
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    font-size: 13px;
+    font-size: 0.45rem;
     gap: 10px;
     text-transform: capitalize;
 }

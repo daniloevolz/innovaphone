@@ -676,7 +676,17 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" , src: obj.src }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+            if (obj.mt == "InsertMessageSrc") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -686,7 +696,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertAlarmMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -696,7 +706,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertNumberMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -715,7 +725,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertComboMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -736,7 +746,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 Database.exec("SELECT * FROM list_buttons")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -757,7 +767,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, sensor_min_threshold, sensor_max_threshold, sensor_type, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.min) + "','" + String(obj.max) + "','" + String(obj.sensorType) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -767,7 +777,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertDestMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));

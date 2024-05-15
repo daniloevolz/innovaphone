@@ -135,6 +135,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         { id: 'sensor', img: './images/wifi.svg' },
         { id: 'radio', img: './images/warning.svg' },
         { id: 'video', img: './images/camera.svg' },
+        { id: 'chat' , img: './images/chat.svg'}
     ]
 
     var dests = [
@@ -229,8 +230,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectMessageSuccess") {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
+            console.log( "USER SRC " + obj.src)
             //makeTableButtons(col_direita);
-            makeDivAddButton2(col_direita)
+            makeDivAddButton2(col_direita, obj.src)
         }
         if (obj.api == "admin" && obj.mt == "SelectButtonsMessageSuccess") {
             console.log(obj.result);
@@ -243,7 +245,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             
         }
         if (obj.api == "admin" && obj.mt == "InsertMessageSuccess") {
-            app.send({ api: "admin", mt: "SelectMessage" });
+            app.send({ api: "admin", mt: "SelectMessage", src: obj.src });
             makePopup("Sucesso", "Botão criado com sucesso!");
         }
         if (obj.api == "admin" && obj.mt == "UpdateMessageSuccess") {
@@ -430,7 +432,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             })
         }
     }
-    function makeDivAddButton2(t1) {
+    function makeDivAddButton2(t1,userSrc) {
         t1.clear();
         //user
         var codDireita = document.getElementById("colDireita")
@@ -474,6 +476,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         const buttonTable = document.createElement("div")
         buttonTable.innerHTML = makeButton(texts.text("labelTable"),"secundary");
 
+        
         const optUser = document.createElement("option")
         optUser.textContent = appText('select', 15)
         optUser.id = "noUser"
@@ -482,10 +485,16 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         list_users.forEach(function(user) {
             const optUser = document.createElement("option")
             optUser.textContent = user.cn
+            optUser.value = user.guid;
             optUser.id = user.guid
             selectUser.appendChild(optUser)
+
+            if (user.guid === userSrc) {
+                optUser.selected = true; 
+            }
         })
 
+        
         //Botões centrais
         var divButtonsMain = document.createElement("div")
         divButtonsMain.id = "divMainButtons"
@@ -567,8 +576,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             pagesBtnDiv.appendChild(pagesBtnText)
             pagesDiv.appendChild(pagesBtnDiv)
         })
-
-
 
         selectUser.addEventListener("change", function (e) {
             //user id
@@ -680,6 +687,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         //Criar a coluna de botões a direita
         createGridZero("floor", "all")
+
+        if(userSrc){
+            popButtons(userSrc, "1")
+            leftBottomButons(userSrc)
+            createGridZero("floor", userSrc);
+        }
+
     }
     function popButtons(user, page) {
         console.log('ERICK POPBUTTONS', user, page, list_buttons)
@@ -825,7 +839,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     else if (position_x == 2) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
                         makeDivAddButton3( "sensor", user, position_x, position_y, z);
-                    } else if (position_x >= 3 && position_x <= 7) {
+                    } else if (position_x >= 3 && position_x <= 8) {
                         // Chamar a função makeDivAddButton3() passando os valores obtidos como argumentos
                         makeDivAddButton3("center", user, position_x, position_y, z);
                     }
@@ -875,25 +889,29 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             imgTop.setAttribute("src", srcImg)
             divTop.appendChild(imgTop)
             var divTopText = document.createElement("div")
-            divTopText.textContent = truncateString(object.button_name.toLowerCase(),"7")
+            divTopText.textContent = object.button_name.toLowerCase()
+            //truncateString(object.button_name.toLowerCase(),"7")
             divTop.appendChild(divTopText);
 
             var divBottom = document.createElement("div")
             divBottom.classList.add(bgBottom)
             divBottom.classList.add("buttondown")
             var divBottomTxt = document.createElement("div")
-            divBottomTxt.textContent = truncateString(object.button_prt.toLowerCase(),"7")
+            divBottomTxt.textContent = object.button_prt.toLowerCase()
+            //truncateString(object.button_prt.toLowerCase(),"7")
             divBottom.appendChild(divBottomTxt)
             allBtns.appendChild(divBottom)
             allBtns.setAttribute("button_prt", object.button_prt); 
                 allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
-                divBottomTxt.textContent = truncateString(object.button_prt.toLowerCase(),"7")
+                divBottomTxt.textContent = object.button_prt.toLowerCase()
+                //truncateString(object.button_prt.toLowerCase(),"7")
                 var found = true;
                 list_users.forEach(function(u){
                     if(object.button_prt == u.guid && found){
                         allBtns.setAttribute("button_prt", u.e164); 
                         allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
-                        divBottomTxt.textContent = truncateString(u.cn.toLowerCase(),"7")
+                        divBottomTxt.textContent = u.cn.toLowerCase()
+                        // truncateString(u.cn.toLowerCase(),"7")
                         found = false
                         // se mudar o sip vai refletir aqui 
                         //pois tratamos tudo com GUID no admin
@@ -924,14 +942,16 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             imgTop.setAttribute("src", srcImg)
             divTop.appendChild(imgTop)
             var divTopText = document.createElement("div")
-            divTopText.textContent = truncateString(object.button_prt.toLowerCase(),"7")// nome do sensor que é o button_prt da list_buttons
+            divTopText.textContent = object.button_prt.toLowerCase()
+            //truncateString(object.button_prt.toLowerCase(),"7")// nome do sensor que é o button_prt da list_buttons
             divTop.appendChild(divTopText);
 
             var divBottom = document.createElement("div")
             divBottom.classList.add(bgBottom)
             divBottom.classList.add("buttondown")
             var divBottomTxt = document.createElement("div")
-            divBottomTxt.textContent = truncateString(texts.text(object.sensor_type).toLowerCase(),"7")
+            divBottomTxt.textContent = texts.text(object.sensor_type).toLowerCase()
+            //truncateString(texts.text(object.sensor_type).toLowerCase(),"7")
             divBottomTxt.style.fontSize = "13px";
             divBottomTxt.style.margin = '8px';
             divBottomTxt.style.width = "100%"
@@ -966,11 +986,13 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             divComboName.classList.add(bgBottom)
             divComboName.classList.add("divComboName")
             var divComboTopName = document.createElement("div")
-            divComboTopName.textContent = truncateString(object.button_type.toLowerCase(),"5")
+            divComboTopName.textContent = object.button_type.toLowerCase()
+            //truncateString(object.button_type.toLowerCase(),"5")
             divComboTopName.classList.add("divComboTopName")
             divComboName.appendChild(divComboTopName)
             var divComboBottomName = document.createElement("div")
-            divComboBottomName.textContent = truncateString(object.button_name.toLowerCase(),"5");
+            divComboBottomName.textContent = object.button_name.toLowerCase()
+            //truncateString(object.button_name.toLowerCase(),"5");
             divComboBottomName.classList.add("divComboBottomName")
             divComboName.appendChild(divComboBottomName)
             allBtns.appendChild(divComboName)
@@ -1140,7 +1162,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var value = selectedOption.id;
                     list_users.forEach(function(u){
                         if (u.guid == value ) {
-                            app.send({ api: "admin", mt: "InsertNumberMessage", name: iptName.value , user: String(""), value: String(u.guid), guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                            app.send({ api: "admin", mt: "InsertNumberMessage", name: iptName.value , user: String(""), value: String(u.guid), guid: String(user), type: String(type), device: device, page: z, x: x, y: y, src: user });
                         }
                     })
                     var insideDiv = document.getElementById("insideDiv")
@@ -1199,7 +1221,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             } else {
 
-                app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptNameButton.value), user: String(""), value: String(iptParam.value), guid: String(user), type: String(type), page: z, x: x, y: y });
+                app.send({ api: "admin", mt: "InsertAlarmMessage", name: String(iptNameButton.value), user: String(""), value: String(iptParam.value), guid: String(user), type: String(type), page: z, x: x, y: y, src: user });
                 //waitConnection(colDireita);
                 var insideDiv = document.getElementById("insideDiv")
                 document.body.removeChild(insideDiv)
@@ -1347,7 +1369,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var type4 = document.getElementById("selectType4");
                 var selectedOption = type4.options[type4.selectedIndex];
                 var type4 = selectedOption.id;
-                app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName), user: String(""), value: String(iptValue), guid: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4), page: z, x: x, y: y });
+                app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName), user: String(""), value: String(iptValue), guid: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4), page: z, x: x, y: y, src: user });
                 //waitConnection(colDireita);
                 var insideDiv = document.getElementById("insideDiv")
                 document.body.removeChild(insideDiv)
@@ -1438,7 +1460,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             }
             else if (type == "number") {
-                app.send({ api: "admin", mt: "InsertNumberMessage", name: iptName.value, user: String(""), value: iptParam.value, guid: String(user), type: String(type), device: device, page: z, x: x, y: y });
+                app.send({ api: "admin", mt: "InsertNumberMessage", name: iptName.value, user: String(""), value: iptParam.value, guid: String(user), type: String(type), device: device, page: z, x: x, y: y, src: user });
                 //waitConnection(t1);
                 var insideDiv = document.getElementById("insideDiv")
                 document.body.removeChild(insideDiv)
@@ -1519,7 +1541,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             if (String(iptNameSensor) == "" || String(type) == "" || iptMin == "" || iptMax == "") {
                 makePopup(texts.text("labelWarning"), texts.text("labelFillInputsSensor"));
             } else {
-                app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName), user: String(""), value: String(iptNameSensor), guid: String(user), type: String(type), min: iptMin, max: iptMax, sensorType: String(valueType), page: z, x: x, y: y });
+                app.send({ api: "admin", mt: "InsertSensorMessage", name: String(iptName), user: String(""), value: String(iptNameSensor), guid: String(user), type: String(type), min: iptMin, max: iptMax, sensorType: String(valueType), page: z, x: x, y: y, src: user });
                 //waitConnection(t1);
                 var insideDiv = document.getElementById("insideDiv")
                 document.body.removeChild(insideDiv)
@@ -1576,8 +1598,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             if (String(iptName) == "" || String(type) == "") {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             } else {
-                app.send({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y });
-                waitConnection(t1);
+                app.send ({ api: "user", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
+                // waitConnection(t1);
              
             }
         })
@@ -1613,7 +1635,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (String(iptName) == "" || String(type) == "") {
             makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
         } else {
-            app.send({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y });
+            app.send({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y, src: user });
             waitConnection(t1);
          
         }
@@ -1861,7 +1883,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             console.log('TEXTOS 2', input2.value)
             console.log('TEXTOS S', select.value)
             console.log('TEXTOS I', imgSelected.getAttribute("src"))
-            app.send({ api: "admin", mt: "InsertDestMessage", name: String(input1.value), user: String(""), value: String(input2.value), guid: String(user), type: String(type), device: select.value, img: String(imgSelected.getAttribute("src")), page: z, x: x, y: y }); 
+            app.send({ api: "admin", mt: "InsertDestMessage", name: String(input1.value), user: String(""), value: String(input2.value), guid: String(user), type: String(type), device: select.value, img: String(imgSelected.getAttribute("src")), page: z, x: x, y: y, src: user }); 
         })
     
         var cancel = document.createElement('div')
@@ -1945,7 +1967,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             const txtBtn = document.createElement('div')
             txtBtn.classList.add("txtBtn")
             txtBtn.id = "txtBtn"
-            txtBtn.textContent = truncateString(object.button_name, "7")
+            txtBtn.textContent = object.button_name
+            //truncateString(object.button_name, "7")
 
 
             allBtns.appendChild(imgBtn)
@@ -2748,11 +2771,15 @@ function getButtonTypeText(buttonType) {
     function getActionStartTypeText(startType) {
     switch (startType) {
         case "alarm":
-            return "Alarme";
+            return texts.text("labelAlarm")
         case "out-number":
-            return "Número Destino";
+            return texts.text("labelDestinationNumber")
         case "inc-number":
-            return "Número Origem";
+            return texts.text("labelOriginNumber")
+        case "min-threshold":
+            return texts.text("minValue")
+        case "max-threshold":
+            return texts.text("maxValue")
         default:
             return startType;
     }
@@ -2781,6 +2808,9 @@ function getButtonTypeText(buttonType) {
                         <select id="selectTypeTrigger" class="genericInputs">
                             <option value="selectDevice" style = "text-align:center">${texts.text("labelAlarmeOrCall")}</option>
                         </select>
+                    </div> 
+                    <div class="divSelectAndTextModalBig" id = "divSensorInfos" style = "display:none;" >
+                  
                     </div> 
                     <div class="divSelectAndTextModalBig">
                     <span class="textGeneric">${texts.text("labelAlarmCode")}</span>
@@ -2922,15 +2952,58 @@ function getButtonTypeText(buttonType) {
 
             
             })
-            
+
+        selectTypeTrigger.addEventListener("change",function(){
+            var selectedGuid = selectUserModal.options[selectUserModal.selectedIndex];
+            var guidUser = selectedGuid.id;
+
+            var selectedOptionTrigger = selectTypeTrigger.options[selectTypeTrigger.selectedIndex];
+            var typeTrigger = selectedOptionTrigger.id;
+
+            if(typeTrigger === "min-threshold" || typeTrigger === "max-threshold"){
+                var divSensorInfos = document.getElementById("divSensorInfos");
+                divSensorInfos.style.display = 'block';
+                divSensorInfos.innerHTML = ''
+                divSensorInfos.innerHTML += `
+                <div class="divSelectAndTextModalBig">
+                    <span class="textGeneric">${texts.text("labelSensorName")}</span>
+                    <input type="text" class="genericInputs" id= "iptSensorName" placeholder="${texts.text("labelSensorName")}">
+                </div> 
+                <div class="divSelectAndTextModalBig">
+                    <span class="textGeneric">${texts.text("labelSensorType")}</span>
+                    <select id="selectTypeSensor" class="genericInputs">
+                        <option value="selectSensorType" style = "text-align:center">${texts.text("labelSensorType")}</option>
+                    </select>
+                 </div> 
+                `
+                const selectTypeSensor = document.getElementById("selectTypeSensor")
+                list_sensor_types.forEach(function (s) {
+                    var opts = document.createElement("option")
+                    opts.textContent =  texts.text(s.id)
+                    opts.id = s.id;
+                    opts.style.fontSize = '12px';
+                    opts.style.textAlign = "center";
+                    opts.style.color = "white";
+                    selectTypeSensor.appendChild(opts)
+                });
+            }else{
+                var divSensorInfos = document.getElementById("divSensorInfos");
+                divSensorInfos.style.display = 'none'
+            }
+            })
+
+        
+
         document.getElementById("btnSave").addEventListener("click",function(){
             const iptName = document.getElementById("iptNameAction").value;
             const iptAlarmAction = document.getElementById("iptAlarmAction").value;
             const iptValueAction = document.getElementById("iptValueAction").value;
+            const iptSensorName = document.getElementById("iptSensorName").value
             const selectTypeTrigger = document.getElementById("selectTypeTrigger");
             const typetriggerOpt = selectTypeTrigger.options[selectTypeTrigger.selectedIndex];
             const typeTriggerValue = typetriggerOpt.id;
             const selectDevices = document.getElementById("selectDevices");
+            const selectTypeSensor = document.getElementById("selectTypeSensor")
             var optSelectDevices = selectDevices.options[selectUserModal.selectedIndex];
             const device = optSelectDevices.id;
 
@@ -2940,11 +3013,14 @@ function getButtonTypeText(buttonType) {
             var selectedOption = selectTypeAction.options[selectTypeAction.selectedIndex];
             const type = selectedOption.id;
 
+            var selectTypeSensorOpt = selectTypeSensor.options[selectTypeSensor.selectedIndex];
+            const typeSensor = selectTypeSensorOpt.id;
+
             if (String(iptName) == "" || String(iptAlarmAction) == "") {
                  makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName), alarm: String(iptAlarmAction), start: String(typeTriggerValue), value: String(iptValueAction), guid: String(guidUser), type: String(type), device: device });
+                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName), alarm: String(iptAlarmAction), start: String(typeTriggerValue), value: String(iptValueAction), guid: String(guidUser), type: String(type), device: device, sensorType: typeSensor, sensorName: iptSensorName });
                 makeTableActions(t);
                     
                         // Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, 
@@ -3385,7 +3461,7 @@ function getButtonTypeText(buttonType) {
                 <h2 class="titleModal">${texts.text("labelTituloClearDB")}</h2>
                     <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelSelectDate")}</span>
-                        <input type="date" class="genericInputs" id= "iptDate" placeholder="${texts.text("labelButtonName")}">
+                        <input type="date" style="width: 200px; align-items:center; justify-content:center;" class="genericInputs" id= "iptDate" placeholder="${texts.text("labelButtonName")}">
                     </div>
                     <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelSelectTheType")}</span>
@@ -3417,6 +3493,13 @@ function getButtonTypeText(buttonType) {
             app.send({ api: "admin", mt: "DeleteFromReports", src: report, to: iptDate });
         }
     })  
+
+    var inputDate = document.getElementById('iptDate');
+    inputDate.addEventListener('focus', function() {
+        // Abrir o calendário ao focar no input
+        this.type = 'text';
+        this.type = 'date';
+    });
 
     }
     function makeDivLicense(t) {

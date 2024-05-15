@@ -70,7 +70,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         { id: 'map', img: './images/location.svg'}, 
         { id: 'sensor', img: './images/wifi.svg'}, 
         { id: 'radio', img: './images/warning.svg'},
-        { id: 'video', img: './images/camera.svg'}
+        { id: 'video', img: './images/camera.svg'},
+        { id: 'chat' , img: './'}
     ]
 
     function app_connected(domain, user, dn, appdomain) {
@@ -191,6 +192,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             popButtons(list_buttons,1); //Cria os botões na tela
+            popBottomButtons(list_buttons)
             leftBottomButons()
             createGridZero("floor")
                 .then(function (message) {
@@ -834,7 +836,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // var allbtn = coldireita.add(new innovaphone.ui1.Div(null, null, "allbtn"));
         // var pagebtn = coldireita.add(new innovaphone.ui1.Div(null, null, "pagebtn"));
         // var pageDivider = coldireita.add(new innovaphone.ui1.Div(null, null, "pageDivider"));
-
+        var divMainButtons = document.getElementById("divMainButtons")
+        divMainButtons.setAttribute("page",page)
+        
           // div botão combo
           var combobtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "combobtn"));
           for (let i = 1; i < 6 ; i++) {
@@ -873,25 +877,25 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allbtn.setAttribute("position-x", positionX);
             allbtn.setAttribute("position-y", positionY);
         }
-          // cameras sensores graficos planta baixa
-        var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
-            options.forEach(function (o) {
-                var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
-                optionsDivBtn.setAttribute("id",o.id)
-                var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
-                var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
-                imgTop.setAttribute("src", o.img)
-                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
-            })
+        //   // cameras sensores graficos planta baixa
+        // var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
+        //     options.forEach(function (o) {
+        //         var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+        //         optionsDivBtn.setAttribute("id",o.id)
+        //         var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
+        //         var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
+        //         imgTop.setAttribute("src", o.img)
+        //         var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
+        //     })
 
-           //paginas de 1 - 5
-           var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
-           for (let i = 1; i < 6 ; i++) {
-               var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
-               var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
-               var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
-               pagesBtnDiv.setAttribute("page", i )
-           }     
+        //    //paginas de 1 - 5
+        //    var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
+        //    for (let i = 1; i < 6 ; i++) {
+        //        var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
+        //        var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
+        //        var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
+        //        pagesBtnDiv.setAttribute("page", i )
+        //    }     
        
         //var allbtn = document.getElementById("allbtn");
         console.log("TODOS OS BOTÕES " + "\n" + JSON.stringify(buttons))
@@ -969,21 +973,100 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+    //     var pages = document.querySelectorAll(".pagina")
+    //     pages.forEach(function(page){
+    //         var pageAttribute = page.getAttribute("page")
+    //         var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
+    //         page.addEventListener("click", function(evt){
+    //             var divPrincipal = document.getElementById("divMainButtons")
+    //             var divOptions = document.getElementById("divOptions")
+    //             divPrincipal.setAttribute("page",pageAttribute)
+    //             divPrincipal.innerHTML = ''
+    //             divOptions.innerHTML = ''
+    //             popButtons(buttons,pageAttribute)
+            
+    //         });
+    //         if(divMainAttribute == pageAttribute){
+    //               page.classList.add("azul-600-bottom")  
+    //         }
+
+    //     })
+    //     var botoes = document.querySelectorAll(".optionsBtn");
+    //    for (var i = 0; i < botoes.length; i++) {
+    //         var botao = botoes[i];
+
+    //         // O jeito correto e padronizado de incluir eventos no ECMAScript
+    //         // (Javascript) eh com addEventListener:
+    //         botao.addEventListener("click", function(evt){
+    //             var idBtn = evt.currentTarget.id
+
+    //             if(!this.classList.contains("clicked")){
+    //                 createGridZero(idBtn)
+    //                     .then(function (message) {
+    //                         console.log("createGridZero" + message);
+    //                     })
+    //                     .catch(function (error) {
+    //                         console.log("createGridZero" + error);
+    //                     });
+    //             }
+
+    //         });
+    //     }
+        updatePageButtons()
+        updateActiveAlarmButtons()
+
+    }
+    function popBottomButtons(buttons){
+        // cameras sensores graficos planta baixa
+        var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
+        options.forEach(function (o) {
+            var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+            optionsDivBtn.setAttribute("id",o.id)
+            var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
+            var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
+            imgTop.setAttribute("src", o.img)
+            var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
+        })
+
+        //paginas de 1 - 5
+        var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
+        for (let i = 1; i < 6 ; i++) {
+            var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
+            var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
+            var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
+            pagesBtnDiv.setAttribute("page", i )
+        }   
+
         var pages = document.querySelectorAll(".pagina")
         pages.forEach(function(page){
             var pageAttribute = page.getAttribute("page")
-            var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
-            page.addEventListener("click", function(evt){
-                var divPrincipal = document.getElementById("divMainButtons")
-                var divOptions = document.getElementById("divOptions")
-                divPrincipal.setAttribute("page",pageAttribute)
-                divPrincipal.innerHTML = ''
-                divOptions.innerHTML = ''
-                popButtons(buttons,pageAttribute)
-            
+            var divPrincipal = document.getElementById("divMainButtons")
+           // var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
+           page.addEventListener("click", function(evt) {
+
+            var divOptions = document.getElementById("divOptions");
+            var currentPageAttribute = divPrincipal.getAttribute("page");
+    
+            // Remover a classe "azul-600-bottom" de todas as páginas
+            pages.forEach(function(p) {
+                p.classList.remove("azul-600-bottom");
             });
-            if(divMainAttribute == pageAttribute){
-                  page.classList.add("azul-600-bottom")  
+    
+            // Adicionar a classe "azul-600-bottom" apenas à página atual
+            page.classList.add("azul-600-bottom");
+    
+            // Atualizar o atributo "page" do elemento divPrincipal
+            divPrincipal.setAttribute("page", pageAttribute);
+    
+            // Limpar o conteúdo do divPrincipal
+            divPrincipal.innerHTML = '';
+    
+            // Populando os botões
+            popButtons(buttons, pageAttribute);
+        });
+           
+            if(divPrincipal.getAttribute("page") == pageAttribute){
+                page.classList.add("azul-600-bottom")  
             }
 
         })
@@ -1008,8 +1091,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             });
         }
-        updatePageButtons()
-        updateActiveAlarmButtons()
 
     }
 
@@ -1457,6 +1538,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     element.type = "application/pdf";
                     element.width = "100%";
                     element.height = "400"; // Altura desejada
+                    element.src = buttonLink;
                 } else if (fileType === 'image') {
                     element = document.createElement("img");
                     element.src = buttonLink;
