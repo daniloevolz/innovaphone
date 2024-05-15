@@ -30,6 +30,18 @@
     /* background-color: var(--colors-neutro-1200); */
     backdrop-filter: blur(5px);
 }
+.imageSrc{
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    cursor: pointer;
+}
+.nameInputText{
+    font-size: 14px;
+}
+.nameSelectText{
+    font-size: 14px;
+}
 .titleModal{
     color: #FFF;
     font-family: Inter;
