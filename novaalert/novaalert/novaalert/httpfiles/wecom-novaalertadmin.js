@@ -424,13 +424,25 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             newRow.appendChild(deleteIconCell);
             tbody.appendChild(newRow);
         });
-        var deleteIconCell = document.getElementById("deleteTrash")
-        if(deleteIconCell){
-            deleteIconCell.addEventListener("click",function(evt){
+        //var deleteIconCell = document.getElementById("deleteTrash")
+        //if(deleteIconCell){
+        //    deleteIconCell.addEventListener("click",function(evt){
+        //        var rowId = this.getAttribute("row-id")
+        //        app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(rowId) });
+        //    })
+        //}
+        var deleteIconCell = document.querySelectorAll(".deleteTrash")
+        for (var i = 0; i < deleteIconCell.length; i++) {
+            var botao = deleteIconCell[i];
+            // O jeito correto e padronizado de incluir eventos no ECMAScript
+            // (Javascript) eh com addEventListener:
+            botao.addEventListener("click", function (e) {
                 var rowId = this.getAttribute("row-id")
                 app.send({ api: "admin", mt: "DeleteMessage", id: parseInt(rowId) });
+
             })
         }
+
     }
     function makeDivAddButton2(t1,userSrc) {
         t1.clear();
@@ -1558,7 +1570,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     function makeDivAddOption(divmain, type, user, x, y, z) {
         switch (type) {
             case "radio":
-                // addNumberParamtersMultiDevice(comboarea, type); // Analisar o que podemos fazer aqui ~Pietro
+                addNumberParamtersMultiDevice(comboarea, type); // Analisar o que podemos fazer aqui ~Pietro
                 break;
             case "dest":
                 addDestParamtersMultiDevice(comboarea, type);
@@ -1580,13 +1592,30 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             </div>
             <div class="divSelectAndTextModalBig">
                 <span class="textGeneric">${texts.text("labelValue")}</span>
-                <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">
+                <select id="selectUserModal" class="genericInputs">
+                    <option value="">${texts.text("labelSelectUser")}</option>
+                </select>
+                
+                /*<input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">*/
             </div>
+            
             <div class="divButtonsGeneric">
                 <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
                 <div id = "btnSave">${makeButton(texts.text("btnAddButton"),"primary")}</div>
             </div> 
             `;
+
+            var selectUserModal = document.getElementById("selectUserModal");
+            list_users.forEach(function (user) {
+                var option = document.createElement("option");
+                option.value = user.guid;
+                option.id = user.guid
+                option.textContent = user.cn;
+                option.style.fontSize = '12px';
+                option.style.textAlign = "center";
+                option.style.color = "white";
+                selectUserModal.appendChild(option);
+            });
 
             divmain.innerHTML = '';
             divmain.innerHTML += html;
@@ -1594,11 +1623,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         // //Botão Salvar
         document.getElementById("btnSave").addEventListener("click",function(evt){
             var iptName = document.getElementById("iptName").value;
-            var iptParam = document.getElementById("iptParam").value;
+            //var iptParam = document.getElementById("iptParam").value;
+            var user = document.getElementById("selectUserModal");
+            var selectedOption = user.options[user.selectedIndex];
+            var user = selectedOption.id;
             if (String(iptName) == "" || String(type) == "") {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             } else {
-                app.send ({ api: "user", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
+                app.send ({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(user), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
                 // waitConnection(t1);
              
             }
@@ -2719,11 +2751,22 @@ function makeTableActions(user) {
         newRow.appendChild(deleteIconCell);
         tbody.appendChild(newRow);
     });
-    var deleteIconCell = document.getElementById("deleteTrash")
-    if(deleteIconCell){
-        deleteIconCell.addEventListener("click",function(evt){
+    //var deleteIconCell = document.document.getElementById("deleteTrash")
+    //if(deleteIconCell){
+    //    deleteIconCell.addEventListener("click",function(evt){
+    //        var rowId = this.getAttribute("row-id")
+    //        app.send({ api: "admin", mt: "DeleteActionMessage", id: parseInt(rowId) });
+    //    })
+    //}
+    var deleteIconCell = document.querySelectorAll(".deleteTrash")
+    for (var i = 0; i < deleteIconCell.length; i++) {
+        var botao = deleteIconCell[i];
+        // O jeito correto e padronizado de incluir eventos no ECMAScript
+        // (Javascript) eh com addEventListener:
+        botao.addEventListener("click", function (e) {
             var rowId = this.getAttribute("row-id")
             app.send({ api: "admin", mt: "DeleteActionMessage", id: parseInt(rowId) });
+
         })
     }
 }
@@ -2998,29 +3041,59 @@ function getButtonTypeText(buttonType) {
             const iptName = document.getElementById("iptNameAction").value;
             const iptAlarmAction = document.getElementById("iptAlarmAction").value;
             const iptValueAction = document.getElementById("iptValueAction").value;
-            const iptSensorName = document.getElementById("iptSensorName").value
+            
+
+            //trygger type
             const selectTypeTrigger = document.getElementById("selectTypeTrigger");
             const typetriggerOpt = selectTypeTrigger.options[selectTypeTrigger.selectedIndex];
             const typeTriggerValue = typetriggerOpt.id;
-            const selectDevices = document.getElementById("selectDevices");
-            const selectTypeSensor = document.getElementById("selectTypeSensor")
-            var optSelectDevices = selectDevices.options[selectUserModal.selectedIndex];
-            const device = optSelectDevices.id;
 
+            //user
+            const selectUserModal = document.getElementById("selectUserModal")
             var selectedGuid = selectUserModal.options[selectUserModal.selectedIndex];
             var guidUser = selectedGuid.id;
 
+            //action type
+            const selectTypeAction = document.getElementById("selectTypeAction")
             var selectedOption = selectTypeAction.options[selectTypeAction.selectedIndex];
             const type = selectedOption.id;
 
-            var selectTypeSensorOpt = selectTypeSensor.options[selectTypeSensor.selectedIndex];
-            const typeSensor = selectTypeSensorOpt.id;
+            let iptSensorName = ''
+            let typeSensor = ''
+            if (typeTriggerValue == 'min-threshold' || typeTriggerValue == 'max-threshold') {
+                //sensor name
+                iptSensorName = document.getElementById("iptSensorName").value;
+                //sensor type
+                const selectTypeSensor = document.getElementById("selectTypeSensor")
+                var selectTypeSensorOpt = selectTypeSensor.options[selectTypeSensor.selectedIndex];
+                typeSensor = selectTypeSensorOpt.id;
+            }
+
+            let device = ''
+            if (type == 'number') {
+                //device
+                const selectDevices = document.getElementById("selectDevices");
+                var optSelectDevices = selectDevices.options[selectDevices.selectedIndex];
+                device = optSelectDevices.id;
+            }
+            
 
             if (String(iptName) == "" || String(iptAlarmAction) == "") {
                  makePopup("Atenção", "Complete todos os campos para que a Ação possa ser criada.");
             }
             else {
-                app.send({ api: "admin", mt: "InsertActionMessage", name: String(iptName), alarm: String(iptAlarmAction), start: String(typeTriggerValue), value: String(iptValueAction), guid: String(guidUser), type: String(type), device: device, sensorType: typeSensor, sensorName: iptSensorName });
+                app.send({
+                    api: "admin", mt: "InsertActionMessage",
+                    name: String(iptName),
+                    alarm: String(iptAlarmAction),
+                    start: String(typeTriggerValue),
+                    value: String(iptValueAction),
+                    guid: String(guidUser),
+                    type: String(type),
+                    device: device,
+                    sensorType: typeSensor,
+                    sensorName: iptSensorName
+                });
                 makeTableActions(t);
                     
                         // Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, 
@@ -3470,6 +3543,7 @@ function getButtonTypeText(buttonType) {
                             <option value="RptCalls" style = "text-align:center">${texts.text("labelRptCalls")}</option>
                             <option value="RptActivities" style = "text-align:center">${texts.text("labelRptActivities")}</option>
                             <option value="RptAvailability" style = "text-align:center">${texts.text("labelRptAvailability")}</option>
+                            <option value="RptMessages" style = "text-align:center">${texts.text("labelRptMessages")}</option>
                         </select>
                     </div> 
                     <div class="divButtonsGeneric">

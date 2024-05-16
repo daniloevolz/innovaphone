@@ -71,7 +71,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         { id: 'sensor', img: './images/wifi.svg'}, 
         { id: 'radio', img: './images/warning.svg'},
         { id: 'video', img: './images/camera.svg'},
-        { id: 'chat' , img: './'}
+        { id: 'chat' , img: './images/chat.svg'}
     ]
 
     function app_connected(domain, user, dn, appdomain) {
@@ -1528,7 +1528,51 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             bottomRight.appendChild(infoBox)
 
         
-        }else{
+        }
+        else if (obj.button_type == "chat") {
+            const infoBox = document.createElement("div")
+            infoBox.id = "infoBox"
+            infoBox.classList.add("infobox")
+
+            const sensorInfoBox = document.createElement("div")
+            sensorInfoBox.id = "sensorInfoBox"
+            sensorInfoBox.classList.add("sensorInfoBox")
+
+            const sensorBox = document.createElement("div")
+            sensorBox.id = "sendBtn"
+            sensorBox.classList.add("sensorBox")
+
+            const topBox = document.createElement("div")
+            topBox.id = "topBox"
+            topBox.classList.add("topBox", "neutro-700")
+            topBox.textContent = obj.button_prt;
+            sensorBox.appendChild(topBox)
+
+            const btmBox = document.createElement("div")
+            btmBox.id = "btmBox"
+            btmBox.classList.add("btmBox", "neutro-900")
+
+            app.sendSrc(app.sendSrc({ api: "user", mt: "SelectMessageHistorySrc", to: obj.button_prt, src: obj.button_user }, function (obj) {
+                console.log("SendSrcResult: " + JSON.stringify(obj))
+                //var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
+                //var objParse = JSON.parse(obj.result)[0];
+
+                //continuar aqui Danilo!!!
+            }))
+            //btmBox.textContent = 
+
+            sensorInfoBox.appendChild(sensorBox)
+            infoBox.appendChild(sensorInfoBox)
+            bottomRight.appendChild(infoBox)
+
+            const chat_id = 1
+
+            sensorBox.addEventListener("click", function () {
+                app.send({ api: "user", mt: "Message", msg: msg, to: obj.button_prt, id: chat_id })
+            })
+
+        }
+        else {
             function createFileElement(buttonLink) {
                 var fileType = getFileType(buttonLink);
                 var element;

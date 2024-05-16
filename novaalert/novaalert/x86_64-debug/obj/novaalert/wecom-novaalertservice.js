@@ -131,6 +131,26 @@ new JsonApi("user").onconnected(function (conn) {
             var today = getDateNow();
 
             if (license != null && connectionsUser.length <= license.Users) {
+                if (obj.mt == "Message") {
+                    log("danilo-req msg:" + obj.msg);
+
+                    var objToInsert = {
+                        caht_id: obj.id,
+                        from_guid: conn.guid,
+                        to_guid: obj.to,
+                        date: getDateNow(),
+                        msg:obj.msg
+                    }
+                    insertTblMessages(objToInsert)
+                    var isReceived = false
+                    connectionsUser.forEach(function (c) {
+                        if (c.guid == obj.to) {
+                            c.send(JSON.stringify({ api: "user", mt: "Message", src: conn.guid, msg: obj.msg, id: obj.id }));
+                            isReceived = true
+                        }
+                    })
+                    conn.send(JSON.stringify({ api: "user", mt: "MessageResult", id: obj.id, received: isReceived }));
+                }
 
                 if (obj.mt == "TableUsers") {
                     log("danilo-req TableUsers: reducing the pbxTableUser object to send to user");
@@ -571,6 +591,16 @@ new JsonApi("user").onconnected(function (conn) {
                             log("Erro ao Consultar Info do Sensor " + errorText);
                         });
                 }
+                if (obj.mt == "SelectMessageHistorySrc") {
+                    var querySelect = "SELECT * FROM tbl_messages WHERE from_guid = '" + obj.to + "' OR from_guid = '" + conn.guid + "' OR to_guid = '" + conn.guid + "' OR to_guid = '" + obj.to +"' ORDER BY id DESC LIMIT 20";
+                    Database.exec(querySelect)
+                        .oncomplete(function (data) {
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResultSrc", result: JSON.stringify(data), src: obj.src }))
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("Erro ao Consultar Info do Sensor " + errorText);
+                        });
+                }
             }
             else {
                 log("danilo req: No license Available")
@@ -676,7 +706,17 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" , src: obj.src }));
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
+            }
+            if (obj.mt == "InsertMessageSrc") {
+                Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
+                    .oncomplete(function () {
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -686,7 +726,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertAlarmMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -696,7 +736,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertNumberMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -715,7 +755,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertComboMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_type_1, button_type_2, button_type_3, button_type_4, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.type1) + "','" + String(obj.type2) + "','" + String(obj.type3) + "','" + String(obj.type4) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -736,7 +776,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 Database.exec("SELECT * FROM list_buttons")
                     .oncomplete(function (data) {
                         log("result=" + JSON.stringify(data, null, 4));
-                        conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4) }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
 
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -757,7 +797,7 @@ new JsonApi("admin").onconnected(function (conn) {
                 //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, sensor_min_threshold, sensor_max_threshold, sensor_type, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.min) + "','" + String(obj.max) + "','" + String(obj.sensorType) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -767,7 +807,7 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertDestMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess" }));
+                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -840,7 +880,13 @@ new JsonApi("admin").onconnected(function (conn) {
                     case "RptCalls":
                         var query = "SELECT guid, number, call_started, call_ringing, call_connected, call_ended, status, direction FROM tbl_calls";
                         var conditions = [];
-                        if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
+                        //if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
+                        if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                            var guidConditions = obj.guid.map(function (guid) {
+                                return "guid ='" + guid + "'";
+                            });
+                            conditions.push("(" + guidConditions.join(" OR ") + ")");
+                        }
                         if (obj.number) conditions.push("number ='" + obj.number + "'");
                         if (obj.from) conditions.push("call_started >'" + obj.from + "'");
                         if (obj.to) conditions.push("call_started <'" + obj.to + "'");
@@ -872,7 +918,13 @@ new JsonApi("admin").onconnected(function (conn) {
                     case "RptActivities":
                         var query = "SELECT guid, name, date, status, details  FROM tbl_activities";
                         var conditions = [];
-                        if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
+                        //if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
+                        if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                            var guidConditions = obj.guid.map(function (guid) {
+                                return "guid ='" + guid + "'";
+                            });
+                            conditions.push("(" + guidConditions.join(" OR ") + ")");
+                        }
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (obj.event) conditions.push("name ='" + obj.event + "'");
@@ -904,7 +956,13 @@ new JsonApi("admin").onconnected(function (conn) {
                     case "RptAvailability":
                         var query = "SELECT guid, date, status, group_name FROM tbl_availability";
                         var conditions = [];
-                        if (obj.guid) conditions.push("sip ='" + obj.guid + "'");
+                        //if (obj.guid) conditions.push("sip ='" + obj.guid + "'");
+                        if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                            var guidConditions = obj.guid.map(function (guid) {
+                                return "guid ='" + guid + "'";
+                            });
+                            conditions.push("(" + guidConditions.join(" OR ") + ")");
+                        }
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
@@ -973,6 +1031,43 @@ new JsonApi("admin").onconnected(function (conn) {
                                     conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
                                 });
                         break;
+                    case "RptMessages":
+                        var query = "SELECT id, chat_id, from_guid, to_guid, date, msg FROM tbl_messages";
+                        var conditions = [];
+                        //if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
+                        if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                            var guidConditions = obj.guid.map(function (guid) {
+                                return "guid ='" + guid + "'";
+                            });
+                            conditions.push("(" + guidConditions.join(" OR ") + ")");
+                        }
+                        if (obj.from) conditions.push("date >'" + obj.from + "'");
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+
+                                var jsonData = JSON.stringify(data, null, 4);
+                                var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                var fragments = [];
+                                for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                    fragments.push(jsonData.substr(i, maxFragmentSize));
+                                }
+                                // Enviar cada fragmento separadamente através do websocket
+                                for (var i = 0; i < fragments.length; i++) {
+                                    var isLastFragment = i === fragments.length - 1;
+                                    conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                }
+
+                                //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
                     }        
                 }       
             if (obj.mt == "DeleteFromReports") {
@@ -1011,6 +1106,40 @@ new JsonApi("admin").onconnected(function (conn) {
                         break;
                     case "RptAvailability":
                         var query = "DELETE FROM tbl_availability";
+                        var conditions = [];
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptSensorHistory":
+                        var query = "DELETE FROM tbl_sensors_history";
+                        var conditions = [];
+                        if (obj.to) conditions.push("date <'" + obj.to + "'");
+                        if (conditions.length > 0) {
+                            query += " WHERE " + conditions.join(" AND ");
+                        }
+
+                        Database.exec(query)
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "DeleteFromReportsSuccess", src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                            });
+                        break;
+                    case "RptMessages":
+                        var query = "DELETE FROM tbl_messages";
                         var conditions = [];
                         if (obj.to) conditions.push("date <'" + obj.to + "'");
                         if (conditions.length > 0) {
@@ -2867,6 +2996,15 @@ function getDateNow() {
 }
 
 //#region inserts reports
+function insertTblMessages(obj) {
+    Database.insert("INSERT INTO tbl_messages (chat_id, from_guid, to_guid, date, msg) VALUES ('" + obj.chat_id + "','" + obj.from_guid + "','" + obj.to_guid + "','" + obj.date + "','" + obj.msg + "')")
+        .oncomplete(function (data) {
+            log("insertTblActivities= Success");
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblActivities= Erro " + errorText);
+        });
+}
 function insertTblActivities(obj) {
     Database.insert("INSERT INTO tbl_activities (guid, name, date, status, details) VALUES ('" + obj.guid + "','" + obj.name + "','" + obj.date + "','" + obj.status + "','" + obj.details + "')")
         .oncomplete(function () {
@@ -2877,6 +3015,7 @@ function insertTblActivities(obj) {
             log("insertTblActivities= Erro " + errorText);
         });
 }
+
 function insertTblCalls(obj) {
     if (!obj.call_ringing) {
         obj.call_ringing = "";
