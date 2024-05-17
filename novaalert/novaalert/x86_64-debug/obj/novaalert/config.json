@@ -400,11 +400,6 @@
             "cmd": "column",
             "name": "msg",
             "type": "text"
-          },
-          {
-            "cmd": "column",
-            "name": "group_name",
-            "type": "text"
           }
         ]
       }

@@ -1595,8 +1595,6 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 <select id="selectUserModal" class="genericInputs">
                     <option value="">${texts.text("labelSelectUser")}</option>
                 </select>
-                
-                /*<input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">*/
             </div>
             
             <div class="divButtonsGeneric">
@@ -1605,32 +1603,34 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             </div> 
             `;
 
-            var selectUserModal = document.getElementById("selectUserModal");
-            list_users.forEach(function (user) {
-                var option = document.createElement("option");
-                option.value = user.guid;
-                option.id = user.guid
-                option.textContent = user.cn;
-                option.style.fontSize = '12px';
-                option.style.textAlign = "center";
-                option.style.color = "white";
-                selectUserModal.appendChild(option);
-            });
+            
 
             divmain.innerHTML = '';
             divmain.innerHTML += html;
+
+        var selectUserModal = document.getElementById("selectUserModal");
+        list_users.forEach(function (user) {
+            var option = document.createElement("option");
+            option.value = user.guid;
+            option.id = user.guid
+            option.textContent = user.cn;
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectUserModal.appendChild(option);
+        });
 
         // //Botão Salvar
         document.getElementById("btnSave").addEventListener("click",function(evt){
             var iptName = document.getElementById("iptName").value;
             //var iptParam = document.getElementById("iptParam").value;
-            var user = document.getElementById("selectUserModal");
-            var selectedOption = user.options[user.selectedIndex];
-            var user = selectedOption.id;
+            var userTo = document.getElementById("selectUserModal");
+            var selectedOption = userTo.options[userTo.selectedIndex];
+            userTo = selectedOption.id;
             if (String(iptName) == "" || String(type) == "") {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             } else {
-                app.send ({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(user), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
+                app.send ({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(userTo), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
                 // waitConnection(t1);
              
             }

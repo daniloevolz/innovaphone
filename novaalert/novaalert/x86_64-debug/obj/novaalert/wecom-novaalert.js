@@ -165,6 +165,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "Message") {
+
+            popChatMessages(obj.msg)
+        }
         if (obj.api == "user" && obj.mt == "UserSessionResult") {
             console.log(obj.session);
             session = obj.session;
@@ -1530,43 +1534,70 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         
         }
         else if (obj.button_type == "chat") {
-            const infoBox = document.createElement("div")
-            infoBox.id = "infoBox"
-            infoBox.classList.add("infobox")
 
-            const sensorInfoBox = document.createElement("div")
-            sensorInfoBox.id = "sensorInfoBox"
-            sensorInfoBox.classList.add("sensorInfoBox")
+            //área de mensagens
+            const messagesArea = document.createElement("div")
+            messagesArea.id = "messagesArea"
+            messagesArea.classList.add("messagesArea")
 
-            const sensorBox = document.createElement("div")
-            sensorBox.id = "sendBtn"
-            sensorBox.classList.add("sensorBox")
 
-            const topBox = document.createElement("div")
-            topBox.id = "topBox"
-            topBox.classList.add("topBox", "neutro-700")
-            topBox.textContent = obj.button_prt;
-            sensorBox.appendChild(topBox)
+            //input/btn de mensagens
+            const messagesBtnArea = document.createElement("div")
+            messagesBtnArea.id = "messagesBtnArea"
+            messagesBtnArea.classList.add("messagesBtnArea")
 
-            const btmBox = document.createElement("div")
-            btmBox.id = "btmBox"
-            btmBox.classList.add("btmBox", "neutro-900")
+            //area de escrita de mensagem
+            const inputMessage = document.createElement("textarea")
+            inputMessage.id = "inputMessage"
+            inputMessage.classList.add("inputMessage")
 
-            app.sendSrc(app.sendSrc({ api: "user", mt: "SelectMessageHistorySrc", to: obj.button_prt, src: obj.button_user }, function (obj) {
+            //botão enviar
+            const sendBtn = document.createElement("div")
+            sendBtn.id = "sendBtn"
+            sendBtn.classList.add("sendBtn")
+            const sendBtnTxt = document.createElement("div")
+            sendBtnTxt.id = "sendBtnTxt"
+            sendBtnTxt.classList.add("sendBtnTxt")
+            sendBtnTxt.innerText = texts.text("sendBtn")
+            sendBtn.appendChild(sendBtnTxt)
+            
+
+            messagesBtnArea.appendChild(inputMessage)
+            messagesBtnArea.appendChild(sendBtn)
+
+            bottomRight.appendChild(messagesArea)
+            bottomRight.appendChild(messagesBtnArea)
+
+            app.sendSrc({ api: "user", mt: "SelectMessageHistorySrc", to: obj.button_prt, src: obj.button_user }, function (obj) {
                 console.log("SendSrcResult: " + JSON.stringify(obj))
+                if (obj.result.length > 0) {
+                    var messages = JSON.parse(obj.result)
+
+                    popChatMessages(messages)
+
+                }
+
                 //var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
                 //var objParse = JSON.parse(obj.result)[0];
-            }))
+
+                //continuar aqui Danilo!!!
+            })
             //btmBox.textContent = 
 
-            sensorInfoBox.appendChild(sensorBox)
-            infoBox.appendChild(sensorInfoBox)
-            bottomRight.appendChild(infoBox)
+            
 
             const chat_id = 1
 
-            sensorBox.addEventListener("click", function () {
-                app.send({ api: "user", mt: "Message", msg: msg, to: obj.button_prt, id: chat_id })
+            sendBtn.addEventListener("click", function () {
+                var inputMessage = document.getElementById("inputMessage")
+                if (inputMessage.value.length > 0) {
+                    app.sendSrc({ api: "user", mt: "Message", msg: inputMessage.value, to: obj.button_prt, id: chat_id, src: chat_id }, function (msg) {
+                        inputMessage.value = ''
+                        popChatMessages(msg.result)
+                    })
+                }
+                
+                
             })
 
         }
@@ -1641,6 +1672,62 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         colRight.appendChild(bottomRight)
 
 
+    }
+    function popChatMessages(messages) {
+        const messagesArea = document.getElementById("messagesArea")
+        if (messagesArea) {
+            messages.forEach(function (m) {
+                //div chat object
+                const chatDiv = document.createElement("div")
+                chatDiv.id = "chatDiv"
+                chatDiv.classList.add("chatDiv")
+                var u = list_users.filter(function (item) {
+                    return item.sip === userUI;
+                });
+                if (m.from_guid == u[0].guid) {
+                    chatDiv.classList.add("chatSend")
+                } else {
+                    chatDiv.classList.add("chatReceived")
+                }
+
+                //div message
+                const messageDiv = document.createElement("div")
+                messageDiv.id = "messageDiv"
+                messageDiv.classList.add("messageDiv")
+                //mensagem
+                const message = document.createElement("label")
+                message.id = m.id
+                message.classList.add("message")
+                message.textContent = m.msg
+                messageDiv.appendChild(message)
+
+                //botão enviar
+                const timestampDiv = document.createElement("div")
+                timestampDiv.id = "timestampDiv"
+                timestampDiv.classList.add("timestampDiv")
+                timestampDiv.innerHTML = m.date
+                //mensagem
+                //const timestamp = document.createElement("label")
+                //timestamp.id = m.date
+                //timestamp.classList.add("message")
+
+                //timestampDiv.appendChild(timestamp)
+
+
+                chatDiv.appendChild(messageDiv)
+                chatDiv.appendChild(timestampDiv)
+                //messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+
+                if (messagesArea.firstChild) {
+                    messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+                } else {
+                    messagesArea.appendChild(chatDiv);
+                }
+
+                //messagesArea.appendChild(chatDiv)
+            })
+        }
+        
     }
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {

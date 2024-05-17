@@ -135,21 +135,43 @@ new JsonApi("user").onconnected(function (conn) {
                     log("danilo-req msg:" + obj.msg);
 
                     var objToInsert = {
-                        caht_id: obj.id,
+                        chat_id: obj.id,
                         from_guid: conn.guid,
                         to_guid: obj.to,
                         date: getDateNow(),
                         msg:obj.msg
                     }
-                    insertTblMessages(objToInsert)
-                    var isReceived = false
-                    connectionsUser.forEach(function (c) {
-                        if (c.guid == obj.to) {
-                            c.send(JSON.stringify({ api: "user", mt: "Message", src: conn.guid, msg: obj.msg, id: obj.id }));
-                            isReceived = true
-                        }
-                    })
-                    conn.send(JSON.stringify({ api: "user", mt: "MessageResult", id: obj.id, received: isReceived }));
+                    var isDelivered = false
+                    Database.insert("INSERT INTO tbl_messages (chat_id, from_guid, to_guid, date, msg) VALUES ('" + objToInsert.chat_id + "','" + objToInsert.from_guid + "','" + objToInsert.to_guid + "','" + objToInsert.date + "','" + objToInsert.msg + "')")
+                        .oncomplete(function (id) {
+                            log("insertTblActivities= Success"+id);
+                            
+                            
+                            Database.exec("SELECT * FROM tbl_messages WHERE id = " + id)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+                                    var msg = data
+
+                                    connectionsUser.forEach(function (c) {
+                                        if (c.guid == obj.to) {
+                                            c.send(JSON.stringify({ api: "user", mt: "Message", src: conn.guid, msg: msg, id: obj.id }));
+                                            isDelivered = true
+
+                                        }
+                                    })
+
+                                    conn.send(JSON.stringify({ api: "user", mt: "MessageResult", result: msg, delivered: isDelivered, src: obj.src }));
+
+                                }).onerror(function () {
+
+                                })
+                            })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("insertTblActivities= Erro " + errorText);
+                        });
+                    //insertTblMessages(objToInsert)
+                    
+                    
                 }
 
                 if (obj.mt == "TableUsers") {
@@ -592,10 +614,10 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "SelectMessageHistorySrc") {
-                    var querySelect = "SELECT * FROM tbl_messages WHERE from_guid = '" + obj.to + "' OR from_guid = '" + conn.guid + "' OR to_guid = '" + conn.guid + "' OR to_guid = '" + obj.to +"' ORDER BY id DESC LIMIT 20";
+                    var querySelect = "SELECT * FROM tbl_messages WHERE (from_guid = '" + obj.to + "' AND to_guid = '" + conn.guid + "') OR (from_guid = '" + conn.guid + "' AND to_guid = '" + obj.to + "') ORDER BY id ASC LIMIT 50";
                     Database.exec(querySelect)
                         .oncomplete(function (data) {
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResultSrc", result: JSON.stringify(data), src: obj.src }))
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectMessageHistoryResultSrc", result: JSON.stringify(data), src: obj.src }))
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             log("Erro ao Consultar Info do Sensor " + errorText);
