@@ -3324,5 +3324,271 @@ div.button-inn-del {
     }
   }
 
+  h3{
+    color: var(--text-Text-1, #FFF);
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+h4{
+    color: var(--text-Text-1, #FFF);
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+select{
+    color: var(--text-Text-1, #FFF);
+    display: flex;
+    padding: 12px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    width: 100%;
+    border: 1px solid var(--Background-Bg-4, #262626);
+    background: var(--Background-Bg-3, #141414);
+    /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
+}
+.bgFilter{
+    display: flex;
+    /* width: 650px; */
+    padding: var(--Tamanhos-7, 24px) var(--Tamanhos-6, 20px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: var(--Tamanhos-2, 6px);
+    background: var(--Background-Bg-2, #141414);
+}
+.bgCategory{
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);        
+}
+.btnCateg{
+    display: flex;
+    padding: 6px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--Buttons-ButtonGhost, #B62F18);
+    color: var(--text-Text-1, #B62F18);
+    cursor: pointer;
+}
+.bgUser{
+    display: flex;
+    padding: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);
+    flex-wrap: wrap;
+}
+.bgComp{
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);
+}
+.btnDate{
+    display: flex;
+    padding: 6px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--Primario-400, #EF7B48);
+    background: var(--Buttons-ButtonScundary, #F4A97D);
+    color: rgba(145, 39, 27, 1);
+    cursor: pointer;
+}
+.bgCurtain{
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    background: var(--Buttons-ButtonScundary, #141414);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    justify-content: center;
+}
+.bgSensor{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);
+}
+.userInfo{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+.userSelected{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+.infoSensor{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+.sensorSelected{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+.bgDate{
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);
+}
+.bgInputDate{
+    width: 230px;
+    height: 200px;
+    display: flex;
+    padding: 30px;
+    gap: 10px;
+    border-radius: 8px;
+    flex-direction: column;
+    background: var(--Background-Bg-4, #262626);
+    justify-content: space-between;
+    align-items: stretch;
+    z-index: 100;
+}
+.inputDate{
+    display: inline-flex;
+    padding: var(--Tamanhos-4, 12px);
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-radius: var(--Tamanhos-2, 6px);
+    /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
+    background: var(--Background-Bg-2, #141414);
+    color: var(--text-Text-1, #FFF);
+    justify-content: center;
+}
+/* Oculta o ícone padrão do calendário */
+input[type="date" i]::-webkit-calendar-picker-indicator {
+    background-size: 15px;
+    background-image: url('./images/calendar.svg');
+    background-repeat: no-repeat;
+    background-position: right center;
+}
 
+.setDate{
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    background: var(--Background-Bg-2, #141414);
+    /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
+}
+.bgSelectedDate{
+    display: inline-flex;
+    gap:10px
+}
+.bgButtons{
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+.clearBtn{
+    display: flex;
+    padding: 6px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    background: var(--Buttons-ButtonDisable, #434343);
+    color: var(--text-TextBtnDisable, #8C8C8C);;
+}
+
+.confirmBtn{
+    display: flex;
+    padding: 6px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    background: var(--Buttons-ButtonPrimary, #EA551F);
+}
+.selectReporting{
+    border-radius: 4px;
+    background: var(--Buttons-ButtonPrimary, #EA551F);
+    color: var(--text-Text-1, #FFF);
+}
+.userCard{
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    background: var(--Background-Bg-2, #141414);
+    border-radius: 8px;
+    /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
+}
+.sensorCard{
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    background: var(--Background-Bg-2, #141414);
+    border-radius: 8px;
+}
+.iconCard{
+    width: 20px;
+    height: 20px;
+}
+
+/*ANIMATIONS*/
+
+.tremor {
+    position: relative;
+    animation: shake 0.5s ;
+    border-radius: 5px; /* Adiciona bordas arredondadas */
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, 3px); }
+    50% { transform: translate(3px, -3px); }
+    75% { transform: translate(-3px, 3px); }
+    100% { transform: translate(0, 0); }
+}
 /*FIM MESSAGE ALERTS*/

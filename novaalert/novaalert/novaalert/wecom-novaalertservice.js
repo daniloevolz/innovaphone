@@ -826,6 +826,16 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
 
             }
+            if (obj.mt == "SelectSensorName") {
+                Database.exec("SELECT DISTINCT sensor_name FROM list_sensors_history")
+                    // base = "SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';"
+                    .oncomplete(function (data) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectSensorNameResult", result: JSON.stringify(data) }))
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log("Erro ao Consultar Info do Sensor " + errorText);
+                    });
+            }
             if (obj.mt == "InsertDestMessage") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y, img) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "','" + String(obj.img) + "')")
                     .oncomplete(function () {

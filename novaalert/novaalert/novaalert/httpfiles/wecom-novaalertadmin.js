@@ -22,7 +22,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var divButtonsMain;
     var col_direita;
     var col_esquerda;
-    
+    var list_sensors_name = []
     var addButtonsArea;
     var colorSchemes = {
         dark: {
@@ -147,6 +147,23 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         { id: 'hospital', img: './images/hospital.svg' },
         { id: 'fire', img: './images/fire.svg' },
     ]
+    var category = [
+        {menu: "Disponibilidade", id: "RptAvailability"},
+        {menu: "Chamadas", id: "RptCalls"},
+        {menu: "Atividades", id: "RptActivities"},
+        {menu: "Sensores", id: "RptSensors"},
+        {menu: "Chat", id: "RptMessages"},
+        {menu: "Todos", id: "RptAll"},
+    ]
+    list_Sensors = [
+        {sensor_name: "Técnica", id: "5874125"},
+        {sensor_name: "Adm", id: "5383483"},
+        {sensor_name: "Logistica", id: "834834534"},
+        {sensor_name: "Vendas", id: "43583483"},
+        {sensor_name: "Diretoria", id: "48338434"},
+        {sensor_name: "Fabrica 1", id: "43843478"},
+        {sensor_name: "Fabrica 2", id: "42484338"},
+    ]
 
     //license
     var licenseToken = null;
@@ -163,7 +180,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         UIuserPicture = avatar.url(user, 100, dn);
         constructor();
         app.send({ api: "admin", mt: "AdminMessage" });
-
+        app.send({ api: "admin", mt: "SelectSensorName" });
     }
     //TEXTS.TEXT + TRUNCATE STRING
     function appText(text, maxLength){
@@ -317,6 +334,10 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigMessageErro") {
             window.alert("Erro ao atualizar as configurações, verifique os logs do serviço.");
+        }
+        if (obj.api == "admin" && obj.mt == "SelectSensorNameResult") {
+            console.log(obj.result);
+            list_sensors_name = JSON.parse(obj.result);
         }
 
     }
@@ -3664,7 +3685,7 @@ function getButtonTypeText(buttonType) {
                     waitConnection(_colDireita);
                 break;
                 case "menu_rpt":
-                    makeDivReports(_colDireita)
+                    createReportingDiv()
                     
                 break;  
                 case "menu_srv":
@@ -3709,171 +3730,686 @@ function getButtonTypeText(buttonType) {
     }
 
     //report pages
-    function makeDivReports(colDireita) {
-        colDireita.clear()
-        var options = colDireita.add(new innovaphone.ui1.Div(null, null, "divReportOptions"))
-        var filters = colDireita.add(new innovaphone.ui1.Div(null, null, "divReportFilters"))
+    function createReportingDiv(){
+        var colDireita = document.getElementById('colDireita')
+        colDireita.innerHTML = ""
 
-        var lirelatorios1 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios2 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios3 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        var lirelatorios4 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
-        lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptAvailability"), null).setAttribute("id", "RptAvailability"));
-        lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptCalls"), null).setAttribute("id", "RptCalls"));
-        lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptActivities"), null).setAttribute("id", "RptActivities"));
-        lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptSensors"), null).setAttribute("id", "RptSensors"));
+        var bgFilter = document.createElement('div')
+        bgFilter.classList.add('bgFilter')
+        bgFilter.id = 'bgFilter'
+    
+        var text = document.createElement('h3')
+        text.textContent = 'Filtro de relatório'
+    
+        var bgCategory = document.createElement('div')
+        bgCategory.classList.add('bgCategory')
+        bgCategory.id = 'bgCategory'
+    
+        var h4Category = document.createElement('h4')
+        h4Category.textContent = "Categoria"
+        
+        bgCategory.appendChild(h4Category)
+        
+        category.forEach(function(cat){
+            var btnCateg = document.createElement('div')
+            btnCateg.classList.add('btnCateg')
+            btnCateg.id = cat.id
+            btnCateg.textContent = cat.menu
+            btnCateg.addEventListener('click', function(evt){
+                console.log("Categoria clicada", cat.id)
+                switch (cat.id) {
+                    case "RptAvailability":
+                        if(!document.getElementById("bgUser")){
+                            usersSelect(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                    case "RptCalls":
+                        if(!document.getElementById("bgUser")){
+                            usersSelect(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                    case "RptActivities":
+                        if(!document.getElementById("bgUser")){
+                            usersSelect(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                    case "RptSensors":
+                        if(!document.getElementById("bgSensor")){
+                            getSensor(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                    case "RptMessages":
+                        if(!document.getElementById("bgChat")){
+                            usersSelect(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                    default:
+                        if(!document.getElementById("bgAll")){
+                            usersSelect(bgFilter)
+                            dateSelect(bgFilter)
+                            buttonsReport(bgFilter, cat.id)
+                        }
+                        break;
+                }
+                
+                category.forEach(function(cat){
+                    var catToRemSelec = document.getElementById(cat.id) 
+                    catToRemSelec.classList.remove('selectReporting')
+                })
+    
+                btnCateg.classList.add("selectReporting")
+    
+            })
+            bgCategory.appendChild(btnCateg)
+        });
+    
+    
+    
+        bgFilter.appendChild(text)
+        
+        bgFilter.appendChild(bgCategory)
+    
+    
+    
+        colDireita.appendChild(bgFilter)
+        
+    }
+    function buttonsReport(bgFilter, reportID){
+        var bgButtons = document.createElement('div')
+        bgButtons.classList.add('bgButtons')
+        bgButtons.id = 'bgButtons'
+    
+        var clearBtn = document.createElement('div')
+        clearBtn.classList.add('clearBtn')
+        clearBtn.id = 'clearBtn'
+        clearBtn.textContent = "Limpar"
+    
+        var confirmBtn = document.createElement('div')
+        confirmBtn.classList.add('confirmBtn')
+        confirmBtn.id = 'confirmBtn'
+        confirmBtn.textContent = "Filtar"
+    
+        confirmBtn.addEventListener('click',function(){
+            var selectedUsers = document.querySelectorAll('.userCard')
+            var users = []
+            var selectedSensors = document.querySelectorAll('.sensorCard')
+            var sensors = []
+            selectedUsers.forEach(function(evt){
+                users.push(evt.id)
+            })
+            selectedSensors.forEach(function(evt){
+                sensors.push(evt.id)
+            })
+            var from = document.getElementById('firstDate').textContent + "T00:00:000"
+            var to = document.getElementById('lastDate').textContent +"T23:59:999"
 
-        var a = document.getElementById("RptAvailability");
-        a.addEventListener("click", function () { filterReports("RptAvailability", filters) })
-        var a = document.getElementById("RptCalls");
-        a.addEventListener("click", function () { filterReports("RptCalls", filters) })
-        var a = document.getElementById("RptActivities");
-        a.addEventListener("click", function () { filterReports("RptActivities", filters) })
-        var a = document.getElementById("RptSensors");
-        a.addEventListener("click", function () {
-            //app.sendSrc({ api: "admin", mt: "SelectSensorsFromButtons", src: "RptSensors" }, function (obj) {
+            console.log('app.send(report)', reportID)
+            console.log('app.send(users)', users)
+            console.log('app.send(sensors)', sensors)
+            console.log('app.send(from)', from)
+            console.log('app.send(to)', to)
+            switch (reportID) {
+                case 'RptSensors':
+                    app.send({ api: "admin", mt: "SelectFromReports", sensor: sensors, from: from, to: to, src: reportID });
+                    break;
+                case 'RptAvailability':
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                break;
+                case 'RptActivities':
+                    //AJUSTAR EVENTS
+                    app.send({ api: "admin", mt: "SelectFromReports", event: events, from: from, to: to, src: reportID });
+                break;
+                case 'RptCalls':
+                    //AJUSTAR CALLS
+                    app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
+                break;
+                case 'RptMessages':
+                    //AJUSTAR MENSSAGES
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                break;
+                default:
+                    break;
+            }
 
-            //});
-            //waitConnection(colDireita)
-            filterReports("RptSensors", filters)
+            
+            waitConnection(colDireita)
+
         })
+        clearBtn.addEventListener('click',function(){
+            document.querySelectorAll('.userCard').forEach(function(evt){
+                evt.remove()
+            })
+            document.getElementById('firstDate').remove()
+            document.getElementById('lastDate').remove()
+        })
+        bgButtons.appendChild(clearBtn)
+        bgButtons.appendChild(confirmBtn)
+        
+        bgFilter.appendChild(bgButtons)
+    
     }
-    function filterReports(rpt, colDireita) {
-        colDireita.clear();
-
-        switch (rpt) {
-            case "RptCalls":
-                var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
-                var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
-                var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
-                var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
-                var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
-                var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
-                var divNumber = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelPhone"), null));
-                var InputNumber = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 45%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ", null, null, null, "number", null).setAttribute("id", "number"));
-                var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
-                var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
-                colDireita.add(SelectRamal);
-                SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
-                list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
+    function dateSelect(bgFilter){
+        var bgDate = document.createElement('div')
+        bgDate.classList.add('bgDate')
+        bgDate.id = 'bgDate'
+    
+        var h4Date = document.createElement('h4')
+        h4Date.textContent = "Período"
+        bgDate.appendChild(h4Date)
+    
+        var btnDate = document.createElement('div')
+        btnDate.classList.add('btnDate')
+        btnDate.id = 'btnDate'
+        btnDate.textContent = 'Selecione'
+        btnDate.addEventListener('click',function(ent){
+            console.log('butão clicado Data')
+            getDate()
+        })
+    
+        var bgSelectedDate = document.createElement('div')
+        bgSelectedDate.classList.add('bgSelectedDate')
+        bgSelectedDate.id = 'bgSelectedDate'
+        bgDate.appendChild(bgSelectedDate)
+        bgDate.appendChild(btnDate)
+        bgFilter.appendChild(bgDate)
+    
+    }
+    function usersSelect(bgFilter) {
+    
+        var bgUser = document.createElement('div')
+        bgUser.classList.add('bgUser')
+        bgUser.id = 'bgUser'
+    
+        var userInfo = document.createElement('div')
+        userInfo.classList.add('userInfo')
+    
+        var h4Users = document.createElement('h4');
+        h4Users.textContent = "Usuários";
+    
+        var bgSelect = document.createElement('div')
+        bgSelect.classList.add('bgSelect')
+    
+        var selectUsers = document.createElement('select');
+        selectUsers.id = 'selectUsers';
+    
+        var optUsers = document.createElement('option');
+        optUsers.textContent = "Selecione";
+        selectUsers.appendChild(optUsers);
+    
+        var optAll = document.createElement('option');
+        optAll.textContent = "Todos";
+        optAll.id = 'allUsers'
+        
+        selectUsers.appendChild(optAll);
+    
+        var userSelected = document.createElement('div')
+        userSelected.classList.add('userSelected')
+        userSelected.id = "userSelected"
+        list_users.forEach(function (u) {
+            console.log('ERICK LIST USER', u)
+            var optUsers = document.createElement('option');
+            optUsers.textContent = u.sip;
+            optUsers.id = u.guid;
+            selectUsers.appendChild(optUsers);
+        });
+    
+        userInfo.appendChild(h4Users);
+        userInfo.appendChild(selectUsers);
+    
+        bgUser.appendChild(userInfo)
+        bgUser.appendChild(userSelected)
+        selectUsers.addEventListener('change', function (e) {
+            var selectedOption = selectUsers.options[selectUsers.selectedIndex];
+            var sip = selectedOption.id; // Pegue o valor (ID) do option selecionado
+            console.log("ERICK SELECTED USER ID:", sip);
+        
+            // Verifica se já existe uma div com a classe "userCard" para o usuário selecionado
+            var existingUserCards = document.getElementsByClassName('userCard');
+            
+            // Variável para verificar se o usuário já existe
+            var userAlreadyExists = false;
+            for (var i = 0; i < existingUserCards.length; i++) {
+                existingUserCards[i].classList.remove('tremor');
+            }
+        
+            // Verifica se o usuário já foi selecionado anteriormente
+            for (var i = 0; i < existingUserCards.length; i++) {
+                
+                if (existingUserCards[i].id === sip ) {
+                    // Se o usuário já existir, adiciona a classe "tremor" e define a variável userAlreadyExists como true
+                    existingUserCards[i].classList.add('tremor');
+                    userAlreadyExists = true;
+                    break;
+                }
+    
+            }
+            if (!userAlreadyExists && sip ) {
+    
+                var userCard = document.createElement('div');
+                userCard.id = sip;
+                userCard.classList.add('userCard');
+        
+                var iconCard = document.createElement('img');
+                iconCard.setAttribute('src', "./images/user.svg");
+                iconCard.classList.add('iconCard');
+        
+                var nameCard = document.createElement('div');
+                nameCard.textContent = selectedOption.value;
+        
+                userCard.appendChild(iconCard);
+                userCard.appendChild(nameCard);
+                userSelected.appendChild(userCard);
+        
+                // Adiciona um event listener para remover a div ao clicar nela
+                userCard.addEventListener('click', function () {
+                    userCard.remove();
+                });
+            }
+        });
+        
+    
+        var bgSelectedUsers = document.createElement('div');
+        bgSelectedUsers.classList.add('bgSelectedUsers');
+        bgSelectedUsers.id = 'bgSelectedUsers';
+    
+        bgFilter.appendChild(bgUser)
+    }
+    function getDate(){
+    
+        var bgCurtain = document.createElement('div')
+        bgCurtain.classList.add('bgCurtain')
+        bgCurtain.id = 'bgCurtain'
+        bgCurtain.addEventListener('click', function(event){
+            if (event.target === bgCurtain) {
+                console.log('remove date')
+                document.getElementById('bgCurtain').remove();
+            }
+        })
+    
+        var bgInputDate = document.createElement('div')
+        bgInputDate.classList.add('bgInputDate')
+        bgInputDate.id = 'bgInputDate'
+    
+        var bgInputDateTxt = document.createElement('h4')
+        bgInputDateTxt.classList.add('bgInputDateTxt')
+        bgInputDateTxt.id = 'bgInputDateTxt'
+        bgInputDateTxt.textContent = "Selecione uma data"
+    
+        var inputDate = document.createElement('input');
+        inputDate.setAttribute('type', 'date');
+        inputDate.id = 'inputDate';
+        inputDate.classList.add('inputDate');
+        
+        console.log(inputDate.value)
+            
+        var btnConfirm = document.createElement('div')
+        btnConfirm.classList.add('btnDate')
+        btnConfirm.id = 'btnDate'
+        btnConfirm.textContent = 'Confirm'
+        btnConfirm.addEventListener('click', function(event){
+            var ajustedDate = inputDate.value
+            console.log('Data clicada', ajustedDate)
+            if (inputDate.value == "" ){
+                window.alert("SET DATE")
+            }else{
+                setDate(inputDate.value)
+                if (event.target === btnConfirm) {
+                    document.getElementById('bgCurtain').remove();
+                }
+            }
+        })
+        
+        bgInputDate.appendChild(bgInputDateTxt)
+        bgInputDate.appendChild(inputDate)
+        bgInputDate.appendChild(btnConfirm)
+        bgCurtain.appendChild(bgInputDate)
+        colDireita.appendChild(bgCurtain)
+    
+    }
+    function setDate(date){
+    
+        var bgDate = document.getElementById('bgSelectedDate')
+    
+        var firstDate = document.getElementById('firstDate')
+        var lastDate = document.getElementById('lastDate')
+    
+        if (!firstDate){
+            var firstDate = document.createElement('div')
+            firstDate.classList.add('setDate')
+            firstDate.id = 'firstDate'
+    
+            var iconDate = document.createElement('img')
+            iconDate.classList.add('iconDate')
+            iconDate.src = './images/calendar.svg'
+            
+            var textDate = document.createElement('div')
+            textDate.classList.add('textDate')
+            textDate.id = 'textDate'
+            textDate.textContent = date
+            
+            firstDate.appendChild(iconDate)
+            firstDate.appendChild(textDate)
+            bgDate.appendChild(firstDate)
+    
+            firstDate.addEventListener('click',function(){
+                document.getElementById('firstDate').remove()
+    
+                var lastDate = document.getElementById('lastDate')
+                if(lastDate){
+                    console.log('delete fristDate', lastDate.children[1].textContent)
+                    setDate(lastDate.children[1].textContent)
+                    
+                    document.getElementById('lastDate').remove()
+                    
+                }
+            })
+    
+        }else if(!lastDate){
+    
+            if(firstDate.children[1].textContent > date){
+                console.log("FIRST DATE MAIOR QUE LAST DATE")
+                var firstdate = date
+                var lastDate = firstDate.children[1].textContent
+    
+                document.getElementById('firstDate').remove()
+    
+                setDate(firstdate)
+                setDate(lastDate)
+    
+            }else{
+                var lastDate = document.createElement('div')
+                lastDate.classList.add('setDate')
+                lastDate.id = 'lastDate'
+        
+                var iconDate = document.createElement('img')
+                iconDate.classList.add('iconDate')
+                iconDate.src = './images/calendar.svg'
+                
+                var textDate = document.createElement('div')
+                textDate.classList.add('textDate')
+                textDate.id = 'textDate'
+                textDate.textContent = date
+        
+                lastDate.appendChild(iconDate)
+                lastDate.appendChild(textDate)
+                bgDate.appendChild(lastDate)
+                lastDate.addEventListener('click',function(){
+                    document.getElementById('lastDate').remove()
                 })
-                break;
-            case "RptAvailability":
-                var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
-                var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
-                var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
-                var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
-                var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
-                var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
-                var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
-                var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 45.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
-                colDireita.add(SelectRamal);
-                SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
-                list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
-                })
-                break;
-            case "RptActivities":
-                var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
-                var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
-                var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
-                var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
-                var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
-                var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
-                var divEvent = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelEvent"), null));
-                var iptEvent = colDireita.add(new innovaphone.ui1.Node("select", "position:absolute; left:20%; width:20%; top:45.6%; text-align:center; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold;", null, null));
-                iptEvent.setAttribute("id", "selectEvent");
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Alarme", null).setAttribute("id", "alarm"));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Ligação", null).setAttribute("id", "call"));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Vídeo", null).setAttribute("id", "video"));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Combo", null).setAttribute("id", "combo"));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Página Iframe", null).setAttribute("id", "page"));
-                var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "PopUp Iframe", null).setAttribute("id", "popup"));
-                var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
-                var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
-                colDireita.add(SelectRamal);
-                SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
-                list_users.forEach(function (user) {
-                    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
-                })
-                break;
-            case "RptSensors":
-                var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
-                var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
-                var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
-                var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
-                var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
-                var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
-                var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
-                //var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 45.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
-                //colDireita.add(SelectRamal);
-                //SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
-                //list_users.forEach(function (user) {
-                //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
-                //})
-                //sensor name
-                colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelSensorName"), null));
-                var SelectSensor = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensor");
-                colDireita.add(SelectSensor);
-                SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
-                list_buttons.forEach(function (b) {
-                    if (b.button_type == "sensor") {
-                        SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", b.button_prt, null)).setAttribute("id", b.id);
-                    }
-                })
-                //sensor type
-                colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65.6%; left: 6%; font-weight: bold;", texts.text("labelValueType"), null));
-                var SelectSensorType = new innovaphone.ui1.Node("select", "position: absolute; top: 65.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensorType");
-                colDireita.add(SelectSensorType);
-                SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
-                list_sensor_types.forEach(function (t) {
-                    SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", t.typeName, null)).setAttribute("id", t.id);
-                })
-                break;
+            }
+    
+            
         }
-        // buttons
-        colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            var guid;
-            var from = document.getElementById("dateFrom").value;
-            var to = document.getElementById("dateTo").value;
-            var event;
-            var number;
-            var sensor;
-            var sensor_type;
-
-            if (rpt == "RptCalls") {
-                var SelectUser = document.getElementById("selectUser");
-                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
-                guid = selectedOption.id;
-                number = document.getElementById("number").value;
-            } else if (rpt == "RptActivities") {
-                var SelectUser = document.getElementById("selectUser");
-                var selectedOption = SelectUser.options[SelectUser.selectedIndex];
-                guid = selectedOption.id;
-                event = document.getElementById("selectEvent");
-                var selectedOption = event.options[event.selectedIndex];
-                event = selectedOption.id;
-            }
-            else if (rpt == "RptSensors") {
-                sensor = document.getElementById("selectSensor");
-                var selectedOption = sensor.options[sensor.selectedIndex];
-                sensor = selectedOption.value;
-                sensor_type = document.getElementById("selectSensorType");
-                var selectedOption = sensor_type.options[sensor_type.selectedIndex];
-                sensor_type = selectedOption.id;
-            }
-
-
-            app.send({ api: "admin", mt: "SelectFromReports", guid: guid, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
-            waitConnection(colDireita);
-        });
-        colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
-            makeDivReports(colDireita)
-        });
-
+        
     }
+    
+    function getSensor(bgFilter){
+        
+        var bgSensor = document.createElement('div')
+        bgSensor.id = 'bgSensor'
+        bgSensor.classList.add('bgSensor')
+    
+        var infoSensor = document.createElement('div');
+        infoSensor.classList.add('infoSensor');
+    
+        var h4Sensor = document.createElement('h4');
+        h4Sensor.textContent = "Sensores";
+    
+        var selectSensor = document.createElement('select');
+        selectSensor.id = 'selectSensor';
+     
+        var optSelect = document.createElement('option');
+        optSelect.textContent = "Selecione";
+        
+        var optAll = document.createElement('option');
+        optAll.textContent = "Todos";
+        optAll.id = 'allSensors';
+    
+        selectSensor.appendChild(optSelect);
+        selectSensor.appendChild(optAll);
+    
+        list_Sensors.forEach(function (s) {
+            var optSensor = document.createElement('option');
+            optSensor.textContent = s.sensor_name;
+            optSensor.id = s.id;
+            selectSensor.appendChild(optSensor);
+        });
+
+        var sensorSelected = document.createElement('div');
+        sensorSelected.classList.add('sensorSelected');
+    
+        infoSensor.appendChild(h4Sensor);
+        infoSensor.appendChild(selectSensor);
+        bgSensor.appendChild(infoSensor);
+        bgSensor.appendChild(sensorSelected);
+        bgFilter.appendChild(bgSensor);
+        
+        selectSensor.addEventListener('change', function (e) {
+            var selectedOption = selectSensor.options[selectSensor.selectedIndex];
+            var sip = selectedOption.id; // Pegue o valor (ID) do option selecionado
+            console.log("ERICK SELECTED USER ID:", sip);
+        
+            // Verifica se já existe uma div com a classe "userCard" para o usuário selecionado
+            var existingUserCards = document.getElementsByClassName('sensorCard');
+            
+            // Variável para verificar se o usuário já existe
+            var userAlreadyExists = false;
+            for (var i = 0; i < existingUserCards.length; i++) {
+                existingUserCards[i].classList.remove('tremor');
+            }
+        
+            // Verifica se o usuário já foi selecionado anteriormente
+            for (var i = 0; i < existingUserCards.length; i++) {
+                
+                if (existingUserCards[i].id === sip ) {
+                    // Se o usuário já existir, adiciona a classe "tremor" e define a variável userAlreadyExists como true
+                    existingUserCards[i].classList.add('tremor');
+                    userAlreadyExists = true;
+                    break;
+                }
+    
+            }
+            if (!userAlreadyExists && sip ) {
+    
+                var selectCard = document.createElement('div');
+                selectCard.id = sip;
+                selectCard.classList.add('sensorCard');
+        
+                var iconCard = document.createElement('img');
+                iconCard.setAttribute('src', "./images/alarm.svg");
+                iconCard.classList.add('iconCard');
+        
+                var nameCard = document.createElement('div');
+                nameCard.textContent = selectedOption.value;
+        
+                selectCard.appendChild(iconCard);
+                selectCard.appendChild(nameCard);
+                sensorSelected.appendChild(selectCard);
+        
+                // Adiciona um event listener para remover a div ao clicar nela
+                selectCard.addEventListener('click', function () {
+                    selectCard.remove();
+                });
+            }
+        });  
+    
+        
+    }
+    // function makeDivReports(colDireita) {
+    //     colDireita.clear()
+    //     var options = colDireita.add(new innovaphone.ui1.Div(null, null, "divReportOptions"))
+    //     var filters = colDireita.add(new innovaphone.ui1.Div(null, null, "divReportFilters"))
+
+    //     var lirelatorios1 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+    //     var lirelatorios2 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+    //     var lirelatorios3 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+    //     var lirelatorios4 = options.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"))
+    //     lirelatorios1.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptAvailability"), null).setAttribute("id", "RptAvailability"));
+    //     lirelatorios2.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptCalls"), null).setAttribute("id", "RptCalls"));
+    //     lirelatorios3.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptActivities"), null).setAttribute("id", "RptActivities"));
+    //     lirelatorios4.add(new innovaphone.ui1.Node("a", null, texts.text("labelRptSensors"), null).setAttribute("id", "RptSensors"));
+
+    //     var a = document.getElementById("RptAvailability");
+    //     a.addEventListener("click", function () { filterReports("RptAvailability", filters) })
+    //     var a = document.getElementById("RptCalls");
+    //     a.addEventListener("click", function () { filterReports("RptCalls", filters) })
+    //     var a = document.getElementById("RptActivities");
+    //     a.addEventListener("click", function () { filterReports("RptActivities", filters) })
+    //     var a = document.getElementById("RptSensors");
+    //     a.addEventListener("click", function () {
+    //         //app.sendSrc({ api: "admin", mt: "SelectSensorsFromButtons", src: "RptSensors" }, function (obj) {
+
+    //         //});
+    //         //waitConnection(colDireita)
+    //         filterReports("RptSensors", filters)
+    //     })
+    // }
+    // function filterReports(rpt, colDireita) {
+    //     colDireita.clear();
+
+    //     switch (rpt) {
+    //         case "RptCalls":
+    //             var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+    //             var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+    //             var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+    //             var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
+    //             var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+    //             var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+    //             var divNumber = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelPhone"), null));
+    //             var InputNumber = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 45%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; ", null, null, null, "number", null).setAttribute("id", "number"));
+    //             var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+    //             var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
+    //             colDireita.add(SelectRamal);
+    //             SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+    //             list_users.forEach(function (user) {
+    //                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
+    //             })
+    //             break;
+    //         case "RptAvailability":
+    //             var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+    //             var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+    //             var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+    //             var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
+    //             var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+    //             var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+    //             var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+    //             var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 45.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
+    //             colDireita.add(SelectRamal);
+    //             SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+    //             list_users.forEach(function (user) {
+    //                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
+    //             })
+    //             break;
+    //         case "RptActivities":
+    //             var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+    //             var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+    //             var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+    //             var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
+    //             var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+    //             var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+    //             var divEvent = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelEvent"), null));
+    //             var iptEvent = colDireita.add(new innovaphone.ui1.Node("select", "position:absolute; left:20%; width:20%; top:45.6%; text-align:center; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold;", null, null));
+    //             iptEvent.setAttribute("id", "selectEvent");
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "", null).setAttribute("id", ""));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Alarme", null).setAttribute("id", "alarm"));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Ligação", null).setAttribute("id", "call"));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Vídeo", null).setAttribute("id", "video"));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Combo", null).setAttribute("id", "combo"));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "Página Iframe", null).setAttribute("id", "page"));
+    //             var opt = iptEvent.add(new innovaphone.ui1.Node("option", "font-size:12px; text-align:center", "PopUp Iframe", null).setAttribute("id", "popup"));
+    //             var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+    //             var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
+    //             colDireita.add(SelectRamal);
+    //             SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+    //             list_users.forEach(function (user) {
+    //                 SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", user.cn, null)).setAttribute("id", user.guid);
+    //             })
+    //             break;
+    //         case "RptSensors":
+    //             var divFiltros = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 90%; top: 5%; left: 5%; font-size: 25px;", texts.text("labelFiltros"), null));
+    //             var divFiltrosDetails = colDireita.add(new innovaphone.ui1.Div("position:absolute; font-weight:bolder; width: 50%; top: 8.5%; left: 18%; font-size: 15px;", texts.text(rpt), null));
+    //             var divFrom = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25.5%; left: 6%; font-weight: bold;", texts.text("labelFrom"), null));
+    //             var InputFrom = colDireita.add(new innovaphone.ui1.Input("position: absolute;  top: 25%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateFrom"));
+    //             var divTo = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35.5%; left: 6%; font-weight: bold;", texts.text("labelTo"), null));
+    //             var InputTo = colDireita.add(new innovaphone.ui1.Input("position: absolute; top: 35%; left: 20%; height: 30px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F;", null, null, null, "date", null).setAttribute("id", "dateTo"));
+    //             var divRamal = colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45.6%; left: 6%; font-weight: bold;", texts.text("labelAgent"), null));
+    //             //var SelectRamal = new innovaphone.ui1.Node("select", "position: absolute; top: 45.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectUser");
+    //             //colDireita.add(SelectRamal);
+    //             //SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "sips");
+    //             //list_users.forEach(function (user) {
+    //             //    SelectRamal.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", guid, null)).setAttribute("id", "sips");
+    //             //})
+    //             //sensor name
+    //             colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55.6%; left: 6%; font-weight: bold;", texts.text("labelSensorName"), null));
+    //             var SelectSensor = new innovaphone.ui1.Node("select", "position: absolute; top: 55.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensor");
+    //             colDireita.add(SelectSensor);
+    //             SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
+    //             list_buttons.forEach(function (b) {
+    //                 if (b.button_type == "sensor") {
+    //                     SelectSensor.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", b.button_prt, null)).setAttribute("id", b.id);
+    //                 }
+    //             })
+    //             //sensor type
+    //             colDireita.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65.6%; left: 6%; font-weight: bold;", texts.text("labelValueType"), null));
+    //             var SelectSensorType = new innovaphone.ui1.Node("select", "position: absolute; top: 65.0%; left: 20%; height: 25px; width: 20%; border-radius: 10px; border: 2px solid; border-color:#02163F; font-size: 13px; font-weight: bold ", null, null).setAttribute("id", "selectSensorType");
+    //             colDireita.add(SelectSensorType);
+    //             SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", null, null)).setAttribute("id", "");
+    //             list_sensor_types.forEach(function (t) {
+    //                 SelectSensorType.add(new innovaphone.ui1.Node("option", "font-size:13px; font-weight: bold; text-align:center", t.typeName, null)).setAttribute("id", t.id);
+    //             })
+    //             break;
+    //     }
+    //     // buttons
+    //     colDireita.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
+    //         var guid;
+    //         var from = document.getElementById("dateFrom").value;
+    //         var to = document.getElementById("dateTo").value;
+    //         var event;
+    //         var number;
+    //         var sensor;
+    //         var sensor_type;
+
+    //         if (rpt == "RptCalls") {
+    //             var SelectUser = document.getElementById("selectUser");
+    //             var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+    //             guid = selectedOption.id;
+    //             number = document.getElementById("number").value;
+    //         } else if (rpt == "RptActivities") {
+    //             var SelectUser = document.getElementById("selectUser");
+    //             var selectedOption = SelectUser.options[SelectUser.selectedIndex];
+    //             guid = selectedOption.id;
+    //             event = document.getElementById("selectEvent");
+    //             var selectedOption = event.options[event.selectedIndex];
+    //             event = selectedOption.id;
+    //         }
+    //         else if (rpt == "RptSensors") {
+    //             sensor = document.getElementById("selectSensor");
+    //             var selectedOption = sensor.options[sensor.selectedIndex];
+    //             sensor = selectedOption.value;
+    //             sensor_type = document.getElementById("selectSensorType");
+    //             var selectedOption = sensor_type.options[sensor_type.selectedIndex];
+    //             sensor_type = selectedOption.id;
+    //         }
+
+
+    //         app.send({ api: "admin", mt: "SelectFromReports", guid: guid, from: from, to: to, number: number, event: event, sensor: sensor, sensor_type: sensor_type, src: rpt });
+    //         waitConnection(colDireita);
+    //     });
+    //     colDireita.add(new innovaphone.ui1.Div("position:absolute; left:35%; width:15%; top:75%; font-size:12px; text-align:center;", null, "button-inn-del")).addTranslation(texts, "btnCancel").addEvent("click", function () {
+    //         makeDivReports(colDireita)
+    //     });
+
+    // }
     function reportView(t, response, src) {
         return new Promise(function (resolve, reject) {
             try {
