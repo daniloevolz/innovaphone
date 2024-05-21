@@ -1,6 +1,7 @@
 ﻿var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        message: "Mensagem",
         sendBtn:"Enviar",
         labelRptMessages: "Mensagens",
         promptSelectAction: "Selecione uma ação!",

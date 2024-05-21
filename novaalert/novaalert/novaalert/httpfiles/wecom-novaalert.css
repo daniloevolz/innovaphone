@@ -36,6 +36,9 @@ body {
 .chatReceived {
     margin-right: 100px;
 }
+.chatNotified {
+    background-color: var(--colors-vermelho-500) !important;
+}
 .messagesBtnArea {
     padding: 15px;
     display: flex;

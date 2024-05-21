@@ -410,7 +410,7 @@ new JsonApi("user").onconnected(function (conn) {
                                         log("Conn.sip " + JSON.stringify(conn.sip));
                                         log("Connection Inteira " + JSON.stringify(con));
                                         if (conn.guid != c.guid) { // antigo = conn.sip != c.sip
-                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.dn, to: c.dn })); 
+                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.guid, to: c.guid })); 
                                         }
                                     })
                                 })
@@ -446,7 +446,7 @@ new JsonApi("user").onconnected(function (conn) {
 
                     connectionsUser.forEach(function (c) {
                         if (c.guid != conn.guid) {
-                            c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.sip}));
+                            c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.dn}));
 
                         }
                     })
@@ -2711,9 +2711,9 @@ function triggerAction2(from, to, prt, type, detail) {
                                 //alarmReceived(value);
 
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:alarm conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:alarm conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
                                     log("danilo-req alarmReceived:alarm ac.action_user " + String(ac.action_user));
-                                    if (String(conn.sip) == String(ac.action_user)) {
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
                                         updateTableBadgeCount(conn.sip, "IncrementCount");
@@ -2725,9 +2725,9 @@ function triggerAction2(from, to, prt, type, detail) {
                             case "number":
                                 //var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === to });
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:number conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:number conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
                                     log("danilo-req alarmReceived:number ac.action_user " + String(ac.action_user));
-                                    if (String(conn.sip) == String(ac.action_user)) {
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req alarmReceived:number conn ", JSON.stringify(conn));
 
@@ -2755,9 +2755,9 @@ function triggerAction2(from, to, prt, type, detail) {
                             case "button":
                                 var btn = buttons.filter(function (btn) { return btn.id == ac.action_prt });
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:button conn.sip " + String(conn.sip));
-                                    log("danilo-req alarmReceived:button obj.to " + String(to));
-                                    if (String(conn.sip) == String(to)) {
+                                    log("danilo-req alarmReceived:button conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
+                                    log("danilo-req alarmReceived:button ac.action_user " + String(ac.action_user));
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
                                         updateTableBadgeCount(conn.sip, "IncrementCount");

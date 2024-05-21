@@ -1599,6 +1599,9 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             case "sensor":
                 addSensorOptions(divmain, type, user , x ,y ,z)
                 break;
+            case "chat":
+                addChatOptions(divmain, type, user, x, y, z);
+                break;
             default:
                 addOptions(divmain, type,user,x,y,z);
                 break;
@@ -1613,6 +1616,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             </div>
             <div class="divSelectAndTextModalBig">
                 <span class="textGeneric">${texts.text("labelValue")}</span>
+                <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">
                 <select id="selectUserModal" class="genericInputs">
                     <option value="">${texts.text("labelSelectUser")}</option>
                 </select>
@@ -1644,14 +1648,14 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         // //Botão Salvar
         document.getElementById("btnSave").addEventListener("click",function(evt){
             var iptName = document.getElementById("iptName").value;
-            //var iptParam = document.getElementById("iptParam").value;
-            var userTo = document.getElementById("selectUserModal");
-            var selectedOption = userTo.options[userTo.selectedIndex];
-            userTo = selectedOption.id;
+            var iptParam = document.getElementById("iptParam").value;
+            //var userTo = document.getElementById("selectUserModal");
+            //var selectedOption = userTo.options[userTo.selectedIndex];
+            //userTo = selectedOption.id;
             if (String(iptName) == "" || String(type) == "") {
                 makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
             } else {
-                app.send ({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(userTo), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })       
+                app.send({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y , src: user })
                 // waitConnection(t1);
              
             }
@@ -1659,6 +1663,64 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
 
         // //Botão Cancelar   
         document.getElementById("btnCancel").addEventListener("click",function(evt){
+            divmain.innerHTML = '';
+        })
+    }
+    function addChatOptions(divmain, type, user, x, y, z) {
+
+        var html = `
+            <div class="divSelectAndTextModalBig">
+                <span class="textGeneric">${texts.text("labelButtonName")}</span>
+                <input type="text" class="genericInputs" id= "iptName" placeholder="${texts.text("labelButtonName")}">
+            </div>
+            <div class="divSelectAndTextModalBig">
+                <span class="textGeneric">${texts.text("labelValue")}</span>
+                <select id="selectUserModal" class="genericInputs">
+                    <option value="">${texts.text("labelSelectUser")}</option>
+                </select>
+            </div>
+            
+            <div class="divButtonsGeneric">
+                <div id = "btnCancel">${makeButton(texts.text("btnCancel"), "tertiary")}</div>
+                <div id = "btnSave">${makeButton(texts.text("btnAddButton"), "primary")}</div>
+            </div> 
+            `;
+
+
+
+        divmain.innerHTML = '';
+        divmain.innerHTML += html;
+
+        var selectUserModal = document.getElementById("selectUserModal");
+        list_users.forEach(function (user) {
+            var option = document.createElement("option");
+            option.value = user.guid;
+            option.id = user.guid
+            option.textContent = user.cn;
+            option.style.fontSize = '12px';
+            option.style.textAlign = "center";
+            option.style.color = "white";
+            selectUserModal.appendChild(option);
+        });
+
+        // //Botão Salvar
+        document.getElementById("btnSave").addEventListener("click", function (evt) {
+            var iptName = document.getElementById("iptName").value;
+            //var iptParam = document.getElementById("iptParam").value;
+            var userTo = document.getElementById("selectUserModal");
+            var selectedOption = userTo.options[userTo.selectedIndex];
+            userTo = selectedOption.id;
+            if (String(iptName) == "" || String(type) == "") {
+                makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
+            } else {
+                app.send({ api: "admin", mt: "InsertMessage", name: String(iptName), user: String(""), value: String(userTo), guid: String(user), type: String(type), page: z, x: x, y: y, src: user })
+                // waitConnection(t1);
+
+            }
+        })
+
+        // //Botão Cancelar   
+        document.getElementById("btnCancel").addEventListener("click", function (evt) {
             divmain.innerHTML = '';
         })
     }
