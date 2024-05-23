@@ -30,9 +30,26 @@ body {
     /* align-content: space-between; */
     flex-direction: column-reverse;
 }
+.statusDiv {
+    background-image: url('./images/check.svg');
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    display: flex;
+    width: 50px;
+    height: 50px;
+}
 .chatSend {
     margin-left: 100px;
 }
+
+.chatDelivered {
+    background-image: url('./images/check-check.svg');
+}
+
+.chatRead {
+    background-image: url('./images/check-check-check.svg');
+}
+
 .chatReceived {
     margin-right: 100px;
 }
@@ -79,7 +96,6 @@ body {
     /* width: 993px; */
     height: 75px;
     padding: 10px;
-    justify-content: space-between;
     align-items: center;
     gap: 10px;
     border-radius: 8px;
@@ -102,6 +118,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+    width: -webkit-fill-available;
 }
 /*Fim Coluna de Chat da Direita*/
 /*#region MODAIS CRIAÇÃO DE BOTÕES DO ADMIN */

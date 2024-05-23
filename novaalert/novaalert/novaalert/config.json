@@ -404,13 +404,13 @@
           {
             "cmd": "column",
             "name": "delivered",
-            "type": "boolean"
+            "type": "text"
           },
 
           {
             "cmd": "column",
             "name": "read",
-            "type": "boolean"
+            "type": "text"
           }
         ]
       }

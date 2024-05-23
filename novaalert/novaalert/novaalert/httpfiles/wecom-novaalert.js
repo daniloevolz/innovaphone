@@ -52,6 +52,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var divButtonsMain;
     var divOptionsMain;
     var zoneDiv;
+    var player = null;
 
     var scroll;
     var popup;
@@ -170,6 +171,30 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             popChatMessages(obj.msg)
         }
+        if (obj.api == "user" && obj.mt == "ChatDelivered") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatDelivered")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+            
+        }
+        if (obj.api == "user" && obj.mt == "ChatRead") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.remove("chatDelivered")
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatRead")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+
+        }
+
         if (obj.api == "user" && obj.mt == "UserSessionResult") {
             console.log(obj.session);
             session = obj.session;
@@ -1300,6 +1325,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 document.getElementById(id).classList.remove("neutro-800");
                 document.getElementById(id).classList.add("vermelho-900");
             }
+            button_clicked.push(btn);
+            console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
+            
         }
     }
 
@@ -1458,11 +1486,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     this.classList.remove("chatNotified")
                 }
                 createDivRightBottom(object)
-                app.send({api: "user", mt: "SelectSensorInfo"})
+                //app.send({api: "user", mt: "SelectSensorInfo"})
             })
         }
     }
-    function createDivRightBottom(obj){
+    function createDivRightBottom(obj) {
         console.log("ERICK OBJ JSON", obj)
         const colRight = document.getElementById("colDireita")
         var btmRight = document.getElementById("bottomR")
@@ -1482,59 +1510,63 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         const buttonLink = obj.button_prt
 
-        if(obj.button_type == "sensor"){
-            const unic_sensor = []
-            var arrayHistory = JSON.parse(list_sensors_history);
-            
-            var filtredhistory = arrayHistory.filter(function(h){
-                return h.sensor_name == buttonLink;
-            });
-            console.log("FILTRO HIST", filtredhistory)
-            const infoBox = document.createElement("div")
-            infoBox.id = "infoBox"
-            infoBox.classList.add("infobox")
+        if (obj.button_type == "sensor") {
+            app.sendSrc({ api: "user", mt: "SelectSensorInfo", src: obj.id }, function (obj) {
+                list_sensors_history = obj.result
+                const unic_sensor = []
+                var arrayHistory = JSON.parse(list_sensors_history);
 
-            const sensorInfoBox = document.createElement("div")
-            sensorInfoBox.id = "sensorInfoBox"
-            sensorInfoBox.classList.add("sensorInfoBox")
-            for(let key in filtredhistory[0]){
-                if (filtredhistory[0].hasOwnProperty(key)) {
-                    console.log(key + ': ' + filtredhistory[0][key]);
-                    if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null){
-                        const sensorBox = document.createElement("div")
-                        sensorBox.id = "sensorBox"
-                        sensorBox.classList.add("sensorBox")
-    
-                        const topBox = document.createElement("div")
-                        topBox.id = "topBox"
-                        topBox.classList.add("topBox", "neutro-700")
-                        topBox.textContent = texts.text(key)
-    
-                        const btmBox = document.createElement("div")
-                        btmBox.id = "btmBox"
-                        btmBox.classList.add("btmBox", "neutro-900")
-                        btmBox.textContent = filtredhistory[0][key]
-                        
-                        sensorBox.appendChild(topBox)
-                        sensorBox.appendChild(btmBox)
-                        sensorInfoBox.appendChild(sensorBox)
+                var filtredhistory = arrayHistory.filter(function (h) {
+                    return h.sensor_name == buttonLink;
+                });
+                console.log("FILTRO HIST", filtredhistory)
+                const infoBox = document.createElement("div")
+                infoBox.id = "infoBox"
+                infoBox.classList.add("infobox")
 
-                        sensorBox.addEventListener("click", function(){
-                            var clickBtm = document.querySelectorAll(".btmBox")
-                            clickBtm.forEach(function(b){
-                                b.classList.remove("neutro-1100")
+                const sensorInfoBox = document.createElement("div")
+                sensorInfoBox.id = "sensorInfoBox"
+                sensorInfoBox.classList.add("sensorInfoBox")
+                for (let key in filtredhistory[0]) {
+                    if (filtredhistory[0].hasOwnProperty(key)) {
+                        console.log(key + ': ' + filtredhistory[0][key]);
+                        if (key !== "date" && key !== "id" && key !== "row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null) {
+                            const sensorBox = document.createElement("div")
+                            sensorBox.id = "sensorBox"
+                            sensorBox.classList.add("sensorBox")
+
+                            const topBox = document.createElement("div")
+                            topBox.id = "topBox"
+                            topBox.classList.add("topBox", "neutro-700")
+                            topBox.textContent = texts.text(key)
+
+                            const btmBox = document.createElement("div")
+                            btmBox.id = "btmBox"
+                            btmBox.classList.add("btmBox", "neutro-900")
+                            btmBox.textContent = filtredhistory[0][key]
+
+                            sensorBox.appendChild(topBox)
+                            sensorBox.appendChild(btmBox)
+                            sensorInfoBox.appendChild(sensorBox)
+
+                            sensorBox.addEventListener("click", function () {
+                                var clickBtm = document.querySelectorAll(".btmBox")
+                                clickBtm.forEach(function (b) {
+                                    b.classList.remove("neutro-1100")
+                                })
+                                btmBox.classList.add('neutro-1100')
+                                createLineGrafic(filtredhistory, key)
                             })
-                            btmBox.classList.add('neutro-1100')
-                            createLineGrafic(filtredhistory, key)
-                        })
 
+                        }
                     }
                 }
-            }
 
-          
-            infoBox.appendChild(sensorInfoBox)
-            bottomRight.appendChild(infoBox)
+
+                infoBox.appendChild(sensorInfoBox)
+                bottomRight.appendChild(infoBox)
+            })
+            
 
         
         }
@@ -1618,11 +1650,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     element.width = "100%";
                     element.height = "400"; // Altura desejada
                     element.src = buttonLink;
-                } else if (fileType === 'image') {
+                }
+                else if (fileType === 'image') {
                     element = document.createElement("img");
                     element.src = buttonLink;
                     element.style.width = '100%'
-                } else if (fileType === 'video') {
+                }
+                else if (fileType === 'video') {
                     element = document.createElement("video");
                     element.controls = true; // Adiciona controles de vídeo
                     element.autoplay = true; 
@@ -1633,7 +1667,26 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     source.src = buttonLink;
                     source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
                     element.appendChild(source);
-                } 
+                }
+                else if (fileType === 'streaming') {
+                    if (player) {
+                        player.dispose(); // Remove o player Video.js existente
+                    }
+                    element = document.createElement("video");
+                    element.controls = true; // Adiciona controles de vídeo
+                    element.id = "my-video"
+                    element.classList.add("video-js", "vjs-default-skin")
+                    element.preload = "auto"
+                    element.autoplay = true;
+                    element.setAttribute("data-setup","{}")
+                    element.style.width = "100%"
+                    element.style.height = "auto"
+                    // Ajuste a altura conforme necessário
+                    var source = document.createElement("source");
+                    source.src = buttonLink;
+                    source.type = "application/x-mpegURL"//"video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+                    element.appendChild(source);
+                }
                 else if (fileType === 'google-maps') {
                     element = document.createElement("iframe");
                     element.src = buttonLink;
@@ -1655,8 +1708,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     return 'pdf';
                 } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
                     return 'image';
-                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov','m3u8'].includes(extension)) {
+                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
                     return 'video';
+                } else if (['m3u8'].includes(extension)) {
+                    return 'streaming';
                 } else if (buttonLink.includes('google.com/maps/embed')) {
                     return 'google-maps';
                 } else {
@@ -1677,7 +1732,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         colRight.appendChild(bottomRight)
 
-
+        try {
+            player = videojs('my-video');
+            player.ready(function () {
+                player.muted(true);
+                player.play().catch(function (error) {
+                    console.log('Autoplay was prevented:', error);
+                });
+            });
+        } catch (e) {
+            console.log('videojs not present:', e);
+        }
     }
     function popChatMessages(messages) {
         const optInFocus = document.getElementById("colDireita").getAttribute("type");
@@ -1693,15 +1758,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         //div chat object
                         const chatDiv = document.createElement("div")
                         chatDiv.id = "chatDiv"
+                        chatDiv.setAttribute("msg", m.id)
                         chatDiv.classList.add("chatDiv")
-                        var u = list_users.filter(function (item) {
-                            return item.sip === userUI;
-                        });
-                        if (m.from_guid == u[0].guid) {
-                            chatDiv.classList.add("chatSend")
-                        } else {
-                            chatDiv.classList.add("chatReceived")
-                        }
+                        
 
                         //div message
                         const messageDiv = document.createElement("div")
@@ -1714,11 +1773,66 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         message.textContent = m.msg
                         messageDiv.appendChild(message)
 
-                        //botão enviar
+                        //horário da mensagem
                         const timestampDiv = document.createElement("div")
                         timestampDiv.id = "timestampDiv"
                         timestampDiv.classList.add("timestampDiv")
                         timestampDiv.innerHTML = m.date
+
+
+                        chatDiv.appendChild(messageDiv)
+                        chatDiv.appendChild(timestampDiv)
+                        
+                        
+
+                        var u = list_users.filter(function (item) {
+                            return item.sip === userUI;
+                        });
+
+                        if (u.length == 0) {
+                            makePopup(texts.text("labelWarning"), texts.text("labelTableUsersNotLoaded"))
+                            return
+                        }
+                        else {
+                            if (m.from_guid == u[0].guid) {
+                                chatDiv.classList.add("chatSend")
+                                //status da mensagem enviada
+                                const statusDiv = document.createElement("div")
+                                statusDiv.id = "statusDiv_"+m.id
+                                statusDiv.classList.add("statusDiv")
+                                chatDiv.appendChild(statusDiv)
+                                if (m.delivered != null) {
+                                    statusDiv.classList.add("chatDelivered")
+
+                                }
+                                if (m.read != null) {
+                                    statusDiv.classList.remove("chatDelivered")
+                                    statusDiv.classList.add("chatRead")
+
+                                }
+
+
+                            }
+                            else {
+                                chatDiv.classList.add("chatReceived")
+                                if (m.delivered == null) {
+                                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                                }
+                                if (m.read == null) {
+                                    app.send({ api: "user", mt: "ChatRead", msg_id: m.id })
+
+                                }
+
+                            }
+                            if (messagesArea.firstChild) {
+                                messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+                            } else {
+                                messagesArea.appendChild(chatDiv);
+                            }
+                        }
+                        
+
                         //mensagem
                         //const timestamp = document.createElement("label")
                         //timestamp.id = m.date
@@ -1727,15 +1841,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         //timestampDiv.appendChild(timestamp)
 
 
-                        chatDiv.appendChild(messageDiv)
-                        chatDiv.appendChild(timestampDiv)
+                        
+                        
                         //messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
 
-                        if (messagesArea.firstChild) {
-                            messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
-                        } else {
-                            messagesArea.appendChild(chatDiv);
-                        }
+                        
 
                         //messagesArea.appendChild(chatDiv)
 
@@ -1760,6 +1870,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                             childElement.classList.add("chatNotified")
                         } else {
                             console.log("Elemento não encontrado");
+                        }
+
+                        //a mensagem foi entregue, vamos registrar no banco
+                        if (m.delivered == null) {
+                            app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
                         }
 
                     }
@@ -1789,6 +1905,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     } else {
                         console.log("Elemento não encontrado");
                     }
+                    //a mensagem foi entregue, vamos registrar no banco
+                    if (m.delivered == null) {
+                        app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                    }
                 })
                 
 
@@ -1808,6 +1929,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 }).catch(function (e) {
                     console.log(e)
                 })
+
+                //a mensagem foi entregue, vamos registrar no banco
+                if (m.delivered == null) {
+                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                }
             })
 
         }

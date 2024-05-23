@@ -400,6 +400,17 @@
             "cmd": "column",
             "name": "msg",
             "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "delivered",
+            "type": "text"
+          },
+
+          {
+            "cmd": "column",
+            "name": "read",
+            "type": "text"
           }
         ]
       }
