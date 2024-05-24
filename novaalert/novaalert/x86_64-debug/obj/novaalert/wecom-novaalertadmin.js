@@ -2851,6 +2851,10 @@ function makeTableActions(user) {
         return action.action_user === user;
     });
 
+    if (user != "") {
+        document.getElementById("selectUserModal").value = user
+    }
+
     var tbody = document.getElementById("tbodyAction");
 
     // Limpa o conteúdo atual do tbody
@@ -2910,7 +2914,7 @@ function makeTableActions(user) {
                     .then(function (message) {
                         console.log(message);
                         makeTableActions(obj.guid)
-                        makePopup(texts.text("labelWarning", "labelDeleteSuccess"))
+                        makePopup(texts.text("labelWarning"), texts.text("labelDeleteSuccess"))
                     })
                     .catch(function (error) {
                         console.log(error);
