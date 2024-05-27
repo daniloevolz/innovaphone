@@ -4553,15 +4553,21 @@ function getButtonTypeText(buttonType) {
             infoBox.classList.add("infobox")    
 
 
+
             const sensorInfoBox = document.createElement("div")
             sensorInfoBox.id = "sensorInfoBox"
             sensorInfoBox.classList.add("sensorInfoBox")
             
             for (const sensor in filtredhistory) {
+                var h2Sensor = document.createElement('h2')
+                h2Sensor.textContent = sensor
+
+                infoBox.appendChild(h2Sensor)
                 if (filtredhistory.hasOwnProperty(sensor)) {
                     const rows = filtredhistory[sensor];
+
                     for (const key in rows[0]) {
-                        console.log(key + ': ' + rows[0][key]);
+                        
                         if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && rows[0][key] !== null){
                             const sensorBox = document.createElement("div")
                             sensorBox.id = "sensorBox"
@@ -4600,7 +4606,7 @@ function getButtonTypeText(buttonType) {
                                     yArray.push(r[key]);
                                 })
 
-                                reportGraph(xArray, yArray, key, 'Data', key)
+                                reportGraph(xArray, yArray, rows[0].sensor_name + ' - ' + key, 'Data', key)
                             })
 
                         }
