@@ -1,6 +1,7 @@
 ﻿var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        message: "Mensagem",
         noReport:"Relátorio não encontrado",
         sendBtn:"Enviar",
         labelRptMessages: "Mensagens",
@@ -154,6 +155,7 @@ Wecom.novaalertTexts = {
         labelFillInputsSensor: "Complete todos os campos para que o botão possa ser criado.",
         labelFillUser: "Priemiro selecione o usuário para visualizar a tela e as posições vagas",
         labelFillDate: "Selecione um data válida",
+        labelInsertSuccess: "Inserido com sucesso!",
         labelPage: "Página",
         labelLine: "Linha",
         labelColumn: "Coluna",

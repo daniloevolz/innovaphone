@@ -410,7 +410,7 @@ new JsonApi("user").onconnected(function (conn) {
                                         log("Conn.sip " + JSON.stringify(conn.sip));
                                         log("Connection Inteira " + JSON.stringify(con));
                                         if (conn.guid != c.guid) { // antigo = conn.sip != c.sip
-                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.dn, to: c.dn })); 
+                                            c.send(JSON.stringify({ api: "user", mt: "AlarmSuccessTrigged", alarm: obj.prt, btn_id: String(b.id), from: conn.guid, to: c.guid })); 
                                         }
                                     })
                                 })
@@ -446,7 +446,7 @@ new JsonApi("user").onconnected(function (conn) {
 
                     connectionsUser.forEach(function (c) {
                         if (c.guid != conn.guid) {
-                            c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.sip}));
+                            c.send(JSON.stringify({ api: "user", mt: "AlarmReceived", alarm: obj.prt, src: conn.dn}));
 
                         }
                     })
@@ -585,7 +585,7 @@ new JsonApi("user").onconnected(function (conn) {
                     Database.exec("SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sensor_name ORDER BY id DESC) as row_num FROM list_sensors_history) AS subquery WHERE row_num <= 10")
                         // base = "SELECT * FROM list_buttons WHERE button_prt ='" + obj.sensor_name + "';"
                         .oncomplete(function (data) {
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResult", result: JSON.stringify(data) }))
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectSensorInfoResult", result: JSON.stringify(data), src: obj.src }))
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             log("Erro ao Consultar Info do Sensor " + errorText);
@@ -620,7 +620,58 @@ new JsonApi("user").onconnected(function (conn) {
                             conn.send(JSON.stringify({ api: "user", mt: "SelectMessageHistoryResultSrc", result: JSON.stringify(data), src: obj.src }))
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
-                            log("Erro ao Consultar Info do Sensor " + errorText);
+                            log("Erro ao Consultar Mensagens " + errorText);
+                        });
+                }
+                if (obj.mt == "ChatDelivered") {
+                    Database.exec("UPDATE tbl_messages SET delivered='" + String(getDateNow()) + "' WHERE id=" + obj.msg_id)
+                        .oncomplete(function () {
+                            conn.send(JSON.stringify({ api: "user", mt: "UpdateChatSuccess" }));
+                            var querySelect = "SELECT * FROM tbl_messages WHERE id = " + obj.msg_id
+                            Database.exec(querySelect)
+                                .oncomplete(function (data) {
+                                    //var msg = JSON.parse(data)
+
+                                    log("ChatDelivered: Mensagem " + JSON.stringify(data))
+                                    log("ChatDelivered: Mensagem[0].from_guid " + JSON.stringify(data[0].from_guid))
+                                    connectionsUser.forEach(function (c) {
+                                        if (c.guid == data[0].from_guid ) {
+                                            c.send(JSON.stringify({ api: "user", mt:"ChatDelivered", id: obj.msg_id, result: data}))
+                                        }
+                                    })
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    log("ChatDelivered: Erro ao Consultar Mensagem " + errorText);
+                                });
+                            
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(error) }));
+                        });
+                }
+                if (obj.mt == "ChatRead") {
+                    Database.exec("UPDATE tbl_messages SET read='" + String(getDateNow()) + "' WHERE id=" + obj.msg_id)
+                        .oncomplete(function () {
+                            conn.send(JSON.stringify({ api: "user", mt: "UpdateChatSuccess" }));
+                            var querySelect = "SELECT * FROM tbl_messages WHERE id = " + obj.msg_id
+                            Database.exec(querySelect)
+                                .oncomplete(function (data) {
+                                    //var msg = JSON.parse(data)
+                                    log("ChatRead: Mensagem " + JSON.stringify(data))
+                                    log("ChatRead: Mensagem.from_guid " + JSON.stringify(data.from_guid))
+                                    connectionsUser.forEach(function (c) {
+                                        if (c.guid == data[0].from_guid) {
+                                            c.send(JSON.stringify({ api: "user", mt: "ChatRead", id: obj.msg_id, result: data }))
+                                        }
+                                    })
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    log("ChatRead: Erro ao Consultar Mensagem " + errorText);
+                                });
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "MessageError", result: String(error) }));
                         });
                 }
             }
@@ -738,7 +789,14 @@ new JsonApi("admin").onconnected(function (conn) {
             if (obj.mt == "InsertMessageSrc") {
                 Database.insert("INSERT INTO list_buttons (button_name, button_prt, button_prt_user, button_user, button_type, button_device, create_date, create_user, page, position_x, position_y) VALUES ('" + String(obj.name) + "','" + String(obj.value) + "','" + String(obj.user) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(getDateNow()) + "','" + String(conn.guid) + "','" + String(obj.page) + "','" + String(obj.x) + "','" + String(obj.y) + "')")
                     .oncomplete(function () {
-                        conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSuccess", src: obj.src }));
+                        Database.exec("SELECT * FROM list_buttons")
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "InsertMessageSrcSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
@@ -809,10 +867,18 @@ new JsonApi("admin").onconnected(function (conn) {
                     Database.exec("DELETE FROM list_buttons WHERE id=" + obj.id + ";")
                         .oncomplete(function () {
                             log("DeleteMessage: Delete Success ID " + obj.id);
-                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess" }));
-                        })
+
+                            Database.exec("SELECT * FROM list_buttons")
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteMessageSuccess", result: JSON.stringify(data, null, 4), guid: obj.guid, src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                                });
+                            })
                         .onerror(function (error, errorText, dbErrorCode) {
-                            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText), src:obj.src }));
                         });
             }
             if (obj.mt == "InsertSensorMessage") {
@@ -859,6 +925,23 @@ new JsonApi("admin").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
                     });
 
+            }if (obj.mt == "InsertActionMessageSrc") {
+                //Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_prt, action_user, action_type) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.value) + "','" + String(obj.sip) + "','" + String(obj.type) + "')")
+                Database.insert("INSERT INTO list_alarm_actions (action_name, action_alarm_code, action_start_type, action_prt, action_user, action_type, action_device, action_sensor_type, action_sensor_name) VALUES ('" + String(obj.name) + "','" + String(obj.alarm) + "','" + String(obj.start) + "','" + String(obj.value) + "','" + String(obj.guid) + "','" + String(obj.type) + "','" + String(obj.device) + "','" + String(obj.sensorType) + "','" + String(obj.sensorName)+ "')")
+                    .oncomplete(function () {
+                        Database.exec("SELECT * FROM list_alarm_actions")
+                            .oncomplete(function (data) {
+                                log("result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "InsertActionMessageSrcSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(error) }));
+                    });
+
             }
             if (obj.mt == "UpdateActionMessage") {
                 Database.exec("UPDATE list_alarm_actions SET action_name='" + String(obj.name) + "', action_alarm_code='" + String(obj.alarm) + "',action_start_type='" + String(obj.start) + "', action_prt='" + String(obj.value) + "', action_user='" + String(obj.guid) + "', action_type='" + String(obj.type) + "', action_device='" + String(obj.device) + "' WHERE id=" + obj.id)
@@ -898,10 +981,18 @@ new JsonApi("admin").onconnected(function (conn) {
                     Database.exec("DELETE FROM list_alarm_actions WHERE id=" + obj.id + ";")
                         .oncomplete(function () {
                             log("DeleteMessage: Delete Success ID " + obj.id);
-                            conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess" }));
+
+                            Database.exec("SELECT * FROM list_buttons")
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+                                    conn.send(JSON.stringify({ api: "admin", mt: "DeleteActionMessageSuccess", result: JSON.stringify(data, null, 4), guid: obj.guid, src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                                });
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
-                            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText) }));
+                            conn.send(JSON.stringify({ api: "admin", mt: "MessageError", result: String(errorText), src:obj.src }));
                         });
             
             }
@@ -1285,6 +1376,26 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 pbxTableUsers.push(obj);
                 conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
             } finally {
+            }
+        }
+        if (obj.mt == "ReplicateNextResult" && !obj.columns) {
+            try {
+                log("danilo-req ReplicateNextResult: Replicate Finished. Reducing the pbxTableUser object to send to user");
+                var list_users = [];
+                pbxTableUsers.forEach(function (u) {
+                    list_users.push({ sip: u.columns.h323, cn: u.columns.cn, devices: u.columns.devices, guid: u.columns.guid, e164: u.columns.e164 })
+                })
+                log("danilo-req ReplicateNextResult: Replicate Finished. Reducing Done!")
+                connectionsUser.forEach(function (c) {
+                    c.send(JSON.stringify({ api: "user", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
+                    log("danilo-req ReplicateNextResult: Replicate Finished. Reducing Done. Sent to User " + c.dn)
+                })
+                connectionsAdmin.forEach(function (c) {
+                    c.send(JSON.stringify({ api: "user", mt: "TableUsersResult", src: obj.src, result: JSON.stringify(list_users, null, 4) }));
+                    log("danilo-req ReplicateNextResult: Replicate Finished. Reducing Done. Sent to Administrator " + c.dn)
+                })
+            } catch (e) {
+                log("danilo-req ReplicateNextResult: Replicate Finished. error " + e)
             }
         }
         if (obj.mt == "ReplicateAdd") {
@@ -2773,9 +2884,9 @@ function triggerAction2(from, to, prt, type, detail) {
                                 //alarmReceived(value);
 
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:alarm conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:alarm conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
                                     log("danilo-req alarmReceived:alarm ac.action_user " + String(ac.action_user));
-                                    if (String(conn.sip) == String(ac.action_user)) {
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
                                         updateTableBadgeCount(conn.sip, "IncrementCount");
@@ -2787,9 +2898,9 @@ function triggerAction2(from, to, prt, type, detail) {
                             case "number":
                                 //var foundConnectionUser = connectionsUser.filter(function (conn) { return conn.sip === to });
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:number conn.sip " + String(conn.sip));
+                                    log("danilo-req alarmReceived:number conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
                                     log("danilo-req alarmReceived:number ac.action_user " + String(ac.action_user));
-                                    if (String(conn.sip) == String(ac.action_user)) {
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req alarmReceived:number conn ", JSON.stringify(conn));
 
@@ -2817,9 +2928,9 @@ function triggerAction2(from, to, prt, type, detail) {
                             case "button":
                                 var btn = buttons.filter(function (btn) { return btn.id == ac.action_prt });
                                 connectionsUser.forEach(function (conn) {
-                                    log("danilo-req alarmReceived:button conn.sip " + String(conn.sip));
-                                    log("danilo-req alarmReceived:button obj.to " + String(to));
-                                    if (String(conn.sip) == String(to)) {
+                                    log("danilo-req alarmReceived:button conn.guid " + String(conn.guid) + " || conn.dn " + String(conn.dn));
+                                    log("danilo-req alarmReceived:button ac.action_user " + String(ac.action_user));
+                                    if (String(conn.guid) == String(ac.action_user)) {
                                         //Send notifications
                                         log("danilo-req triggerAction2:notifing user logged in now " + String(conn.sip));
                                         updateTableBadgeCount(conn.sip, "IncrementCount");

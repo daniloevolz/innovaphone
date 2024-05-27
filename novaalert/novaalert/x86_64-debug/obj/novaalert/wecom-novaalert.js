@@ -52,6 +52,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var divButtonsMain;
     var divOptionsMain;
     var zoneDiv;
+    var player = null;
 
     var scroll;
     var popup;
@@ -142,7 +143,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         //    var prt_user = "";
         //}
         var name = evt.currentTarget.innerText;
-        updateScreen(id, name.split("\n")[0], type, prt);
+        //updateScreen(id, name.split("\n")[0], type, prt);
+        updateScreen(id);
     };
     function findById(id) {
         return function (value) {
@@ -169,6 +171,30 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             popChatMessages(obj.msg)
         }
+        if (obj.api == "user" && obj.mt == "ChatDelivered") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatDelivered")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+            
+        }
+        if (obj.api == "user" && obj.mt == "ChatRead") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.remove("chatDelivered")
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatRead")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+
+        }
+
         if (obj.api == "user" && obj.mt == "UserSessionResult") {
             console.log(obj.session);
             session = obj.session;
@@ -256,7 +282,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
             try {
 
-                list_active_alarms.filter(function(a){return a != obj.alarm})
+                // Supondo que list_active_alarms e obj.alarm já estejam definidos
+                list_active_alarms = list_active_alarms.filter(function (a) {
+                    return a.trim() !== obj.alarm.trim();
+                });
+
                 console.log("danilo req:AlarmSuccessTrigged Alarme removido da lista list_active_alarms: "+list_active_alarms);
                 updateDeactiveAlarmButtons()
 
@@ -270,7 +300,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 
             } finally {
                 //addNotification("out", "Alarme " + obj.alarm);
-                addNotification('alarm', 'inc', obj.alarm, obj.from, obj.to)
+                var user = list_users.filter(function (u) { return u.guid == obj.from })[0]
+                addNotification('alarm', 'inc', obj.alarm, user.cn, obj.to)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -311,7 +342,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification('alarm', 'inc', obj.alarm, obj.src, userUI)
+                var user = list_users.filter(function (u) {return u.sip  == userUI})[0]
+                addNotification('alarm', 'inc', obj.alarm, obj.src, user.guid)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -1192,110 +1224,110 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function updateScreen(id, name, type, prt) {
-        var clicked = button_clicked.filter(findById(id));
+    function updateScreen(id) {
+        var btn = list_buttons.filter(function (b) { return b.id == id })[0]
+
+        var clicked = button_clicked.filter(findById(btn.id));
         if (clicked.length > 0) {
             //DESATIVAR
             
-            if (type == "user") {
-                // var found = list_users.indexOf(prt);
-                found = list_users.findIndex(function(user) {
-                    return user.e164 == prt;
-                });
-                var found = list_users.findIndex(function(user) {
-                    return user.e164 == prt;
+            if (btn.button_type == "user") {
+                var found = -1;
+                found = list_users.findIndex(function (user) {
+                    return user.guid == btn.button_prt;
                 });
                 if (found != -1) {
-                    app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id)})
+                    var user = list_users.filter(function (u) { return u.guid == btn.button_prt })[0]
+                    app.send({ api: "user", mt: "EndCall", prt: String(user.e164), btn_id: String(btn.id)})
                     //document.getElementById(id).style.backgroundColor = "darkgreen";
                 }
             }
-            if (type == "number") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
+            if (btn.button_type == "number") {
+                app.send({ api: "user", mt: "EndCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 //document.getElementById(id).style.backgroundColor = "";
             }
-            if (type == "alarm") {
+            if (btn.button_type == "alarm") {
                 app.send({ api: "user", mt: "DecrementCount" });
-                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt), btn_id: String(id) })
-                list_active_alarms = list_active_alarms.filter(function(a){return a != prt})
+                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(btn.button_prt), btn_id: String(btn.id) })
+                list_active_alarms = list_active_alarms.filter(function (a) { return a != btn.button_prt})
                 updateDeactiveAlarmButtons()
                 
             }
             
-            if (type == "dest") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
+            if (btn.button_type == "dest") {
+                app.send({ api: "user", mt: "EndCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 //addNotification("out", name);
-                addNotification(type,'out', name, userUI, prt)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                var elemento = document.getElementById(id)
+                //addNotification(type,'out', name, userUI, prt)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
+                var elemento = document.getElementById(btn.id)
                 elemento.classList.remove("vermelho-900")
                 elemento.classList.add("neutro-800")
-                found = 1;
             }
             //var btn = { id: id, type: type, name: name, prt: prt };
             //button_clicked.splice(button_clicked.indexOf(btn), 1);
-            button_clicked = button_clicked.filter(deleteById(id));
+            button_clicked = button_clicked.filter(deleteById(btn.id));
             console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
         }
         else {
             //ATIVAR
-            var found = -1;
-            
-            if (type == "user") {
+            if (btn.button_type == "user") {
+                var found = -1;
                 found = list_users.findIndex(function(user) {
-                    return user.e164 == prt;
+                    return user.guid == btn.button_prt;
                 });
                 if (found != -1) {
-                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
+                    var user = list_users.filter(function (u) { return u.guid == btn.button_prt })[0]
+                    app.send({ api: "user", mt: "TriggerCall", prt: String(user.e164), btn_id: String(btn.id)})
                     //addNotification("out", name);
-                    addNotification(type,'out', name, userUI, prt)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                    var elemento = document.getElementById(id)
+                    //addNotification(type,'out', name, userUI, prt)
+                    //    .then(function (message) {
+                    //        console.log(message);
+                    //    })
+                    //    .catch(function (error) {
+                    //        console.log(error);
+                    //    });
+                    var elemento = document.getElementById(btn.id)
                     elemento.children[0].classList.remove("verde-900")
                     elemento.children[1].classList.remove("verde-600")
                     elemento.children[0].classList.add("vermelho-900")
                     elemento.children[1].classList.add("vermelho-600")
                 }
             }
-            if (type == "number") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
+            if (btn.button_type == "number") {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(btn.button_prt), btn_id: String(btn.id)})
                 //addNotification("out", name);
-                addNotification(type, 'out', name, userUI, prt)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    var elemento = document.getElementById(id)
+                //addNotification(type, 'out', name, userUI, prt)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
+                var elemento = document.getElementById(btn.id)
                 elemento.children[0].classList.remove("verde-900")
                 elemento.children[1].classList.remove("verde-600")
                 elemento.children[0].classList.add("vermelho-900")
                 elemento.children[1].classList.add("vermelho-600")
-                found = 1;
             }
-            if (type == "alarm") {
-                app.send({ api: "user", mt: "TriggerAlert", prt: String(prt), btn_id: String(id)})
+            if (btn.button_type == "alarm") {
+                app.send({ api: "user", mt: "TriggerAlert", prt: String(btn.button_prt), btn_id: String(btn.id)})
 
-                list_active_alarms.push(prt)
+                list_active_alarms.push(btn.button_prt)
                 updateActiveAlarmButtons()
-                found = 1;
             }
-            if (type == "dest") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
+            if (btn.button_type == "dest") {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 document.getElementById(id).classList.remove("neutro-800");
                 document.getElementById(id).classList.add("vermelho-900");
             }
+            button_clicked.push(btn);
+            console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
+            
         }
     }
 
@@ -1380,10 +1412,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 btnOptions.children[1].classList.remove("neutro-900")
                 btnOptions.children[0].classList.add("azul-marinho-400")
                 btnOptions.children[1].classList.add("azul-500")
-
                 console.log("createGridZero Acessado")
                 const colRight = document.getElementById("colDireita")
                 colRight.innerHTML = ""
+                colRight.setAttribute("type", type);
                 const headerTxt = document.createElement("div")
                 headerTxt.id = "headerTxt"
                 headerTxt.classList.add("headerTxt")
@@ -1450,14 +1482,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     })
                     this.classList.add("clicked2")
                     this.classList.add("azul-marinho-1000")
-                    this.classList.remove ("azul-500")
+                    this.classList.remove("azul-500")
+                    this.classList.remove("chatNotified")
                 }
                 createDivRightBottom(object)
-                app.send({api: "user", mt: "SelectSensorInfo"})
+                //app.send({api: "user", mt: "SelectSensorInfo"})
             })
         }
     }
-    function createDivRightBottom(obj){
+    function createDivRightBottom(obj) {
         console.log("ERICK OBJ JSON", obj)
         const colRight = document.getElementById("colDireita")
         var btmRight = document.getElementById("bottomR")
@@ -1477,59 +1510,63 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         const buttonLink = obj.button_prt
 
-        if(obj.button_type == "sensor"){
-            const unic_sensor = []
-            var arrayHistory = JSON.parse(list_sensors_history);
-            
-            var filtredhistory = arrayHistory.filter(function(h){
-                return h.sensor_name == buttonLink;
-            });
-            console.log("FILTRO HIST", filtredhistory)
-            const infoBox = document.createElement("div")
-            infoBox.id = "infoBox"
-            infoBox.classList.add("infobox")
+        if (obj.button_type == "sensor") {
+            app.sendSrc({ api: "user", mt: "SelectSensorInfo", src: obj.id }, function (obj) {
+                list_sensors_history = obj.result
+                const unic_sensor = []
+                var arrayHistory = JSON.parse(list_sensors_history);
 
-            const sensorInfoBox = document.createElement("div")
-            sensorInfoBox.id = "sensorInfoBox"
-            sensorInfoBox.classList.add("sensorInfoBox")
-            for(let key in filtredhistory[0]){
-                if (filtredhistory[0].hasOwnProperty(key)) {
-                    console.log(key + ': ' + filtredhistory[0][key]);
-                    if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null){
-                        const sensorBox = document.createElement("div")
-                        sensorBox.id = "sensorBox"
-                        sensorBox.classList.add("sensorBox")
-    
-                        const topBox = document.createElement("div")
-                        topBox.id = "topBox"
-                        topBox.classList.add("topBox", "neutro-700")
-                        topBox.textContent = texts.text(key)
-    
-                        const btmBox = document.createElement("div")
-                        btmBox.id = "btmBox"
-                        btmBox.classList.add("btmBox", "neutro-900")
-                        btmBox.textContent = filtredhistory[0][key]
-                        
-                        sensorBox.appendChild(topBox)
-                        sensorBox.appendChild(btmBox)
-                        sensorInfoBox.appendChild(sensorBox)
+                var filtredhistory = arrayHistory.filter(function (h) {
+                    return h.sensor_name == buttonLink;
+                });
+                console.log("FILTRO HIST", filtredhistory)
+                const infoBox = document.createElement("div")
+                infoBox.id = "infoBox"
+                infoBox.classList.add("infobox")
 
-                        sensorBox.addEventListener("click", function(){
-                            var clickBtm = document.querySelectorAll(".btmBox")
-                            clickBtm.forEach(function(b){
-                                b.classList.remove("neutro-1100")
+                const sensorInfoBox = document.createElement("div")
+                sensorInfoBox.id = "sensorInfoBox"
+                sensorInfoBox.classList.add("sensorInfoBox")
+                for (let key in filtredhistory[0]) {
+                    if (filtredhistory[0].hasOwnProperty(key)) {
+                        console.log(key + ': ' + filtredhistory[0][key]);
+                        if (key !== "date" && key !== "id" && key !== "row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null) {
+                            const sensorBox = document.createElement("div")
+                            sensorBox.id = "sensorBox"
+                            sensorBox.classList.add("sensorBox")
+
+                            const topBox = document.createElement("div")
+                            topBox.id = "topBox"
+                            topBox.classList.add("topBox", "neutro-700")
+                            topBox.textContent = texts.text(key)
+
+                            const btmBox = document.createElement("div")
+                            btmBox.id = "btmBox"
+                            btmBox.classList.add("btmBox", "neutro-900")
+                            btmBox.textContent = filtredhistory[0][key]
+
+                            sensorBox.appendChild(topBox)
+                            sensorBox.appendChild(btmBox)
+                            sensorInfoBox.appendChild(sensorBox)
+
+                            sensorBox.addEventListener("click", function () {
+                                var clickBtm = document.querySelectorAll(".btmBox")
+                                clickBtm.forEach(function (b) {
+                                    b.classList.remove("neutro-1100")
+                                })
+                                btmBox.classList.add('neutro-1100')
+                                createLineGrafic(filtredhistory, key)
                             })
-                            btmBox.classList.add('neutro-1100')
-                            createLineGrafic(filtredhistory, key)
-                        })
 
+                        }
                     }
                 }
-            }
 
-          
-            infoBox.appendChild(sensorInfoBox)
-            bottomRight.appendChild(infoBox)
+
+                infoBox.appendChild(sensorInfoBox)
+                bottomRight.appendChild(infoBox)
+            })
+            
 
         
         }
@@ -1539,6 +1576,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             const messagesArea = document.createElement("div")
             messagesArea.id = "messagesArea"
             messagesArea.classList.add("messagesArea")
+            messagesArea.setAttribute("userInChat", obj.button_prt);
 
 
             //input/btn de mensagens
@@ -1612,11 +1650,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     element.width = "100%";
                     element.height = "400"; // Altura desejada
                     element.src = buttonLink;
-                } else if (fileType === 'image') {
+                }
+                else if (fileType === 'image') {
                     element = document.createElement("img");
                     element.src = buttonLink;
                     element.style.width = '100%'
-                } else if (fileType === 'video') {
+                }
+                else if (fileType === 'video') {
                     element = document.createElement("video");
                     element.controls = true; // Adiciona controles de vídeo
                     element.autoplay = true; 
@@ -1627,7 +1667,26 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     source.src = buttonLink;
                     source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
                     element.appendChild(source);
-                } 
+                }
+                else if (fileType === 'streaming') {
+                    if (player) {
+                        player.dispose(); // Remove o player Video.js existente
+                    }
+                    element = document.createElement("video");
+                    element.controls = true; // Adiciona controles de vídeo
+                    element.id = "my-video"
+                    element.classList.add("video-js", "vjs-default-skin")
+                    element.preload = "auto"
+                    element.autoplay = true;
+                    element.setAttribute("data-setup","{}")
+                    element.style.width = "100%"
+                    element.style.height = "auto"
+                    // Ajuste a altura conforme necessário
+                    var source = document.createElement("source");
+                    source.src = buttonLink;
+                    source.type = "application/x-mpegURL"//"video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+                    element.appendChild(source);
+                }
                 else if (fileType === 'google-maps') {
                     element = document.createElement("iframe");
                     element.src = buttonLink;
@@ -1649,8 +1708,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     return 'pdf';
                 } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
                     return 'image';
-                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov','m3u8'].includes(extension)) {
+                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
                     return 'video';
+                } else if (['m3u8'].includes(extension)) {
+                    return 'streaming';
                 } else if (buttonLink.includes('google.com/maps/embed')) {
                     return 'google-maps';
                 } else {
@@ -1671,62 +1732,213 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         colRight.appendChild(bottomRight)
 
-
+        try {
+            player = videojs('my-video');
+            player.ready(function () {
+                player.muted(true);
+                player.play().catch(function (error) {
+                    console.log('Autoplay was prevented:', error);
+                });
+            });
+        } catch (e) {
+            console.log('videojs not present:', e);
+        }
     }
     function popChatMessages(messages) {
-        const messagesArea = document.getElementById("messagesArea")
-        if (messagesArea) {
+        const optInFocus = document.getElementById("colDireita").getAttribute("type");
+        if (optInFocus == "chat") {
+            //option chat já selecionada
+            const messagesArea = document.getElementById("messagesArea")
+            if (messagesArea) {
+                //ja em conversa com alguém
+                const userInChat = messagesArea.getAttribute("userInChat");
+                messages.forEach(function (m) {
+                    if (m.from_guid == userInChat || m.to_guid == userInChat) {
+                        //atualizar area de bate papo pois é o usuário correto
+                        //div chat object
+                        const chatDiv = document.createElement("div")
+                        chatDiv.id = "chatDiv"
+                        chatDiv.setAttribute("msg", m.id)
+                        chatDiv.classList.add("chatDiv")
+                        
+
+                        //div message
+                        const messageDiv = document.createElement("div")
+                        messageDiv.id = "messageDiv"
+                        messageDiv.classList.add("messageDiv")
+                        //mensagem
+                        const message = document.createElement("label")
+                        message.id = m.id
+                        message.classList.add("message")
+                        message.textContent = m.msg
+                        messageDiv.appendChild(message)
+
+                        //horário da mensagem
+                        const timestampDiv = document.createElement("div")
+                        timestampDiv.id = "timestampDiv"
+                        timestampDiv.classList.add("timestampDiv")
+                        timestampDiv.innerHTML = m.date
+
+
+                        chatDiv.appendChild(messageDiv)
+                        chatDiv.appendChild(timestampDiv)
+                        
+                        
+
+                        var u = list_users.filter(function (item) {
+                            return item.sip === userUI;
+                        });
+
+                        if (u.length == 0) {
+                            makePopup(texts.text("labelWarning"), texts.text("labelTableUsersNotLoaded"))
+                            return
+                        }
+                        else {
+                            if (m.from_guid == u[0].guid) {
+                                chatDiv.classList.add("chatSend")
+                                //status da mensagem enviada
+                                const statusDiv = document.createElement("div")
+                                statusDiv.id = "statusDiv_"+m.id
+                                statusDiv.classList.add("statusDiv")
+                                chatDiv.appendChild(statusDiv)
+                                if (m.delivered != null) {
+                                    statusDiv.classList.add("chatDelivered")
+
+                                }
+                                if (m.read != null) {
+                                    statusDiv.classList.remove("chatDelivered")
+                                    statusDiv.classList.add("chatRead")
+
+                                }
+
+
+                            }
+                            else {
+                                chatDiv.classList.add("chatReceived")
+                                if (m.delivered == null) {
+                                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                                }
+                                if (m.read == null) {
+                                    app.send({ api: "user", mt: "ChatRead", msg_id: m.id })
+
+                                }
+
+                            }
+                            if (messagesArea.firstChild) {
+                                messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+                            } else {
+                                messagesArea.appendChild(chatDiv);
+                            }
+                        }
+                        
+
+                        //mensagem
+                        //const timestamp = document.createElement("label")
+                        //timestamp.id = m.date
+                        //timestamp.classList.add("message")
+
+                        //timestampDiv.appendChild(timestamp)
+
+
+                        
+                        
+                        //messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+
+                        
+
+                        //messagesArea.appendChild(chatDiv)
+
+                    }
+                    else {
+                        //adicionar log no history e colocar icone no botão do cara pois está conversando com outro
+                        var from_user = list_users.filter(function (u) { return u.guid == m.from_guid })[0].cn;
+                        console.log("from_user " + from_user)
+                        var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                        console.log("to_user " + to_user)
+                        addNotification('message', 'inc', m.msg, from_user, m.to_guid).then(function (result) {
+                            console.log(result)
+                        }).catch(function (e) {
+                            console.log(e)
+                        })
+                        const grid = document.getElementById("gridZero")
+                        var childElement = grid.querySelector('[button_prt="' + m.from_guid + '"]');
+
+                        if (childElement) {
+                            console.log("Elemento encontrado:", childElement);
+                            childElement.classList.remove("azul-500")
+                            childElement.classList.add("chatNotified")
+                        } else {
+                            console.log("Elemento não encontrado");
+                        }
+
+                        //a mensagem foi entregue, vamos registrar no banco
+                        if (m.delivered == null) {
+                            app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                        }
+
+                    }
+
+                })
+            }
+            else {
+                //está em foco a option chat mas não está com a area de chat aberta com nenhum usuário
+                //adicionar log no history e colocar icone no botão do cara
+                messages.forEach(function (m) {
+                    var from_user = list_users.filter(function (u) { return u.guid == m.from_guid })[0].cn;
+                    console.log("from_user " + from_user)
+                    var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                    console.log("to_user " + to_user)
+                    addNotification('message', 'inc', m.msg, from_user, m.to_guid).then(function (result) {
+                        console.log(result)
+                    }).catch(function (e) {
+                        console.log(e)
+                    })
+                    const grid = document.getElementById("gridZero")
+                    var childElement = grid.querySelector('[button_prt="' + m.from_guid + '"]');
+
+                    if (childElement) {
+                        console.log("Elemento encontrado:", childElement);
+                        childElement.classList.remove("azul-500")
+                        childElement.classList.add("chatNotified")
+                    } else {
+                        console.log("Elemento não encontrado");
+                    }
+                    //a mensagem foi entregue, vamos registrar no banco
+                    if (m.delivered == null) {
+                        app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                    }
+                })
+                
+
+            }
+
+        } else {
+            //alguma outra option selecionada
+            //não está com a area de chat aberta
+            //adicionar log no history
             messages.forEach(function (m) {
-                //div chat object
-                const chatDiv = document.createElement("div")
-                chatDiv.id = "chatDiv"
-                chatDiv.classList.add("chatDiv")
-                var u = list_users.filter(function (item) {
-                    return item.sip === userUI;
-                });
-                if (m.from_guid == u[0].guid) {
-                    chatDiv.classList.add("chatSend")
-                } else {
-                    chatDiv.classList.add("chatReceived")
+                var from_user = list_users.filter(function (u) { return u.guid == m.from_guid });
+                console.log("from_user " + from_user)
+                var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                console.log("to_user "+to_user)
+                addNotification('message', 'inc', m.msg, from_user[0].cn, m.to_guid).then(function (result) {
+                    console.log(result)
+                }).catch(function (e) {
+                    console.log(e)
+                })
+
+                //a mensagem foi entregue, vamos registrar no banco
+                if (m.delivered == null) {
+                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
                 }
-
-                //div message
-                const messageDiv = document.createElement("div")
-                messageDiv.id = "messageDiv"
-                messageDiv.classList.add("messageDiv")
-                //mensagem
-                const message = document.createElement("label")
-                message.id = m.id
-                message.classList.add("message")
-                message.textContent = m.msg
-                messageDiv.appendChild(message)
-
-                //botão enviar
-                const timestampDiv = document.createElement("div")
-                timestampDiv.id = "timestampDiv"
-                timestampDiv.classList.add("timestampDiv")
-                timestampDiv.innerHTML = m.date
-                //mensagem
-                //const timestamp = document.createElement("label")
-                //timestamp.id = m.date
-                //timestamp.classList.add("message")
-
-                //timestampDiv.appendChild(timestamp)
-
-
-                chatDiv.appendChild(messageDiv)
-                chatDiv.appendChild(timestampDiv)
-                //messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
-
-                if (messagesArea.firstChild) {
-                    messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
-                } else {
-                    messagesArea.appendChild(chatDiv);
-                }
-
-                //messagesArea.appendChild(chatDiv)
             })
+
         }
+        
         
     }
     function calllistonmessage(consumer, obj) {
@@ -1801,7 +2013,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             allBtns.addEventListener("click", function () {
                 console.log("Function do Botão ligar para", object.button_name)
-                updateScreen(object.id, object.button_name, object.button_type, object.button_prt)
+                //updateScreen(object.id, object.button_name, object.button_type, object.button_prt)
+                updateScreen(object.id)
             })
         }
     }
@@ -2056,7 +2269,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     elemento.children[1].classList.add("vermelho-600")
                     button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: id });
                 }
-                console.log("danilo req:updateActiveAlarmButtons button_clicked atualizado +: " + button_clicked)
+                console.log("danilo req:updateActiveAlarmButtons button_clicked atualizado +: " + JSON.stringify(button_clicked))
                 
             }   
         })    
@@ -2073,9 +2286,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
 
         })
-        console.log("danilo req:updateDeactiveAlarmButtons button_clicked atualizado -: " + button_clicked) 
+        console.log("danilo req:updateDeactiveAlarmButtons button_clicked atualizado -: " + JSON.stringify(button_clicked)) 
     }
-    function addNotification(type, flux, msg, from, to) {
+    function addNotification(type, flux, msg, from_user, to) {
         return new Promise(function(resolve, reject) {
             try {
                 var today = new Date();
@@ -2116,7 +2329,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 const eventText1 = document.createElement("div");
                 eventText1.id = "eventText1";
                 eventText1.classList.add("eventText1");
-                eventText1.textContent = from;
+                eventText1.textContent = from_user;
 
                 const eventImg1 = document.createElement("img");
                 eventImg1.id = "eventImg1";
@@ -2127,7 +2340,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     eventImg1.src = "./images/left-arrow.svg";
                 }
                 
-                var cn = list_users.filter(function(u){return u.sip == to})[0].cn;
+                var cn = list_users.filter(function(u){return u.guid == to})[0].cn;
                 const eventText2 = document.createElement("div");
                 eventText2.id = "eventText2";
                 eventText2.classList.add("eventText2");
@@ -2202,6 +2415,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         })
     }
 
+    // Cria os gráficos de barras
     function createBarGrafic(data) {
         const colRight = document.getElementById("colDireita")
         const canvas = document.createElement('canvas');
@@ -2264,7 +2478,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         drawBarGraph();
     }
 
-    // Cria os gráficos
+    // Cria os gráficos de linha
     function createLineGrafic(data, key) {
         console.log("Grafico", data)
         var grafico = document.getElementById("grafico")
