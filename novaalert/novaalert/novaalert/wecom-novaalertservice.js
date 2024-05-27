@@ -1023,46 +1023,108 @@ new JsonApi("admin").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                    case "RptSensors":
+                        case "RptSensors":
                             var query;
-                            if (obj.sensor_type) {
-                                query = "SELECT id, sensor_name, " + obj.sensor_type + ", date FROM list_sensors_history";
-                                var conditions = [];
-                                if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
-                                if (obj.from) conditions.push("date >'" + obj.from + "'");
-                                if (obj.to) conditions.push("date <'" + obj.to + "'");
-                                if (conditions.length > 0) {
-                                    query += " AND " + conditions.join(" AND ");
-                                }
-                            } else {
-                                query = "SELECT * FROM list_sensors_history";
-                                var conditions = [];
-                                if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
-                                if (obj.from) conditions.push("date >'" + obj.from + "'");
-                                if (obj.to) conditions.push("date <'" + obj.to + "'");
-                                if (conditions.length > 0) {
-                                    query += " WHERE " + conditions.join(" AND ");
-                                }
-                            }
-                            Database.exec(query)
-                                .oncomplete(function (data) {
-                                    log("result=" + JSON.stringify(data, null, 4));
+                            // Criar um objeto para armazenar os resultados organizados por sensor_name
+                            const sensorResults = {};
+                                if (obj.sensor_type) {
+                                    query = "SELECT id, sensor_name, " + obj.sensor_type + ", date FROM list_sensors_history";
+                                    var conditions = [];
     
-                                    var jsonData = JSON.stringify(data, null, 4);
-                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
-                                    var fragments = [];
-                                    for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
-                                        fragments.push(jsonData.substr(i, maxFragmentSize));
+                                    //if (obj.sensor && Object.prototype.toString.call(obj.sensor) === '[object Array]' && obj.sensor.length > 0) {
+    
+                                    //    var sensorConditions = obj.sensor.map(function (sensor) {
+                                    //        return "sensor_name ='" + sensor + "'";
+                                    //    });
+                                    //    conditions.push("(" + sensorConditions.join(" OR ") + ")");
+    
+                                    //} else {
+    
+                                    //    if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+    
+                                    //}
+    
+    
+                                    if (obj.sensor && Object.prototype.toString.call(obj.sensor) === '[object Array]' && obj.sensor.length > 0) {
+                                        var sensorConditions = obj.sensor.map(function (sensor) {
+                                            // Inicializar o array de resultados para o sensor atual
+                                            sensorResults[sensor] = [];
+                                            return "sensor_name ='" + sensor + "'";
+                                        });
+                                        conditions.push("(" + sensorConditions.join(" OR ") + ")");
                                     }
-                                    // Enviar cada fragmento separadamente através do websocket
-                                    for (var i = 0; i < fragments.length; i++) {
-                                        var isLastFragment = i === fragments.length - 1;
-                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
-                                    }})
-                                .onerror(function (error, errorText, dbErrorCode) {
-                                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
-                                });
-                        break;
+                                    else {
+    
+                                        if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+                                        // Inicializar o array de resultados para o sensor atual
+                                        sensorResults[obj.sensor] = [];
+    
+                                    }
+    
+                                    //if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+                                    if (obj.from) conditions.push("date >'" + obj.from + "'");
+                                    if (obj.to) conditions.push("date <'" + obj.to + "'");
+                                    if (conditions.length > 0) {
+                                        query += " AND " + conditions.join(" AND ");
+                                    }
+                                } else {
+    
+                                    // Suponha que 'obj' seja o objeto com os parâmetros da consulta (sensor, from, to, etc.)
+                                    query = "SELECT * FROM list_sensors_history";
+                                    const conditions = [];
+                                    
+    
+                                    if (obj.sensor && Object.prototype.toString.call(obj.sensor) === '[object Array]' && obj.sensor.length > 0) {
+                                        var sensorConditions = obj.sensor.map(function (sensor) {
+                                            // Inicializar o array de resultados para o sensor atual
+                                            sensorResults[sensor] = [];
+                                            return "sensor_name ='" + sensor + "'";
+                                        });
+                                        conditions.push("(" + sensorConditions.join(" OR ") + ")");
+                                    }
+                                    else {
+    
+                                        if (obj.sensor) conditions.push("sensor_name ='" + obj.sensor + "'");
+                                        // Inicializar o array de resultados para o sensor atual
+                                        sensorResults[obj.sensor] = [];
+    
+                                    }
+                                    log("sensorResults " + JSON.stringify(sensorResults))
+                                    if (obj.from) conditions.push("date >'" + obj.from + "'");
+                                    if (obj.to) conditions.push("date <'" + obj.to + "'");
+                                    if (conditions.length > 0) {
+                                        query += " WHERE " + conditions.join(" AND ");
+                                    }
+                                }
+                                Database.exec(query)
+                                    .oncomplete(function (data) {
+                                        log("result =" + JSON.stringify(data, null, 4));
+    
+                                        // Organizar os resultados por sensor_name
+                                        data.forEach(function(row){
+                                            const sensorName = row.sensor_name;
+                                            sensorResults[sensorName].push(row);
+                                        });
+    
+                                        // Agora 'sensorResults' contém os resultados organizados conforme desejado
+                                        log('Sensor Result =',JSON.stringify(sensorResults));
+        
+                                        var jsonData = JSON.stringify(sensorResults) //JSON.stringify(data, null, 4);
+                                        var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                        var fragments = [];
+                                        for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                            fragments.push(jsonData.substr(i, maxFragmentSize));
+                                        }
+                                        // Enviar cada fragmento separadamente através do websocket
+                                        log('Fragment =',JSON.stringify(fragments))
+                                        for (var i = 0; i < fragments.length; i++) {
+                                            var isLastFragment = i === fragments.length - 1;
+                                            conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                        }})
+                                    .onerror(function (error, errorText, dbErrorCode) {
+                                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                                    });
+                            break;
                     case "RptMessages":
                         var query = "SELECT id, chat_id, from_guid, to_guid, date, msg FROM tbl_messages";
                         var conditions = [];

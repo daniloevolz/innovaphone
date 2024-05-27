@@ -1,6 +1,7 @@
 ﻿var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        noReport:"Relátorio não encontrado",
         sendBtn:"Enviar",
         labelRptMessages: "Mensagens",
         promptSelectAction: "Selecione uma ação!",

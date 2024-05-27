@@ -24,6 +24,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
     var col_esquerda;
     var list_sensors_name = []
     var addButtonsArea;
+    var reportsHitory = []
     var colorSchemes = {
         dark: {
             "--bg": "url('wecom-white.png')",
@@ -288,26 +289,58 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectSensorsFromButtonsSuccess") {
             console.log(obj.result);
             list_buttons_sensors = JSON.parse(obj.result);
-            filterReports(obj.src, colDireita);
+            filterReports(obj.src, col_direita);
         }
         if (obj.api == "admin" && obj.mt == "SelectFromReportsSuccess") {
-            receivedFragments.push(obj.result);
-            if (obj.lastFragment) {
-                // Todos os fragmentos foram recebidos
-                var jsonData = receivedFragments.join("");
-                // Faça o que quiser com os dados aqui
-                reportView(colDireita, jsonData, obj.src)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                //reportView(colDireita, jsonData, obj.src);
-                // Limpe o array de fragmentos recebidos
-                receivedFragments = [];
+            // reportsHitory = JSON.stringify(obj.result)
+            // reportList(reportsHitory)
+            if(obj.src == "RptSensors"){
+                receivedFragments.push(obj.result);
+
+                if (obj.lastFragment) {
+                    
+                    // Todos os fragmentos foram recebidos
+                    var jsonData = receivedFragments.join("");
+    
+                    receivedFragments = [];
+                    // Faça o que quiser com os dados aqui
+                    sensorAnalyse(jsonData, obj.src)
+                        .then(function (message) {
+                            console.log(message);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                    //reportView(colDireita, jsonData, obj.src);
+                    // Limpe o array de fragmentos recebidos
+                    //receivedFragments = [];
+                }
+                //sensorAnalyse(obj.result, obj.src);
+                
+            }else{
+                receivedFragments.push(obj.result);
+
+                if (obj.lastFragment) {
+                    
+                    // Todos os fragmentos foram recebidos
+                    var jsonData = receivedFragments.join("");
+    
+                    // receivedFragments = [];
+                    // Faça o que quiser com os dados aqui
+                    reportList(jsonData, obj.src)
+                        .then(function (message) {
+                            console.log(message);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                    //reportView(colDireita, jsonData, obj.src);
+                    // Limpe o array de fragmentos recebidos
+                    receivedFragments = [];
+                }
+                reportList(obj.result, obj.src);
             }
-            //reportView(colDireita, obj.result, obj.src);
+
         }
         if (obj.api == "admin" && obj.mt == "DeleteFromReportsSuccess") {
             constructor();
@@ -3796,6 +3829,7 @@ function getButtonTypeText(buttonType) {
                     default:
                         if(!document.getElementById("bgAll")){
                             usersSelect(bgFilter)
+                            getSensor(bgFilter)
                             dateSelect(bgFilter)
                             buttonsReport(bgFilter, cat.id)
                         }
@@ -3842,7 +3876,7 @@ function getButtonTypeText(buttonType) {
         confirmBtn.addEventListener('click',function(){
             var selectedUsers = document.querySelectorAll('.userCard')
             var users = []
-            var selectedSensors = document.querySelectorAll('.sensorCard')
+            var selectedSensors = document.querySelectorAll('.selectSensor')
             var sensors = []
             selectedUsers.forEach(function(evt){
                 users.push(evt.id)
@@ -3850,40 +3884,48 @@ function getButtonTypeText(buttonType) {
             selectedSensors.forEach(function(evt){
                 sensors.push(evt.id)
             })
-            var from = document.getElementById('firstDate').textContent + "T00:00:000"
-            var to = document.getElementById('lastDate').textContent +"T23:59:999"
-
+            var from = document.getElementById('firstDate').textContent.replace(' ', 'T')
+            var to = document.getElementById('lastDate').textContent.replace(' ', 'T')
+    
             console.log('app.send(report)', reportID)
             console.log('app.send(users)', users)
             console.log('app.send(sensors)', sensors)
             console.log('app.send(from)', from)
             console.log('app.send(to)', to)
+    
             switch (reportID) {
                 case 'RptSensors':
+                    //sensorAnalyse(sensorHistory)
                     app.send({ api: "admin", mt: "SelectFromReports", sensor: sensors, from: from, to: to, src: reportID });
                     break;
                 case 'RptAvailability':
-                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                    
+                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
                 break;
                 case 'RptActivities':
                     //AJUSTAR EVENTS
-                    app.send({ api: "admin", mt: "SelectFromReports", event: events, from: from, to: to, src: reportID });
+                    reportList(dummy1)
+                    //app.send({ api: "admin", mt: "SelectFromReports", event: events, from: from, to: to, src: reportID });
                 break;
                 case 'RptCalls':
                     //AJUSTAR CALLS
-                    app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
+                    //app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
                 break;
                 case 'RptMessages':
                     //AJUSTAR MENSSAGES
-                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                break;
+                case 'RptAll':
+                    //AJUSTAR MENSSAGES
+                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
                 break;
                 default:
                     break;
             }
-
+    
             
-            waitConnection(colDireita)
-
+            // waitConnection(colDireita)
+    
         })
         clearBtn.addEventListener('click',function(){
             document.querySelectorAll('.userCard').forEach(function(evt){
@@ -4049,20 +4091,28 @@ function getButtonTypeText(buttonType) {
         inputDate.setAttribute('type', 'date');
         inputDate.id = 'inputDate';
         inputDate.classList.add('inputDate');
-        
+    
+        var inputTime = document.createElement('input');
+        inputTime.setAttribute('type', 'time');
+        inputTime.id = 'inputTime';
+        inputTime.classList.add('inputTime');
+    
         console.log(inputDate.value)
+        console.log(inputTime.value)
             
         var btnConfirm = document.createElement('div')
         btnConfirm.classList.add('btnDate')
         btnConfirm.id = 'btnDate'
         btnConfirm.textContent = 'Confirm'
         btnConfirm.addEventListener('click', function(event){
-            var ajustedDate = inputDate.value
-            console.log('Data clicada', ajustedDate)
+            var ajustedDate = inputDate.value 
+            var ajustedHour = inputTime.value
+            console.log('Data clicada', ajustedDate + "T" + ajustedHour)
+    
             if (inputDate.value == "" ){
                 window.alert("SET DATE")
             }else{
-                setDate(inputDate.value)
+                setDate(inputDate.value + " " + ajustedHour)
                 if (event.target === btnConfirm) {
                     document.getElementById('bgCurtain').remove();
                 }
@@ -4071,6 +4121,7 @@ function getButtonTypeText(buttonType) {
         
         bgInputDate.appendChild(bgInputDateTxt)
         bgInputDate.appendChild(inputDate)
+        bgInputDate.appendChild(inputTime)
         bgInputDate.appendChild(btnConfirm)
         bgCurtain.appendChild(bgInputDate)
         colDireita.appendChild(bgCurtain)
@@ -4152,7 +4203,6 @@ function getButtonTypeText(buttonType) {
         }
         
     }
-    
     function getSensor(bgFilter){
         
         var bgSensor = document.createElement('div')
@@ -4165,86 +4215,238 @@ function getButtonTypeText(buttonType) {
         var h4Sensor = document.createElement('h4');
         h4Sensor.textContent = "Sensores";
     
-        var selectSensor = document.createElement('select');
-        selectSensor.id = 'selectSensor';
+        // var selectSensor = document.createElement('select');
+        // selectSensor.id = 'selectSensor';
      
-        var optSelect = document.createElement('option');
-        optSelect.textContent = "Selecione";
+        // var optSelect = document.createElement('option');
+        // optSelect.textContent = "Selecione";
         
-        var optAll = document.createElement('option');
-        optAll.textContent = "Todos";
-        optAll.id = 'allSensors';
+        // var optAll = document.createElement('option');
+        // optAll.textContent = "Todos";
+        // optAll.id = 'allSensors';
     
-        selectSensor.appendChild(optSelect);
-        selectSensor.appendChild(optAll);
+        // selectSensor.appendChild(optSelect);
+        // selectSensor.appendChild(optAll);
+        // console.log("ERICK NAME SENSORS",list_sensors_name)
     
-        list_Sensors.forEach(function (s) {
-            var optSensor = document.createElement('option');
-            optSensor.textContent = s.sensor_name;
-            optSensor.id = s.id;
-            selectSensor.appendChild(optSensor);
-        });
-
+        // list_sensors_name.forEach(function (s) {
+        //     var optSensor = document.createElement('option');
+        //     optSensor.textContent = s.sensor_name;
+        //     optSensor.id = s.sensor_name;
+        //     selectSensor.appendChild(optSensor);
+        // });
         var sensorSelected = document.createElement('div');
-        sensorSelected.classList.add('sensorSelected');
+        sensorSelected.classList.add('sensorSelectedDIV');
     
         infoSensor.appendChild(h4Sensor);
-        infoSensor.appendChild(selectSensor);
+        
+        list_sensors_name.forEach(function(sens){
+            var btSensor = document.createElement('div')
+            btSensor.classList.add('btnSensor')
+            btSensor.id = sens.sensor_name
+            btSensor.textContent = sens.sensor_name
+            btSensor.addEventListener('click', function(evt){
+                console.log("Categoria clicada", sens.id)
+                
+                list_sensors_name.forEach(function(sens){
+                    var sensToRemSelec = document.getElementById(sens.sensor_name) 
+                    sensToRemSelec.classList.remove('selectSensor')
+                })
+    
+                btSensor.classList.add("selectSensor")
+    
+            })
+            sensorSelected.appendChild(btSensor)
+        });
+    
+    
+        
+        //infoSensor.appendChild(selectSensor);
         bgSensor.appendChild(infoSensor);
         bgSensor.appendChild(sensorSelected);
         bgFilter.appendChild(bgSensor);
         
-        selectSensor.addEventListener('change', function (e) {
-            var selectedOption = selectSensor.options[selectSensor.selectedIndex];
-            var sip = selectedOption.id; // Pegue o valor (ID) do option selecionado
-            console.log("ERICK SELECTED USER ID:", sip);
-        
-            // Verifica se já existe uma div com a classe "userCard" para o usuário selecionado
-            var existingUserCards = document.getElementsByClassName('sensorCard');
-            
-            // Variável para verificar se o usuário já existe
-            var userAlreadyExists = false;
-            for (var i = 0; i < existingUserCards.length; i++) {
-                existingUserCards[i].classList.remove('tremor');
-            }
-        
-            // Verifica se o usuário já foi selecionado anteriormente
-            for (var i = 0; i < existingUserCards.length; i++) {
-                
-                if (existingUserCards[i].id === sip ) {
-                    // Se o usuário já existir, adiciona a classe "tremor" e define a variável userAlreadyExists como true
-                    existingUserCards[i].classList.add('tremor');
-                    userAlreadyExists = true;
-                    break;
-                }
-    
-            }
-            if (!userAlreadyExists && sip ) {
-    
-                var selectCard = document.createElement('div');
-                selectCard.id = sip;
-                selectCard.classList.add('sensorCard');
-        
-                var iconCard = document.createElement('img');
-                iconCard.setAttribute('src', "./images/alarm.svg");
-                iconCard.classList.add('iconCard');
-        
-                var nameCard = document.createElement('div');
-                nameCard.textContent = selectedOption.value;
-        
-                selectCard.appendChild(iconCard);
-                selectCard.appendChild(nameCard);
-                sensorSelected.appendChild(selectCard);
-        
-                // Adiciona um event listener para remover a div ao clicar nela
-                selectCard.addEventListener('click', function () {
-                    selectCard.remove();
-                });
-            }
-        });  
+
     
         
     }
+    function reportList(history, objSrc){
+        console.log('reportList history', history)
+        console.log('reportList objSrc', objSrc)
+    
+        var colRight = document.getElementById('colDireita')
+        colRight.innerHTML = ''
+    
+        // var nameReport = document.createElement('div')
+        // nameReport.textContent = history.sensor_name[0]
+        var tableContainer = document.createElement('div')
+        tableContainer.id = "table-container"
+        tableContainer.classList.add('tableContainer')
+    
+        var table = document.createElement('table')
+        table.id = "table"
+        table.classList.add('table')
+    
+        var headerRow = document.createElement('tr')
+
+        
+
+        for (let key in history[0]) {
+            console.log('ACESSO FOR')
+            if (history[0].hasOwnProperty(key)){
+                console.log('KEY IN HISTORY', key + ': ' + history[0][key]);
+                if(key !== null){
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                }
+            }
+    
+        }a
+        table.appendChild(headerRow)
+        // Create table data rows
+        history.forEach(function(h){
+            console.log("row", h)
+            const dataRow = document.createElement('tr');
+            // Para cada chave do objeto, criamos uma célula <td> e atribuímos o valor correspondente
+            Object.keys(h).forEach(function(key) {
+                const td = document.createElement('td');
+                td.textContent = h[key];
+                dataRow.appendChild(td);
+            });
+            table.appendChild(dataRow);
+        });
+        
+        tableContainer.appendChild(table);
+        colRight.appendChild(tableContainer)
+    }
+    function reportGraph(xArray, yArray, name, nameX, nameY){
+
+        const rangMinY = Math.min(...yArray)
+        const rangMaxY = Math.max(...yArray)
+        const rangMinX = Math.min(...xArray)
+        const rangMaxX = Math.max(...xArray)
+    
+        // Define Data
+        const data = [{
+        x: xArray,
+        y: yArray,
+        mode:"lines"
+        }];
+        console.log("Array",rangMinY, rangMaxY)
+        // Define Layout
+        const layout = {
+        xaxis: {range: [rangMinX, rangMaxX], title: nameX},
+        yaxis: {range: [rangMinY, rangMaxY], title: nameY},  
+        title: name
+        };
+        var bgFilter = document.getElementById('bgFilter')
+        // bgFilter.innerHTML = ''
+    
+        var grafDiv = document.createElement('div')
+        grafDiv.id = 'grafDiv'
+
+        bgFilter.appendChild(grafDiv)
+        // Display using Plotly
+        Plotly.newPlot("grafDiv", data, layout);
+    }
+    //sensorAnalyse(sensorHistory, 'Datacenter', 'temperature')
+    function sensorAnalyse(data, sensor, tipo){
+        return new Promise(function (resolve, reject) {
+            try {
+            console.log(JSON.stringify(data))
+            var filtredhistory = JSON.parse(data)
+            var bgFilter = document.getElementById('bgFilter')
+
+            const infoBox = document.createElement("div")
+            infoBox.id = "infoBox"
+            infoBox.classList.add("infobox")
+
+            const sensorInfoBox = document.createElement("div")
+            sensorInfoBox.id = "sensorInfoBox"
+            sensorInfoBox.classList.add("sensorInfoBox")
+            
+            for (const sensor in filtredhistory) {
+                if (filtredhistory.hasOwnProperty(sensor)) {
+                    const rows = filtredhistory[sensor];
+                    for (const key in rows[0]) {
+                        console.log(key + ': ' + rows[0][key]);
+                        if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && rows[0][key] !== null){
+                            const sensorBox = document.createElement("div")
+                            sensorBox.id = "sensorBox"
+                            sensorBox.classList.add("sensorBox")
+
+                            const topBox = document.createElement("div")
+                            topBox.id = "topBox"
+                            topBox.classList.add("topBox", "neutro-700")
+                            topBox.textContent = texts.text(key)
+
+                            const btmBox = document.createElement("div")
+                            btmBox.id = "btmBox"
+                            btmBox.classList.add("btmBox", "neutro-900")
+                            btmBox.textContent = rows[0][key]
+                            
+                            sensorBox.appendChild(topBox)
+                            sensorBox.appendChild(btmBox)
+                            sensorInfoBox.appendChild(sensorBox)
+
+                            sensorBox.addEventListener("click", function(){
+                                if(document.getElementById('mygrafDiv')){
+                                    document.getElementById('mygrafDiv').remove()
+                                }
+                                var clickBtm = document.querySelectorAll(".btmBox")
+                                clickBtm.forEach(function(b){
+                                    b.classList.remove("neutro-1100")
+                                })
+                                btmBox.classList.add('neutro-1100')
+
+                                var xArray = []
+                                var yArray = []
+
+                                rows.forEach(function(r){
+                                    xArray.push(r.date);
+                                    yArray.push(r[key]);
+                                    console.log('ultima etapa',r[key])
+                                })
+
+                                reportGraph(xArray, yArray, key, 'Data', key)
+                            })
+
+                        }
+                       
+                        infoBox.appendChild(sensorInfoBox)
+                    }
+                    // for (const row of rows) {
+                    //     const entries = Object.entries(categoria);
+                    //     const keyValues = entries.map(([key, value]) => `${key}`, `${value}`).join(', ');
+                    //     console.log(keyValues);
+                    // }
+                }
+            }
+
+            for (const sensor in filtredhistory) {
+                if (filtredhistory.hasOwnProperty(sensor)) {
+                    console.log(sensor);
+
+                    
+                    
+                }
+            }
+            
+
+            
+            bgFilter.appendChild(infoBox)
+            resolve('success')
+
+            }catch (error) {
+            reject('Error adding report: ' + error.message);
+            }
+        }) 
+        //reportGraph(eixoX, eixoY,'nome do gráfico', 'eixoX', 'eixoY')
+    
+
+    }
+    
     // function makeDivReports(colDireita) {
     //     colDireita.clear()
     //     var options = colDireita.add(new innovaphone.ui1.Div(null, null, "divReportOptions"))
