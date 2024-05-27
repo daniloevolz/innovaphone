@@ -4541,9 +4541,17 @@ function getButtonTypeText(buttonType) {
             var filtredhistory = JSON.parse(data)
             var bgFilter = document.getElementById('bgFilter')
 
+            var infoBoxDiv = document.getElementById('infoBox')
+            var grafDiv = document.getElementById('grafDiv')
+
+            if (infoBoxDiv){
+                bgFilter.removeChild(infoBoxDiv)
+                bgFilter.removeChild(grafDiv)
+            }
             const infoBox = document.createElement("div")
             infoBox.id = "infoBox"
-            infoBox.classList.add("infobox")
+            infoBox.classList.add("infobox")    
+
 
             const sensorInfoBox = document.createElement("div")
             sensorInfoBox.id = "sensorInfoBox"
@@ -4574,8 +4582,9 @@ function getButtonTypeText(buttonType) {
                             sensorInfoBox.appendChild(sensorBox)
 
                             sensorBox.addEventListener("click", function(){
-                                if(document.getElementById('mygrafDiv')){
-                                    document.getElementById('mygrafDiv').remove()
+                                
+                                if(document.getElementById('grafDiv')){
+                                    document.getElementById('grafDiv').remove()
                                 }
                                 var clickBtm = document.querySelectorAll(".btmBox")
                                 clickBtm.forEach(function(b){
@@ -4589,7 +4598,6 @@ function getButtonTypeText(buttonType) {
                                 rows.forEach(function(r){
                                     xArray.push(r.date);
                                     yArray.push(r[key]);
-                                    console.log('ultima etapa',r[key])
                                 })
 
                                 reportGraph(xArray, yArray, key, 'Data', key)
