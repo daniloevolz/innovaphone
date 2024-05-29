@@ -3358,14 +3358,22 @@ select{
     /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
 }
 .bgFilter{
+    background: var(--Background-Bg-2, #141414);
     display: flex;
-    /* width: 650px; */
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    flex-direction: column;
+}
+.bgReport{
+    display: flex;
     padding: var(--Tamanhos-7, 24px) var(--Tamanhos-6, 20px);
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
     border-radius: var(--Tamanhos-2, 6px);
-    background: var(--Background-Bg-2, #141414);
+    background: var(--Background-Bg-2, #141414); 
 }
 .bgCategory{
     display: flex;
@@ -3425,11 +3433,12 @@ select{
     align-items: center;
     gap: 10px;
     border-radius: 8px;
-    background: var(--Buttons-ButtonScundary, #141414);
+    background: rgba(77, 77, 77, 0.377);
     width: 100%;
     height: 100%;
     position: absolute;
     justify-content: center;
+    backdrop-filter: blur(5px);
 }
 .bgSensor{
     display: flex;
@@ -3493,8 +3502,8 @@ select{
     background: var(--Background-Bg-4, #262626);
 }
 .bgInputDate{
-    width: 230px;
-    height: 200px;
+    width: 260px;
+    height: 230px;
     display: flex;
     padding: 30px;
     gap: 10px;
@@ -3517,6 +3526,18 @@ select{
     color: var(--text-Text-1, #FFF);
     justify-content: center;
 }
+.inputTime{
+    display: inline-flex;
+    padding: var(--Tamanhos-4, 12px);
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-radius: var(--Tamanhos-2, 6px);
+    /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
+    background: var(--Background-Bg-2, #141414);
+    color: var(--text-Text-1, #FFF);
+    justify-content: center;
+}
 /* Oculta o ícone padrão do calendário */
 input[type="date" i]::-webkit-calendar-picker-indicator {
     background-size: 15px;
@@ -3524,7 +3545,59 @@ input[type="date" i]::-webkit-calendar-picker-indicator {
     background-repeat: no-repeat;
     background-position: right center;
 }
+input[type="time" i]::-webkit-calendar-picker-indicator {
+    background-size: 15px;
+    background-image: url('./images/clock.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+table{
+    width: 100%;
+}
+.dataRow{
+    text-align: center;
+    display: flex;
+    padding: 10px;
+    vertical-align: middle;
+    background: var(--Neutro-1000, #262626);
+    margin: 10px;
+    justify-content: space-around;
+    border-radius: 10px;
+}
+.headerRow{
+    margin: 10px;
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    background: var(--Neutro-1200, #141414);
+    border-radius: 10px;
+}
+.tableContainer{
+    gap: 10px;
+    display: flex;
+    width: 100%;
+    align-self: stretch;
+    justify-content: space-around;
+}
 
+.tableContainer th{
+    font-size: 16px;
+    display: flex;
+    padding: 10px;
+    justify-content: space-around;
+    align-items: center;
+    font-weight: bold;
+    width: 100%
+}
+.tableContainer td{
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+}
 .setDate{
     display: flex;
     padding: 10px;
@@ -3532,6 +3605,7 @@ input[type="date" i]::-webkit-calendar-picker-indicator {
     gap: 10px;
     border-radius: 8px;
     background: var(--Background-Bg-2, #141414);
+    cursor: pointer;
     /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
 }
 .bgSelectedDate{
@@ -3554,7 +3628,8 @@ input[type="date" i]::-webkit-calendar-picker-indicator {
     gap: 10px;
     border-radius: 4px;
     background: var(--Buttons-ButtonDisable, #434343);
-    color: var(--text-TextBtnDisable, #8C8C8C);;
+    color: var(--text-TextBtnDisable, #8C8C8C);
+    cursor: pointer;
 }
 
 .confirmBtn{
@@ -3566,6 +3641,7 @@ input[type="date" i]::-webkit-calendar-picker-indicator {
     gap: 10px;
     border-radius: 4px;
     background: var(--Buttons-ButtonPrimary, #EA551F);
+    cursor: pointer;
 }
 .selectReporting{
     border-radius: 4px;
@@ -3579,6 +3655,7 @@ input[type="date" i]::-webkit-calendar-picker-indicator {
     gap: 10px;
     background: var(--Background-Bg-2, #141414);
     border-radius: 8px;
+    cursor: pointer;
     /* border: 1px solid var(--Background-Bg-4-inverted, #F0F0F0); */
 }
 .sensorCard{

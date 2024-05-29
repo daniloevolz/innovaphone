@@ -294,52 +294,82 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (obj.api == "admin" && obj.mt == "SelectFromReportsSuccess") {
             // reportsHitory = JSON.stringify(obj.result)
             // reportList(reportsHitory)
-            if(obj.src == "RptSensors"){
-                receivedFragments.push(obj.result);
-
-                if (obj.lastFragment) {
-                    
-                    // Todos os fragmentos foram recebidos
-                    var jsonData = receivedFragments.join("");
-    
-                    receivedFragments = [];
-                    // Faça o que quiser com os dados aqui
-                    sensorAnalyse(jsonData, obj.src)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                    //reportView(colDireita, jsonData, obj.src);
-                    // Limpe o array de fragmentos recebidos
-                    //receivedFragments = [];
-                }
-                //sensorAnalyse(obj.result, obj.src);
-                
+            if(obj.result === "[]"){
+                makePopup("Error", texts.text("noReport"))
             }else{
                 receivedFragments.push(obj.result);
 
                 if (obj.lastFragment) {
-                    
                     // Todos os fragmentos foram recebidos
                     var jsonData = receivedFragments.join("");
     
-                    // receivedFragments = [];
-                    // Faça o que quiser com os dados aqui
-                    reportList(jsonData, obj.src)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                    //reportView(colDireita, jsonData, obj.src);
-                    // Limpe o array de fragmentos recebidos
                     receivedFragments = [];
+                    // Faça o que quiser com os dados aqui
+                    if(obj.src == "RptSensors"){
+                        sensorAnalyse(jsonData, obj.src)
+                            .then(function (message) {
+                                console.log(message);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }else{
+                        reportList(JSON.parse(jsonData), obj.src)
+                            .then(function (message) {
+                                console.log(message);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
                 }
-                reportList(obj.result, obj.src);
             }
+            // if(obj.src == "RptSensors"){
+            //     receivedFragments.push(obj.result);
+
+            //     if (obj.lastFragment) {
+                    
+            //         // Todos os fragmentos foram recebidos
+            //         var jsonData = receivedFragments.join("");
+    
+            //         receivedFragments = [];
+            //         // Faça o que quiser com os dados aqui
+            //         sensorAnalyse(jsonData, obj.src)
+            //             .then(function (message) {
+            //                 console.log(message);
+            //             })
+            //             .catch(function (error) {
+            //                 console.log(error);
+            //             });
+            //         //reportView(colDireita, jsonData, obj.src);
+            //         // Limpe o array de fragmentos recebidos
+            //         //receivedFragments = [];
+            //     }
+            //     //sensorAnalyse(obj.result, obj.src);
+                
+            // }else{
+            //     receivedFragments.push(obj.result);
+
+            //     if (obj.lastFragment) {
+                    
+            //         // Todos os fragmentos foram recebidos
+            //         var jsonData = receivedFragments.join("");
+    
+            //         // receivedFragments = [];
+            //         // Faça o que quiser com os dados aqui
+            //         reportList(jsonData, obj.src)
+            //             .then(function (message) {
+            //                 console.log(message);
+            //             })
+            //             .catch(function (error) {
+            //                 console.log(error);
+            //             });
+            //         //reportView(colDireita, jsonData, obj.src);
+            //         // Limpe o array de fragmentos recebidos
+            //         receivedFragments = [];
+            //     }
+            //     //reportList(obj.result, obj.src);
+            // }
 
         }
         if (obj.api == "admin" && obj.mt == "DeleteFromReportsSuccess") {
@@ -3950,17 +3980,21 @@ function getButtonTypeText(buttonType) {
         var colDireita = document.getElementById('colDireita')
         colDireita.innerHTML = ""
 
-        var bgFilter = document.createElement('div')
-        bgFilter.classList.add('bgFilter')
-        bgFilter.id = 'bgFilter'
-    
+        var bgReport = document.createElement('div')
+        bgReport.classList.add('bgReport')
+        bgReport.id = 'bgReport'
+
         var text = document.createElement('h3')
         text.textContent = 'Filtro de relatório'
-    
+
         var bgCategory = document.createElement('div')
         bgCategory.classList.add('bgCategory')
         bgCategory.id = 'bgCategory'
-    
+
+        var bgFilter = document.createElement('div')
+        bgFilter.classList.add('bgFilter')
+        bgFilter.id = 'bgFilter'
+        
         var h4Category = document.createElement('h4')
         h4Category.textContent = "Categoria"
         
@@ -3975,53 +4009,48 @@ function getButtonTypeText(buttonType) {
                 console.log("Categoria clicada", cat.id)
                 switch (cat.id) {
                     case "RptAvailability":
-                        if(!document.getElementById("bgUser")){
-                            usersSelect(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        usersSelect(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                     case "RptCalls":
-                        if(!document.getElementById("bgUser")){
-                            usersSelect(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        usersSelect(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                     case "RptActivities":
-                        if(!document.getElementById("bgUser")){
-                            usersSelect(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        usersSelect(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                     case "RptSensors":
-                        if(!document.getElementById("bgSensor")){
-                            getSensor(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        getSensor(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                     case "RptMessages":
-                        if(!document.getElementById("bgChat")){
-                            usersSelect(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        usersSelect(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                     default:
-                        if(!document.getElementById("bgAll")){
-                            usersSelect(bgFilter)
-                            getSensor(bgFilter)
-                            dateSelect(bgFilter)
-                            buttonsReport(bgFilter, cat.id)
-                        }
+                        bgFilter.innerHTML =''
+                        usersSelect(bgFilter)
+                        getSensor(bgFilter)
+                        dateSelect(bgFilter)
+                        buttonsReport(bgFilter, cat.id)
                         break;
                 }
                 
                 category.forEach(function(cat){
                     var catToRemSelec = document.getElementById(cat.id) 
                     catToRemSelec.classList.remove('selectReporting')
+                    
                 })
     
                 btnCateg.classList.add("selectReporting")
@@ -4032,14 +4061,12 @@ function getButtonTypeText(buttonType) {
     
     
     
-        bgFilter.appendChild(text)
+        bgReport.appendChild(text)
         
-        bgFilter.appendChild(bgCategory)
-    
-    
-    
-        colDireita.appendChild(bgFilter)
-        
+        bgReport.appendChild(bgCategory)
+        bgReport.appendChild(bgFilter)
+        colDireita.appendChild(bgReport)
+                
     }
     function buttonsReport(bgFilter, reportID){
         var bgButtons = document.createElement('div')
@@ -4049,12 +4076,18 @@ function getButtonTypeText(buttonType) {
         var clearBtn = document.createElement('div')
         clearBtn.classList.add('clearBtn')
         clearBtn.id = 'clearBtn'
-        clearBtn.textContent = "Limpar"
-    
+
+        var h4Clear = document.createElement('h4')
+        h4Clear.textContent = "Limpar"
+        clearBtn.appendChild(h4Clear)
+
         var confirmBtn = document.createElement('div')
         confirmBtn.classList.add('confirmBtn')
         confirmBtn.id = 'confirmBtn'
-        confirmBtn.textContent = "Filtar"
+
+        var h4Confirm = document.createElement('h4')
+        h4Confirm.textContent = "Filtrar"
+        confirmBtn.appendChild(h4Confirm)
     
         confirmBtn.addEventListener('click',function(){
             var selectedUsers = document.querySelectorAll('.userCard')
@@ -4067,9 +4100,12 @@ function getButtonTypeText(buttonType) {
             selectedSensors.forEach(function(evt){
                 sensors.push(evt.id)
             })
-            var from = document.getElementById('firstDate').textContent.replace(' ', 'T')
-            var to = document.getElementById('lastDate').textContent.replace(' ', 'T')
-    
+            var firstDate = document.getElementById('firstDate').textContent.replace(' ', 'T')
+            var lastDate = document.getElementById('lastDate').textContent.replace(' ', 'T')
+      
+            var from = convertLocalToUTC(firstDate)
+            var to = convertLocalToUTC(lastDate)
+
             console.log('app.send(report)', reportID)
             console.log('app.send(users)', users)
             console.log('app.send(sensors)', sensors)
@@ -4078,29 +4114,26 @@ function getButtonTypeText(buttonType) {
     
             switch (reportID) {
                 case 'RptSensors':
-                    //sensorAnalyse(sensorHistory)
                     app.send({ api: "admin", mt: "SelectFromReports", sensor: sensors, from: from, to: to, src: reportID });
                     break;
                 case 'RptAvailability':
-                    
-                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
                 break;
                 case 'RptActivities':
                     //AJUSTAR EVENTS
-                    reportList(dummy1)
-                    //app.send({ api: "admin", mt: "SelectFromReports", event: events, from: from, to: to, src: reportID });
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
                 break;
                 case 'RptCalls':
                     //AJUSTAR CALLS
-                    //app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
+                    app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
                 break;
                 case 'RptMessages':
                     //AJUSTAR MENSSAGES
-                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
                 break;
                 case 'RptAll':
                     //AJUSTAR MENSSAGES
-                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, from: from, to: to, src: reportID });
+                    //app.send({ api: "admin", mt: "SelectFromReports", guid: users, sensor: sensors, number: number, from: from, to: to, src: reportID });
                 break;
                 default:
                     break;
@@ -4116,6 +4149,11 @@ function getButtonTypeText(buttonType) {
             })
             document.getElementById('firstDate').remove()
             document.getElementById('lastDate').remove()
+            document.getElementById('infoBox').remove()
+            document.getElementById('grafDiv').remove()
+            document.querySelectorAll('.selectSensor').forEach(function(evt){
+                evt.classList.remove('selectSensor')
+            })
         })
         bgButtons.appendChild(clearBtn)
         bgButtons.appendChild(confirmBtn)
@@ -4173,7 +4211,7 @@ function getButtonTypeText(buttonType) {
     
         var optAll = document.createElement('option');
         optAll.textContent = "Todos";
-        optAll.id = 'allUsers'
+        //optAll.id = 'allUsers'
         
         selectUsers.appendChild(optAll);
     
@@ -4292,8 +4330,8 @@ function getButtonTypeText(buttonType) {
             var ajustedHour = inputTime.value
             console.log('Data clicada', ajustedDate + "T" + ajustedHour)
     
-            if (inputDate.value == "" ){
-                window.alert("SET DATE")
+            if (inputDate.value == "" ||  inputTime.value == ''){
+                makePopup(texts.text('labelWarning'),texts.text("date"))
             }else{
                 setDate(inputDate.value + " " + ajustedHour)
                 if (event.target === btnConfirm) {
@@ -4397,27 +4435,7 @@ function getButtonTypeText(buttonType) {
     
         var h4Sensor = document.createElement('h4');
         h4Sensor.textContent = "Sensores";
-    
-        // var selectSensor = document.createElement('select');
-        // selectSensor.id = 'selectSensor';
-     
-        // var optSelect = document.createElement('option');
-        // optSelect.textContent = "Selecione";
-        
-        // var optAll = document.createElement('option');
-        // optAll.textContent = "Todos";
-        // optAll.id = 'allSensors';
-    
-        // selectSensor.appendChild(optSelect);
-        // selectSensor.appendChild(optAll);
-        // console.log("ERICK NAME SENSORS",list_sensors_name)
-    
-        // list_sensors_name.forEach(function (s) {
-        //     var optSensor = document.createElement('option');
-        //     optSensor.textContent = s.sensor_name;
-        //     optSensor.id = s.sensor_name;
-        //     selectSensor.appendChild(optSensor);
-        // });
+
         var sensorSelected = document.createElement('div');
         sensorSelected.classList.add('sensorSelectedDIV');
     
@@ -4454,9 +4472,9 @@ function getButtonTypeText(buttonType) {
         
     }
     function reportList(history, objSrc){
-        console.log('reportList history', history)
+        console.log('reportList history', JSON.stringify(history))
         console.log('reportList objSrc', objSrc)
-    
+        
         var colRight = document.getElementById('colDireita')
         colRight.innerHTML = ''
     
@@ -4465,37 +4483,53 @@ function getButtonTypeText(buttonType) {
         var tableContainer = document.createElement('div')
         tableContainer.id = "table-container"
         tableContainer.classList.add('tableContainer')
-    
+        if(tableContainer){
+            tableContainer.innerHTML = ''
+        }
         var table = document.createElement('table')
         table.id = "table"
         table.classList.add('table')
     
         var headerRow = document.createElement('tr')
-
-        
-
-        for (let key in history[0]) {
-            console.log('ACESSO FOR')
+        headerRow.classList.add('headerRow')
+        for (const key in history[0]) {
+            console.log('ACESSO FOR', key)
             if (history[0].hasOwnProperty(key)){
                 console.log('KEY IN HISTORY', key + ': ' + history[0][key]);
                 if(key !== null){
                     const th = document.createElement('th');
-                    th.textContent = key;
+                    th.textContent = texts.text(key);
+                    
                     headerRow.appendChild(th);
                 }
             }
     
-        }a
+        }
         table.appendChild(headerRow)
         // Create table data rows
         history.forEach(function(h){
             console.log("row", h)
             const dataRow = document.createElement('tr');
+            dataRow.classList.add("dataRow")
             // Para cada chave do objeto, criamos uma célula <td> e atribuímos o valor correspondente
             Object.keys(h).forEach(function(key) {
-                const td = document.createElement('td');
-                td.textContent = h[key];
-                dataRow.appendChild(td);
+                if(key == 'guid'){
+                    var u = list_users.filter(function (u){
+                        return u.guid == h[key]
+                    })[0]
+                    const td = document.createElement('td');
+                    td.textContent = u.cn;
+                    dataRow.appendChild(td);
+                }else if(key == 'date' || key.startsWith('call_')){
+                    const td = document.createElement('td');
+                    td.textContent = convertUTCToLocalTime(h[key]);
+                    dataRow.appendChild(td);
+                }else{
+                    const td = document.createElement('td');
+                    td.textContent = h[key];
+                    dataRow.appendChild(td);
+                }
+                
             });
             table.appendChild(dataRow);
         });
@@ -4539,11 +4573,12 @@ function getButtonTypeText(buttonType) {
             try {
             console.log(JSON.stringify(data))
             var filtredhistory = JSON.parse(data)
-            var bgFilter = document.getElementById('bgFilter')
 
+            var bgFilter = document.getElementById('bgFilter')
             var infoBoxDiv = document.getElementById('infoBox')
             var grafDiv = document.getElementById('grafDiv')
-
+            
+            // remove div elementos criados para filtro
             if (infoBoxDiv){
                 bgFilter.removeChild(infoBoxDiv)
                 bgFilter.removeChild(grafDiv)
@@ -4552,22 +4587,24 @@ function getButtonTypeText(buttonType) {
             infoBox.id = "infoBox"
             infoBox.classList.add("infobox")    
 
-
-
             const sensorInfoBox = document.createElement("div")
             sensorInfoBox.id = "sensorInfoBox"
             sensorInfoBox.classList.add("sensorInfoBox")
-            
-            for (const sensor in filtredhistory) {
+            // Criação da grade de opções para o gráfico
+            for (const sensor in filtredhistory) { // Recebe o nome dos sensores solicitados
+                // cria o H2 que mostra o nome do sensor recebido                
                 var h2Sensor = document.createElement('h2')
                 h2Sensor.textContent = sensor
 
                 infoBox.appendChild(h2Sensor)
+                
                 if (filtredhistory.hasOwnProperty(sensor)) {
+                    // recebe os lançamentos do sensor e armazena
                     const rows = filtredhistory[sensor];
 
                     for (const key in rows[0]) {
-                        
+                        // cria a grade de parâmetros para seleceionar no gráfico
+
                         if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && rows[0][key] !== null){
                             const sensorBox = document.createElement("div")
                             sensorBox.id = "sensorBox"
@@ -4602,35 +4639,19 @@ function getButtonTypeText(buttonType) {
                                 var yArray = []
 
                                 rows.forEach(function(r){
-                                    xArray.push(r.date);
+                                    xArray.push(convertUTCToLocalTime(r.date));
                                     yArray.push(r[key]);
                                 })
 
-                                reportGraph(xArray, yArray, rows[0].sensor_name + ' - ' + key, 'Data', key)
+                                reportGraph(xArray, yArray, key, 'Data', key)
                             })
 
                         }
                        
                         infoBox.appendChild(sensorInfoBox)
                     }
-                    // for (const row of rows) {
-                    //     const entries = Object.entries(categoria);
-                    //     const keyValues = entries.map(([key, value]) => `${key}`, `${value}`).join(', ');
-                    //     console.log(keyValues);
-                    // }
                 }
             }
-
-            for (const sensor in filtredhistory) {
-                if (filtredhistory.hasOwnProperty(sensor)) {
-                    console.log(sensor);
-
-                    
-                    
-                }
-            }
-            
-
             
             bgFilter.appendChild(infoBox)
             resolve('success')
@@ -5241,7 +5262,36 @@ function getButtonTypeText(buttonType) {
         return input;
     
     }
+    function convertUTCToLocalTime(utcString) {
+        // Parse the UTC string into a Date object
+        const utcDate = new Date(utcString);
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+
+        utcDate.setUTCMinutes(utcDate.getUTCMinutes() - clientTimeZoneOffset);
+        // Get the local time components
+        const localHours = utcDate.getHours().toString().padStart(2, '0');
+        const localMinutes = utcDate.getMinutes().toString().padStart(2, '0');
+        const localSeconds = utcDate.getSeconds().toString().padStart(2, '0');
+        const localDay = utcDate.getDate().toString().padStart(2, '0');
+        const localMonth = (utcDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+        const localYear = utcDate.getFullYear();
+
+        // Format the local time string
+        const localTimeString = `${localHours}:${localMinutes}:${localSeconds} ${localDay}/${localMonth}/${localYear}`;
+
+        return localTimeString;
+    }
+    function convertLocalToUTC(localDateString) {
+
+        //var clientTimeZoneOffset = new Date().getTimezoneOffset();
     
+        // Parse the local date string into a Date object
+        const localDate = new Date(localDateString);
+        //localDate.setUTCMinutes(localDate.getUTCMinutes());
+    
+        var dateString = localDate.toISOString();
+        return dateString.slice(0, -5);
+    }
 }
 
 Wecom.novaalertAdmin.prototype = innovaphone.ui1.nodePrototype;
