@@ -4129,7 +4129,7 @@ function getButtonTypeText(buttonType) {
                     //AJUSTAR CALLS
                     console.log('app.send(sensors)', number)
                     var number = document.getElementById('inputCall').value
-                    app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
+                    app.send({ api: "admin", mt: "SelectFromReports", guid: users, number: number, from: from, to: to, src: reportID });
                 break;
                 case 'RptMessages':
                     //AJUSTAR MENSSAGES
