@@ -2731,35 +2731,35 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 var colDireita = document.getElementById("colDireita")
 
                 var html = `
-            <div class = "mainDivTableAction" style = "width: 100%; ">
-            <div class = "divHeaderTableActions">
-            <div>${texts.text("labelCfgAcctions")}</div>
-            <select id="selectUserModal" class="genericInputs">
-            <option value="">${texts.text("labelSelectUser")}</option>
-            </select>
-            <div id = "btnCreate">${makeButton(texts.text("btnAddAction"), "primary")}</div>
-            </div>
-            <br>
-            <div class = "tableActionDiv" id = "tableActionDiv">
-            <table id = "tableAction" >
-            <thead>
-                <tr>
-                <th class = "thAction">${texts.text("labelID")}</th>
-                <th class = "thAction">${texts.text("cabecalho1")}</th>
-                <th class = "thAction">${texts.text("cabecalho2")}</th>
-                <th class = "thAction">${texts.text("cabecalhoAction3")}</th>
-                <th class = "thAction">${texts.text("cabecalhoAction4")}</th>
-                <th class = "thAction">${texts.text("labelAction")}</th>
-                <th class = "thAction">${texts.text("labelUser")}</th>
-                <th class = "thAction"><img src = "./images/star.svg" style = "35px" > </img></th>
-                </tr>
-            </thead>
-            <tbody id = "tbodyAction">
-            </tbody>
-            </table>
-            </div>
-            </div>
-            `
+                    <div class = "mainDivTableAction" style = "width: 100%; ">
+                    <div class = "divHeaderTableActions">
+                    <div>${texts.text("labelCfgAcctions")}</div>
+                    <select id="selectUserModal" class="genericInputs">
+                    <option value="">${texts.text("labelSelectUser")}</option>
+                    </select>
+                    <div id = "btnCreate">${makeButton(texts.text("btnAddAction"), "primary")}</div>
+                    </div>
+                    <br>
+                    <div class = "tableActionDiv" id = "tableActionDiv">
+                    <table id = "tableAction" >
+                    <thead>
+                        <tr>
+                        <th class = "thAction">${texts.text("labelID")}</th>
+                        <th class = "thAction">${texts.text("labelName")}</th>
+                        <th class = "thAction">${texts.text("labelParameter")}</th>
+                        <th class = "thAction">${texts.text("labelAlarmCode")}</th>
+                        <th class = "thAction">${texts.text("labelValue")}</th>
+                        <th class = "thAction">${texts.text("labelAction")}</th>
+                        <th class = "thAction">${texts.text("labelUser")}</th>
+                        <th class = "thAction"><img src = "./images/star.svg" style = "35px" > </img></th>
+                        </tr>
+                    </thead>
+                    <tbody id = "tbodyAction">
+                    </tbody>
+                    </table>
+                    </div>
+                    </div>
+                `
 
                 colDireita.innerHTML += html;
 
@@ -4017,6 +4017,7 @@ function getButtonTypeText(buttonType) {
                     case "RptCalls":
                         bgFilter.innerHTML =''
                         usersSelect(bgFilter)
+                        callnumber(bgFilter)
                         dateSelect(bgFilter)
                         buttonsReport(bgFilter, cat.id)
                         break;
@@ -4039,11 +4040,10 @@ function getButtonTypeText(buttonType) {
                         buttonsReport(bgFilter, cat.id)
                         break;
                     default:
-                        bgFilter.innerHTML =''
-                        usersSelect(bgFilter)
-                        getSensor(bgFilter)
-                        dateSelect(bgFilter)
-                        buttonsReport(bgFilter, cat.id)
+                        bgFilter.innerHTML = ''
+                        var noImplemented = document.createElement('h2')
+                        noImplemented.textContent = texts.text('noImplemented')
+                        bgFilter.appendChild(noImplemented)
                         break;
                 }
                 
@@ -4102,13 +4102,15 @@ function getButtonTypeText(buttonType) {
             })
             var firstDate = document.getElementById('firstDate').textContent.replace(' ', 'T')
             var lastDate = document.getElementById('lastDate').textContent.replace(' ', 'T')
-      
+            
+
             var from = convertLocalToUTC(firstDate)
             var to = convertLocalToUTC(lastDate)
 
             console.log('app.send(report)', reportID)
             console.log('app.send(users)', users)
             console.log('app.send(sensors)', sensors)
+
             console.log('app.send(from)', from)
             console.log('app.send(to)', to)
     
@@ -4125,6 +4127,8 @@ function getButtonTypeText(buttonType) {
                 break;
                 case 'RptCalls':
                     //AJUSTAR CALLS
+                    console.log('app.send(sensors)', number)
+                    var number = document.getElementById('inputCall').value
                     app.send({ api: "admin", mt: "SelectFromReports", number: number, from: from, to: to, src: reportID });
                 break;
                 case 'RptMessages':
@@ -4206,11 +4210,11 @@ function getButtonTypeText(buttonType) {
         selectUsers.id = 'selectUsers';
     
         var optUsers = document.createElement('option');
-        optUsers.textContent = "Selecione";
+        optUsers.textContent = texts.text('labelSelectUser');
         selectUsers.appendChild(optUsers);
     
         var optAll = document.createElement('option');
-        optAll.textContent = "Todos";
+        optAll.textContent = texts.text('all');
         //optAll.id = 'allUsers'
         
         selectUsers.appendChild(optAll);
@@ -4286,6 +4290,26 @@ function getButtonTypeText(buttonType) {
         bgSelectedUsers.id = 'bgSelectedUsers';
     
         bgFilter.appendChild(bgUser)
+    }
+    function callnumber(bgFilter){
+
+        var bgCall = document.createElement('div')
+        bgCall.classList.add('bgCall')
+    
+        var h4Call = document.createElement('h4');
+        h4Call.textContent = "Parâmetro";
+    
+        var inputCall = document.createElement('input')
+        inputCall.type = 'text'
+        inputCall.classList.add('genericInputs')
+        inputCall.id = 'inputCall'
+        inputCall.style.backgroundColor = '#141414'
+        inputCall.placeholder = texts.text('labelNumber') +' / ' + "SIP"
+
+        bgCall.appendChild(h4Call)
+        bgCall.appendChild(inputCall)
+        bgFilter.appendChild(bgCall)
+
     }
     function getDate(){
     
@@ -4513,12 +4537,12 @@ function getButtonTypeText(buttonType) {
             dataRow.classList.add("dataRow")
             // Para cada chave do objeto, criamos uma célula <td> e atribuímos o valor correspondente
             Object.keys(h).forEach(function(key) {
-                if(key == 'guid'){
+                if(key == 'guid' || key == 'from_guid'|| key == 'to_guid'){
                     var u = list_users.filter(function (u){
                         return u.guid == h[key]
                     })[0]
                     const td = document.createElement('td');
-                    td.textContent = u.cn;
+                    td.textContent = h.guid == 'undefined'? texts.text('labelInsertError') : u.cn;
                     dataRow.appendChild(td);
                 }else if(key == 'date' || key.startsWith('call_')){
                     const td = document.createElement('td');

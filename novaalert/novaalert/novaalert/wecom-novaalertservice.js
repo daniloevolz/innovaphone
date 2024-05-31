@@ -1114,7 +1114,7 @@ new JsonApi("admin").onconnected(function (conn) {
                                 conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
                             });
                         break;
-                        case "RptSensors":
+                    case "RptSensors":
                             var query;
                             // Criar um objeto para armazenar os resultados organizados por sensor_name
                             const sensorResults = {};
@@ -1217,14 +1217,18 @@ new JsonApi("admin").onconnected(function (conn) {
                                     });
                             break;
                     case "RptMessages":
-                        var query = "SELECT id, chat_id, from_guid, to_guid, date, msg FROM tbl_messages";
+                        var query = "SELECT id, from_guid, to_guid, date, msg, delivered, read FROM tbl_messages";
                         var conditions = [];
                         //if (obj.guid) conditions.push("guid ='" + obj.guid + "'");
                         if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
-                            var guidConditions = obj.guid.map(function (guid) {
-                                return "guid ='" + guid + "'";
+                            var guidConditions1 = obj.guid.map(function (guid) {
+                                return "from_guid ='" + guid + "'";
                             });
-                            conditions.push("(" + guidConditions.join(" OR ") + ")");
+                            var guidConditions2 = obj.guid.map(function (guid) {
+                                return "to_guid ='" + guid + "'";
+                            });
+                            conditions.push("(" + guidConditions1.join(" OR ") + ")");
+                            conditions.push("(" + guidConditions2.join(" OR ") + ")");
                         }
                         if (obj.from) conditions.push("date >'" + obj.from + "'");
                         if (obj.to) conditions.push("date <'" + obj.to + "'");

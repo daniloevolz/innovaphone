@@ -409,8 +409,8 @@ embed {
     gap: 10px;
 }
 .sensorBox{
-    width: 160px;
-    height: 75px;
+    width: 140px;
+    height: 65px;
     display: flex;
     flex-direction: column;
     border-radius: 6px;
@@ -3405,6 +3405,15 @@ select{
     flex-wrap: wrap;
     gap: 10px;
 }
+.bgCall{
+    display: flex;
+    padding: 10px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: var(--Background-Bg-4, #262626);
+    gap: 10px;
+    align-items: center;
+}
 .bgComp{
     display: flex;
     padding: 10px;
@@ -3491,6 +3500,17 @@ select{
     border: 1px solid var(--Buttons-ButtonGhost, #B62F18);
     color: var(--text-Text-1, #B62F18);
     cursor: pointer;
+}
+.input[type="text" i]{
+    color: var(--text-Text-1, #FFF);
+    display: flex;
+    padding: 12px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    width: 100%;
+    border: 1px solid var(--Background-Bg-4, #262626);
+    background: var(--Background-Bg-3, #141414);
 }
 .bgDate{
     display: flex;
@@ -3585,7 +3605,7 @@ table{
 .tableContainer th{
     font-size: 16px;
     display: flex;
-    padding: 10px;
+    padding: 4px;
     justify-content: space-around;
     align-items: center;
     font-weight: bold;
@@ -3593,9 +3613,8 @@ table{
 }
 .tableContainer td{
     width: 100%;
-    font-size: 14px;
+    font-size: 16px;
     display: flex;
-    padding: 10px;
     justify-content: center;
 }
 .setDate{
