@@ -1325,6 +1325,11 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 document.getElementById(id).classList.remove("neutro-800");
                 document.getElementById(id).classList.add("vermelho-900");
             }
+            if (btn.button_type == "combo") {
+                app.send({ api: "user", mt: "TriggerCombo", prt: String(btn.button_prt), btn_id: String(btn.id) })
+                document.getElementById(id).classList.remove("neutro-800");
+                document.getElementById(id).classList.add("vermelho-900");
+            }
             button_clicked.push(btn);
             console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             
@@ -1777,7 +1782,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         const timestampDiv = document.createElement("div")
                         timestampDiv.id = "timestampDiv"
                         timestampDiv.classList.add("timestampDiv")
-                        timestampDiv.innerHTML = m.date
+                        timestampDiv.innerHTML = convertUTCToLocalTime(m.date)
 
 
                         chatDiv.appendChild(messageDiv)
@@ -1949,6 +1954,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
+    function convertUTCToLocalTime(utcString) {
+        // Parse the UTC string into a Date object
+        const utcDate = new Date(utcString);
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+
+        utcDate.setUTCHours(utcDate.getUTCHours() + clientTimeZoneOffset);
+        // Get the local time components
+        const localHours = utcDate.getHours().toString().padStart(2, '0');
+        const localMinutes = utcDate.getMinutes().toString().padStart(2, '0');
+        const localSeconds = utcDate.getSeconds().toString().padStart(2, '0');
+        const localDay = utcDate.getDate().toString().padStart(2, '0');
+        const localMonth = (utcDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+        const localYear = utcDate.getFullYear();
+
+        // Format the local time string
+        const localTimeString = `${localHours}:${localMinutes}:${localSeconds} ${localDay}/${localMonth}/${localYear}`;
+
+        return localTimeString;
+    }
+
+
     function updatePageButtons() {
         var divPrincipal = document.getElementById("divMainButtons")
         var page = divPrincipal.getAttribute("page")
