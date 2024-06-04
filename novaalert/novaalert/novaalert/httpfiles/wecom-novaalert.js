@@ -1959,7 +1959,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         const utcDate = new Date(utcString);
         var clientTimeZoneOffset = new Date().getTimezoneOffset();
 
-        utcDate.setUTCHours(utcDate.getUTCHours() + clientTimeZoneOffset);
+        utcDate.setUTCHours(utcDate.getUTCHours() - clientTimeZoneOffset);
         // Get the local time components
         const localHours = utcDate.getHours().toString().padStart(2, '0');
         const localMinutes = utcDate.getMinutes().toString().padStart(2, '0');

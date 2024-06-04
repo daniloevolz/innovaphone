@@ -926,6 +926,7 @@ embed {
     overflow: hidden;
     width: 228px;
     position: relative;
+    cursor:pointer;
   }
 
   .CenterDiv .sensorBtnDiv {

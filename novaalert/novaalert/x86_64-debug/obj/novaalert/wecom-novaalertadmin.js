@@ -1820,8 +1820,8 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
         if (String(iptName) == "" || String(type) == "") {
             makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
         } else {
-            waitConnection(t1);
-            app.send({ api: "admin", mt: "InsertMessageSrc", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y, src: user }, function (obj) {
+            //waitConnection(t1);
+            app.sendSrc({ api: "admin", mt: "InsertMessageSrc", name: String(iptName), user: String(""), value: String(iptParam), guid: String(user), type: String(type), page: z, x: x, y: y, src: user }, function(obj) {
                 list_buttons = JSON.parse(obj.result)
                 createGridZero(type, user)
 
@@ -2292,7 +2292,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     makePopup("Atenção", "Complete todos os campos para que o botão possa ser criado.");
                 } else {
                     app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type) });
-                    waitConnection(t1);
+                    //waitConnection(t1);
                 }
             });
             //Botão Cancelar   
@@ -2396,7 +2396,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 }
                 else if (type == "number") {
                     app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), device: device });
-                    waitConnection(t1);
+                    //waitConnection(t1);
                 }
             });
             //Botão Cancelar   
@@ -2513,7 +2513,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                 }
                 else {
                     app.send({ api: "admin", mt: "UpdateMessage", id: button.id, name: String(iptName.getValue()), user: String(""), value: String(value), sip: String(user), type: String(type), device: device });
-                    waitConnection(t1);
+                    //waitConnection(t1);
                 }
             });
             //Botão Cancelar   
@@ -2675,7 +2675,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     var selectedOption = type4.options[type4.selectedIndex];
                     var type4 = selectedOption.id;
                     app.send({ api: "admin", mt: "InsertComboMessage", name: String(iptName.getValue()), user: String(""), value: String(iptValue.getValue()), sip: String(user), type: String(type), type1: String(type1), type2: String(type2), type3: String(type3), type4: String(type4) });
-                    waitConnection(t1);
+                    //waitConnection(t1);
                 }
             });
 

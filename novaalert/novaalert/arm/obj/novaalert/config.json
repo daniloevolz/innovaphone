@@ -12,7 +12,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
@@ -59,7 +59,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
@@ -96,7 +96,7 @@
           },
           {
             "cmd": "column",
-            "name": "sip",
+            "name": "guid",
             "type": "VARCHAR(120) NOT NULL"
           },
           {
@@ -361,6 +361,55 @@
           {
             "cmd": "column",
             "name": "date",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "cmd": "table",
+        "name": "tbl_messages",
+        "init": [
+          {
+            "cmd": "column",
+            "name": "id",
+            "type": "BIGSERIAL PRIMARY KEY NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "chat_id",
+            "type": "VARCHAR(120) NOT NULL"
+          },
+          {
+            "cmd": "column",
+            "name": "from_guid",
+            "type": "VARCHAR(120) NOT NULL"
+
+          },
+          {
+            "cmd": "column",
+            "name": "to_guid",
+            "type": "VARCHAR(120) NOT NULL"
+
+          },
+          {
+            "cmd": "column",
+            "name": "date",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "msg",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "delivered",
+            "type": "text"
+          },
+
+          {
+            "cmd": "column",
+            "name": "read",
             "type": "text"
           }
         ]

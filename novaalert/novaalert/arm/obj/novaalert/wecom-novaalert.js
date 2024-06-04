@@ -7,6 +7,7 @@
 
 var Wecom = Wecom || {};
 Wecom.novaalert = Wecom.novaalert || function (start, args) {
+    
     this.createNode("body");
     var that = this;
 
@@ -51,10 +52,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var divButtonsMain;
     var divOptionsMain;
     var zoneDiv;
+    var player = null;
 
     var scroll;
     var popup;
     var teste;
+    var list_active_alarms = [];
     var button_clicked = [];
     var list_users = [];
     var list_buttons = [];
@@ -68,10 +71,12 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         { id: 'map', img: './images/location.svg'}, 
         { id: 'sensor', img: './images/wifi.svg'}, 
         { id: 'radio', img: './images/warning.svg'},
-        { id: 'video', img: './images/camera.svg'}
+        { id: 'video', img: './images/camera.svg'},
+        { id: 'chat' , img: './images/chat.svg'}
     ]
 
     function app_connected(domain, user, dn, appdomain) {
+        app.send({api: "user", mt: "TableUsers"}); //Requisita a lista de usuarios do PBX
         app.send({api: "user", mt: "SelectSensorInfo"})
         app.send({api: "user", mt: "SelectSensorName"})
         userUI = user;
@@ -127,7 +132,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     var buttonClicked = function (evt) {
         // Dentro do objeto evt esta o target, e o target tem um value:
-        
         var type = evt.currentTarget.attributes['button_type'].value;
         var prt = evt.currentTarget.attributes['button_prt'].value;
         //var btn_id = evt.currentTarget.attributes['button_id'].value;
@@ -139,7 +143,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         //    var prt_user = "";
         //}
         var name = evt.currentTarget.innerText;
-        updateScreen(id, name.split("\n")[0], type, prt);
+        //updateScreen(id, name.split("\n")[0], type, prt);
+        updateScreen(id);
     };
     function findById(id) {
         return function (value) {
@@ -162,6 +167,34 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
     
     function app_message(obj) {
+        if (obj.api == "user" && obj.mt == "Message") {
+
+            popChatMessages(obj.msg)
+        }
+        if (obj.api == "user" && obj.mt == "ChatDelivered") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatDelivered")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+            
+        }
+        if (obj.api == "user" && obj.mt == "ChatRead") {
+            try {
+                document.getElementById("statusDiv_" + obj.id).classList.remove("chatDelivered")
+                document.getElementById("statusDiv_" + obj.id).classList.add("chatRead")
+            } catch (e) {
+                console.log("Objeto do chat não está disponível!")
+
+            } finally {
+
+            }
+
+        }
+
         if (obj.api == "user" && obj.mt == "UserSessionResult") {
             console.log(obj.session);
             session = obj.session;
@@ -189,6 +222,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.result);
             list_buttons = JSON.parse(obj.result);
             popButtons(list_buttons,1); //Cria os botões na tela
+            popBottomButtons(list_buttons)
             leftBottomButons()
             createGridZero("floor")
                 .then(function (message) {
@@ -197,7 +231,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 .catch(function (error) {
                     console.log("createGridZero" + error);
                 });
-            app.send({api: "user", mt: "TableUsers"}); //Requisita a lista de usuarios do PBX
             app.send({ api: "user", mt: "UserPresence" }); //Requisita a lista de ususários conectados
         }
         if (obj.api == "user" && obj.mt == "TableUsersResult") {
@@ -248,17 +281,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "AlarmSuccessTrigged") {
             try {
-                button_clicked = button_clicked.filter(deleteById(obj.btn_id));
-                var clicked = document.getElementById(obj.btn_id);
-                var elemento = document.getElementById(obj.btn_id)
-                elemento.children[0].classList.add("gold-900")
-                elemento.children[1].classList.add("gold-600")
+
+                // Supondo que list_active_alarms e obj.alarm já estejam definidos
+                list_active_alarms = list_active_alarms.filter(function (a) {
+                    return a.trim() !== obj.alarm.trim();
+                });
+
+                console.log("danilo req:AlarmSuccessTrigged Alarme removido da lista list_active_alarms: "+list_active_alarms);
+                updateDeactiveAlarmButtons()
+
+                // button_clicked = button_clicked.filter(deleteById(obj.btn_id));
+                // var clicked = document.getElementById(obj.btn_id);
+                // var elemento = document.getElementById(obj.btn_id)
+                // elemento.children[0].classList.add("gold-900")
+                // elemento.children[1].classList.add("gold-600")
             } catch {
                 console.log("danilo req: Alarme acionado não estava ativo no botão.");
                 
             } finally {
                 //addNotification("out", "Alarme " + obj.alarm);
-                addNotification("alarm", 'out', obj.alarm, obj.from, obj.to)
+                var user = list_users.filter(function (u) { return u.guid == obj.from })[0]
+                addNotification('alarm', 'inc', obj.alarm, user.cn, obj.to)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -289,61 +332,18 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "AlarmReceived") {
             console.log(obj.alarm);
+
             try {
-                var button_found = [];
-                list_buttons.forEach(function (l) {
-                    if (l.button_prt == obj.alarm) {
-                        button_found.push(l);
-                    }
-                })
-
-                var hasClicked = button_clicked.filter(function (b) { return b.button_prt == obj.alarm })
-                if (hasClicked.length==0) {
-                    // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                    var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
-
-                    // Percorre cada elemento encontrado
-                    for (var i = 0; i < elementos.length; i++) {
-                        var elemento = elementos[i];
-                        elemento.children[0].classList.remove("gold-900")
-                        elemento.children[1].classList.remove("gold-600")
-                        elemento.children[0].classList.add("vermelho-900")
-                        elemento.children[1].classList.add("vermelho-600")
-                        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
-                    }
-                }
-                //var clicked = document.getElementById(obj.alarm);
-                //document.getElementById(obj.alarm).style.backgroundColor = "darkred";
-
-                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
-                //var elementos = document.querySelectorAll('[button_prt="' + obj.alarm + '"]');
-
-                //// Percorre cada elemento encontrado
-                //for (var i = 0; i < elementos.length; i++) {
-                //    var elemento = elementos[i];
-
-                //    // Altera as características do elemento
-                //    if(elemento.children[0].classList.contains("vermelho-900") && elemento.children[1].classList.contains("vermelho-600")){
-                //        //elemento.children[0].classList.remove("vermelho-900")
-                //        //elemento.children[1].classList.remove("vermelho-600")   
-                //        //elemento.children[0].classList.add("gold-900")
-                //        //elemento.children[1].classList.add("gold-600")
-                //        //button_clicked = button_clicked.filter(button => button.id != elemento.id);
-
-                //    }else{
-                //        elemento.children[0].classList.remove("gold-900")
-                //        elemento.children[1].classList.remove("gold-600")
-                //        elemento.children[0].classList.add("vermelho-900")
-                //        elemento.children[1].classList.add("vermelho-600")
-                //        button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: obj.alarm });
-                //    }
-                //}
+                list_active_alarms.push(obj.alarm) //insere o alarme na lista para consulta posterior
+                console.log("danilo req:AlarmReceived Alarme incluido da lista list_active_alarms: "+list_active_alarms);
+                updateActiveAlarmButtons()
                 console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
             } catch (e){
                 makePopup("ATENÇÃO", "<p class='popup-alarm-p'>Alarme Recebido: " + obj.alarm + "</p><br/><p class='popup-alarm-p'>Origem: " + obj.src +"</p>", 500, 200);
             } finally {
                 //addNotification("inc", "Alarme " + obj.alarm);
-                addNotification("alarm", 'inc', obj.alarm, obj.src, userUI)
+                var user = list_users.filter(function (u) {return u.sip  == userUI})[0]
+                addNotification('alarm', 'inc', obj.alarm, obj.src, user.guid)
                     .then(function (message) {
                         console.log(message);
                     })
@@ -459,19 +459,19 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             
         }
-        if (obj.api == "user" && obj.mt == "PopupRequest") {
-            console.log(obj.alarm);
-            //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
-            updateScreen(obj.btn_id, obj.name, "popup", obj.alarm);
-            //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
-            //addNotification(">>>  " + obj.alarm);
-        }
-        if (obj.api == "user" && obj.mt == "ButtonRequest") {
-            console.log(obj.button);
-            var btn = JSON.parse(obj.button);
-            updateScreen(btn.id, btn.button_name, btn.button_type, btn.button_prt);
+        // if (obj.api == "user" && obj.mt == "PopupRequest") {
+        //     console.log(obj.alarm);
+        //     //document.getElementById(obj.alarm).setAttribute("class", "allbuttonClicked");
+        //     updateScreen(obj.btn_id, obj.name, "popup", obj.alarm);
+        //     //makePopup("Alarme Recebido!!!!", obj.alarm, 500, 200);
+        //     //addNotification(">>>  " + obj.alarm);
+        // }
+        // if (obj.api == "user" && obj.mt == "ButtonRequest") {
+        //     console.log(obj.button);
+        //     var btn = JSON.parse(obj.button);
+        //     updateScreen(btn.id, btn.button_name, btn.button_type, btn.button_prt);
  
-        }
+        // }
         if (obj.api == "user" && obj.mt == "CallRinging") {
             console.log(obj.src);
             var element = obj.src + "-status";
@@ -611,6 +611,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             var element = obj.src+"-status";
             console.log(element);
+            console.log("Chamada Conectada")
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
                 var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
@@ -678,6 +679,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.src);
             var element = obj.src + "-status";
             console.log(element);
+            console.log("Chamada Disconectada")
             try {
                 // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
                 var elementos = document.querySelectorAll('[button_prtstatus="' + obj.src + '-status"]');
@@ -870,11 +872,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         // var allbtn = coldireita.add(new innovaphone.ui1.Div(null, null, "allbtn"));
         // var pagebtn = coldireita.add(new innovaphone.ui1.Div(null, null, "pagebtn"));
         // var pageDivider = coldireita.add(new innovaphone.ui1.Div(null, null, "pageDivider"));
-
+        var divMainButtons = document.getElementById("divMainButtons")
+        divMainButtons.setAttribute("page",page)
+        
           // div botão combo
           var combobtnDiv = divButtonsMain.add(new innovaphone.ui1.Div(null, null, "combobtn"));
           for (let i = 1; i < 6 ; i++) {
-          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button combobutton"))
+          var combobtn = combobtnDiv.add(new innovaphone.ui1.Div(null,null,"Button comboButton"))
             
             combobtn.setAttribute("page",page)
             combobtn.setAttribute("position-x", 1); 
@@ -909,25 +913,25 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allbtn.setAttribute("position-x", positionX);
             allbtn.setAttribute("position-y", positionY);
         }
-          // cameras sensores graficos planta baixa
-        var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
-            options.forEach(function (o) {
-                var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
-                optionsDivBtn.setAttribute("id",o.id)
-                var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
-                var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
-                imgTop.setAttribute("src", o.img)
-                var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
-            })
+        //   // cameras sensores graficos planta baixa
+        // var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
+        //     options.forEach(function (o) {
+        //         var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+        //         optionsDivBtn.setAttribute("id",o.id)
+        //         var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
+        //         var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
+        //         imgTop.setAttribute("src", o.img)
+        //         var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
+        //     })
 
-           //paginas de 1 - 5
-           var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
-           for (let i = 1; i < 6 ; i++) {
-               var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
-               var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
-               var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
-               pagesBtnDiv.setAttribute("page", i )
-           }     
+        //    //paginas de 1 - 5
+        //    var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
+        //    for (let i = 1; i < 6 ; i++) {
+        //        var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
+        //        var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
+        //        var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
+        //        pagesBtnDiv.setAttribute("page", i )
+        //    }     
        
         //var allbtn = document.getElementById("allbtn");
         console.log("TODOS OS BOTÕES " + "\n" + JSON.stringify(buttons))
@@ -938,7 +942,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             switch (object.button_type) {
                 case "combo":
-                    createComboButton(object,null,"ciano-600","ciano-900","./images/Layer.svg","combobutton")
+                    createComboButton(object,"combobutton","ciano-600","ciano-900","./images/Layer.svg","comboButton")
                     break;
                 case "alarm":
                     createButtons(object,"allbutton","gold-900","gold-600","./images/warning.svg","Button",object.page)
@@ -1005,21 +1009,100 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             // (Javascript) eh com addEventListener:
             botao.addEventListener("click", buttonClicked);
         }
+    //     var pages = document.querySelectorAll(".pagina")
+    //     pages.forEach(function(page){
+    //         var pageAttribute = page.getAttribute("page")
+    //         var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
+    //         page.addEventListener("click", function(evt){
+    //             var divPrincipal = document.getElementById("divMainButtons")
+    //             var divOptions = document.getElementById("divOptions")
+    //             divPrincipal.setAttribute("page",pageAttribute)
+    //             divPrincipal.innerHTML = ''
+    //             divOptions.innerHTML = ''
+    //             popButtons(buttons,pageAttribute)
+            
+    //         });
+    //         if(divMainAttribute == pageAttribute){
+    //               page.classList.add("azul-600-bottom")  
+    //         }
+
+    //     })
+    //     var botoes = document.querySelectorAll(".optionsBtn");
+    //    for (var i = 0; i < botoes.length; i++) {
+    //         var botao = botoes[i];
+
+    //         // O jeito correto e padronizado de incluir eventos no ECMAScript
+    //         // (Javascript) eh com addEventListener:
+    //         botao.addEventListener("click", function(evt){
+    //             var idBtn = evt.currentTarget.id
+
+    //             if(!this.classList.contains("clicked")){
+    //                 createGridZero(idBtn)
+    //                     .then(function (message) {
+    //                         console.log("createGridZero" + message);
+    //                     })
+    //                     .catch(function (error) {
+    //                         console.log("createGridZero" + error);
+    //                     });
+    //             }
+
+    //         });
+    //     }
+        updatePageButtons()
+        updateActiveAlarmButtons()
+
+    }
+    function popBottomButtons(buttons){
+        // cameras sensores graficos planta baixa
+        var optionsDiv = divOptionsMain.add(new innovaphone.ui1.Div(null, null, "optionsDiv"));
+        options.forEach(function (o) {
+            var optionsDivBtn = optionsDiv.add(new innovaphone.ui1.Div(null, null, "optionsBtn"));
+            optionsDivBtn.setAttribute("id",o.id)
+            var divTop = optionsDivBtn.add(new innovaphone.ui1.Div(null, null, "buttontop neutro-800"));
+            var imgTop = divTop.add(new innovaphone.ui1.Node("img", null, null, null))
+            imgTop.setAttribute("src", o.img)
+            var divBottom = optionsDivBtn.add(new innovaphone.ui1.Div(null, texts.text(o.id), "buttondown neutro-900"));
+        })
+
+        //paginas de 1 - 5
+        var pagesDiv = divOptionsMain.add(new innovaphone.ui1.Div(null,null,"div-page"))
+        for (let i = 1; i < 6 ; i++) {
+            var pagesBtnDiv = pagesDiv.add(new innovaphone.ui1.Div(null,null,"pagina"))    
+            var pagesBtnText = pagesBtnDiv.add(new innovaphone.ui1.Div(null,null,"framePagesText"))   
+            var textBtn = pagesBtnText.add(new innovaphone.ui1.Div(null,"Página " + i,"text-wrapper-Pages"))  
+            pagesBtnDiv.setAttribute("page", i )
+        }   
+
         var pages = document.querySelectorAll(".pagina")
         pages.forEach(function(page){
             var pageAttribute = page.getAttribute("page")
-            var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
-            page.addEventListener("click", function(evt){
-                var divPrincipal = document.getElementById("divMainButtons")
-                var divOptions = document.getElementById("divOptions")
-                divPrincipal.setAttribute("page",pageAttribute)
-                divPrincipal.innerHTML = ''
-                divOptions.innerHTML = ''
-                popButtons(buttons,pageAttribute)
-            
+            var divPrincipal = document.getElementById("divMainButtons")
+           // var divMainAttribute = document.getElementById("divMainButtons").getAttribute("page")
+           page.addEventListener("click", function(evt) {
+
+            var divOptions = document.getElementById("divOptions");
+            var currentPageAttribute = divPrincipal.getAttribute("page");
+    
+            // Remover a classe "azul-600-bottom" de todas as páginas
+            pages.forEach(function(p) {
+                p.classList.remove("azul-600-bottom");
             });
-            if(divMainAttribute == pageAttribute){
-                  page.classList.add("azul-600-bottom")  
+    
+            // Adicionar a classe "azul-600-bottom" apenas à página atual
+            page.classList.add("azul-600-bottom");
+    
+            // Atualizar o atributo "page" do elemento divPrincipal
+            divPrincipal.setAttribute("page", pageAttribute);
+    
+            // Limpar o conteúdo do divPrincipal
+            divPrincipal.innerHTML = '';
+    
+            // Populando os botões
+            popButtons(buttons, pageAttribute);
+        });
+           
+            if(divPrincipal.getAttribute("page") == pageAttribute){
+                page.classList.add("azul-600-bottom")  
             }
 
         })
@@ -1044,8 +1127,6 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             });
         }
-        updatePageButtons()
-        
 
     }
 
@@ -1143,385 +1224,115 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
-    function updateScreen(id, name, type, prt) {
-        var clicked = button_clicked.filter(findById(id));
+    function updateScreen(id) {
+        var btn = list_buttons.filter(function (b) { return b.id == id })[0]
+
+        var clicked = button_clicked.filter(findById(btn.id));
         if (clicked.length > 0) {
             //DESATIVAR
-            if (type == "page") {
-                button_clicked.forEach(function (b) {
-                    if (b.type == "page" && b.prt==prt) {
-                        document.getElementById(b.id).style.backgroundColor = "";
-                        try {
-                            document.getElementsByClassName("pagebtn")[0].style.width = "";
-                            var gfg_down = document.getElementsByClassName("colunapage")[0];
-                            gfg_down.parentNode.removeChild(gfg_down);
-                            document.getElementsByClassName("pageDivider")[0].style.display = "none";
-                            document.getElementsByClassName("combobtn")[0].style.width = "";
-                            document.getElementsByClassName("allbtn")[0].style.width = "";
-                            document.getElementsByClassName("pagebtn")[0].style.width = "";
-                        }
-                        catch {
-                            console.log("danilo req: Area de page já estava fechada");
-                        }
-
-                    }
-                })
-            }
-            if (type == "user") {
-                var found = list_users.indexOf(prt);
+            
+            if (btn.button_type == "user") {
+                var found = -1;
+                found = list_users.findIndex(function (user) {
+                    return user.guid == btn.button_prt;
+                });
                 if (found != -1) {
-                    app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id)})
+                    var user = list_users.filter(function (u) { return u.guid == btn.button_prt })[0]
+                    app.send({ api: "user", mt: "EndCall", prt: String(user.e164), btn_id: String(btn.id)})
                     //document.getElementById(id).style.backgroundColor = "darkgreen";
                 }
             }
-            if (type == "number") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
+            if (btn.button_type == "number") {
+                app.send({ api: "user", mt: "EndCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 //document.getElementById(id).style.backgroundColor = "";
             }
-            if (type == "alarm") {
+            if (btn.button_type == "alarm") {
                 app.send({ api: "user", mt: "DecrementCount" });
-                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(prt), btn_id: String(id) })
-                var elemento = document.getElementById(id);
-                elemento.children[0].classList.remove("vermelho-900")
-                elemento.children[1].classList.remove("vermelho-600")
-                elemento.children[0].classList.add("gold-900")
-                elemento.children[1].classList.add("gold-600")
+                app.send({ api: "user", mt: "TriggerStopAlarm", prt: String(btn.button_prt), btn_id: String(btn.id) })
+                list_active_alarms = list_active_alarms.filter(function (a) { return a != btn.button_prt})
+                updateDeactiveAlarmButtons()
+                
             }
-            if (type == "video") {
-                try {
-                    var oldPlayer = document.getElementById('video-js');
-                    videojs(oldPlayer).dispose();
-                    container.clear();
-                }
-                catch {
-                    container.clear();
-                }
-                app.send({ api: "user", mt: "TriggerStopVideo", prt: String(prt), btn_id: String(id) })
-                container.clear();
-                container.add(new innovaphone.ui1.Node("img", "width:20%; height:20%; max-width: 100px;", null, null).setAttribute("src", "./images/play.png"), null);
-
-                document.getElementById(id).style.backgroundColor = "var(--button)";
-            }
-            if (type == "combo") {
-                //document.getElementById(id).style.backgroundColor = "";
-            }
-            if (type == "dest") {
-                app.send({ api: "user", mt: "EndCall", prt: String(prt), btn_id: String(id) })
+            
+            if (btn.button_type == "dest") {
+                app.send({ api: "user", mt: "EndCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 //addNotification("out", name);
-                addNotification(type, 'out', name, userUI, prt)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                var elemento = document.getElementById(id)
+                //addNotification(type,'out', name, userUI, prt)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
+                var elemento = document.getElementById(btn.id)
                 elemento.classList.remove("vermelho-900")
                 elemento.classList.add("neutro-800")
-                found = 1;
             }
             //var btn = { id: id, type: type, name: name, prt: prt };
             //button_clicked.splice(button_clicked.indexOf(btn), 1);
-            button_clicked = button_clicked.filter(deleteById(id));
+            button_clicked = button_clicked.filter(deleteById(btn.id));
             console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
         }
         else {
             //ATIVAR
-            var found = -1;
-            if (type == "page") {
-                button_clicked.forEach(function (b) {
-                    if (b.type == "page") {
-                        try {
-                            //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
-                            //button_clicked.splice(button_clicked.indexOf(btn), 1);
-                            button_clicked = button_clicked.filter(deleteById(b.id));
-                            //document.getElementById(b.id).style.backgroundColor = "";
-                            //var gfg_down = document.getElementsByClassName("colunapage")[0];
-                            //gfg_down.parentNode.removeChild(gfg_down);
-                            //document.getElementsByClassName("pageDivider")[0].style.display = "none";
-                            //document.getElementsByClassName("combobtn")[0].style.width = "";
-                            //document.getElementsByClassName("allbtn")[0].style.width = "";
-                            //document.getElementsByClassName("pagebtn")[0].style.width = "";
-                            
-                        } catch {
-                            console.log("danilo req: Area de page já estava fechada");
-                        }
-                    }
-                })
-
-
-                var is_button = document.getElementById(id);
-                if (is_button == null) {
-                    makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
-                } else {
-
-                    //document.getElementsByClassName("combobtn")[0].style.width = "65%";
-                    //document.getElementsByClassName("allbtn")[0].style.width = "65%";
-                    //document.getElementsByClassName("pagebtn")[0].style.width = "65%";
-                    //document.getElementsByClassName("pageDivider")[0].style.display = "block";
-                    //document.getElementsByClassName("pageDivider")[0].style.left = "65%";
-                    //var colunapage = coldireita.add(new innovaphone.ui1.Div(null, null, "colunapage"));
-                    //colunapage.addHTML("<iframe id='iframepage' class='iframepage' src='" + prt + "' width='100%' height='100%' style='border:0; z-index:-1;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>");
-                    //makePopup("Página", "<iframe src='" + value + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 600, 450);
+            if (btn.button_type == "user") {
+                var found = -1;
+                found = list_users.findIndex(function(user) {
+                    return user.guid == btn.button_prt;
+                });
+                if (found != -1) {
+                    var user = list_users.filter(function (u) { return u.guid == btn.button_prt })[0]
+                    app.send({ api: "user", mt: "TriggerCall", prt: String(user.e164), btn_id: String(btn.id)})
                     //addNotification("out", name);
-                    //addNotification('out', name)
+                    //addNotification(type,'out', name, userUI, prt)
                     //    .then(function (message) {
                     //        console.log(message);
                     //    })
                     //    .catch(function (error) {
                     //        console.log(error);
                     //    });
-                    app.send({ api: "user", mt: "TriggerStartPage", prt: String(prt) })
-                    //document.getElementById(id).style.backgroundColor = "darkred";
-
-                    //ARRASTAR E SOLTAR DIMENSÂO COLUNAS
-                    // Obtenha as referências às DIVs que serão redimensionadas
-                    //var comboBtn = document.querySelector('.combobtn');
-                    //var allBtn = document.querySelector('.allbtn');
-                    //var pageBtn = document.querySelector('.pagebtn');
-                    //var pageColumn = document.querySelector('.colunapage');
-                    //var iframe = document.querySelector('.iframepage');
-                    
-                    ////// Adicione os manipuladores de eventos
-                    //var isDragging = false;
-                    //var startX = 0;
-                    //var btnWidth = 0;
-
-                    //var pageDivider = document.querySelector('.pageDivider');
-
-                    //pageDivider.addEventListener('mousedown', function (event) {
-                    //    isDragging = true;
-
-                    //    startX = event.pageX;
-                    //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-                    //});
-
-                    //document.addEventListener('mousemove', function (event) {
-                    //    if (!isDragging) {
-                    //        return;
-                    //    }
-                    //    var offset = event.pageX - startX;
-                    //    var newBtnWidth = btnWidth + offset;
-
-                    //    // Verifique se a nova largura está dentro dos limites permitidos
-                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-                    //        pageColumn.style.left = newBtnWidth + 5 + 'px';
-                    //    }
-
-                    //});
-
-                    ////var iframe = document.getElementById('iframepage');
-                    //pageColumn.addEventListener('mousemove', function (event) {
-                    //    // faça algo quando o mouse se mover dentro do iframe
-                    //    if (!isDragging) {
-                    //        return;
-                    //    }
-                    //    var offset = event.pageX - startX;
-                    //    var newBtnWidth = btnWidth + event.pageX;
-
-                    ////    // Verifique se a nova largura está dentro dos limites permitidos
-                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-                    //        pageColumn.style.left = newBtnWidth + 'px';
-                    //    }
-                    //});
-                    //pageColumn.addEventListener('mouseup', function () {
-                    //    isDragging = false;
-                    //});
-
-                    //document.addEventListener('mouseup', function () {
-                    //    isDragging = false;
-                    //});
-
-                    //// Adiciona um ouvinte de eventos para touchstart
-                    //pageDivider.addEventListener("touchstart", function (event) {
-                    //    // Lida com o evento touchstart aqui
-                    //    isDragging = true;
-                    //    //startX = event.pageX;
-                    //    //startX = event.changedTouches[0].clientX
-                    //    startX = event.touches[0].pageX;
-                    //    btnWidth = parseInt(getComputedStyle(allBtn).width, 10);
-                    //});
-
-                    //// Adiciona um ouvinte de eventos para touchmove
-                    //pageDivider.addEventListener("touchmove", function (event) {
-                    //    // Lida com o evento touchmove aqui
-                    //    if (!isDragging) {
-                    //        return;
-                    //    }
-                    //    var offset = event.touches[0].pageX - startX;
-                    //    var newBtnWidth = btnWidth + offset;
-
-                    //    // Verifique se a nova largura está dentro dos limites permitidos
-                    //    if (newBtnWidth > 0 && newBtnWidth < window.innerWidth * 0.8) {
-                    //        comboBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        allBtn.style.width = newBtnWidth - 5 + 'px';
-                    //        pageBtn.style.width = newBtnWidth - 5 + 'px';
-
-                    //        pageDivider.style.left = newBtnWidth - 5 + 'px';
-                    //        pageColumn.style.left = newBtnWidth + 5 + 'px';
-                    //    }
-                        
-                    //});
-
-                    //// Adiciona um ouvinte de eventos para touchend
-                    //pageDivider.addEventListener("touchend", function (event) {
-                    //    // Lida com o evento touchend aqui
-                    //    isDragging = false;
-                    //});
-
-                    //found = 1;
-                }
-            }
-            if (type == "user") {
-                found = list_users.indexOf(prt);
-                if (found != -1) {
-                    app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
-                    //addNotification("out", name);
-                    addNotification(type, 'out', name, userUI, prt)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                    var elemento = document.getElementById(id)
+                    var elemento = document.getElementById(btn.id)
                     elemento.children[0].classList.remove("verde-900")
                     elemento.children[1].classList.remove("verde-600")
                     elemento.children[0].classList.add("vermelho-900")
                     elemento.children[1].classList.add("vermelho-600")
                 }
             }
-            if (type == "popup") {
-                makePopup("Popup", "<iframe src='" + prt + "' width='100%' height='100%' style='border:0;' allowfullscreen='' loading='lazy' referrerpolicy='no-referrer-when-downgrade'></iframe>", 800, 600);
-                app.send({ api: "user", mt: "TriggerStartPopup", prt: String(prt) })
-            }
-            if (type == "number") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id)})
+            if (btn.button_type == "number") {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(btn.button_prt), btn_id: String(btn.id)})
                 //addNotification("out", name);
-                addNotification(type, 'out', name, userUI, prt)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    var elemento = document.getElementById(id)
+                //addNotification(type, 'out', name, userUI, prt)
+                //    .then(function (message) {
+                //        console.log(message);
+                //    })
+                //    .catch(function (error) {
+                //        console.log(error);
+                //    });
+                var elemento = document.getElementById(btn.id)
                 elemento.children[0].classList.remove("verde-900")
                 elemento.children[1].classList.remove("verde-600")
                 elemento.children[0].classList.add("vermelho-900")
                 elemento.children[1].classList.add("vermelho-600")
-                found = 1;
             }
-            if (type == "alarm") {
-                app.send({ api: "user", mt: "TriggerAlert", prt: String(prt), btn_id: String(id)})
-                var elemento = document.getElementById(id)
-                elemento.children[0].classList.remove("gold-900")
-                elemento.children[1].classList.remove("gold-600")
-                elemento.children[0].classList.add("vermelho-900")
-                elemento.children[1].classList.add("vermelho-600")
-                found = 1;
-            }
-            if (type == "video") {
-                button_clicked.forEach(function (b) {
-                    if (b.type == "video") {
-                        try {
-                            //var btn = { id: b.id, type: b.type, name: b.name, prt: b.prt };
-                            //button_clicked.splice(button_clicked.indexOf(btn), 1);
-                            button_clicked = button_clicked.filter(deleteById(b.id));
-                            document.getElementById(b.id).style.backgroundColor = "";
+            if (btn.button_type == "alarm") {
+                app.send({ api: "user", mt: "TriggerAlert", prt: String(btn.button_prt), btn_id: String(btn.id)})
 
-                        } catch {
-                            console.log("danilo req: Area de video já estava fechada, vamos abrir um novo video");
-                        }
-                    }
-                })
-                try {
-                    var oldPlayer = document.getElementById('video-js');
-                    videojs(oldPlayer).dispose();
-                    container.clear();
-                }
-                catch {
-                    container.clear();
-                }
-                app.send({ api: "user", mt: "TriggerStartVideo", prt: String(prt) })
-                //addNotification("out" , name);
-                //addNotification('out', name)
-                //    .then(function (message) {
-                //        console.log(message);
-                //    })
-                //    .catch(function (error) {
-                //        console.log(error);
-                //    });
-                var videoElement = container.add(new innovaphone.ui1.Node("video", "position: absolute ;width:100%; height:100%; border: 0px;", null, null));
-
-                //document.getElementById("videoPlayer").setAttribute("src", value);
-                var source = document.createElement("source");
-                source.setAttribute("src", prt);
-                source.setAttribute("type", "application/x-mpegURL");
-                //document.getElementById("container").appendChild(script);
-                //var videoElement = document.createElement("video");
-                videoElement.setAttribute("allow", "autoplay");
-                videoElement.setAttribute("autoplay", "true");
-                videoElement.setAttribute("muted", "muted");
-                videoElement.setAttribute("width", "800%");
-                videoElement.setAttribute("height", "470%");
-                videoElement.setAttribute("controls", "");
-                videoElement.setAttribute("class", "video-js vjs-default-skin");
-                videoElement.setAttribute("id", "video-js");
-                //videoElement.setAttribute("src", url);
-                //videoElement.setAttribute("type", type);
-                //document.getElementById("container").appendChild(videoElement);
-                document.getElementById("video-js").appendChild(source);
-                var video = videojs('video-js', {
-                    html5: {
-                        vhs: {
-                            overrideNative: !videojs.browser.IS_SAFARI
-                        },
-                        nativeAudioTracks: false,
-                        nativeVideoTracks: false
-                    }
-                });
-                //video.src({ type: type, src: url });
-                video.ready(function () {
-                    video.src({ type: "application/x-mpegURL", src: prt });
-                });
-                document.getElementById(id).style.backgroundColor = "darkred";
-                found = 1;
-                        //document.getElementById(value).setAttribute("class", "allbuttonClicked");
-                        
+                list_active_alarms.push(btn.button_prt)
+                updateActiveAlarmButtons()
             }
-            if (type == "combo") {
-                app.send({ api: "user", mt: "TriggerCombo", prt: String(prt), btn_id: String(id)})
-                //addNotification("out", name);
-                //addNotification('out', name)
-                //    .then(function (message) {
-                //        console.log(message);
-                //    })
-                //    .catch(function (error) {
-                //        console.log(error);
-                //    });
-                document.getElementById(id).style.backgroundColor = "darkred";
-                found = 1;
-            }
-            if (type != "popup" && found != -1) {
-                button_clicked.push({ id: id, type: type, name: name, prt: prt });
-                console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
-            }
-            if (type == "dest") {
-                app.send({ api: "user", mt: "TriggerCall", prt: String(prt), btn_id: String(id) })
+            if (btn.button_type == "dest") {
+                app.send({ api: "user", mt: "TriggerCall", prt: String(btn.button_prt), btn_id: String(btn.id) })
                 document.getElementById(id).classList.remove("neutro-800");
                 document.getElementById(id).classList.add("vermelho-900");
             }
+            if (btn.button_type == "combo") {
+                app.send({ api: "user", mt: "TriggerCombo", prt: String(btn.button_prt), btn_id: String(btn.id) })
+                document.getElementById(id).classList.remove("neutro-800");
+                document.getElementById(id).classList.add("vermelho-900");
+            }
+            button_clicked.push(btn);
+            console.log("danilo req: Lista de botões clicados atualizada: " + JSON.stringify(button_clicked));
+            
         }
     }
 
@@ -1606,10 +1417,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 btnOptions.children[1].classList.remove("neutro-900")
                 btnOptions.children[0].classList.add("azul-marinho-400")
                 btnOptions.children[1].classList.add("azul-500")
-
                 console.log("createGridZero Acessado")
                 const colRight = document.getElementById("colDireita")
                 colRight.innerHTML = ""
+                colRight.setAttribute("type", type);
                 const headerTxt = document.createElement("div")
                 headerTxt.id = "headerTxt"
                 headerTxt.classList.add("headerTxt")
@@ -1662,7 +1473,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             allBtns.setAttribute("button_id", object.id);
             allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.remove("optEmpty")
-            allBtns.classList.add("azul-500", "optFree")
+            allBtns.classList.add("azul-500", "optBusy")
             allBtns.innerHTML = object.button_name
             allBtns.addEventListener("click", function(){
                 console.log("Botão clicado", object.button_name)
@@ -1676,14 +1487,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     })
                     this.classList.add("clicked2")
                     this.classList.add("azul-marinho-1000")
-                    this.classList.remove ("azul-500")
+                    this.classList.remove("azul-500")
+                    this.classList.remove("chatNotified")
                 }
                 createDivRightBottom(object)
-                app.send({api: "user", mt: "SelectSensorInfo"})
+                //app.send({api: "user", mt: "SelectSensorInfo"})
             })
         }
     }
-    function createDivRightBottom(obj){
+    function createDivRightBottom(obj) {
         console.log("ERICK OBJ JSON", obj)
         const colRight = document.getElementById("colDireita")
         var btmRight = document.getElementById("bottomR")
@@ -1703,62 +1515,136 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
         const buttonLink = obj.button_prt
 
-        if(obj.button_type == "sensor"){
-            const unic_sensor = []
-            var arrayHistory = JSON.parse(list_sensors_history);
-            
-            var filtredhistory = arrayHistory.filter(function(h){
-                return h.sensor_name == buttonLink;
-            });
-            console.log("FILTRO HIST", filtredhistory)
-            const infoBox = document.createElement("div")
-            infoBox.id = "infoBox"
-            infoBox.classList.add("infobox")
+        if (obj.button_type == "sensor") {
+            app.sendSrc({ api: "user", mt: "SelectSensorInfo", src: obj.id }, function (obj) {
+                list_sensors_history = obj.result
+                const unic_sensor = []
+                var arrayHistory = JSON.parse(list_sensors_history);
 
-            const sensorInfoBox = document.createElement("div")
-            sensorInfoBox.id = "sensorInfoBox"
-            sensorInfoBox.classList.add("sensorInfoBox")
-            for(let key in filtredhistory[0]){
-                if (filtredhistory[0].hasOwnProperty(key)) {
-                    console.log(key + ': ' + filtredhistory[0][key]);
-                    if(key !== "date" && key !=="id" && key !=="row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null){
-                        const sensorBox = document.createElement("div")
-                        sensorBox.id = "sensorBox"
-                        sensorBox.classList.add("sensorBox")
-    
-                        const topBox = document.createElement("div")
-                        topBox.id = "topBox"
-                        topBox.classList.add("topBox", "neutro-700")
-                        topBox.textContent = texts.text(key)
-    
-                        const btmBox = document.createElement("div")
-                        btmBox.id = "btmBox"
-                        btmBox.classList.add("btmBox", "neutro-900")
-                        btmBox.textContent = filtredhistory[0][key]
-                        
-                        sensorBox.appendChild(topBox)
-                        sensorBox.appendChild(btmBox)
-                        sensorInfoBox.appendChild(sensorBox)
+                var filtredhistory = arrayHistory.filter(function (h) {
+                    return h.sensor_name == buttonLink;
+                });
+                console.log("FILTRO HIST", filtredhistory)
+                const infoBox = document.createElement("div")
+                infoBox.id = "infoBox"
+                infoBox.classList.add("infobox")
 
-                        sensorBox.addEventListener("click", function(){
-                            var clickBtm = document.querySelectorAll(".btmBox")
-                            clickBtm.forEach(function(b){
-                                b.classList.remove("neutro-1100")
+                const sensorInfoBox = document.createElement("div")
+                sensorInfoBox.id = "sensorInfoBox"
+                sensorInfoBox.classList.add("sensorInfoBox")
+                for (let key in filtredhistory[0]) {
+                    if (filtredhistory[0].hasOwnProperty(key)) {
+                        console.log(key + ': ' + filtredhistory[0][key]);
+                        if (key !== "date" && key !== "id" && key !== "row_number" && key !== "battery" && key !== "sensor_name" && key !== "row_num" && filtredhistory[0][key] !== null) {
+                            const sensorBox = document.createElement("div")
+                            sensorBox.id = "sensorBox"
+                            sensorBox.classList.add("sensorBox")
+
+                            const topBox = document.createElement("div")
+                            topBox.id = "topBox"
+                            topBox.classList.add("topBox", "neutro-700")
+                            topBox.textContent = texts.text(key)
+
+                            const btmBox = document.createElement("div")
+                            btmBox.id = "btmBox"
+                            btmBox.classList.add("btmBox", "neutro-900")
+                            btmBox.textContent = filtredhistory[0][key]
+
+                            sensorBox.appendChild(topBox)
+                            sensorBox.appendChild(btmBox)
+                            sensorInfoBox.appendChild(sensorBox)
+
+                            sensorBox.addEventListener("click", function () {
+                                var clickBtm = document.querySelectorAll(".btmBox")
+                                clickBtm.forEach(function (b) {
+                                    b.classList.remove("neutro-1100")
+                                })
+                                btmBox.classList.add('neutro-1100')
+                                createLineGrafic(filtredhistory, key)
                             })
-                            btmBox.classList.add('neutro-1100')
-                            createLineGrafic(filtredhistory, key)
-                        })
 
+                        }
                     }
                 }
-            }
 
-          
-            infoBox.appendChild(sensorInfoBox)
-            bottomRight.appendChild(infoBox)
+
+                infoBox.appendChild(sensorInfoBox)
+                bottomRight.appendChild(infoBox)
+            })
+            
 
         
-        }else{
+        }
+        else if (obj.button_type == "chat") {
+
+            //área de mensagens
+            const messagesArea = document.createElement("div")
+            messagesArea.id = "messagesArea"
+            messagesArea.classList.add("messagesArea")
+            messagesArea.setAttribute("userInChat", obj.button_prt);
+
+
+            //input/btn de mensagens
+            const messagesBtnArea = document.createElement("div")
+            messagesBtnArea.id = "messagesBtnArea"
+            messagesBtnArea.classList.add("messagesBtnArea")
+
+            //area de escrita de mensagem
+            const inputMessage = document.createElement("textarea")
+            inputMessage.id = "inputMessage"
+            inputMessage.classList.add("inputMessage")
+
+            //botão enviar
+            const sendBtn = document.createElement("div")
+            sendBtn.id = "sendBtn"
+            sendBtn.classList.add("sendBtn")
+            const sendBtnTxt = document.createElement("div")
+            sendBtnTxt.id = "sendBtnTxt"
+            sendBtnTxt.classList.add("sendBtnTxt")
+            sendBtnTxt.innerText = texts.text("sendBtn")
+            sendBtn.appendChild(sendBtnTxt)
+            
+
+            messagesBtnArea.appendChild(inputMessage)
+            messagesBtnArea.appendChild(sendBtn)
+
+            bottomRight.appendChild(messagesArea)
+            bottomRight.appendChild(messagesBtnArea)
+
+            app.sendSrc({ api: "user", mt: "SelectMessageHistorySrc", to: obj.button_prt, src: obj.button_user }, function (obj) {
+                console.log("SendSrcResult: " + JSON.stringify(obj))
+                if (obj.result.length > 0) {
+                    var messages = JSON.parse(obj.result)
+
+                    popChatMessages(messages)
+
+                }
+
+                //var divToUpdate = document.querySelector('.sensorbutton[position-x="' + object.position_x + '"][position-y="' + object.position_y + '"][page="' + object.page + '"]');
+                //var objParse = JSON.parse(obj.result)[0];
+
+                //continuar aqui Danilo!!!
+            })
+            //btmBox.textContent = 
+
+            
+
+            const chat_id = 1
+
+            sendBtn.addEventListener("click", function () {
+                var inputMessage = document.getElementById("inputMessage")
+                if (inputMessage.value.length > 0) {
+                    app.sendSrc({ api: "user", mt: "Message", msg: inputMessage.value, to: obj.button_prt, id: chat_id, src: chat_id }, function (msg) {
+                        inputMessage.value = ''
+                        popChatMessages(msg.result)
+                    })
+                }
+                
+                
+            })
+
+        }
+        else {
             function createFileElement(buttonLink) {
                 var fileType = getFileType(buttonLink);
                 var element;
@@ -1768,11 +1654,14 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     element.type = "application/pdf";
                     element.width = "100%";
                     element.height = "400"; // Altura desejada
-                } else if (fileType === 'image') {
+                    element.src = buttonLink;
+                }
+                else if (fileType === 'image') {
                     element = document.createElement("img");
                     element.src = buttonLink;
                     element.style.width = '100%'
-                } else if (fileType === 'video') {
+                }
+                else if (fileType === 'video') {
                     element = document.createElement("video");
                     element.controls = true; // Adiciona controles de vídeo
                     element.autoplay = true; 
@@ -1783,7 +1672,26 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     source.src = buttonLink;
                     source.type = "video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
                     element.appendChild(source);
-                } 
+                }
+                else if (fileType === 'streaming') {
+                    if (player) {
+                        player.dispose(); // Remove o player Video.js existente
+                    }
+                    element = document.createElement("video");
+                    element.controls = true; // Adiciona controles de vídeo
+                    element.id = "my-video"
+                    element.classList.add("video-js", "vjs-default-skin")
+                    element.preload = "auto"
+                    element.autoplay = true;
+                    element.setAttribute("data-setup","{}")
+                    element.style.width = "100%"
+                    element.style.height = "auto"
+                    // Ajuste a altura conforme necessário
+                    var source = document.createElement("source");
+                    source.src = buttonLink;
+                    source.type = "application/x-mpegURL"//"video/" + buttonLink.split('.').pop(); // Defina o tipo de vídeo com base na extensão
+                    element.appendChild(source);
+                }
                 else if (fileType === 'google-maps') {
                     element = document.createElement("iframe");
                     element.src = buttonLink;
@@ -1805,8 +1713,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     return 'pdf';
                 } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(extension)) {
                     return 'image';
-                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov','m3u8'].includes(extension)) {
+                } else if (['mp4', 'webm', 'ogg', 'avi', 'mov'].includes(extension)) {
                     return 'video';
+                } else if (['m3u8'].includes(extension)) {
+                    return 'streaming';
                 } else if (buttonLink.includes('google.com/maps/embed')) {
                     return 'google-maps';
                 } else {
@@ -1827,7 +1737,214 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
         colRight.appendChild(bottomRight)
 
+        try {
+            player = videojs('my-video');
+            player.ready(function () {
+                player.muted(true);
+                player.play().catch(function (error) {
+                    console.log('Autoplay was prevented:', error);
+                });
+            });
+        } catch (e) {
+            console.log('videojs not present:', e);
+        }
+    }
+    function popChatMessages(messages) {
+        const optInFocus = document.getElementById("colDireita").getAttribute("type");
+        if (optInFocus == "chat") {
+            //option chat já selecionada
+            const messagesArea = document.getElementById("messagesArea")
+            if (messagesArea) {
+                //ja em conversa com alguém
+                const userInChat = messagesArea.getAttribute("userInChat");
+                messages.forEach(function (m) {
+                    if (m.from_guid == userInChat || m.to_guid == userInChat) {
+                        //atualizar area de bate papo pois é o usuário correto
+                        //div chat object
+                        const chatDiv = document.createElement("div")
+                        chatDiv.id = "chatDiv"
+                        chatDiv.setAttribute("msg", m.id)
+                        chatDiv.classList.add("chatDiv")
+                        
 
+                        //div message
+                        const messageDiv = document.createElement("div")
+                        messageDiv.id = "messageDiv"
+                        messageDiv.classList.add("messageDiv")
+                        //mensagem
+                        const message = document.createElement("label")
+                        message.id = m.id
+                        message.classList.add("message")
+                        message.textContent = m.msg
+                        messageDiv.appendChild(message)
+
+                        //horário da mensagem
+                        const timestampDiv = document.createElement("div")
+                        timestampDiv.id = "timestampDiv"
+                        timestampDiv.classList.add("timestampDiv")
+                        timestampDiv.innerHTML = convertUTCToLocalTime(m.date)
+
+
+                        chatDiv.appendChild(messageDiv)
+                        chatDiv.appendChild(timestampDiv)
+                        
+                        
+
+                        var u = list_users.filter(function (item) {
+                            return item.sip === userUI;
+                        });
+
+                        if (u.length == 0) {
+                            makePopup(texts.text("labelWarning"), texts.text("labelTableUsersNotLoaded"))
+                            return
+                        }
+                        else {
+                            if (m.from_guid == u[0].guid) {
+                                chatDiv.classList.add("chatSend")
+                                //status da mensagem enviada
+                                const statusDiv = document.createElement("div")
+                                statusDiv.id = "statusDiv_"+m.id
+                                statusDiv.classList.add("statusDiv")
+                                chatDiv.appendChild(statusDiv)
+                                if (m.delivered != null) {
+                                    statusDiv.classList.add("chatDelivered")
+
+                                }
+                                if (m.read != null) {
+                                    statusDiv.classList.remove("chatDelivered")
+                                    statusDiv.classList.add("chatRead")
+
+                                }
+
+
+                            }
+                            else {
+                                chatDiv.classList.add("chatReceived")
+                                if (m.delivered == null) {
+                                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                                }
+                                if (m.read == null) {
+                                    app.send({ api: "user", mt: "ChatRead", msg_id: m.id })
+
+                                }
+
+                            }
+                            if (messagesArea.firstChild) {
+                                messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+                            } else {
+                                messagesArea.appendChild(chatDiv);
+                            }
+                        }
+                        
+
+                        //mensagem
+                        //const timestamp = document.createElement("label")
+                        //timestamp.id = m.date
+                        //timestamp.classList.add("message")
+
+                        //timestampDiv.appendChild(timestamp)
+
+
+                        
+                        
+                        //messagesArea.insertBefore(chatDiv, messagesArea.firstChild);
+
+                        
+
+                        //messagesArea.appendChild(chatDiv)
+
+                    }
+                    else {
+                        //adicionar log no history e colocar icone no botão do cara pois está conversando com outro
+                        var from_user = list_users.filter(function (u) { return u.guid == m.from_guid })[0].cn;
+                        console.log("from_user " + from_user)
+                        var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                        console.log("to_user " + to_user)
+                        addNotification('message', 'inc', m.msg, from_user, m.to_guid).then(function (result) {
+                            console.log(result)
+                        }).catch(function (e) {
+                            console.log(e)
+                        })
+                        const grid = document.getElementById("gridZero")
+                        var childElement = grid.querySelector('[button_prt="' + m.from_guid + '"]');
+
+                        if (childElement) {
+                            console.log("Elemento encontrado:", childElement);
+                            childElement.classList.remove("azul-500")
+                            childElement.classList.add("chatNotified")
+                        } else {
+                            console.log("Elemento não encontrado");
+                        }
+
+                        //a mensagem foi entregue, vamos registrar no banco
+                        if (m.delivered == null) {
+                            app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                        }
+
+                    }
+
+                })
+            }
+            else {
+                //está em foco a option chat mas não está com a area de chat aberta com nenhum usuário
+                //adicionar log no history e colocar icone no botão do cara
+                messages.forEach(function (m) {
+                    var from_user = list_users.filter(function (u) { return u.guid == m.from_guid })[0].cn;
+                    console.log("from_user " + from_user)
+                    var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                    console.log("to_user " + to_user)
+                    addNotification('message', 'inc', m.msg, from_user, m.to_guid).then(function (result) {
+                        console.log(result)
+                    }).catch(function (e) {
+                        console.log(e)
+                    })
+                    const grid = document.getElementById("gridZero")
+                    var childElement = grid.querySelector('[button_prt="' + m.from_guid + '"]');
+
+                    if (childElement) {
+                        console.log("Elemento encontrado:", childElement);
+                        childElement.classList.remove("azul-500")
+                        childElement.classList.add("chatNotified")
+                    } else {
+                        console.log("Elemento não encontrado");
+                    }
+                    //a mensagem foi entregue, vamos registrar no banco
+                    if (m.delivered == null) {
+                        app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                    }
+                })
+                
+
+            }
+
+        } else {
+            //alguma outra option selecionada
+            //não está com a area de chat aberta
+            //adicionar log no history
+            messages.forEach(function (m) {
+                var from_user = list_users.filter(function (u) { return u.guid == m.from_guid });
+                console.log("from_user " + from_user)
+                var to_user = list_users.filter(function (u) { return u.guid == m.to_guid })[0].cn;
+                console.log("to_user "+to_user)
+                addNotification('message', 'inc', m.msg, from_user[0].cn, m.to_guid).then(function (result) {
+                    console.log(result)
+                }).catch(function (e) {
+                    console.log(e)
+                })
+
+                //a mensagem foi entregue, vamos registrar no banco
+                if (m.delivered == null) {
+                    app.send({ api: "user", mt: "ChatDelivered", msg_id: m.id })
+
+                }
+            })
+
+        }
+        
+        
     }
     function calllistonmessage(consumer, obj) {
         if (obj.msg) {
@@ -1837,6 +1954,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     }
 
     //#region funções internas
+    function convertUTCToLocalTime(utcString) {
+        // Parse the UTC string into a Date object
+        const utcDate = new Date(utcString);
+        var clientTimeZoneOffset = new Date().getTimezoneOffset();
+
+        utcDate.setUTCHours(utcDate.getUTCHours() - clientTimeZoneOffset);
+        // Get the local time components
+        const localHours = utcDate.getHours().toString().padStart(2, '0');
+        const localMinutes = utcDate.getMinutes().toString().padStart(2, '0');
+        const localSeconds = utcDate.getSeconds().toString().padStart(2, '0');
+        const localDay = utcDate.getDate().toString().padStart(2, '0');
+        const localMonth = (utcDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+        const localYear = utcDate.getFullYear();
+
+        // Format the local time string
+        const localTimeString = `${localHours}:${localMinutes}:${localSeconds} ${localDay}/${localMonth}/${localYear}`;
+
+        return localTimeString;
+    }
+
+
     function updatePageButtons() {
         var divPrincipal = document.getElementById("divMainButtons")
         var page = divPrincipal.getAttribute("page")
@@ -1901,7 +2039,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
 
             allBtns.addEventListener("click", function () {
                 console.log("Function do Botão ligar para", object.button_name)
-                updateScreen(object.id, object.button_name, object.button_type, object.button_prt)
+                //updateScreen(object.id, object.button_name, object.button_type, object.button_prt)
+                updateScreen(object.id)
             })
         }
     }
@@ -1939,13 +2078,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
 
-                    addNotification('sensor', 'out', sensorType, sensorName , userUI)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    // addNotification('sensor', 'out', sensorType, sensorName , userUI)
+                    // .then(function (message) {
+                    //     console.log(message);
+                    // })
+                    // .catch(function (error) {
+                    //     console.log(error);
+                    // });
                     // registrar no histórico qual sensor que explodiu o threshold junto com o horário
 
 
@@ -1955,13 +2094,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     buttonDown.classList.add("vulcano-1000");
                     buttonTop.classList.add("blinking"); // colocar animação do botão piscando
 
-                    addNotification('sensor','out', sensorType, sensorName , userUI)
-                    .then(function (message) {
-                        console.log(message);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    // addNotification('sensor', 'out', sensorType, sensorName , userUI)
+                    // .then(function (message) {
+                    //     console.log(message);
+                    // })
+                    // .catch(function (error) {
+                    //     console.log(error);
+                    // });
 
                     // registrar no histórico qual sensor que explodiu o threshold junto com o horário
 
@@ -1996,13 +2135,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                         buttonDown.classList.add("vulcano-1000");
                         buttonTop.classList.add("blinking"); // colocar animação do botão piscando
     
-                        addNotification('sensor', 'out', sensorType, sensorName , userUI)
-                        .then(function (message) {
-                            console.log(message);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                        // addNotification('sensor', 'inc', sensorType, sensorName , userUI)
+                        // .then(function (message) {
+                        //     console.log(message);
+                        // })
+                        // .catch(function (error) {
+                        //     console.log(error);
+                        // });
     
                         // registrar no histórico qual sensor que explodiu o threshold junto com o horário
     
@@ -2012,16 +2151,15 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         }
     }
 
+    
     function createButtons(object,classButton,bgTop,bgBottom,srcImg,mainButtonClass){
-
+        var found = false;
         var selector = `.${mainButtonClass}[position-x='${object.position_x}'][position-y='${object.position_y}'][page='${object.page}']`;
         var allBtns = document.querySelector(selector);
         if (allBtns) {
             allBtns.setAttribute("id", object.id);
             allBtns.setAttribute("button_type", object.button_type);
-            allBtns.setAttribute("button_prt", object.button_prt);
             allBtns.setAttribute("button_id", object.id);
-            allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
             allBtns.classList.add(classButton)
             var divTop = document.createElement("div")
                 divTop.classList.add(bgTop)
@@ -2036,14 +2174,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 var divTopText = document.createElement("div")
                 divTopText.textContent = object.button_name
                 divTop.appendChild(divTopText);
-
                 var divBottom = document.createElement("div")
                 divBottom.classList.add(bgBottom)
                 divBottom.classList.add("buttondown")
                 var divBottomTxt = document.createElement("div")
-                divBottomTxt.textContent = object.button_prt
                 divBottom.appendChild(divBottomTxt)
                 allBtns.appendChild(divBottom)
+                allBtns.setAttribute("button_prt", object.button_prt); 
+                allBtns.setAttribute("button_prtstatus", object.button_prt + "-status");
+                divBottomTxt.textContent = object.button_prt
+                found = true;
+                list_users.forEach(function(u){
+                   // && found
+                    if(String(object.button_prt) === String(u.guid)){
+                        allBtns.setAttribute("button_prt", u.e164); 
+                        allBtns.setAttribute("button_prtstatus", u.e164 + "-status");
+                        divBottomTxt.textContent = u.cn
+                        found = false
+                        // se mudar o sip vai refletir aqui 
+                        //pois tratamos tudo com GUID no admin
+                    }
+                })
         }
     }
 
@@ -2069,7 +2220,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 imgTop.setAttribute("src",srcImg)
                 divTop.appendChild(imgTop)
                 var divTopText = document.createElement("div")
-                divTopText.textContent = object.button_prt // nome do sensor que é o button_prt da list_buttons
+                divTopText.textContent = object.button_name // nome do botão que é o button_name da list_buttons
                 divTop.appendChild(divTopText);
 
                 var divBottom = document.createElement("div")
@@ -2121,109 +2272,49 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 allBtns.appendChild(divComboName)
         }
     }
-
-    function addOnHistory(history, objType, state, text1, text2){
-        console.log("Função addOnHistory")
-        console.log(JSON.stringify(history))
-
-        var msgType = texts.text(history.type)
-        var msgState = texts.text(history.state)
-        var msgText1 = history.alert1
-        var msgText2 = history.alert2
-
-        // if(history = ''){
-        //     msgType = objType
-        //     msgState = state
-        //     msgText1 = text1
-        //     msgText2 = text2
-
-        // }else{
-            
-        //     msgType = history.type
-        //     msgState = history.state
-        //     msgText1 = history.alert1
-        //     msgText2 = history.alert2
-        // }
-
-        var today = new Date();
-        var day = today.getDate() + "";
-        var month = (today.getMonth() + 1) + "";
-        var year = today.getFullYear() + "";
-        var hour = today.getHours() + "";
-        var minutes = today.getMinutes() + "";
-        var seconds = today.getSeconds() + "";
-
-        const histScroll = document.getElementById("scroll-calls")
-
-        const boxDate = document.createElement("div")
-        boxDate.id = "boxDate"
-        boxDate.classList.add("boxDate")
-
-        const boxEvent = document.createElement("div")
-        boxEvent.id = "boxEvent"
-        boxEvent.classList.add("boxEvent", "lastHistory",'toastAnimation')
-
-        const boxEventTypeStatat = document.createElement("div")
-        boxEventTypeStatat.id = "boxEventTypeStatat"
-        boxEventTypeStatat.classList.add("boxEventTypeStatat")
-
-        const eventType = document.createElement("div")
-        eventType.id = "eventType"
-        eventType.classList.add("eventType")
-        eventType.textContent = msgType
-
-        const eventStatus = document.createElement("div")
-        eventStatus.id = "eventStatus"
-        eventStatus.classList.add("eventStatus")
-        eventStatus.textContent = msgState
-
-        const boxEventTexts = document.createElement("div")
-        boxEventTexts.id = "boxEventTexts"
-        boxEventTexts.classList.add("boxEventTexts")
-
-        const eventText1 = document.createElement("div")
-        eventText1.id = "eventText1"
-        eventText1.classList.add("eventText1")
-        eventText1.textContent = msgText1
-
-        const eventText2 = document.createElement("div")
-        eventText2.id = "eventText2"
-        eventText2.classList.add("eventText2")
-        eventText2.textContent = msgText2
-
-        const boxEventDate =document.createElement("div")
-        boxEventDate.id = "boxEventDate"
-        boxEventDate.classList.add("boxEventDate")
-
-        const eventDate =document.createElement("div")
-        eventDate.id = "eventDate"
-        eventDate.classList.add("eventDate")
-        eventDate.textContent = (day  < 10 ? '0' : '') + day + "/" + (month < 10 ? '0' : '') + month 
-
-        const eventHour =document.createElement("div")
-        eventHour.id = "eventHour"
-        eventHour.classList.add("eventHour")
-        eventHour.textContent = (hour  < 10 ? '0' : '') + hour + ":" + (minutes  < 10 ? '0' : '') + minutes
-
-        boxEventTypeStatat.appendChild(eventType)
-        boxEventTypeStatat.appendChild(eventStatus)
-
-        boxEventTexts.appendChild(eventText1)
-        boxEventTexts.appendChild(eventText2)
-
-        boxEventDate.appendChild(eventDate)
-        boxEventDate.appendChild(eventHour)
-
-        boxEvent.appendChild(boxEventTypeStatat)
-        boxEvent.appendChild(boxEventTexts)
-        boxEvent.appendChild(boxEventDate)
-
-        boxDate.appendChild(boxEvent)
-        histScroll.appendChild(boxDate)
-
-    }
+    function updateActiveAlarmButtons(){
+        list_active_alarms.forEach(function(id){
+            var button_found = [];
+            list_buttons.forEach(function (l) {
+                if (l.button_prt == id) {
+                    button_found.push(l);
+                }
+            })
     
-    function addNotification(type, flux, msg, from, to) {
+            var hasClicked = button_clicked.filter(function (bc) { return bc.prt == id })
+            if (hasClicked.length==0) {
+                // Obtém todos os elementos com o parâmetro btn_id igual a obj.alarm
+                var elementos = document.querySelectorAll('[button_prt="' + id + '"]');
+    
+                // Percorre cada elemento encontrado
+                for (var i = 0; i < elementos.length; i++) {
+                    var elemento = elementos[i];
+                    elemento.children[0].classList.remove("gold-900")
+                    elemento.children[1].classList.remove("gold-600")
+                    elemento.children[0].classList.add("vermelho-900")
+                    elemento.children[1].classList.add("vermelho-600")
+                    button_clicked.push({ id: String(elemento.id), type: "alarm", name: button_found[i].button_name, prt: id });
+                }
+                console.log("danilo req:updateActiveAlarmButtons button_clicked atualizado +: " + JSON.stringify(button_clicked))
+                
+            }   
+        })    
+    }
+    function updateDeactiveAlarmButtons(){
+        button_clicked.forEach(function(bc){
+            if(bc.type=="alarm" && list_active_alarms.findIndex(function(a){return a == bc.prt}) == -1){
+                button_clicked = button_clicked.filter(deleteById(bc.id))
+                var elemento = document.getElementById(bc.id);
+                elemento.children[0].classList.remove("vermelho-900")
+                elemento.children[1].classList.remove("vermelho-600")
+                elemento.children[0].classList.add("gold-900")
+                elemento.children[1].classList.add("gold-600")
+            }
+
+        })
+        console.log("danilo req:updateDeactiveAlarmButtons button_clicked atualizado -: " + JSON.stringify(button_clicked)) 
+    }
+    function addNotification(type, flux, msg, from_user, to) {
         return new Promise(function(resolve, reject) {
             try {
                 var today = new Date();
@@ -2264,24 +2355,22 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 const eventText1 = document.createElement("div");
                 eventText1.id = "eventText1";
                 eventText1.classList.add("eventText1");
-                eventText1.textContent = from;
+                eventText1.textContent = from_user;
+
+                const eventImg1 = document.createElement("img");
+                eventImg1.id = "eventImg1";
+                eventImg1.classList.add("eventImg1");
                 if(flux =='inc'){
-                    const eventImg1 = document.createElement("img");
-                    eventImg1.id = "eventImg1";
-                    eventImg1.classList.add("eventImg1");
-                    eventImg1.src = "./images/right-arrow.png";
+                    eventImg1.src = "./images/right-arrow.svg";
                 }else{
-                    const eventImg1 = document.createElement("img");
-                    eventImg1.id = "eventImg1";
-                    eventImg1.classList.add("eventImg1");
-                    eventImg1.src = "./images/left-arrow.png";
+                    eventImg1.src = "./images/left-arrow.svg";
                 }
                 
-            
+                var cn = list_users.filter(function(u){return u.guid == to})[0].cn;
                 const eventText2 = document.createElement("div");
                 eventText2.id = "eventText2";
                 eventText2.classList.add("eventText2");
-                eventText2.textContent = to;
+                eventText2.textContent = cn;
             
                 const boxEventDate = document.createElement("div");
                 boxEventDate.id = "boxEventDate";
@@ -2346,12 +2435,13 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             zoneDiv.appendChild(buttonGrid)
         }
         list_buttons.forEach(function (zb) {
-            if (zb.page == "0" && zb.button_type == "dest") {
+            if (zb.page == "0" && zb.button_type == "dest") { 
                 createDests(zb)
             }
         })
     }
 
+    // Cria os gráficos de barras
     function createBarGrafic(data) {
         const colRight = document.getElementById("colDireita")
         const canvas = document.createElement('canvas');
@@ -2414,7 +2504,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
         drawBarGraph();
     }
 
-    // Cria os gráficos
+    // Cria os gráficos de linha
     function createLineGrafic(data, key) {
         console.log("Grafico", data)
         var grafico = document.getElementById("grafico")
