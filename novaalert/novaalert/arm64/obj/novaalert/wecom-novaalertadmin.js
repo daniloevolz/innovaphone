@@ -1301,7 +1301,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     </div>
                     <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelValue")}</span>
-                        <input type="text" class="genericInputs"  id="iptParam" placeholder="${texts.text("labelValue")}">
+                        <input type="text" class="genericInputs"  id="iptParam" placeholder="${texts.text("alarm")}">
                     </div> 
                     <div class="divButtonsGeneric">
                         <div id = "btnCancel">${makeButton(texts.text("btnCancel"),"tertiary")}</div>
@@ -1514,7 +1514,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
                     </div>
                     <div class="divSelectAndTextModalBig">
                         <span class="textGeneric">${texts.text("labelValue")}</span>
-                        <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">
+                        <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("number")}">
                     </div> 
                     <div class="divSelectAndTextModal">
                         <span class="textGeneric">${texts.text("labelDevice")}</span>
@@ -1693,7 +1693,7 @@ Wecom.novaalertAdmin = Wecom.novaalertAdmin || function (start, args) {
             </div>
             <div class="divSelectAndTextModalBig">
                 <span class="textGeneric">${texts.text("labelValue")}</span>
-                <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("labelValue")}">
+                <input type="text" class="genericInputs" id= "iptParam" placeholder="${texts.text("placeholderOptionType"+type)}">
             </div>
             
             <div class="divButtonsGeneric">

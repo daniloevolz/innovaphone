@@ -2,6 +2,7 @@
 var Wecom = Wecom || {};
 Wecom.wecallTexts = {
     pt: {
+        labelsecondsTimeoutLoginGrp: "Tempo de espera em segundos para Login nos Grupos",
         labelLicenseUsed: "Licenças em uso:",
         labelCfgLicense: "Licenciamento",
         labelTituloLicense: "Licenciamento do sistema",

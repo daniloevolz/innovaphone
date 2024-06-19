@@ -1694,10 +1694,27 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                 }
                 else if (fileType === 'google-maps') {
                     element = document.createElement("iframe");
-                    element.src = buttonLink;
+                    //element.src = buttonLink; 
+                    var positions = buttonLink.split(",")
+                    var lati = positions[0]
+                    var long = positions[1]
+                    element.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1447.8169395888099!2d"+lati+"2273905!3d"+long+"80489054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95058b96586f3f8f%3A0xe1d6419a936ab384!2sCandiota%2C%20RS%2C%2096495-000!5e1!3m2!1spt-BR!2sbr!4v1718822549993!5m2!1spt-BR!2sbr"
                     element.style.width = "100%";
-                    element.style.height = "100%"; // Altura desejada para o mapa
-                    element.style.position = "absolute";
+                    element.style.height = "600px"; // Altura desejada para o mapa
+                    element.style.position = "relative";
+                } else if (fileType == 'youtube') {
+                    element = document.createElement("iframe");
+                    var videoIdMatch = buttonLink.match(/[?&]v=([^&]+)/);
+                    if (videoIdMatch) {
+                        var videoId = videoIdMatch[1];
+                        buttonLink = 'https://www.youtube.com/embed/' + videoId;
+                    } else {
+                        console.log("Invalid YouTube URL");
+                    }
+                    element.src = buttonLink
+                    element.style.width = "100%";
+                    element.style.height = "600px"; // Altura desejada para o mapa
+                    element.style.position = "relative";
                 }
                 else {
                     console.error("Tipo de arquivo desconhecido.");
@@ -1708,6 +1725,17 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             }
             // Função para verificar o tipo de arquivo com base na extensão do link
             function getFileType(buttonLink) {
+
+                try {
+                    // Dividir a URL pelo caractere '&'
+                    var parts = buttonLink.split('&');
+                    // A URL base é a primeira parte
+                    buttonLink = parts[0];
+                } catch (e) {
+                    console.log('A URL não continha &')
+                }
+
+
                 var extension = buttonLink.split('.').pop().toLowerCase();
                 if (extension === 'pdf') {
                     return 'pdf';
@@ -1719,8 +1747,10 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     return 'streaming';
                 } else if (buttonLink.includes('google.com/maps/embed')) {
                     return 'google-maps';
+                } else if (buttonLink.includes('youtube.com/')) {
+                    return 'youtube';
                 } else {
-                    return 'unknown';
+                    return 'google-maps';
                 }
             }      
             // Exemplo de uso:

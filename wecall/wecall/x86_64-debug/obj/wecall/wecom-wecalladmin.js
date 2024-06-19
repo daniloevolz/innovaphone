@@ -58,6 +58,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var licenseActive;
     var licenseInstallDate;
     var licenseUsed;
+    var secondsTimeoutLoginGrp;
 
     function makeDivCallListAPI(t) {
         t.clear();
@@ -208,6 +209,13 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "Url", vl: String(ipturl.getValue()) });
         });
 
+        //Timeout Login Grupos
+        t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:45%; font-size:15px; text-align:right", texts.text("labelsecondsTimeoutLoginGrp")));
+        var iptsecondsTimeoutLoginGrp = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:45%; font-size:12px; text-align:center", secondsTimeoutLoginGrp, texts.text("labelsecondsTimeoutLoginGrp"), 255, "text", null));
+        t.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:45%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+            app.send({ api: "admin", mt: "UpdateConfig", prt: "secondsTimeoutLoginGrp", vl: String(iptsecondsTimeoutLoginGrp.getValue()) });
+        });
+
         //URL Autenticação SSO MOBILE (telas largura <1000px)
         //var labelUrlM = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:45%; font-size:15px; text-align:right", texts.text("labelUrlM")));
         //var ipturlM = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:30%; top:45%; font-size:12px; text-align:center", urlMobile, texts.text("urlText"), 255, "url", null));
@@ -306,6 +314,7 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             urlG=obj.urlG;
             CodLeaveGroups=obj.CodLeave;
             LeaveGroupsStartup = obj.sLS;
+            secondsTimeoutLoginGrp = obj.secondsTimeoutLoginGrp;
         }
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
             console.log("TableUsersResult:result="+obj.result);

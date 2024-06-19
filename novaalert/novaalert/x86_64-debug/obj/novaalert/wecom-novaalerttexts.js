@@ -1,6 +1,12 @@
 ﻿var Wecom = Wecom || {};
 Wecom.novaalertTexts = {
     pt: {
+        placeholderOptionTypefloor: "URL do arquivo desejado, pode ser utilizado o Files App",
+        placeholderOptionTypemap: "Coordenadas no formato: latitude,longitude EX: -51.777777,-31.666666",
+        placeholderOptionTypesensor: "Nome do Sensor configurado no HTTP Body da aplicação do Gateway Milesight",
+        placeholderOptionTyperadio: "Número do Canal de rário",
+        placeholderOptionTypevideo: "URL do arquivo de vídeo .mp4, .m3u8 ou youtube",
+        placeholderOptionTypechat: "Usuário",
         all:"Todos",
         noImplemented: "Não Implementado",
         delivered: "Entregue",
