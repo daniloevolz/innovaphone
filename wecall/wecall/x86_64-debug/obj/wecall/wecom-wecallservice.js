@@ -848,11 +848,13 @@ new PbxApi("RCC").onconnected(function (conn) {
             try {
                 if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
                     num = obj.peer.e164;
-                    log("danilo req : RCC message:CallUpdate: num = obj.local.e164;");
-                } else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                    log("danilo req : RCC message:CallUpdate: num = obj.peer.e164;");
+                }
+                else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
                     num = obj.peer.h323;
                     log("danilo req : RCC message:CallUpdate: num = obj.peer.h323");
-                } else {
+                }
+                else {
                     // Se nenhum dos parâmetros estiver definido, ignore o evento
                     log("danilo req : RCC message:CallUpdate: num = null");
                     return;
@@ -860,20 +862,23 @@ new PbxApi("RCC").onconnected(function (conn) {
             }
             catch (e) {
                 log("danilo req : RCC message:CallUpdate NUM Catch "+e);
-                if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
-                    num = obj.peer.e164;
-                    log("danilo req : RCC message:CallUpdate:Catch num = obj.local.e164;");
-                } else {
-                    // Se o parâmetro local.e164 não estiver definido, ignore o evento
-                    log("danilo req : RCC message:CallUpdate:Catch num = null");
-                    return;
-                }
+                //if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                //    num = obj.peer.e164;
+                //    log("danilo req : RCC message:CallUpdate:Catch num = obj.local.e164;");
+                //} else {
+                //    // Se o parâmetro local.e164 não estiver definido, ignore o evento
+                //    log("danilo req : RCC message:CallUpdate:Catch num = null");
+                //    return;
+                //}
+                // Se o parâmetro local.e164 não estiver definido, ignore o evento
+                log("danilo req : RCC message:CallUpdate:Catch num = null");
+                return;
             }
 
-            log("danilo-req : RCC message::CallInfo for user src " + sip);
+            log("danilo-req : RCC message::CallInfo for user src " + sip +" and num "+ num);
             //var foundIndex = connectionsPbxSignal[0].sip.indexOf(obj.src);
             //log("danilo-req : RCC message::CallInfo user src foundIndex " + foundIndex);
-            var foundCall = calls.filter(function (call) { return call.sip === sip });
+            var foundCall = calls.filter(function (call) { return call.sip === sip && call.num === num });
 
             if (String(foundCall) == "") {
                 log("danilo-req : RCC message::CallInfo NOT foundCall ");
@@ -881,64 +886,66 @@ new PbxApi("RCC").onconnected(function (conn) {
                     log("danilo-req : RCC message:: obj.state == 1 || obj.state == 129");
                     //var e164 = obj.peer.e164;
                     var myArray = obj.src.split(",");
-                    var src = myArray[0];
-                    calls.push({ sip: String(src), callid: obj.call, num: num, state: obj.state });
-                    log("danilo-req : RCC message:: call after insertion "+JSON.stringify(calls));
+                    //var src = myArray[0];
+                    var callToInsert = { sip: String(sip), callid: obj.call, num: num, state: obj.state }
+                    log("danilo req : RCC message:: call to insert " + JSON.stringify(callToInsert));
+                    calls.push(callToInsert);
+                    log("danilo-req : RCC message:: calls after insertion "+JSON.stringify(calls));
                     // if (e164 == "") {
                     //     calls.push({ sip: String(src), callid: obj.call, num: num, state: obj.state });
                     // } else {
                     //     calls.push({ sip: String(src), callid: obj.call, num: obj.peer.e164, state: obj.state });
                     // }
-                    log("danilo req : RCC message:: call inserted " + JSON.stringify(calls));
+                    
 
-                    switch (obj.state) {
-                        case 4:
-                            //Ativa (Alert)
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                //var e164 = obj.peer.e164;
-                                if (queues.some(function (v) { return v.Fila === sip })) {
-                                    var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "out" };
-                                    // if (e164 == "") {
-                                    //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "out" };
-                                    // } else {
-                                    //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "out" };
-                                    // }
-                                } else {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "out" };
-                                    // if (e164 == "") {
-                                    //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "out" };
-                                    // } else {
-                                    //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "out" };
-                                    // }
-                                }
-                                httpClient(urlPhoneApiEvents, "PUT", msg, null);
-                            }
-                            break;
-                        case 132:
-                            //Receptiva (Alert)
-                            if (sendCallEvents) {
-                                log("danilo-req : RCC message::sendCallEvents=true");
-                                //var e164 = obj.peer.e164;
-                                if (queues.some(function (v) { return v.Fila === sip })) {
-                                    var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
-                                    // if (e164 == "") {
-                                    //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "inc" };
-                                    // } else {
-                                    //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "inc" };
-                                    // }
-                                } else {
-                                    var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "inc" };
-                                    // if (e164 == "") {
-                                    //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "inc" };
-                                    // } else {
-                                    //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "inc" };
-                                    // }
-                                }
-                                httpClient(urlPhoneApiEvents, "PUT", msg, null);
-                            }
-                            break;
-                    }
+                    //switch (obj.state) {
+                    //    case 4:
+                    //        //Ativa (Alert)
+                    //        if (sendCallEvents) {
+                    //            log("danilo-req : RCC message::sendCallEvents=true");
+                    //            //var e164 = obj.peer.e164;
+                    //            if (queues.some(function (v) { return v.Fila === sip })) {
+                    //                var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "out" };
+                    //                // if (e164 == "") {
+                    //                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "out" };
+                    //                // } else {
+                    //                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "out" };
+                    //                // }
+                    //            } else {
+                    //                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "out" };
+                    //                // if (e164 == "") {
+                    //                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "out" };
+                    //                // } else {
+                    //                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "out" };
+                    //                // }
+                    //            }
+                    //            httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                    //        }
+                    //        break;
+                    //    case 132:
+                    //        //Receptiva (Alert)
+                    //        if (sendCallEvents) {
+                    //            log("danilo-req : RCC message::sendCallEvents=true");
+                    //            //var e164 = obj.peer.e164;
+                    //            if (queues.some(function (v) { return v.Fila === sip })) {
+                    //                var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
+                    //                // if (e164 == "") {
+                    //                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.h323, Status: "inc" };
+                    //                // } else {
+                    //                //     var msg = { User: "", Grupo: sip, Callinnumber: obj.peer.e164, Status: "inc" };
+                    //                // }
+                    //            } else {
+                    //                var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "inc" };
+                    //                // if (e164 == "") {
+                    //                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.h323, Status: "inc" };
+                    //                // } else {
+                    //                //     var msg = { User: sip, Grupo: "", Callinnumber: obj.peer.e164, Status: "inc" };
+                    //                // }
+                    //            }
+                    //            httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                    //        }
+                    //        break;
+                    //}
                 }
             }
             else {
@@ -948,7 +955,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                 if (obj.cause) cause = obj.cause;
                 if (obj.msg) message = obj.msg;
                 calls.forEach(function (call) {
-                    if (call.sip == sip) {
+                    if (call.sip == sip && call.num === num) {
                         if (call.callid < obj.call && cause !=26) {
                             call.callid = obj.call;
                         }
@@ -1076,7 +1083,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(removeObjectBySip(sip));
+                                    calls = calls.filter(removeCallBySipAndNum(sip, num));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     break;
                                 case 7:
@@ -1103,7 +1110,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(removeObjectBySip(sip));
+                                    calls = calls.filter(removeCallBySipAndNum(sip, num));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     break;
                                 case 134:
@@ -1133,7 +1140,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                         }
                                         //Remove
                                         log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                        calls = calls.filter(removeObjectBySip(sip));
+                                        calls = calls.filter(removeCallBySipAndNum(sip, num));
                                         log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     }
                                     break;
@@ -1163,7 +1170,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                     }
                                     //Remove
                                     log("danilo req : before deleteCall " + JSON.stringify(calls), "Obj.call " + sip);
-                                    calls = calls.filter(removeObjectBySip(sip));
+                                    calls = calls.filter(removeCallBySipAndNum(sip, num));
                                     log("danilo req : after deleteCall " + JSON.stringify(calls));
                                     //if (del == true) {
 
@@ -1175,7 +1182,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                         
                     }
                 })
-                var foundCall = calls.filter(function (call) { return call.sip === sip });
+
+                var foundCall = calls.filter(function (call) { return call.sip === sip && call.num === num });
                 log("danilo-req : RCC message::CallInfo UPDATED foundCall " + JSON.stringify(foundCall));
             }
         }
@@ -1642,7 +1650,18 @@ function removeObjectBySip(sip) {
         return false;
     }
 }
+//Functions to delete a call from calls Arrays
+function removeCallBySipAndNum(sip, num) {
+    return function (call) {
+        if (call.sip != sip || call.num != num) {
+            return true;
+        }
+        //countInvalidEntries++
+        return false;
+    }
+}
 
+//Funcions to delete user Call from PbxSignal API Array
 function removeObjectByCall(arr, pbx, callToRemove) {
     //console.log("removeObjectByCall+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx].length));
     for (var i = 0; i < arr[pbx].length; i++) {
