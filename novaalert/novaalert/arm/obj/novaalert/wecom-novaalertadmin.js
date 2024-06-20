@@ -3820,27 +3820,55 @@ function getButtonTypeText(buttonType) {
             </body>
         </html>
     `;
-    colDireita.innerHTML += htmlReport
+        colDireita.innerHTML += htmlReport
 
-    document.getElementById("btnSave").addEventListener("click",function(){
-        const iptDate = document.getElementById("iptDate").value;
-        var report = document.getElementById("selectReport");
-        var selectedOption = report.options[report.selectedIndex];
-        var report = selectedOption.value;
+        var googleForm = `
+        <html>
+            <body>
+                <div class="divMainModal" style = "width: 80%;">
+                <h2 class="titleModal">${texts.text("labelGoogleKey")}</h2>
+                    <div class="divSelectAndTextModalBig">
+                        <span class="textGeneric">${texts.text("labelGoogleKey")}</span>
+                        <input type="text" style="align-items:center; justify-content:center;" class="genericInputs" id= "iptGoogleKey" placeholder="${texts.text("labelGoogleKey")}" value=${googlekey}>
+                    </div>
+                    <div class="divButtonsGeneric">
+                        <div id = "btnSaveGoogleKey">${makeButton(texts.text("btnOk"), "primary")}</div>
+                    </div> 
+                </div>
+            </body>
+        </html>
+    `;
+        colDireita.innerHTML += googleForm
 
-        if(iptDate == ""){
-            makePopup(texts.text("labelWarning"), texts.text("labelFillDate"))
-        }else{
-            app.send({ api: "admin", mt: "DeleteFromReports", src: report, to: iptDate });
-        }
-    })  
+        document.getElementById("btnSave").addEventListener("click",function(){
+            const iptDate = document.getElementById("iptDate").value;
+            var report = document.getElementById("selectReport");
+            var selectedOption = report.options[report.selectedIndex];
+            var report = selectedOption.value;
 
-    var inputDate = document.getElementById('iptDate');
-    inputDate.addEventListener('focus', function() {
-        // Abrir o calendário ao focar no input
-        this.type = 'text';
-        this.type = 'date';
-    });
+            if(iptDate == ""){
+                makePopup(texts.text("labelWarning"), texts.text("labelFillDate"))
+            }else{
+                app.send({ api: "admin", mt: "DeleteFromReports", src: report, to: iptDate });
+            }
+        })
+
+        document.getElementById("btnSaveGoogleKey").addEventListener("click", function () {
+            const iptGoogleKey = document.getElementById("iptGoogleKey").value;
+
+            if (iptGoogleKey == "") {
+                makePopup(texts.text("labelWarning"), texts.text("labelFillGoogleKey"))
+            } else {
+                app.send({ api: "admin", mt: "UpdateConfig", prt: "googlekey", vl: iptGoogleKey });
+            }
+        })
+
+        var inputDate = document.getElementById('iptDate');
+        inputDate.addEventListener('focus', function() {
+            // Abrir o calendário ao focar no input
+            this.type = 'text';
+            this.type = 'date';
+        });
 
     }
     function makeDivLicense(t) {

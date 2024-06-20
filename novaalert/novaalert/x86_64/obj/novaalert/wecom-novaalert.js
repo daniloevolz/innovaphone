@@ -65,6 +65,7 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
     var list_sensors = []
     var popupOpen = false;
     var session;
+    var google_api_key = '';
     
     var options = [
         { id: 'floor', img: './images/map.svg'}, 
@@ -199,6 +200,9 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
             console.log(obj.session);
             session = obj.session;
             app.send({ api: "user", mt: "InitializeMessage", session: session }); //Inicializa o ramal
+        }
+        if (obj.api == "user" && obj.mt == "UserConfigResult") {
+            google_api_key = obj.googleKey
         }
         if (obj.api == "user" && obj.mt == "NoLicense") {
             console.log(obj.result);
@@ -1698,7 +1702,8 @@ Wecom.novaalert = Wecom.novaalert || function (start, args) {
                     var positions = buttonLink.split(",")
                     var lati = positions[0]
                     var long = positions[1]
-                    element.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1447.8169395888099!2d"+lati+"2273905!3d"+long+"80489054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95058b96586f3f8f%3A0xe1d6419a936ab384!2sCandiota%2C%20RS%2C%2096495-000!5e1!3m2!1spt-BR!2sbr!4v1718822549993!5m2!1spt-BR!2sbr"
+                    //element.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1447.8169395888099!2d"+lati+"2273905!3d"+long+"80489054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95058b96586f3f8f%3A0xe1d6419a936ab384!2sCandiota%2C%20RS%2C%2096495-000!5e1!3m2!1spt-BR!2sbr!4v1718822549993!5m2!1spt-BR!2sbr"
+                    element.src = "https://www.google.com/maps/embed/v1/view?key=" + google_api_key +"&center=" + positions+"&zoom=20"
                     element.style.width = "100%";
                     element.style.height = "600px"; // Altura desejada para o mapa
                     element.style.position = "relative";

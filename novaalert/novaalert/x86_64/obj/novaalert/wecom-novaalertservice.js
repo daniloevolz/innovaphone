@@ -188,6 +188,8 @@ new JsonApi("user").onconnected(function (conn) {
                     var session = Random.bytes(16);
                     conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
 
+                    conn.send(JSON.stringify({ api: "user", mt: "UserConfigResult", googleKey: google_api_key }));
+
                     //Intert into DB the event of new login
                     log("danilo req: insert into DB = user " + conn.sip);
                     var today = getDateNow();
