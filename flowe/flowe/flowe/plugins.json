@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.flowemanager",
+            "icon": "wecom-flowe.png",
+            "lang": "wecom.flowemanagertexts",
+            "domains": false
+        }
+    ]
+}

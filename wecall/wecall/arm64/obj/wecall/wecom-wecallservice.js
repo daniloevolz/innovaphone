@@ -22,6 +22,9 @@ var leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
 var url = Config.url;
 var urlSSO = Config.urlSSO;
 var urlGetGroups = Config.urlGetGroups;
+var secondsTimeoutLoginGrp = Config.secondsTimeoutLoginGrp;
+var prefOutgoingCall = Config.prefOutgoingCall;
+var localDDDToRemove = Config.localDDDToRemove;
 
 var connectionsUser = [];
 var connectionsAdmin = [];
@@ -55,6 +58,9 @@ Config.onchanged(function () {
     leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
     licenseAppFile = Config.licenseAppFile;
     licenseInstallDate = Config.licenseInstallDate;
+    secondsTimeoutLoginGrp = Config.secondsTimeoutLoginGrp;
+    prefOutgoingCall = Config.prefOutgoingCall;
+    localDDDToRemove = Config.localDDDToRemove;
     updateConfigUsers();
 });
 
@@ -464,6 +470,18 @@ new JsonApi("admin").onconnected(function (conn) {
                     Config.urlGetGroups = obj.vl;
                     Config.save();
                 }
+                if (obj.prt == "secondsTimeoutLoginGrp") {
+                    Config.secondsTimeoutLoginGrp = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "prefOutgoingCall") {
+                    Config.prefOutgoingCall = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "localDDDToRemove") {
+                    Config.localDDDToRemove = obj.vl;
+                    Config.save();
+                }
             }
             // license 
             if (obj.mt == "ConfigLicense") {
@@ -815,12 +833,12 @@ new PbxApi("RCC").onconnected(function (conn) {
             })
 
             //Sair de Todos os Grupos DAC do PABX para que usuario faca login
-            if (Boolean(leaveAllGroupsOnStatup)) {
-                log("danilo req UserInitializeResult: leaveAllGroupsOnStatup is " + String(leaveAllGroupsOnStatup));
-                var userC = connectionsUser.filter(function (userC) { return userC.sip === sip });
-                var msg = { api: "user", mt: "MakeCall", num: codLeaveAllGroups, src: sip };
-                userC[0].send(JSON.stringify(msg));
-            }
+            //if (Boolean(leaveAllGroupsOnStatup)) {
+            //    log("danilo req UserInitializeResult: leaveAllGroupsOnStatup is " + String(leaveAllGroupsOnStatup));
+            //    var userC = connectionsUser.filter(function (userC) { return userC.sip === sip });
+            //    var msg = { api: "user", mt: "MakeCall", num: codLeaveAllGroups, src: sip };
+            //    userC[0].send(JSON.stringify(msg));
+            //}
         }
         else if (obj.mt === "UserEndResult") {
             log("danilo req UserEndResult: RCC message:: received" + JSON.stringify(obj));
@@ -835,6 +853,12 @@ new PbxApi("RCC").onconnected(function (conn) {
                 }
             })
             log("RCC: connections after delete result " + JSON.stringify(RCC));
+
+            //Sair de todos os grupos para garantir que não entre mais chamadas para usuario
+            if (Boolean(leaveAllGroupsOnStatup)) {
+                log("danilo req UserEndResult: leaveAllGroupsOnStatup is " + String(leaveAllGroupsOnStatup));
+                logoutOnClose(sip)
+            }
 
         }
         else if (obj.mt === "CallInfo") {
@@ -1241,7 +1265,24 @@ function updateConfigUsers() {
     log("danilo-req updateConfigUsers:");
     connectionsAdmin.forEach(function (connection) {
         log("danilo-req updateConfigUsers:connection user" + connection.guid);
-        connection.send(JSON.stringify({ api: "admin", mt: "UpdateConfigResult", sH: sendCallHistory, sP: sendCallEvents, urlP: String(urlPhoneApiEvents), urlH: String(urlCallHistory), urlD: String(urlDashboard), urlSSO: String(urlSSO), CodCli: String(codClient), url: String(url), urlG: String(urlGetGroups), urlM: String(urlMobile), CodLeave: String(codLeaveAllGroups), sLS: leaveAllGroupsOnStatup}));
+        connection.send(JSON.stringify({
+            api: "admin", mt: "UpdateConfigResult",
+            sH: sendCallHistory,
+            sP: sendCallEvents,
+            urlP: String(urlPhoneApiEvents),
+            urlH: String(urlCallHistory),
+            urlD: String(urlDashboard),
+            urlSSO: String(urlSSO),
+            CodCli: String(codClient),
+            url: String(url),
+            urlG: String(urlGetGroups),
+            urlM: String(urlMobile),
+            CodLeave: String(codLeaveAllGroups),
+            sLS: leaveAllGroupsOnStatup,
+            secondsTimeoutLoginGrp: secondsTimeoutLoginGrp,
+            prefOutgoingCall: prefOutgoingCall,
+            localDDDToRemove: localDDDToRemove
+        }));
     });
 }
 //Function called by WebServer.onrequest("badge")
@@ -1332,6 +1373,39 @@ function updateBadge(sip, count) {
         log("danilo req: erro send badge: " + e);
     }
 }
+//Função chamada quando o usuário disconecta da RCC
+function logoutOnClose(sip) {
+    log("danilo-req pbxTableRequest::logoutOnClose: sip " + String(sip));
+    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip });
+
+    if (user[0].columns.grps) {
+        log("danilo-req pbxTableRequest::logoutOnClose:Objeto contem colunms.grps" + JSON.stringify(user[0].columns));
+        // Altera o status do Grupo para 'out'
+        user[0].columns.grps.forEach(function (grp) {
+            log("danilo-req pbxTableRequest::logoutOnClose: Group founded changing presence")
+            grp["dyn"] = "out";
+        })
+        // Envia a atualização para o PBX
+        if (pbxTable.length > 0) {
+            user[0].mt = "ReplicateUpdate";
+            log("danilo-req pbxTableRequest::logoutOnClose: found PBX connection user " + JSON.stringify(user[0]));
+            pbxTable[0].send(JSON.stringify(user[0]));
+        } else {
+            log("danilo-req pbxTableRequest::logoutOnClose: PBX connection is 0 ");
+        }
+
+        // Retorna a Lista para "NextResult" como inicialmente recebido do PBX
+        pbxTableUsers.forEach(function (u) {
+            if (u.columns.h323 == user[0].columns.h323) {
+                user[0].mt = "ReplicateNextResult";
+                Object.assign(u, user[0])
+                log("danilo-req pbxTableRequest::logoutOnClose: pbxTableUsers list updated " + JSON.stringify(pbxTableUsers));
+            }
+        })
+
+    }
+
+}
 //Function called by WebServer.onrequest("rcc")
 function rccRequest(value) {
 
@@ -1339,17 +1413,32 @@ function rccRequest(value) {
     var obj = JSON.parse(String(value));
 
     if (obj.mode == "Grp_Add") {
-        log("danilo-req rccRequest:Grp_Add before END Queue " + obj.user);
-        queues.push({ Fila: obj.user, Nome: obj.pbx })
-        log("danilo-req rccRequest:Grp_Add after END Queue " + obj.user);
+        log("danilo-req rccRequest:Grp_Add before ADD Queue " + obj.user);
+        if (!queueExists(obj)) {
+            queues.push({ Fila: obj.user, Nome: obj.pbx });
+            log("danilo-req rccRequest:Grp_Add after ADD Queue " + obj.user);
 
-        log("danilo-req rccRequest:Grp_Add wil call RCC for NEW Queue " + obj.user);
-        RCC.forEach(function (rcc) {
-            if (rcc.pbx == obj.pbx) {
-                var msg = { api: "RCC", mt: "UserInitialize", cn: obj.user, src: obj.user + "," + obj.pbx };
-                rcc.send(JSON.stringify(msg));
-            }
-        })
+            log("danilo-req rccRequest:Grp_Add wil call RCC for NEW Queue " + obj.user + " on PBX "+ obj.pbx);
+            RCC.forEach(function (rcc) {
+                if (rcc.pbx == obj.pbx) {
+                    var msg = { api: "RCC", mt: "UserInitialize", cn: obj.user, src: obj.user + "," + obj.pbx };
+                    rcc.send(JSON.stringify(msg));
+                }
+            })
+        } else {
+            log("danilo-req rccRequest:Grp_Add Queue already exists, nothing to do!");
+        }
+        //queues.push({ Fila: obj.user, Nome: obj.pbx })
+        //log("danilo-req rccRequest:Grp_Add after END Queue " + obj.user);
+
+        //log("danilo-req rccRequest:Grp_Add wil call RCC for NEW Queue " + obj.user);
+        //RCC.forEach(function (rcc) {
+        //    if (rcc.pbx == obj.pbx) {
+        //        var msg = { api: "RCC", mt: "UserInitialize", cn: obj.user, src: obj.user + "," + obj.pbx };
+        //        rcc.send(JSON.stringify(msg));
+        //    }
+        //})
+        
     }
     else if (obj.mode == "Grp_Del") {
         var foundQueue = queues.filter(function (queue) { return queue.Fila === obj.user });
@@ -1375,6 +1464,20 @@ function rccRequest(value) {
         log("danilo-req rccRequest:sip " + obj.sip);
         log("danilo-req rccRequest:mode " + obj.mode);
         log("danilo-req rccRequest:num " + obj.num);
+        if (obj.num.length >= 10) {
+            // Verifica se os dois primeiros dígitos de obj.num são iguais ao valor de ddd
+            if (obj.num.substring(0, 2) === localDDDToRemove) {
+                // Remove os dois primeiros dígitos
+                obj.num = obj.num.substring(2);
+                // Adiciona o primeiro dígito de prefOutgoingCall no início de obj.num
+                obj.num = prefOutgoingCall.charAt(0) + obj.num;
+            } else {
+                // Adiciona o prefOutgoingCall no início de obj.num
+                obj.num = prefOutgoingCall + obj.num
+            }
+            
+            log("danilo-req rccRequest:prefOutgoingCall num " + obj.num);
+        }
         var userC = connectionsUser.filter(function (userC) { return userC.sip === obj.sip });
         var user;
         RCC.forEach(function (rcc) {
@@ -1382,7 +1485,7 @@ function rccRequest(value) {
             log("danilo-req rccRequest:temp " + temp);
             if (temp != null) {
                 user = temp;
-                log("danilo-req rccRequest:wil call RCC for user id " + user+ " sip "+ obj.sip);
+                log("danilo-req rccRequest:wil call RCC for user id " + user + " sip " + obj.sip);
                 //callRCC(rcc, user, obj.mode, obj.num, obj.sip + "," + rcc.pbx);
                 if (obj.mode == "UserCall") {
                     log("danilo-req UserCall:sip " + obj.sip);
@@ -1399,15 +1502,15 @@ function rccRequest(value) {
                         log("danilo-req UserClear:call.callid " + JSON.stringify(call.callid));
                         log("danilo-req UserClear:call.sip " + JSON.stringify(call.sip));
                         if (call.sip == obj.sip) {
-            
+
                             //var msg = { api: "RCC", mt: "UserClear", call: call.callid, src: call.sip };
                             //log("danilo req callRCC: UserClear sent rcc msg " + JSON.stringify(msg));
                             //ws.send(JSON.stringify(msg));
                             var msg = { api: "user", mt: "DisconnectCall", src: obj.sip };
                             userC[0].send(JSON.stringify(msg));
                         }
-                        
-            
+
+
                     })
                 }
                 else if (obj.mode == "UserHold") {
@@ -1416,7 +1519,7 @@ function rccRequest(value) {
                             var msg = { api: "RCC", mt: "UserHold", call: call.callid, remote: true, src: call.src };
                             rcc.send(JSON.stringify(msg));
                         }
-            
+
                     })
                 }
                 else if (obj.mode == "UserRetrieve") {
@@ -1426,16 +1529,16 @@ function rccRequest(value) {
                             var msg = { api: "RCC", mt: "UserRetrieve", call: call.callid, src: call.src };
                             rcc.send(JSON.stringify(msg));
                         }
-            
+
                     })
                 }
                 else if (obj.mode == "UserRedirect") {
                     calls.forEach(function (call) {
                         if (call.sip == obj.sip) {
-                            var msg = { api: "RCC", mt: "UserRedirect",  call: call.callid, e164: obj.num, src: call.src };
+                            var msg = { api: "RCC", mt: "UserRedirect", call: call.callid, e164: obj.num, src: call.src };
                             rcc.send(JSON.stringify(msg));
                         }
-            
+
                     })
                 }
                 else if (obj.mode == "UserConnect") {
@@ -1450,11 +1553,16 @@ function rccRequest(value) {
                             var msg = { api: "user", mt: "ConnectCall", call: call.callid, src: call.src };
                             userC[0].send(JSON.stringify(msg));
                         }
-            
+
                     })
                 }
+            } else {
+                log("danilo-req rccRequest:temp is NULL, user must login first in Wecall App, then try to call again");
             }
         })
+        if (RCC.length == 0) {
+            log("danilo-req rccRequest: we don't have any RCC connection to make the request, please see if the PBX are Ok and allow RCC access to the app Instance.");
+        }
     }
 }
 //Function called by WebServer.onrequest("pbxTable")
@@ -1463,6 +1571,9 @@ function pbxTableRequest(value) {
     var obj = JSON.parse(String(value));
     var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
     var found = false;
+    var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+    var seconds = miliSeconds * 1000
+    log("danilo-req:pbxTableRequest:seconds to wait "+seconds)
 
     if (user[0].columns.grps) {
         log("danilo-req pbxTableRequest:Objeto contem colunms.grps" + JSON.stringify(user[0].columns));
@@ -1483,19 +1594,77 @@ function pbxTableRequest(value) {
             log("danilo-req pbxTableRequest: Group not founded including it");
             if (obj.mode == "Login") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "in" })
+
+
+                var t = Timers.setTimeout(function () {
+                    if (pbxTable.length > 0) {
+                        user[0].mt = "ReplicateUpdate";
+                        log("danilo-req pbxTable: found PBX connection user " + JSON.stringify(user[0]));
+                        pbxTable[0].send(JSON.stringify(user[0]));
+                    } else {
+                        log("danilo-req pbxTable: PBX connection is 0 ");
+                    }
+                    log("danilo-req pbxTable:timeout after " + seconds+" seconds!");
+                    Timers.clearTimeout(t);
+                }, seconds);
             }
             if (obj.mode == "Logout") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+
+                if (pbxTable.length > 0) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("danilo-req pbxTable: found PBX connection user " + JSON.stringify(user[0]));
+                    pbxTable[0].send(JSON.stringify(user[0]));
+                } else {
+                    log("danilo-req pbxTable: PBX connection is 0 ");
+                }
             }
         }
-        //Teste do problema de antrar e sair de grupos
-        if (pbxTable.length >0) {
-            user[0].mt="ReplicateUpdate";
-            log("danilo-req pbxTable: found PBX connection user "+ JSON.stringify(user[0]));
-            pbxTable[0].send(JSON.stringify(user[0]));
-        }else{
-            log("danilo-req pbxTable: PBX connection is 0 ");
+        else {
+            if (obj.mode == "Login") {
+                var t = Timers.setTimeout(function () {
+                    if (pbxTable.length > 0) {
+                        user[0].mt = "ReplicateUpdate";
+                        log("danilo-req pbxTable: found PBX connection user " + JSON.stringify(user[0]));
+                        pbxTable[0].send(JSON.stringify(user[0]));
+                    } else {
+                        log("danilo-req pbxTable: PBX connection is 0 ");
+                    }
+                    log("danilo-req pbxTable:timeout after " + seconds +" seconds!");
+                    Timers.clearTimeout(t);
+                }, seconds);
+            }
+            if (obj.mode == "Logout") {
+                user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+
+                if (pbxTable.length > 0) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("danilo-req pbxTable: found PBX connection user " + JSON.stringify(user[0]));
+                    pbxTable[0].send(JSON.stringify(user[0]));
+                } else {
+                    log("danilo-req pbxTable: PBX connection is 0 ");
+                }
+            }
+
         }
+        //Teste do problema de antrar e sair de grupos
+        //Substituido por um timer de 15 segundos em mode Login
+        //if (pbxTable.length >0) {
+        //     user[0].mt="ReplicateUpdate";
+        //     log("danilo-req pbxTable: found PBX connection user " + JSON.stringify(user[0]));
+        //     if (obj.mode == "Login") {
+        //         var t = Timers.setTimeout(function () {
+                     
+        //             pbxTable[0].send(JSON.stringify(user[0]))
+        //             log("danilo-req pbxTable:timeout after 15 seconds!");
+        //             Timers.clearTimeout(t);
+        //         }, 15000);
+        //     } else {
+        //         pbxTable[0].send(JSON.stringify(user[0]));
+        //     }
+        //}else{
+        //    log("danilo-req pbxTable: PBX connection is 0 ");
+        //}
         // pbxTable.forEach(function (conn) {
         //     log("danilo-req pbxTable: forEach conn "+ JSON.stringify(conn));
         //     if (conn.pbx == user[0].src) {
@@ -1504,6 +1673,8 @@ function pbxTableRequest(value) {
         //         conn.send(JSON.stringify(user[0]));
         //     }
         // })
+
+        //Retorna a Lista para "NextResult" como inicialmente recebido do PBX
         pbxTableUsers.forEach(function (u) {
             if (u.columns.h323 == user[0].columns.h323) {
                 user[0].mt = "ReplicateNextResult";
@@ -1512,7 +1683,8 @@ function pbxTableRequest(value) {
             }
         })
 
-    } else {
+    }
+    else {
         log("danilo-req pbxTableRequest:Objeto nno contem colunms.grps" + JSON.stringify(user[0].columns));
         if (obj.mode == "Login") {
             //user[0].columns.grps = [];
@@ -1525,6 +1697,20 @@ function pbxTableRequest(value) {
             ];
             user[0].columns.grps = grps;
             user[0].columns.grps.push({ name: obj.group, dyn: "in" })
+
+
+            var t = Timers.setTimeout(function () {
+                log("danilo-req pbxTableRequest:timeout after " + seconds +" seconds!");
+                pbxTable.forEach(function (conn) {
+                    if (conn.pbx == user[0].src) {
+                        user[0].mt = "ReplicateUpdate";
+                        log("danilo-req pbxTableRequest:Objeto a ser enviado no pbxTable " + JSON.stringify(user[0]));
+                        conn.send(JSON.stringify(user[0]));
+                    }
+                })
+                Timers.clearTimeout(t);
+            }, seconds);
+
         }
         if (obj.mode == "Logout") {
             //user[0].columns.grps = [];
@@ -1537,14 +1723,25 @@ function pbxTableRequest(value) {
             ];
             user[0].columns.grps = grps;
             user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+
+            pbxTable.forEach(function (conn) {
+                if (conn.pbx == user[0].src) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("danilo-req pbxTableRequest:Objeto a ser enviado no pbxTable " + JSON.stringify(user[0]));
+                    conn.send(JSON.stringify(user[0]));
+                }
+            })
         }
-        pbxTable.forEach(function (conn) {
-            if (conn.pbx == user[0].src) {
-                user[0].mt = "ReplicateUpdate";
-                log("danilo-req pbxTableRequest:Objeto a ser enviado no pbxTable "+JSON.stringify(user[0]));
-                conn.send(JSON.stringify(user[0]));
-            }
-        })
+        //Colocado um delay de 15 segundos no mode Login
+        //pbxTable.forEach(function (conn) {
+        //    if (conn.pbx == user[0].src) {
+        //        user[0].mt = "ReplicateUpdate";
+        //        log("danilo-req pbxTableRequest:Objeto a ser enviado no pbxTable " + JSON.stringify(user[0]));
+        //        conn.send(JSON.stringify(user[0]));
+        //    }
+        //})
+
+        //Retorna a Lista para "NextResult" como inicialmente recebido do PBX
         pbxTableUsers.forEach(function (u) {
             if (u.columns.h323 == user[0].columns.h323) {
                 user[0].mt = "ReplicateNextResult";
@@ -1640,6 +1837,16 @@ function httpClient(url, method, msg, callback) {
         });
 }
 
+
+// Função para verificar se o objeto já existe na lista
+function queueExists(obj) {
+    for (var i = 0; i < queues.length; i++) {
+        if (queues[i].Fila === obj.user && queues[i].Nome === obj.pbx) {
+            return true;
+        }
+    }
+    return false;
+}
 //Functions to delete objects from Arrays
 function removeObjectBySip(sip) {
     return function (value) {

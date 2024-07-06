@@ -360,6 +360,31 @@
           },
           {
             "cmd": "column",
+            "name": "o3",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "hcho",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "pm2_5",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "pm10",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
+            "name": "beep",
+            "type": "text"
+          },
+          {
+            "cmd": "column",
             "name": "date",
             "type": "text"
           }

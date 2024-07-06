@@ -154,6 +154,27 @@
         "type": "STRING",
         "default": "https://wecallsup.3sales.net/api/innovaphone/getgroups",
         "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "secondsTimeoutLoginGrp",
+        "type": "STRING",
+        "default": "15",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "prefOutgoingCall",
+        "type": "STRING",
+        "default": "0",
+        "password": false
+      },
+      {
+        "cmd": "item",
+        "name": "localDDDToRemove",
+        "type": "STRING",
+        "default": "",
+        "password": false
       }
     ]
   },

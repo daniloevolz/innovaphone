@@ -3811,6 +3811,7 @@ function getButtonTypeText(buttonType) {
                             <option value="RptActivities" style = "text-align:center">${texts.text("labelRptActivities")}</option>
                             <option value="RptAvailability" style = "text-align:center">${texts.text("labelRptAvailability")}</option>
                             <option value="RptMessages" style = "text-align:center">${texts.text("labelRptMessages")}</option>
+                            <option value="RptSensorHistory" style = "text-align:center">${texts.text("labelRptSensorHistory")}</option>
                         </select>
                     </div> 
                     <div class="divButtonsGeneric">

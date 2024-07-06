@@ -59,14 +59,16 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
     var licenseInstallDate;
     var licenseUsed;
     var secondsTimeoutLoginGrp;
+    var prefOutgoingCall;
+    var localDDDToRemove;
 
     function makeDivCallListAPI(t) {
         t.clear();
         //CallList
         var labelCallList = t.add(new innovaphone.ui1.Div("position: absolute;left: 0px;width: 100%; top: 10%; font-size: 15px; text-align: center; text-decoration: underline;color: blue;", texts.text("labelCallListAdmin")));
         var labelChkCallList = t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelChkCallList")));
-        var switchCallList = t.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;",null,null,CallList));
-        switchCallList.addEvent("click", onCallListSwitchCLick);
+        //var switchCallList = t.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;",null,null,CallList));
+        //switchCallList.addEvent("click", onCallListSwitchCLick);
 
         var labelURLCallList = t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelURLCallList")));
         var iptUrlCallList = t.add(new innovaphone.ui1.Input("position:absolute; left:36%; width:30%; top:15%; font-size:12px; text-align:center", UrlCallList, texts.text("urlText"), 255, "url", null));
@@ -74,11 +76,22 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:15%; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "urlCallHistory", vl: String(iptUrlCallList.getValue()) });
         });
-        var onCallListSwitchCLick = function() {
-            var state = switchCallList.getValue();
-            //e.currentTarget.state;
+        //var onCallListSwitchCLick = function(e) {
+        //    var state = e.currentTarget.state;
+        //    //e.currentTarget.state;
+        //    app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallHistory", vl: state });
+        //}
+
+
+        onSwitchCLick = function (e) {
+            var state = e.currentTarget.state;
             app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallHistory", vl: state });
         }
+
+        var switchEl = new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;",null,null, CallList);
+        t.add(switchEl)
+        switchEl.addEvent("click", onSwitchCLick);
+
     }
 
     function makeDivCallEventsAPI(t) {
@@ -86,8 +99,8 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         //RCC CallEvents
         var labelCallEvents = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:10%; font-size:15px; text-align:center;text-decoration: underline;color: blue;", texts.text("labelCallEventsAdmin")));
         var labelChkCallEvents = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelChkCallEvents")));
-        var switchCallEvents = t.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;",null,null,CallEvents));
-        switchCallEvents.addEvent("click", onCallEventsSwitchCLick);
+        //var switchCallEvents = t.add(new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;",null,null,CallEvents));
+        //switchCallEvents.addEvent("click", onCallEventsSwitchCLick);
 
         var labelURLCallEvents = t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:15%; top:15%; font-size:15px; text-align:right", texts.text("labelURLCallEvents")));
         var iptUrlCallEvents = t.add(new innovaphone.ui1.Input("position:absolute; left:36%; width:30%; top:15%; font-size:12px; text-align:center", UrlCallEvents, texts.text("urlText"), 255, "url", null));
@@ -96,12 +109,35 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             app.send({ api: "admin", mt: "UpdateConfig", prt: "urlPhoneApiEvents", vl: String(iptUrlCallEvents.getValue()) });
         });
 
-        var onCallEventsSwitchCLick = function() {
+        //var onCallEventsSwitchCLick = function(e) {
 
-            var state = switchCallEvents.getValue();
+            //var state = e.currentTarget.state;
             //e.currentTarget.state;
+            //app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: state });
+        //}
+
+        onSwitchCLick = function (e) {
+            var state = e.currentTarget.state;
             app.send({ api: "admin", mt: "UpdateConfig", prt: "sendCallEvents", vl: state });
         }
+
+        var switchEl = new innovaphone.ui1.Switch("position:absolute; left:16%; top:15%;", null, null, CallEvents);
+        t.add(switchEl)
+        switchEl.addEvent("click", onSwitchCLick);
+
+        //Prefixo Números Externos
+        var labelPrefOutgoingCall = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:35%; font-size:15px; text-align:right", texts.text("labelPrefOutgoingCall")));
+        var iptPrefOutgoingCall = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:35%; font-size:12px; text-align:center", prefOutgoingCall, texts.text("labelPrefOutgoingCall"), 255, "text", null));
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:35%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+            app.send({ api: "admin", mt: "UpdateConfig", prt: "prefOutgoingCall", vl: String(iptPrefOutgoingCall.getValue()) });
+        });
+
+        //DDD para ser removido em ligações de saída
+        var labelLocalDDDToRemove = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:45%; font-size:15px; text-align:right", texts.text("labelLocalDDDToRemove")));
+        var iptLocalDDDToRemove = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:45%; font-size:12px; text-align:center", localDDDToRemove, texts.text("labelLocalDDDToRemove"), 255, "text", null));
+        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:45%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+            app.send({ api: "admin", mt: "UpdateConfig", prt: "localDDDToRemove", vl: String(iptLocalDDDToRemove.getValue()) });
+        });
 
     }
 
@@ -236,22 +272,29 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
         });
 
         //Código Sair de Todos os Grupos
-        var labelCodLeaveGroups = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelCodLeaveGroups")));
-        var iptCodLeaveGroups = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:25%; font-size:12px; text-align:center", CodLeaveGroups, texts.text("urlText"), 255, "url", null));
-        t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:25%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
-            app.send({ api: "admin", mt: "UpdateConfig", prt: "CodLeaveGroups", vl: String(iptCodLeaveGroups.getValue()) });
-        });
+        //var labelCodLeaveGroups = t.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelCodLeaveGroups")));
+        //var iptCodLeaveGroups = t.add(new innovaphone.ui1.Input("position:absolute; left:16%; width:20%; top:25%; font-size:12px; text-align:center", CodLeaveGroups, texts.text("urlText"), 255, "url", null));
+        //t.add(new innovaphone.ui1.Div("position:absolute; left:50%; width:15%; top:25%; height:auto; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
+         //   app.send({ api: "admin", mt: "UpdateConfig", prt: "CodLeaveGroups", vl: String(iptCodLeaveGroups.getValue()) });
+        //});
         //Checkbox sair dos grupos ao entrar
-        var labelChkLeaveGroupsStartup = t.add(new innovaphone.ui1.Div("position:absolute; left:70%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelChkLeaveGroupsStartup")));
-        var switchLeaveGroupsStartup = t.add(new innovaphone.ui1.Switch("position:absolute; left:90%; top:25%;",null,null,LeaveGroupsStartup));
-        switchLeaveGroupsStartup.addEvent("click", onLeaveGroupsStartupSwitchCLick);
-
-        var onLeaveGroupsStartupSwitchCLick = function() {
-
-            var state = switchLeaveGroupsStartup.getValue();
+        var labelChkLeaveGroupsStartup = t.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:15%; top:25%; font-size:15px; text-align:right", texts.text("labelChkLeaveGroupsStartup")));
+        //var switchLeaveGroupsStartup = t.add(new innovaphone.ui1.Switch("position:absolute; left:15%; top:25%;",null,null,LeaveGroupsStartup));
+        //switchLeaveGroupsStartup.addEvent("click", onLeaveGroupsStartupSwitchCLick);
+        //var onLeaveGroupsStartupSwitchCLick = function(e) {
+        //    var state = e.currentTarget.state;
             //e.currentTarget.state;
+        //    app.send({ api: "admin", mt: "UpdateConfig", prt: "leaveGroupsStartup", vl: state });
+        //}
+
+        onSwitchCLick = function (e) {
+            var state = e.currentTarget.state;
             app.send({ api: "admin", mt: "UpdateConfig", prt: "leaveGroupsStartup", vl: state });
         }
+
+        var switchEl = new innovaphone.ui1.Switch("position:absolute; left:15%; top:25%;", null, null, LeaveGroupsStartup);
+        t.add(switchEl)
+        switchEl.addEvent("click", onSwitchCLick);
     }
 
     function makeDivLicense(t) {
@@ -315,6 +358,8 @@ Wecom.wecallAdmin = Wecom.wecallAdmin || function (start, args) {
             CodLeaveGroups=obj.CodLeave;
             LeaveGroupsStartup = obj.sLS;
             secondsTimeoutLoginGrp = obj.secondsTimeoutLoginGrp;
+            prefOutgoingCall = obj.prefOutgoingCall
+            localDDDToRemove = obj.localDDDToRemove
         }
         if (obj.api == "admin" && obj.mt == "TableUsersResult") {
             console.log("TableUsersResult:result="+obj.result);
