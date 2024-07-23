@@ -196,6 +196,7 @@ h1 {
     flex: 1 1 0px;
     overflow: auto;
     margin-left: 8px;
+    display: grid;
 }
 /* Div 6 */
 .xml-box-wrapper .box-card h1 {

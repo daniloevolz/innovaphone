@@ -10,14 +10,28 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 
     var colorSchemes = {
         dark: {
-            "--bg": "#191919",
+            "--bg": "#333",
             "--button": "#303030",
             "--text-standard": "#f2f5f6",
+            "--bs-body-bg":"#303030",
+            "--bs-primary-text-emphasis":"white",
+            "--bs-body-color":"#fff",
+            "--bs-secondary-bg":"#5b5d5f",
+            "--bs-secondary-color":"white",
+            "--bs-tertiary-color":"white",
+            "--bs-tertiary-bg": "#343a40",
         },
         light: {
             "--bg": "white",
             "--button": "#e0e0e0",
             "--text-standard": "#4a4a49",
+            "--bs-secondary-bg":"#e9ecef",
+            "--bs-body-bg":"#fff",
+            "--bs-body-color":"#333",
+            "--bs-primary-text-emphasis": "#333",
+            "--bs-secondary-color":"#333",
+            "--bs-tertiary-color":"#333",
+            "--bs-tertiary-bg": "#f8f9fa",
         }
     };
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
@@ -484,7 +498,7 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
             const xml = `<app-box-item xml-id=${x.id} tabindex="0" class="full-width element">
                     <div class="xml-box-wrapper d-flex flex-row flex-wrap theme-secondary">
                     <!---->
-                    <div class="box-title">
+                    <div class="d-flex box-title">
                     <div class="box-icon">
                         <fa-icon class="ng-fa-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#001a4d" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-code"><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/></svg></fa-icon>
@@ -562,12 +576,13 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                 let xmlId = e.currentTarget.getAttribute('xml-id');
                 // Example usage:
                 console.log('Item to edit ' + xmlId);
+                getFileById(xmlId)
             })
         })
         //#endregion
     }
 
-    function manageLicense() {
+    function manageLicense(){
         app.sendSrc({ api: 'user', mt: 'ConfigLicense', src: 1 }, async function (obj) {
             console.log('LicenseMessageResult=' + JSON.stringify(obj))
             try {
@@ -667,7 +682,6 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                 console.log("ERRO LicenseMessageResult:" + e)
             }
         })
-
     }
 
 
@@ -818,7 +832,7 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
     //#endregion
 
 
-    function formatTimestamp(timestamp) {
+    function formatTimestamp(timestamp){
         const date = new Date(timestamp);
 
         const day = String(date.getDate()).padStart(2, '0');
@@ -831,9 +845,20 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 
         return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
+    function getValueAfterLastSlash(str) {
+        try {
 
+            var lastSlashIndex = str.lastIndexOf('/');
+            if (lastSlashIndex === -1) {
+                return ''; // Retorna uma string vazia se não houver /
+            }
+            return str.substring(lastSlashIndex + 1);
+        } catch (e) {
+            return '';
+        }
+    }
     //Função para mostrar Objetos VM no PBX
-    function selectVms(e) {
+    function selectVms(e){
         app.sendSrc({ api: 'user', mt: 'VmObjects', src: 1 }, async function (obj) {
             console.log('VmObjectsResult=' + JSON.stringify(obj.result))
             const vms = obj.result;
@@ -864,6 +889,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 
 
             vms.forEach(function (el) {
+
+                const scriptId = getValueAfterLastSlash(extractUrl(el.columns.pseudo))
+                const xml = xmls.filter(x => x.id == scriptId)
                 const vm = `<app-box-item vm-guid=${el.columns.guid}  _ngcontent-serverapp-c1993480350="" _nghost-serverapp-c1014264283="" tabindex="0" class="full-width element">
                     <div class="box-wrapper d-flex flex-row flex-wrap theme-secondary">
                     <!---->
@@ -881,12 +909,12 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                         <!---->
                     </div>
                     </div>
-                    <div class="box-title">
+                    <div class="d-flex box-title">
                     <div class="box-card">
                         <!---->
                         <h1 class="mb-0">${texts.text('script')}</h1>
-                        <input type="text" vm-guid=${el.columns.guid} value=${extractUrl(el.columns.pseudo)}></>
-                        <!---->
+                        <select vm-guid=${el.columns.guid} id="vmScriptUrl">
+                        </select>
                     </div>
                     <!---->
                     <div class="box-card">
@@ -916,6 +944,18 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                     </app-box-item>
                 `
                 insideLeftPane.innerHTML += vm;
+                const selectScript = document.querySelector('select[vm-guid="' + el.columns.guid + '"]')
+                xmls.forEach(function(xml){
+                    const option = document.createElement('option');
+                    option.textContent = xml.name;
+                    option.value = start.originalUrl + "/files/" + xml.id;
+                    // Verifica se esta e a opção que deve ser selecionada
+                    if (xml.id == scriptId) {
+                        option.selected = true; // Define esta opção como selecionada
+                    }
+                    // Adiciona a nova opção ao <select>
+                    selectScript.appendChild(option);
+                })
             })
                 
             addSaveUrlClickListeners();
@@ -924,16 +964,178 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
         })
 
     }
+    function newVm(e){
+        console.log('newVm:')
+        const leftPane = document.getElementById('left-pane')
+            leftPane.innerHTML = '';
+
+            //#region TOPBAR
+            let topBar = document.createElement('div')
+            topBar.classList.add('left-top-bar')
+
+            // Cria o botão
+            button = document.createElement('button');
+            button.id = 'addVm';
+            button.textContent = texts.text('addVm'); // Define o texto do botão
+
+            topBar.appendChild(button)
+
+            leftPane.appendChild(topBar);
+
+
+            let insideLeftPane = document.createElement('div')
+            insideLeftPane.id = 'inside-left-pane'
+            insideLeftPane.classList.add('group-list-container', 'inside-left-pane')
+            leftPane.appendChild(insideLeftPane);
+            var btnAddVm = document.getElementById('addVm')
+            btnAddVm.addEventListener('click', function(e){
+                const vmName = document.getElementById('newVmName').value
+                const newVmNum = document.getElementById('newVmNum').value
+                const newVmSip = document.getElementById('newVmSip').value
+                const selectScript = document.getElementById('newVmScriptUrl')
+                const selectedOption = selectScript.options[selectScript.selectedIndex];
+                const selectedText = selectedOption.text;
+                const newVmUrl = selectedOption.value;
+
+                if(vmName.length=0){
+                    createInfoModal(texts.text('warning'), texts.text('warningFillName'), texts.text('ok'))
+                    return;
+                }
+                if(newVmNum.length=0){
+                    createInfoModal(texts.text('warning'), texts.text('warningFillNum'), texts.text('ok'))
+                    return;
+                }
+                if(newVmSip.length=0){
+                    createInfoModal(texts.text('warning'), texts.text('warningFillSip'), texts.text('ok'))
+                    return;
+                }
+
+                if(vmName.length>0 && newVmNum.length>0 && newVmSip.length>0){
+                    app.sendSrc({api: 'user', mt: 'AddVmObject', name:vmName, e164:newVmNum, sip:newVmSip, url:newVmUrl, src: 1 }, async function(obj){
+                        console.log('AddVmObjectSucess')
+                        if(obj.mt =='AddVmObjectNoLicense'){
+                            createInfoModal(texts.text('warning'), texts.text('warningNoVmLicense'), texts.text('ok'))
+                            return;
+                        }else{
+                            selectVms();
+                        }
+                        console.log(obj)
+                        
+                    })
+                }
+            })
+            //#endregion
+            const vm = `<app-box-item tabindex="0" class="full-width element">
+                    <div class="xml-box-wrapper row-gap-10 d-flex flex-row flex-wrap theme-secondary">
+                    <!---->
+                    <div class="box-title">
+                    <div class="box-icon">
+                        <fa-icon class="ng-fa-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-audio-lines"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></fa-icon>
+                    </div>
+                    <!---->
+                    <!---->
+                    <!---->
+                    </div>
+                    <div class="box-title">
+                    <div class="box-card function-stack-return">
+                        <!---->
+                        <h1 class="mb-1">${texts.text('vmName')}</h1>
+                        <input type="text" id="newVmName" appdebuggerpopup="" class="highlight-variable"/>
+                        <!---->
+                    </div>
+                    </div>
+                    <div class="box-title">
+                        <div class="box-card">
+                            <!---->
+                            <h1 class="mb-1">${texts.text('number')}</h1>
+                            <input type="text" id="newVmNum" appdebuggerpopup="" class="highlight-variable"/>
+                            <!---->
+                        </div>
+                    </div>
+                    <div class="box-title">
+                        <div class="box-card">
+                            <!---->
+                            <h1 class="mb-1">${texts.text('vmSip')}</h1>
+                            <input type="text" id="newVmSip" appdebuggerpopup="" class="highlight-variable"/>
+                            <!---->
+                        </div>
+                    </div>
+                    <div class="box-title">
+                        <div class="box-card">
+                            <!---->
+                            <h1 class="mb-1">${texts.text('script')}</h1>
+                            <select id="newVmScriptUrl">
+                              <option value=""></>
+                            </select>
+                            <!---->
+                        </div>
+                    </div>
+                    <!---->
+                    <!---->
+                    <!---->
+                    </app-box-item>
+                `
+            insideLeftPane.innerHTML += vm;
+
+            const selectScript = document.getElementById('newVmScriptUrl')
+            xmls.forEach(function(xml){
+                const option = document.createElement('option');
+                option.textContent = xml.name;
+                option.value = start.originalUrl + "/files/" + xml.id;
+                // Adiciona a nova opção ao <select>
+                selectScript.appendChild(option);
+            })
+    }
 
     // Atualiza o nome do arquivo selecionado
     function setProccessTitle(title) {
         const summaryTitle = document.getElementById('app-process-summary-title');
+        if (title.length > 0) {
+            var parts = title.split(".");
+            title = parts[0];
+        }
         if (summaryTitle) {
             const secondDiv = summaryTitle.querySelectorAll('div')[1]; // Isso pega a segunda div aninhada
             if (secondDiv) {
-                secondDiv.textContent = title; // Altera o conteudo da segunda div
+                secondDiv.innerHTML = `
+                <input type="text" class="iptFilename" id="filename" placeholder=${texts.text('fileName')} value=${title}>
+            `;
             }
         }
+    }
+
+    function clearRightPane() {
+
+        setProccessTitle('')
+
+        nextIndex = 0;
+
+        var functionStackContainerMain = document.getElementById('function-stack-container-main')
+        functionStackContainerMain.innerHTML = '';
+        var appProcessCardNoItemsMain = createElement('app-process-card-no-items', 'ng-star-inserted');
+        functionStackContainerMain.appendChild(appProcessCardNoItemsMain);
+
+        var emptyErrorMain = createElement('div', 'empty-error');
+        appProcessCardNoItemsMain.appendChild(emptyErrorMain);
+
+        var py3Main = createElement('div', 'py-3');
+        py3Main.innerText = texts.text('noFunction');
+        emptyErrorMain.appendChild(py3Main);
+
+
+        var functionStackContainerMain = document.getElementById('function-stack-container-function')
+        functionStackContainerMain.innerHTML = '';
+        var appProcessCardNoItemsMain = createElement('app-process-card-no-items', 'ng-star-inserted');
+        functionStackContainerMain.appendChild(appProcessCardNoItemsMain);
+
+        var emptyErrorMain = createElement('div', 'empty-error');
+        appProcessCardNoItemsMain.appendChild(emptyErrorMain);
+
+        var py3Main = createElement('div', 'py-3');
+        py3Main.innerText = texts.text('noFunction');
+        emptyErrorMain.appendChild(py3Main);
+
     }
 
     const extractUrl = (str) => {
@@ -942,14 +1144,17 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
         return match ? match[1] : null;
     };
 
-    function addSaveUrlClickListeners(e) {
+    function addSaveUrlClickListeners(e){
         document.querySelectorAll('#saveVm').forEach(el => {
             el.addEventListener('click', function (e) {
                 var vmGuid = e.currentTarget.getAttribute('vm-guid');
-                var inputElement = document.querySelector('input[vm-guid="' + vmGuid + '"]');
-                if (inputElement) {
-                    console.log(inputElement.value);
-                    app.sendSrc({ api: 'user', mt: 'SetVmObjectUrl', guid:vmGuid, url:inputElement.value, src: 1 }, async function (obj) {
+                var selectScript = document.querySelector('select[vm-guid="' + vmGuid + '"]');
+                const selectedOption = selectScript.options[selectScript.selectedIndex];
+                const selectedText = selectedOption.text;
+                const newVmUrl = selectedOption.value;
+                if (newVmUrl) {
+                    console.log(newVmUrl);
+                    app.sendSrc({ api: 'user', mt: 'SetVmObjectUrl', guid:vmGuid, url:newVmUrl, src: 1 }, async function (obj) {
                         console.log('SetVmObjectUrlResult=' + JSON.stringify(obj.result))
                         selectVms();
                     })
@@ -959,7 +1164,7 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
             });
         })
     }
-    function addDelVmClickListeners(e) {
+    function addDelVmClickListeners(e){
         document.querySelectorAll('#deleteVm').forEach(el => {
             el.addEventListener('click', function (e) {
                 var vmGuid = e.currentTarget.getAttribute('vm-guid');
@@ -980,15 +1185,7 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
     }
 
     function newScript(e) {
-        const summaryTitle = document.getElementById('app-process-summary-title');
-        if (summaryTitle) {
-            const secondDiv = summaryTitle.querySelectorAll('div')[1]; // Isso pega a segunda div aninhada
-            if (secondDiv) {
-                secondDiv.innerHTML = `
-                <input type="text" class="iptFilename" id="filename" placeholder=${texts.text('fileName')}>
-            `;
-            }
-        }
+        clearRightPane()
 
         const leftPane = document.getElementById('inside-left-pane')
         leftPane.innerHTML = '';
@@ -1081,10 +1278,513 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
     }
     //#endregion
 
+    // Funcao para adicionar listeners aos inputs result as
+    function addEventListenersToInputs() {
+        // Seleciona todos os elementos input com o id 'inputVarName'
+        const inputs = document.querySelectorAll('input[id="inputVarName"]');
+
+        // Adiciona um event listener de 'change' para cada input
+        inputs.forEach(input => {
+            // Remove event listeners existentes para evitar duplica��o
+            input.removeEventListener('change', handleInputChange);
+            // Adiciona o novo event listener
+            input.addEventListener('change', handleInputChange);
+        });
+
+
+    }
+    // Funcao que trata a mudanca no input
+    function handleInputChange(event) {
+        const changedInput = event.target;
+        // Encontra o caminho especifico ate o app-process-function-stack-row-type-generic correspondente
+        let parentRow = changedInput.closest('app-process-function-stack-row-type-generic');
+        if (parentRow) {
+            // Encontra o elemento com id='highlight-variable' dentro do parentRow
+            const highlightVariable = parentRow.querySelector('#highlight-variable');
+            if (highlightVariable) {
+                // Atualiza o valor do highlight-variable com o valor do input alterado
+                highlightVariable.textContent = '$' + changedInput.value; // ou highlightVariable.textContent, dependendo do elemento
+                console.log(`Elemento com id 'highlight-variable' atualizado para: ${changedInput.value}`);
+            }
+        }
+    }
+    // Funcao para adicionar listeners nas Stacks
+    function addEventListenersToStacks() {
+        const divs = document.querySelectorAll('div[similarclassname="function-stack-function"]');
+
+        divs.forEach(div => {
+            // Adiciona o evento mouseover para adicionar a classe
+            div.addEventListener('mouseover', () => {
+                div.classList.add('force-hover');
+            });
+
+            // Adiciona o evento mouseout para remover a classe
+            div.addEventListener('mouseout', () => {
+                div.classList.remove('force-hover');
+            });
+        });
+    }
+    // Funcao para adicionar Listners Lower Actions
+    function addEventListenerToLowerActions(card) {
+        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
+
+        lowerActions.forEach(button => {
+            button.removeEventListener('click', lowerActionsclick);
+            button.addEventListener('click', lowerActionsclick);
+        });
+
+
+    }
+    //Funcao auxiliar para Tratar Clicks em Lower Actions
+    function lowerActionsclick(event) {
+        const targetCard = event.currentTarget.getAttribute('card');
+        const card = document.querySelector('app-process-' + targetCard + '-card')
+        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
+        lowerActions.forEach(action => {
+            if (action.classList.contains('force-active')) {
+                action.classList.remove('force-active');
+            }
+        });
+        const targetIndex = parseInt(event.currentTarget.getAttribute('index'));
+        console.log('lower action clicado ' + targetIndex)
+        nextIndex = targetIndex
+        event.currentTarget.classList.add('force-active')
+    }
+    // Funcao para adicionar Listners Hover Delete Stack
+    function addEventListenerToDellStacks(card) {
+        const deleteButtons = card.querySelectorAll('#deleteStack');
+
+        deleteButtons.forEach(button => {
+            button.removeEventListener('click', deleteStack);
+            button.addEventListener('click', deleteStack);
+        });
+
+
+    }
+    // Funcao para deletar um elemento pelo index e ajustar os indices
+    function deleteStack(event) {
+        const targetIndex = parseInt(event.currentTarget.getAttribute('index')); // Parse para garantir que seja um numero
+        const targetCard = event.currentTarget.getAttribute('card');
+        const card = document.querySelector('app-process-' + targetCard + '-card')
+        let allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
+
+        if (targetIndex >= 0 && targetIndex < allRows.length) {
+            // Remove o elemento do DOM pelo �ndice targetIndex
+            const removedElement = allRows[targetIndex];
+            removedElement.parentNode.removeChild(removedElement);
+            console.log(`Elemento com indice ${targetIndex} removido.`);
+
+            // Atualiza os indices dos elementos restantes
+            allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
+            updateStackIndex(card, targetIndex, -1)
+
+            // Verifica se nao ha um unico elemento restante e exibe um aviso se necessario
+            if (allRows.length === 0) {
+                const functionContainer = card.querySelector('#function-stack-container-' + targetCard);
+                //verifica se o aviso de nenhuma funcao esta ativo
+                const functionStack = functionContainer.querySelector('app-process-card-no-items')
+
+                if (functionStack) {
+                    functionStack.classList.remove('hidden');
+                    nextIndex = 0;
+                }
+            }
+
+        } else {
+            console.log(`indice ${targetIndex} é inválido.`);
+        }
+    }
+    //Funcao para Atualizar Indice em Stacks
+    function updateStackIndex(card, targetIndex, offSet) {
+        // Atualiza os indices dos elementos restantes
+        const allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
+
+
+        for (let i = targetIndex; i < allRows.length; i++) {
+            const rowElement = allRows[i];
+            const currentIndex = parseInt(rowElement.getAttribute('index'));
+            const newIndex = currentIndex + offSet;
+
+            // Atualiza o �ndice no pr�prio elemento
+            rowElement.setAttribute('index', newIndex);
+
+            // Atualiza o valor no caminho especificado
+            const indexElement = rowElement.querySelector('div[class="function-stack-index"]');
+            if (indexElement) {
+                indexElement.textContent = newIndex;
+            }
+
+            // Atualiza o indice do botao delete dentro desse elemento
+            const deleteButton = rowElement.querySelector('#deleteStack');
+            if (deleteButton) {
+                deleteButton.setAttribute('index', newIndex);
+            }
+
+            // Atualiza o indice do botao lower-action dentro desse elemento
+            const lowerAction = rowElement.querySelector('#function-stack-lower-actions');
+            if (lowerAction) {
+                lowerAction.setAttribute('index', newIndex + 1);
+            }
+        }
+        selectLastLowerAction(card)
+    }
+    //Função para selecionar sempre o último Lower Action
+    function selectLastLowerAction(card) {
+        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
+        const divCount = lowerActions.length;
+        console.log('selectLastLowerAction count Lower Actions ' + divCount)
+
+        //Atualiza o nextIndex para seguir criando
+        console.log('selectLastLowerAction nextIndex is ' + nextIndex)
+        nextIndex = divCount
+
+        console.log('selectLastLowerAction nextIndex now is in the last element ' + nextIndex)
+
+        lowerActions.forEach(action => {
+            if (action.classList.contains('force-active')) {
+                action.classList.remove('force-active');
+            }
+            if (action.getAttribute('index') == nextIndex) {
+                action.classList.add('force-active');
+            }
+        });
+
+    }
+
+
+    //#region DB files
+    var folder = null;
+
+    function postFile(file) {
+        if (!file) return;
+        if(xmls.length >= xmlAllowed){
+            createInfoModal(texts.text('warning'), texts.text('warningNoXmlLicense'), texts.text('ok'))
+            return;
+        }
+        //dialog.container.showModal();
+        sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
+        console.log("FILE IMG " + String(file))
+        fetch('?dbfiles=myfiles&folder=' + folder + '&name=' + encodeURI(file.name) + '&key=' + sessionKey,
+            {
+                method: 'POST',
+                headers: {},
+                body: file
+            }).then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response);
+                }
+                return response.json();
+            }).then(data => {
+                console.log("Success");
+                //dialog.container.close();
+                console.log(data);
+                listFolder(folder, function (msg) {
+                    xmls = msg.files;
+                    openScripts();
+                });
+            }).catch(error => {
+                //dialog.container.close();
+                if (typeof error.json === "function") {
+                    error.json().then(jsonError => {
+                        console.log("JSON error from API");
+                        console.log(jsonError);
+                    }).catch(genericError => {
+                        console.log("Generic error from API");
+                        console.log(error.statusText);
+                    });
+                } else {
+                    console.log("Fetch error");
+                    console.log(error);
+                }
+            });
+    }
+
+    function deleteFile(id) {
+        controlDB = false
+        if (!id) return;
+        // dialog.container.showModal();
+        sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
+
+        fetch('?dbfiles=myfiles&folder=' + folder + '&del=' + id + '&key=' + sessionKey,
+            {
+                method: 'POST',
+                headers: {}
+            }).then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response);
+                }
+                return response.json();
+            }).then(data => {
+                console.log("Success");
+                //dialog.container.close();
+                console.log(data);
+                //document.getElementById("imgBD").innerHTML = '';
+                listFolder(folder, function (msg) {
+                    xmls = msg.files
+                    openScripts();
+                });
+                
+            }).catch(error => {
+                //dialog.container.close();
+                if (typeof error.json === "function") {
+                    error.json().then(jsonError => {
+                        console.log("JSON error from API");
+                        console.log(jsonError);
+                    }).catch(genericError => {
+                        console.log("Generic error from API");
+                        console.log(error.statusText);
+                    });
+                } else {
+                    console.log("Fetch error");
+                    console.log(error);
+                }
+            });
+    }
+    function folderAdded(msg) {
+        console.log("FOLDER" + msg)
+        folder = msg.id;
+        listFolder(folder, listFolderResult);
+    }
+
+    function listFolder(id, listFolderResult) {
+        // fileList.clear();
+        app.sendSrc({ mt: "DbFilesList", name: "myfiles", folder: id }, listFolderResult);
+    }
+
+    function listFolderResult(msg) {
+        if ("files" in msg && msg.files.length > 0) {
+            xmls = msg.files;
+        }
+    }
+   
+    //#endregion
+
+    //#region Create XML file
+    function createVoicemailXml() {
+        let xmlPart = ''
+        //Header
+        let xmlDocument = `<?xml version="1.0" encoding="utf-8" ?>\n<voicemail xmlns="http://www.innovaphone.com/xsd/voicemail6.xsd">\n`;
+
+        const functionMainContainer = document.getElementById('function-stack-container-main');
+
+        //const functionMainContainer = document.getElementById('function-stack-container-main');
+
+        if (!functionMainContainer) {
+            console.error('Container not found');
+            return;
+        }
+        // Seleciona todos os elementos filhos dentro do cont�iner.
+        const rowsMain = functionMainContainer.querySelectorAll('app-process-function-stack-row-type-generic')
+
+        //const rows = functionMainContainer.getElementsByClassName('app-process-function-stack-row-type-generic');
+        console.log(`Number of elements found: ${rowsMain.length}`);
+
+        xmlDocument += `   <function define="Main">\n`
+        xmlPart = createXmlDom(rowsMain)
+        console.log('xmlPart at end Main Functions: ' + xmlPart);
+        xmlDocument += xmlPart
+        xmlDocument += `  </function>\n`;
+
+        console.log('xmlDocument at end Main: ' + xmlDocument);
+
+        const functionsContainer = document.getElementById('function-stack-container-function');
+        if (!functionsContainer) {
+            console.error('Container Functions not found');
+        }
+        // Seleciona todos os elementos filhos dentro do cont�iner.
+        const rowsFunctions = functionsContainer.querySelectorAll('app-process-function-stack-row-type-generic')
+        xmlPart = createXmlDom(rowsFunctions)
+        console.log('xmlPart at end Aditional Functions: ' + xmlPart);
+        xmlDocument += xmlPart
+        xmlDocument += `</voicemail>`;
+        console.log('xmlDocument at end Aditional Functions: ' + xmlDocument);
+        return xmlDocument
+    }
+    function createXmlDom(rows) {
+        let xmlDocument = '';
+        Array.from(rows).forEach(row => {
+            const elementType = row.getAttribute('element');
+            switch (elementType) {
+                case 'add':
+                    const addVarName = row.querySelector('#inputVarName')?.value;
+                    const addVarValue = row.querySelector('#inputVarValue')?.value;
+                    const addVarValue2 = row.querySelector('#inputVarValue2')?.value;
+                    if (addVarName && addVarValue && addVarValue2) {
+                        xmlDocument += `    <${elementType} out="${addVarName}" value="${addVarValue}" value2="${addVarValue2}"/>\n`;
+                    }
+                    break;
+                case 'sub':
+                    const subVarName = row.querySelector('#inputVarName')?.value;
+                    const subVarValue = row.querySelector('#inputVarValue')?.value;
+                    const subVarValue2 = row.querySelector('#inputVarValue2')?.value;
+                    if (subVarName && subVarValue && subVarValue2) {
+                        xmlDocument += `    <${elementType} out="${subVarName}" value="${subVarValue}" value2="${subVarValue2}"/>\n`;
+                    }
+                    break;
+                case 'assign':
+                    const assignVarName = row.querySelector('#inputVarName')?.value;
+                    const assignVarValue = row.querySelector('#inputVarValue')?.value;
+                    if (assignVarName && assignVarValue) {
+                        xmlDocument += `    <${elementType} out="${assignVarName}" value="${assignVarValue}"/>\n`;
+                    }
+                    break;
+                case 'call':
+                    const callVarName = row.querySelector('#inputVarName')?.value;
+                    if (callVarName) {
+                        xmlDocument += `    <${elementType} name="${callVarName}" />\n`;
+                    }
+                    break;
+                case 'wait':
+                    const waitVarSeconds = row.querySelector('#inputVarSeconds')?.value;
+                    if (waitVarSeconds) {
+                        xmlDocument += `    <${elementType} sec="${waitVarSeconds}" />\n`;
+                    }
+                    break;
+                case 'dbg':
+                    const dbgVarValue = row.querySelector('#inputVarString1')?.value;
+                    const dbgVarValue2 = row.querySelector('#inputVarString2')?.value;
+                    if (dbgVarValue || dbgVarValue2) {
+                        xmlDocument += `    <${elementType} string="${dbgVarValue}" string2="${dbgVarValue2}"/>\n`;
+                    }
+                    break;
+                case 'exec':
+                    const execVarUrl = row.querySelector('#inputVarUrl')?.value;
+                    if (execVarUrl) {
+                        xmlDocument += `    <${elementType} url="${execVarUrl}" />\n`;
+                    }
+                    break;
+                case 'pbx-fwd':
+                    const fwdVare164 = row.querySelector('#inputVare164')?.value;
+                    if (fwdVare164) {
+                        xmlDocument += `    <${elementType} url="${fwdVare164}" />\n`;
+                    }
+                    break;
+                case 'pbx-disc':
+                    xmlDocument += `    <${elementType} />\n`;
+                    break;
+                case 'store-get':
+                    const getVarName = row.querySelector('#inputVarName')?.value;
+                    const getVarValue = row.querySelector('#inputVarValue')?.value;
+                    const getVarValue2 = row.querySelector('#inputVarValue2')?.value;
+                    if (getVarName && getVarValue2) {
+                        xmlDocument += `    <${elementType} out-url="${getVarName}" root="${getVarValue}" name="${getVarValue2}"/>\n`;
+                    }
+                    break;
+                case 'pbx-prompt':
+                    const promptVarUrl = row.querySelector('#inputVarValue')?.value;
+                    if (promptVarUrl) {
+                        xmlDocument += `    <${elementType} url="${promptVarUrl}" sec="35" repeat="false" />\n`;
+                    }
+                    break;
+                case 'if-start':
+                    const ifVarCond = row.querySelector('#inputVarCond')?.value;
+                    const ifVarNotCond = row.querySelector('#selectVarCond')?.value;
+                    if (ifVarNotCond == '==') {
+                        xmlDocument += `    <if cond="${ifVarCond}" >\n`;
+                    } else {
+                        xmlDocument += `    <if notcond="${ifVarCond}" >\n`;
+                    }
+                    break;
+                case 'if-end':
+                    xmlDocument += `    </if>\n`;
+                    break;
+                case 'function-start':
+                    const funcVarDefine = row.querySelector('#inputVarDefine')?.value;
+                    if (funcVarDefine) {
+                        xmlDocument += `    <function define="${funcVarDefine}" >\n`;
+                    }
+                    break;
+                case 'function-end':
+                    xmlDocument += `    </function>\n`;
+                    break;
+                case 'while-start':
+                    const whileVarCond = row.querySelector('#inputVarCond')?.value;
+                    const whileVarNotCond = row.querySelector('#selectVarCond')?.value;
+                    if (whileVarNotCond == '==') {
+                        xmlDocument += `    <while cond="${whileVarCond}" >\n`;
+                    } else {
+                        xmlDocument += `    <while notcond="${whileVarCond}" >\n`;
+                    }
+                    break;
+                case 'while-end':
+                    xmlDocument += `    </while>\n`;
+                    break;
+                case 'switch-start':
+                    const switchVarName = row.querySelector('#inputVarName')?.value;
+                    if (switchVarName) {
+                        xmlDocument += `    <switch var="${switchVarName}" >\n`;
+                    }
+                    break;
+                case 'switch-end':
+                    xmlDocument += `    </switch>\n`;
+                    break;
+                case 'case-start':
+                    const caseVarCond = row.querySelector('#inputVarCond')?.value;
+                    const caseVarNotCond = row.querySelector('#selectVarCond')?.value;
+                    if (caseVarNotCond == '==') {
+                        xmlDocument += `    <case equal="${caseVarCond}" >\n`;
+                    } else {
+                        xmlDocument += `    <case not-equal="${caseVarCond}" >\n`;
+                    }
+                    break;
+                case 'case-end':
+                    xmlDocument += `    </case>\n`;
+                    break;
+                case 'pbx-getdtmfdigit':
+                    const dtmfVarName = row.querySelector('#inputVarName')?.value;
+                    if (dtmfVarName) {
+                        xmlDocument += `    <${elementType} out-dtmf="${dtmfVarName}" >\n`;
+                    }
+                    break;
+                case 'lib-strcat':
+                    const strVarName = row.querySelector('#inputVarName')?.value;
+                    const strVarValue = row.querySelector('#inputVarValue')?.value;
+                    const strVarValue2 = row.querySelector('#inputVarValue2')?.value;
+                    if (strVarName && strVarValue && strVarValue2) {
+                        xmlDocument += `    <${elementType} out-string="${strVarName}" string="${strVarValue}" string2="${strVarValue2}"/>\n`;
+                    }
+                    break;
+                case 'lib-strlen':
+                    const lenVarName = row.querySelector('#inputVarName')?.value;
+                    const lenVarValue = row.querySelector('#inputVarValue')?.value;
+                    if (lenVarName && lenVarValue) {
+                        xmlDocument += `    <${elementType} out-string="${lenVarName}" string="${lenVarValue}"/>\n`;
+                    }
+                    break;
+                case 'lib-enc':
+                    const encVarName = row.querySelector('#inputVarName')?.value;
+                    const encVarValue = row.querySelector('#inputVarValue')?.value;
+                    if (encVarName && encVarValue) {
+                        xmlDocument += `    <${elementType} out-string="${encVarName}" string="${encVarValue}" type="url" />\n`;
+                    }
+                    break;
+                case 'lib-dec':
+                    const decVarName = row.querySelector('#inputVarName')?.value;
+                    const decVarValue = row.querySelector('#inputVarValue')?.value;
+                    if (decVarName && decVarValue) {
+                        xmlDocument += `    <${elementType} out-string="${decVarName}" string="${decVarValue}" type="url" />\n`;
+                    }
+                    break;
+                case 'event':
+                    const eventVarDefine = row.querySelector('#inputVarDefine')?.value;
+                    if (eventVarDefine) {
+                        xmlDocument += `    <event type="dtmf" block="false">\n        <call name="${eventVarDefine}" />\n    </event>\n`;
+                    }
+                    break;
+                default:
+                    console.warn(`Unknown type: ${elementType}`);
+            }
+        });
+        return xmlDocument;
+    }
+    //#endregion
+
     //Funcao para adicionar listners aos elements 
-    function addElementClickListeners() {
+    function addElementClickListeners(){
         document.querySelectorAll('.element').forEach(el => {
             el.addEventListener('click', () => {
+
+                const elementId = el.getAttribute('element')
 
                 if (processCardName == null) {
                     createInfoModal(texts.text('warning'), texts.text('selectCard'), texts.text('ok'))
@@ -1097,298 +1797,380 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                     //window.alert("Selecione uma posição para continuar criando o script")
                     return
                 }
-                const processCard = document.querySelector('app-process-' + processCardName + '-card')
-                const functionContainer = processCard.querySelector('#function-stack-container-' + processCardName);
-                //verifica se o aviso de nenhuma funcao esta ativo
-                const functionStack = functionContainer.querySelector('app-process-card-no-items')
-                if (functionStack) {
-                    functionStack.classList.add('hidden')
+                addElement(elementId, processCardName, nextIndex)
+            });
+        });
+    }
+    //#region Edit XML File
+    function getFileById(id) {
+        if (!id) return;
+        // dialog.container.showModal();
+        sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
+
+        fetch(start.originalUrl + "/files/" +id,
+            {
+                method: 'GET',
+                headers: {}
+            }).then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response);
                 }
+                return response.text();
+            }).then(data => {
+                console.log("Success");
+                //dialog.container.close();
+                console.log(data);
+                newScript();
+                parseAndCreateHtmlFromXml(data, id)
 
-                const elementId = el.getAttribute('element')
+            }).catch(error => {
+                console.log("Fetch error");
+                console.log(error);
+            });
+    }
+    function parseAndCreateHtmlFromXml(xmlString, id) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
 
-                console.log('danilo req: Adicionar o Elemento: ' + elementId + ', na posicao: ' + nextIndex + ' do ' + processCardName)
+        if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+            console.error('Error parsing XML');
+            return;
+        }
+
+        // Process 'Main' function elements
+        const mainFunction = xmlDoc.querySelector('function[define="Main"]');
+        if (mainFunction) {
+            processXmlElements(mainFunction.children, 'main');
+        }
+
+        // Process other function elements
+        const otherFunctions = xmlDoc.querySelectorAll('function:not([define="Main"])');
+        otherFunctions.forEach(functionElement => {
+            processXmlElements(functionElement.children, 'process');
+        });
+        const xml = xmls.filter(x => x.id == id)
+        setProccessTitle(xml[0].name);
+    }
+
+    function processXmlElements(elements, processCardName) {
+        Array.from(elements).forEach((element, index) => {
+            const elementType = element.tagName;
+            const attributes = element.attributes;
+
+            addElement(elementType, processCardName, index);
+
+            const container = document.getElementById(`function-stack-container-${processCardName}`);
+            const newElement = container.querySelector(`app-process-function-stack-row-type-generic[index="${index}"]`);
+
+            if (newElement) {
+                Array.from(attributes).forEach(attr => {
+                    const input = newElement.querySelector(`input[param=${attr.name}]`);
+                    if (input) {
+                        input.value = attr.value;
+                    }
+                });
+            }
+        });
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    //#endregion
+
+    function addElement(elementId, processCardName, nextIndex) {
+        const processCard = document.querySelector('app-process-' + processCardName + '-card')
+        const functionContainer = processCard.querySelector('#function-stack-container-' + processCardName);
+        //verifica se o aviso de nenhuma funcao esta ativo
+        const functionStack = functionContainer.querySelector('app-process-card-no-items')
+        if (functionStack) {
+            functionStack.classList.add('hidden')
+        }
 
 
-                const element = elements.find(obj => obj.id === elementId);
 
-                let component;
-                switch (elementId) {
-                    case 'dbg':
-                        component = `<app-process-function-stack-row-type-generic
-  index="${nextIndex}"
-  element="${elementId}"
->
-  <app-process-function-stack-row
+        console.log('danilo req: Adicionar o Elemento: ' + elementId + ', na posicao: ' + nextIndex + ' do ' + processCardName)
+
+
+        const element = elements.find(obj => obj.id === elementId);
+
+        let component;
+        switch (elementId) {
+            case 'dbg':
+                component = `<app-process-function-stack-row-type-generic
+                              index="${nextIndex}"
+                              element="${elementId}"
+                            >
+                              <app-process-function-stack-row
     
-    _nghost-serverapp-c865612792=""
-  >
-    <div
+                                _nghost-serverapp-c865612792=""
+                              >
+                                <div
       
-      class="d-flex function-stack-row"
-      id="row-f:c2251a64-dfc3-45a9-9a50-295c0ecdf330"
-    >
-      <div
+                                  class="d-flex function-stack-row"
+                                  id="row-f:c2251a64-dfc3-45a9-9a50-295c0ecdf330"
+                                >
+                                  <div
         
-        class="function-stack-index"
-        style="left: 0px"
-      >
-        ${nextIndex}
-      </div>
-      <!---->
-      <!---->
-      <div  class="flex-grow-1 menu-padding">
-        <div
+                                    class="function-stack-index"
+                                    style="left: 0px"
+                                  >
+                                    ${nextIndex}
+                                  </div>
+                                  <!---->
+                                  <!---->
+                                  <div  class="flex-grow-1 menu-padding">
+                                    <div
           
-          similarclassname="function-stack-function"
-          class="d-flex diff- flex-column function-stack-function force-hover"
-          data-selectable-xsid="f:c2251a64-dfc3-45a9-9a50-295c0ecdf330"
-        >
-          <div  class="d-flex flex-row">
-            <!---->
-            <div  class="function-stack-icon">
-              <app-process-function-stack-row-icon
+                                      similarclassname="function-stack-function"
+                                      class="d-flex diff- flex-column function-stack-function force-hover"
+                                      data-selectable-xsid="f:c2251a64-dfc3-45a9-9a50-295c0ecdf330"
+                                    >
+                                      <div  class="d-flex flex-row">
+                                        <!---->
+                                        <div  class="function-stack-icon">
+                                          <app-process-function-stack-row-icon
                 
-                _nghost-serverapp-c335782559=""
-              >
-                <fa-icon  class="ng-fa-icon">
-                  ${element.img}
-                </fa-icon>
-              </app-process-function-stack-row-icon>
-              <!---->
-              <!---->
-              <!---->
-            </div>
-            <div
+                                            _nghost-serverapp-c335782559=""
+                                          >
+                                            <fa-icon  class="ng-fa-icon">
+                                              ${element.img}
+                                            </fa-icon>
+                                          </app-process-function-stack-row-icon>
+                                          <!---->
+                                          <!---->
+                                          <!---->
+                                        </div>
+                                        <div
               
-              class="function-stack-body my-auto flex-grow-1"
-            >
-              <app-process-function-stack-row-body
+                                          class="function-stack-body my-auto flex-grow-1"
+                                        >
+                                          <app-process-function-stack-row-body
                 
-                _nghost-serverapp-c2854308694=""
-              >
-                <div
+                                            _nghost-serverapp-c2854308694=""
+                                          >
+                                            <div
                   
-                  class="function-stack-action"
-                >
-                  <div
+                                              class="function-stack-action"
+                                            >
+                                              <div
                     
-                    class="function-stack-description"
-                  ></div>
-                  ${element.name}
-                  <!---->
-                  <!---->
-                </div>
-                <div
+                                                class="function-stack-description"
+                                              ></div>
+                                              ${element.name}
+                                              <!---->
+                                              <!---->
+                                            </div>
+                                            <div
                   
-                  class="d-flex align-items-center gap-1"
-                >
-                  <div
+                                              class="d-flex align-items-center gap-1"
+                                            >
+                                              <div
                     
-                    appdebuggerpopup=""
-                    class="function-stack-variable highlight"
-                  >
-                    <span  class="prefix"
-                      >string:</span
-                    >
-                    <!---->
-                    <input
-                      id="inputVarString1"
-                      param="string"
-                      index="${nextIndex}"
-                      type="text"
-                    />
-                  </div>
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
-                  <div
+                                                appdebuggerpopup=""
+                                                class="function-stack-variable highlight"
+                                              >
+                                                <span  class="prefix"
+                                                  >string:</span
+                                                >
+                                                <!---->
+                                                <input
+                                                  id="inputVarString1"
+                                                  param="string"
+                                                  index="${nextIndex}"
+                                                  type="text"
+                                                />
+                                              </div>
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <div
                     
-                    appdebuggerpopup=""
-                    class="function-stack-variable highlight"
-                  >
-                    <span  class="prefix"
-                      >string2:</span
-                    >
-                    <!---->
-                    <input
-                      id="inputVarString2"
-                      param="string2"
-                      index="${nextIndex}"
-                      type="text"
-                    />
-                  </div>
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
+                                                appdebuggerpopup=""
+                                                class="function-stack-variable highlight"
+                                              >
+                                                <span  class="prefix"
+                                                  >string2:</span
+                                                >
+                                                <!---->
+                                                <input
+                                                  id="inputVarString2"
+                                                  param="string2"
+                                                  index="${nextIndex}"
+                                                  type="text"
+                                                />
+                                              </div>
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
                   
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
     
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
-                  <!---->
-                </div>
-                <!---->
-              </app-process-function-stack-row-body>
-            </div>
-            <!---->
-            <!---->
-            <!---->
-            <!---->
-            <!-- Hover Actions-->
-            <div
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                              <!---->
+                                            </div>
+                                            <!---->
+                                          </app-process-function-stack-row-body>
+                                        </div>
+                                        <!---->
+                                        <!---->
+                                        <!---->
+                                        <!---->
+                                        <!-- Hover Actions-->
+                                        <div
               
-              class="function-stack-hover-actions"
-            >
-              <!-- Esquerda -->
-              <div
+                                          class="function-stack-hover-actions"
+                                        >
+                                          <!-- Esquerda -->
+                                          <div
                 
-                class="function-stack-left-actions d-flex flex-column justify-content-center"
-              >
-                <div
+                                            class="function-stack-left-actions d-flex flex-column justify-content-center"
+                                          >
+                                            <div
                   
-                  class="action-icon function-stack-handle"
-                >
-                  <fa-icon
+                                              class="action-icon function-stack-handle"
+                                            >
+                                              <fa-icon
                     
-                    class="ng-fa-icon action-icon-icon"
-                  >
-                    <svg
-                      role="img"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fal"
-                      data-icon="grip-vertical"
-                      class="svg-inline--fa fa-grip-vertical fa-fw"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 320 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M32 440l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zm184-40l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zM32 232c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8l0-48zM0 280c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48zm224 0l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zM32 72c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8l0-48zM0 120c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40L40 32C17.9 32 0 49.9 0 72l0 48zm224 0l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40z"
-                      ></path>
-                    </svg>
-                  </fa-icon>
-                </div>
-                <!---->
-              </div>
-              <!-- Direita -->
-              <div  class="function-stack-right-actions">
-                <!-- 3 pontinhos -->
-                <div
+                                                class="ng-fa-icon action-icon-icon"
+                                              >
+                                                <svg
+                                                  role="img"
+                                                  aria-hidden="true"
+                                                  focusable="false"
+                                                  data-prefix="fal"
+                                                  data-icon="grip-vertical"
+                                                  class="svg-inline--fa fa-grip-vertical fa-fw"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  viewBox="0 0 320 512"
+                                                >
+                                                  <path
+                                                    fill="currentColor"
+                                                    d="M32 440l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zm184-40l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zM32 232c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8l0-48zM0 280c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48zm224 0l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40zM32 72c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8l0-48zM0 120c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40L40 32C17.9 32 0 49.9 0 72l0 48zm224 0l0-48c0-4.4 3.6-8 8-8l48 0c4.4 0 8 3.6 8 8l0 48c0 4.4-3.6 8-8 8l-48 0c-4.4 0-8-3.6-8-8zm8 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40z"
+                                                  ></path>
+                                                </svg>
+                                              </fa-icon>
+                                            </div>
+                                            <!---->
+                                          </div>
+                                          <!-- Direita -->
+                                          <div  class="function-stack-right-actions">
+                                            <!-- 3 pontinhos -->
+                                            <div
                   
-                  dropdownclass="processStackRowDropdown"
-                  ngbdropdown=""
-                  placement="left-top"
-                  class="action-icon processStackRowDropdown dropdown"
-                >
-                  <div
+                                              dropdownclass="processStackRowDropdown"
+                                              ngbdropdown=""
+                                              placement="left-top"
+                                              class="action-icon processStackRowDropdown dropdown"
+                                            >
+                                              <div
                     
-                    ngbdropdowntoggle=""
-                    class="dropdown-toggle"
-                    aria-expanded="false"
-                  >
-                    <fa-icon
+                                                ngbdropdowntoggle=""
+                                                class="dropdown-toggle"
+                                                aria-expanded="false"
+                                              >
+                                                <fa-icon
                       
-                      class="ng-fa-icon action-icon-icon"
-                    >
-                      <svg
-                        role="img"
-                        aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fal"
-                        data-icon="ellipsis"
-                        class="svg-inline--fa fa-ellipsis fa-fw"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M416 256a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zm-160 0a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM64 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"
-                        ></path>
-                      </svg>
-                    </fa-icon>
-                  </div>
-                  <!-- Edit description -->
-                </div>
-                <!--Delete-->
-                <div id="deleteStack" index=${nextIndex} card=${processCardName}  class="action-icon text-danger">
-                  <fa-icon
+                                                  class="ng-fa-icon action-icon-icon"
+                                                >
+                                                  <svg
+                                                    role="img"
+                                                    aria-hidden="true"
+                                                    focusable="false"
+                                                    data-prefix="fal"
+                                                    data-icon="ellipsis"
+                                                    class="svg-inline--fa fa-ellipsis fa-fw"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 448 512"
+                                                  >
+                                                    <path
+                                                      fill="currentColor"
+                                                      d="M416 256a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zm-160 0a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM64 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"
+                                                    ></path>
+                                                  </svg>
+                                                </fa-icon>
+                                              </div>
+                                              <!-- Edit description -->
+                                            </div>
+                                            <!--Delete-->
+                                            <div id="deleteStack" index=${nextIndex} card=${processCardName}  class="action-icon text-danger">
+                                              <fa-icon
                     
-                    class="ng-fa-icon action-icon-icon"
-                  >
-                  <svg
-                  role="img"
-                  aria-hidden="true"
-                  focusable="false"
-                  data-prefix="fal"
-                  data-icon="trash-can"
-                  class="svg-inline--fa fa-trash-can fa-fw"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 448 512"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M164.2 39.5L148.9 64H299.1L283.8 39.5c-2.9-4.7-8.1-7.5-13.6-7.5H177.7c-5.5 0-10.6 2.8-13.6 7.5zM311 22.6L336.9 64H384h32 16c8.8 0 16 7.2 16 16s-7.2 16-16 16H416V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V96H16C7.2 96 0 88.8 0 80s7.2-16 16-16H32 64h47.1L137 22.6C145.8 8.5 161.2 0 177.7 0h92.5c16.6 0 31.9 8.5 40.7 22.6zM64 96V432c0 26.5 21.5 48 48 48H336c26.5 0 48-21.5 48-48V96H64zm80 80V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16zm96 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16zm96 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16z"
-                  ></path>
-                  </svg>
-                  </fa-icon>
-                </div>
-                <!---->
-                <!---->
-                <!---->
-              </div>
+                                                class="ng-fa-icon action-icon-icon"
+                                              >
+                                              <svg
+                                              role="img"
+                                              aria-hidden="true"
+                                              focusable="false"
+                                              data-prefix="fal"
+                                              data-icon="trash-can"
+                                              class="svg-inline--fa fa-trash-can fa-fw"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              viewBox="0 0 448 512"
+                                            >
+                                              <path
+                                                fill="currentColor"
+                                                d="M164.2 39.5L148.9 64H299.1L283.8 39.5c-2.9-4.7-8.1-7.5-13.6-7.5H177.7c-5.5 0-10.6 2.8-13.6 7.5zM311 22.6L336.9 64H384h32 16c8.8 0 16 7.2 16 16s-7.2 16-16 16H416V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V96H16C7.2 96 0 88.8 0 80s7.2-16 16-16H32 64h47.1L137 22.6C145.8 8.5 161.2 0 177.7 0h92.5c16.6 0 31.9 8.5 40.7 22.6zM64 96V432c0 26.5 21.5 48 48 48H336c26.5 0 48-21.5 48-48V96H64zm80 80V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16zm96 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16zm96 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V176c0-8.8 7.2-16 16-16s16 7.2 16 16z"
+                                              ></path>
+                                              </svg>
+                                              </fa-icon>
+                                            </div>
+                                            <!---->
+                                            <!---->
+                                            <!---->
+                                          </div>
               
-              <!---->
-            </div>
-            <!---->
-          </div>
-          <!---->
-        </div>
-      </div>
-    </div>
-</app-process-function-stack-row>
-<!-- Bot�o + para seguir o fluxo-->
-              <div id="function-stack-lower-actions" index=${nextIndex + 1} card=${processCardName} class="function-stack-lower-actions function-stack-hover-actions">
-                <div class="add-action-icon">
-                  <fa-icon class="ng-fa-icon"
-                  >
-                    <svg
-                      role="img"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fal"
-                      data-icon="plus"
-                      class="svg-inline--fa fa-plus fa-fw"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 448 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M240 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V240H32c-8.8 0-16 7.2-16 16s7.2 16 16 16H208V448c0 8.8 7.2 16 16 16s16-7.2 16-16V272H416c8.8 0 16-7.2 16-16s-7.2-16-16-16H240V64z"
-                      ></path>
-                    </svg>
-                  </fa-icon>
-                </div>
-                <!---->
-              </div>
-<!---->
-<!---->
-<!---->
-<!---->
-</app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'add':
-                        component = `<app-process-function-stack-row-type-generic
+                                          <!---->
+                                        </div>
+                                        <!---->
+                                      </div>
+                                      <!---->
+                                    </div>
+                                  </div>
+                                </div>
+                            </app-process-function-stack-row>
+                            <!-- Bot�o + para seguir o fluxo-->
+                                          <div id="function-stack-lower-actions" index=${nextIndex + 1} card=${processCardName} class="function-stack-lower-actions function-stack-hover-actions">
+                                            <div class="add-action-icon">
+                                              <fa-icon class="ng-fa-icon"
+                                              >
+                                                <svg
+                                                  role="img"
+                                                  aria-hidden="true"
+                                                  focusable="false"
+                                                  data-prefix="fal"
+                                                  data-icon="plus"
+                                                  class="svg-inline--fa fa-plus fa-fw"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  viewBox="0 0 448 512"
+                                                >
+                                                  <path
+                                                    fill="currentColor"
+                                                    d="M240 64c0-8.8-7.2-16-16-16s-16 7.2-16 16V240H32c-8.8 0-16 7.2-16 16s7.2 16 16 16H208V448c0 8.8 7.2 16 16 16s16-7.2 16-16V272H416c8.8 0 16-7.2 16-16s-7.2-16-16-16H240V64z"
+                                                  ></path>
+                                                </svg>
+                                              </fa-icon>
+                                            </div>
+                                            <!---->
+                                          </div>
+                            <!---->
+                            <!---->
+                            <!---->
+                            <!---->
+                            </app-process-function-stack-row-type-generic>`
+                break;
+            case 'add':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -1696,9 +2478,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'sub':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'sub':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -2006,9 +2788,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'assign':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'assign':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -2293,9 +3075,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'exec':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'exec':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -2552,9 +3334,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'pbx-disc':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'pbx-disc':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -2805,9 +3587,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'wait':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'wait':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -3064,9 +3846,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'pbx-prompt':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'pbx-prompt':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -3147,6 +3929,7 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
                     <input
                       id="inputVarValue"
                       index="${nextIndex}"
+                      param="url"
                       type="text"
                     />
                   </div>
@@ -3322,9 +4105,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'pbx-xfer':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'pbx-xfer':
+                component = `<app-process-function-stack-row-type-generic
     
     index="${nextIndex}"
     element="${elementId}"
@@ -3581,9 +4364,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
   <!---->
   <!---->
   </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'store-get':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'store-get':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -3891,9 +4674,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'call':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'call':
+                component = `<app-process-function-stack-row-type-generic
       
       index="${nextIndex}"
       element="${elementId}"
@@ -4150,9 +4933,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
     <!---->
     <!---->
     </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'if-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'if-end':
+                component = `<app-process-function-stack-row-type-generic
         
         index="${nextIndex}"
         element="${elementId}"
@@ -4403,9 +5186,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
       <!---->
       <!---->
       </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'function-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'function-end':
+                component = `<app-process-function-stack-row-type-generic
             
             index="${nextIndex}"
             element="${elementId}"
@@ -4656,9 +5439,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
           <!---->
           <!---->
           </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'else-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'else-end':
+                component = `<app-process-function-stack-row-type-generic
               index="${nextIndex}"
               element="${elementId}"
             >
@@ -4908,9 +5691,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
             <!---->
             <!---->
             </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'else-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'else-start':
+                component = `<app-process-function-stack-row-type-generic
                 index="${nextIndex}"
                 element="${elementId}"
               >
@@ -5160,9 +5943,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
               <!---->
               <!---->
               </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'function-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'function-start':
+                component = `<app-process-function-stack-row-type-generic
         
         index="${nextIndex}"
         element="${elementId}"
@@ -5419,9 +6202,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
       <!---->
       <!---->
       </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'if-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'if-start':
+                component = `<app-process-function-stack-row-type-generic
           index="${nextIndex}"
           element="${elementId}"
         >
@@ -5694,9 +6477,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
         <!---->
         <!---->
         </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'while-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'while-start':
+                component = `<app-process-function-stack-row-type-generic
             index="${nextIndex}"
             element="${elementId}"
           >
@@ -5969,9 +6752,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
           <!---->
           <!---->
           </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'while-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'while-end':
+                component = `<app-process-function-stack-row-type-generic
                 index="${nextIndex}"
                 element="${elementId}"
               >
@@ -6221,9 +7004,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
               <!---->
               <!---->
               </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'lib-enc':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'lib-enc':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -6508,9 +7291,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'lib-dec':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'lib-dec':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -6795,9 +7578,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'lib-strcat':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'lib-strcat':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -7105,9 +7888,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'pbx-getdtmfdigit':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'pbx-getdtmfdigit':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -7366,9 +8149,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'lib-strlen':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'lib-strlen':
+                component = `<app-process-function-stack-row-type-generic
   
   index="${nextIndex}"
   element="${elementId}"
@@ -7653,9 +8436,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
 <!---->
 <!---->
 </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'event':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'event':
+                component = `<app-process-function-stack-row-type-generic
         
         index="${nextIndex}"
         element="${elementId}"
@@ -7912,9 +8695,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
       <!---->
       <!---->
       </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'switch-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'switch-start':
+                component = `<app-process-function-stack-row-type-generic
         
         index="${nextIndex}"
         element="${elementId}"
@@ -8171,9 +8954,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
       <!---->
       <!---->
       </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'switch-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'switch-end':
+                component = `<app-process-function-stack-row-type-generic
             
             index="${nextIndex}"
             element="${elementId}"
@@ -8424,9 +9207,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
           <!---->
           <!---->
           </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'case-start':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'case-start':
+                component = `<app-process-function-stack-row-type-generic
             index="${nextIndex}"
             element="${elementId}"
           >
@@ -8699,9 +9482,9 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
           <!---->
           <!---->
           </app-process-function-stack-row-type-generic>`
-                        break;
-                    case 'case-end':
-                        component = `<app-process-function-stack-row-type-generic
+                break;
+            case 'case-end':
+                component = `<app-process-function-stack-row-type-generic
                 index="${nextIndex}"
                 element="${elementId}"
               >
@@ -8910,533 +9693,41 @@ Wecom.flowe = Wecom.flowe || function (start, args) {
               <!---->
               <!---->
               </app-process-function-stack-row-type-generic>`
-                        break;
-                }
-
-                // Converte a string do componente para um elemento DOM.
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = component.trim();
-                const newElement = tempDiv.firstChild;
-
-                // Seleciona todos os elementos filhos dentro do container.
-                const allRows = functionContainer.querySelectorAll('app-process-function-stack-row-type-generic')
-                //const allRows = functionContainer.children;
-
-                if (nextIndex < allRows.length) {
-                    // Se o nextIndex for valido, insere o novo componente ap�s o elemento com previousIndex.
-                    const nextElement = allRows[nextIndex];
-                    functionContainer.insertBefore(newElement, nextElement);
-
-                    //Reordenar Stacks
-                    updateStackIndex(processCard, nextIndex + 1, 1)
-
-                    const divCount = functionContainer.querySelectorAll('app-process-function-stack-row-type-generic').length;
-                    if (nextIndex == 0 && divCount.length == 1) {
-                        nextIndex = null
-                    }
-                } else {
-                    // Se nextIndex for o ultimo, insere no final.
-                    functionContainer.appendChild(newElement);
-                }
-
-                addEventListenersToInputs();
-                addEventListenersToStacks();
-                addEventListenerToDellStacks(processCard);
-                addEventListenerToLowerActions(processCard);
-                selectLastLowerAction(processCard)
-            });
-        });
-    }
-
-    // Funcao para adicionar listeners aos inputs result as
-    function addEventListenersToInputs() {
-        // Seleciona todos os elementos input com o id 'inputVarName'
-        const inputs = document.querySelectorAll('input[id="inputVarName"]');
-
-        // Adiciona um event listener de 'change' para cada input
-        inputs.forEach(input => {
-            // Remove event listeners existentes para evitar duplica��o
-            input.removeEventListener('change', handleInputChange);
-            // Adiciona o novo event listener
-            input.addEventListener('change', handleInputChange);
-        });
-
-
-    }
-    // Funcao que trata a mudanca no input
-    function handleInputChange(event) {
-        const changedInput = event.target;
-        // Encontra o caminho especifico ate o app-process-function-stack-row-type-generic correspondente
-        let parentRow = changedInput.closest('app-process-function-stack-row-type-generic');
-        if (parentRow) {
-            // Encontra o elemento com id='highlight-variable' dentro do parentRow
-            const highlightVariable = parentRow.querySelector('#highlight-variable');
-            if (highlightVariable) {
-                // Atualiza o valor do highlight-variable com o valor do input alterado
-                highlightVariable.textContent = '$' + changedInput.value; // ou highlightVariable.textContent, dependendo do elemento
-                console.log(`Elemento com id 'highlight-variable' atualizado para: ${changedInput.value}`);
-            }
+                break;
         }
-    }
-    // Funcao para adicionar listeners nas Stacks
-    function addEventListenersToStacks() {
-        const divs = document.querySelectorAll('div[similarclassname="function-stack-function"]');
 
-        divs.forEach(div => {
-            // Adiciona o evento mouseover para adicionar a classe
-            div.addEventListener('mouseover', () => {
-                div.classList.add('force-hover');
-            });
+        // Converte a string do componente para um elemento DOM.
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = component.trim();
+        const newElement = tempDiv.firstChild;
 
-            // Adiciona o evento mouseout para remover a classe
-            div.addEventListener('mouseout', () => {
-                div.classList.remove('force-hover');
-            });
-        });
-    }
-    // Funcao para adicionar Listners Lower Actions
-    function addEventListenerToLowerActions(card) {
-        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
+        // Seleciona todos os elementos filhos dentro do container.
+        const allRows = functionContainer.querySelectorAll('app-process-function-stack-row-type-generic')
+        //const allRows = functionContainer.children;
 
-        lowerActions.forEach(button => {
-            button.removeEventListener('click', lowerActionsclick);
-            button.addEventListener('click', lowerActionsclick);
-        });
+        if (nextIndex < allRows.length) {
+            // Se o nextIndex for valido, insere o novo componente ap�s o elemento com previousIndex.
+            const nextElement = allRows[nextIndex];
+            functionContainer.insertBefore(newElement, nextElement);
 
+            //Reordenar Stacks
+            updateStackIndex(processCard, nextIndex + 1, 1)
 
-    }
-    //Funcao auxiliar para Tratar Clicks em Lower Actions
-    function lowerActionsclick(event) {
-        const targetCard = event.currentTarget.getAttribute('card');
-        const card = document.querySelector('app-process-' + targetCard + '-card')
-        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
-        lowerActions.forEach(action => {
-            if (action.classList.contains('force-active')) {
-                action.classList.remove('force-active');
+            const divCount = functionContainer.querySelectorAll('app-process-function-stack-row-type-generic').length;
+            if (nextIndex == 0 && divCount.length == 1) {
+                nextIndex = null
             }
-        });
-        const targetIndex = parseInt(event.currentTarget.getAttribute('index'));
-        console.log('lower action clicado ' + targetIndex)
-        nextIndex = targetIndex
-        event.currentTarget.classList.add('force-active')
-    }
-    // Funcao para adicionar Listners Hover Delete Stack
-    function addEventListenerToDellStacks(card) {
-        const deleteButtons = card.querySelectorAll('#deleteStack');
-
-        deleteButtons.forEach(button => {
-            button.removeEventListener('click', deleteStack);
-            button.addEventListener('click', deleteStack);
-        });
-
-
-    }
-    // Funcao para deletar um elemento pelo index e ajustar os indices
-    function deleteStack(event) {
-        const targetIndex = parseInt(event.currentTarget.getAttribute('index')); // Parse para garantir que seja um numero
-        const targetCard = event.currentTarget.getAttribute('card');
-        const card = document.querySelector('app-process-' + targetCard + '-card')
-        let allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
-
-        if (targetIndex >= 0 && targetIndex < allRows.length) {
-            // Remove o elemento do DOM pelo �ndice targetIndex
-            const removedElement = allRows[targetIndex];
-            removedElement.parentNode.removeChild(removedElement);
-            console.log(`Elemento com indice ${targetIndex} removido.`);
-
-            // Atualiza os indices dos elementos restantes
-            allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
-            updateStackIndex(card, targetIndex, -1)
-
-            // Verifica se nao ha um unico elemento restante e exibe um aviso se necessario
-            if (allRows.length === 0) {
-                const functionContainer = card.querySelector('#function-stack-container-' + targetCard);
-                //verifica se o aviso de nenhuma funcao esta ativo
-                const functionStack = functionContainer.querySelector('app-process-card-no-items')
-
-                if (functionStack) {
-                    functionStack.classList.remove('hidden');
-                    nextIndex = 0;
-                }
-            }
-
         } else {
-            console.log(`indice ${targetIndex} é inválido.`);
+            // Se nextIndex for o ultimo, insere no final.
+            functionContainer.appendChild(newElement);
         }
+
+        addEventListenersToInputs();
+        addEventListenersToStacks();
+        addEventListenerToDellStacks(processCard);
+        addEventListenerToLowerActions(processCard);
+        selectLastLowerAction(processCard)
     }
-    //Funcao para Atualizar Indice em Stacks
-    function updateStackIndex(card, targetIndex, offSet) {
-        // Atualiza os indices dos elementos restantes
-        const allRows = card.querySelectorAll('app-process-function-stack-row-type-generic');
-
-
-        for (let i = targetIndex; i < allRows.length; i++) {
-            const rowElement = allRows[i];
-            const currentIndex = parseInt(rowElement.getAttribute('index'));
-            const newIndex = currentIndex + offSet;
-
-            // Atualiza o �ndice no pr�prio elemento
-            rowElement.setAttribute('index', newIndex);
-
-            // Atualiza o valor no caminho especificado
-            const indexElement = rowElement.querySelector('div[class="function-stack-index"]');
-            if (indexElement) {
-                indexElement.textContent = newIndex;
-            }
-
-            // Atualiza o indice do botao delete dentro desse elemento
-            const deleteButton = rowElement.querySelector('#deleteStack');
-            if (deleteButton) {
-                deleteButton.setAttribute('index', newIndex);
-            }
-
-            // Atualiza o indice do botao lower-action dentro desse elemento
-            const lowerAction = rowElement.querySelector('#function-stack-lower-actions');
-            if (lowerAction) {
-                lowerAction.setAttribute('index', newIndex + 1);
-            }
-        }
-        selectLastLowerAction(card)
-    }
-    //Função para selecionar sempre o último Lower Action
-    function selectLastLowerAction(card) {
-        const lowerActions = card.querySelectorAll('.function-stack-lower-actions');
-        const divCount = lowerActions.length;
-        console.log('selectLastLowerAction count Lower Actions ' + divCount)
-
-        //Atualiza o nextIndex para seguir criando
-        console.log('selectLastLowerAction nextIndex is ' + nextIndex)
-        nextIndex = divCount
-
-        console.log('selectLastLowerAction nextIndex now is in the last element ' + nextIndex)
-
-        lowerActions.forEach(action => {
-            if (action.classList.contains('force-active')) {
-                action.classList.remove('force-active');
-            }
-            if (action.getAttribute('index') == nextIndex) {
-                action.classList.add('force-active');
-            }
-        });
-
-    }
-
-
-    //#region DB files
-    // container
-    var folder = null;
-
-    function postFile(file) {
-        if (!file) return;
-        //dialog.container.showModal();
-        sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
-        console.log("FILE IMG " + String(file))
-        fetch('?dbfiles=myfiles&folder=' + folder + '&name=' + encodeURI(file.name) + '&key=' + sessionKey,
-            {
-                method: 'POST',
-                headers: {},
-                body: file
-            }).then(response => {
-                if (!response.ok) {
-                    return Promise.reject(response);
-                }
-                return response.json();
-            }).then(data => {
-                console.log("Success");
-                //dialog.container.close();
-                console.log(data);
-                listFolder(folder, function (msg) {
-                    xmls = msg.files;
-                    openScripts();
-                });
-            }).catch(error => {
-                //dialog.container.close();
-                if (typeof error.json === "function") {
-                    error.json().then(jsonError => {
-                        console.log("JSON error from API");
-                        console.log(jsonError);
-                    }).catch(genericError => {
-                        console.log("Generic error from API");
-                        console.log(error.statusText);
-                    });
-                } else {
-                    console.log("Fetch error");
-                    console.log(error);
-                }
-            });
-    }
-
-    function deleteFile(id) {
-        controlDB = false
-        if (!id) return;
-        // dialog.container.showModal();
-        sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());
-
-        fetch('?dbfiles=myfiles&folder=' + folder + '&del=' + id + '&key=' + sessionKey,
-            {
-                method: 'POST',
-                headers: {}
-            }).then(response => {
-                if (!response.ok) {
-                    return Promise.reject(response);
-                }
-                return response.json();
-            }).then(data => {
-                console.log("Success");
-                //dialog.container.close();
-                console.log(data);
-                //document.getElementById("imgBD").innerHTML = '';
-                listFolder(folder, function (msg) {
-                    xmls = msg.files
-                    openScripts();
-                });
-                
-            }).catch(error => {
-                //dialog.container.close();
-                if (typeof error.json === "function") {
-                    error.json().then(jsonError => {
-                        console.log("JSON error from API");
-                        console.log(jsonError);
-                    }).catch(genericError => {
-                        console.log("Generic error from API");
-                        console.log(error.statusText);
-                    });
-                } else {
-                    console.log("Fetch error");
-                    console.log(error);
-                }
-            });
-    }
-    function folderAdded(msg) {
-        console.log("FOLDER" + msg)
-        folder = msg.id;
-        listFolder(folder, listFolderResult);
-    }
-
-    function listFolder(id, listFolderResult) {
-        // fileList.clear();
-        app.sendSrc({ mt: "DbFilesList", name: "myfiles", folder: id }, listFolderResult);
-    }
-
-    function listFolderResult(msg) {
-        if ("files" in msg && msg.files.length > 0) {
-            xmls = msg.files;
-        }
-    }
-   
-    //#endregion
-
-    //#region Create XML file
-    function createVoicemailXml() {
-        let xmlPart = ''
-        //Header
-        let xmlDocument = `<?xml version="1.0" encoding="utf-8" ?>\n<voicemail xmlns="http://www.innovaphone.com/xsd/voicemail6.xsd">\n`;
-
-        const functionMainContainer = document.getElementById('function-stack-container-main');
-
-        //const functionMainContainer = document.getElementById('function-stack-container-main');
-
-        if (!functionMainContainer) {
-            console.error('Container not found');
-            return;
-        }
-        // Seleciona todos os elementos filhos dentro do cont�iner.
-        const rowsMain = functionMainContainer.querySelectorAll('app-process-function-stack-row-type-generic')
-
-        //const rows = functionMainContainer.getElementsByClassName('app-process-function-stack-row-type-generic');
-        console.log(`Number of elements found: ${rowsMain.length}`);
-
-        xmlDocument += `   <function define="Main">\n`
-        xmlPart = createXmlDom(rowsMain)
-        console.log('xmlPart at end Main Functions: ' + xmlPart);
-        xmlDocument += xmlPart
-        xmlDocument += `  </function>\n`;
-
-        console.log('xmlDocument at end Main: ' + xmlDocument);
-
-        const functionsContainer = document.getElementById('function-stack-container-function');
-        if (!functionsContainer) {
-            console.error('Container Functions not found');
-        }
-        // Seleciona todos os elementos filhos dentro do cont�iner.
-        const rowsFunctions = functionsContainer.querySelectorAll('app-process-function-stack-row-type-generic')
-        xmlPart = createXmlDom(rowsFunctions)
-        console.log('xmlPart at end Aditional Functions: ' + xmlPart);
-        xmlDocument += xmlPart
-        xmlDocument += `</voicemail>`;
-        console.log('xmlDocument at end Aditional Functions: ' + xmlDocument);
-        return xmlDocument
-    }
-    function createXmlDom(rows) {
-        let xmlDocument = '';
-        Array.from(rows).forEach(row => {
-            const elementType = row.getAttribute('element');
-            switch (elementType) {
-                case 'add':
-                    const addVarName = row.querySelector('#inputVarName')?.value;
-                    const addVarValue = row.querySelector('#inputVarValue')?.value;
-                    const addVarValue2 = row.querySelector('#inputVarValue2')?.value;
-                    if (addVarName && addVarValue && addVarValue2) {
-                        xmlDocument += `    <${elementType} out="${addVarName}" value="${addVarValue}" value2="${addVarValue2}"/>\n`;
-                    }
-                    break;
-                case 'sub':
-                    const subVarName = row.querySelector('#inputVarName')?.value;
-                    const subVarValue = row.querySelector('#inputVarValue')?.value;
-                    const subVarValue2 = row.querySelector('#inputVarValue2')?.value;
-                    if (subVarName && subVarValue && subVarValue2) {
-                        xmlDocument += `    <${elementType} out="${subVarName}" value="${subVarValue}" value2="${subVarValue2}"/>\n`;
-                    }
-                    break;
-                case 'assign':
-                    const assignVarName = row.querySelector('#inputVarName')?.value;
-                    const assignVarValue = row.querySelector('#inputVarValue')?.value;
-                    if (assignVarName && assignVarValue) {
-                        xmlDocument += `    <${elementType} out="${assignVarName}" value="${assignVarValue}"/>\n`;
-                    }
-                    break;
-                case 'call':
-                    const callVarName = row.querySelector('#inputVarName')?.value;
-                    if (callVarName) {
-                        xmlDocument += `    <${elementType} name="${callVarName}" />\n`;
-                    }
-                    break;
-                case 'wait':
-                    const waitVarSeconds = row.querySelector('#inputVarSeconds')?.value;
-                    if (waitVarSeconds) {
-                        xmlDocument += `    <${elementType} sec="${waitVarSeconds}" />\n`;
-                    }
-                    break;
-                case 'dbg':
-                    const dbgVarValue = row.querySelector('#inputVarString1')?.value;
-                    const dbgVarValue2 = row.querySelector('#inputVarString2')?.value;
-                    if (dbgVarValue || dbgVarValue2) {
-                        xmlDocument += `    <${elementType} string="${dbgVarValue}" string2="${dbgVarValue2}"/>\n`;
-                    }
-                    break;
-                case 'exec':
-                    const execVarUrl = row.querySelector('#inputVarUrl')?.value;
-                    if (execVarUrl) {
-                        xmlDocument += `    <${elementType} url="${execVarUrl}" />\n`;
-                    }
-                    break;
-                case 'pbx-fwd':
-                    const fwdVare164 = row.querySelector('#inputVare164')?.value;
-                    if (fwdVare164) {
-                        xmlDocument += `    <${elementType} url="${fwdVare164}" />\n`;
-                    }
-                    break;
-                case 'pbx-disc':
-                    xmlDocument += `    <${elementType} />\n`;
-                    break;
-                case 'pbx-prompt':
-                    const promptVarUrl = row.querySelector('#inputVarUrl')?.value;
-                    if (promptVarUrl) {
-                        xmlDocument += `    <${elementType} url="${promptVarUrl}" />\n`;
-                    }
-                    break;
-                case 'if-start':
-                    const ifVarCond = row.querySelector('#inputVarCond')?.value;
-                    const ifVarNotCond = row.querySelector('#selectVarCond')?.value;
-                    if (ifVarNotCond == '==') {
-                        xmlDocument += `    <if cond="${ifVarCond}" >\n`;
-                    } else {
-                        xmlDocument += `    <if notcond="${ifVarCond}" >\n`;
-                    }
-                    break;
-                case 'if-end':
-                    xmlDocument += `    </if>\n`;
-                    break;
-                case 'function-start':
-                    const funcVarDefine = row.querySelector('#inputVarDefine')?.value;
-                    if (funcVarDefine) {
-                        xmlDocument += `    <function define="${funcVarDefine}" >\n`;
-                    }
-                    break;
-                case 'function-end':
-                    xmlDocument += `    </function>\n`;
-                    break;
-                case 'while-start':
-                    const whileVarCond = row.querySelector('#inputVarCond')?.value;
-                    const whileVarNotCond = row.querySelector('#selectVarCond')?.value;
-                    if (whileVarNotCond == '==') {
-                        xmlDocument += `    <while cond="${whileVarCond}" >\n`;
-                    } else {
-                        xmlDocument += `    <while notcond="${whileVarCond}" >\n`;
-                    }
-                    break;
-                case 'while-end':
-                    xmlDocument += `    </while>\n`;
-                    break;
-                case 'switch-start':
-                    const switchVarName = row.querySelector('#inputVarName')?.value;
-                    if (switchVarName) {
-                        xmlDocument += `    <switch var="${switchVarName}" >\n`;
-                    }
-                    break;
-                case 'switch-end':
-                    xmlDocument += `    </switch>\n`;
-                    break;
-                case 'case-start':
-                    const caseVarCond = row.querySelector('#inputVarCond')?.value;
-                    const caseVarNotCond = row.querySelector('#selectVarCond')?.value;
-                    if (caseVarNotCond == '==') {
-                        xmlDocument += `    <case equal="${caseVarCond}" >\n`;
-                    } else {
-                        xmlDocument += `    <case not-equal="${caseVarCond}" >\n`;
-                    }
-                    break;
-                case 'case-end':
-                    xmlDocument += `    </case>\n`;
-                    break;
-                case 'pbx-getdtmfdigit':
-                    const dtmfVarName = row.querySelector('#inputVarName')?.value;
-                    if (dtmfVarName) {
-                        xmlDocument += `    <${elementType} out-dtmf="${dtmfVarName}" >\n`;
-                    }
-                    break;
-                case 'lib-strcat':
-                    const strVarName = row.querySelector('#inputVarName')?.value;
-                    const strVarValue = row.querySelector('#inputVarValue')?.value;
-                    const strVarValue2 = row.querySelector('#inputVarValue2')?.value;
-                    if (strVarName && strVarValue && strVarValue2) {
-                        xmlDocument += `    <${elementType} out-string="${strVarName}" string="${strVarValue}" string2="${strVarValue2}"/>\n`;
-                    }
-                    break;
-                case 'lib-strlen':
-                    const lenVarName = row.querySelector('#inputVarName')?.value;
-                    const lenVarValue = row.querySelector('#inputVarValue')?.value;
-                    if (lenVarName && lenVarValue) {
-                        xmlDocument += `    <${elementType} out-string="${lenVarName}" string="${lenVarValue}"/>\n`;
-                    }
-                    break;
-                case 'lib-enc':
-                    const encVarName = row.querySelector('#inputVarName')?.value;
-                    const encVarValue = row.querySelector('#inputVarValue')?.value;
-                    if (encVarName && encVarValue) {
-                        xmlDocument += `    <${elementType} out-string="${encVarName}" string="${encVarValue}" type="url" />\n`;
-                    }
-                    break;
-                case 'lib-dec':
-                    const decVarName = row.querySelector('#inputVarName')?.value;
-                    const decVarValue = row.querySelector('#inputVarValue')?.value;
-                    if (decVarName && decVarValue) {
-                        xmlDocument += `    <${elementType} out-string="${decVarName}" string="${decVarValue}" type="url" />\n`;
-                    }
-                    break;
-                case 'event':
-                    const eventVarDefine = row.querySelector('#inputVarDefine')?.value;
-                    if (eventVarDefine) {
-                        xmlDocument += `    <event type="dtmf" block="false">\n        <call name="${eventVarDefine}" />\n    </event>\n`;
-                    }
-                    break;
-                default:
-                    console.warn(`Unknown type: ${elementType}`);
-            }
-        });
-        return xmlDocument;
-    }
-    //#endregion
 }
 
 Wecom.flowe.prototype = innovaphone.ui1.nodePrototype;

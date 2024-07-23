@@ -445,11 +445,16 @@ button, [type=button], [type=reset], [type=submit] {
 button, select {
     text-transform: none;
 }
+input, select, textarea {
+    border-radius: 5px;
+}
 input, button, select, optgroup, textarea {
     margin: 0;
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
+    color: var(--text-standard);
+    background-color: var(--bs-tertiary-bg);
 }
 /*.function-stack-row .function-stack-function.force-hover > * > .function-stack-hover-actions .function-stack-left-actions .action-icon, .function-stack-row .function-stack-function.force-hover > * > .function-stack-hover-actions .function-stack-right-actions .action-icon {
     cursor: pointer;

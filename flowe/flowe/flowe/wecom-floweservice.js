@@ -8,6 +8,8 @@ var license = getLicense();
 
 var pbxTable = [];
 var pbxTableUsers = [];
+var vmObjects = [];
+updateVmObjects();
 
 //FUNCOES DO CLIENTE
 new JsonApi("user").onconnected(function (conn) {
@@ -20,22 +22,53 @@ new JsonApi("user").onconnected(function (conn) {
                 //var lic = decrypt(licenseAppToken, licenseAppFile)
                 var lic = getLicense()
                 if (lic != undefined) {
-                    var licObj = JSON.parse(lic)
+                    var licObj = lic
                     lic = licObj.xmls;
                 }
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", xmls: lic, src: obj.src }));
             }
             if (obj.mt == "VmObjects") {
                 conn.send(JSON.stringify({ api: "user", mt: "VmObjectsResult", result: pbxTableUsers, src: obj.src }));
+                //Database.exec("SELECT * FROM vms")
+                //    .oncomplete(function (data) {
+                //        log('VmObjects: data '+JSON.stringify(data))
+                //        log('VmObjects: pbxTableUsers '+JSON.stringify(pbxTableUsers))
+                //        var vmObjects = findMatchingGuids(data, pbxTableUsers)
+                //        conn.send(JSON.stringify({ api: "user", mt: "VmObjectsResult", result: vmObjects, src: obj.src }));
+                //    })
+                 //   .onerror(function (error, errorText, dbErrorCode) {
+                 //       conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                //});
             }
             if (obj.mt == "SetVmObjectUrl") {
                 var result = updatePseudoByGuid(obj.guid, obj.url)
                 conn.send(JSON.stringify({ api: "user", mt: "SetVmObjectUrlResult", result: result, src: obj.src }));
             }
             if (obj.mt == "DeleteVmObject") {
-                var result = deleteObjectByGuid(obj.guid)
-                conn.send(JSON.stringify({ api: "user", mt: "DeleteVmObjectResult", result: result, src: obj.src }));
+                
+                Database.exec("DELETE FROM vms WHERE guid = '"+obj.guid+"'")
+                        .oncomplete(function (data) {
+                            log('DeleteVmObject: data '+JSON.stringify(data))
+                            //log('VmObjects: pbxTableUsers '+JSON.stringify(pbxTableUsers))
+                            //vmObjects = findMatchingGuids(data, pbxTableUsers)
+                            var result = deleteObjectByGuid(obj.guid)
+                            updateVmObjects()
+                            conn.send(JSON.stringify({ api: "user", mt: "DeleteVmObjectResult", result: result, src: obj.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                    }); 
             }
+            if (obj.mt == "AddVmObject") {
+                if(vmObjects.length >= license.vms){
+                    conn.send(JSON.stringify({ api: "user", mt: "AddVmObjectNoLicense", src: obj.src }));
+                }else{
+                    var result = addVmObject(obj, conn)
+                    
+                }
+                
+            }
+
             // license 
             if (obj.mt == "ConfigLicense") {
                 licenseAppToken = Config.licenseAppToken;
@@ -65,15 +98,46 @@ new JsonApi("user").onconnected(function (conn) {
                 } catch (e) {
                     conn.send(JSON.stringify({ api: "user", mt: "UpdateConfigMessageErro", result: e}));
                     log("ERRO UpdateConfigLicenseMessage:" + e);
-
-
                 }
             }
 
         });
     }
 });
+function findMatchingGuids(lista1, lista2) {
+    var matchingObjects = [];
 
+    for (var i = 0; i < lista1.length; i++) {
+        for (var j = 0; j < lista2.length; j++) {
+            if (lista1[i].guid === lista2[j].columns.guid) {
+                matchingObjects.push(lista2[j]);
+            }
+        }
+    }
+
+    return matchingObjects;
+}
+
+function matchVmGuid(pbxTable){
+    for (var i = 0; i < vmObjects.length; i++) {
+        if (vmObjects[i].guid === pbxTable.columns.guid) {
+            return true;
+        }
+    }
+    return false;
+}
+function updateVmObjects(){
+    Database.exec("SELECT * FROM vms")
+        .oncomplete(function (data) {
+            log('VmObjects: data '+JSON.stringify(data))
+            //log('VmObjects: pbxTableUsers '+JSON.stringify(pbxTableUsers))
+            //vmObjects = findMatchingGuids(data, pbxTableUsers)
+            vmObjects = data;
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+    });
+}
 
 //PBX APIS
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
@@ -91,10 +155,18 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             "add": true,
             "del": true,
             "columns": {
+                "node": {
+                    "update": true
+                },
+                "pbx": {
+                    "update": true
+                },
                 "cn": {
                     "update": true
                 },
-                "guid": {},
+                "guid": {
+                    "update": true
+                },
                 "h323": {
                     "update": true
                 },
@@ -110,7 +182,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             ],
             "src": conn.pbx
         }));
-
     }
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
@@ -121,12 +192,53 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
         }
         if (obj.mt == "ReplicateNextResult" && obj.columns) {
-            pbxTableUsers.push(obj)
+            var match = matchVmGuid(obj)
+            if(match){
+                pbxTableUsers.push(obj)
+            }
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
         }
-
         if (obj.mt == "ReplicateAdd") {
-            pbxTableUsers.push(obj);
+            obj.mt = "ReplicateNextResult"
+            //pbxTableUsers.push(obj)
+            
+        }
+        if (obj.mt == "ReplicateAddResult") {
+
+            log('ReplicateAddResult: start again the replication')
+            conn.send(JSON.stringify({
+            "api": "PbxTableUsers",
+            "mt": "ReplicateStart",
+            "add": true,
+            "del": true,
+            "columns": {
+                "node": {
+                    "update": true
+                },
+                "pbx": {
+                    "update": true
+                },
+                "cn": {
+                    "update": true
+                },
+                "guid": {
+                    "update": true
+                },
+                "h323": {
+                    "update": true
+                },
+                "e164": {
+                    "update": true
+                },
+                "pseudo": {
+                    "update": true
+                }
+            },
+            "pseudo": [
+                "vm"
+            ],
+            "src": conn.pbx
+        }));
         }
         if (obj.mt == "ReplicateUpdate") {
             var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
@@ -139,15 +251,28 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                     found = true;
                 }
             })
-            if (found == false) {
-                log("ReplicateUpdate: Adding the object user " + obj.columns.h323 + " because it not exists here before");
-                pbxTableUsers.push(obj);
-            }
+            //if (found == false) {
+            //    log("ReplicateUpdate: Adding the object user " + obj.columns.h323 + " because it not exists here before");
+             //   pbxTableUsers.push(obj);
+            //}
 
         }
 
         if (obj.mt == "ReplicateDel") {
             pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+            var match = matchVmGuid(obj)
+            if(match){
+                Database.exec("DELETE FROM vms WHERE guid = '"+obj.columns.guid+"'")
+                    .oncomplete(function (data) {
+                        log('ReplicateDel: data '+JSON.stringify(data))
+                        //log('VmObjects: pbxTableUsers '+JSON.stringify(pbxTableUsers))
+                        //vmObjects = findMatchingGuids(data, pbxTableUsers)
+                        updateVmObjects()
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        log(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                });
+            } 
         }
     });
 
@@ -163,9 +288,7 @@ function updatePseudoByGuid(guid, url) {
     pbxTableUsers.forEach(function (item) {
         if (item.columns && item.columns.guid === guid) {
             //Atualiza o valor de pseudo
-            item.columns.pseudo = "<pseudo type=\"vm\"><script url=\"" + url + "\"/></pseudo>";
-
-            // Envia a atualizaao para o PBX
+            item.columns.pseudo = "<pseudo type=\"vm\"><script url=\"" + url + "\"/></pseudo>"
             if (pbxTable.length > 0) {
                 item.mt = "ReplicateUpdate";
                 log("danilo-req updatePseudoByGuid: found PBX connection to update vm " + JSON.stringify(item));
@@ -200,6 +323,42 @@ function deleteObjectByGuid(guid) {
             }
         }
     });
+}
+function addVmObject(obj, conn){
+    var rand = Random.bytes(16);
+    var item = {
+        "mt":"ReplicateAdd",
+        "src":"Flowe",
+        "api":"PbxTableUsers",
+        "columns":{
+            "node":"root",
+            "guid": rand,
+            "cn":obj.name,
+            "h323":obj.sip,
+            "e164":obj.e164,
+            "pseudo":"<pseudo type=\"vm\"><script url=\"" + obj.url + "\"/></pseudo>"
+        }
+    }
+    // Envia o item para o PBX
+    if (pbxTable.length > 0) {
+        log("danilo-req addVmObject: found PBX connection to add vm " + JSON.stringify(item));
+        Database.insert("INSERT INTO vms (guid) VALUES ('" + rand + "')")
+            .oncomplete(function (id) {
+                log("danilo-req addVmObject: inserted on db with id " + JSON.stringify(id));
+                item.columns.pbx = pbxTable[0].pbx;
+                pbxTable[0].send(JSON.stringify(item));
+                conn.send(JSON.stringify({ api: "user", mt: "AddVmObjectResult", result: id, src: obj.src }));
+                updateVmObjects();
+                return;
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                conn.send(JSON.stringify({ api: "user", mt: "AddVmObjectResult", result: String(errorText), src: obj.src }));
+                return;
+        });
+    } else {
+        log("danilo-req addVmObject: PBX connection length is 0 ");
+        return false;
+    }
 
 }
 //#region License Functions

@@ -92,7 +92,7 @@ body {
     display: flex;
     gap: 10px;
     /* flex: 1; */
-    background-color: #f4f4f4;
+    background-color: var(--bs-body-bg);
     flex-grow: 1;
     padding: 75px;
     overflow-y: auto;
@@ -184,7 +184,7 @@ body {
         display: flex;
         gap: 10px;
         /* flex: 1; */
-        background-color: #f4f4f4;
+        background-color: var(--bs-body-bg);
         flex-grow: 1;
         padding: 25px;
         overflow-y: auto;
@@ -192,5 +192,8 @@ body {
     }
     .function-stack-variable.highlight {
         flex-direction: column !important;
+    }
+    .box-card{
+        flex:auto !important;
     }
 }
