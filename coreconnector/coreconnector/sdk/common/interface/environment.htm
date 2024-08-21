@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Environment Implementation</title>
+    <link rel="stylesheet" href="../../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../web1/doc/vs.css">
+</head>
+
+<body>
+    <script src="../../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>Environment</h1>
+    <p>
+        Interface to get environment information.<br />
+        The encoding is UTF-8.
+    </p>
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/environment.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#Environment">Environment</a><br>
+                <br>
+            </td>
+        </tr>
+    </table>
+
+    <h1>Classes</h1>
+    <h2 id="ISystem">Environment</h2>
+    <pre><code class="language-cpp">class Environment {
+public:
+    <a href="#GetEnv" style="text-decoration:none;">static char * GetEnv(const char * name)</a>;
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="GetEnv">GetEnv (static function)</div>
+    <dl>
+        <dd>
+            The function is used to get the environment variable value with the given name.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>name</b></td><td>To environment variable name</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            A char buffer holding the value. The buffer must be freed by the caller.
+        </dd>
+    </dl>
+
+</body>
+</html>

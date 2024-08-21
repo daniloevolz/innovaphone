@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Certificates implementation</title>
+    <link rel="stylesheet" href="../../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../web1/doc/vs.css">
+</head>
+
+<body>
+    <script src="../../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>Certificates</h1>
+    <p>
+        Interface to create and validate certificates.
+    </p>
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/certificates.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#IGuuid">ICertificates</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Data types</b></td>
+            <td>
+                <a href="#certificate_error_t">certificate_error_t</a><br>
+                <a href="#certificate_type_t">certificate_type_t</a><br>
+                <a href="#fingerprint_t">fingerprint_t</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#ExampleCertificates">Example</a><br>
+                <br>
+            </td>
+        </tr>
+    </table>
+    <h3>Logging</h3>
+    To enable logging for ICertificates, the flag LOG_TLS must be set in the managers diagnostic settings.
+    <h1>Classes</h1>
+    <a name="ICertificates"><h2>ICertificates</h2></a>
+    <pre><code class="language-cpp">class ICertificates {
+public:
+    <a href="#ValidateCertificate" style="text-decoration:none;">static certificate_error_t ValidateCertificate(class IInstanceLog * log, const byte * cert, size_t certLen, class ICertificateInformation * info = nullptr, bool privateKeyRequired = true, bool verifyChain = true);</a>
+    <a href="#CreateCertificateSigningRequest" style="text-decoration:none;">static bool CreateCertificateSigningRequest(class IInstanceLog * log, class ICertificateSigningRequest * iCsr);</a>
+    <a href="#ConvertPEMToDER" style="text-decoration:none;">static byte * ConvertPEMToDER(this, csr->GetRequestPEM(), outLength);</a>
+    <a href="#ConvertDERToPEM" style="text-decoration:none;">static char * ConvertDERToPEM(class IInstanceLog * log, const byte * der, size_t derLength);</a>
+    <a href="#CertificateFingerprint" style="text-decoration:none;">virtual byte * CertificateFingerprint(class IInstanceLog * log, const byte * cert, size_t certLen, size_t * length, fingerprint_t type = FINGERPRINT_SHA256) = 0;</a>
+    <a href="#CreateCertificate" style="text-decoration:none;">virtual byte * CreateCertificate(class IInstanceLog * log, size_t * certLen, certificate_type_t type = CERTIFICATE_PEM) = 0;</a>
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="ValidateCertificate">ValidateCertificate (static function)</div>
+    <dl>
+        <dd>
+            This function validates a certificate in PEM format.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">const byte * <b>cert </b></td><td>A byte buffer which holds the certificate.</td></tr>
+                <tr><td class="param">size_t <b>certLen </b></td><td>The length of the byte buffer.</td></tr>
+                <tr><td class="param">ICertificateInformation * <b>info </b></td><td>An optional <a href="#ICertificateInformation">ICertificateInformation</a> object which will hold information about the certificate after successfull information.</td></tr>
+                <tr><td class="param">bool <b>privateKeyRequired </b></td><td>Default true; if false, the chain does not need to contain a private key.</td></tr>
+                <tr><td class="param">bool <b>verifyChain </b></td><td>Default true; if false, the certificate chain is not verified.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            An enum <a href="#certificate_error_t">certificate_error_t</a> which indicates a possible error.
+
+            <h4>Remarks</h4>
+            If you want certificate informations, you must hand an instance of <a href="#ICertificateInformation">ICertificateInformation</a>, which you can create with <a href="#ICertificateInformationCreate">ICertificateInformation::Create</a>.
+            You are responsible for deletion of this object afterwards!
+        </dd>
+    </dl>
+    <div class="fnhead" id="CreateCertificateSigningRequest">CreateCertificateSigningRequest (static function)</div>
+    <dl>
+        <dd>
+            This function will create a private RSA key together with a certificate signing request.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">ICertificateSigningRequest * <b>iCsr </b></td><td>An <a href="#ICertificateSigningRequest">ICertificateSigningRequest</a> object which will hold information about the CSR and after the creation the private key and request.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            A boolean, if false, something failed (enable TLS traces to see possible erros).
+
+            <h4>Remarks</h4>
+            As the generation of an RSA certificate may take a while, depending on the architecture and key length, you should consider to call this function inside a thread to avoid blocking of your App.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ConvertPEMToDER">ConvertPEMToDER (static function)</div>
+    <dl>
+        <dd>
+            This function will convert a PEM formatted certificate to a DER format.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">const char * <b>pem </b></td><td>A const char * which holds the null terminated PEM string.</td></tr>
+                <tr><td class="param">size_t & <b>outLength </b></td><td>A reference to a size_t variable which will hold the length of the returned buffer afterwards.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            A byte * buffer. You must free this buffer yourself! On errors, a nullptr is returned and the error can be found in the log file with an enabled TLS log flag.
+
+            <h4>Remarks</h4>
+            Just simple PEMs with a single certificate and without certificate data description, just with ----- lines and base64 encoding are supported.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ConvertDERToPEM">ConvertDERToPEM (static function)</div>
+    <dl>
+        <dd>
+            This function will convert a DER formatted certificate to a PEM format.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">const byte * <b>der </b></td><td>A const byte * which holds the DER binary data.</td></tr>
+                <tr><td class="param">size_t <b>derLength </b></td><td>The length of the der byte array.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            A char * buffer. You must free this buffer yourself! On errors, a nullptr is returned and the error can be found in the log file with an enabled TLS log flag.
+
+            <h4>Remarks</h4>
+            Just a single public key certificate is supported.
+        </dd>
+    </dl>
+    <div class="fnhead" id="CertificateFingerprint">CertificateFingerprint</div>
+    <dl>
+        <dd>
+            This function generates a certificate fingerprint for PEM certificates.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">const byte * <b>cert </b></td><td>A byte buffer which holds the certificate.</td></tr>
+                <tr><td class="param">size_t <b>certLen </b></td><td>The length of the byte buffer.</td></tr>
+                <tr><td class="param"><a href="#fingerprint_t">fingerprint_t</a> <b>type </b></td><td>The fingerprint hash type.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            A byte buffer holding the fingerprint hash. The buffer must be freed by the caller.
+        </dd>
+    </dl>
+    <div class="fnhead" id="CreateCertificate">CreateCertificate</div>
+    <dl>
+        <dd>
+            This function creates a certificate.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+                <tr><td class="param">size_t * <b>certLen </b></td><td>The length of the returned buffer.</td></tr>
+                <tr><td class="param"><a href="#certificate_type_t">certificate_type_t</a> <b>type </b></td><td>The output certificate type.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            A byte buffer holding the certificates private and public key. The buffer must be freed by the caller.
+        </dd>
+    </dl>
+
+    <a name="ICertificateSigningRequest"><h2>ICertificateSigningRequest</h2></a>
+    <pre><code class="language-cpp">class ICertificateSigningRequest {
+public:
+    <a href="#ICertificateSigningRequestCreate" style="text-decoration:none;">static ICertificateSigningRequest * Create(const char * commonName, certificate_key_length_t keyLength);</a>;
+    <a href="#ICertificateSigningRequestAddDnsName" style="text-decoration:none;">virtual void AddDnsName(const char * dnsName) = 0;</a>;
+    <a href="#ICertificateSigningRequestGetKeyLength" style="text-decoration:none;">virtual certificate_key_length_t GetKeyLength() = 0;</a>;
+    <a href="#ICertificateSigningRequestGetCommonName" style="text-decoration:none;">virtual const char * GetCommonName() = 0;</a>;
+    <a href="#ICertificateSigningRequestGetPrivateKeyPEM" style="text-decoration:none;">virtual const char * GetPrivateKeyPEM() = 0;</a>;
+    <a href="#ICertificateSigningRequestGetRequestPEM" style="text-decoration:none;">virtual const char * GetRequestPEM() = 0;</a>;
+};</code></pre>
+
+    <h3>Usage</h3>
+    This class is used to hand neccessary information to <a href="#CreateCertificateSigningRequest" style="text-decoration:none;">ICertificates::CreateCertificateSigningRequest</a> and afterwards also holds the created privated key and CSR on success.<br />
+    An object is created by <a href="#ICertificateSigningRequestCreate" style="text-decoration:none;">ICertificateSigningRequest::Create</a>.
+    You can hand one or multiple DNS names with the function <a href="#ICertificateSigningRequestAddDnsName" style="text-decoration:none;">AddDnsName(const char * dnsName)</a>.<br />
+    You must delete the object after your usage.
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="ICertificateSigningRequestCreate">Create (static function)</div>
+    <dl>
+        <dd>
+            This function creates an object for the interface class ICertificateSigningRequest.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>commonName </b></td><td>The common name for the signing request.</td></tr>
+                <tr><td class="param"><a href="#certificate_error_t">certificate_key_length_t</a> <b>keyLength </b></td><td>The key length of the generated certificate.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            An object of type <a href="#ICertificateSigningRequest">ICertificateSigningRequest</a>.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateSigningRequestAddDnsName">AddDnsName</div>
+    <dl>
+        <dd>
+            Adds a DNS name which will be added as subject alternative name to the CSR.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>dnsName </b></td><td>The DNS name.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateSigningRequestGetKeyLength">GetKeyLength</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            An enum <a href="#certificate_key_length_t">certificate_key_length_t</a> with the set key length.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateSigningRequestGetCommonName">GetCommonName</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * with the common name.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateSigningRequestGetPrivateKeyPEM">GetPrivateKeyPEM</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * with the private key in PEM format.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateSigningRequestGetRequestPEM">GetRequestPEM</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * with the certificate signing request in PEM format..
+        </dd>
+    </dl>
+
+    <a name="ICertificateInformation"><h2>ICertificateInformation</h2></a>
+    <pre><code class="language-cpp">
+    class ICertificateInformation {
+    public:
+    <a href="#ICertificateInformationCreate" style="text-decoration:none;">static ICertificateInformation * Create();</a>
+    <a href="#ICertificateInformationGetCommonName" style="text-decoration:none;">virtual const char * GetCommonName() = 0;</a>
+    <a href="#ICertificateInformationGetIssuer" style="text-decoration:none;">virtual const char * GetIssuer() = 0;</a>
+    <a href="#ICertificateInformationGetNotAfter" style="text-decoration:none;">virtual int GetNotAfter() = 0;</a>
+    <a href="#ICertificateInformationGetNotBefore" style="text-decoration:none;">virtual int GetNotBefore() = 0;</a>
+    <a href="#ICertificateInformationGetChainDepth" style="text-decoration:none;">virtual size_t GetChainDepth() = 0;</a>
+    <a href="#ICertificateInformationGetChainCertificate" style="text-decoration:none;">virtual const char * GetChainCertificate(size_t index) = 0;</a>
+    <a href="#ICertificateInformationGetDnsNamesCount" style="text-decoration:none;">virtual size_t GetDnsNamesCount() = 0;</a>
+    <a href="#ICertificateInformationGetDnsName" style="text-decoration:none;">virtual const char * GetDnsName(size_t index) = 0;</a>
+    <a href="#ICertificateInformationGetIpAddressesCount" style="text-decoration:none;">virtual size_t GetIpAddressesCount() = 0;</a>
+    <a href="#ICertificateInformationGetIpAddress" style="text-decoration:none;">virtual const char * GetIpAddress(size_t index) = 0;</a>
+    <a href="#ICertificateInformationGetFingerprintSHA256" style="text-decoration:none;">virtual const char * GetFingerprintSHA256() = 0;</a>
+    <a href="#ICertificateInformationGetSignatureAlgorithm" style="text-decoration:none;">virtual const char * GetSignatureAlgorithm() = 0;</a>
+    };
+</code></pre>
+
+    <h3>Usage</h3>
+    An object is created by <a href="#ICertificateInformationCreate" style="text-decoration:none;">ICertificateInformation::Create</a>.<br />
+    You must delete the object after your usage.
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="ICertificateInformationCreate">Create (static function)</div>
+    <dl>
+        <dd>
+            This function creates an object for the interface class ICertificateInformation.
+
+            <h4>Return value</h4>
+            An object of type <a href="#ICertificateInformation">ICertificateInformation</a>.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetCommonName">GetCommonName</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * with the common name.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetIssuer">GetCommonName</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * with the issuer.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetNotAfter">GetNotAfter</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            Valid not after as ulong64 UTC timestamp in milliseconds.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetNotBefore">GetNotBefore</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            Valid not before as ulong64 UTC timestamp in milliseconds.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetChainDepth">GetChainDepth</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The size_t chain depth, aka count of chain certificates.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetChainCertificate">GetChainCertificate</div>
+    <dl>
+        <dd>
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">size_t <b>index </b></td><td>The index of the chain certificate which shall be returned.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            A const char * pointer to the chain certificate in PEM format. If index is not found, nullptr is returned.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetDnsNamesCount">GetDnsNamesCount</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The size_t count of DNS SAN entries.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetDnsName">GetDnsName</div>
+    <dl>
+        <dd>
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">size_t <b>index </b></td><td>The index of the DNS name which shall be returned.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            A const char * pointer to the DNS name. If index is not found, nullptr is returned.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetIpAddressesCount">GetIpAddressesCount</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The size_t count of IP address SAN entries.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetIpAddress">GetIpAddress</div>
+    <dl>
+        <dd>
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">size_t <b>index </b></td><td>The index of the IP address which shall be returned.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            A const char * pointer to the IP address. If index is not found, nullptr is returned.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetFingerprintSHA256">GetFingerprintSHA256</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * pointer to the SHA256 fingerprint.
+        </dd>
+    </dl>
+    <div class="fnhead" id="ICertificateInformationGetSignatureAlgorithm">GetSignatureAlgorithm</div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            A const char * pointer to the used signature algorithm.
+        </dd>
+    </dl>
+
+    <h1>Data types</h1>
+    <h2 id="certificate_error_t">certificate_error_t</h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    CERTIFICATE_OK = 0,
+    CERTIFICATE_PARSING_FAILED,
+    CERTIFICATE_PUBLIC_KEY_INVALID,
+    CERTIFICATE_PRIVATE_KEY_INVALID,
+    CERTIFICATE_LOAD_FAILED,
+    CERTIFICATE_CHAIN_INVALID
+} certificate_error_t;</code></pre>
+
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">enum certificate_error_t</code> is used to determine the error code of the parsing or if the parsing succeeded.
+
+    <h2 id="certificate_type_t">certificate_type_t</h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    CERTIFICATE_PEM = 0
+} certificate_type_t;</code></pre>
+
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">enum certificate_type_t</code> holds all supported certificate types.
+
+    <h2 id="fingerprint_t">fingerprint_t</h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    FINGERPRINT_MD5,
+    FINGERPRINT_SHA1,
+    FINGERPRINT_SHA224,
+    FINGERPRINT_SHA256,
+    FINGERPRINT_SHA384,
+    FINGERPRINT_SHA512
+} fingerprint_t;</code></pre>
+
+    <h2 id="certificate_key_length_t">certificate_key_length_t</h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    CERTIFICAFTE_KEY_LENGTH_2048,
+    CERTIFICAFTE_KEY_LENGTH_3072,
+    CERTIFICAFTE_KEY_LENGTH_4096
+
+} certificate_key_length_t;</code></pre>
+
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">enum fingerprint_t</code> holds all supported fingerprint hash types.
+
+    <h1> Code Example </h1>
+    <a name="ExampleCertificates"></a>
+<pre class="sample"><code class="language-cpp">size_t pemBufferLen = 0;
+byte * pemBuffer = ICertificates::CreateCertificate(logIf, &pemBufferLen, CERTIFICATE_PEM);
+if(pemBuffer) {
+    ICertificateInformation * info = ICertificateInformation::Create();
+    if(ICertificates::ValidateCertificate(logIf, pemBuffer, pemBufferLen, info) == CERTIFICATE_OK) {
+        size_t certFplength;
+        byte * fingerPrint = CertificateFingerprint(logIf, pemBuffer, pemBufferLen, &certFplength, FINGERPRINT_SHA512);
+        debug->printf("fingerprint of new certificate: %s notAfter:%llu", fingerPrint, info->GetNotAfter());
+        free(fingerPrint);
+    }
+    free(pemBuffer);
+    delete info;
+}
+    </code>
+  </pre>
+</body>
+</html>
