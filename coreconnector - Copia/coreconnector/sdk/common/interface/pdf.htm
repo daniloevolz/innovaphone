@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - pdf</title>
+    <link rel="stylesheet" href="../../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../web1/doc/vs.css" type="text/css" />
+</head>
+
+<body>
+    <script src="../../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>pdf</h1>
+    <p>
+        Interface to create a PDF document.
+    </p>
+
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/pdf.h<br /><br /></td></tr>
+        <tr>
+            <td><a href="#classes"><b>Classes</b></a></td>
+            <td>
+                <a href="#class-IPdfProvider">IPdfProvider</a><br>
+                <a href="#class-IPdf">IPdf</a><br>
+                <a href="#class-IPdfFont">IPdfFont</a><br>
+                <a href="#class-IPdfColor">IPdfColor</a><br>
+                <a href="#class-IPdfImage">IPdfImage</a><br>
+                <a href="#class-IPdfDocumentPosition">IPdfDocumentPosition</a><br>
+                <a href="#class-IPdfPage">IPdfPage</a><br>
+                <a href="#class-IPdfImageStream">IPdfImageStream</a><br>
+                <a href="#class-IPdfPage">IPdfTable</a><br>
+                <a href="#class-IPdfPage">UPdfTable</a><br>
+                <a href="#class-IPdfPage">IPdfTableHeader</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfProvider-members"><b>class IPdfProvider members</b></a></td>
+            <td>
+                <a href="#IPdfProvider-CreatePdf">CreatePdf</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdf-members"><b>class IPdf members</b></a></td>
+            <td>
+                <a href="#IPdf-SetInfo">SetInfo</a><br>
+                <a href="#IPdf-SetCompressionMode">SetCompressionMode</a><br>
+                <a href="#IPdf-SetFont">SetFont</a><br>
+                <a href="#IPdf-SetFontSize">SetFontSize</a><br>
+                <a href="#IPdf-SetMargin">SetMargin</a><br>
+                <a href="#IPdf-AddFont">AddFont</a><br>
+                <a href="#IPdf-FontWeight">FontWeight</a><br>
+                <a href="#IPdf-FontStyle">FontStyle</a><br>
+                <a href="#IPdf-AddColor">AddColor</a><br>
+                <a href="#IPdf-AddPngImage">AddPngImage</a><br>
+                <a href="#IPdf-AddPage">AddPage</a><br>
+                <a href="#IPdf-Get">Get</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfDocumentPosition-members"><b>class IPdfDocumentPosition members</b></a></td>
+            <td>
+                <a href="#IPdfDocumentPosition-GetPage">GetPage</a><br>
+                <a href="#IPdfDocumentPosition-GetHorizontalPosition">GetHorizontalPosition</a><br>
+                <a href="#IPdfDocumentPosition-GetVerticalPosition">GetVerticalPosition</a><br>
+                <a href="#IPdfDocumentPosition-Move">Move</a><br>
+                <a href="#IPdfDocumentPosition-MoveTo">MoveTo</a><br>
+                <a href="#IPdfDocumentPosition-Clone">Clone</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfPage-members"><b>class IPdfPage members</b></a></td>
+            <td>
+                <a href="#IPdfPage-GetPreviousPage">GetPreviousPage</a><br>
+                <a href="#IPdfPage-GetNextPage">GetNextPage</a><br>
+                <a href="#IPdfPage-GetSize">GetSize</a><br>
+                <a href="#IPdfPage-GetDirection">GetDirection</a><br>
+                <a href="#IPdfPage-GetWidth">GetWidth</a><br>
+                <a href="#IPdfPage-GetHeight">GetHeight</a><br>
+                <a href="#IPdfPage-GetContentStart">GetContentStart</a><br>
+                <a href="#IPdfPage-GetContentEnd">GetContentEnd</a><br>
+                <a href="#IPdfPage-SetSize">SetSize</a><br>
+                <a href="#IPdfPage-SetDirection">SetDirection</a><br>
+                <a href="#IPdfPage-SetMargin">SetMargin</a><br>
+                <a href="#IPdfPage-AddText">AddText</a><br>
+                <a href="#IPdfPage-AddImage">AddImage</a><br>
+                <a href="#IPdfPage-AddBackground">AddBackground</a><br>
+                <a href="#IPdfPage-AddHorizontalLine">AddHorizontalLine</a><br>
+                <a href="#IPdfPage-AddImageStream">AddImageStream</a><br>
+                <a href="#IPdfPage-AddTable">AddTable</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfImageStream-members"><b>class IPdfImageStream members</b></a></td>
+            <td>
+                <a href="#IPdfImageStream-Write">Write</a><br>
+                <a href="#IPdfImageStream-SetStreamWidth">SetStreamWidth</a><br>
+                <a href="#IPdfImageStream-SetStreamHeight">SetStreamHeight</a><br>
+                <a href="#IPdfImageStream-Draw">Draw</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfTable-members"><b>class IPdfTable members</b></a></td>
+            <td>
+                <a href="#IPdfTable-SetFont">SetFont</a><br>
+                <a href="#IPdfTable-SetContentMargin">SetContentMargin</a><br>
+                <a href="#IPdfTable-SetContentMargin">SetContentMargin</a><br>
+                <a href="#IPdfTable-SetHorizontalLine">SetHorizontalLine</a><br>
+                <a href="#IPdfTable-SetEvenRowBackground">SetEvenRowBackground</a><br>
+                <a href="#IPdfTable-SetOddRowBackground">SetOddRowBackground</a><br>
+                <a href="#IPdfTable-AddHeader">AddHeader</a><br>
+                <a href="#IPdfTable-AddColumn">AddColumn</a><br>
+                <a href="#IPdfTable-AddRows">AddRows</a><br>
+                <a href="#IPdfTable-GetEndPosition">GetEndPosition</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#UPdfTable-members"><b>class UPdfTable members</b></a></td>
+            <td>
+                <a href="#UPdfTable-GetFieldContent">GetFieldContent</a><br>
+                <a href="#UPdfTable-GetHeaderContent">GetHeaderContent</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#IPdfTableHeader-members"><b>class IPdfTableHeader members</b></a></td>
+            <td>
+                <a href="#IPdfTableHeader-SetFont">SetFont</a><br>
+                <a href="#IPdfTableHeader-SetHorizontalLine">SetHorizontalLine</a><br>
+                <br />
+            </td>
+        </tr>
+    </table>
+
+    <h1 id="classes">Classes</h1>
+    <!-- ---------------------------------------------------------------------- -->
+    <h2 id="class-IPdfProvider">IPdfProvider</h2>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfProvider {
+public:
+    virtual ~IPdfProvider() { };
+    virtual class IPdf * CreatePdf(class IInstanceLog * log = 0) = 0;
+};</code></pre>
+    <h3 id="IPdfProvider-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfProvider-CreatePdf">CreatePdf</div>
+        <dd>
+            Creates an IPdf object. This object is to be deleted after use.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class IInstanceLog <b>log</b></td>
+                    <td>If given and the app tracing is enabled, error messages are logged.</td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <h2 id="class-IPdf">IPdf</h2>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdf {
+public:
+    virtual ~IPdf() { };
+    enum class InfoType {
+        Author,
+        Creator,
+        Title,
+        Subject,
+        Keywords,
+    };
+    enum Compressions {
+        CompressionNone     = 0x0,
+        CompressionText     = 0x1,
+        CompressionImage    = 0x2,
+        CompressionMetaData = 0x4,
+        CompressionAll      = 0xf,
+    };
+    enum Directions {
+        DirectionPortrait,
+        DirectionLandscape,
+    };
+    enum Sizes {
+        SizeA4,
+    };
+    enum class DefaultFont {
+        Courier,
+        Helvetica,
+        Times,
+    };
+    enum class FontWeight {
+        Normal,
+        Bold,
+    };
+    enum class FontStyle {
+        Normal,
+        Italic,
+    };
+    enum class TextHAlign {
+        Left,
+        Right,
+        Center,
+    };
+    enum StreamTypes {
+        StreamTypeCcittG31D,
+    };
+    virtual class IPdf &                    SetInfo(InfoType type, const char * info) = 0;
+    virtual class IPdf &                    SetCompressionMode(unsigned compressionMode) = 0;
+    virtual class IPdf &                    SetFont(const class IPdfFont * font) = 0;
+    virtual class IPdf &                    SetFontSize(unsigned int fontSize) = 0;
+    virtual class IPdf &                    SetMargin(float all) = 0;
+    virtual class IPdf &                    SetMargin(float top, float right, float bottom, float left) = 0;
+    virtual class IPdfFont *                AddFont(const char * fontFileName) = 0;
+    virtual class IPdfFont *                AddFont(DefaultFont font = DefaultFont::Helvetica,
+                                                    FontWeight weight = FontWeight::Normal,
+                                                    FontStyle style = FontStyle::Normal) = 0;
+    virtual const class IPdfColor *         AddColor(float gray) = 0;
+    virtual class IPdfImage *               AddPngImage(const byte * data, unsigned int length) = 0;
+    
+    virtual class IPdfPage *                AddPage(enum IPdf::Sizes size = IPdf::SizeA4,
+                                                    enum IPdf::Directions direction = IPdf::DirectionPortrait) = 0;
+    virtual void                            Complete() = 0;         // Obsolete
+    virtual void                            Get(const byte * & data, unsigned & length, bool * last = 0) = 0;
+};
+</code></pre>
+    <p>
+    </p>
+    <h3 id="IPdf-members">Public functions</h3>
+    <dl>
+        
+        <div class="fnhead" id="IPdf-SetInfo">SetInfo</div>
+        <dd>
+            With this function serveral information of the PDF file can be set. The types are: the author, the creator, the title, the subject or keywords.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">InfoType <b>type</b></td>
+                    <td>The type of the information which is set.</td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>info</b></td>
+                    <td>The text in UTF-8 encoding.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns itself as reference.
+        </dd>
+        <div class="fnhead" id="IPdf-SetCompressionMode">SetCompressionMode</div>
+        <dd>The function sets the compression mode of the PDF document.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">unsigned <b>compressionMode</b></td>
+                    <td>Bit mask which type of content should be compressed.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns itself as reference.
+        </dd>
+        <div class="fnhead" id="IPdf-SetFont">SetFont</div>
+        <dd>
+            Sets the current font to be used.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfFont * <b>font</b></td>
+                    <td>A font added to the document before.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns itself as reference.
+        </dd>
+        <div class="fnhead" id="IPdf-SetFontSize">SetFontSize</div>
+        <dd>
+            Sets the current font size to be used.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">unsigned int <b>font-size</b></td>
+                    <td>The font size.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns itself as reference.
+        </dd>
+        <div class="fnhead" id="IPdf-SetMargin">SetMargin</div>
+        <dd>
+            Sets the margin of the document used for the first page. Further pages use the current margin of the last page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>all</b></td>
+                    <td>Sets all four margins to this value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdf-SetMargin">SetMargin</div>
+        <dd>
+            Sets the margin of the document used for the first page. Further pages use the current margin of the last page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>top</b></td>
+                    <td>The top margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>right</b></td>
+                    <td>The right margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>bottom</b></td>
+                    <td>The bottom margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>left</b></td>
+                    <td>The left margin value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdf-AddFont">AddFont</div>
+        <dd>
+            Loads a true type font file exists in the local directory with the given file name for later usage. This font is embedded in the generated PDF file.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>fontFileName</b></td>
+                    <td>The file name of the font.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the font handle if succeeds, otherwise zero.
+        </dd>
+        <div class="fnhead" id="IPdf-AddFont">AddFont</div>
+        <dd>
+            Adds a standard PDF font to the document which needn't to be embedded in the PDF file. The used encoding is LATIN-1. The expected UTF-8 text is transcribed into this encoding.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">DefaultFont <b>font</b></td>
+                    <td><i>(Default DefaultFont::Helvetica)</i>The font.</td>
+                </tr>
+                <tr>
+                    <td class="param">FontWeight <b>weight</b></td>
+                    <td><i>(Default FontWeight::Normal)</i>The font weight.</td>
+                </tr>
+                <tr>
+                    <td class="param">FontStyle <b>style</b></td>
+                    <td><i>(Default FontStyle::Normal)</i>The font style.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the font handle if succeeds, otherwise zero.
+        </dd>
+        <div class="fnhead" id="IPdf-AddColor">AddColor</div>
+        <dd>
+            Adds a gray value as color to the document for later usage.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>gray</b></td>
+                    <td>The gray value. Zero is black, one is white.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the color handle.
+        </dd>
+        <div class="fnhead" id="IPdf-AddPngImage">AddPngImage</div>
+        <dd>
+            Loads a PNG image from memory which is embedded in the PDF file and can be shown at several document positions later.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const byte * <b>data</b></td>
+                    <td>The PNG data.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned int <b>length</b></td>
+                    <td>The PNG data length.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the image handle if succeeds, otherwise zero.
+        </dd>
+        <div class="fnhead" id="IPdf-AddPage">AddPage</div>
+        <dd>This function adds a new page to the document.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">enum IPdf::Sizes <b>size</b></td>
+                    <td><i>(Default IPdf::SizeA4)</i> The size of the page.</td>
+                </tr>
+                <tr>
+                    <td class="param">enum IPdf::Directions <b>direction</b></td>
+                    <td><i>(Default IPdf::DirectionPortrait)</i> The direction of the page.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the new page.
+        </dd>
+        <div class="fnhead" id="IPdf-Complete">Complete</div>
+        <dd>The function is obsolete. Don't use it.</dd>
+        <div class="fnhead" id="IPdf-Get">Get</div>
+        <dd>
+            Get the document data. The data pointer is set to a pointer allocated by IPdf. The end of the document is reached if length is zero or last is true.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const byte * & <b>data</b></td>
+                    <td>Reference to the data pointer which is set by the function to the internal data.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned & <b>length</b></td>
+                    <td>Reference to a unsigned variable which is set by the function to the data length.</td>
+                </tr>
+                <tr>
+                    <td class="param">bool * <b>last</b></td>
+                    <td><i>(Default 0)</i> Reference to a bool variable, whose value is set by the function. The value is set to true if the end of the data is reached.
+                        This parameter can also be a null pointer, in which case it is not used.</td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfFont"><h2>IPdfFont</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <p>
+    </p>
+    <h3>Overview</h3>
+    A font object handled by the PDF document.
+    <h3 id="IPdfFont-members"></h3>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfColor"><h2>IPdfColor</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <p>
+    </p>
+    <h3>Overview</h3>
+    A color object handled by the PDF document.
+    <h3 id="IPdfColor-members"></h3>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfImage"><h2>IPdfImage</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <p>
+    </p>
+    <h3>Overview</h3>
+    A image object handled by the PDF document.
+    <h3 id="IPdfImage-members"></h3>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <h2 id="class-IPdfPage">IPdfPage</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfPage {
+public:
+    virtual class IPdfPage *                    GetPreviousPage() = 0;
+    virtual const class IPdfPage *              GetPreviousPage() const = 0;
+    virtual class IPdfPage *                    GetNextPage() = 0;
+    virtual const class IPdfPage *              GetNextPage() const = 0;
+    virtual enum IPdf::Sizes                    GetSize() const = 0;
+    virtual enum IPdf::Directions               GetDirection() const = 0;
+    virtual float                               GetWidth() const = 0;
+    virtual float                               GetHeight() const = 0;
+    virtual const class IPdfDocumentPosition &  GetContentStart() const = 0;
+    virtual const class IPdfDocumentPosition &  GetContentEnd() const = 0;
+    virtual void                                SetSize(enum IPdf::Sizes size) = 0;
+    virtual void                                SetDirection(enum IPdf::Directions direction) = 0;
+    virtual void                                SetMargin(float all) = 0;
+    virtual void                                SetMargin(float top, float right, float bottom, float left) = 0;
+    
+    virtual unsigned int                        AddText(const char *                        text,
+                                                        const class IPdfDocumentPosition &  position,
+                                                        IPdf::TextHAlign                    align = IPdf::TextHAlign::Left,
+                                                        float                               maxWidth = 0,
+                                                        float                               maxHeight = 0,
+                                                        float *                             height = 0) = 0;
+    virtual void                                AddImage(const class IPdfImage *    image,
+                                                         float                      positionX,
+                                                         float                      positionY,
+                                                         float                      width,
+                                                         float                      height) = 0;
+    virtual void                                AddBackground(const class IPdfColor *               color,
+                                                              const class IPdfDocumentPosition &    startPosition,
+                                                              const class IPdfDocumentPosition &    endPosition) = 0;
+    virtual void                                AddHorizontalLine(const class IPdfDocumentPosition &    startPosition,
+                                                                  float                                 length,
+                                                                  float                                 lineWidth,
+                                                                  const class IPdfColor *               color) = 0;
+    virtual class IPdfImageStream *             AddImageStream(enum IPdf::StreamTypes type) = 0;
+    virtual class IPdfTable *                   AddTable(const class IPdfDocumentPosition * startPosition = 0) = 0;
+    virtual void                                Complete() = 0;     // Obsolete
+protected:
+    virtual ~IPdfPage() { };
+};
+</code></pre>
+    <p>
+    </p>
+    <h3 id="IPdfPage-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfPage-GetPreviousPage">GetPreviousPage</div>
+        <dd>
+            Gets the previous page of this page.
+            <h4>Return value</h4>
+            Returns a handle of a page, if a previous page exists, otherwise zero.
+       </dd>
+        <div class="fnhead" id="IPdfPage-GetNextPage">GetNextPage</div>
+        <dd>
+            Gets the next page of this page.
+            <h4>Return value</h4>
+            Returns a handle of a page, if a next page exists, otherwise zero.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetSize">GetSize</div>
+        <dd>
+            Gets the size format of this this page.
+            <h4>Return value</h4>
+            Returns the format type.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetDirection">GetDirection</div>
+        <dd>
+            Gets the direction of this this page.
+            <h4>Return value</h4>
+            Returns the direction type: portrait or landscape.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetWidth">GetWidth</div>
+        <dd>Gets the page width.
+            <h4>Return value</h4>
+            Returns the width of the page.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetHeight">GetHeight</div>
+        <dd>Gets the page height.
+            <h4>Return value</h4>
+            Returns the height of the page.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetContentStart">GetContentStart</div>
+        <dd>
+            Gets the left upper position of this page which considers the page margin.
+            <h4>Return value</h4>
+            Returns a constant document position.
+        </dd>
+        <div class="fnhead" id="IPdfPage-GetContentEnd">GetContentEnd</div>
+        <dd>
+            Gets the right lower position of this page which considers the page margin.
+            <h4>Return value</h4>
+            Returns a constant document position.
+        </dd>
+        <div class="fnhead" id="IPdfPage-SetSize">SetSize</div>
+        <dd>Set the page size.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">enum IPdf::Sizes <b>size</b></td>
+                    <td>The supported size is A4.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-SetDirection">SetDirection</div>
+        <dd>Set the page direction.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">enum IPdf::Directions <b>direction</b></td>
+                    <td>Portrait or landscape.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-SetMargin">SetMargin</div>
+        <dd>
+            Sets a new margin of the this page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>all</b></td>
+                    <td>Sets all four margins to this value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-SetMargin">SetMargin</div>
+        <dd>
+            Sets a new margin of the this page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>top</b></td>
+                    <td>The top margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>right</b></td>
+                    <td>The right margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>bottom</b></td>
+                    <td>The bottom margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>left</b></td>
+                    <td>The left margin value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddText">AddText</div>
+        <dd>
+            Adds UTF-8 encoded text within a given space to this page beginning at the given start position. The page of the document position is ignored, this page is used. No page break is done.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>text</b></td>
+                    <td>The text to be added.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>position</b></td>
+                    <td>The start position of the text.</td>
+                </tr>
+                <tr>
+                    <td class="param">IPdf::TextHAlign <b>align</b></td>
+                    <td><i>(Default IPdf::TextHAlign::Left)</i> The horizontal alignment of the text.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>maxWidth</b></td>
+                    <td><i>(Default 0)</i> The available width for the text. If it is set, the page's right content margin is ignored, otherwise the width from the horizontal start position to the right content margin is used.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>maxHeight</b></td>
+                    <td><i>(Default 0)</i> The available height for the text. If it isn't set, the height from the vertical start position to the bottom margin is used. The configured page bottom margin isn't considered.</td>
+                </tr>
+                <tr>
+                    <td class="param">float * <b>height</b></td>
+                    <td><i>(Default 0)</i> If the pointer is set, the used height is written.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the number of the bytes which could be added on this page within the available space.
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddImage">AddImage</div>
+        <dd>
+            Adds an image of the document to this page at the given position.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfImage * <b>image</b></td>
+                    <td>The image handle.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>positionX</b></td>
+                    <td>The horizonal left position for the image in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>positionY</b></td>
+                    <td>The vertical bottom position for the image in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>width</b></td>
+                    <td>The width for the image in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>height</b></td>
+                    <td>The height for the image in pixel.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddBackground">AddBackground</div>
+        <dd>
+            Adds a background in the defined color within two corners.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>A color handle.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>startPosition</b></td>
+                    <td>The left upper corner.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>endPosition</b></td>
+                    <td>The right lower corner.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddHorizontalLine">AddHorizontalLine</div>
+        <dd>
+            Adds a horizontal line with a defined length, width and color on this page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>startPosition</b></td>
+                    <td>The start position for the line.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>length</b></td>
+                    <td>The length of the line in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>lineWidth</b></td>
+                    <td>The width of the line in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>The color of the line.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddImageStream">AddImageStream</div>
+        <dd>Adds an image stream to the page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">enum IPdf::StreamTypes <b>type</b></td>
+                    <td>The supported type is one-dimentional G3 data.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns a handle to the image stream.
+        </dd>
+        <div class="fnhead" id="IPdfPage-AddTable">AddTable</div>
+        <dd>
+            Adds a new table to this page.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition * <b>startPosition</b></td>
+                    <td><i>(Default 0)</i> If set, the table starts at this position within this page. Otherweise the content start position of this page is used.</td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            Returns the handle of the new table.
+        </dd>
+        <div class="fnhead" id="IPdfPage-Complete">Complete</div>
+        <dd>This function is obsolete.</dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfDocumentPosition"><h2>IPdfDocumentPosition</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfDocumentPosition {
+public:
+    virtual class IPdfPage *                GetPage() const = 0;
+    virtual float                           GetHorizontalPosition() const = 0;
+    virtual float                           GetVerticalPosition() const = 0;
+    virtual class IPdfDocumentPosition &    Move(float horizontalRight, float verticalDown) = 0;
+    virtual class IPdfDocumentPosition &    MoveTo(const class IPdfDocumentPosition & position) = 0;
+    virtual class IPdfDocumentPosition *    Clone() const = 0;
+protected:
+    IPdfDocumentPosition& operator=(const IPdfDocumentPosition&) = default;
+    ~IPdfDocumentPosition() = default;
+};
+        </code></pre>
+    <p>
+    </p>
+    <h3>Overview</h3>
+    The IPdfDocumentPosition object handles a valid position within a PDF document.
+    <h3 id="IPdfDocumentPosition-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfDocumentPosition-GetPage">GetPage</div>
+        <dd>
+            Returns the page of this document position.
+        </dd>
+        <div class="fnhead" id="IPdfDocumentPosition-GetHorizontalPosition">GetHorizontalPosition</div>
+        <dd>
+            Returns the horizontal position in pixel.
+        </dd>
+        <div class="fnhead" id="IPdfDocumentPosition-GetVerticalPosition">GetVerticalPosition</div>
+        <dd>
+            Returns the vertical position in pixel.
+        </dd>
+        <div class="fnhead" id="IPdfDocumentPosition-Move">Move</div>
+        <dd>
+            Moves the current position within the current page for the given values in pixel in direction right and down.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>horizontalRight</b></td>
+                    <td>The value in pixel for the horizontal direction. A negative value moves left.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>verticalDown</b></td>
+                    <td>The value in pixel for the vertical direction. A negative value moves upwards.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfDocumentPosition-MoveTo">MoveTo</div>
+        <dd>
+            Moves to another given document position.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>position</b></td>
+                    <td>The new position.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfDocumentPosition-Clone">Clone</div>
+        <dd>
+            Returns a created document position with the current position. The object is handled by the PDF document, can be used, but not be deleted and is valid till the PDF document is deleted.
+        </dd>
+    </dl>
+
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfImageStream"><h2>IPdfImageStream</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfImageStream {
+public:
+    virtual ~IPdfImageStream() { };
+    virtual void Write(const byte * data, unsigned length) = 0;
+    virtual void SetStreamWidth(unsigned int width) = 0;
+    virtual void SetStreamHeight(unsigned int height) = 0;
+    virtual void Draw(float x, float y, float width, float height) = 0;
+};</code></pre>
+    <p>
+    </p>
+    <h3 id="IPdfImageStream-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfImageStream-Write">Write</div>
+        <dd>The function is to be called to write data into the image stream.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const byte * <b>data</b></td>
+                    <td>Pointer to the data block to write.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned <b>length</b></td>
+                    <td>Length of the data block to write.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfImageStream-SetStreamWidth">SetStreamWidth</div>
+        <dd>This function must be called to set the internal width parameter to the width of the written image.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">unsigned int <b>width</b></td>
+                    <td>The width in pixel.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfImageStream-SetStreamHeight">SetStreamHeight</div>
+        <dd>This function must be called to set the internal height parameter to the height of the written image.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">unsigned int <b>height</b></td>
+                    <td>The height in pixel.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfImageStream-Draw">Draw</div>
+        <dd>
+            The function is to be called if the stream is complete. After this, IPdfImageStream is invalid.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>x</b></td>
+                    <td>Horizontal start position of the image in the page.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>y</b></td>
+                    <td>Vertical start position of the image in the page.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>width</b></td>
+                    <td>Width of the image in the page.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>height</b></td>
+                    <td>Height of the image in the page.</td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfTable"><h2>IPdfTable</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfTable {
+public:
+    virtual ~IPdfTable() = default;
+    virtual const class IPdfDocumentPosition &  GetEndPosition() const = 0;
+    virtual class IPdfTable &                   SetFont(const class IPdfFont * font) = 0;
+    virtual class IPdfTable &                   SetContentMargin(float all) = 0;
+    virtual class IPdfTable &                   SetContentMargin(float top, float right, float bottom, float left) = 0;
+    virtual class IPdfTable &                   SetHorizontalLine(float width, const class IPdfColor * color) = 0;
+    virtual class IPdfTable &                   SetEvenRowBackground(const class IPdfColor * color) = 0;
+    virtual class IPdfTable &                   SetOddRowBackground(const class IPdfColor * color) = 0;
+    virtual class IPdfTableHeader *             AddHeader() = 0;
+    virtual class IPdfTableColumn *             AddColumn(float             width,
+                                                          IPdf::TextHAlign  align = IPdf::TextHAlign::Left) = 0;
+    virtual void                                AddRows(class UPdfTable *   user,
+                                                        unsigned int        count = 1) = 0;
+};
+        </code></pre>
+    <p>
+    </p>
+    <h3 id="IPdfTable-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfTable-SetFont">SetFont</div>
+        <dd>
+            Sets the font of the table content.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfFont * <b>font</b></td>
+                    <td>A font added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-SetContentMargin">SetContentMargin</div>
+        <dd>
+            Sets the margin width for the table content fields.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>all</b></td>
+                    <td>Sets all four margins to this value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-SetContentMargin">SetContentMargin</div>
+        <dd>
+            Sets the margin width for the table content fields.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>top</b></td>
+                    <td>The top margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>right</b></td>
+                    <td>The right margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>bottom</b></td>
+                    <td>The bottom margin value.</td>
+                </tr>
+                <tr>
+                    <td class="param">float <b>left</b></td>
+                    <td>The left margin value.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-SetHorizontalLine">SetHorizontalLine</div>
+        <dd>
+            Configures a horizontal line between rows.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>width</b></td>
+                    <td>The line width in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>A color added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-SetEvenRowBackground">SetEvenRowBackground</div>
+        <dd>
+            Sets the background color of the even rows.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>A color added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-SetOddRowBackground">SetOddRowBackground</div>
+        <dd>
+            Sets the background color of the odd rows.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>A color added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-AddHeader">AddHeader</div>
+        <dd>
+            Adds a table header to this table which can be configured. The header is added to the page with the first row added to the table.The UPdfTable object is used to get the table header content.
+        </dd>
+        <div class="fnhead" id="IPdfTable-AddColumn">AddColumn</div>
+        <dd>
+            Defines a column added to the table. Must be called before rows are added.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>width</b></td>
+                    <td>The column width in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">IPdf::TextHAlign <b>align</b></td>
+                    <td>The horizontal text alignment of this column.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-AddRows">AddRows</div>
+        <dd>
+            Adds a number of rows to this table. The UPdfTable object is used to get the field contents.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class UPdfTable * <b>user</b></td>
+                    <td>A UPdfTable object for the call-back functions.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned int <b>count</b></td>
+                    <td>The number of the rows to be addes to this table.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTable-GetEndPosition">GetEndPosition</div>
+        <dd>
+            Gets the current end position of the table in the document.
+        </dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-UPdfTable"><h2>UPdfTable</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class UPdfTable {
+public:
+    virtual const char *    GetFieldContent(class IPdfTable *                   table,
+                                            unsigned int                        row,
+                                            unsigned int                        column,
+                                            const class IPdfDocumentPosition &  startPosition,
+                                            class IPdfDocumentPosition &        endPosition) = 0;
+    virtual const char *    GetHeaderContent(class IPdfTable *                   table,
+                                             unsigned int                        column,
+                                             const class IPdfDocumentPosition &  startPosition,
+                                             class IPdfDocumentPosition &        endPosition) { return 0; };
+};
+        </code></pre>
+    <p>
+        This class defines the call-back functions needed to use the IPdfTable.
+    </p>
+    <h3 id="UPdfTable-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="UPdfTable-GetFieldContent">GetFieldContent</div>
+        <dd>
+            This function is called for every row is to be added to the table and for every column of the row. It gets the field content in the return value reference. This return value must be valid till the next function call or the AddRows function returns.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class IPdfTable * <b>table</b></td>
+                    <td>It is set to the table which is called the AddRows function.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned int <b>row</b></td>
+                    <td>It is set to the current row number beginning from zero.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned int <b>column</b></td>
+                    <td>It is set to the current column number beginning from zero.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>startPosition</b></td>
+                    <td>It is set to the content field start position considered the left margin.</td>
+                </tr>
+                <tr>
+                    <td class="param">class IPdfDocumentPosition & <b>endPosition</b></td>
+                    <td>It is a given reference to the content field end position which can be changed to a lower vertical position to enhance the row height.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="UPdfTable-GetHeaderContent">GetHeaderContent</div>
+        <dd>
+            This function is called for every column of the table header to get the field content in the return value reference. This return value must be valid till the next function call or the GetFieldContent function call.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class IPdfTable * <b>table</b></td>
+                    <td>It is set to the table which is called the AddRows function.</td>
+                </tr>
+                <tr>
+                    <td class="param">unsigned int <b>column</b></td>
+                    <td>It is set to the current column number beginning from zero.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfDocumentPosition & <b>startPosition</b></td>
+                    <td>It is set to the column start position considered the left margin.</td>
+                </tr>
+                <tr>
+                    <td class="param">class IPdfDocumentPosition & <b>endPosition</b></td>
+                    <td>It is a given reference to the content field end position which can be changed to a lower vertical position to enhance the header line height.</td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+    <!-- ---------------------------------------------------------------------- -->
+    <a name="class-IPdfTableHeader"><h2>IPdfTableHeader</h2></a>
+    <!-- ---------------------------------------------------------------------- -->
+    <pre><code class="C++">class IPdfTableHeader {
+public:
+    virtual class IPdfTableHeader &             SetFont(const class IPdfFont * font) = 0;
+    virtual class IPdfTableHeader &             SetHorizontalLine(float width, const class IPdfColor * color) = 0;
+protected:
+    ~IPdfTableHeader() = default;
+};
+        </code></pre>
+    <p>
+    </p>
+    <h3 id="IPdfTableHeader-members">Public functions</h3>
+    <dl>
+        <div class="fnhead" id="IPdfTableHeader-SetFont">SetFont</div>
+        <dd>
+            Sets the font of the table header text.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const class IPdfFont * <b>font</b></td>
+                    <td>A font added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+        <div class="fnhead" id="IPdfTableHeader-SetHorizontalLine">SetHorizontalLine</div>
+        <dd>
+            Defines a horizontal line after the table header.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">float <b>width</b></td>
+                    <td>The line width in pixel.</td>
+                </tr>
+                <tr>
+                    <td class="param">const class IPdfColor * <b>color</b></td>
+                    <td>A color added to the document before.</td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
+
+</body>
+</html>
+

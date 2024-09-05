@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.coreconnectormanager",
+            "icon": "wecom-coreconnector.png",
+            "lang": "wecom.coreconnectormanagertexts",
+            "domains": false
+        }
+    ]
+}

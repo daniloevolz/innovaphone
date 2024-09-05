@@ -1,0 +1,18 @@
+{
+  "javascript": {
+    "eval": [
+      "wecom-coreconnectorservice.js"
+    ]
+  },
+  "config": {
+    "init": [
+      {
+        "cmd": "item",
+        "name": "url",
+        "type": "STRING",
+        "default": "core.wecom.com.br",
+        "password": false
+      }
+    ]
+  }
+  }

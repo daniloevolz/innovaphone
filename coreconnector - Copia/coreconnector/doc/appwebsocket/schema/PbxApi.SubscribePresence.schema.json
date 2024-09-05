@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "pbxapi.subscribepresence.schema.json",
+  "description": "Start monitoring of the presence of the object defined by sip or num.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "sip",
+    "num"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "src": {
+      "type": "string"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "SubscribePresence"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "sip": {
+      "type": "string",
+      "description": "SIP URI of the user to monitor"
+    },
+    "num": {
+      "type": "string",
+      "description": "Number of the user to monitor"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "sip": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sip"
+      ]
+    },
+    {
+      "properties": {
+        "num": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "num"
+      ]
+    }
+  ]
+}

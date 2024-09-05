@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "pbxapi.setpresenceresult.schema.json",
+  "description": "Message sent back to confirm that setting the presence has been completed or failed.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "error",
+    "errorText"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "SetPresenceResult"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "error": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The Error code received if it didn't work"
+    },
+    "errorText": {
+      "type": "string",
+      "description": "The matching Error Text of the Error Code if it didn't work"
+    }
+  },
+  "additionalProperties": false
+}

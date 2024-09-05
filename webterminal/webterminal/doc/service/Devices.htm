@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - devices service api</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>com.innovaphone.devices</h1>
+
+    <p>
+        The com.innovaphone.devices services api enables apps to use the whole websocket communication API from devices. E.g. the users App uses this functionality on the C++ part of the App for provisioning.<br>
+        All messages are send as JSON strings and must use the <b>mt</b> property which is the message type.<br/>
+        You can also use this API to execute HTTP requests on connected devices, so called sysclients.
+	</p>
+
+    <h2>Summary</h2>
+    <a href="#GetService" style="text-decoration:none;">GetService</a><br/>
+    <a href="#AppLogin" style="text-decoration:none;">AppLogin</a><br/>
+    <a href="#SysclientComm" style="text-decoration:none;">Communication with connected Sysclients</a><br/>
+    <a href="#MessagesSend" style="text-decoration:none;">Messages send to the service</a><br/>
+    <a href="#MessagesReceived" style="text-decoration:none;">Messages received by the service</a><br/>
+        
+	<a name="GetService"><h2>GetService</h2></a>
+    
+    <p>
+        See <a href="../../common/interface/services.htm">services</a> for the information how to exactly work with IServices!<br>
+<pre><code class="c++">
+        IServicesApi * services = ...;    // must be retrieved within the PBX websocket connection PbxInfo message to the app service.
+        IService * service = services->GetService("com.innovaphone.devices");
+        class IAppWebsocketClient * awsClient = IAppWebsocketClient::Create(iomux, this, tcpSocketProvider, tlsSocketProvider, dns, log);
+        awsClient->Connect(service->GetWebsocketUrl(), service->GetName(), session->services->CreateAuthenticator());
+</code></pre>
+    </p>
+    
+    <a name="AppLogin"><h2>AppLogin</h2></a>
+    <p>
+        If you do not work with IServices and you know the intance password of the Devices instance, you can also use the standard AppLogin mechanism to login to Devices.<br>
+        In a multi domain environment in Devices, you're automatically admin with access to all domains, if you login with the instance password and the instance domain.<br>
+        If you login with the domain password from a domain different than the instance domain, you just have access to your own domain or domains, where you got access to.<br>
+    </p>
+    
+    <a name="SysclientComm"><h2>Communication with connected Sysclients</h2></a>
+    After having successfully established an AppWebsocket connection to Devices and queried the session key with the <a href="#GetUserInfo">GetUserInfo</a> message,
+    you can start communicating with connected devices. As you are already authenticated to Devices, you do not need to authenticate the following requests anymore!<br>
+    The URL is always built after the same scheme:<br>
+    <br>
+    https://domain.com/domain/devices-instance/passthrough/SERIAL/SESSION-KEY/...<br>
+    <br>
+    SERIAL is a MAC address, e.g. 009033020202 and the session key is a GUID like 0e6ff4c7-7a88-40c4-98eb-8c91903933e6.<br>
+    The part before the passthrough can be retrieved from your Devices App object URL inside the PBX.<br>
+    The session key is just valid as long as the AppWebsocket session is open.
+    
+    <a name="MessagesSend"><h2>Messages send to the service</h2></a>
+    <a href="#GetUserInfo" style="text-decoration:none;">GetUserInfo</a><br/>
+    <a href="#GetProvisioningCategories" style="text-decoration:none;">GetProvisioningCategories</a><br/>
+    <a href="#GetProvisioningCode" style="text-decoration:none;">GetProvisioningCode</a><br/>
+    <a href="#GetProvisionedDevice" style="text-decoration:none;">GetProvisionedDevice</a><br/>
+    <a href="#GetDomains" style="text-decoration:none;">GetDomains</a><br/>
+    <a href="#GetDevices" style="text-decoration:none;">GetDevices</a><br/>
+    <a href="#GetFilteredDevices" style="text-decoration:none;">GetFilteredDevices</a><br/>
+    <a href="#GetDeviceConfigs" style="text-decoration:none;">GetDevicesConfigs</a><br/>
+    <a href="#GetDeviceConfig" style="text-decoration:none;">GetDevicesConfig</a><br/>
+    <a href="#FurtherMessages" style="text-decoration:none;">Not yet documented messages</a><br/>
+    
+    <a name="MessagesReceived"><h2>Messages received by the service</h2></a>
+    <a href="#DeviceProvisioned" style="text-decoration:none;">DeviceProvisioned</a><br/>
+    <a href="#DomainEdited" style="text-decoration:none;">DomainEdited</a><br/>
+    <a href="#DomainDeleted" style="text-decoration:none;">DomainDeleted</a><br/>
+    <a href="#DomainAdded" style="text-decoration:none;">DomainAdded</a><br/>
+    <a href="#DeviceUpdate" style="text-decoration:none;">DeviceUpdate</a><br/>
+    <a href="#DeviceAdded" style="text-decoration:none;">DeviceAdded</a><br/>
+    <a href="#DeviceRemoved" style="text-decoration:none;">DeviceRemoved</a><br/>
+    
+    <a name="GetUserInfo"><h3>GetUserInfo</h3></a>
+
+    <p>
+        Query the login info of the logged in user.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>src </b></td><td>Will be echoed in the result message (optional).</td></tr>
+    </table>
+
+    <h3>GetUserInfoResult</h3>    
+    <p>
+        The result message for the GetUserInfo request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>key </b></td><td>The session key which is used to talk to devices.</td></tr>
+        <tr><td class="param">boolean <b>admin </b></td><td>If true, the user has access to all domains.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <a name="GetProvisioningCategories"><h3>GetProvisioningCategories</h3></a>
+
+    <p>
+        Retrieves all provisioning categories. With type='PHONE' you can just retrieve provisioning categories suitable for phones (device configurations Phone/Analog Phone exist).
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>The domain ID (optional). If not given, the domain of the currently logged in user is used.</td></tr>
+        <tr><td class="param">string <b>type </b></td><td>Device types: VA|GW|PHONE|DECT|APP_PLATFORM.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Will be echoed in the result message (optional).</td></tr>
+    </table>
+
+    <h3>GetProvisioningCategoriesResult</h3>    
+    <p>
+        The result message for the GetProvisioningCategories request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>categories </b></td><td>An array of <a href="#CategoryObject">category objects</a>.</td></tr>
+        <tr><td class="param">boolean <b>last </b></td><td>If true, no more GetProvisioningCategoriesResult messages are to be expected, otherwise more will follow with further categories.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>Set to an error code if an error happened (optional).</td></tr>
+    </table>
+    
+    <a name="CategoryObject"><h4>Category object</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>id </b></td><td>A unique ID for this category.</td></tr>
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>The domain ID of this category.</td></tr>
+        <tr><td class="param">string <b>name </b></td><td>The name of the category.</td></tr>
+        <tr><td class="param">boolean <b>config </b></td><td>If true, this category is used for provisioning and device configurations.</td></tr>
+    </table>
+    <h5>Example</h5>
+    <pre><code class="javascript">
+{
+    "mt":"GetProvisioningCategories",
+    "last":true,
+    "categories":[
+        {
+            "id":1,
+            "name":"Cat1",
+            "domainId":2,
+            "config":true
+        }
+    ]
+}
+</code></pre>
+
+    <a name="GetProvisioningCode"><h3>GetProvisioningCode</h3></a>
+
+    <p>
+        Generates a new provisioning code and triggers a <a href="#DeviceProvisioned">DeviceProvisioned</a> message on provisioning afterwards.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>The domain ID (optional). If not given, the domain of the currently logged in user is used.</td></tr>
+        <tr><td class="param">string <b>category </b></td><td>The category name.</td></tr>
+        <tr><td class="param">string <b>sip </b></td><td>The SIP name of the provisioning user (optional).</td></tr>
+        <tr><td class="param">boolean <b>rollout </b></td><td>If true, the provisioning code will be valid for 7 days, otherwise 15 minutes (optional, default false).</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">boolean <b>administrative </b></td><td>If true, the provisioned device will get the domain password as administrative password if the domain checkword to set these passwords is checked. (optional, default false)</td></tr>
+    </table>
+
+    <h3>GetProvisioningCodeResult</h3>    
+    <p>
+        The result message for the GetProvisioningCode request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>code </b></td><td>The generated code.</td></tr>
+        <tr><td class="param">ulong64 <b>validUntil </b></td><td>A UTC unixtimestamp until the code is valid.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+    
+    <a name="GetProvisionedDevice"><h3>GetProvisionedDevice</h3></a>
+
+    <p>
+        Gets the device provisioned with a certain code. This is useful if a provisioning was interrupted and might have been finished in the meantime.<br/>
+        If not yet finished, a <a href="#DeviceProvisioned">DeviceProvisioned</a> message will be triggered on the actual provisioning.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>The domain ID (optional). If not given, the domain of the currently logged in user is used.</td></tr>
+        <tr><td class="param">string <b>code </b></td><td>The code to be checked.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+
+    <h3>GetProvisionedDeviceResult</h3>    
+    <p>
+        The result message for the GetProvisionedDevice request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>device </b></td><td>A <a href="#DeviceObject">device object</a>. Just given, if provisioning with the requested code was already done.</td></tr>
+        <tr><td class="param">string <b>code </b></td><td>The provisioning code.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+    
+    <a name="DeviceObject"><h4>Device object</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td class="param">number <b>id </b></td><td>A unique ID for this device.</td></tr>
+        <tr><td class="param">string <b>hwId </b></td><td>The hardware ID.</td></tr>
+        <tr><td class="param">string <b>name </b></td><td>The name of the device, if configured.</td></tr>
+        <tr><td class="param">number <b>domainId </b></td><td>The domain ID.</td></tr>
+        <tr><td class="param">string <b>product </b></td><td>The product name, e.g. IP811.</td></tr>
+        <tr><td class="param">string <b>version </b></td><td>The software and hardware version, e.g. 13r1 dvl [13.A110/13A146/200]</td></tr>
+        <tr><td class="param">string <b>type </b></td><td>The hardware type (possible types are <b>GW,VA,PHONE,DECT,APP_PLATFORM</a>).</td></tr>
+        <tr><td class="param">boolean <b>pbxActive </b></td><td>If true, the PBX is enabled on this device.</td></tr>
+        <tr><td class="param">boolean <b>online </b></td><td>If true, this device is currently online.</td></tr>
+        <tr><td class="param">boolean <b>hasLeaseLicenses </b></td><td>If true, this device has rental licenses.</td></tr>
+        <tr><td class="param">boolean <b>other </b></td><td>If true, this device is no innovaphone device, but e.g. a Yealink phone.</td></tr>
+        <tr><td class="param">array <b>ethIfs </b></td><td>An array of <a href="#EthernetObject">ethernet</a> objects.</td></tr>
+        <tr><td class="param">string <b>uri </b></td><td>The URI under which this device is accessible during the current session (not always set!, e.g. not in GetDevicesResult).</td></tr>
+    </table>
+    
+    <a name="EthernetObject"><h4>Ethernet object</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>if </b></td><td>Interface name.</td></tr>
+        <tr><td class="param">string <b>ipv4 </b></td><td>The IPv4 address (optional).</td></tr>        
+        <tr><td class="param">string <b>ipv6 </b></td><td>The IPv6 address (optional).</td></tr>        
+    </table>
+    <h5>Example</h5>
+    <pre><code class="javascript">
+{
+    "mt":"GetProvisionedDeviceResult",
+    "code": "123123123123",
+    "device":[
+        {
+            "id":1,
+            "hwId":"0090334100be",
+            "name":"Kari2",
+            "domainId":2,
+            "product":"IP811",
+            "version":"13r1 dvl [13.A110/13A146/200]",
+            "type":"GW",
+            "pbxActive":true,
+            "online":true
+        }
+    ]
+}
+</code></pre>
+
+
+    <a name="GetDomains"><h3>GetDomains</h3></a>
+
+    <p>
+        Gets domains.<br/>
+        The answer might be sent multiple times until the last property is set.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">boolean <b>recvUpdates </b></td><td>set this flag, if you want to get messages over domain updates (DomainAdded, DomainDeleted, DomainEdited) (optional).</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <h3>GetDomainsResult</h3>    
+    <p>
+        The result message for the GetDomains request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>domains </b></td><td>An array of <a href="#DomainObject">domain objects</a>.</td></tr>
+        <tr><td class="param">boolean <b>last </b></td><td>If last is set, no further GetDomainsResult messages will be received.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+    
+    <h5>Example</h5>
+    <pre><code class="javascript">
+{
+    "mt": "GetDomainsResult",
+    "last": true,
+    "domains": [{
+            "id": 1,
+            "name": "domain.com",
+            "hasRentalProducts": true,
+            "deployAdminPasswords": true,
+            "isInstanceDomain": true,
+            "categories": [{
+                    "id": 1,
+                    "name": "Test",
+                    "config": false
+                }, {
+                    "id": 2,
+                    "name": "Test2",
+                    "config": false
+                }
+            ]
+        }
+    ]
+}
+    </code></pre>
+    
+    <a name="DomainObject"><h4>Domain object</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td class="param">number <b>id </b></td><td>A unique ID for this domain.</td></tr>
+        <tr><td class="param">string <b>name </b></td><td>The name of the domain.</td></tr>
+        <tr><td class="param">boolean <b>hasRentalProducts </b></td><td>If true, rental software or hardware is used within this domain.</td></tr>
+        <tr><td class="param">boolean <b>deployAdminPasswords </b></td><td>If true, the domain password is deployed to all devices within this domain.</td></tr>
+        <tr><td class="param">boolean <b>isInstanceDomain </b></td><td>If true, this is the domain which matches to the configured domain of the Devices instance in the AP Manager.</td></tr>
+        <tr><td class="param">array <b>categories </b></td><td>An array of <a href="#CategoryObject">category</a> objects.</td></tr>        
+    </table>
+    
+    <a name="CategoryObject"><h4>Category object</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td class="param">number <b>id </b></td><td>A unique ID for this category.</td></tr>
+        <tr><td class="param">string <b>name </b></td><td>The name of the category.</td></tr>
+        <tr><td class="param">boolean <b>config </b></td><td>If true, this category is used as provisioning category for device configurations.</td></tr>
+    </table>
+    
+    <a name="GetDevices"><h3>GetDevices</h3></a>
+
+    <p>
+        Gets devices with certain filters.<br/>
+        The answer might be sent multiple times until the last property is set.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">boolean <b>recvUpdates </b></td><td>set this flag, if you want to get messages over device updates (DeviceAdded, DeviceRemoved, DeviceUpdate) (optional).</td></tr>
+        <tr><td class="param">boolean <b>unassigned </b></td><td>set this flag, if you want to get devices which are not assigned to a domain (DeviceAdded, DeviceRemoved, DeviceUpdate) (optional).</td></tr>
+        <tr><td class="param">string <b>domainIds </b></td><td>A comma separated string with ulong64 domainIds, e.g. "10,12". Just devices are returned within these domains (optional).</td></tr>
+        <tr><td class="param">string <b>categories </b></td><td>A comma separated string with category names, e.g. "test1,Test 2". Just devices are returned with these categories (optional).</td></tr>
+        <tr><td class="param">string <b>subcategories </b></td><td>A comma separated string with category names, e.g. "test1,Test 2". Just devices are returned with these subcategories in addition to categories (optional).</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    <h4>Note</h4>
+    If you do not set domainIds, categories and unassigned, you will get all devices. If you just set unassigned, you will just get unassigend but if you set domainIds in addition, you will get unassigned and devices within domains.
+
+    <h5>Example</h5>
+    <pre><code class="javascript">
+{
+    "mt": "GetDevices",
+    "recvUpdates": true,
+    "domainIds": "1",
+    "categories": "",
+    "subcategories": "",
+    "unassigned": true
+}
+    </code></pre>
+
+    <h3>GetDevicesResult</h3>    
+    <p>
+        The result message for the GetDevices request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>devices </b></td><td>An array of <a href="#DeviceObject">device objects</a>.</td></tr>
+        <tr><td class="param">boolean <b>last </b></td><td>If last is set, no further GetDevicesResult messages will be received.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+    
+    <h5>Example</h5>
+    <pre><code class="javascript">
+{
+    "mt": "GetDevicesResult",
+    "devices": [{
+            "id": 0,
+            "hwId": "009033280177",
+            "domainId": 0,
+            "product": "IP111",
+            "version": "13r2 sr2 [13.6146/136146/400]",
+            "type": "PHONE",
+            "pbxActive": false,
+            "online": true,
+            "ethIfs": [{
+                    "if": "ETH0",
+                    "ipv4": "172.16.136.105",
+                    "ipv6": "2002:91fd:9d07:136:290:33ff:fe28:177"
+                }
+            ]
+        }
+    ],
+    "last": true
+}
+    </code></pre>
+    
+    <a name="GetFilteredDevices"><h3>GetFilteredDevices</h3></a>
+
+    <p>
+        Gets devices with certain filters.<br/>
+        The answer might be sent multiple times until the last property is set.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>Search within this domain (optional). If not given, the domain of the AppWebsocket login is used for searching.</td></tr>
+        <tr><td class="param">boolean <b>justFxs </b></td><td>Just return devices with FXS interfaces (optional).</td></tr>
+        <tr><td class="param">array <b>types </b></td><td>An array of strings to filter for device types. Possible types: VA|GW|PHONE|DECT|APP_PLATFORM (optional)</td></tr>
+        <tr><td class="param">string <b>hwIds </b></td><td>A comma separated string with hardware ids (optional), a hwId is e.g. 009033090909.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <h3>GetFilteredDevicesResult</h3>    
+    <p>
+        The result message for the GetFilteredDevices request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>devices </b></td><td>An array of <a href="#DeviceObject">device objects</a>.</td></tr>
+        <tr><td class="param">boolean <b>last </b></td><td>If last is set, no further GetDevicesResult messages will be received.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+
+
+    <a name="GetDeviceConfigs"><h3>GetDeviceConfigs</h3></a>
+
+    <p>
+        Gets device configurations of a domain.<br/>
+        The answer might be sent multiple times until the last property is set.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>Search within this domain (optional). If not given, the domain of the AppWebsocket login is used for searching.</td></tr>
+        <tr><td class="param">boolean <b>recvUpdates </b></td><td>set this flag, if you want to get messages over device config changes (DeviceConfigAdded, DeviceConfigDeleted, DeviceConfigEdited) (optional).</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <h3>GetDeviceConfigsResult</h3>    
+    <p>
+        The result message for the GetDeviceConfigs request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">array <b>configs </b></td><td>An array of <a href="#DeviceConfigObject">device config objects</a> without their configuration values.</td></tr>
+        <tr><td class="param">boolean <b>last </b></td><td>If last is set, no further GetDeviceConfigsResult messages will be received.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+    
+    <a name="DeviceConfigObject"><h4>Device configuration object</h4></a>
+    <p>
+        A device configuration object always has common fields. Every device configuration type has its own fields in addition.
+    </p>
+    <h4>Common fields</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">number <b>id </b></td><td>A unique ID for this device config.</td></tr>
+        <tr><td class="param">number <b>domainId </b></td><td>The domain ID of this device config.</td></tr>
+        <tr><td class="param">string <b>desc </b></td><td>The description of this device config (optional).</td></tr>
+        <tr><td class="param">string <b>type </b></td><td>The configuration type, one of ALARM_SERVER | EXPERT | FXS_PHONE | MEDIA | NTP | PHONE | TLS_PROFILE .</td></tr>
+        <tr><td class="param">array <b>categories </b></td><td>An array of <a href="#CategoryObject">category</a> objects. If array is empty, the configuration is valid for all devices independent of their category.</td></tr>        
+    </table>
+    
+    <h4>Fields type ALARM_SERVER</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>url </b></td><td>The URL of an alarm server (optional).</td></tr>
+        <tr><td class="param">string <b>logUrl </b></td><td>The URL of a logging server (optional).</td></tr>
+        <tr><td class="param">string <b>logUser </b></td><td>The user name used for HTTP authentication (optional).</td></tr>
+        <tr><td class="param">string <b>logPassword </b></td><td>The password used for HTTP authentication, encrypted with the AppWebsocket encryption function (optional).</td></tr>
+        <tr><td class="param">string <b>seed </b></td><td>The seed used to encrypt the password (optional).</td></tr>
+        <tr><td class="param">boolean <b>setLogUrl </b></td><td>If setLogUrl is set, also empty logging URLs are set.</td></tr>        
+    </table>
+    <p>Note: the logPassword field is transferred encrypted to 3rd party sysclients inside the configuration message! Instead of seed, use logSeed and see <a href="../protocol/sysclient.htm#AMTPassword">for how to decrypt it</a>!</p>
+    
+    <h4>Fields type EXPERT</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>script </b></td><td>The update script. As this field can exceed 64kb, its value is transferred with GetDeviceConfigValueResult.</td></tr>
+    </table>
+    <p>Note: the script field is not transferred to 3rd party sysclients inside the configuration message!</p>
+    
+    <h4>Fields type FXS_PHONE and PHONE</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>gk1 </b></td><td>The primary gatekeeper (optional).</td></tr>
+        <tr><td class="param">string <b>gk2 </b></td><td>The secondary gatekeeper (optional).</td></tr>
+        <tr><td class="param">string <b>gkId </b></td><td>The gatekeeper identifier (optional).</td></tr>
+        <tr><td class="param">string <b>coder </b></td><td>One of G711A | G711u | G722 | OPUS-NB | OPUS-WB.</td></tr>
+        <tr><td class="param">dword <b>frameSize </b></td><td>Framesize [ms], 20 - 80ms (optional).</td></tr>
+        <tr><td class="param">boolean <b>exclusive </b></td><td>Exclusive (optional).</td></tr>
+        <tr><td class="param">boolean <b>fax </b></td><td>Fax device (T.38 on, featurecodes off) (optional, just FXS_PHONE).</td></tr>
+        <tr><td class="param">boolean <b>setRecordingUrl </b></td><td>If set, the recording URL is set (optional).</td></tr>
+        <tr><td class="param">boolean <b>audioOnly </b></td><td>Audio onle (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>noCtHookOn </b></td><td>No transfer on hang up (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>protectCfg </b></td><td>Protect configuration at phone (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>allowUserCfg </b></td><td>Allow user settings at phone (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>hideCompleteCfg </b></td><td>Hide complete configuration at phone (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>hideAdminCfg </b></td><td>Hide administration configuration at phone (optional, just PHONE).</td></tr>
+        <tr><td class="param">boolean <b>silenceComp </b></td><td>Silence compression (optional).</td></tr>
+        <tr><td class="param">boolean <b>noDtmfDetect </b></td><td>No DTMF detection (optional).</td></tr>
+        <tr><td class="param">boolean <b>noPhysicalLocation </b></td><td>No physical location (optional).</td></tr>
+        <tr><td class="param">string <b>srtpKey </b></td><td>A string representing a number, see <a href="#SRTPKeys">SRTP key exchange<a/>.</td></tr>
+        <tr><td class="param">string <b>srtpCipher </b></td><td>A string representing a number, see <a href="#SRTPCiphers">SRTP ciphers<a/>.</td></tr>
+        <tr><td class="param">string <b>recordingUrl </b></td><td>The recording URL (optional).</td></tr>
+        <tr><td class="param">int <b>dialTone </b></td><td>The Dial tone, value from 0 - 26, see <a href="#DialTones">dial tones<a/>.</td></tr>        
+    </table>
+    
+    <h4>Fields type MEDIA</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>stunServer </b></td><td>STUN server (optional).</td></tr>
+        <tr><td class="param">string <b>turnServer </b></td><td>TURN server (optional).</td></tr>
+        <tr><td class="param">string <b>turnUser </b></td><td>TURN username (optional).</td></tr>
+        <tr><td class="param">string <b>turnPassword </b></td><td>The password used for TURN authentication, encrypted with the AppWebsocket encryption function (optional).</td></tr>
+        <tr><td class="param">string <b>seed </b></td><td>The seed used to encrypt the password (optional).</td></tr>
+        <tr><td class="param">string <b>tosRtp </b></td><td>TOS priority - RTP data. A string represending a hex value between 0x00 and 0xff (optional).</td></tr>
+        <tr><td class="param">string <b>tosSig </b></td><td>TOS priority - signaling. A string represending a hex value between 0x00 and 0xff (optional).</td></tr>
+        <tr><td class="param">boolean <b>setRtpPorts </b></td><td>If set, the RTP ports are sent (optional).</td></tr>
+        <tr><td class="param">dword <b>rtpFirst </b></td><td>First UDP-RTP port, 2052 - 65534 (optional).</td></tr>
+        <tr><td class="param">dword <b>rtpNum </b></td><td>Number of RTP ports, 128 - 16384 (optional).</td></tr>
+        <tr><td class="param">boolean <b>setNatPorts </b></td><td>If set, the NAT ports are sent (optional).</td></tr>
+        <tr><td class="param">dword <b>natFirst </b></td><td>First UDP-NAT port, 2052 - 65534 (optional).</td></tr>
+        <tr><td class="param">dword <b>natNum </b></td><td>Number of NAT ports, overlapping of NAT and RTP isn't allowed (optional).</td></tr>
+    </table>
+    <p>Note: the turnPassword field is transferred encrypted to 3rd party sysclients inside the configuration message! Instead of seed, use turnSeed and see <a href="../protocol/sysclient.htm#AMTPassword">for how to decrypt it</a>!</p>
+    
+    <h4>Fields type NTP</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>ntp1 </b></td><td>First NTP server.</td></tr>
+        <tr><td class="param">string <b>ntp2 </b></td><td>Second NTP server.</td></tr>
+        <tr><td class="param">string <b>tz </b></td><td>Timezone string, e.g. "CET-1CEST-2,M3.5.0/2,M10.5.0/3".</td></tr>
+    </table>
+    
+    <h4>Fields type TLS_PROFILE</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>profile </b></td><td>Must be one of normal | fast | secure | strict.</td></tr>        
+    </table>
+    
+    <a name="SRTPKeys"><h4>SRTP key exchange</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td>0</td><td>SDES-DTLS</td></tr>
+        <tr><td>1</td><td>DTLS-SDES</td></tr>
+        <tr><td>2</td><td>SDES</td></tr>
+        <tr><td>3</td><td>DTLS</td></tr>
+        <tr><td>4</td><td>No encryption</td></tr>
+    </table>
+    
+    <a name="SRTPCiphers"><h4>SRTP ciphers</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td>0</td><td>AES128/32</td></tr>
+        <tr><td>1</td><td>AES128/80</td></tr>
+        <tr><td>2</td><td>AES192/32</td></tr>
+        <tr><td>3</td><td>AES192/80</td></tr>
+        <tr><td>4</td><td>AES256/32</td></tr>
+        <tr><td>5</td><td>AES256/80</td></tr>
+    </table>
+    
+    <a name="DialTones"><h4>Dial tones</h4></a>
+    <table style="margin-left:-12px">
+        <tr><td>0</td><td>EUROPE-PBX</td></tr>
+        <tr><td>1</td><td>EUROPE-PUBLIC</td></tr>
+        <tr><td>2</td><td>US</td></tr>
+        <tr><td>3</td><td>UK</td></tr>
+        <tr><td>4</td><td>ITALY-PUBLIC</td></tr>
+        <tr><td>5</td><td>CZECH-PBX</td></tr>
+        <tr><td>6</td><td>CZECH-PUBLIC</td></tr>
+        <tr><td>7</td><td>SWEDEN</td></tr>
+        <tr><td>8</td><td>FRANCE</td></tr>
+        <tr><td>9</td><td>SWISS</td></tr>
+        <tr><td>10</td><td>ITALY-PBX</td></tr>
+        <tr><td>11</td><td>BELGIUM</td></tr>
+        <tr><td>12</td><td>NETHERLANDS</td></tr>
+        <tr><td>13</td><td>NORWAY</td></tr>
+        <tr><td>14</td><td>DENMARK</td></tr>
+        <tr><td>15</td><td>GERMANY</td></tr>
+        <tr><td>16</td><td>SPAIN</td></tr>
+        <tr><td>17</td><td>FINLAND</td></tr>
+        <tr><td>18</td><td>AUSTRIA</td></tr>
+        <tr><td>19</td><td>IRELAND</td></tr>
+        <tr><td>20</td><td>AUSTRALIA</td></tr>
+        <tr><td>21</td><td>NEWZEALAND</td></tr>
+        <tr><td>22</td><td>MALAYSIA</td></tr>
+        <tr><td>23</td><td>TURKEY</td></tr>
+        <tr><td>24</td><td>RUSSIA</td></tr>
+        <tr><td>25</td><td>SOUTH AFRICA</td></tr>
+        <tr><td>26</td><td>BRAZIL</td></tr>
+    </table>
+    
+    
+    <a name="GetDeviceConfig"><h3>GetDeviceConfig</h3></a>
+
+    <p>
+        Gets a specific device configuration.<br/>
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>domainId </b></td><td>Device configuration of this domain (optional). If not given, the domain of the AppWebsocket login is used for searching.</td></tr>
+        <tr><td class="param">ulong64 <b>id </b></td><td>The id of the device configuration.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <h3>GetDeviceConfigValueResult</h3>    
+    <p>
+        A GetDeviceConfig message may trigger 0 ... n GetDeviceConfigValueResult messages before you receive the final GetDeviceConfigResult message,
+        as a configuration value may exceed the maximum size of a single JSON message.<br/>
+        You must concatenate all values received for the same name to build the final value.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>name </b></td><td>The name of the configuration value.</td></tr>
+        <tr><td class="param">string <b>value </b></td><td>The value itself.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <h3>GetDeviceConfigResult</h3>    
+    <p>
+        The result message for the GetDeviceConfig request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>config </b></td><td>A <a href="#DeviceConfigObject">device config object</a> with its configuration values.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">string <b>error </b></td><td>An error string if an error happened (optional).</td></tr>
+    </table>
+
+    <a name="FurtherMessages"><h3>FurtherMessages</h3>    </a>
+    As long as not all messages are documented here, you can always open the Devices App and your browser console (F12) and take a look at the sent and received messages to the Devices App!
+
+    <a name="DeviceProvisioned"><h3>DeviceProvisioned</h3></a>    
+    <p>
+        Message from the service if a device has been provisioned after the GetProvisioningCode request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>device </b></td><td>A <a href="#DeviceObject">device object</a>. Just given, if provisioning with the requested code was already done.</td></tr>
+        <tr><td class="param">string <b>code </b></td><td>The provisioning code.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
+    
+    <a name="DomainEdited"><h3>DomainEdited</h3></a>    
+    <p>
+        Message from the service if a domain has been edited. This message is just triggered if a GetDomains request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>domain </b></td><td>A <a href="#DomainObject">domain object</a>.</td></tr>
+    </table>
+    
+    <a name="DomainDeleted"><h3>DomainDeleted</h3></a>    
+    <p>
+        Message from the service if a domain has been deleted. This message is just triggered if a GetDomains request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ulong64 <b>id </b></td><td>The id of the deleted domain.</td></tr>
+    </table>
+    
+    <a name="DomainAdded"><h3>DomainAdded</h3></a>    
+    <p>
+        Message from the service if a domain has been added. This message is just triggered if a GetDomains request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>domain </b></td><td>A <a href="#DomainObject">domain object</a>.</td></tr>
+    </table>
+    
+    <a name="DeviceUpdate"><h3>DeviceUpdate</h3></a>    
+    <p>
+        Message from the service if a device has been updated. This message is just triggered if a GetDevices request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>device </b></td><td>A <a href="#DeviceObject">device object</a>.</td></tr>        
+    </table>
+    
+    <a name="DeviceAdded"><h3>DeviceAdded</h3></a>    
+    <p>
+        Message from the service if a device has been added. This message is just triggered if a GetDevices request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>device </b></td><td>A <a href="#DeviceObject">device object</a>.</td></tr>        
+    </table>
+    
+    <a name="DeviceRemoved"><h3>DeviceRemoved</h3></a>    
+    <p>
+        Message from the service if a device has been removed. This message is just triggered if a GetDevices request with recvUpdates true has been send before.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">object <b>device </b></td><td>A <a href="#DeviceObject">device object</a>.</td></tr>        
+    </table>
+    
+</body>
+</html>

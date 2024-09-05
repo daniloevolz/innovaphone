@@ -284,6 +284,74 @@ new PbxApi("RCC").onconnected(function (conn) {
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
                 }
             }
+            if (obj.msg && obj.msg == 'r-held') {
+
+                var call = calls.filter(function (c) { return c.src == obj.src })[0]
+
+                if (call != null) {
+                    var src = call.src;
+                    var myArray = src.split(",");
+                    var guid = myArray[0];
+                    var pbx = myArray[1];
+                    var device = myArray[2];
+                    var num = myArray[3];
+                    var btn_id = myArray[4];
+                    var msg = { mode: "CallHeld", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    log("danilo req : RCC message:CallInfo: will send http message CallHeld to CORE server " + JSON.stringify(msg));
+                    httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                }
+            }
+            if (obj.msg && obj.msg == 'update' && obj.state == 261) {
+
+                var call = calls.filter(function (c) { return c.call == obj.call })[0]
+
+                if (call != null) {
+                    var src = call.src;
+                    var myArray = src.split(",");
+                    var guid = myArray[0];
+                    var pbx = myArray[1];
+                    var device = myArray[2];
+                    var num = myArray[3];
+                    var btn_id = myArray[4];
+                    var msg = { mode: "UserCallHeld", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    log("danilo req : RCC message:CallInfo: will send http message UserCallHeld to CORE server " + JSON.stringify(msg));
+                    httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                }
+            }
+            if (obj.msg && obj.msg == 'update' && obj.state == 5) {
+
+                var call = calls.filter(function (c) { return c.call == obj.call })[0]
+
+                if (call != null) {
+                    var src = call.src;
+                    var myArray = src.split(",");
+                    var guid = myArray[0];
+                    var pbx = myArray[1];
+                    var device = myArray[2];
+                    var num = myArray[3];
+                    var btn_id = myArray[4];
+                    var msg = { mode: "UserCallRetrieved", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    log("danilo req : RCC message:CallInfo: will send http message UserCallRetrieved to CORE server " + JSON.stringify(msg));
+                    httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                }
+            }
+            if (obj.msg && obj.msg == 'r-retrieved') {
+
+                var call = calls.filter(function (c) { return c.src == obj.src })[0]
+
+                if (call != null) {
+                    var src = call.src;
+                    var myArray = src.split(",");
+                    var guid = myArray[0];
+                    var pbx = myArray[1];
+                    var device = myArray[2];
+                    var num = myArray[3];
+                    var btn_id = myArray[4];
+                    var msg = { mode: "CallRetrieved", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    log("danilo req : RCC message:CallInfo: will send http message CallRetrieved to CORE server " + JSON.stringify(msg));
+                    httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                }
+            }
         }
     });
     conn.onclose(function () {
@@ -432,6 +500,114 @@ function rccRequest2(value) {
             log("danilo-req rccRequest:MakeCall: user not found");
         }
     }
+    if (obj.mode == "HeldCall") {
+        var userC = pbxTableUsers.filter(function (userC) { return userC.columns.guid === obj.guid })[0];
+
+        if (userC != null) {
+            log("danilo-req rccRequest2:HeldCall: userPbx " + String(userC.columns.dn));
+
+            RCC.forEach(function (rcc) {
+                var src = userC.columns.guid + "," + rcc.pbx + "," + obj.device + "," + obj.num + "," + obj.btn_id
+                var userRcc = rcc[String(src)];
+                log("danilo req:rccRequest2:HeldCall userRcc " + userRcc);
+                if (userRcc != null) {
+                    var call = calls.filter(function (c) { return c.src == src })[0]
+                    log("danilo req:rccRequest2:HeldCall: to " + userC.columns.cn);
+
+                    if (call != null) {
+                        var msg = { api: "RCC", mt: "UserHold", call: call.call, remote: true, user: userRcc, src: src };
+                        log("danilo req:rccRequest2:HeldCall: sent rcc msg " + JSON.stringify(msg));
+                        rcc.send(JSON.stringify(msg));
+                    } else {
+                        log('danilo req:rccRequest2:HeldCall: call not found');
+                    }
+                }
+            })
+        } else {
+            log("danilo-req rccRequest:HeldCall: user not found");
+        }
+    }
+    if (obj.mode == "RetrieveCall") {
+        var userC = pbxTableUsers.filter(function (userC) { return userC.columns.guid === obj.guid })[0];
+
+        if (userC != null) {
+            log("danilo-req rccRequest2:RetrieveCall: userPbx " + String(userC.columns.dn));
+
+            RCC.forEach(function (rcc) {
+                var src = userC.columns.guid + "," + rcc.pbx + "," + obj.device + "," + obj.num + "," + obj.btn_id
+                var userRcc = rcc[String(src)];
+                log("danilo req:rccRequest2:RetrieveCall userRcc " + userRcc);
+                if (userRcc != null) {
+                    var call = calls.filter(function (c) { return c.src == src })[0]
+                    log("danilo req:rccRequest2:RetrieveCall: to " + userC.columns.cn);
+
+                    if (call != null) {
+                        var msg = { api: "RCC", mt: "UserRetrieve", call: call.call, user: userRcc, src: src };
+                        log("danilo req:rccRequest2:RetrieveCall: sent rcc msg " + JSON.stringify(msg));
+                        rcc.send(JSON.stringify(msg));
+                    } else {
+                        log('danilo req:rccRequest2:RetrieveCall: call not found');
+                    }
+                }
+            })
+        } else {
+            log("danilo-req rccRequest:RetrieveCall: user not found");
+        }
+    }
+    if (obj.mode == "RedirectCall") {
+        var userC = pbxTableUsers.filter(function (userC) { return userC.columns.guid === obj.guid })[0];
+
+        if (userC != null) {
+            log("danilo-req rccRequest2:RetrieveCall: userPbx " + String(userC.columns.dn));
+
+            RCC.forEach(function (rcc) {
+                var src = userC.columns.guid + "," + rcc.pbx + "," + obj.device + "," + obj.num + "," + obj.btn_id
+                var userRcc = rcc[String(src)];
+                log("danilo req:rccRequest2:RedirectCall userRcc " + userRcc);
+                if (userRcc != null) {
+                    var call = calls.filter(function (c) { return c.src == src })[0]
+                    log("danilo req:rccRequest2:RedirectCall: to " + userC.columns.cn);
+
+                    if (call != null) {
+                        var msg = { api: "RCC", mt: "UserRedirect", call: call.call, e164: obj.destination, user: userRcc, src: src };
+                        log("danilo req:rccRequest2:RedirectCall: sent rcc msg " + JSON.stringify(msg));
+                        rcc.send(JSON.stringify(msg));
+                    } else {
+                        log('danilo req:rccRequest2:RedirectCall: call not found');
+                    }
+                }
+            })
+        } else {
+            log("danilo-req rccRequest:RedirectCall: user not found");
+        }
+    }
+    if (obj.mode == "SendDtmfDigits") {
+        var userC = pbxTableUsers.filter(function (userC) { return userC.columns.guid === obj.guid })[0];
+
+        if (userC != null) {
+            log("danilo-req rccRequest2:SendDtmfDigits: userPbx " + String(userC.columns.dn));
+
+            RCC.forEach(function (rcc) {
+                var src = userC.columns.guid + "," + rcc.pbx + "," + obj.device + "," + obj.num + "," + obj.btn_id
+                var userRcc = rcc[String(src)];
+                log("danilo req:rccRequest2:SendDtmfDigits userRcc " + userRcc);
+                if (userRcc != null) {
+                    var call = calls.filter(function (c) { return c.src == src })[0]
+                    log("danilo req:rccRequest2:SendDtmfDigits: to " + userC.columns.cn);
+
+                    if (call != null) {
+                        var msg = { api: "RCC", mt: "UserDTMF", call: call.call, dtmf: obj.digit, recv: true, user: userRcc, src: src };
+                        log("danilo req:rccRequest2:SendDtmfDigits: sent rcc msg " + JSON.stringify(msg));
+                        rcc.send(JSON.stringify(msg));
+                    } else {
+                        log('danilo req:rccRequest2:SendDtmfDigits: call not found');
+                    }
+                }
+            })
+        } else {
+            log("danilo-req rccRequest:SendDtmfDigits: user not found");
+        }
+    }
     if (obj.mode == "ClearCall") {
         var userC = pbxTableUsers.filter(function (userC) { return userC.columns.guid === obj.guid })[0];
 
@@ -459,6 +635,7 @@ function rccRequest2(value) {
             log("danilo-req rccRequest:ClearCall: user not found");
         }
     }
+
 
     
 }

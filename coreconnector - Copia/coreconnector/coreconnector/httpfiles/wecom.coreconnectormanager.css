@@ -1,0 +1,95 @@
+
+div.wecom-coreconnector-panel {
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:var(--wecom-coreconnector-item-text);
+    font-size:14px;
+}
+
+div.wecom-coreconnector-obj {
+    position:relative;
+    margin:10px;
+    padding:5px;
+    background-color:var(--wecom-coreconnector-item);
+    color:var(--wecom-coreconnector-item-text);
+    font-size:14px;
+}
+
+div.wecom-coreconnector-header {
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+div.wecom-coreconnector-label {
+    position:relative;
+    margin:5px 10px;
+    color:var(--wecom-coreconnector-c2);
+}
+
+div.wecom-coreconnector-label2 {
+    position:relative;
+    width:100px;
+    margin:5px 10px;
+    font-size: 15px;
+    text-align: left;
+    color: var(--innovaphone-coreconnector-item-text);
+}
+
+div.wecom-coreconnector-value {
+    position:relative;
+    margin:5px 0px;
+    /*background-color:var(--wecom-coreconnector-input);*/
+    color:var(--wecom-coreconnector-input-text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+div.wecom-coreconnector-appicon {
+    background-size: cover;
+    position: absolute;
+    height: 50px;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+}
+
+div.wecom-coreconnector-button {
+    position:absolute;
+    width:120px;
+    height:25px;
+    background-color:var(--wecom-coreconnector-button);
+    color:var(--wecom-coreconnector-button-text);
+    text-align:center;
+    cursor:pointer;
+}
+
+input.wecom-coreconnector-input {
+    width:100%;
+    box-sizing:border-box;
+    border:none;
+    margin:5px 0px;
+    padding: 5px 10px;
+    background-color:var(--wecom-coreconnector-input);
+    color:var(--wecom-coreconnector-input-text);
+}
+
+div.wecom-coreconnector-choice {
+    box-sizing: border-box;
+    position:relative;
+    width:120px;
+    height:30px;
+    text-align:center;
+    background-color:var(--wecom-coreconnector-button-bg);
+    margin:10px;
+    padding: 5px;
+}
+
+div.wecom-coreconnector-choice:hover {
+    background-color:var(--wecom-coreconnector-highlight-bg);
+}
+

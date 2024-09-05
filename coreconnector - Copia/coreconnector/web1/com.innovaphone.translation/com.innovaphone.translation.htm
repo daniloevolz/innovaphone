@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - phoneInfo api</title>
+    <link rel="stylesheet" href="../doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../doc/vs.css">
+    <script src="../doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>com.innovaphone.translation</h1>
+    <p>
+        This API is used for text translation (HTML payload is also supported) against an external service.
+    </p>
+
+    <h2><a id="messages">Messages</a></h2>
+    <a href="#Translate" style="text-decoration:none;">Translate</a><br>
+    <a href="#TranslateAll" style="text-decoration:none;">TranslateAll</a><br>
+    <a href="#GetTargetLanguages" style="text-decoration:none;">GetTargetLanguages</a><br>
+    <a href="#DetectLanguage" style="text-decoration:none;">DetectLanguage</a><br>
+
+    <h3><a id="Translate">Translate</a></h3>
+    <p>
+        Translate a specific payload to requested language.
+    </p>
+    <pre><code class="json">{
+    mt:   "Translate",
+    html: "Payload we want translated",
+    langDst: "de"
+}</code></pre>
+    
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type [mandatory]</td></tr>
+        <tr><td class="param">string <b>html</b></td><td>payload to be translated [mandatory]</td></tr>
+        <tr><td class="param">string <b>langSrc</b></td><td>2 letter source language. If not set, the language will be detected. [optional]</td></tr>
+        <tr><td class="param">string <b>langDst</b></td><td>2 letter target language. If not set, the current myApps language will be used. [optional]</td></tr>
+    </table>
+    <br />
+    If you want to exclude some content from translation, you can wrap them in an HTML tag with the parameter <code class="html">translate="no"</code>. (Example: "<code class="html">Bananas are &lt;span translate="no"&gt;yellow&lt;/span&gt; fruits.</code>)<br>
+
+    <h4>Response</h4>
+    <pre><code class="json">{
+    mt:        "TranslateResult",
+    html:      "Nutzdaten, die &uuml;bersetzt werden sollen",
+    langSrc:   "en"
+    langDst:   "de"
+    unchanged: false
+}</code></pre>
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "TranslateResult")</td></tr>
+        <tr><td class="param">string <b>html</b></td><td>translated payload</td></tr>
+        <tr><td class="param">string <b>langSrc</b></td><td>2 letter source language</td></tr>
+        <tr><td class="param">string <b>langDst</b></td><td>2 letter target language</td></tr>
+        <tr><td class="param">bool <b>unchanged</b></td><td>labelling if the payload in <i>html</i> have been changed</td></tr>
+    </table>
+
+    <h4>Error Response</h4>
+    If you run into an error you will receive the following response.
+    <pre><code class="json">{
+    mt:    "TranslateResult",
+    html:  "Error: [English error message which can be shown to the User]",
+    error: true
+}</code></pre>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "TranslateResult")</td></tr>
+        <tr><td class="param">string <b>html</b></td><td>English error message which can be shown to the User</td></tr>
+        <tr><td class="param">bool <b>error</b></td><td>labelling whether error was send. Only sent if true [optional]</td></tr>
+    </table>
+
+    <h3><a id="TranslateAll">TranslateAll</a></h3>
+    <p>
+        Translate a specific payload to all possible languages.
+    </p>
+    <pre><code class="json">{
+    mt:   "TranslateAll",
+    html: "Christmas Tree"
+}</code></pre>
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "TranslateAll") [mandatory]</td></tr>
+        <tr><td class="param">string <b>html</b></td><td>payload to be translated [mandatory]</td></tr>
+        <tr><td class="param">string <b>langSrc</b></td><td>2 letter source language [optional]</td></tr>
+    </table>
+    <br />
+
+    <h4>Response</h4>
+    <pre><code class="json">{
+    mt:     "TranslateAllResult",
+    html:   [
+        { langSrc: "en", langDst: "bg", html: "&#x41A;&#x43E;&#x43B;&#x435;&#x434;&#x43D;&#x430; &#x435;&#x43B;&#x445;&#x430;" },
+        { langSrc: "en", langDst: "cs", html: "V&#xE1;no&#x10D;n&#xED; stromek" },
+        { langSrc: "en", langDst: "da", html: "Juletr&#xE6;" },
+        { langSrc: "en", langDst: "de", html: "Weihnachtsbaum" },
+        { langSrc: "en", langDst: "el", html: "&#x3A7;&#x3C1;&#x3B9;&#x3C3;&#x3C4;&#x3BF;&#x3C5;&#x3B3;&#x3B5;&#x3BD;&#x3BD;&#x3B9;&#x3AC;&#x3C4;&#x3B9;&#x3BA;&#x3BF; &#x3B4;&#x3AD;&#x3BD;&#x3C4;&#x3C1;&#x3BF;" },
+        ...
+    ]
+}</code></pre>
+
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "TranslateAllResult")</td></tr>
+        <tr><td class="param">array <b>html</b></td><td>array of translated payload for all languages</td></tr>
+    </table>
+
+    <h3><a id="GetTargetLanguages">GetTargetLanguages</a></h3>
+    <p>Get all possible target languages.</p>
+    <pre><code class="json">{
+    mt:   "GetTargetLanguages"
+}</code></pre>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "GetTargetLanguages")</td></tr>
+    </table>
+
+    <h4>Response</h4>
+    <pre><code class="json">{
+    mt:        "GetTargetLanguagesResult",
+    languages: [
+        { language: "bg", name: "Bulgarian" },
+        { language: "cs", name: "Czech" },
+        { language: "da", name: "Danish" },
+        { language: "de", name: "German" },
+        { language: "el", name: "Greek" },
+        ...
+    ]
+}</code></pre>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "GetTargetLanguagesResult")</td></tr>
+        <tr><td class="param">array <b>languages</b></td><td>array of all supported target languages</td></tr>
+    </table>
+
+
+    <h3><a id="DetectLanguage">DetectLanguage</a></h3>
+    <p>Detect langiage from given string.</p>
+    <pre><code class="json">{
+    mt:   "DetectLanguage",
+    html: "Payload that should be detected"
+}</code></pre>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "DetectLanguage")</td></tr>
+        <tr><td class="param">string <b>html</b></td><td>payload</td></tr>
+    </table>
+
+    <h4>Response</h4>
+    <pre><code class="json">{
+    mt:   "DetectLanguageResult",
+    lang: "en"
+}</code></pre>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>mt</b></td><td>message type (is "DetectLanguageResult")</td></tr>
+        <tr><td class="param">array <b>lang</b></td><td>2-letter detected language, empty if no match</td></tr>
+        <tr><td class="param">bool <b>error</b></td><td>labelling whether error was send. Only sent if true [optional]</td></tr>
+    </table>
+
+
+    <h2><a id="example">Example</a></h2>
+    <p>
+        You can consume the API <i>com.innovaphone.translate</i> and send translation request to them. Inside the callback you can access the translated version via <i>recv.msg.html</i><br />
+    </p>
+    <pre><code class="javascript">var translateApi = start.consumeApi("com.innovaphone.translate");
+translateApi.sendSrc({ mt: "translate", html: "&lt;div&gt;Hello World!&lt;/div&gt;", lang: "de" }, translateApi.providers[0], function (recv) {
+    console.log('translated text: '+recv.msg.html);
+});</code></pre>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>com.innovaphone.events (App API)</title>
+    <link rel="stylesheet" href="../doc/innovaphone.doc.css" type="text/css" />
+</head>
+
+<body>
+    <h1>com.innovaphone.events (App API)</h1>
+    <p>
+        This API provides an interface for sending logs and events to the Events App Service.
+    </p>
+
+    <h2>API model</h2>
+    <h3>Service info</h3>
+    <p>
+        The API doesn't define any service info.
+    </p>
+    <h3>Provider model</h3>
+    <p>
+        The API doesn't define a provider model.
+    </p>
+
+    <h2>API messages</h2>
+    <p>
+        All messages are JSON objects that have a mandatory attribute "mt" that specifies the message type.
+    </p>
+    <h3>Requests</h3>
+    <dl>
+        <dt>AddEvent</dt>
+        <dd>Used to add a new event.</dd>
+        <dd>
+            <dl>
+                <dt>type</dt>
+                <dd>It should be "error" to add a new event</dd>
+                <dt>severity</dt>
+                <dd>It can be Minor (0), Indeterminate (1) or Major (2)</dd>
+                <dt>code</dt>
+                <dd>Unique code number for this event</dd>
+                <dt>date</dt>
+                <dd>The timestamp in seconds</dd>
+                <dt>host</dt>
+                <dd>The host</dd>
+                <dt>serial</dt>
+                <dd>The MAC address of the device</dd>
+                <dt>source</dt>
+                <dd>Indicates software module, which sent the corresponding event</dd>
+                <dt>text</dt>
+                <dd>A short description of the corresponding event </dd>
+                <dt>xsl</dt>
+                <dd>Name of the template to parse the details</dd>
+                <dt>details</dt>
+                <dd>XML data to be parsed using the xsl template</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddEvent", type: "error", severity: 1, code: "0x0011005b", date: "1580559884", host: "IP0011-00-00-00", serial: "009033000000", source: "IP", text: "No route to destination", xsl: "fault_network.xsl", details: "&lt;route src-addr=\"10.0.0.1\" src-port=\"24\" dst-addr=\"10.0.0.3\" dst-port=\"80\" prot=\"TCP\" cause=\"Destination interface down\"/&gt;" }</code></dd>
+    </dl>
+    <dl>
+        <dt>AddAlarm</dt>
+        <dd>Used to add a new alarm or clear an existing one.</dd>
+        <dd>
+            <dl>
+                <dt>type</dt>
+                <dd>It could be "alarm" to set a new alarm or "clear" to clear an existing alarm</dd>
+                <dt>severity</dt>
+                <dd>It can be Minor (0), Indeterminate (1) or Major (2)</dd>
+                <dt>active</dt>
+                <dd>It should be true if the alarm is still active and false in other case</dd>
+                <dt>code</dt>
+                <dd>Unique code number for this alarm</dd>
+                <dt>date</dt>
+                <dd>The timestamp in seconds</dd>
+                <dt>host</dt>
+                <dd>The host</dd>
+                <dt>serial</dt>
+                <dd>The MAC address of the device</dd>
+                <dt>source</dt>
+                <dd>Indicates software module, which sent the corresponding alarm</dd>
+                <dt>text</dt>
+                <dd>A short description of the corresponding alarm</dd>
+                <dt>xsl</dt>
+                <dd>Name of the template to parse the details</dd>
+                <dt>details</dt>
+                <dd>XML data to be parsed using the xsl template</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddAlarm", type: "alarm", severity: 1, active: true, code: "0x00010002", date: "1580559884", host: "IP0011-42-04-a7", serial: "009033000000", source: "RELAY/RECH", text: "Registration down", xsl: "fault_relay.xsl", details: "&lt;relay prot=\"SH323\"/&gt;" }</code></dd>
+    </dl>
+    <dl>
+        <dt>AddLog</dt>
+        <dd>Used to add a new log.</dd>
+        <dd>
+            <dl>
+                <dt>time</dt>
+                <dd>The timestamp in seconds</dd>
+                <dt>date</dt>
+                <dd>The date of the log with the format YYYYMMDD-HHmmss</dd>
+                <dt>from</dt>
+                <dd>The host</dd>
+                <dt>serial</dt>
+                <dd>The MAC address of the device</dd>
+                <dt>msg</dt>
+                <dd>The log message</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddLog", time: "1580559884", date: "20200302-101125", from: "IP811-00-00-00", serial: "009033000000", msg: "This is the log info" }</code></dd>
+    </dl>
+    <h3>Responses</h3>
+    <dl>
+        <dt>AddEventResult</dt>
+        <dd>One single AddEventResult is returned for each <b>AddEvent</b> request</dd>
+        <dd>
+            <dl>
+                <dt>result</dt>
+                <dd>"ok" if the event could be added and "failed" in other case</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddEventResult", result :"ok" }</code></dd>
+
+        <dt>AddAlarmResult</dt>
+        <dd>One single AddAlarmResult is returned for each <b>AddAlarm</b> request</dd>
+        <dd>
+            <dl>
+                <dt>result</dt>
+                <dd>"ok" if the alarm could be added and "failed" in other case</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddAlarmResult", result :"ok" }</code></dd>
+
+        <dt>AddLogResult</dt>
+        <dd>One single AddLogResult is returned for each <b>AddLog</b> request</dd>
+        <dd>
+            <dl>
+                <dt>result</dt>
+                <dd>"ok" if the log could be added and "failed" in other case</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "AddLogResult", result :"ok" }</code></dd>
+    </dl>
+</body>
+</html>

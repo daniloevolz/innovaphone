@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.webterminalmanager",
+            "icon": "wecom-webterminal.png",
+            "lang": "wecom.webterminalmanagertexts",
+            "domains": false
+        }
+    ]
+}

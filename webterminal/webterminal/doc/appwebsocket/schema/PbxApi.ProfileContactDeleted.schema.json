@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pbxapi.profilecontactdeleted.schema.json",
+  "type": "object",
+  "description": "This message is sent when a favourite has been deleted from the first profile.",
+  "required": [
+    "api",
+    "mt",
+    "profile"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "ProfileContactDeleted"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The nummerical id of the profile"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "The nummerical id of the Contact"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "contact"
+      ]
+    }
+  }
+}
