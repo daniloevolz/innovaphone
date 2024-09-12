@@ -40,6 +40,28 @@ new JsonApi("user").onconnected(function (conn) {
                 });
 
             }
+            if (obj.mt == "InsertToken") {
+                // Horario Atual
+                var day = new Date().toLocaleString();
+                log("AddURLDashMessage:day: " + day);
+                Database.insert("INSERT INTO tbl_dashboards (sip, app_name, url, date_add) VALUES ('" + obj.sip + "','" + obj.app + "','" + obj.url + "','" + day + "')")
+                    .oncomplete(function () {
+                        Database.exec("SELECT * FROM tbl_dashboards")
+                            .oncomplete(function (data) {
+                                log("AddURLDashMessage:result=" + JSON.stringify(data, null, 4));
+                                conn.send(JSON.stringify({ api: "admin", mt: "AddURLDashMessageSucess", result: JSON.stringify(data, null, 4) }));
+
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                            });
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+
+
+            }
         });
     }
 });
@@ -149,6 +171,8 @@ function authenticate(username, password) {
     // Implementar autenticação com base em senha ou chave pública
     state = "session";
 };
+
+
 
 
 

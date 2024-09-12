@@ -171,9 +171,11 @@ new PbxApi("RCC").onconnected(function (conn) {
             var device = myArray[2];
             var num = myArray[3];
             var btn_id = myArray[4];
+            if (obj.call != 0) {
 
-            calls.push({ call: obj.call, guid: guid, src: guid + "," + pbx + "," +device, num: num, btn_id: btn_id })
-            log("danilo req : RCC message:UserCallResult: after addCall " + JSON.stringify(calls));
+                calls.push({ call: obj.call, guid: guid, src: guid + "," + pbx + "," + device, num: num, btn_id: btn_id })
+                log("danilo req : RCC message:UserCallResult: after addCall " + JSON.stringify(calls));
+            }
         }
         else if (obj.mt === "UserEndResult") {
             log("danilo req UserEndResult: RCC message:: received" + JSON.stringify(obj));
@@ -285,12 +287,14 @@ new PbxApi("RCC").onconnected(function (conn) {
                         log("danilo req : RCC message:CallUpdate: x-alert Catch num = null");
                         return;
                     }
-                    calls.push({ call: obj.call, guid: guid, src: obj.src, num: num, btn_id: '' })
-                    log("danilo req : RCC message:CallUpdate: x-alert after addCall " + JSON.stringify(calls));
+                    if (obj.call != 0) {
+                        calls.push({ call: obj.call, guid: guid, src: obj.src, num: num, btn_id: '' })
+                        log("danilo req : RCC message:CallUpdate: x-alert after addCall " + JSON.stringify(calls));
 
-                    var msg = { mode: "IncomingCallRinging", guid: guid, device: device, num: num, call: obj.call };
-                    log("danilo req : RCC message:CallInfo: x-alert will send http message IncomingCallRinging to CORE server " + JSON.stringify(msg));
-                    httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                        var msg = { mode: "IncomingCallRinging", guid: guid, device: device, num: num, call: obj.call };
+                        log("danilo req : RCC message:CallInfo: x-alert will send http message IncomingCallRinging to CORE server " + JSON.stringify(msg));
+                        httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
+                    }
                 }
             }
             if (obj.conf && obj.msg && obj.msg == 'x-setup') {
@@ -743,7 +747,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:ConnectCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src })[0]
+                    var call = calls.filter(function (c) { return c.src == src && c.call == obj.call })[0]
                     log("danilo req:rccRequest2:ConnectCall: to " + userC.columns.cn);
 
                     if (call != null) {

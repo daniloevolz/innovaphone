@@ -152,4 +152,77 @@ function authenticate(username, password) {
 
 
 
+// Funcao para obter as reunioes do dia atual
+function getTodayMeetings(token, callback) {
+    // Obter a data de hoje no formato correto para a API
+    var now = new Date();
+    var todayStart = now.toISOString().split('T')[0] + 'T00:00:00Z';  // Inicio do dia em UTC
+    var todayEnd = now.toISOString().split('T')[0] + 'T23:59:59Z';    // Fim do dia em UTC
+
+    // URL da API do Google Calendar para eventos de um intervalo de tempo
+    var calendarId = 'primary';  // Use 'primary' para o calendario principal
+    var url = 'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events?' +
+        'timeMin=' + encodeURIComponent(todayStart) +
+        '&timeMax=' + encodeURIComponent(todayEnd) +
+        '&orderBy=startTime&singleEvents=true';
+
+    // Fazer a requisicao
+    httpClient(url, token, "GET", function (err, responseText) {
+        if (err) {
+            callback(err);
+        } else {
+            var events = JSON.parse(responseText).items;
+            callback(null, events);
+        }
+    });
+}
+
+// Exemplo de uso:
+var token = 'ya29.a0AcM612zoXFE-eLMIKcfEU-65Dqh601yJC5n-B7TC7WIQxK6cW0FP0WNWzO7PdSvcolGyRlBu9y8FW4EQB0rm67urUVBg-JQ0CwNEQdr3RHBpO5gDP2uWyUDyRfa4redwRWD4KmMkvu4auvNLyf9UCrt1bbkbYKRtYHyc2VyJaCgYKASQSARASFQHGX2MiKOxtWx5BnkBeqfLhhnhkyQ0175';  // Substitua pelo seu token OAuth
+
+getTodayMeetings(token, function (err, meetings) {
+    if (err) {
+        log('Erro ao obter reunioes: ' + err.message);
+    } else {
+        log('Reuniões de hoje:');
+        for (var i = 0; i < meetings.length; i++) {
+            var meeting = meetings[i];
+            log('Titulo: ' + meeting.summary);
+            log('Inicio: ' + meeting.start.dateTime);
+            log('Fim: ' + meeting.end.dateTime);
+        }
+    }
+});
+
+function httpClient(url, token, method,  callback) {
+    log("danilo-req : httpClient token " + JSON.stringify(token));
+    var responseData = "";
+    log("danilo-req : httpClient url " + url);
+    HttpClient.request(method, url)
+        .header("Authorization", 'Bearer ' + token)
+        .onrecv(function (req, data, last) {
+            log("danilo-req : httpClient HttpRequest onrecv " + JSON.stringify(req));
+            responseData += new TextDecoder("utf-8").decode(data);
+            if (!last) req.recv();
+        }, 1024)
+        .oncomplete(function (req, success) {
+            log(success ? url + " httpClient OK" : url + " httpClient ERROR");
+            if (success) {
+                log("danilo-req : httpClient HttpRequest complete " + JSON.stringify(req));
+                log("danilo-req : httpClient HttpRequest responseData " + responseData);
+                if (callback) {
+                    callback(responseData);
+                }
+            }
+        })
+        .onerror(function (error) {
+            log("danilo-req : httpClient HttpRequest error=" + error);
+            if (callback) {
+                callback();
+            }
+        });
+}
+
+
+
 

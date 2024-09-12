@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - AppInstance</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>AppInstance</h1>
+    <p>
+        This document describes the AppInstance library available in the JavaScript environment for app serivices.
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#AppInstance">AppInstance</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Properties</b></td>
+            <td>
+                <a href="#serviceId">serviceId</a><br />
+                <a href="#serviceDns">serviceDns</a><br />
+                <a href="#serviceVersion">serviceVersion</a>
+                <a href="#serviceBuild">serviceBuild</a><br />
+                <a href="#serviceLabel">serviceLabel</a><br />
+                <a href="#name">name</a><br />
+                <a href="#domain">domain</a><br />
+                <a href="#password">password</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#httpfiles">httpfiles</a><br />
+                <a href="#httpfile">httpfile</a><br />
+                <br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="AppInstance">AppInstance</a></h2>
+    <p>
+        The AppInstance object provides information about the configuration of the app instance.
+    </p>
+
+    <a name="serviceId"><div class="fnhead" style="margin-top:5px">serviceId</div></a>
+    <dd>
+        <p>
+            A string containing the ID of the app service.
+        </p>
+    </dd>
+
+    <a name="serviceDns"><div class="fnhead" style="margin-top:5px">serviceDns</div></a>
+    <dd>
+        <p>
+            A string containing the DNS name of the App Platform where the service is running.
+            <code>null</code>, if no DNS name is configured.
+        </p>
+    </dd>
+
+    <a name="serviceVersion"><div class="fnhead" style="margin-top:5px">serviceVersion</div></a>
+    <dd>
+        <p>
+            A string containing the major version of the app service.
+        </p>
+    </dd>
+
+    <a name="serviceBuild"><div class="fnhead" style="margin-top:5px">serviceBuild</div></a>
+    <dd>
+        <p>
+            A string containing the build number of the app service.
+        </p>
+    </dd>
+
+    <a name="serviceLabel"><div class="fnhead" style="margin-top:5px">serviceLabel</div></a>
+    <dd>
+        <p>
+            A string containing the build label of the app service.
+        </p>
+    </dd>
+
+    <a name="name"><div class="fnhead" style="margin-top:5px">name</div></a>
+    <dd>
+        <p>
+            A string containing the app instance name.
+        </p>
+    </dd>
+
+    <a name="domain"><div class="fnhead" style="margin-top:5px">domain</div></a>
+    <dd>
+        <p>
+            A string containing the app instance domain.
+        </p>
+    </dd>
+
+    <a name="password"><div class="fnhead" style="margin-top:5px">password</div></a>
+    <dd>
+        <p>
+            A string containing the app instance password.
+        </p>
+    </dd>
+
+    <a name="httpfiles"><div class="fnhead" style="margin-top:5px">httpfiles</div></a>
+    <dd>
+        <p>
+            Lists all files that come with the app service inside the httpfiles.zip.
+        </p>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">[string]</td><td>An array containing the file names.</td></tr>
+        </table>
+    </dd>
+
+    <a name="httpfile"><div class="fnhead" style="margin-top:5px">httpfile</div></a>
+    <dd>
+        <p>
+            Returns the content of an httpfile.
+        </p>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>filename</b></td><td>The filename.</td></tr>
+            <tr><td class="param">bool <b>binary</b></td><td>Optional, default false. Specifies, if the file content shall be returned as a string or an Uint8Array.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string/Uint8Array</td><td>The file content as a string or binary data, depending on the binary parameter.</td></tr>
+        </table>
+    </dd>
+
+</body>
+</html>
