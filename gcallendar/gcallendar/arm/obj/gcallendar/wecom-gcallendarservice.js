@@ -591,7 +591,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
 
     // Se existir um timer, limpar o timer anterior
     if (existingTimer) {
-        clearTimeout(existingTimer.timer);
+        Timers.clearTimeout(existingTimer.timer);
         log("startTokenRenewalTimer:Timer anterior para o guid " + guid + " foi limpo.");
     } else {
         // Se nao existir, criar um novo timer para esse 'guid'
@@ -602,6 +602,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
 
     // Criar o novo timer e armazena-lo
     existingTimer.timer = Timers.setTimeout(function () {
+
         Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + guid + "';")
             .oncomplete(function (data) {
                 log("INTERVAL:startTokenRenewalTimer:existingTimer: result=" + JSON.stringify(data, null, 4));

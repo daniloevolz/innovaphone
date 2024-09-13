@@ -403,88 +403,88 @@ var i = Timers.setInterval(function () {
                             log('INTERVAL:Erro ao obter reunioes: ' + err.message);
                         } else {
                             log('INTERVAL:Reunioes de hoje:');
+                            var isUserInMeeting = false;
                             for (var i = 0; i < meetings.length; i++) {
                                 var meeting = meetings[i];
-                                log('INTERVAL:Titulo: ' + meeting.summary);
+                                log('INTERVAL:===========MEETING============Titulo: ' + meeting.summary);
                                 
                                 var startDateTime = new Date(meeting.start.dateTime);
                                 var endDateTime = new Date(meeting.end.dateTime);
                                 log('INTERVAL:Inicio: ' + startDateTime);
                                 log('INTERVAL:Fim: ' + endDateTime);
-                                log('INTERVAL:pbxTableUsers:' + pbxTableUsers.length);
+                                log('INTERVAL:pbxTableUsers:total ' + pbxTableUsers.length);
                                 var user = pbxTableUsers.filter(function (u) { return u.columns.guid == item.guid })[0]
-                                log('INTERVAL: user: ' + JSON.stringify(user));
+                                log('INTERVAL: user: ' + JSON.stringify(user.columns.cn));
                                 // Obter a data e hora atuais
                                 var currentDateTime = new Date();
                                 log('INTERVAL: Current Date: ' + currentDateTime);
+
                                 if (currentDateTime >= startDateTime && currentDateTime <= endDateTime) {
                                     log('INTERVAL: A data atual esta dentro do intervalo da reuniao: ' + meeting.summary);
 
-
                                     var is_in_meeting = in_meeting_now.filter(function (m) { return m.guid == item.guid })[0]
-                                    if (user && !is_in_meeting) {
-                                        log('INTERVAL: user: is_not_in_meeting ' + JSON.stringify(is_in_meeting));
-                                        var originalPresence = presences.filter(function (p) { return p.src == user.columns.guid; })[0];
-                                        log('INTERVAL: user: originalPresence ' + JSON.stringify(originalPresence));
-                                        if (originalPresence) {
-                                            in_meeting_now.push({ guid: item.guid, originalPresence: originalPresence });
-                                            log('INTERVAL: user: handleSetPresenceMessage ' + JSON.stringify(meeting.summary));
-                                            handleSetPresenceMessage(user.columns.h323, 'GMEET: ' + meeting.summary, 'dnd')
-                                            break;
+                                    if (user) {
+                                        if (!is_in_meeting) {
+                                            log('INTERVAL: user: is_not_in_meeting');
+                                            var originalPresence = presences.filter(function (p) { return p.src == user.columns.guid; })[0];
+                                            log('INTERVAL: user: originalPresence ' + JSON.stringify(originalPresence));
+                                            if (originalPresence) {
+                                                in_meeting_now.push({ guid: item.guid, originalPresence: originalPresence, meeting: meeting.summary });
+                                                log('INTERVAL: user: handleSetPresenceMessage ' + JSON.stringify(meeting.summary));
+                                                handleSetPresenceMessage(user.columns.h323, 'GMEET: ' + meeting.summary, 'dnd')
+
+                                            }
+                                        }
+                                        else {
+                                            log('INTERVAL: user: is_in_meeting now');
+                                            if (is_in_meeting.meeting != meeting.summary) {
+                                                log('INTERVAL: user: is_in_meeting now but with diferent meeting summary');
+                                                log('INTERVAL: user: handleSetPresenceMessage ' + JSON.stringify(meeting.summary));
+                                                in_meeting_now.forEach(function (m) {
+                                                    if (m.guid == item.guid) {
+                                                        m.meeting = meeting.summary
+                                                    }
+                                                })
+                                                handleSetPresenceMessage(user.columns.h323, 'GMEET: ' + meeting.summary, 'dnd')
+                                            }
+
                                         }
                                     }
+                                    isUserInMeeting = true;
+                                    log('INTERVAL: users: in_meeting_now ' + JSON.stringify(in_meeting_now));
+                                    break;
+                                } 
+                            }
+                            if (!isUserInMeeting) {
 
-                                }
-                                //else if (currentDateTime > endDateTime) {
-                                //    log('INTERVAL:A reuniao terminou, restaurar a presenca original se o usuario estava em reuniao');
-                                //    var endedMeetingUser = in_meeting_now.filter(function (m) { return m.guid == item.guid })[0];
-                                //    if (endedMeetingUser) {
-                                //        log('INTERVAL: A reuniao terminou, restaurando presenca do usuario: ' + item.guid);
+                                log('INTERVAL:A data atual esta fora do periodo de reunioes');
+                                var endedMeetingUser = in_meeting_now.filter(function (m) { return m.guid == item.guid })[0];
+                                if (endedMeetingUser) {
+                                    log('INTERVAL: endedMeetingUser restaurando presenca do usuario: ' + item.guid);
 
-                                //        // Restaurar a presenca original
-                                //        var originalPresence = endedMeetingUser.originalPresence;
-                                //        if (originalPresence) {
-                                //            var note = '';
-                                //            if (originalPresence.presence[0].note) {
-                                //                note = originalPresence.presence[0].note;
-                                //            }
-                                //            var activity = 'online';
-                                //            if (originalPresence.presence[0].activity) {
-                                //                activity = originalPresence.presence[0].activity
-                                //            }
-                                //            handleSetPresenceMessage(user.columns.h323, note, activity);
-                                //        }
-
-                                //        log('INTERVAL:Remover o usuario da lista de reuniao em andamento')
-                                //        in_meeting_now = in_meeting_now.filter(function (m) { return m.guid != item.guid });
-                                //    }
-                                //}
-                                else {
-
-                                    log('INTERVAL:nenhuma reuniao anterior');
-                                    var endedMeetingUser = in_meeting_now.filter(function (m) { return m.guid == item.guid })[0];
-                                    if (endedMeetingUser) {
-                                        log('INTERVAL: restaurando presenca do usuario: ' + item.guid);
-
-                                        // Restaurar a presenca original
-                                        var originalPresence = endedMeetingUser.originalPresence;
-                                        if (originalPresence) {
-                                            var note = '';
-                                            if (originalPresence.presence[0].note) {
-                                                note = originalPresence.presence[0].note;
-                                            }
-                                            var activity = 'online';
-                                            if (originalPresence.presence[0].activity) {
-                                                activity = originalPresence.presence[0].activity
-                                            }
-                                            handleSetPresenceMessage(user.columns.h323, note, activity);
+                                    // Restaurar a presenca original
+                                    var originalPresence = endedMeetingUser.originalPresence;
+                                    if (originalPresence) {
+                                        var note = '';
+                                        if (originalPresence.presence[0].note) {
+                                            note = originalPresence.presence[0].note;
                                         }
-
-                                        log('INTERVAL:Remover o usuario da lista de reuniao em andamento')
-                                        in_meeting_now = in_meeting_now.filter(function (m) { return m.guid != item.guid });
+                                        var activity = 'online';
+                                        if (originalPresence.presence[0].activity) {
+                                            activity = originalPresence.presence[0].activity
+                                        }
+                                        log('INTERVAL: endedMeetingUser restaurando presenca do usuario para originalPresence: ' + JSON.stringify(originalPresence));
+                                        handleSetPresenceMessage(user.columns.h323, note, activity);
+                                    } else {
+                                        log('INTERVAL: endedMeetingUser nao tem originalPresence: ' + JSON.stringify(originalPresence));
                                     }
 
+                                    log('INTERVAL:Remover o usuario da lista de reuniao em andamento')
+                                    in_meeting_now = in_meeting_now.filter(function (m) { return m.guid != item.guid });
+                                } else {
+                                    log('INTERVAL: NOT endedMeetingUser usuario: ' + item.guid);
                                 }
+
                             }
                         }
                     });
@@ -591,7 +591,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
 
     // Se existir um timer, limpar o timer anterior
     if (existingTimer) {
-        clearTimeout(existingTimer.timer);
+        Timers.clearTimeout(existingTimer.timer);
         log("startTokenRenewalTimer:Timer anterior para o guid " + guid + " foi limpo.");
     } else {
         // Se nao existir, criar um novo timer para esse 'guid'
@@ -602,6 +602,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
 
     // Criar o novo timer e armazena-lo
     existingTimer.timer = Timers.setTimeout(function () {
+
         Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + guid + "';")
             .oncomplete(function (data) {
                 log("INTERVAL:startTokenRenewalTimer:existingTimer: result=" + JSON.stringify(data, null, 4));
