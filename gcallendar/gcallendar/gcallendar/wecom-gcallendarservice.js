@@ -1,4 +1,4 @@
-
+﻿
 var clientId = Config.client_id;
 var redirectUrl;
 var clientSecret = Config.client_secret;

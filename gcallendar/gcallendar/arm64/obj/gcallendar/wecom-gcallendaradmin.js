@@ -66,6 +66,11 @@ Wecom.gcallendarAdmin = Wecom.gcallendarAdmin || function (start, args) {
         t.add(new innovaphone.ui1.Div("position:absolute; left:80%; width:15%; top:25%; font-size:15px; text-align:center", null, "button")).addTranslation(texts, "btnUpdate").addEvent("click", function () {
             app.send({ api: "admin", mt: "UpdateClientSecret", client_secret: String(iptClientSecret.getValue()) });
         });
+        var labeluri = t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:80%; top:35%; font-size:15px; text-align:left", texts.text("labelUri")));
+
+        var labeluriVl = t.add(new innovaphone.ui1.Div("position:absolute; left:20%; width:80%; top:45%; font-size:15px; text-align:left", origins));
+
+
     }
 
     // Função para criar um toast de notificação
