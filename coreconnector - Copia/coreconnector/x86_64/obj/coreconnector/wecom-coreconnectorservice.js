@@ -14,6 +14,8 @@ var calls = [];
 var presences = [];
 var queues = [];
 var url = Config.url;
+
+var regsDevices = [];
 Config.onchanged(function () {
     url = Config.url;
 
@@ -177,6 +179,28 @@ new PbxApi("RCC").onconnected(function (conn) {
                 log("danilo req : RCC message:UserCallResult: after addCall " + JSON.stringify(calls));
             }
         }
+        else if (obj.mt === "UserInfo" && obj.regs) {
+            var msg = { mode: "UserInfo", guid: obj.guid, regs: obj.regs };
+      
+            var found = false;
+
+            for (var i = 0; i < regsDevices.length; i++) {
+                if (regsDevices[i].guid === obj.guid) {
+                    // Se encontramos o guid, atualizamos o valor de regs
+                    regsDevices[i].regs = obj.regs;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                regsDevices.push({ guid: obj.guid, regs: obj.regs });
+            }
+
+            log("danilo req : RCC message:UserInfo: array regsDevices " + JSON.stringify(regsDevices));
+            log("danilo req : RCC message:UserInfo: will send http message UserInfo to CORE server " + JSON.stringify(msg));
+            httpClient("https://" + url + "/api/innovaphone/userEvents", "POST", msg)
+
+        }
         else if (obj.mt === "UserEndResult") {
             log("danilo req UserEndResult: RCC message:: received" + JSON.stringify(obj));
             log("RCC: connections before delete result " + JSON.stringify(RCC));
@@ -247,7 +271,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                     var device = myArray[2];
                     var num = call.num;
                     var btn_id = call.btn_id;
-                    var msg = { mode: "CallRinging", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    var msg = { mode: "CallRinging", guid: call.guid, device: device, num: num, btn_id: btn_id, call: obj.call };
                     log("danilo req : RCC message:CallInfo: will send http message CallRinging to CORE server " + JSON.stringify(msg));
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
                 }
@@ -309,7 +333,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                     var device = myArray[2];
                     var num = call.num;
                     var btn_id = call.btn_id;
-                    var msg = { mode: "CallRecordId", guid: call.guid, device: device, num: num, btn_id: btn_id, record_id: obj.conf };
+                    var msg = { mode: "CallRecordId", guid: call.guid, device: device, num: num, btn_id: btn_id, record_id: obj.conf, call: obj.call };
                     log("danilo req : RCC message:CallInfo: will send http message CallRecordId to CORE server " + JSON.stringify(msg));
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
                 }
@@ -324,9 +348,39 @@ new PbxApi("RCC").onconnected(function (conn) {
                     var guid = myArray[0];
                     var pbx = myArray[1];
                     var device = myArray[2];
-                    var num = call.num;
+                    
                     var btn_id = call.btn_id;
-                    var msg = { mode: "CallConnected", guid: call.guid, device: device, num: num, btn_id: btn_id };
+                    var num;
+
+                    //Define num
+                    try {
+                        if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                            num = obj.peer.e164;
+                            log("danilo req : RCC message:CallUpdate: x-conn  num = obj.peer.e164;");
+                        }
+                        else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                            num = obj.peer.h323;
+                            log("danilo req : RCC message:CallUpdate: x-conn num = obj.peer.h323");
+                        }
+                        else {
+                            // Se nenhum dos parametros estiver definido, ignore o evento
+                            log("danilo req : RCC message:CallUpdate: x-conn  num = null");
+                            return;
+                        }
+                    }
+                    catch (e) {
+                        log("danilo req : RCC message:CallUpdate: x-conn  NUM Catch " + e);
+                        log("danilo req : RCC message:CallUpdate: x-conn Catch num = null");
+                        num = call.num;
+                        return;
+                    }
+                    for (var i = 0; i < calls.length; i++) {
+                        if (calls[i].call == obj.call) {
+                            calls[i].num = num; // Atualize o valor de num
+                            break; // Saia do loop apos encontrar e atualizar o objeto
+                        }
+                    }
+                    var msg = { mode: "CallConnected", guid: call.guid, device: device, num: num, btn_id: btn_id, call: obj.call };
                     log("danilo req : RCC message:CallInfo: r-conn will send http message CallConnected to CORE server " + JSON.stringify(msg));
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
                 }
@@ -363,7 +417,14 @@ new PbxApi("RCC").onconnected(function (conn) {
                     catch (e) {
                         log("danilo req : RCC message:CallUpdate: x-conn  NUM Catch " + e);
                         log("danilo req : RCC message:CallUpdate: x-conn Catch num = null");
+                        num = call.num;
                         return;
+                    }
+                    for (var i = 0; i < calls.length; i++) {
+                        if (calls[i].call == obj.call) {
+                            calls[i].num = num; // Atualize o valor de num
+                            break; // Saia do loop apos encontrar e atualizar o objeto
+                        }
                     }
                     var msg = { mode: "IncomingCallConnected", guid: call.guid, device: device, num: num, call: obj.call };
                     log("danilo req : RCC message:CallInfo: x-conn will send http message IncomingCallConnected to CORE server " + JSON.stringify(msg));
@@ -431,8 +492,38 @@ new PbxApi("RCC").onconnected(function (conn) {
                     var guid = myArray[0];
                     var pbx = myArray[1];
                     var device = myArray[2];
-                    var num = call.num;
                     var btn_id = call.btn_id;
+                    var num;
+
+                    //Define num
+                    try {
+                        if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                            num = obj.peer.e164;
+                            log("danilo req : RCC message:CallUpdate: update133 num = obj.peer.e164;");
+                        }
+                        else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                            num = obj.peer.h323;
+                            log("danilo req : RCC message:CallUpdate: update133 num = obj.peer.h323");
+                        }
+                        else {
+                            // Se nenhum dos parametros estiver definido, ignore o evento
+                            log("danilo req : RCC message:CallUpdate: update133  num = null");
+                            return;
+                        }
+                    }
+                    catch (e) {
+                        log("danilo req : RCC message:CallUpdate: update133  NUM Catch " + e);
+                        log("danilo req : RCC message:CallUpdate: update133 Catch num = null");
+                        num = call.num;
+                        return;
+                    }
+                    for (var i = 0; i < calls.length; i++) {
+                        if (calls[i].call == obj.call) {
+                            calls[i].num = num; // Atualize o valor de num
+                            break; // Saia do loop apos encontrar e atualizar o objeto
+                        }
+                    }
+
                     var msg = { mode: "UserIncomingCallRetrieved", guid: call.guid, device: device, num: num, btn_id: btn_id, call: call.call };
                     log("danilo req : RCC message:CallInfo: will send http message UserIncomingCallRetrieved to CORE server " + JSON.stringify(msg));
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
@@ -448,8 +539,38 @@ new PbxApi("RCC").onconnected(function (conn) {
                     var guid = myArray[0];
                     var pbx = myArray[1];
                     var device = myArray[2];
-                    var num = call.num;
                     var btn_id = call.btn_id;
+                    var num;
+
+                    //Define num
+                    try {
+                        if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                            num = obj.peer.e164;
+                            log("danilo req : RCC message:CallUpdate: update5 num = obj.peer.e164;");
+                        }
+                        else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                            num = obj.peer.h323;
+                            log("danilo req : RCC message:CallUpdate: update5 num = obj.peer.h323");
+                        }
+                        else {
+                            // Se nenhum dos parametros estiver definido, ignore o evento
+                            log("danilo req : RCC message:CallUpdate: update5  num = null");
+                            return;
+                        }
+                    }
+                    catch (e) {
+                        log("danilo req : RCC message:CallUpdate: update5  NUM Catch " + e);
+                        log("danilo req : RCC message:CallUpdate: update5 Catch num = null");
+                        num = call.num;
+                        return;
+                    }
+                    for (var i = 0; i < calls.length; i++) {
+                        if (calls[i].call == obj.call) {
+                            calls[i].num = num; // Atualize o valor de num
+                            break; // Saia do loop apos encontrar e atualizar o objeto
+                        }
+                    }
+
                     var msg = { mode: "UserCallRetrieved", guid: call.guid, device: device, num: num, btn_id: btn_id, call: call.call };
                     log("danilo req : RCC message:CallInfo: will send http message UserCallRetrieved to CORE server " + JSON.stringify(msg));
                     httpClient("https://" + url + "/api/innovaphone/callEvents", "POST", msg)
@@ -577,7 +698,40 @@ WebServer.onrequest("pbxTableUsers", function (req) {
     if (req.method == "GET") {
         var list_users = [];
         pbxTableUsers.forEach(function (u) {
-            list_users.push({ cn: u.columns.cn, guid: u.columns.guid, sip: u.columns.h323, e164: u.columns.e164, devices: u.columns.devices })
+            var devices = u.columns.devices;
+            log("danilo-req pbxTableUsers: " + u.columns.cn + " devices: " + JSON.stringify(devices));
+            var regs = findRegByGuid(u.columns.guid)
+            log("danilo-req pbxTableUsers: " + u.columns.cn + " regs " + JSON.stringify(regs));
+            if (devices) {
+
+                // Percorrer a lista de devices
+                for (var i = 0; i < devices.length; i++) {
+                    var device = devices[i];
+                    log("danilo-req pbxTableUsers: " + u.columns.cn + " device " + JSON.stringify(device));
+                    // Verificar se o hw existe na lista regs
+                    var found = false;
+                    if (regs != null) {
+                        for (var j = 0; j < regs.length; j++) {
+                            log("danilo-req pbxTableUsers: verificar se device.hw == regs.hw");
+                            if (regs[j].hw == device.hw) {
+                                found = true;
+                                log("danilo-req pbxTableUsers: device.hw == regs.hw");
+                                break;
+                            }
+                        }
+                    }
+
+                    // Adicionar o estado com base na existencia
+                    if (found) {
+                        devices[i].state = "online";
+                    } else {
+                        devices[i].state = "offline";
+                    }
+                }
+            }
+            
+
+            list_users.push({ cn: u.columns.cn, guid: u.columns.guid, sip: u.columns.h323, e164: u.columns.e164, devices: devices })
         })
         if (list_users) {
             // value exists, send it back as text/plain
@@ -593,6 +747,16 @@ WebServer.onrequest("pbxTableUsers", function (req) {
         }
     }
 });
+
+function findRegByGuid(guid) {
+    // Percorre a lista para encontrar o objeto que tem o 'guid' especificado
+    for (var i = 0; i < regsDevices.length; i++) {
+        if (regsDevices[i].guid === guid) {
+            return regsDevices[i].regs; // Retorna o objeto correspondente
+        }
+    }
+    return null; // Retorna null se nao encontrar
+}
 
 //Function called by WebServer.onrequest("rcc")
 function rccRequest2(value) {
@@ -693,7 +857,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:HeldCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.btn_id == obj.btn_id})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:HeldCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -720,7 +884,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:HeldIncomingCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.call == obj.call})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:HeldIncomingCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -747,7 +911,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:ConnectCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.call == obj.call })[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id) })[0]
                     log("danilo req:rccRequest2:ConnectCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -774,7 +938,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:RetrieveCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.btn_id == obj.btn_id})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:RetrieveCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -801,7 +965,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:RetrieveIncomingCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.call == obj.call})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:RetrieveIncomingCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -828,7 +992,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:RedirectCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.btn_id == obj.btn_id})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:RedirectCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -855,7 +1019,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:RedirectIncomingCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.call == obj.call})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:RedirectIncomingCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -882,7 +1046,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:SendDtmfDigits userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.btn_id == obj.btn_id})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:SendDtmfDigits: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -909,7 +1073,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:SendDtmfDigitsIncomingCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.call && obj.call})[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:SendDtmfDigitsIncomingCall: to " + userC.columns.cn);
 
                     if (call != null) {
@@ -936,7 +1100,7 @@ function rccRequest2(value) {
                 var userRcc = rcc[String(src)];
                 log("danilo req:rccRequest2:ClearCall userRcc " + userRcc);
                 if (userRcc != null) {
-                    var call = calls.filter(function (c) { return c.src == src && c.btn_id == obj.btn_id && c.num == obj.num })[0]
+                    var call = calls.filter(function (c) { return c.src == src && (c.call == obj.call || c.btn_id == obj.btn_id)})[0]
                     log("danilo req:rccRequest2:ClearCall: to " + userC.columns.cn);
 
                     if (call != null) {
