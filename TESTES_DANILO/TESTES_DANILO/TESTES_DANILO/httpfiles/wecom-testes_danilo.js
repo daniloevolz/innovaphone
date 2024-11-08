@@ -32,7 +32,14 @@ Wecom.TESTES_DANILO = Wecom.TESTES_DANILO || function (start, args) {
     app.onmessage = app_message;
 
     function app_connected(domain, user, dn, appdomain) {
-        app.send({ api: "user", mt: "UserMessage" });
+
+        document.getElementById('send-btn').addEventListener('click', function () {
+            var msg = document.getElementById('msg').value;
+            var to = document.getElementById('to').value;
+            app.send({ api: "user", mt: "UserMessage", to: to, msg: msg });
+        });
+
+        
     }
 
     function app_message(obj) {

@@ -6,7 +6,7 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "UserMessage") {
 
                 //PbxSignal[0].send(JSON.stringify({ "api": "PbxSignal", "mt": "Signaling", "call": 1, "sig": { "type": "setup", "channel": 0, "cd": { "flags":"U", "sip": "danilo.volz" }, "fty": [{ "type": "im_setup" }] } }));
-
+                sendMessage(obj.to, obj.msg)
                 
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
@@ -25,8 +25,9 @@ new JsonApi("admin").onconnected(function(conn) {
     }
 });
 
-
-
+var messages = [];
+var message_calls = [];
+var lastcallid = 0;
 var PbxSignal = [];
 var PbxSignalUsers = [];
 new PbxApi("PbxSignal").onconnected(function (conn) {
@@ -44,33 +45,32 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
         log("PbxSignal msg: " + msg);
-        if (obj.mt === "Signaling" && obj.sig.type === "setup_ack") {
-            var date = new Date();
-            conn.send(JSON.stringify({
-                "api": "PbxSignal",
-                "mt": "Signaling",
-                "call": 1,
-                "sig": {
-                    "type": "facility",
-                    "cd": { "sip": "1dpherval" },
-                    "fty": [{
-                        "type": "im_message",
-                        "subject": "TESTES",
-                        "data": "Mensagem do servico de teste do Danilo",
-                        "attach": "",
-                        "time": date.getTime(),
-                        "typing": false,
-                        "mime": "text/html",
-                        "more": false
-                    }]
-                }
-            }));
-        }
+
         if (obj.mt === "RegisterResult") {
             log("PBXSignal: registration result " + JSON.stringify(obj));
-
-            
         }
+
+        else if (obj.mt === "Signaling" && obj.sig.type === "call_proc") {
+            log("PbxSignal: send message on call " + obj.call);
+            var call = message_calls.filter(function (call) { return call.callid === obj.call })[0];
+
+            if (call === undefined) {
+                log("Pbxsignal: no call found for callid " + obj.callid);
+                log(JSON.stringify(message_calls));
+            } else {
+                sendTyping(PbxSignal[0], call.callid, true);
+
+                messages.filter(function (message) { return message.call === call.callid; }).
+                    forEach(function (message) {
+                        sendIMMessage(conn, message.call, message.data);
+                    });
+
+                messages = messages.filter(function (message) { return message.call !== call.callid; });
+
+                sendTyping(PbxSignal[0], call.callid, false);
+            }
+        }
+
 
         // handle incoming presence_subscribe call setup messages
         // the callid "obj.call" required later for sending badge notifications
@@ -90,7 +90,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var sip = obj.sig.cg.sip;
             var call = obj.call;
             var callData = { call, sip };
-            //Adiciona o PBX2 no objeto caso ele nao exista
+            //Adiciona o PBX2 no objeto caso ele not exist
             if (!PbxSignalUsers[pbx]) {
                 PbxSignalUsers[pbx] = [];
                 PbxSignalUsers[pbx].push(callData);
@@ -119,13 +119,14 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
+            message_calls = message_calls.filter(function (c) { return c.callid != obj.call });
             //Remove signals
             //log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-            var src = obj.src;
-            var myArray = src.split(",");
-            var sip = "";
-            var pbx = myArray[0];
-            removeObjectByCall(PbxSignalUsers, pbx, obj.call);
+            //var src = obj.src;
+            //var myArray = src.split(",");
+            //var sip = "";
+            //var pbx = myArray[0];
+            //removeObjectByCall(PbxSignalUsers, pbx, obj.call);
 
             log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
         }
@@ -138,26 +139,27 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
         //PbxSignal.splice(PbxSignal.indexOf(conn), 1);
         //connectionsPbxSignal.splice(connectionsPbxSignal.indexOf(conn), 1);
     });
+});
 
-    function removeObjectByCall(arr, pbx, callToRemove) {
-        //console.log("removeObjectByCall+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx].length));
-        for (var i = 0; i < arr[pbx].length; i++) {
-            var pbxEntry = arr[pbx];
-            //console.log("arr[i][pbx]+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx]));
-            if (pbxEntry) {
-                //console.log("pbxEntry+++++++++++++++++++++++++++++++" + JSON.stringify(pbxEntry.length));
-                for (var j = 0; j < pbxEntry.length; j++) {
-                    //console.log("pbxEntry[j].call+++++++++++++++++++++++++++++++" + pbxEntry[j].call);
-                    if (pbxEntry[j].call == callToRemove) {
-                        log("pbxEntry[j].call == callToRemove:" + pbxEntry[j].call + " == " + callToRemove);
-                        pbxEntry.splice(j, 1);
-                        break;
-                    }
+//Funcions to delete user Call from PbxSignal API Array
+function removeObjectByCall(arr, pbx, callToRemove) {
+    //console.log("removeObjectByCall+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx].length));
+    for (var i = 0; i < arr[pbx].length; i++) {
+        var pbxEntry = arr[pbx];
+        //console.log("arr[i][pbx]+++++++++++++++++++++++++++++++" + JSON.stringify(arr[pbx]));
+        if (pbxEntry) {
+            //console.log("pbxEntry+++++++++++++++++++++++++++++++" + JSON.stringify(pbxEntry.length));
+            for (var j = 0; j < pbxEntry.length; j++) {
+                //console.log("pbxEntry[j].call+++++++++++++++++++++++++++++++" + pbxEntry[j].call);
+                if (pbxEntry[j].call == callToRemove) {
+                    log("pbxEntry[j].call == callToRemove:" + pbxEntry[j].call + " == " + callToRemove);
+                    pbxEntry.splice(j, 1);
+                    break;
                 }
             }
         }
     }
-});
+}
 
 // Establish a TCP connection
 Network.socket("tcp")
@@ -202,6 +204,7 @@ Network.socket("tcp")
         log("danilo req: TCP register request ", JSON.stringify(request))
         socket.send(request);
     });
+
 
 
 //Network.server("tcp", null, 5060)
@@ -306,5 +309,101 @@ function isHeader(line) {
     var re = /^[A-Za-z\-]+:\s.*$/; // eslint-disable-line
     return line.match(re) === null ? false : true;
 }
+
+
+function sendTyping(conn, callid, isTyping) {
+    var msg = {
+        "mt": "Signaling", "api": "PbxSignal", "call": callid,
+        "sig": { "type": "facility", "fty": [{ "type": "im_message", "typing": isTyping }] }
+    };
+    conn.send(JSON.stringify(msg));
+}
+
+function sendMessage(sip, data) {
+    var callid = getCallId(sip);
+
+    if (callid === false) {
+        callid = generateCallId(sip);
+        log("Created new callid " + callid);
+        message_calls.push({ "callid": callid, "sip": sip });
+        messages.push({ "call": callid, "data": data });
+        log("Message_calls: " + JSON.stringify(message_calls));
+
+        sendSetup(PbxSignal[0], sip, callid);
+
+        //PbxSignal.forEach(function (pbxsignal) {
+          //  if (pbxsignal.pbx == pbxname) {
+            //    sendSetup(pbxsignal, sip, callid);
+            //}
+        //
+        //});
+
+    } else {
+        log("Send message for " + sip + " on existing call " + callid);
+        sendTyping(PbxSignal[0], callid, true);
+        sendIMMessage(PbxSignal[0], callid, data);
+        //sendTyping(pbxapiconns, targetApi, callid, true);
+        //PbxSignal.forEach(function (pbxsignal) {
+          //  if (pbxsignal.pbx == pbxname) {
+            //    sendIMMessage(pbxsignal, callid, data);
+            //}
+        //});
+
+        //sendTyping(pbxapiconns, targetApi, callid, false);
+        sendTyping(PbxSignal[0], callid, false);
+    }
+}
+
+function sendSetup(conn, sip, call) {
+    var msg = {
+        "mt": "Signaling", "api": "PbxSignal", "call": call,
+        "sig": {
+            "type": "setup",
+            "channel": 0,
+            "cd": { "flags": "U", "sip": sip },
+            "fty": [{ "type": "im_setup" }]
+        }
+    };
+    conn.send(JSON.stringify(msg));
+}
+
+function sendIMMessage(conn, call, data) {
+    var msg = {
+        "mt": "Signaling", "api": "PbxSignal", "call": call,
+        "sig": { "type": "facility", "fty": [{ "type": "im_message", "sender": "danilo.volz", "sender_dn": "Danilo Volz", "guid": "d62ea630ff2b670165620050560ec001", "data": data, "mime": "text/html", "attach": "" }] }
+    };
+    conn.send(JSON.stringify(msg));
+}
+
+function generateCallId(sip) {
+    var callid;
+    callid = lastcallid + 1;
+    lastcallid = callid;
+    log("Generate new callid for " + sip + ": " + callid);
+    return callid;
+}
+
+function getCallId(sip) {
+    log("Get callid for " + sip);
+    log(JSON.stringify(message_calls));
+
+    if (message_calls.length === 0) return false;
+
+    if (message_calls.some(function (v) { return v.sip === sip; })) {
+        var usercalls = message_calls.filter(function (v) { return v.sip === sip; });
+        log("Found calls for " + sip + " " + JSON.stringify(usercalls));
+
+        if (usercalls.length === 1) {
+            return usercalls[0].callid;
+        } else {
+            log("ERROR: multiple calls for same user");
+        }
+    } else {
+        return false;
+    }
+
+    return false;
+}
+
 
 
