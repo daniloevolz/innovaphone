@@ -145,6 +145,7 @@
     <None Include="dwcscheduler\httpfiles\wecom.dwcschedulermanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="dwcscheduler\httpfiles\images\close.png" />
     <Image Include="dwcscheduler\httpfiles\wecom-dwcidentity.png" />
     <Image Include="dwcscheduler\httpfiles\wecom-dwcscheduler.png" />
     <Image Include="dwcscheduler\httpfiles\wecom-dwcscheduleradmin.png" />

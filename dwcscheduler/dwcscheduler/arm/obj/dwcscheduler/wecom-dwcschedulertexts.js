@@ -71,7 +71,10 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Salvar",
         labelAdmin: "Administração",
         labelTituloSmtp:"Configure o servidor de emails",
-        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site"
+        labelTituloAdmin: "Acesse os agendamentos e gerencie a sua disponibilidade no site",
+        labelNoValidDate: "Período inválido",
+        labelWarning: "Atenção",
+        labelWrongObjectConf: "Verifique o Objeto de Conferências pois encontramos um problema nas suas configurações atuais"
     },
     en: {
         btnLink: "Link",
@@ -143,7 +146,10 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Save",
         labelAdmin: "Administration",
         labelTituloSmtp: "Configure the email server",
-        labelTituloAdmin: "Access appointments and manage your availability on the website"
+        labelTituloAdmin: "Access appointments and manage your availability on the website",
+        labelNoValidDate: "Invalid date range",
+        labelWarning: "Warning",
+        labelWrongObjectConf: "Please check the Conference Object as we have found a problem with your current settings."
     },
     de: {
         labelLicenseUsed: "Verwendete Lizenzen:",
@@ -200,7 +206,10 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Speichern",
         labelAdmin: "Administration",
         labelTituloSmtp: "E-Mail-Server konfigurieren",
-        labelTituloAdmin: "Greifen Sie auf Ihre Termine zu und verwalten Sie Ihre Verfügbarkeit auf der Website"
+        labelTituloAdmin: "Greifen Sie auf Ihre Termine zu und verwalten Sie Ihre Verfügbarkeit auf der Website",
+        labelNoValidDate: "Ungültiger Zeitraum",
+        labelWarning: "Achtung",
+        labelWrongObjectConf: "Bitte überprüfen Sie das Konferenzobjekt, da wir ein Problem mit Ihren aktuellen Einstellungen festgestellt haben"
     },
     fr: {
         btnLink: "Lien",
@@ -272,7 +281,10 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Enregistrer",
         labelAdmin: "Administration",
         labelTituloSmtp: "Configurer le serveur de messagerie",
-        labelTituloAdmin: "Accédez aux rendez-vous et gérez votre disponibilité sur le site"
+        labelTituloAdmin: "Accédez aux rendez-vous et gérez votre disponibilité sur le site",
+        labelNoValidDate: "Période invalide",
+        labelWarning: "Attention",
+        labelWrongObjectConf: "Veuillez vérifier l'objet de conférence car nous avons trouvé un problème avec vos paramètres actuels."
     },
     es: {
         btnLink: "Enlace",
@@ -344,7 +356,10 @@ Wecom.dwcschedulerTexts = {
         btnOk: "Guardar",
         labelAdmin: "Administración",
         labelTituloSmtp: "Configurar el servidor de correos electrónicos",
-        labelTituloAdmin: "Acceda a las citas y administre su disponibilidad en el sitio"
+        labelTituloAdmin: "Acceda a las citas y administre su disponibilidad en el sitio",
+        labelNoValidDate: "Período no válido",
+        labelWarning: "Atención",
+        labelWrongObjectConf: "Verifique el objeto de la conferencia ya que encontramos un problema con su configuración actual."
     }
 }
 

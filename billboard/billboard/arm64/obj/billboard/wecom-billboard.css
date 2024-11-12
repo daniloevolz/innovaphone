@@ -12,6 +12,7 @@
 .popup-header {
     /*background-image: url("novaalert.png");*/
     color: #fdb901;
+    margin-bottom:10px;
 }
 
 .popup-main {
@@ -23,6 +24,8 @@
     vertical-align: central;
     font-size: 20px;
     z-index: 5000;
+    width: 500px;
+    height: 250px;
 }
 
 .popup-closer {
@@ -348,6 +351,10 @@ td.checkbox {
             opacity: 1;
             transform: translateY(0);
     }
+    .popup-main {
+        width: 300px;
+        height: 150px;
+    }
 }
 .logo {
     z-index: 0;
@@ -588,6 +595,10 @@ td.checkbox {
 @media (max-width: 600px){
     .depcards{
         align-content: flex-start;
+    }
+    .popup-main {
+        width: 300px;
+        height:150px;
     }
 }
 .flag {

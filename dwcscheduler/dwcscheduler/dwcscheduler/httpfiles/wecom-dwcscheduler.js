@@ -247,10 +247,10 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         var divother = colEsquerda.add(new innovaphone.ui1.Div("text-align: left; position: absolute; top:59%;", null, null));
         var divother2 = divother.add(new innovaphone.ui1.Div(null, null, "otherli"));
 
-        var config = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 85%;", null, null));
-        var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center; justify-content:center;", null, "config"));
+        var config = colEsquerda.add(new innovaphone.ui1.Div("top: 85%; display: flex; justify-content: center; position: absolute;", null, null));
+        //var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center; justify-content:center;", null, "config"));
 
-        var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
+        var imgconfig = config.add(new innovaphone.ui1.Node("img", "width: 80%; opacity: 0.9;", null, null));
         imgconfig.setAttribute("src", "wecom-white.svg");
 
         var a = document.getElementById("CfgGeral");
@@ -715,7 +715,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         return (num < 10 ? "0" : "") + num;
     }
     // callback function called upon events in the phone app
-    function onPhoneApiUpdate(arg0) {
+    function onPhoneApiUpdate(arg0) {Meeting status integration 
         const provider = arg0.defaultApiProvider;
         const calls = arg0.model[provider].model.calls;
         calls.forEach(function (call) {

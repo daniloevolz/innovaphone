@@ -169,7 +169,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     function makePopup(header, content, width, height) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
-        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap;", styles[0], h[0]);
         _popup.header.addText(header);
         _popup.content.addHTML(content);
     }
@@ -465,7 +465,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-             var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
             
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
@@ -479,18 +479,18 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
             console.log("Filtro Visualizador:", userV);
             console.log("Filtro Editor:", userE);
-             var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
 
-             var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
             
 
-             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
-             viewerCheckbox.setAttribute("name", "viewerDepartments");
-             viewerCheckbox.setAttribute("value", user.guid);
+            var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+            viewerCheckbox.setAttribute("name", "viewerDepartments");
+            viewerCheckbox.setAttribute("value", user.guid);
 
-             var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
-             editorCheckbox.setAttribute("name", "editorDepartments");
-             editorCheckbox.setAttribute("value", user.guid);
+            var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+            editorCheckbox.setAttribute("name", "editorDepartments");
+            editorCheckbox.setAttribute("value", user.guid);
 
             editorCheckbox.addEvent('click', function () {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);

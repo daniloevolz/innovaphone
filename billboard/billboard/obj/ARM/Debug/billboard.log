@@ -3,7 +3,7 @@
       Project output dirctory : arm-debug/billboard
       Temp directory          : arm-debug\obj\billboard
       Runtime binary          : jse/arm/generic
-      Build Number            : 13C7
+      Build Number            : 13C43
   
   Copying runtime jse/arm/generic to arm-debug\billboard\billboard...
   Copying icon billboard/billboard.png to arm-debug\billboard\billboard.png...

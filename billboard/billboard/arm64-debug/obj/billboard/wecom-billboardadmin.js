@@ -24,6 +24,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     var licenseUsed = 0;
     var avatar = start.consumeApi("com.innovaphone.avatar");
     var appUrl = start.originalUrl;
+    var receivedFragments = [];
 
     var colorSchemes = {
         dark: {
@@ -116,12 +117,36 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
         if (obj.api == "admin" && obj.mt == "SelectDepartmentsResult") {
-            list_departments = JSON.parse(obj.result)
-            makeDivDepart(_colDireita, list_departments, list_tableUsers);
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_departments = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
+                // Faça o que quiser com os dados aqui
+                makeDivDepart(_colDireita, list_departments, list_tableUsers);
+                // Limpe o array de fragmentos recebidos
+                
+            }
+
+            //list_departments = JSON.parse(obj.result)
+            //makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectPostsResult") {
-            list_post = JSON.parse(obj.result)
-            makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_post = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
+                // Faça o que quiser com os dados aqui
+                makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
+                // Limpe o array de fragmentos recebidos
+                
+            }
+
+            //list_post = JSON.parse(obj.result)
+            //makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
         }
         if (obj.api == "admin" && obj.mt == "UpdatePostSuccess") {
             app.send({ api: "admin", mt: "SelectPosts" })
@@ -130,6 +155,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             app.send({ api: "admin", mt: "SelectDepartments" });
         }
         if (obj.api == 'admin' && obj.mt == "SelectDepartments") {
+
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         }
         if (obj.api == "admin" && obj.mt == "SelectAdminDepartmentViewersResult") {
@@ -143,7 +169,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     function makePopup(header, content, width, height) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
-        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap;", styles[0], h[0]);
         _popup.header.addText(header);
         _popup.content.addHTML(content);
     }
@@ -439,7 +465,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-             var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
             
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
@@ -453,18 +479,18 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
 
             console.log("Filtro Visualizador:", userV);
             console.log("Filtro Editor:", userE);
-             var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
 
-             var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
+            var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
             
 
-             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
-             viewerCheckbox.setAttribute("name", "viewerDepartments");
-             viewerCheckbox.setAttribute("value", user.guid);
+            var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
+            viewerCheckbox.setAttribute("name", "viewerDepartments");
+            viewerCheckbox.setAttribute("value", user.guid);
 
-             var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
-             editorCheckbox.setAttribute("name", "editorDepartments");
-             editorCheckbox.setAttribute("value", user.guid);
+            var editorCheckbox = editorCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox editorcheckbox").setAttribute("id", "editcheckbox_" + user.guid));
+            editorCheckbox.setAttribute("name", "editorDepartments");
+            editorCheckbox.setAttribute("value", user.guid);
 
             editorCheckbox.addEvent('click', function () {
                 var viewerCheckbox = document.getElementById("viewercheckbox_" + user.guid);
@@ -505,7 +531,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
-        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
+        var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, "nameDepDiv").setAttribute("id", "nameDepDiv"))
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #000000;">`
+        //var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
         postMsgDiv.add(userTable);
 
@@ -523,7 +551,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var save = document.getElementById('savemsg');
         save.addEventListener('click', function () {
             // Aqui voc� pode implementar a a��o que deseja realizar quando o bot�o � clicado
-            var departmentName = document.getElementById("nameDepDiv").innerHTML;
+            var departmentName = document.getElementById("namedep").value;
             var departmentColor = document.getElementById('newdep').style.backgroundColor;//document.getElementById("colorbox").value;
             console.log("Salvar clicado!");
             console.log("Nome do departamento:", departmentName);
@@ -766,9 +794,11 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 makePopup(texts.text("labelAlert"),texts.text("labelFullAllPosts"), 500, 200);
             } else if (endPost < startPost) {
                 makePopup(texts.text("labelAlert"),texts.text("labelDataEndPostAlert"), 500, 200);
-            } else if (startPost < currentDate) {
-                makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
-            } else {
+            }
+            //else if (startPost < currentDate) {
+            //    makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
+            //}
+            else {
                 app.send({ api: "admin", mt: "UpdatePost", id: parseInt(dep_id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(departPost, 10), date_start: startPost, date_end: endPost, type: idSel });
             };
             s.removeEventListener('click', s);

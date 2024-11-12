@@ -193,11 +193,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        var _popup = new innovaphone.ui1.Popup("position: absolute;display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap;", styles[0], h[0]);
         _popup.header.addText(header);
         _popup.content.addHTML(content);
 
-        // if (popupOpen == false) {
+        // if (popupOpen == false) {s
         //     }    
         //     popup = _popup;
         //     popupOpen = true;

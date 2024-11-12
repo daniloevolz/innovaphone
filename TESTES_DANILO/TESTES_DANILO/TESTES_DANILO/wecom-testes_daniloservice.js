@@ -6,7 +6,7 @@ new JsonApi("user").onconnected(function(conn) {
             if (obj.mt == "UserMessage") {
 
                 //PbxSignal[0].send(JSON.stringify({ "api": "PbxSignal", "mt": "Signaling", "call": 1, "sig": { "type": "setup", "channel": 0, "cd": { "flags":"U", "sip": "danilo.volz" }, "fty": [{ "type": "im_setup" }] } }));
-                sendMessage(obj.to, obj.msg)
+                sendMessage(obj.from, obj.to, obj.msg)
                 
                 conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", src: obj.src }));
             }
@@ -27,7 +27,7 @@ new JsonApi("admin").onconnected(function(conn) {
 
 var messages = [];
 var message_calls = [];
-var lastcallid = 0;
+var lastcallid = 100;
 var PbxSignal = [];
 var PbxSignalUsers = [];
 new PbxApi("PbxSignal").onconnected(function (conn) {
@@ -51,11 +51,11 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
         }
 
         else if (obj.mt === "Signaling" && obj.sig.type === "call_proc") {
-            log("PbxSignal: send message on call " + obj.call);
+            log("PbxSignal: call_proc on call " + obj.call);
             var call = message_calls.filter(function (call) { return call.callid === obj.call })[0];
 
             if (call === undefined) {
-                log("Pbxsignal: no call found for callid " + obj.callid);
+                log("Pbxsignal: call_proc no call found for callid " + obj.callid);
                 log(JSON.stringify(message_calls));
             } else {
                 sendTyping(PbxSignal[0], call.callid, true);
@@ -69,6 +69,10 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
                 sendTyping(PbxSignal[0], call.callid, false);
             }
+        }
+        if (obj.mt === "Signaling" && obj.sig.type === "setup_ack" ) {
+            log("PbxSignal: setup_ack on call " + obj.call);
+
         }
 
 
@@ -119,6 +123,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
+            log("PbxSignal: rel on call " + obj.call);
             message_calls = message_calls.filter(function (c) { return c.callid != obj.call });
             //Remove signals
             //log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
@@ -128,7 +133,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             //var pbx = myArray[0];
             //removeObjectByCall(PbxSignalUsers, pbx, obj.call);
 
-            log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
+            log("PBXSignalUsers: message_calls after rel result " + JSON.stringify(message_calls));
         }
     });
 
@@ -311,15 +316,15 @@ function isHeader(line) {
 }
 
 
-function sendTyping(conn, callid, isTyping) {
+function sendTyping(conn, call, isTyping) {
     var msg = {
-        "mt": "Signaling", "api": "PbxSignal", "call": callid,
+        "mt": "Signaling", "api": "PbxSignal", "call": parseInt(call),
         "sig": { "type": "facility", "fty": [{ "type": "im_message", "typing": isTyping }] }
     };
     conn.send(JSON.stringify(msg));
 }
 
-function sendMessage(sip, data) {
+function sendMessage(from, sip, data) {
     var callid = getCallId(sip);
 
     if (callid === false) {
@@ -356,7 +361,7 @@ function sendMessage(sip, data) {
 
 function sendSetup(conn, sip, call) {
     var msg = {
-        "mt": "Signaling", "api": "PbxSignal", "call": call,
+        "mt": "Signaling", "api": "PbxSignal", "call": parseInt(call),
         "sig": {
             "type": "setup",
             "channel": 0,
@@ -369,8 +374,8 @@ function sendSetup(conn, sip, call) {
 
 function sendIMMessage(conn, call, data) {
     var msg = {
-        "mt": "Signaling", "api": "PbxSignal", "call": call,
-        "sig": { "type": "facility", "fty": [{ "type": "im_message", "sender": "danilo.volz", "sender_dn": "Danilo Volz", "guid": "d62ea630ff2b670165620050560ec001", "data": data, "mime": "text/html", "attach": "" }] }
+        "mt": "Signaling", "api": "PbxSignal", "call": parseInt(call),
+        "sig": { "type": "facility", "fty": [{ "type": "im_message", "data": data, "mime": "text/html", "attach": "" }] }
     };
     conn.send(JSON.stringify(msg));
 }

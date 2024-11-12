@@ -17,6 +17,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
     var list_viewers_departments = [];
     var createDepartment = false;
     var billboard;
+    var receivedFragments = [];
 
 
     var colorSchemes = {
@@ -152,17 +153,39 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         }
         if (obj.api == "user" && obj.mt == "SelectAllPostsResult") {
             console.log(obj.result);
-            list_posts = JSON.parse(obj.result)
-            var dep_id = JSON.parse(obj.dep_id)
+
+            receivedFragments.push(obj.result);
+            if (obj.lastFragment) {
+                // Todos os fragmentos foram recebidos
+                list_posts = JSON.parse(receivedFragments.join(""));
+                receivedFragments = [];
+                // Faça o que quiser com os dados aqui
+                //list_posts = JSON.parse(obj.result)
+                var dep_id = JSON.parse(obj.dep_id)
                 var hasPosts = list_posts.filter(function (item) {
                     return item.department
                 })
                 console.log("Has posts" + JSON.stringify(hasPosts))
                 if (hasPosts.length > 0) {
-                    makePopup(texts.text("labelAlert"),texts.text("labelDelAllPosts"), 500, 200);
+                    makePopup(texts.text("labelAlert"), texts.text("labelDelAllPosts"), 500, 200);
                 } else {
                     app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
                 }
+            }
+            //list_posts = JSON.parse(obj.result)
+            //var dep_id = JSON.parse(obj.dep_id)
+            //var hasPosts = list_posts.filter(function (item) {
+            //    return item.department
+            //})
+            //console.log("Has posts" + JSON.stringify(hasPosts))
+            //if (hasPosts.length > 0) {
+            //    makePopup(texts.text("labelAlert"), texts.text("labelDelAllPosts"), 500, 200);
+            //} else {
+            //    app.send({ api: "user", mt: "DeleteDepartment", id: dep_id });
+            //}
+
+
+            
         }
     }
     function makePopup(header, content, width, height) {
@@ -170,11 +193,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var styles = [new innovaphone.ui1.PopupStyles("popup-background", "popup-header", "popup-main", "popup-closer")];
         var h = [20];
 
-        var _popup = new innovaphone.ui1.Popup("position: absolute; display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap; width:" + width + "px; height:" + height + "px;", styles[0], h[0]);
+        var _popup = new innovaphone.ui1.Popup("position: absolute;display: inline-flex; left:50px; top:50px; align-content: center; justify-content: center; flex-direction: row; flex-wrap: wrap;", styles[0], h[0]);
         _popup.header.addText(header);
         _popup.content.addHTML(content);
 
-        // if (popupOpen == false) {
+        // if (popupOpen == false) {s
         //     }    
         //     popup = _popup;
         //     popupOpen = true;
@@ -222,7 +245,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 document.getElementById(department.id).style.fontSize = "20px"
             }
             var ulNew = div.add(new innovaphone.ui1.Node("ul", null, null, null).setAttribute("id", "newDepPost"))
-            var aElement = div.add(new innovaphone.ui1.Node("a", null, nameDepartment, null))
+            if (department.color=="#000000") {
+                var aElement = div.add(new innovaphone.ui1.Node("a", "color:white;", nameDepartment, null))
+            } else {
+                var aElement = div.add(new innovaphone.ui1.Node("a", null, nameDepartment, null))
+            }
+            
         });
 
         if (createDepartment == true) {
@@ -694,14 +722,17 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         footShowPost.id = 'footShowPost';
         footShowPost.className = 'footShowPost';
         
-        var postType = (post.type == "private") ? texts.text("labelType") + texts.text("labelPrivate") : texts.text("labelType") + texts.text("labelPublic")
-        var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
-       
+        var postType = (post.type == "private") ? texts.text("labelPrivate") : texts.text("labelPublic")
+        //var publicPost = footShowPost.add(new innovaphone.ui1.Node('div', null, postType, 'creatorPost').setAttribute('id', post.type));
+        var dateString = post.date_start;
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var formattedDateStart = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
-        var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, texts.text("labelCreator") + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
-
-        var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDate, 'closedate').setAttribute('id', 'closedate'));
-  
         var dateString = post.date_end;
         var date = new Date(dateString);
         var day = date.getDate();
@@ -709,19 +740,33 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var year = date.getFullYear();
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var formattedDate = texts.text("labelEnd") + (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+        var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
-        document.getElementById("closedate").innerHTML = formattedDate
-
-
+        footInfo(footShowPost, texts.text("labelType"), postType)
+        footInfo(footShowPost, texts.text("labelCreator"), user.cn)
+        footInfo(footShowPost, texts.text("labelStart"), formattedDateStart)
+        footInfo(footShowPost, texts.text("labelEnd"), formattedDateEnd)
+        // var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, texts.text("labelCreator") + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
+        // var startDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDateStart, 'creatorPost').setAttribute('id', 'startdate'));
+        // var closeDateDiv = footShowPost.add(new innovaphone.ui1.Node('div', null, formattedDateEnd, 'creatorPost').setAttribute('id', 'closedate'));
+  
+        // document.getElementById("startdate").innerHTML = formattedDateStart
+       
+        // document.getElementById("closedate").innerHTML = formattedDateEnd
         // Adicionando o listener de clique
         var a = document.getElementById('closewindow');
         a.addEventListener('click', function () {
             console.log("O elemento closeWindowDiv foi clicado!");
             makeDivPosts(post.department);
         });
-                         
+        
 
+    }
+    function footInfo(div, text1, text2){
+        const divMain = div.add(new innovaphone.ui1.Node("div", null, null, 'creatorPost').setAttribute("id","divMain"));
+        const labelName = divMain.add(new innovaphone.ui1.Node("div", null, text1, null));
+        const labelInfo = divMain.add(new innovaphone.ui1.Node("div", null, text2, null));
+        return;
     }
     function createPostForm(dep_id) {
         var department = list_departments.filter(function (item) {
@@ -888,9 +933,11 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                 makePopup(texts.text("labelAlert"),texts.text("labelCompletePostFormAlert"), 500, 200);
             } else if (endPost < startPost) {
                 makePopup(texts.text("labelAlert"),texts.text("labelDataEndPostAlert"), 500, 200);
-            } else if (startPost < currentDate) {
-                makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
-            } else {
+            }
+            //else if (startPost < currentDate) {
+            //    makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);
+            //}
+            else {
                 app.send({ api: "user", mt: "UpdatePost", id: parseInt(id, 10), title: titlePost, color: colorPost, description: msgPost, department: parseInt(dep_id, 10), date_start: startPost, date_end: endPost, type: idSel });
 
             };
@@ -927,7 +974,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             makeDivDepartments();
         });
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "nameDepDiv").setAttribute("id", "nameDepDiv"))
-        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" placeholder="${texts.text("labelNameDepart")} " style="color: #ffff;">`
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" placeholder="${texts.text("labelNameDepart")} " style="color: #000000;">`
         var userTable = createUsersDepartmentsGrid();
         postMsgDiv.add(userTable)
         var buttonsDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, null, "buttonsDiv").setAttribute("id", "buttonsDiv"))
@@ -1041,6 +1088,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         //usersListDiv.add(table);
         return usersListDiv;
     }
+
     function editUsersDepartmentsGrid() {
         var usersListDiv = new innovaphone.ui1.Node("div", null, null, "userlist").setAttribute("id", "userslist");
 

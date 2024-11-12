@@ -167,21 +167,29 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "UpdatePost") {
-                    Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title.replace(/'/g, "''") + "', description = '" + obj.description.replace(/'/g, "''") + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
+                    var now = getDateNow();
+                    var query = "UPDATE tbl_posts SET deleted = '" + now + "', deleted_guid = '" + conn.guid + "' WHERE id = '" + obj.id + "'";
+                    Database.exec(query)
                         .oncomplete(function () {
-                            log("UpdatePost:result=success");
+                            log("UpdatePost:UpdateDeletedColumns:result=success");
 
-                            // Atualize os usuários sobre o post atualizado, se necessário
-                            for (var pbx in PbxSignalUsers) {
-                                if (PbxSignalUsers.hasOwnProperty(pbx)) {
-                                    var entry = PbxSignalUsers[pbx];
-                                    entry.forEach(function (e) {
-                                        selectViewsHistory(e.sip);
-                                    });
-                                }
-                            }
-
-                            conn.send(JSON.stringify({ api: "user", mt: "UpdatePostSuccess", src: obj.department }));
+                            Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end, type) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title.replace(/'/g, "''") + "','" + obj.description.replace(/'/g, "''") + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "','" + obj.type + "')")
+                                .oncomplete(function () {
+                                    log("UpdatePost:InsertPost:result=success");
+                                    //Atualiza usuários sobre NEW Post
+                                    for (var pbx in PbxSignalUsers) {
+                                        if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                                            var entry = PbxSignalUsers[pbx];
+                                            entry.forEach(function (e) {
+                                                selectViewsHistory(e.sip);
+                                            })
+                                        }
+                                    }
+                                    conn.send(JSON.stringify({ api: "user", mt: "UpdatePostSuccess", src: obj.department }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                                });
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -538,20 +546,6 @@ new JsonApi("admin").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
             }
-            //if (obj.mt == "SelectDepartments") {
-            //    Database.exec("SELECT * FROM tbl_departments")
-            //    //log("SelectDepartments:");
-            //    ////selectViewsHistory(conn.sip, conn);
-            //    //var queryViewer;
-            //    //Database.exec(queryViewer)
-            //        .oncomplete(function (data) {
-            //            log("SelectDepartments:result=" + JSON.stringify(data, null, 4));
-            //            conn.send(JSON.stringify({ api: "admin", mt: "SelectDepartmentsResult", src: obj.src, result: JSON.stringify(data, null, 4) }));
-            //        })
-            //        .onerror(function (error, errorText, dbErrorCode) {
-            //            conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
-            //        });
-            //};
             if (obj.mt == "SelectPosts") {
                 Database.exec("SELECT * FROM tbl_posts")
                     //log("SelectDepartments:");
@@ -694,24 +688,33 @@ new JsonApi("admin").onconnected(function (conn) {
                     });
             }
             if (obj.mt == "UpdatePost") {
-                Database.exec("UPDATE tbl_posts SET color = '" + obj.color + "', title = '" + obj.title.replace(/'/g, "''") + "', description = '" + obj.description.replace(/'/g, "''") + "', department = '" + obj.department + "', date_start = '" + obj.date_start + "', date_end = '" + obj.date_end + "', type = '" + obj.type + "' WHERE id = " + obj.id)
+
+                var now = getDateNow();
+                var query = "UPDATE tbl_posts SET deleted = '" + now + "', deleted_guid = '" + conn.guid + "' WHERE id = '" + obj.id + "'";
+                Database.exec(query)
                     .oncomplete(function () {
-                        log("UpdatePost:result=success");
+                        log("UpdatePost:UpdateDeletedColumns:result=success");
 
-                        // Atualize os usuários sobre o post atualizado, se necessário
-                        for (var pbx in PbxSignalUsers) {
-                            if (PbxSignalUsers.hasOwnProperty(pbx)) {
-                                var entry = PbxSignalUsers[pbx];
-                                entry.forEach(function (e) {
-                                    selectViewsHistory(e.sip);
-                                });
-                            }
-                        }
-
-                        conn.send(JSON.stringify({ api: "admin", mt: "UpdatePostSuccess", src: obj.department }));
+                        Database.exec("INSERT INTO tbl_posts (user_guid, color, title, description, department, date_creation, date_start, date_end, type) VALUES ('" + conn.guid + "','" + obj.color + "','" + obj.title.replace(/'/g, "''") + "','" + obj.description.replace(/'/g, "''") + "','" + obj.department + "','" + now + "','" + obj.date_start + "','" + obj.date_end + "','" + obj.type + "')")
+                            .oncomplete(function () {
+                                log("UpdatePost:InsertPost:result=success");
+                                //Atualiza usuários sobre NEW Post
+                                for (var pbx in PbxSignalUsers) {
+                                    if (PbxSignalUsers.hasOwnProperty(pbx)) {
+                                        var entry = PbxSignalUsers[pbx];
+                                        entry.forEach(function (e) {
+                                            selectViewsHistory(e.sip);
+                                        })
+                                    }
+                                }
+                                conn.send(JSON.stringify({ api: "admin", mt: "UpdatePostSuccess", src: obj.department }));
+                            })
+                            .onerror(function (error, errorText, dbErrorCode) {
+                                conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                            });
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                     });
             }
         });
