@@ -1298,3 +1298,152 @@ function httpClient(url, method, msg, callback) {
         });
 }
 
+var serviceconns = [];
+var appsocket_connect = false;
+var contacts = [];
+
+new PbxApi("Services").onconnected(function (conn) {
+    log("Connected to PBX API with connection: " + JSON.stringify(conn));
+    serviceconns.push(conn);
+    if (serviceconns.length == 1) {
+        conn.send(JSON.stringify({ "mt": "SubscribeServices", "api": "Services" }));
+    }
+
+    log("Services connected: " + conn.pbx);
+
+    conn.onmessage(function (msg) {
+        log("Message received from " + conn.pbx + ": " + msg);
+        var obj;
+        try {
+            obj = JSON.parse(msg);
+        } catch (e) {
+            log("Error parsing message: " + e);
+            return;
+        }
+
+        if (obj.mt == "ServicesInfo") {
+            log("ServicesInfo received: " + JSON.stringify(obj));
+            for (var i = 0; i < obj.services.length; i++) {
+                if (obj.services[i].info != null) {
+                    if (obj.services[i].info.apis != null) {
+                        if (obj.services[i].info.apis.hasOwnProperty("com.innovaphone.replicator")) {
+                            log("Connecting to service: " + JSON.stringify(obj.services[i]));
+                            connectToConnect(transformUrl(obj.services[i].url), obj.services[i].name);
+                        }
+                        log(JSON.stringify(obj.services[i].info.apis));
+                    }
+                }
+            }
+        }
+        else if (obj.mt == "GetServiceLoginResult") {
+            log("Service Login Result received: " + JSON.stringify(obj));
+            if (obj.app == "innovaphone-contacts-searchapi") {
+                if (obj.error) {
+                    log("Login failed with error: " + obj.error);
+                    appsocket_connect.close();
+                } else {
+                    try {
+                        var key = conn.decrypt(obj.salt, obj.key);
+                        var info = JSON.stringify(obj.info);
+                        appsocket_connect.auth(obj.domain, obj.sip, obj.guid, obj.dn, obj.pbxObj, obj.app, info, obj.digest, key);
+                    } catch (e) {
+                        log("Error during authentication process: " + e);
+                    }
+                }
+            }
+
+        } else {
+            log("Unhandled message type: " + obj.mt);
+        }
+    });
+
+    conn.onclose(function () {
+        log("Service connection closed " + conn.pbx);
+        serviceconns.splice(serviceconns.indexOf(conn), 1);
+    });
+});
+
+function connectToConnect(uri, app) {
+    log("Attempting to connect to service at " + uri + " for app " + app);
+
+    var appwebsocket = AppWebsocketClient.connect(uri, null, app);
+    appsocket_connect = appwebsocket;
+
+    appwebsocket.onauth(function (conn, app, challenge) {
+        log("Auth challenge received for app " + app + ": " + challenge);
+        serviceconns.forEach(function (serviceconn) {
+            serviceconn.send(JSON.stringify({ api: "Services", mt: "GetServiceLogin", challenge: challenge, app: app }));
+        });
+    });
+
+    appwebsocket.onopen(function (conn) {
+        log("REPLICATOR WebSocket connection opened");
+
+        conn.send(JSON.stringify({
+            api: "Services", mt: "ReplicatorAPI", src: conn.pbx, apimsg: {
+                mt: "ReplicationStart",
+                hasExtAnchor: true
+            }
+        }))
+    });
+
+    appwebsocket.onmessage(function (conn, msg) {
+        log("REPLICATOR message received " + msg);
+        var obj = JSON.parse(msg);
+        // Handle Messages from AppService
+        var apimsg = obj.apimsg;
+        log("REPLICATOR message received  obj " + JSON.stringify(obj));
+        if (apimsg && apimsg.mt == "ReplicationStartResult") {
+            //var apimsg = obj.apimsg;
+            log("REPLICATOR message received  apimsg " + JSON.stringify(apimsg));
+            //conn.send(JSON.stringify({
+            //    mt: "ReplicatorAPI", src: "src-02", apimsg: {
+            //        mt: "ReplicateNext",
+            //        hasExtAnchor: true
+            //    }
+            //}))
+            //log("REPLICATOR ReplicateNext sent");
+
+            //conn.send(JSON.stringify({
+            //    mt: "ReplicatorAPI", src: "src-02", apimsg: {
+            //        mt: "ReplicationUpdate",
+            //        attrs:
+            //            [
+            //                { a: "sn", v: "Replicator" },
+            //                { a: "givenName", v: "Ronald" },
+            //                { a: "company", v: "Smith Corp" },
+            //                { a: "street", v: "Arlington Blvd 1" },
+            //                { a: "city", v: "Munich" },
+            //                { a: "postalCode", v: "89000" },
+            //                { a: "telephoneNumber", v: "+49891234567" },
+            //                { a: "mobile", v: "+491561234567" },
+            //                { a: "homePhone", v: "+493361234567" },
+            //                { a: "description", v: "Info fur Ron" },
+            //                { a: "sip", v: "ron.rep@smithcorp.com" },
+            //                { a: "extAnchor", v: "2" }
+            //            ]
+            //    }
+            //}))
+
+            //log("REPLICATOR ReplicationUpdate sent");
+
+        }
+    });
+
+    appwebsocket.onclose(function () {
+        log("REPLICATOR WebSocket connection closed");
+        appsocket_connect = null;
+    });
+}
+function transformUrl(url) {
+    if (url.indexOf("https://") === 0) {
+        return url.replace("https://", "wss://");
+    }
+
+    else if (url.indexOf("http://") === 0) {
+        return url.replace("http://", "ws://");
+    }
+
+    return url;
+}
+
