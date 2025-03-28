@@ -1261,6 +1261,11 @@ new PbxApi("RCC").onconnected(function (conn) {
                 logoutOnClose(sip)
             }
 
+            //Remove calls from this user if exists
+            calls = calls.filter(function (c) {
+                return c.sip !== sip;
+            });
+
         }
 
         else if (obj.mt === "UserCallResult") {
@@ -1351,49 +1356,92 @@ new PbxApi("RCC").onconnected(function (conn) {
             }
             if (obj.msg && obj.msg == 'x-alert') {
 
-                var call = calls.filter(function (c) { return c.call == obj.call })[0]
-                log("RCC: CallInfo:IncomingCallRinging: 'x-alert call =" + JSON.stringify(call));
-                if (call == null) {
-                    var num;
+                // var call = calls.filter(function (c) { return c.call == obj.call })[0]
+                // log("RCC: CallInfo:IncomingCallRinging: 'x-alert call =" + JSON.stringify(call));
+                // if (call == null) {
+                //     var num;
 
-                    //Define num
-                    try {
-                        if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
-                            num = obj.peer.e164;
-                            log("RCC: CallInfo:IncomingCallRinging: x-alert  num = obj.peer.e164;");
-                        }
-                        else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
-                            num = obj.peer.h323;
-                            log("RCC: CallInfo:IncomingCallRinging: x-alert num = obj.peer.h323");
-                        }
-                        else {
-                            // Se nenhum dos parametros estiver definido, ignore o evento
-                            log("RCC: CallInfo:IncomingCallRinging: x-alert  num = null");
-                            return;
-                        }
-                    }
-                    catch (e) {
-                        log("RCC: CallInfo:IncomingCallRinging: x-alert  NUM Catch " + e);
-                        log("RCC: CallInfo:IncomingCallRinging: x-alert Catch num = null");
-                        return;
-                    }
-                    if (obj.call != 0) {
-                        calls.push({ call: obj.call, sip: sip, src: src, num: num })
-                        log("RCC: CallInfo:IncomingCallRinging: x-alert after addCall " + JSON.stringify(calls));
+                //     //Define num
+                //     try {
+                //         if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                //             num = obj.peer.e164;
+                //             log("RCC: CallInfo:IncomingCallRinging: x-alert  num = obj.peer.e164;");
+                //         }
+                //         else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                //             num = obj.peer.h323;
+                //             log("RCC: CallInfo:IncomingCallRinging: x-alert num = obj.peer.h323");
+                //         }
+                //         else {
+                //             // Se nenhum dos parametros estiver definido, ignore o evento
+                //             log("RCC: CallInfo:IncomingCallRinging: x-alert  num = null");
+                //             return;
+                //         }
+                //     }
+                //     catch (e) {
+                //         log("RCC: CallInfo:IncomingCallRinging: x-alert  NUM Catch " + e);
+                //         log("RCC: CallInfo:IncomingCallRinging: x-alert Catch num = null");
+                //         return;
+                //     }
+                //     if (obj.call != 0) {
+                //         calls.push({ call: obj.call, sip: sip, src: src, num: num })
+                //         log("RCC: CallInfo:IncomingCallRinging: x-alert after addCall " + JSON.stringify(calls));
 
-                        if (queues.some(function (v) { return v.Fila === sip })) {
-                            var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
-                        } else {
-                            var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "inc" };
-                        }
+                //         if (queues.some(function (v) { return v.Fila === sip })) {
+                //             var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
+                //         } else {
+                //             var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "inc" };
+                //         }
 
 
-                        log("RCC: CallInfo:IncomingCallRinging: will send http message Incoming Call Ringing to WECALL server data=" + JSON.stringify(msg));
-                        httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                //         log("RCC: CallInfo:IncomingCallRinging: will send http message Incoming Call Ringing to WECALL server data=" + JSON.stringify(msg));
+                //         httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                //     }
+                // }
+
+
+                // 1. Localiza o índice do call em calls
+                var callIndex = -1;
+                for (var i = 0; i < calls.length; i++) {
+                    if (calls[i].call === obj.call) {
+                    callIndex = i;
+                    break;
                     }
                 }
-            }
 
+                // 2. Se não encontrou, ignore
+                if (callIndex === -1) {
+                    log("RCC: CallInfo:IncomingCallRinging: x-alert call ignored =" + JSON.stringify(obj.src));
+                    return;
+                }
+
+                // 3. Se encontrou, vamos ler o item do array
+                var call = calls[callIndex];
+
+                // 4. Verifica se já processamos esse msg
+                if (call.msg === obj.msg) {
+                    log("RCC: CallInfo:IncomingCallRinging: x-alert já processado para essa chamada: " + JSON.stringify(call.src));
+                    return;
+                }
+
+                // 5. Atualiza o valor de msg
+                calls[callIndex].msg = obj.msg;
+
+                // 6. Lógica de "Chamando"
+                log("RCC: CallInfo:IncomingCallRinging: x-alert call =" +
+                    JSON.stringify(call.src) + " on conversation " +
+                    JSON.stringify(call.call) + " with num " +JSON.stringify(call.num)+
+                    " from queue " + JSON.stringify(call.conversation)
+                );
+
+                if (queues.some(function (v) { return v.Fila === sip })) {
+                    var msg = { User: "", Grupo: sip, Callinnumber: num, Status: "inc" };
+                } else {
+                    var msg = { User: sip, Grupo: "", Callinnumber: num, Status: "inc" };
+                }
+
+                log("RCC: CallInfo:IncomingCallRinging: will send http message Incoming Call Ringing to WECALL server data=" + JSON.stringify(msg));
+                httpClient(urlPhoneApiEvents, "PUT", msg, null);
+            }
             //Conectado
             if (obj.msg && obj.msg == 'r-conn') {
 
@@ -1411,21 +1459,133 @@ new PbxApi("RCC").onconnected(function (conn) {
                     httpClient(urlPhoneApiEvents, "PUT", msg, null);
                 }
             }
+
             if (obj.msg && obj.msg == 'x-conn') {
 
-                var call = calls.filter(function (c) { return c.call == obj.call })[0]
-                log("RCC: CallInfo:IncomingCallConnected: r-conn call =" + JSON.stringify(call));
-                if (call != null) {
+                // var call = calls.filter(function (c) { return c.call == obj.call })[0]
+                // log("RCC: CallInfo:IncomingCallConnected: r-conn call =" + JSON.stringify(call));
+                // if (call != null) {
 
-                    if (queues.some(function (v) { return v.Fila === sip })) {
-                        var msg = { User: "", Grupo: sip, Callinnumber: call.num, Status: "ans" };
-                    } else {
-                        var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "ans" };
+                //     if (queues.some(function (v) { return v.Fila === sip })) {
+                //         var msg = { User: "", Grupo: sip, Callinnumber: call.num, Status: "ans" };
+                //     } else {
+                //         var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "ans" };
+                //     }
+
+
+                //     log("RCC: CallInfo:IncomingCallConnected: will send http message Incoming Call Connected to WECALL server data=" + JSON.stringify(msg));
+                //     httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                // }
+
+                // 1. Localiza o índice do call em calls
+                var callIndex = -1;
+                for (var i = 0; i < calls.length; i++) {
+                    if (calls[i].call === obj.call) {
+                    callIndex = i;
+                    break;
                     }
+                }
+
+                // 2. Se não encontrou, ignore
+                if (callIndex === -1) {
+                    log("RCC: CallInfo:IncomingCallConnected: x-conn call ignored =" + JSON.stringify(obj.src));
+                    return;
+                }
+
+                // 3. Se encontrou, vamos ler o item do array
+                var call = calls[callIndex];
+
+                // 4. Verifica se já processamos esse msg
+                if (call.msg === obj.msg) {
+                    log("RCC: x-conn já processado para essa chamada: " + JSON.stringify(call.src));
+                    return;
+                }
+
+                // 5. Atualiza o valor de msg
+                calls[callIndex].msg = obj.msg;
+
+                // 6. Lógica de "Conectado"
+                log("RCC: CallInfo:IncomingCallConnected: x-conn call =" +
+                    JSON.stringify(call.src) + " on conversation " +
+                    JSON.stringify(call.call) + " with num " +JSON.stringify(call.num)+
+                    " from queue " + JSON.stringify(call.conversation)
+                );
+
+                if (queues.some(function (v) { return v.Fila === sip })) {
+                    var msg = { User: "", Grupo: sip, Callinnumber: call.num, Status: "ans" };
+                } else {
+                    var msg = { User: sip, Grupo: "", Callinnumber: call.num, Status: "ans" };
+                }
 
 
-                    log("RCC: CallInfo:IncomingCallConnected: will send http message Incoming Call Connected to WECALL server data=" + JSON.stringify(msg));
-                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                log("RCC: CallInfo:IncomingCallConnected: will send http message Incoming Call Connected to WECALL server data=" + JSON.stringify(msg));
+                httpClient(urlPhoneApiEvents, "PUT", msg, null);
+
+            }
+            //Start Conf
+            else if (obj.msg && obj.msg == 'r-setup') {
+                var call = calls.filter(function (c) { return c.src == obj.src && c.conf == obj.conf })[0]
+                log("RCC: CallInfo: r-setup call =" + JSON.stringify(call));
+                if (call == null) {
+                    var num;
+                    //Define num
+                    try {
+                        if (obj.peer.e164 !== undefined && obj.peer.e164 !== "") {
+                            num = obj.peer.e164;
+                            log("RCC: CallInfo:r-setup  num = obj.peer.e164;");
+                        }
+                        else if (obj.peer.h323 !== undefined && obj.peer.h323 !== "") {
+                            num = obj.peer.h323;
+                            log("RCC: CallInfo:r-setup num = obj.peer.h323");
+                        }
+                        else {
+                            // Se nenhum dos parametros estiver definido, ignore o evento
+                            log("RCC: CallInfo:r-setup  num = null");
+                            return;
+                        }
+                    }
+                    catch (e) {
+                        log("RCC: CallInfo:r-setup  NUM Catch " + e);
+                        log("RCC: CallInfo:r-setup Catch num = null");
+                        return;
+                    }
+                    if (obj.call != 0) {
+                        // 1. Verifica se já existe um call com conf == obj.conf
+                        var existingConversation = null;
+                        for (var i = 0; i < calls.length; i++) {
+                            if (calls[i].conf === obj.conf) {
+                                existingConversation = calls[i].sip;
+                                // <- Ajuste se precisar copiar outra propriedade
+                                break;
+                            }
+                        }
+
+                        // 2. Cria o novo objeto call
+                        var call = {
+                            call: obj.call,
+                            sip: sip,
+                            src: src,
+                            num: num,
+                            conf: obj.conf,
+                            msg: obj.msg
+                        };
+
+                        // 3. Se já existe uma conversa associada, reaproveite-a
+                        if (existingConversation) {
+                            call.conversation = existingConversation;
+                        }
+
+                        // 4. Adiciona o novo call em calls
+                        calls.push(call);
+                        log("RCC: CallInfo:r-setup after addCall " + JSON.stringify(calls));
+                    } else {
+                        log("RCC: CallInfo: r-setup invalid obj.call = " + JSON.stringify(obj.call));
+                        return;
+                    }
+                }
+                else {
+                    log("RCC: CallInfo: r-setup duplicated call = " + JSON.stringify(call));
+                    return;
                 }
             }
         }
