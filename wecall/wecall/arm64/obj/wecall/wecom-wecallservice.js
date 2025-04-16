@@ -192,43 +192,53 @@ if (license != null && license.System == true) {
 
                     log("/pbxTable: value " + String(value));
                     var obj = JSON.parse(String(value));
-                    var miliSeconds = parseInt(secondsTimeoutLoginGrp)
-                    var seconds = miliSeconds * 1000
-                    log("/pbxTable: "+seconds+" seconds to wait if mode login ")
+                    
 
                     if(obj.mode == "Login"){
+
+                        var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+                        var seconds = miliSeconds * 1000
+                        log("/pbxTable: "+seconds+" segundos para aguardar no mode Login")
+
                         var t = Timers.setTimeout(function () {
                             pbxTableRequest(obj);
-                            log("/pbxTable:  " + JSON.stringify(obj.sip) + "Login after timeout " + seconds + " seconds!");
+                            log("/pbxTable: " + JSON.stringify(obj.sip) + "Login após timeout " + seconds + " segundos!");
                             Timers.clearTimeout(t);
                         }, seconds);
 
-                        var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+                        if (useMyappsStatus) {
 
-                        var isUserAvailable = presences.filter(function (presence) {
-                            return presence.src === user[0].columns.guid;
-                        });
-                        
-                        log("/pbxTable: mode Login and isUserAvailable " + JSON.stringify(isUserAvailable));
-                        log("/pbxTable: mode Login and isUserAvailable length " + isUserAvailable.length);
-                        
-                        if (isUserAvailable.length > 0 && isUserAvailable[0].presence) {
-                            var hasActivity = false;
-                            for (var i = 0; i < isUserAvailable[0].presence.length; i++) {
-                                if (isUserAvailable[0].presence[i].activity) {
-                                    hasActivity = true;
-                                    break;
+                            var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+                            if(user.length == 0) {
+                                log("/pbxTable:Login Nenhum User do PBX encontrado para " + obj.sip + ", mudando para online");
+                                setPresenceStatusMessage(obj.sip, '', '');
+                            }else{
+                                var isUserAvailable = presences.filter(function (presence) {
+                                    return presence.src === user[0].columns.guid;
+                                });
+                                
+                                if (isUserAvailable.length > 0 && isUserAvailable[0].presence) {
+                                    var hasActivity = false;
+                                    for (var i = 0; i < isUserAvailable[0].presence.length; i++) {
+                                        if (isUserAvailable[0].presence[i].activity) {
+                                            hasActivity = true;
+                                            break;
+                                        }
+                                    }
+                                
+                                    if (hasActivity) {
+                                        log("/pbxTable:Login User " + user[0].columns.cn + ", mudando para online");
+                                        setPresenceStatusMessage(obj.sip, '', '');
+                                    } else {
+                                        log("/pbxTable:Login User " + user[0].columns.cn + " já estava online.");
+                                    }
+                                } else {
+                                    log("/pbxTable:Login Nenhum dado de presença encontrado para " + user[0].columns.cn+ ", mudando para online");
+                                    setPresenceStatusMessage(obj.sip, '', '');
                                 }
                             }
-                        
-                            if (hasActivity) {
-                                log("/pbxTable: User " + user[0].columns.cn + ", setting presence to online");
-                                setPresenceStatusMessage(obj.sip, 'online', 'online');
-                            } else {
-                                log("/pbxTable: User " + user[0].columns.cn + " não possui activity definida.");
-                            }
                         } else {
-                            log("/pbxTable: Nenhum dado de presença encontrado para " + user[0].columns.cn);
+                            log("/pbxTable:Login Não mudar usuário " + sip +" para online pois useMyappsStatus = false");
                         }
 
                     }
@@ -677,7 +687,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         }
         if (obj.mt == "ReplicateUpdate") {
             var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
-            log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
+            log("ReplicateUpdate= Encontrado TableUser local: " + JSON.stringify(foundTableUser));
             //Vamos tentar obter o grupo do usuario que esta na tabela local
             var grps1;
             if (foundTableUser.length > 0) {
@@ -689,7 +699,6 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 grps2 = obj.columns.grps;
             }
 
-            log("ReplicateUpdate= user " + obj.columns.h323);
             if (grps1) {
                 //Obj local do usuario ja possui algum Grupo
                 for (var i = 0; i < grps1.length; i++) {
@@ -713,7 +722,28 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                                 if (sendCallEvents) {
                                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
                                                     httpClient(urlPhoneApiEvents, "PUT", msg, null);
-                                                    //setPresenceStatusMessage(obj.columns.h323, 'online', 'online'); 
+                                                    if (useMyappsStatus) {
+                                                        var isAppOpen = connectionsUser.filter(function (u) { return u.guid == obj.columns.guid });
+                                                        if(isAppOpen.length > 0) {
+                                                            log("ReplicateUpdate: Mudar usuário "+obj.columns.h323+" para online pois ele manualmente tornou disponível em uma Fila e o Wecall está aberto");
+                                                            var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+                                                            var seconds = miliSeconds * 1000
+                                                            log("ReplicateUpdate: "+seconds+" segundos para aguardar no mode Online")
+
+                                                            var t = Timers.setTimeout(function () {
+                                                                setPresenceStatusMessage(obj.columns.h323, '', '');
+                                                                log("ReplicateUpdate: " + JSON.stringify(obj.columns.h323) + "Online após timeout " + seconds + " segundos!");
+                                                                Timers.clearTimeout(t);
+                                                            }, seconds);
+                                                             
+                                                        }
+                                                        else{
+                                                            log("ReplicateUpdate: Não mudar usuário "+obj.columns.h323+" para online pois o app não está aberto");
+                                                        }
+                                            
+                                                    } else {
+                                                        log("ReplicateUpdate: Não mudar usuário " + obj.columns.h323 +" para online pois useMyappsStatus = false");
+                                                    }
                                                 }
                                                 break;
                                         }
@@ -751,7 +781,26 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                 if (sendCallEvents) {
                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
                                     httpClient(urlPhoneApiEvents, "PUT", msg, null);
-                                    //setPresenceStatusMessage(obj.columns.h323, 'online', 'online'); 
+                                    if (useMyappsStatus) {
+                                        var isAppOpen = connectionsUser.filter(function (u) { return u.guid == obj.columns.guid });
+                                        if(isAppOpen.length > 0) {
+                                            log("ReplicateUpdate: Mudar usuário "+obj.columns.h323+" para online pois ele manualmente tornou disponível em uma Fila e o Wecall está aberto");
+                                            var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+                                            var seconds = miliSeconds * 1000
+                                            log("ReplicateUpdate: "+seconds+" segundos para aguardar no mode Online")
+
+                                            var t = Timers.setTimeout(function () {
+                                                setPresenceStatusMessage(obj.columns.h323, '', '');
+                                                log("ReplicateUpdate: " + JSON.stringify(obj.columns.h323) + "Online após timeout " + seconds + " segundos!");
+                                                Timers.clearTimeout(t);
+                                            }, seconds);
+                                        }
+                                        else{
+                                            log("ReplicateUpdate: Não mudar usuário "+obj.columns.h323+" para online pois o app não está aberto");
+                                        }
+                                    } else {
+                                        log("ReplicateUpdate: Não mudar usuário " + obj.columns.h323 +" para online pois useMyappsStatus = false");
+                                    } 
                                 }
                                 break;
                         }
@@ -1671,9 +1720,10 @@ new PbxApi("PbxApi").onconnected(function (conn) {
     pbxApi = conn
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
+        log("PbxApi:onmessage: " + JSON.stringify(obj));
         //log("PbxApi msg: " + msg);
         if (obj.mt == "PresenceUpdate") {
-            log("handlePresenceUpdate: " + JSON.stringify(obj));
+            log("PbxApi:PresenceUpdate: " + JSON.stringify(obj));
             handlePresenceUpdate(obj);
         }
     })
@@ -1703,14 +1753,15 @@ function unsubscribePresence(obj) {
 }
 
 function setPresenceStatusMessage(sip, note, activity) {
-    log("handleSetPresenceMessage: SET PRESENCE ON :", sip +" to "+activity)
+    log("setPresenceStatusMessage: SET PRESENCE ON :", sip +" to "+activity)
     // Enviar a mensagem para a conexao PbxApi
     pbxApi.send(JSON.stringify({
         "api": "PbxApi",
         "mt": "SetPresence",
         "sip": sip,
         "activity": activity,
-        "note": note
+        "note": note,
+        "src": sip
     }));
 
 }
@@ -1793,32 +1844,32 @@ function handlePresenceUpdate(newPresenceEvent) {
         if (useMyappsStatus) {
             var isAppOpen = connectionsUser.filter(function (u) { return u.guid == src });
             if(isAppOpen.length > 0) {
-                log("handlePresenceUpdate: Remover usuário "+sip+" das Filas pois ele alterou a presença manualmente para indisponível");
+                log("handlePresenceUpdate: Remover usuário "+sip+" das Filas pois ele alterou a presença manualmente para indisponível e o Wecall está aberto");
                 logoutOnClose(sip);
             }
             else{
-                log("handlePresenceUpdate: Remover usuário "+sip+" das Filas pois ele alterou a presença manualmente para indisponível mas o app não está aberto");
+                log("handlePresenceUpdate: Não remover usuário "+sip+" das Filas pois o app não está aberto");
             }
 
         } else {
-            log("handlePresenceUpdate: Remover usuário " + sip +" das Filas pois ele alterou a presença manualmente para indisponível useMyappsStatus false");
+            log("handlePresenceUpdate: Não remover usuário " + sip +" das Filas pois useMyappsStatus = false");
         }
         
     }
-    if (oldHadManualUnavailable && !newHasManualUnavailable && !newHasWecallOnline) {
-        if (useMyappsStatus) {
-            var isAppOpen = connectionsUser.filter(function (u) { return u.guid == src });
-            if(isAppOpen.length > 0) {
-                log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível");
-                loginOnQueues(sip);
-            }
-            else {
-                log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível mas o app não está aberto");
-            }
-        } else {
-            log("handlePresenceUpdate: Adicionar usuário " + sip +" nas Filas pois ele alterou a presença manualmente para disponível useMyappsStatus false");
-        }
-    }
+    // if (oldHadOnThePhone && oldHadManualUnavailable && !newHasManualUnavailable && !newHasWecallOnline) {
+    //     if (useMyappsStatus) {
+    //         var isAppOpen = connectionsUser.filter(function (u) { return u.guid == src });
+    //         if(isAppOpen.length > 0) {
+    //             log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível");
+    //             loginOnQueues(sip);
+    //         }
+    //         else {
+    //             log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível mas o app não está aberto");
+    //         }
+    //     } else {
+    //         log("handlePresenceUpdate: Adicionar usuário " + sip +" nas Filas pois ele alterou a presença manualmente para disponível useMyappsStatus false");
+    //     }
+    // }
 
     // Atualiza ou adiciona o novo evento
     var updated = false;

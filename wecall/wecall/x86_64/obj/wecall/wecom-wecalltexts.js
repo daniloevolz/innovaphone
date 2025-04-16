@@ -56,7 +56,7 @@ Wecom.wecallTexts = {
         labelAppName: "Nome do Aplicativo",
         iptText: "...",
         labelUser: "Usuário",
-        labelChkuseMyappsStatus: "Usar a presença do Myapps para controle de Status das Filas no Wecall?"
+        labelChkuseMyappsStatus: "Tornar o usuário disponível no Myapps ao entrar e uma fila do Wecall e quando o usuário ficar indisponível no Myapps então sair das filas do Wecall?"
 
     },
     de: {
