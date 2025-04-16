@@ -150,6 +150,13 @@
       },
       {
         "cmd": "item",
+        "name": "useMyappsStatus",
+        "type": "BOOL",
+        "default": true,
+        "password": false
+      },
+      {
+        "cmd": "item",
         "name": "urlGetGroups",
         "type": "STRING",
         "default": "https://wecallsup.3sales.net/api/innovaphone/getgroups",

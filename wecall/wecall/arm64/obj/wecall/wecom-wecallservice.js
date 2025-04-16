@@ -19,6 +19,7 @@ var urlMobile = Config.urlmobile;
 var codClient = Config.CodClient;
 var codLeaveAllGroups = Config.CodLeaveAllGroups;
 var leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
+var useMyappsStatus = Config.useMyappsStatus;
 var url = Config.url;
 var urlSSO = Config.urlSSO;
 var urlGetGroups = Config.urlGetGroups;
@@ -56,6 +57,7 @@ Config.onchanged(function () {
     urlGetGroups = Config.urlGetGroups;
     codLeaveAllGroups = Config.CodLeaveAllGroups;
     leaveAllGroupsOnStatup = Config.LeaveAllGroupsOnStatup;
+    useMyappsStatus = Config.useMyappsStatus;
     licenseAppFile = Config.licenseAppFile;
     licenseInstallDate = Config.licenseInstallDate;
     secondsTimeoutLoginGrp = Config.secondsTimeoutLoginGrp;
@@ -187,7 +189,52 @@ if (license != null && license.System == true) {
                 else {
                     value = newValue;
                     req.sendResponse();
-                    pbxTableRequest(value);
+
+                    log("/pbxTable: value " + String(value));
+                    var obj = JSON.parse(String(value));
+                    var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+                    var seconds = miliSeconds * 1000
+                    log("/pbxTable: "+seconds+" seconds to wait if mode login ")
+
+                    if(obj.mode == "Login"){
+                        var t = Timers.setTimeout(function () {
+                            pbxTableRequest(obj);
+                            log("/pbxTable:  " + JSON.stringify(obj.sip) + "Login after timeout " + seconds + " seconds!");
+                            Timers.clearTimeout(t);
+                        }, seconds);
+
+                        var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+
+                        var isUserAvailable = presences.filter(function (presence) {
+                            return presence.src === user[0].columns.guid;
+                        });
+                        
+                        log("/pbxTable: mode Login and isUserAvailable " + JSON.stringify(isUserAvailable));
+                        log("/pbxTable: mode Login and isUserAvailable length " + isUserAvailable.length);
+                        
+                        if (isUserAvailable.length > 0 && isUserAvailable[0].presence) {
+                            var hasActivity = false;
+                            for (var i = 0; i < isUserAvailable[0].presence.length; i++) {
+                                if (isUserAvailable[0].presence[i].activity) {
+                                    hasActivity = true;
+                                    break;
+                                }
+                            }
+                        
+                            if (hasActivity) {
+                                log("/pbxTable: User " + user[0].columns.cn + ", setting presence to online");
+                                setPresenceStatusMessage(obj.sip, 'online', 'online');
+                            } else {
+                                log("/pbxTable: User " + user[0].columns.cn + " não possui activity definida.");
+                            }
+                        } else {
+                            log("/pbxTable: Nenhum dado de presença encontrado para " + user[0].columns.cn);
+                        }
+
+                    }
+                    else{
+                        pbxTableRequest(obj);
+                    }
                 }
             });
         }
@@ -227,14 +274,14 @@ new JsonApi("user").onconnected(function (conn) {
             log("connectionsUser:wecom-wecall");
             if (license != null && connectionsUser.length <= license.Users) {
                 if (obj.mt == "UserSession") {
-                    var foundConn = connectionsUser.filter(function (c) { return c.sip == conn.sip });
-                    if(foundConn.length>0){
-                        conn.send(JSON.stringify({ api: "user", mt: "UserSessionResultDuplicated", result: "Login duplicado! Identifiamos uma sessão já aberta no seguinte local: " + foundConn[0].sessionInfo }));
-                    }else{
+                    //var foundConn = connectionsUser.filter(function (c) { return c.sip == conn.sip });
+                    //if(foundConn.length>0){
+                    //    conn.send(JSON.stringify({ api: "user", mt: "UserSessionResultDuplicated", result: "Login duplicado! Identifiamos uma sessão já aberta no seguinte local: " + foundConn[0].sessionInfo }));
+                    //}else{
                         var session = Random.bytes(16);
                         conn.send(JSON.stringify({ api: "user", mt: "UserSessionResult", session: session }));
-                    }
-                    }
+                    //}
+                }
                 if (obj.mt == "CallHistoryEvent") {
                     log("connectionsUser:CallHistoryEvent");
                     if (sendCallHistory) {
@@ -338,14 +385,15 @@ new JsonApi("user").onconnected(function (conn) {
         log("connectionsUser:onclose: after delete conn connectionsUser.length = "+JSON.stringify(connectionsUser.length));
 
         var userHasMultiConn = connectionsUser.filter(function (c) { return c.sip == conn.sip });
-        log("connectionsUser:onclose: after delete conn user "+ conn.cn +" has " + JSON.stringify(userHasMultiConn.length) + " connections remaining");
+        log("connectionsUser:onclose: after delete conn user "+ conn.dn +" has " + JSON.stringify(userHasMultiConn.length) + " connections remaining");
         if(userHasMultiConn.length==0){
             log("connectionsUser:onclose: last connection for this user " + conn.sip);
             RCC.forEach(function (rcc) {
                 if (rcc.pbx == info.pbx) {
-                    var user = rcc[conn.sip];
-                    log("connectionsUser:onclose: calling RCC API to End user Monitor " + String(conn.cn) + " on PBX " + info.pbx + "with rccuser " + user);
-                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: conn.sip + "," + info.pbx };
+                    var src = conn.sip + "," + info.pbx;
+                    var user = rcc[src];
+                    log("connectionsUser:onclose: calling RCC API to End user Monitor " + String(conn.dn) + " on PBX " + info.pbx + " with rccuser " + user);
+                    var msg = { api: "RCC", mt: "UserEnd", user: user, src: src };
                     rcc.send(JSON.stringify(msg));
                 }
             })
@@ -355,6 +403,8 @@ new JsonApi("user").onconnected(function (conn) {
                 var msg = { User: conn.sip, Grupo: "", Callinnumber: "", Status: "logout" };
                 httpClient(urlPhoneApiEvents, "PUT", msg, null);
             }
+            //Usuario fechou o Wecall, removemos as chamadas em andamento deste usuario
+            calls = calls.filter(function (c) { return c.sip != conn.sip });
         }
     });
 });
@@ -450,6 +500,10 @@ new JsonApi("admin").onconnected(function (conn) {
                 }
                 if (obj.prt == "leaveGroupsStartup") {
                     Config.LeaveAllGroupsOnStatup = obj.vl;
+                    Config.save();
+                }
+                if (obj.prt == "useMyappsStatus") {
+                    Config.useMyappsStatus = obj.vl;
                     Config.save();
                 }
                 if (obj.prt == "urlDashboard") {
@@ -614,16 +668,27 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         if (obj.mt == "ReplicateNextResult" && obj.columns) {
             pbxTableUsers.push(obj)
             conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
+            subscribePresence(obj)
         }
 
         if (obj.mt == "ReplicateAdd") {
             pbxTableUsers.push(obj);
+            subscribePresence(obj)
         }
         if (obj.mt == "ReplicateUpdate") {
             var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
             log("ReplicateUpdate= foundTableUser " + JSON.stringify(foundTableUser));
-            var grps1 = foundTableUser[0].columns.grps;
-            var grps2 = obj.columns.grps;
+            //Vamos tentar obter o grupo do usuario que esta na tabela local
+            var grps1;
+            if (foundTableUser.length > 0) {
+                grps1 = foundTableUser[0].columns.grps;
+            }
+            //Vamos tentar obter o grupo do usuario que esta na tabela do PBX
+            var grps2;
+            if(obj.columns.grps){
+                grps2 = obj.columns.grps;
+            }
+
             log("ReplicateUpdate= user " + obj.columns.h323);
             if (grps1) {
                 //Obj local do usuario ja possui algum Grupo
@@ -634,6 +699,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                             for (var j = 0; j < grps2.length; j++) {
                                 if (grps1[i].name === grps2[j].name) {
                                     if (grps1[i].dyn === grps2[j].dyn) {
+                                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence for group " + grps2[j].name + " not chaged!!!");
                                     } else {
                                         log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed for group " + grps2[j].name + "!!!");
                                         switch (grps2[j].dyn) {
@@ -647,6 +713,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                                 if (sendCallEvents) {
                                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
                                                     httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                                                    //setPresenceStatusMessage(obj.columns.h323, 'online', 'online'); 
                                                 }
                                                 break;
                                         }
@@ -672,7 +739,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 log("ReplicateUpdate= user " + obj.columns.h323 + " stored on app has no grups at this moment and new presence received from pbx!!!");
                 if (grps2) {
                     for (var j = 0; j < grps2.length; j++) {
-                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed from PBX for group " + grps1[j].name);
+                        log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed from PBX for group " + grps2[j].name);
                         switch (grps2[j].dyn) {
                             case "out":
                                 if (sendCallEvents) {
@@ -684,6 +751,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                 if (sendCallEvents) {
                                     var msg = { User: obj.columns.h323, Grupo: grps2[j].name, Callinnumber: "", Status: "grp_login" };
                                     httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                                    //setPresenceStatusMessage(obj.columns.h323, 'online', 'online'); 
                                 }
                                 break;
                         }
@@ -691,7 +759,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 }
             }
             
-            var found;
+            var found = false;
             pbxTableUsers.forEach(function (user) {
                 if (user.columns.guid == obj.columns.guid) {
                     log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
@@ -703,11 +771,11 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 log("ReplicateUpdate: Adding the object user " + obj.columns.h323+" because it not exists here before");
                 pbxTableUsers.push(obj);
             }
-
         }
 
         if (obj.mt == "ReplicateDel") {
             pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+            unsubscribePresence(obj)
         }
     });
 
@@ -1596,6 +1664,177 @@ new PbxApi("RCC").onconnected(function (conn) {
     });
 });
 
+var pbxApi;
+var presences = [];
+new PbxApi("PbxApi").onconnected(function (conn) {
+    log("PbxApi conectada", conn)
+    pbxApi = conn
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+        //log("PbxApi msg: " + msg);
+        if (obj.mt == "PresenceUpdate") {
+            log("handlePresenceUpdate: " + JSON.stringify(obj));
+            handlePresenceUpdate(obj);
+        }
+    })
+
+    conn.onclose(function () {
+        pbxApi = {}
+        log("PbxApi: disconnected");
+    });
+});
+
+function subscribePresence(obj) {
+    pbxApi.send(JSON.stringify({
+        "api": "PbxApi",
+        "mt": "SubscribePresence",
+        "sip": obj.columns.h323,
+        "src": obj.columns.guid
+    }));
+}
+
+function unsubscribePresence(obj) {
+    pbxApi.send(JSON.stringify({
+        "api": "PbxApi",
+        "mt": "UnsubscribePresence",
+        "sip": obj.columns.h323,
+        "src": obj.columns.guid
+    }));
+}
+
+function setPresenceStatusMessage(sip, note, activity) {
+    log("handleSetPresenceMessage: SET PRESENCE ON :", sip +" to "+activity)
+    // Enviar a mensagem para a conexao PbxApi
+    pbxApi.send(JSON.stringify({
+        "api": "PbxApi",
+        "mt": "SetPresence",
+        "sip": sip,
+        "activity": activity,
+        "note": note
+    }));
+
+}
+
+function handlePresenceUpdate(newPresenceEvent) {
+    log("handlePresenceUpdate: " + JSON.stringify(newPresenceEvent));
+    var src = newPresenceEvent.src;
+    var newPresenceList = newPresenceEvent.presence;
+
+    // Buscar evento anterior
+    var oldPresenceEvent = null;
+    for (var i = 0; i < presences.length; i++) {
+        if (presences[i].src === src) {
+            oldPresenceEvent = presences[i];
+            break;
+        }
+    }
+
+    // Flags do estado anterior
+    var oldHadOnThePhone = false;
+    var oldHadAnyActivity = false;
+    var oldHadManualUnavailable = false;
+    var oldHadWecallOnline = false;
+
+    if (oldPresenceEvent) {
+        var oldPresenceList = oldPresenceEvent.presence;
+        for (var i = 0; i < oldPresenceList.length; i++) {
+            var act = oldPresenceList[i].activity;
+            var oldNote = oldPresenceList[i].note;
+            if (act) {
+                oldHadAnyActivity = true;
+                if (act === "on-the-phone") {
+                    oldHadOnThePhone = true;
+                }
+                if (act === "busy" || act === "away" || act === "dnd") {
+                    oldHadManualUnavailable = true;
+                }
+            }
+            if(oldNote=="online"){
+                oldHadWecallOnline = true;
+            }
+        }
+    }
+
+    var sip = pbxTableUsers.filter(function (u) { return u.columns.guid == src })[0].columns.h323;
+
+    log("handlePresenceUpdate: User "+sip+" oldHadOnThePhone " + oldHadOnThePhone)
+    log("handlePresenceUpdate: User "+sip+" oldHadAnyActivity " + oldHadAnyActivity)
+    log("handlePresenceUpdate: User "+sip+" oldHadManualUnavailable " + oldHadManualUnavailable)
+    log("handlePresenceUpdate: User "+sip+" oldHadWecallOnline " + oldHadWecallOnline)
+    // Flags do novo estado
+    var newHasOnThePhone = false;
+    var newHasManualUnavailable = false;
+    var newHasWecallOnline = false;
+
+    for (var i = 0; i < newPresenceList.length; i++) {
+        var newAct = newPresenceList[i].activity;
+        var newNote = newPresenceList[i].note;
+        if (newAct === "on-the-phone") {
+            newHasOnThePhone = true;
+        }
+        if (newAct === "busy" || newAct === "away" || newAct === "dnd") {
+            newHasManualUnavailable = true;
+        }
+        if(newNote=="online"){
+            newHasWecallOnline = true;
+        }
+    }
+
+    log("handlePresenceUpdate: User "+sip+" newHasOnThePhone " + newHasOnThePhone)
+    log("handlePresenceUpdate: User "+sip+" newHasManualUnavailable " + newHasManualUnavailable)
+    log("handlePresenceUpdate: User "+sip+" newHasWecallOnline " + newHasWecallOnline)
+    
+    // Regra FINAL: antes só on-the-phone ou nada, agora sem on-the-phone mas com busy/away/dnd
+    if ((!oldHadOnThePhone || !oldHadAnyActivity) && 
+    !oldHadManualUnavailable && 
+    !newHasOnThePhone && 
+    newHasManualUnavailable) {
+        
+        if (useMyappsStatus) {
+            var isAppOpen = connectionsUser.filter(function (u) { return u.guid == src });
+            if(isAppOpen.length > 0) {
+                log("handlePresenceUpdate: Remover usuário "+sip+" das Filas pois ele alterou a presença manualmente para indisponível");
+                logoutOnClose(sip);
+            }
+            else{
+                log("handlePresenceUpdate: Remover usuário "+sip+" das Filas pois ele alterou a presença manualmente para indisponível mas o app não está aberto");
+            }
+
+        } else {
+            log("handlePresenceUpdate: Remover usuário " + sip +" das Filas pois ele alterou a presença manualmente para indisponível useMyappsStatus false");
+        }
+        
+    }
+    if (oldHadManualUnavailable && !newHasManualUnavailable && !newHasWecallOnline) {
+        if (useMyappsStatus) {
+            var isAppOpen = connectionsUser.filter(function (u) { return u.guid == src });
+            if(isAppOpen.length > 0) {
+                log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível");
+                loginOnQueues(sip);
+            }
+            else {
+                log("handlePresenceUpdate: Adicionar usuário " + sip + " nas Filas pois ele alterou a presença manualmente para disponível mas o app não está aberto");
+            }
+        } else {
+            log("handlePresenceUpdate: Adicionar usuário " + sip +" nas Filas pois ele alterou a presença manualmente para disponível useMyappsStatus false");
+        }
+    }
+
+    // Atualiza ou adiciona o novo evento
+    var updated = false;
+    for (var i = 0; i < presences.length; i++) {
+        if (presences[i].src === src) {
+            presences[i] = newPresenceEvent;
+            updated = true;
+            break;
+        }
+    }
+    if (!updated) {
+        presences.push(newPresenceEvent);
+    }
+}
+
+
 //Helper functions
 //Return Date String
 function getDateNow() {
@@ -1659,14 +1898,15 @@ function updateConfigUsers() {
             sLS: leaveAllGroupsOnStatup,
             secondsTimeoutLoginGrp: secondsTimeoutLoginGrp,
             prefOutgoingCall: prefOutgoingCall,
-            localDDDToRemove: localDDDToRemove
+            localDDDToRemove: localDDDToRemove,
+            useMyappsStatus: useMyappsStatus
         }));
     });
 }
 //Function called by WebServer.onrequest("badge")
 function badgeRequest2(value) {
 
-    log("danilo-req badge2:value " + JSON.stringify(value));
+    //log("danilo-req badge2:value " + JSON.stringify(value));
     var obj = JSON.parse(value);
 
     obj.listuser.forEach(function (user) {
@@ -1674,34 +1914,6 @@ function badgeRequest2(value) {
         
         try {
             updateBadge(user.user, user.num)
-            // var count = 0;
-
-            // PbxSignal.forEach(function (signal) {
-            //     log("danilo-req badge2: signal" + JSON.stringify(signal));
-            //     //var call = signal[obj.sip];
-            //     //Teste Danilo 20/07:
-            //     var foundCalls = [];
-            //     for (var key in signal) {
-            //         if (Object.prototype.hasOwnProperty.call(signal, key) && signal[key] == user.user) {
-            //             foundCalls.push(key);
-            //         }
-            //     }
-            //     //
-            //     log("danilo-req: badge2:call = " + foundCalls);
-            //     if (foundCalls.length > 0) {
-            //         log("danilo-req badge2 call " + foundCalls + ", will call updateBadge");
-            //         try {
-            //             foundCalls.forEach(function (call) {
-            //                 updateBadge(signal, parseInt(call, 10), user.num);
-            //             })
-
-            //         } catch (e) {
-            //             log("danilo-req badge2: User " + user.user + " Erro " + e)
-            //         }
-            //     }
-
-            // })
-
         }
         catch (e) {
             log("danilo req: erro send badge: " + e);
@@ -1727,7 +1939,7 @@ function updateBadge(sip, count) {
                 var entry = PbxSignalUsers[pbx];
                 entry.forEach(function (e) {
                     if (e.sip == sip) {
-                        log('danilo-req updateBadge: PBX:', pbx, ', Call:', e.call, ', Sip:', e.sip);
+                        //log('danilo-req updateBadge: PBX:', pbx, ', Call:', e.call, ', Sip:', e.sip, ', Count:', count);
                         var signal = PbxSignal.filter(function (item) {
                             return item.pbx === pbx;
                         })[0];
@@ -1754,33 +1966,91 @@ function updateBadge(sip, count) {
 //Função chamada quando o usuário disconecta da RCC
 function logoutOnClose(sip) {
     log("logoutOnClose: sip " + String(sip));
-    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip });
+    //var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip });
+    log("logoutOnClose: pbxTableUsers lenght " + JSON.stringify(pbxTableUsers.length));
 
-    if (user[0].columns.grps) {
-        log("logoutOnClose: User " + JSON.stringify(user[0].columns.cn) +" contem colunms.grps" + JSON.stringify(user[0].columns));
+    var found = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip });
+    var user = found.length > 0 ? JSON.parse(JSON.stringify(found[0])) : null;
+    log("logoutOnClose: User " + JSON.stringify(user.columns.cn));
+
+    if (user && user.columns.grps) {
+        log("logoutOnClose: User " + JSON.stringify(user.columns.cn) +" contem colunms.grps" + JSON.stringify(user.columns));
         // Altera o status do Grupo para 'out'
-        user[0].columns.grps.forEach(function (grp) {
-            log("logoutOnClose: User " + JSON.stringify(user[0].columns.cn) +" has Group founded, changing presence")
-            grp["dyn"] = "out";
+        user.columns.grps.forEach(function (grp) {
+            var isWecallQueue = queues.filter(function (queue) { return queue.Fila === grp.name });
+            if (isWecallQueue.length > 0) {
+                log("logoutOnClose: User " + JSON.stringify(user.columns.cn) +" has Group founded, changing presence to out" + JSON.stringify(grp));
+                grp["dyn"] = "out";
+            }else{
+                log("logoutOnClose: User " + JSON.stringify(user.columns.cn) +" has Group founded, but not a WECALL Queue" + JSON.stringify(grp));
+            }
+
+
         })
         // Envia a atualização para o PBX
         if (pbxTable.length > 0) {
-            user[0].mt = "ReplicateUpdate";
-            log("logoutOnClose: Update user " + JSON.stringify(user[0].columns.cn) + " on PBX " + JSON.stringify(user[0].src));
-            pbxTable[0].send(JSON.stringify(user[0]));
+            user.mt = "ReplicateUpdate";
+            log("logoutOnClose: Update user " + JSON.stringify(user.columns.cn) + " on PBX " + JSON.stringify(user.src)+" with groups " + JSON.stringify(user.columns.grps));
+            pbxTable[0].send(JSON.stringify(user));
         } else {
             log("logoutOnClose: User " + sip +", no PBX connection");
         }
 
+        //Aguardamos o evento do PBX para atualizar o objeto pois ainda nao sabemos se realmente foi aceito o comando
         // Retorna a Lista para "NextResult" como inicialmente recebido do PBX
-        pbxTableUsers.forEach(function (u) {
-            if (u.columns.h323 == user[0].columns.h323) {
-                user[0].mt = "ReplicateNextResult";
-                Object.assign(u, user[0])
-                log("logoutOnClose: pbxTableUsers list updated for user " + JSON.stringify(user[0].columns.cn));
-            }
-        })
+        // pbxTableUsers.forEach(function (u) {
+        //     if (u.columns.h323 == user[0].columns.h323) {
+        //         user[0].mt = "ReplicateNextResult";
+        //         Object.assign(u, user[0])
+        //         log("logoutOnClose: pbxTableUsers list updated for user " + JSON.stringify(user[0].columns.cn));
+        //     }
+        // })
 
+    }else{
+        log("logoutOnClose: User " + sip +", PBXTableUsers not founded");
+    }
+
+}
+
+//Função chamada quando o usuário fica Disponpivel no Myapps e useMyappsStatus=true
+function loginOnQueues(sip) {
+    log("loginOnQueues: sip " + String(sip));
+    var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip })[0];
+    log("loginOnQueues: pbxTableUsers lenght " + JSON.stringify(pbxTableUsers.length));
+
+    //var found = pbxTableUsers.filter(function (user) { return user.columns.h323 === sip });
+    //var user = found.length > 0 ? JSON.parse(JSON.stringify(found[0])) : null;
+    log("loginOnQueues: User " + JSON.stringify(user.columns.cn));
+
+    if (user && user.columns.grps) {
+        log("loginOnQueues: User " + JSON.stringify(user.columns.cn) + " contem colunms.grps" + JSON.stringify(user.columns));
+        // Altera o status do Grupo para 'out'
+        user.columns.grps.forEach(function (grp) {
+            var isWecallQueue = queues.filter(function (queue) { return queue.Fila === grp.name });
+            if (isWecallQueue.length > 0) {
+                log("loginOnQueues: User " + JSON.stringify(user.columns.cn) + " has Group founded, changing presence to in " + JSON.stringify(grp));
+                grp["dyn"] = "in";
+                if (sendCallEvents) {
+                    var msg = { User: user.columns.h323, Grupo: grp.name, Callinnumber: "", Status: "grp_login" };
+                    httpClient(urlPhoneApiEvents, "PUT", msg, null);
+                }
+            } else {
+                log("loginOnQueues: User " + JSON.stringify(user.columns.cn) + " has Group founded, but not a WECALL Queue " + JSON.stringify(grp));
+            }
+
+
+        })
+        // Envia a atualização para o PBX
+        if (pbxTable.length > 0) {
+            user.mt = "ReplicateUpdate";
+            log("loginOnQueues: Update user " + JSON.stringify(user.columns.cn) + " on PBX " + JSON.stringify(user.src) + " with groups " + JSON.stringify(user.columns.grps));
+            pbxTable[0].send(JSON.stringify(user));
+        } else {
+            log("loginOnQueues: User " + sip + ", no PBX connection");
+        }
+
+    } else {
+        log("loginOnQueues: User " + sip + ", PBXTableUsers not founded");
     }
 
 }
@@ -2164,21 +2434,22 @@ function rccRequest2(value) {
     }
 }
 //Function called by WebServer.onrequest("pbxTable")
-function pbxTableRequest(value) {
-    log("pbxTableRequest: value " + String(value));
-    var obj = JSON.parse(String(value));
+function pbxTableRequest(obj) {
+    
     var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+
+    //var foundUser = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+    //var user = foundUser.length > 0 ? JSON.parse(JSON.stringify(foundUser[0])) : null;
+
     var found = false;
-    var miliSeconds = parseInt(secondsTimeoutLoginGrp)
-    var seconds = miliSeconds * 1000
-    log("pbxTableRequest: seconds to wait if mode login "+seconds)
+    
 
     if (user[0].columns.grps) {
-        log("pbxTableRequest: User Object " + user[0].columns.cn +" contem colunms.grps" + JSON.stringify(user[0].columns));
+        log("pbxTableRequest: User Object " + user[0].columns.cn +" contem colunms.grps" + JSON.stringify(user[0].columns.grps));
         user[0].columns.grps.forEach(function (grp) {
             if (grp.name == obj.group) {
                 found = true;
-                log("pbxTableRequest: User Object " + user[0].columns.cn + ", Group " + grp.name + " founded, changing presence")
+                log("pbxTableRequest: User Object " + user[0].columns.cn + ", Group " + grp.name + " founded, changing presence to " + obj.mode);
                 if (obj.mode == "Login") {
                     grp["dyn"] = "in";
                 }
@@ -2193,25 +2464,20 @@ function pbxTableRequest(value) {
             if (obj.mode == "Login") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "in" })
 
-
-                var t = Timers.setTimeout(function () {
-                    if (pbxTable.length > 0) {
-                        user[0].mt = "ReplicateUpdate";
-                        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on PBX " + JSON.stringify(user[0].src));
-                        pbxTable[0].send(JSON.stringify(user[0]));
-                    } else {
-                        log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                    }
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " after timeout " + seconds + " seconds!");
-                    Timers.clearTimeout(t);
-                }, seconds);
+                if (pbxTable.length > 0) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+                    pbxTable[0].send(JSON.stringify(user[0]));
+                } else {
+                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+                }
             }
             if (obj.mode == "Logout") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "out" })
 
                 if (pbxTable.length > 0) {
                     user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode+" on PBX " + JSON.stringify(user[0].src));
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
                     pbxTable[0].send(JSON.stringify(user[0]));
                 } else {
                     log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
@@ -2220,24 +2486,20 @@ function pbxTableRequest(value) {
         }
         else {
             if (obj.mode == "Login") {
-                var t = Timers.setTimeout(function () {
-                    if (pbxTable.length > 0) {
-                        user[0].mt = "ReplicateUpdate";
-                        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on PBX " + JSON.stringify(user[0].src));
-                        pbxTable[0].send(JSON.stringify(user[0]));
-                    } else {
-                        log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                    }
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " after timeout " + seconds +" seconds!");
-                    Timers.clearTimeout(t);
-                }, seconds);
+                if (pbxTable.length > 0) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+                    pbxTable[0].send(JSON.stringify(user[0]));
+                } else {
+                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+                }
             }
             if (obj.mode == "Logout") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "out" })
 
                 if (pbxTable.length > 0) {
                     user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on PBX " + JSON.stringify(user[0].src));
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
                     pbxTable[0].send(JSON.stringify(user[0]));
                 } else {
                     log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
@@ -2245,15 +2507,6 @@ function pbxTableRequest(value) {
             }
 
         }
-
-        //Retorna a Lista para "NextResult" como inicialmente recebido do PBX
-        pbxTableUsers.forEach(function (u) {
-            if (u.columns.h323 == user[0].columns.h323) {
-                user[0].mt = "ReplicateNextResult";
-                Object.assign(u, user[0])
-                log("pbxTableRequest: pbxTableUsers list updated for user " + JSON.stringify(user[0].columns.cn));
-            }
-        })
 
     }
     else {
@@ -2271,17 +2524,13 @@ function pbxTableRequest(value) {
             user[0].columns.grps.push({ name: obj.group, dyn: "in" })
 
 
-            var t = Timers.setTimeout(function () {
-                pbxTable.forEach(function (conn) {
-                    if (conn.pbx == user[0].src) {
-                        user[0].mt = "ReplicateUpdate";
-                        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on PBX " + JSON.stringify(user[0].src));
-                        conn.send(JSON.stringify(user[0]));
-                    }
-                })
-                log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " after timeout " + seconds + " seconds!");
-                Timers.clearTimeout(t);
-            }, seconds);
+            pbxTable.forEach(function (conn) {
+                if (conn.pbx == user[0].src) {
+                    user[0].mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+                    conn.send(JSON.stringify(user[0]));
+                }
+            })
 
         }
         if (obj.mode == "Logout") {
@@ -2299,22 +2548,201 @@ function pbxTableRequest(value) {
             pbxTable.forEach(function (conn) {
                 if (conn.pbx == user[0].src) {
                     user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on PBX " + JSON.stringify(user[0].src));
+                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
                     conn.send(JSON.stringify(user[0]));
+                }
+            })
+        }
+    }
+}
+function pbxTableRequestObject(value) {
+    log("pbxTableRequest: value " + String(value));
+    var obj = JSON.parse(String(value));
+    //var user = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+
+    var found = pbxTableUsers.filter(function (user) { return user.columns.h323 === obj.sip });
+    var user = found.length > 0 ? JSON.parse(JSON.stringify(found[0])) : null;
+
+    var found = false;
+    var miliSeconds = parseInt(secondsTimeoutLoginGrp)
+    var seconds = miliSeconds * 1000
+    log("pbxTableRequest: seconds to wait if mode login "+seconds)
+
+    if (user.columns.grps) {
+        log("pbxTableRequest: User Object " + user.columns.cn +" contem colunms.grps" + JSON.stringify(user.columns.grps));
+        user.columns.grps.forEach(function (grp) {
+            if (grp.name == obj.group) {
+                found = true;
+                log("pbxTableRequest: User Object " + user.columns.cn + ", Group " + grp.name + " founded, changing presence to " + obj.mode);
+                if (obj.mode == "Login") {
+                    grp["dyn"] = "in";
+                }
+                if (obj.mode == "Logout") {
+                    grp["dyn"] = "out";
+                }
+            }
+
+        })
+        if (!found) {
+            log("pbxTableRequest: User Object " + user.columns.cn + ", Group " + obj.group + " not founded including it");
+            if (obj.mode == "Login") {
+                user.columns.grps.push({ name: obj.group, dyn: "in" })
+
+
+                var t = Timers.setTimeout(function () {
+                    if (pbxTable.length > 0) {
+                        user.mt = "ReplicateUpdate";
+                        log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                        pbxTable[0].send(JSON.stringify(user));
+                    } else {
+                        log("pbxTableRequest: User Object " + user.columns.cn + " no PBX connection");
+                    }
+                    log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " after timeout " + seconds + " seconds!");                    
+                    Timers.clearTimeout(t);
+                }, seconds);
+            }
+            if (obj.mode == "Logout") {
+                user.columns.grps.push({ name: obj.group, dyn: "out" })
+
+                if (pbxTable.length > 0) {
+                    user.mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                    pbxTable[0].send(JSON.stringify(user));
+                } else {
+                    log("pbxTableRequest: User Object " + user.columns.cn + " no PBX connection");
+                }
+            }
+        }
+        else {
+            if (obj.mode == "Login") {
+                var t = Timers.setTimeout(function () {
+                    if (pbxTable.length > 0) {
+                        user.mt = "ReplicateUpdate";
+                        log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                        pbxTable[0].send(JSON.stringify(user));
+                    } else {
+                        log("pbxTableRequest: User Object " + user.columns.cn + " no PBX connection");
+                    }
+                    log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " after timeout " + seconds +" seconds!");
+                    Timers.clearTimeout(t);
+                }, seconds);
+            }
+            if (obj.mode == "Logout") {
+                user.columns.grps.push({ name: obj.group, dyn: "out" })
+
+                if (pbxTable.length > 0) {
+                    user.mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                    pbxTable[0].send(JSON.stringify(user));
+                } else {
+                    log("pbxTableRequest: User Object " + user.columns.cn + " no PBX connection");
+                }
+            }
+
+        }
+
+
+        //Retorna a Lista para "NextResult" como inicialmente recebido do PBX
+        //pbxTableUsers.forEach(function (u) {
+        //    if (u.columns.h323 == user.columns.h323) {
+        //        user.mt = "ReplicateNextResult";
+        //        Object.assign(u, user)
+        //        log("pbxTableRequest: pbxTableUsers list updated for user " + JSON.stringify(user.columns.cn));
+        //    }
+        //})
+
+    }
+    else {
+        log("pbxTableRequest: User Object " + user.columns.cn +" nno contem colunms.grps" + JSON.stringify(user.columns));
+        if (obj.mode == "Login") {
+            //user.columns.grps = [];
+            //user.columns.grps.push({ name: obj.group, dyn: "in" })
+            const grps = [
+                //{
+                //    "name": obj.group,
+                //    "dyn": "in"
+                //}
+            ];
+            user.columns.grps = grps;
+            user.columns.grps.push({ name: obj.group, dyn: "in" })
+
+
+            var t = Timers.setTimeout(function () {
+                pbxTable.forEach(function (conn) {
+                    if (conn.pbx == user.src) {
+                        user.mt = "ReplicateUpdate";
+                        log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                        conn.send(JSON.stringify(user));
+                    }
+                })
+                log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " after timeout " + seconds + " seconds!");
+                Timers.clearTimeout(t);
+            }, seconds);
+
+        }
+        if (obj.mode == "Logout") {
+            //user.columns.grps = [];
+            //user.columns.grps.push({ name: obj.group, dyn: "out" })
+            const grps = [
+                //{
+                //    "name": obj.group,
+                //    "dyn": "out"
+                //}
+            ];
+            user.columns.grps = grps;
+            user.columns.grps.push({ name: obj.group, dyn: "out" })
+
+            pbxTable.forEach(function (conn) {
+                if (conn.pbx == user.src) {
+                    user.mt = "ReplicateUpdate";
+                    log("pbxTableRequest: Update user " + JSON.stringify(user.columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user.src));
+                    conn.send(JSON.stringify(user));
                 }
             })
         }
 
         //Retorna a Lista para "NextResult" como inicialmente recebido do PBX
-        pbxTableUsers.forEach(function (u) {
-            if (u.columns.h323 == user[0].columns.h323) {
-                user[0].mt = "ReplicateNextResult";
-                Object.assign(u, user[0])
-                log("pbxTableRequest: pbxTableUsers list updated for user " + JSON.stringify(user[0].columns.cn));
-            }
-        })
+        //pbxTableUsers.forEach(function (u) {
+        //    if (u.columns.h323 == user.columns.h323) {
+        //        user.mt = "ReplicateNextResult";
+        //        Object.assign(u, user)
+        //        log("pbxTableRequest: pbxTableUsers list updated for user " + JSON.stringify(user.columns.cn));
+        //    }
+        //})
 
     }
+
+
+    
+    // if (obj.mode == "Login") {
+
+    //     var isUserAvailable = presences.filter(function (presence) {
+    //         return presence.src === user.columns.guid;
+    //     });
+        
+    //     log("pbxTableRequest: isUserAvailable " + JSON.stringify(isUserAvailable));
+    //     log("pbxTableRequest: isUserAvailable length " + isUserAvailable.length);
+        
+    //     if (isUserAvailable.length > 0 && isUserAvailable[0].presence) {
+    //         var hasActivity = false;
+    //         for (var i = 0; i < isUserAvailable[0].presence.length; i++) {
+    //             if (isUserAvailable[0].presence[i].activity) {
+    //                 hasActivity = true;
+    //                 break;
+    //             }
+    //         }
+        
+    //         if (hasActivity) {
+    //             log("pbxTableRequest: User " + user.columns.cn + ", setting presence to online");
+    //             setPresenceStatusMessage(obj.sip, 'online', 'online');
+    //         } else {
+    //             log("pbxTableRequest: User " + user.columns.cn + " não possui activity definida.");
+    //         }
+    //     } else {
+    //         log("pbxTableRequest: Nenhum dado de presença encontrado para " + user.columns.cn);
+    //     }
+        
+    // }
 }
 
 function httpClient(url, method, msg, callback) {

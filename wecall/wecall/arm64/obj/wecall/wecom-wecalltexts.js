@@ -55,7 +55,8 @@ Wecom.wecallTexts = {
         btnCancel: "Voltar",
         labelAppName: "Nome do Aplicativo",
         iptText: "...",
-        labelUser:"Usuário"
+        labelUser: "Usuário",
+        labelChkuseMyappsStatus: "Usar a presença do Myapps para controle de Status das Filas no Wecall?"
 
     },
     de: {

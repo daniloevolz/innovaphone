@@ -143,11 +143,18 @@ Wecom.wecall = Wecom.wecall || function (start, args) {
                 var bodyIframe = that.add(new innovaphone.ui1.Node("iframe", "position:fixed; top:0px; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;", null, "iframebody"));
                 var larguraDoNavegador = window.innerWidth;
                 if (larguraDoNavegador < 1000) {
-                    bodyIframe.setAttribute("src", obj.urlM);
+                    bodyIframe.setAttribute("src", obj.src);
                 } else {
                     bodyIframe.setAttribute("src", obj.src);
                 }
-                
+                //Ocultar a presença do MyApps
+                var result = document.evaluate("/html/body/div[3]/header[2]/button[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                var el = result.singleNodeValue;
+                if (el) {
+                    el.style.setProperty("display", "none", "important");
+                }
+
+
             } 
         }
         if (obj.api == "user" && obj.mt == "DevicesList") {
