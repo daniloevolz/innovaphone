@@ -43,6 +43,25 @@ new JsonApi("user").onconnected(function (conn) {
             if (obj.mt == "UserDisconnect") {
                 Database.exec("DELETE FROM tbl_tokens WHERE guid = '" + conn.guid + "';")
                     .oncomplete(function (data) {
+
+                        //Deletar o Timer
+                        // Verificar se ja existe um timer para esse 'guid'
+                        var existingTimer = timers.filter(function (timerObj) {
+                            return timerObj.guid === conn.guid;
+                        })[0];
+                        log("UserDisconnect:existingTimer? " + JSON.stringify(existingTimer))
+
+
+                        // Se existir um timer, limpar o timer anterior
+                        if (existingTimer) {
+                            Timers.clearTimeout(existingTimer.timer);
+                            log("UserDisconnect:Timer anterior para o guid " + conn.guid + " foi limpo.");
+                        } else {
+                            // Se nao existir, criar um novo timer para esse 'guid'
+                            log("UserDisconnect:Timer nao existe para o guid")
+                            
+                        }
+
                         conn.send(JSON.stringify({ api: "user", mt: "UserDisconnectResult", src: obj.src }));
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
@@ -601,7 +620,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
     }
 
     // Criar o novo timer e armazena-lo
-    existingTimer.timer = Timers.setTimeout(function () {
+    existingTimer.timer = Timers.setInterval(function () {
 
         Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + guid + "';")
             .oncomplete(function (data) {
