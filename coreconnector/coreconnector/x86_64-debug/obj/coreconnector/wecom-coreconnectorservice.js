@@ -31,7 +31,8 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     if (pbxTable.length == 0) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
-        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
+        conn.send(JSON.stringify({
+            "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": ["", "vm", "trunk"], "src": conn.pbx }));
 
     }
     conn.onmessage(function (msg) {
