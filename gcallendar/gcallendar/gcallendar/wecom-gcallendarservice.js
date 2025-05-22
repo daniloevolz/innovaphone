@@ -102,9 +102,9 @@ new JsonApi("user").onconnected(function (conn) {
     }
 });
 
-new JsonApi("admin").onconnected(function(conn) {
+new JsonApi("admin").onconnected(function (conn) {
     if (conn.app == "wecom-gcallendaradmin") {
-        conn.onmessage(function(msg) {
+        conn.onmessage(function (msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
                 var info = JSON.parse(conn.info)
@@ -364,7 +364,7 @@ WebServer.onrequest("newToken", function (req) {
     if (req.method == "GET") {
         // Extrair a URL completa
         var fullUrl = req.relativeUri;
-        log('newToken relativeUri===='+fullUrl)
+        log('newToken relativeUri====' + fullUrl)
         // Funcao para extrair o valor de um parametro especifico da URL
         function getQueryParam(url, param) {
             var queryString = url.split('?')[1]; // Pega a parte depois do '?'
@@ -398,7 +398,7 @@ WebServer.onrequest("newToken", function (req) {
             newToken(guidValue, body, function (err, token) {
                 if (err) {
 
-                    responseMessage = 'Error:'+err;
+                    responseMessage = 'Error:' + err;
                     req.responseContentType("txt")
                         .sendResponse()
                         .onsend(function (req) {
@@ -421,7 +421,7 @@ WebServer.onrequest("newToken", function (req) {
                         });
                     return;
                 }
-            })    
+            })
         } else {
             // Se nao encontrou o 'code', retorna um 404
             req.cancel();
@@ -437,7 +437,7 @@ var i = Timers.setInterval(function () {
         if (err) {
             log('INTERVAL:Erro ao obter tokens from db: ' + err);
         } else {
-            log('INTERVAL:tokens from DB:'+JSON.stringify(data));
+            log('INTERVAL:tokens from DB:' + JSON.stringify(data));
             if (data.length > 0) {
                 data.forEach(function (item) {
                     log("INTERVAL:item: ", JSON.stringify(item))
@@ -451,7 +451,7 @@ var i = Timers.setInterval(function () {
                             for (var i = 0; i < meetings.length; i++) {
                                 var meeting = meetings[i];
                                 log('INTERVAL:===========MEETING============Titulo: ' + meeting.summary);
-                                
+
                                 var startDateTime = new Date(meeting.start.dateTime);
                                 var endDateTime = new Date(meeting.end.dateTime);
                                 log('INTERVAL:Inicio: ' + startDateTime);
@@ -497,7 +497,7 @@ var i = Timers.setInterval(function () {
                                     isUserInMeeting = true;
                                     log('INTERVAL: users: in_meeting_now ' + JSON.stringify(in_meeting_now));
                                     break;
-                                } 
+                                }
                             }
                             if (!isUserInMeeting) {
 
@@ -549,7 +549,7 @@ function getTokensFromTable(callback) {
 
         })
         .onerror(function (error, errorText, dbErrorCode) {
-            callback(String(errorText),null);
+            callback(String(errorText), null);
         });
 }
 var timers = [];
@@ -558,7 +558,7 @@ function updateTokenIntoTable(guid, token, callback) {
     //delete this token from db to allow new authorization
     Database.exec("UPDATE tbl_tokens SET token ='" + token + "' WHERE guid = '" + guid + "'")
         .oncomplete(function (data) {
-            
+
             Database.exec("SELECT * FROM tbl_tokens where guid = '" + guid + "';")
                 .oncomplete(function (data) {
                     log("updateTokenIntoTable: result=" + JSON.stringify(data, null, 4));
@@ -569,13 +569,13 @@ function updateTokenIntoTable(guid, token, callback) {
                     log("updateTokenIntoTable:Error:DB result=Error " + String(errorText));
                     callback(String(errorText), null);
                 });
-            
+
         })
         .onerror(function (error, errorText, dbErrorCode) {
             log("updateTokenIntoTable:Error:DB result=Error " + String(errorText));
             callback(String(errorText), null)
         });
-    
+
 }
 function insertTokenAndRefreshTokenIntoTable(guid, token, refresh_token, callback) {
     //delete this token from db to allow new authorization
@@ -615,7 +615,7 @@ function removeLastPartOfUrl(url) {
         return url.substring(0, lastSlashIndex);
     }
 
- 
+
     return url;
 }
 
@@ -660,7 +660,7 @@ function startTokenRenewalTimer(guid, expiresIn) {
             .onerror(function (error, errorText, dbErrorCode) {
                 log("INTERVAL:startTokenRenewalTimer:existingTimer: error DB query token =" + JSON.stringify(errorText, null, 4));
             });
-        
+
     }, parseInt(renewalTime));
 
     log("startTokenRenewalTimer:Timer de renovacao iniciado para " + guid + " por " + String(parseInt(renewalTime) / 1000) + " segundos.");
@@ -704,10 +704,10 @@ function renewToken(guid, body, callback) {
                     startTokenRenewalTimer(guid, parseInt(obj.expires_in));
 
                     if (callback) {
-                        callback(null,token)
+                        callback(null, token)
 
                     }
-                    
+
                 }
             })
 
