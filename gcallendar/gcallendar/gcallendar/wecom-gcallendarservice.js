@@ -30,41 +30,6 @@ new JsonApi("user").onconnected(function (conn) {
             if (conn.unlicensed) {
                 conn.send(JSON.stringify({ api: "user", mt: "noLicense" }));
 
-<<<<<<< Updated upstream
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
-                    });
-            }
-            if (obj.mt == "UserDisconnect") {
-                Database.exec("DELETE FROM tbl_tokens WHERE guid = '" + conn.guid + "';")
-                    .oncomplete(function (data) {
-
-                        //Deletar o Timer
-                        // Verificar se ja existe um timer para esse 'guid'
-                        var existingTimer = timers.filter(function (timerObj) {
-                            return timerObj.guid === conn.guid;
-                        })[0];
-                        log("UserDisconnect:existingTimer? " + JSON.stringify(existingTimer))
-
-
-                        // Se existir um timer, limpar o timer anterior
-                        if (existingTimer) {
-                            Timers.clearTimeout(existingTimer.timer);
-                            log("UserDisconnect:Timer anterior para o guid " + conn.guid + " foi limpo.");
-                        } else {
-                            // Se nao existir, criar um novo timer para esse 'guid'
-                            log("UserDisconnect:Timer nao existe para o guid")
-                            
-                        }
-
-                        conn.send(JSON.stringify({ api: "user", mt: "UserDisconnectResult", src: obj.src }));
-                    })
-                    .onerror(function (error, errorText, dbErrorCode) {
-                        log("UserDisconnect:result=Error " + String(errorText));
-                        conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
-                    });
-=======
             } else {
                 var obj = JSON.parse(msg);
                 if (obj.mt == "UserMessage") {
@@ -92,7 +57,6 @@ new JsonApi("user").onconnected(function (conn) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                         });
                 }
->>>>>>> Stashed changes
             }
         });
         conn.onclose(function () {

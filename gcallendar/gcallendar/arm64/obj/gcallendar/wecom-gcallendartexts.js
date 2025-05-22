@@ -12,7 +12,8 @@ Wecom.gcallendarTexts = {
         updated: 'Atualizado!',
         btnConnect: 'Conectar',
         btnDisconnect: 'Desconectar',
-        labelUri: 'Você vai precisar da URL abaixo para autorizar no Portal OAuth do Google'
+        labelUri: 'Você vai precisar da URL abaixo para autorizar no Portal OAuth do Google',
+        noLicense: 'Licença não encontrada, entre em contato com o suporte para mais informações.',
     },
     en: {
         iptClientId: 'Google Client ID',
@@ -25,7 +26,8 @@ Wecom.gcallendarTexts = {
         updated: 'Updated!',
         btnConnect: 'Connect',
         btnDisconnect: 'Disconnect',
-        labelUri: 'You will need the URL below to authorize on the Google OAuth Portal'
+        labelUri: 'You will need the URL below to authorize on the Google OAuth Portal',
+        noLicense: 'License not found, please contact support for more information.',
     },
     de: {
         iptClientId: 'Google Client-ID',
@@ -38,7 +40,8 @@ Wecom.gcallendarTexts = {
         updated: 'Aktualisiert!',
         btnConnect: 'Verbinden',
         btnDisconnect: 'Trennen',
-        labelUri: 'Sie benötigen die folgende URL, um sich im Google OAuth-Portal zu autorisieren.'
+        labelUri: 'Sie benötigen die folgende URL, um sich im Google OAuth-Portal zu autorisieren.',
+        noLicense: 'Lizenz nicht gefunden, bitte kontaktieren Sie den Support für weitere Informationen.'
     },
     es: {
         iptClientId: 'Google Cliente ID',
@@ -51,6 +54,7 @@ Wecom.gcallendarTexts = {
         updated: 'Actualizado!',
         btnConnect: 'Conectar',
         btnDisconnect: 'Desconectar',
-        labelUri: 'Necesitará la siguiente URL para realizar la autorizaciõn en el Portal OAuth de Google'
+        labelUri: 'Necesitará la siguiente URL para realizar la autorizaciõn en el Portal OAuth de Google',
+        noLicense: 'Licencia no encontrada, por favor contacte al soporte para más información.'
     }
 }
