@@ -52,6 +52,18 @@ Wecom.gcallendar = Wecom.gcallendar || function (start, args) {
             createBody(that);
             createToast(texts.text("updated"))
         }
+                if (obj.api == "user" && obj.mt == "noLicense") {
+            token = [];
+            //createBody(that);
+            makeDivNoLicense();
+
+        }
+    }
+    function makeDivNoLicense() {
+        that.clear();
+        //Titulo
+        that.add(new innovaphone.ui1.Div("position:absolute; left:0%; width:100%; top:40%; font-size:18px; text-align:center; font-weight: bold; color: darkblue;", texts.text("noLicense")));
+
     }
     function createBody(t) {
         t.clear();
@@ -66,7 +78,7 @@ Wecom.gcallendar = Wecom.gcallendar || function (start, args) {
         }
 
     }
-    // Função para abrir o popup do OAuth do Google
+    // Funï¿½ï¿½o para abrir o popup do OAuth do Google
     function openOAuthPopup() {
         var scope = 'https://www.googleapis.com/auth/calendar.readonly';
         var responseType = 'code';
@@ -78,14 +90,14 @@ Wecom.gcallendar = Wecom.gcallendar || function (start, args) {
             'state=' + encodeURIComponent(guid) + '&' +
             'access_type=' + encodeURIComponent('offline') + '&' +
             'prompt=' + encodeURIComponent('consent');
-        // Abrir o popup (tamanho e configuração do popup)
+        // Abrir o popup (tamanho e configuraï¿½ï¿½o do popup)
         var width = 600;
         var height = 600;
         var left = (screen.width / 2) - (width / 2);
         var top = (screen.height / 2) - (height / 2);
         window.open(authUrl, 'OAuthPopup', 'width=' + width + ',height=' + height + ',top=' + top + ',left=' + left);
     }
-    // Função para criar um toast de notificação
+    // Funï¿½ï¿½o para criar um toast de notificaï¿½ï¿½o
     function createToast(message) {
         var toast = that.add(new innovaphone.ui1.Div(null, message, "toast show"));
         //var toast = document.createElement("div");
@@ -97,11 +109,12 @@ Wecom.gcallendar = Wecom.gcallendar || function (start, args) {
         // Adicionar a classe 'show' para mostrar o toast
         //toast.className = "toast show";
 
-        // Remover o toast após 15 segundos
+        // Remover o toast apï¿½s 15 segundos
         setTimeout(function () {
             document.getElementById('toast').remove();
         }, 5000); // 15 segundos
     }
+
 }
 
 Wecom.gcallendar.prototype = innovaphone.ui1.nodePrototype;

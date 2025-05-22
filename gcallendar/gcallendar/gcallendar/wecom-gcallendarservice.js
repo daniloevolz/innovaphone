@@ -21,20 +21,16 @@ Config.onchanged(function () {
 
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-gcallendar") {
-        
-        connectionList.push(conn);
-        conn.onmessage(function(msg) {
-            var obj = JSON.parse(msg);
-            if (obj.mt == "UserMessage") {
-                Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + conn.guid + "';")
-                    .oncomplete(function (data) {
-                        log("result=" + JSON.stringify(data, null, 4));
-                        log("danilo req result conn=" + JSON.stringify(conn, null, 4));
-                        var info = JSON.parse(conn.info)
-                        redirectUrl = removeLastPartOfUrl(info.appurl) + "/newToken";
-                        startRenewTokens()
-                        conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", token: JSON.stringify(data, null, 4), client_id: clientId, javascript_origins: redirectUrl, guid: conn.guid, src: obj.src }));
+        if (conn.unlicensed) {
+            log("user: unlicensed");
+        } else {
+            connectionList.push(conn);
+        }
+        conn.onmessage(function (msg) {
+            if (conn.unlicensed) {
+                conn.send(JSON.stringify({ api: "user", mt: "noLicense" }));
 
+<<<<<<< Updated upstream
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -68,6 +64,35 @@ new JsonApi("user").onconnected(function (conn) {
                         log("UserDisconnect:result=Error " + String(errorText));
                         conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                     });
+=======
+            } else {
+                var obj = JSON.parse(msg);
+                if (obj.mt == "UserMessage") {
+                    Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + conn.guid + "';")
+                        .oncomplete(function (data) {
+                            log("result=" + JSON.stringify(data, null, 4));
+                            log("danilo req result conn=" + JSON.stringify(conn, null, 4));
+                            var info = JSON.parse(conn.info)
+                            redirectUrl = removeLastPartOfUrl(info.appurl) + "/newToken";
+                            startRenewTokens()
+                            conn.send(JSON.stringify({ api: "user", mt: "UserMessageResult", token: JSON.stringify(data, null, 4), client_id: clientId, javascript_origins: redirectUrl, guid: conn.guid, src: obj.src }));
+
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        });
+                }
+                if (obj.mt == "UserDisconnect") {
+                    Database.exec("DELETE FROM tbl_tokens WHERE guid = '" + conn.guid + "';")
+                        .oncomplete(function (data) {
+                            conn.send(JSON.stringify({ api: "user", mt: "UserDisconnectResult", src: obj.src }));
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            log("UserDisconnect:result=Error " + String(errorText));
+                            conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
+                        });
+                }
+>>>>>>> Stashed changes
             }
         });
         conn.onclose(function () {
