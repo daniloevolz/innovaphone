@@ -48,7 +48,7 @@ plugin.wecom.dwcschedulermanager = wecom.dwcschedulermanager || function (start,
     var typeText = ["dwcscheduler", "dwcscheduleradmin"]; //,"dwcidentity"
     var typeUrl = ["/wecom-dwcscheduler", "/wecom-dwcscheduleradmin"]; //"/wecom-dwcidentity"
     var typeCheckmarks = [
-        { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false },
+        { web: false, websocket: true, hidden: false, pbx: true, pbxsignal: true, epsignal: false, messages: false, tableusers: true, admin: true, services: true, rcc: true },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
         //{ web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
     ];

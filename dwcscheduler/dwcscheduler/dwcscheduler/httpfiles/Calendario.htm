@@ -239,7 +239,9 @@
                         console.log("get-agenda result=" + JSON.stringify(obj))
                         var first_start = "2999-01-01T01:00";
                         var last_end = "2000-12-30T23:00";
-                        dataavailability = JSON.parse(obj.dataavailability);
+                        //dataavailability = JSON.parse(obj.dataavailability);
+                        const originalDataAvailability = JSON.parse(obj.dataavailability);
+                        dataavailability = expandAvailabilityDates(originalDataAvailability);
                         dataschedules = JSON.parse(obj.dataschedules);
                         timeZoneMyApps = obj.timeZoneMyApps
                         // var dataTime_start;
@@ -848,7 +850,7 @@
                                                     window.alert("\n" + obj.msg);
                                                     break;
                                                 default:
-                                                    window.alert(obj.msg);
+                                                    window.alert("\n" + WecomDwcschedulerTexts[0][language]['labelSometingWrong'] + "\n" + JSON.stringify(obj));
                                                     break;
                                             }
                                         });
@@ -970,6 +972,38 @@
 
         function padZero(num) {
             return (num < 10 ? "0" : "") + num;
+        }
+        function expandAvailabilityDates(newAvailability) {
+            const expanded = [];
+
+            newAvailability.forEach(avail => {
+                const dayOfWeek = parseInt(avail.day); // 0 = Domingo, 1 = Segunda...
+                const hourStart = parseInt(avail.hour_start);
+                const minStart = parseInt(avail.minute_start);
+                const hourEnd = parseInt(avail.hour_end);
+                const minEnd = parseInt(avail.minute_end);
+
+                // Se não houver date_start ou date_end, usar ano atual como fallback
+                const startDate = avail.date_start ? moment(avail.date_start) : moment().startOf('year');
+                const endDate = avail.date_end ? moment(avail.date_end) : moment().endOf('year');
+
+                let current = moment(startDate);
+
+                while (current.isSameOrBefore(endDate, 'day')) {
+                    if (current.day() === dayOfWeek) {
+                        const timeStart = current.clone().hour(hourStart).minute(minStart).second(0);
+                        const timeEnd = current.clone().hour(hourEnd).minute(minEnd).second(0);
+
+                        expanded.push({
+                            time_start: timeStart.format("YYYY-MM-DDTHH:mm:ss"),
+                            time_end: timeEnd.format("YYYY-MM-DDTHH:mm:ss")
+                        });
+                    }
+                    current.add(1, 'day');
+                }
+            });
+
+            return expanded;
         }
 
     </script>

@@ -3,6 +3,7 @@ var pbxTableUsers = [];
 var pbxTable = [];
 var PbxAdminApi;
 var connectionsUser = [];
+var connectionsAdmin = [];
 var connectionsIdentity = [];
 var baseUrl = WebServer.url;
 var license = getLicense();
@@ -34,6 +35,11 @@ var lang; // idioma do navegador do cliente
 var timeZoneClient;
 var langMyApps; // idioma do myapps do usuario DWC 
 var timeZoneMyApps; // timezone do my apps do usuario DWC
+var url_conference = Config.url_conference;
+var obj_conference = Config.obj_conference;
+var number_conference = Config.number_conference;
+var reserved_conference = Config.reserved_conference;
+var key_conference = Config.key_conference;
 
  var  WecomDwcschedulerTexts = [{
      pt: {
@@ -151,13 +157,18 @@ Config.onchanged(function () {
     sendLocation = Config.sendLocation;
     licenseAppFile = Config.licenseAppFile;
     licenseInstallDate = Config.licenseInstallDate;
+    url_conference = Config.url_conference;
+    obj_conference = Config.obj_conference;
+    number_conference = Config.number_conference;
+    reserved_conference = Config.reserved_conference;
+    key_conference = Config.key_conference;
 })
 
-log("danilo req: License "+JSON.stringify(license));
+log("dwcschedulerservice: License "+JSON.stringify(license));
 if (license != null && license.System==true) {
     log("danilo req: License for System found, Webservers will be available");
-    if (license.Scheduller == true) {
-        log("danilo req: License for Scheduller found, Webservers will be available");
+    if (license.Scheduler == true) {
+        log("danilo req: License for Scheduler found, Webservers will be available");
         WebServer.onrequest("value", function (req) {
             if (req.method == "GET") {
                 var filePath = "Calendario.htm"; // Caminho para o arquivo HTML
@@ -191,7 +202,7 @@ if (license != null && license.System==true) {
                 var array_uri = uri.split("=");
                 var sip = array_uri[1];
                 var msg;
-                Database.exec("SELECT * FROM tbl_availability WHERE sip ='" + sip + "';")
+                Database.exec("SELECT * FROM tbl_day_availability WHERE sip ='" + sip + "';")
                     .oncomplete(function (dataavailability) {
                         log("get-agenda:tbl_availability result=" + JSON.stringify(dataavailability, null, 4));
 
@@ -360,11 +371,11 @@ if (license != null && license.System==true) {
                                     log("selectUserConfigs Resultado:", JSON.stringify(resultConfigs));
                                     var cfg = JSON.parse(JSON.stringify(resultConfigs.msg));
                                     log("resultConfigs.status==" + resultConfigs.status);
-                                    var roomNumber = cfg[0].number_conference;
-                                    var md5Hash = decodeURIComponent(cfg[0].key_conference);
-                                    var reservedChannels = cfg[0].reserved_conference;
+                                    var roomNumber = number_conference;
+                                    var md5Hash = key_conference;
+                                    var reservedChannels = reserved_conference;
                                     //var conferenceLinkClient = createConferenceLink(timeZoneClient,version, flags, roomNumber, meetingId, startTimestampClient, endTimestampClient, reservedChannels, creationTimestampClient, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
-                                    var conferenceLinkMyApps = createConferenceLink(timeZoneMyApps,version, flags, roomNumber, meetingId, startTimestampUTC, endTimestampUTC, reservedChannels, creationTimestampUTC, md5Hash, cfg[0].url_conference, cfg[0].obj_conference);
+                                    var conferenceLinkMyApps = createConferenceLink(timeZoneMyApps, version, flags, roomNumber, meetingId, startTimestampUTC, endTimestampUTC, reservedChannels, creationTimestampUTC, md5Hash, url_conference, obj_conference);
                                     log("conferenceLinkMyApps" + conferenceLinkMyApps);
                                     insertConferenceSchedule(obj, conferenceLinkMyApps, function (error, resultSchedule) {
                                         if (error) {
@@ -629,6 +640,50 @@ if (license != null && license.System==true) {
             }
         });
     }
+    if (license.Reports == true) {
+        //liceciado
+        WebServer.onrequest("cdr", function (req) {
+            if (req.method == "POST") {
+                var newValue = "";
+                var value = "";
+                var msg;
+                req.onrecv(function (req, data) {
+                    //var obj = JSON.parse((new TextDecoder("utf-8").decode(data)));
+                    if (data) {
+                        newValue += (new TextDecoder("utf-8").decode(data));
+                        req.recv();
+                    } else {
+                        value = newValue;
+                        log("dwcscheduler/cdr: received POST data " + value);
+                        try {
+
+                            requestCDREvent(value);
+
+                            msg = { ok: "ok" }
+                            req.responseContentType("application/json")
+                                .sendResponse()
+                                .onsend(function (resp) {
+                                    resp.send(new TextEncoder("utf-8").encode(JSON.stringify(msg)), true);
+                                });
+
+
+                        }
+                        catch (e) {
+                            log("dwcscheduler/cdr: received POST data ERROR: " + e);
+                            req.responseContentType("application/json")
+                                .sendResponse()
+                                .onsend(function (resp) {
+                                    resp.send(new TextEncoder("utf-8").encode(JSON.stringify(e)), true);
+                                });
+                        }
+
+                    }
+                });
+            } else {
+                req.cancel();
+            }
+        });
+    }
     if (license.Identity == true) {
         log("danilo req: License for Identity found, Webservers will be available");
         WebServer.onrequest("put-caller", function (req) {
@@ -801,7 +856,6 @@ new JsonApi("user").onconnected(function(conn) {
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                         });
-
                 }
                 if (obj.mt == "UserAckEventMessage") {
                     var count = 0;
@@ -857,7 +911,7 @@ new JsonApi("user").onconnected(function(conn) {
                     }
 
                     try {
-                        Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, url_conference, email_contato, email_title, title_conference, obj_conference, number_conference, key_conference, reserved_conference) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.url_conference + "','" + obj.email + "','" + obj.email_title + "','" + obj.title_conference + "','" + obj.obj_conference + "','" + obj.number_conference + "','" + obj.key_conference + "','" + obj.reserved_conference+ "')")
+                        Database.exec("INSERT INTO tbl_user_configs (sip, text_invite, email_contato, email_title, title_conference) VALUES ('" + conn.sip + "','" + obj.text_invite + "','" + obj.email + "','" + obj.email_title + "','" + obj.title_conference + "')")
                             .oncomplete(function () {
                                 log("UpdateConfigMessage:result=");
                                 conn.send(JSON.stringify({ api: "user", mt: "UpdateConfigMessageSuccess" }));
@@ -880,6 +934,29 @@ new JsonApi("user").onconnected(function(conn) {
 
 
                 }
+                if (obj.mt == "AddDayAvailability") {
+                    Database.exec("DELETE FROM tbl_day_availability WHERE sip='" + conn.sip + "';")
+                        .oncomplete(function () {
+                            Database.insert("INSERT INTO tbl_day_availability (sip, day, hour_start, hour_end, minute_start, minute_end, date_start, date_end ) VALUES('" + conn.sip + "', '" + obj.day + "', '" + obj.hour_start + "', '" + obj.hour_end + "', '" + obj.minute_start + "', '" + obj.minute_end + "', '" + obj.date_start + "', '" + obj.date_end +"')")
+                                .oncomplete(function () {
+                                    Database.exec("SELECT * FROM tbl_day_availability WHERE sip ='" + conn.sip + "';")
+                                        .oncomplete(function (data) {
+                                            log("AddAvailabilityMessage:result=" + JSON.stringify(data, null, 4));
+                                            conn.send(JSON.stringify({ api: "user", mt: "SelectAvailabilityMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+
+                                        })
+                                        .onerror(function (error, errorText, dbErrorCode) {
+                                            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                                        });
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                                });
+                        })
+                        .onerror(function (error, errorText, dbErrorCode) {
+                            conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
+                        });
+                }
                 if (obj.mt == "AddAvailabilityMessage") {
                     Database.insert("INSERT INTO tbl_availability (sip, time_start, time_end) VALUES ('" + conn.sip + "','" + obj.time_start + "','" + obj.time_end + "')")
                         .oncomplete(function () {
@@ -896,14 +973,14 @@ new JsonApi("user").onconnected(function(conn) {
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                         });
-
+                        
 
                 }
                 if (obj.mt == "SelectAvailabilityMessage") {
-                    Database.exec("SELECT * FROM tbl_availability WHERE sip ='" + conn.sip + "';")
+                    Database.exec("SELECT * FROM tbl_day_availability WHERE sip ='" + conn.sip + "';")
                         .oncomplete(function (data) {
                             log("SelectAvailabilityMessage:result=" + JSON.stringify(data, null, 4));
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectAvailabilityMessageSuccess", result: JSON.stringify(data, null, 4) }));
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectAvailabilityMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
 
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
@@ -932,7 +1009,7 @@ new JsonApi("user").onconnected(function(conn) {
                     Database.exec("SELECT * FROM tbl_schedules WHERE sip ='" + conn.sip + "';")
                         .oncomplete(function (data) {
                             log("SelectSchedulesMessage:result=" + JSON.stringify(data, null, 4));
-                            conn.send(JSON.stringify({ api: "user", mt: "SelectSchedulesMessageSuccess", result: JSON.stringify(data, null, 4) }));
+                            conn.send(JSON.stringify({ api: "user", mt: "SelectSchedulesMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
 
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
@@ -945,7 +1022,7 @@ new JsonApi("user").onconnected(function(conn) {
                             Database.exec("SELECT * FROM tbl_schedules WHERE sip ='" + conn.sip + "';")
                                 .oncomplete(function (data) {
                                     log("DelSchedulesMessage:result=" + JSON.stringify(data, null, 4));
-                                    conn.send(JSON.stringify({ api: "user", mt: "SelectSchedulesMessageSuccess", result: JSON.stringify(data, null, 4) }));
+                                    conn.send(JSON.stringify({ api: "user", mt: "SelectSchedulesMessageSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
 
                                 })
                                 .onerror(function (error, errorText, dbErrorCode) {
@@ -958,7 +1035,9 @@ new JsonApi("user").onconnected(function(conn) {
                         });
                 }
                 if (obj.mt == "FindObjConfMessage") {
-                    PbxAdminApi.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "h323": obj.obj_conference, "template": "without", "src": conn.sip }));
+                    if (PbxAdminApi) {
+                        PbxAdminApi.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "h323": obj.obj_conference, "template": "without", "src": conn.sip }));
+                    }
                 }
             }
             else {
@@ -1021,11 +1100,38 @@ new JsonApi("user").onconnected(function(conn) {
 
 new JsonApi("admin").onconnected(function(conn) {
     if (conn.app == "wecom-dwcscheduleradmin") {
+        connectionsAdmin.push(conn);
+        log("Admins Conectados:  " + connectionsAdmin.length);
+
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {
 
                 conn.send(JSON.stringify({ api: "admin", mt: "AdminMessageResult", src: obj.src, from: from, fromName: fromName, server: server, username: username, password: password, googleApiKey: google_api_key, sendLocation: sendLocation }));
+
+
+                //log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+                //var list_users = [];
+                //pbxTableUsers.forEach(function (u) {
+                //    list_users.push({ sip: u.columns.h323, dn: u.columns.dn, cn: u.columns.cn, guid: u.columns.guid })
+                //})
+                reduceUserObject(function (users) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(users) }));
+                });
+                
+            }
+            if (obj.mt == "ConferenceConfigMessage") {
+
+                conn.send(JSON.stringify({
+                    api: "admin", mt: "ConferenceConfigMessageResult",
+                    src: obj.src,
+                    url_conference: url_conference,
+                    obj_conference: obj_conference,
+                    key_conference: key_conference,
+                    reserved_conference: reserved_conference,
+                    number_conference: number_conference
+                }));
+
             }
             if (obj.mt == "UpdateConfigMessage") {
                 try {
@@ -1046,6 +1152,11 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 }
                 
+            }
+            if (obj.mt == "FindObjConfMessage") {
+                if (PbxAdminApi) {
+                    PbxAdminApi.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "h323": obj.obj_conference, "template": "without", "src": conn.sip }));
+                }
             }
             if (obj.mt == "UpdateConfigGoogleMessage") {
                 try {
@@ -1086,33 +1197,232 @@ new JsonApi("admin").onconnected(function(conn) {
 
                 }
             }
+            if (obj.mt == "UpdateConfigConferenceObjMessage") {
+                try {
+                    Config.url_conference = obj.url_conference;
+                    Config.obj_conference = obj.obj_conference;
+                    Config.number_conference = obj.number_conference;
+                    Config.key_conference = obj.key_conference;
+                    Config.reserved_conference = obj.reserved_conference;
+
+                    Config.save();
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigConferenceObjMessageSuccess" }));
+
+                } catch (e) {
+                    conn.send(JSON.stringify({ api: "admin", mt: "UpdateConfigMessageErro" }));
+                    log("ERRO UpdateConfigConferenceObjMessage:" + e);
+
+
+                }
+            }
+            if (obj.mt == "SelectAvailabilityMessage") {
+                Database.exec("SELECT * FROM tbl_day_availability WHERE sip ='" + obj.sip + "';")
+                    .oncomplete(function (data) {
+                        log("SelectAvailabilityMessage:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectAvailabilityMessageSuccess", result: JSON.stringify(data, null, 4), sip: obj.sip, src:obj.src }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectSchedulesMessage") {
+                Database.exec("SELECT * FROM tbl_schedules WHERE sip ='" + obj.sip + "';")
+                    .oncomplete(function (data) {
+                        log("SelectSchedulesMessage:result=" + JSON.stringify(data, null, 4));
+                        conn.send(JSON.stringify({ api: "admin", mt: "SelectSchedulesMessageSuccess", result: JSON.stringify(data, null, 4), sip: obj.sip, src: obj.src }));
+
+                    })
+                    .onerror(function (error, errorText, dbErrorCode) {
+                        conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
+                    });
+            }
+            if (obj.mt == "SelectFromReports") {
+                if (license.Reports) {
+                    switch (obj.src) {
+                        case "RptAvailability":
+                            var query = "SELECT guid, date, status, detail FROM tbl_agent_availability";
+                            var conditions = [];
+                            //if (obj.guid) conditions.push("sip ='" + obj.guid + "'");
+                            if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                                var guidConditions = obj.guid.map(function (guid) {
+                                    return "guid ='" + guid + "'";
+                                });
+                                conditions.push("(" + guidConditions.join(" OR ") + ")");
+                            }
+                            if (obj.status) conditions.push("status ='" + obj.status + "'");
+                            if (obj.from) conditions.push("date >'" + obj.from + "'");
+                            if (obj.to) conditions.push("date <'" + obj.to + "'");
+                            if (conditions.length > 0) {
+                                query += " WHERE " + conditions.join(" AND ");
+                            }
+
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+
+                                    var jsonData = JSON.stringify(data, null, 4);
+                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                    var fragments = [];
+                                    for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                        fragments.push(jsonData.substr(i, maxFragmentSize));
+                                    }
+                                    // Enviar cada fragmento separadamente através do websocket
+                                    for (var i = 0; i < fragments.length; i++) {
+                                        var isLastFragment = i === fragments.length - 1;
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                    }
+
+                                    //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                                });
+                            break;
+                        case "RptSchedules":
+                            var query = "SELECT * FROM tbl_schedules";
+                            var conditions = [];
+                            //if (obj.guid) conditions.push("sip ='" + obj.guid + "'");
+                            if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                                var guidConditions = obj.guid.map(function (guid) {
+                                    return "sip ='" + guid + "'";
+                                });
+                                conditions.push("(" + guidConditions.join(" OR ") + ")");
+                            }
+                            if (obj.from) conditions.push("time_start >'" + obj.from + "'");
+                            if (obj.to) conditions.push("time_start <'" + obj.to + "'");
+                            if (conditions.length > 0) {
+                                query += " WHERE " + conditions.join(" AND ");
+                            }
+
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+
+                                    var jsonData = JSON.stringify(data, null, 4);
+                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                    var fragments = [];
+                                    for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                        fragments.push(jsonData.substr(i, maxFragmentSize));
+                                    }
+                                    // Enviar cada fragmento separadamente através do websocket
+                                    for (var i = 0; i < fragments.length; i++) {
+                                        var isLastFragment = i === fragments.length - 1;
+                                        conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: fragments[i], lastFragment: isLastFragment, src: obj.src }));
+                                    }
+
+                                    //conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: JSON.stringify(data, null, 4), src: obj.src }));
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText), src: obj.src }));
+                                });
+                            break;
+                        case "RptCalls":
+                            var query = "SELECT cdr_id, guid, sip, cn, node, dir, utc, call, flow, created_at FROM tbl_cdr_events";
+                            var conditions = [];
+
+                            // Filtro por lista de GUIDs
+                            if (obj.guid && Object.prototype.toString.call(obj.guid) === '[object Array]' && obj.guid.length > 0) {
+                                var guidConditions = obj.guid.map(function (guid) {
+                                    return "guid ='" + guid + "'";
+                                });
+                                conditions.push("(" + guidConditions.join(" OR ") + ")");
+                            }
+
+                            // Filtro por intervalo de datas (from = data inicial, to = data final)
+                            if (obj.from) conditions.push("created_at >= '" + obj.from + "'");
+                            if (obj.to) conditions.push("created_at <= '" + obj.to + "'");
+
+                            if (conditions.length > 0) {
+                                query += " WHERE " + conditions.join(" AND ");
+                            }
+
+                            // Ordenação por data mais recente
+                            query += " ORDER BY created_at DESC";
+
+                            Database.exec(query)
+                                .oncomplete(function (data) {
+                                    log("result=" + JSON.stringify(data, null, 4));
+
+                                    var jsonData = JSON.stringify(data, null, 4);
+                                    var maxFragmentSize = 50000; // Para dividir em partes menores no WebSocket
+                                    var fragments = [];
+                                    for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
+                                        fragments.push(jsonData.substr(i, maxFragmentSize));
+                                    }
+
+                                    for (var i = 0; i < fragments.length; i++) {
+                                        var isLastFragment = i === fragments.length - 1;
+                                        conn.send(JSON.stringify({
+                                            api: "admin",
+                                            mt: "SelectFromReportsSuccess",
+                                            result: fragments[i],
+                                            lastFragment: isLastFragment,
+                                            src: obj.src
+                                        }));
+                                    }
+                                })
+                                .onerror(function (error, errorText, dbErrorCode) {
+                                    conn.send(JSON.stringify({
+                                        api: "admin",
+                                        mt: "Error",
+                                        result: String(errorText),
+                                        src: obj.src
+                                    }));
+                                });
+                            break;
+                    }
+                } else {
+                    log("ERRO SelectFromReports: Licensed for Reports? " + license.Reports);
+                    conn.send(JSON.stringify({ api: "admin", mt: "SelectFromReportsSuccess", result: [], lastFragment: true, src: obj.src }));
+                }
+            }
         });
+        conn.onclose(function () {
+            connectionsAdmin = connectionsAdmin.filter(deleteBySip(conn.sip));
+            log("connectionsAdmin: after delete conn " + JSON.stringify(connectionsAdmin));
+        })
     }
 });
 
 new PbxApi("PbxAdminApi").onconnected(function(conn){
     log("PbxAdminApi: connected conn " + JSON.stringify(conn));
+
+
     PbxAdminApi = conn;
+    
     //conn.send(JSON.stringify({ "api": "PbxAdminApi", "mt": "GetObject", "cn":"Conference", "template": "without", "src": conn.pbx }));
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
-        log("PbxAdminApi msg "+msg);
-
-        if (obj.mt === "GetObjectResult") {
-            var found = false;
-            var rooms;
-            var key;
-            if (obj.guid) {
-                found = true;
-                rooms = obj.pseudo["static-room"];
-                key = obj.pseudo["m-key"];
-                log("PbxAdminApi msg " + JSON.stringify(rooms));
-            }
+        log("PbxAdminApi msg "+ msg);
+        if (obj.mt === "GetPseudoObjectsResult") {
+            log("PbxAdminApi timers " + JSON.stringify(obj));
             connectionsUser.forEach(function (c) {
                 if (c.sip == obj.src) {
-                    c.send(JSON.stringify({ api: "user", mt: "FindObjConfMessageResult", found: found, rooms: rooms, key: key}));
+                    c.send(JSON.stringify({ api: "user", mt: "GetObjTimerMessageResult", result: obj.objects }));
                 }
             })
+        }
+        if (obj.mt === "GetObjectResult") {
+            if (obj.src === "Timers") {
+                log("PbxAdminApi timers " + JSON.stringify(obj));
+
+            } else {
+                var found = false;
+                var rooms;
+                var key;
+                if (obj.guid) {
+                    found = true;
+                    rooms = obj.pseudo["static-room"];
+                    key = obj.pseudo["m-key"];
+                    log("PbxAdminApi msg " + JSON.stringify(rooms));
+                }
+                connectionsAdmin.forEach(function (c) {
+                    if (c.sip == obj.src) {
+                        c.send(JSON.stringify({ api: "admin", mt: "FindObjConfMessageResult", found: found, rooms: rooms, key: key }));
+                    }
+                })
+            }
             
         }
     });
@@ -1158,22 +1468,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
 
             //Update signals
             var pbx = obj.src;
-            //var myArray = src.split(",");
-            //var pbx = myArray[0];
-            //log("PbxSignal: before add new userclient " + JSON.stringify(PbxSignal));
-            //Teste Danilo 20/07: armazenar o conte�do call no par�metro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        var call = obj.call.toString();
-            //        signal[call] = obj.sig.cg.sip;
-            //    }
-            //})
-            //Teste Danilo 20/07: armazenar o conte�do call no pa�metro e o sip no valor
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        signal[obj.sig.cg.sip] = obj.call;
-            //    }
-            //})
+
             //Teste Danilo 05/08: armazenar o conteudo call em nova lista
             var sip = obj.sig.cg.sip;
             var call = obj.call;
@@ -1214,35 +1509,68 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
                 return item.columns.h323 === obj.sig.cg.sip;
             })[0];
             log("PbxSignal:connUser=" + JSON.stringify(user));
-
-            // send notification with badge count first time the user has connected
-            var count = 0;
-            try {
-                count = user.badge;
-            } finally {
-                updateBadge(obj.sig.cg.sip, count);
+            if (user) {
+                // send notification with badge count first time the user has connected
+                var count = 0;
+                try {
+                    count = user.badge;
+                } finally {
+                    updateBadge(obj.sig.cg.sip, count);
+                }
+                //Intert into DB the event
+                log("PbxSignal= user " + obj.sig.cg.sip + " login MyApps");
+                //log("PbxSignal= GUID " + obj.sig.cg.guid + " login");
+                if (license.Reports) {
+                    var today = getDateNow();
+                    var msg = { guid: user.columns.guid, date: today, status: "Login", detail: "MyApps" }
+                    log("PbxSignal= will insert it on DB: " + JSON.stringify(msg));
+                    insertTblAvailability(msg);
+                } else {
+                    log("PbxSignal= Licensed for Reports? "+ license.Reports);
+                }
+            } else {
+                log("PbxSignal= PbxTable User not found for user " + obj.sig.cg.sip + " in login MyApps");
             }
-            
         }
 
         // handle incoming call release messages
         if (obj.mt === "Signaling" && obj.sig.type === "rel") {
-            //Remove signals
-            //log("PBXSignal: connections before delete result " + JSON.stringify(PbxSignal));
-            var src = obj.src;
-            //var myArray = src.split(",");
-            //var sip = "";
-            //var pbx = myArray[0];
-            //PbxSignal.forEach(function (signal) {
-            //    if (signal.pbx == pbx) {
-            //        sip = Object.keys(signal).filter(function (key) { return signal[key] === obj.call })[0];
-            //        delete signal[sip];
+            var pbx = obj.src;
 
-            //    }
-            //})
-            removeObjectByCall(PbxSignalUsers, src, obj.call);
+            // Remove da lista e pega o sip associado
+            var sip = removeObjectByCall(PbxSignalUsers, pbx, obj.call);
 
-            log("PBXSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
+            if (sip) {
+                // Log do evento Logout
+                log("PbxSignal= user " + sip + " logout MyApps");
+                var today = getDateNow();
+
+                // Encontrar o usuário na pbxTableUsers para pegar o GUID
+                var user = pbxTableUsers.filter(function (item) {
+                    return item.columns.h323 === sip;
+                })[0];
+
+                if (user) {
+                    if (license.Reports) {
+                        var msg = {
+                            guid: user.columns.guid,
+                            date: today,
+                            status: "Logout",
+                            detail: "MyApps"
+                        };
+                        log("PbxSignal= will insert it on DB : " + JSON.stringify(msg));
+                        insertTblAvailability(msg);
+                    } else {
+                        log("PbxSignal= Licensed for Reports? " + license.Reports);
+                    }
+                } else {
+                    log("PbxSignal= user not found in pbxTableUsers for logout tracking");
+                }
+            } else {
+                log("PbxSignal= no matching call found for pbx " + pbx + " and call " + obj.call);
+            }
+
+            log("PbxSignalUsers: connections after delete result " + JSON.stringify(PbxSignalUsers));
         }
     });
 
@@ -1255,6 +1583,143 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
     });
 });
 
+var pbxApi;
+var presences = [];
+new PbxApi("PbxApi").onconnected(function (conn) {
+    log("PbxApi conectada", conn)
+    pbxApi = conn
+    conn.onmessage(function (msg) {
+        var obj = JSON.parse(msg);
+        log("PbxApi:onmessage: " + JSON.stringify(obj));
+        //log("PbxApi msg: " + msg);
+        if (obj.mt == "PresenceUpdate") {
+            log("PbxApi:PresenceUpdate: " + JSON.stringify(obj));
+            if (license.Reports == true) {
+                handlePresenceUpdate(obj);
+            } else {
+                log("PbxApi:PresenceUpdate: Licensed for Reports? " + license.Reports);
+            }
+        }
+    })
+
+    conn.onclose(function () {
+        pbxApi = {}
+        log("PbxApi: disconnected");
+    });
+});
+
+function subscribePresence(obj) {
+    if (PbxApi) {
+        log("subscribePresence:PbxApi: for user " + obj.columns.cn);
+        pbxApi.send(JSON.stringify({
+            "api": "PbxApi",
+            "mt": "SubscribePresence",
+            "sip": obj.columns.h323,
+            "src": obj.columns.guid
+        }));
+    } else {
+        log("subscribePresence:PbxApi:ERRO PbxApi Disconectada, for user " + obj.columns.cn);
+    }
+}
+
+function unsubscribePresence(obj) {
+    pbxApi.send(JSON.stringify({
+        "api": "PbxApi",
+        "mt": "UnsubscribePresence",
+        "sip": obj.columns.h323,
+        "src": obj.columns.guid
+    }));
+}
+
+function setPresenceStatusMessage(sip, note, activity) {
+    log("setPresenceStatusMessage: SET PRESENCE ON :", sip + " to " + activity)
+    // Enviar a mensagem para a conexao PbxApi
+
+    try {
+        pbxApi.send(JSON.stringify({
+            "api": "PbxApi",
+            "mt": "SetPresence",
+            "sip": sip,
+            "activity": activity,
+            "note": note,
+            "src": sip
+        }));
+
+    } catch (e) {
+        log("ERRO setPresenceStatusMessage: SET PRESENCE ON :", sip + " to " + activity + " ERRO:" + e)
+    }
+}
+function handlePresenceUpdate(newPresenceEvent) {
+    var src = newPresenceEvent.src;
+    var newPresenceList = newPresenceEvent.presence;
+
+    var sip = pbxTableUsers.filter(function (u) { return u.columns.guid == src })[0].columns.h323;
+
+    // Buscar evento anterior
+    var oldPresenceEvent = null;
+    for (var i = 0; i < presences.length; i++) {
+        if (presences[i].src === src) {
+            oldPresenceEvent = presences[i];
+            break;
+        }
+    }
+
+    // Obter último status e nota anteriores
+    var lastStatus = "online";
+    var oldNotes = [];
+
+    if (oldPresenceEvent) {
+        for (var i = 0; i < oldPresenceEvent.presence.length; i++) {
+            var act = oldPresenceEvent.presence[i].activity;
+            var note = oldPresenceEvent.presence[i].note;
+            if (act) lastStatus = act;
+            if (note) oldNotes.push(note);
+        }
+    }
+    var oldNoteConcat = oldNotes.join("|");
+
+    // Novo status e nova nota
+    var newStatus = null;
+    var newNotes = [];
+
+    for (var i = 0; i < newPresenceList.length; i++) {
+        var act = newPresenceList[i].activity;
+        var note = newPresenceList[i].note;
+        if (act && !newStatus) newStatus = act;
+        if (note) newNotes.push(note);
+    }
+    if (!newStatus) newStatus = "online";
+    var newNoteConcat = newNotes.join("|");
+
+    var today = getDateNow();
+
+    if (license.Reports) {
+        if (newStatus !== lastStatus) {
+            var msg = { guid: src, date: today, status: newStatus, detail: newNoteConcat || newStatus };
+            log("handlePresenceUpdate: Status alterado por " + sip + ": " + JSON.stringify(msg));
+            insertTblAvailability(msg);
+        } else if (newNoteConcat !== oldNoteConcat) {
+            var msg = { guid: src, date: today, status: newStatus, detail: newNoteConcat };
+            log("handlePresenceUpdate: Note alterado por " + sip + ": " + JSON.stringify(msg));
+            insertTblAvailability(msg);
+        } else {
+            log("handlePresenceUpdate: Ignorado status e note repetidos para " + sip);
+        }
+    } else {
+        log("handlePresenceUpdate: Licensed for Reports? " + license.Reports);
+    }
+
+    // Atualiza presença no array
+    var updated = false;
+    for (var i = 0; i < presences.length; i++) {
+        if (presences[i].src === src) {
+            presences[i] = newPresenceEvent;
+            updated = true;
+            break;
+        }
+    }
+    if (!updated) presences.push(newPresenceEvent);
+}
 
 
 new PbxApi("PbxTableUsers").onconnected(function (conn) {
@@ -1265,7 +1730,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     if (signalFound.length == 0) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
-        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "src": conn.pbx }));
+        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": ["", "bool", "waiting", "trunk"], "src": conn.pbx }));
 
     }
     conn.onmessage(function (msg) {
@@ -1283,12 +1748,39 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 obj.badge = 0;
                 pbxTableUsers.push(obj);
                 conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateNext", "src": conn.pbx }));
-            } finally {
+                log("ReplicateNextResult: request subscribePresence " +obj.columns.dn)
+                subscribePresence(obj);
+            } catch (e) {
+                log("PbxTableUsers:ReplicateNextResult: erro ao atualizar lista de  usuários " + e)
+            }
+        }
+        if (obj.mt == "ReplicateNextResult" && !obj.columns) {
+            try {
+                reduceUserObject(function (users) {
+                    connectionsAdmin.forEach(function (c) {
+                        c.send(JSON.stringify({ api: "admin", mt: "TableUsersResult", result: JSON.stringify(users) }));
+                    })
+                });
+                
+                
+            } catch (e) {
+                log("PbxTableUsers:ReplicateNextResult: erro ao notificar usuários sobre tabela atualizada "+ e)
             }
         }
         if (obj.mt == "ReplicateAdd") {
-            obj.badge = 0;
-            pbxTableUsers.push(obj);
+            //pbxTableUsers.push(obj);
+            //editado em 05/05/25 para corrigir problemas na Feluma
+            var exists = false;
+            for (var i = 0; i < pbxTableUsers.length; i++) {
+                if (pbxTableUsers[i].columns && pbxTableUsers[i].columns.h323 === obj.columns.h323) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                pbxTableUsers.push(obj);
+                subscribePresence(obj);
+            }
         }
         if (obj.mt == "ReplicateUpdate") {
             log("ReplicateUpdate= user " + obj.columns.h323);
@@ -1302,11 +1794,15 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                 })
 
             } catch (e) {
-                log("ReplicateUpdate: User " + obj.columns.h323 + " Erro " + e)
+                log("PbxTableUsers:ReplicateUpdate: User " + obj.columns.h323 + " Erro " + e)
 
             }
-
-
+        }
+        if (obj.mt == "ReplicateDel") {
+            //pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+            //editado em 05/05/25 para corrigir problemas na Feluma
+            removePbxTableUserByGuid(obj.columns.guid);
+            unsubscribePresence(obj)
         }
     });
 
@@ -1316,6 +1812,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         log("PbxTableUsers: disconnected");
     });
 });
+
 
 function decrypt(key,hash) {
     //var iv = iv.substring(0, 16);
@@ -1339,7 +1836,6 @@ function decrypt(key,hash) {
 
     return JSON.parse(decrypted);
  }
-
 
 function updateBadge(sip, count) {
     //Update Badge
@@ -1373,8 +1869,19 @@ function updateBadge(sip, count) {
         log("danilo req: erro send badge: " + e);
     }
 }
-
-function removeObjectByCall(arr, pbx, callToRemove) {
+//Funcions to delete user Call from PbxTableuser API Array
+function removePbxTableUserByGuid(guid) {
+    log("removePbxTableUserByGuid+++++++++++++++++++++++++++++++is " + JSON.stringify(pbxTableUsers.length));
+    for (var j = 0; j < pbxTableUsers.length; j++) {
+        if (pbxTableUsers.columns.guid == guid) {
+            log("pbxTableUsers[j].columns.guid == guid:" + pbxTableUsers[j].columns.guid + " == " + guid);
+            pbxTableUsers.splice(j, 1);
+            log("removePbxTableUserByGuid+++++++++++++++++++++++++++++++result " + JSON.stringify(pbxTableUsers.length));
+            break;
+        }
+    }
+}
+function oldRemoveObjectByCall(arr, pbx, callToRemove) {
     for (var i = 0; i < arr.length; i++) {
         var pbxEntry = arr[i][pbx];
         if (pbxEntry) {
@@ -1387,6 +1894,28 @@ function removeObjectByCall(arr, pbx, callToRemove) {
         }
     }
 }
+function removeObjectByCall(pbxList, pbx, call) {
+    var sipRemoved = null;
+
+    if (pbxList[pbx]) {
+        for (var i = 0; i < pbxList[pbx].length; i++) {
+            if (pbxList[pbx][i].call === call) {
+                sipRemoved = pbxList[pbx][i].sip;
+                pbxList[pbx].splice(i, 1); // remove o item
+                log("PbxSignalUsers: removed call " + call + " for PBX " + pbx);
+                break;
+            }
+        }
+
+        // se a lista ficar vazia, remover o pbx completamente
+        if (pbxList[pbx].length === 0) {
+            delete pbxList[pbx];
+        }
+    }
+
+    return sipRemoved;
+}
+
 
 function sendEmail(subject, to, data, str, callback) {
     log("danilo req : SendEmail : to: " + to + " email: " + data);
@@ -1477,7 +2006,7 @@ function getDateNow() {
     // Cria uma nova data com a data e hora atuais em UTC
     var date = new Date();
     // Adiciona o deslocamento de GMT-3 às horas da data atual em UTC
-    date.setUTCHours(date.getUTCHours() - 3);
+    date.setUTCHours(date.getUTCHours());
 
     // Formata a data e hora em uma string ISO 8601 com o caractere "T"
     var dateString = date.toISOString();
@@ -1661,7 +2190,7 @@ function convertDateTimeToTimestamp(dateTimeString) {
 function selectUserConfigs(obj, callback){
     Database.exec("SELECT * FROM tbl_user_configs WHERE sip ='" + obj.sip + "';")
             .oncomplete(function (data) {
-                log("selectUserConfigs result success = "+JSON.stringify(data))
+                log("selectUserConfigs result success = " + JSON.stringify(data))
                 msg = { status: 201, msg: data };
                 callback(null, msg);
             })
@@ -1681,3 +2210,202 @@ function insertConferenceSchedule(obj, conferenceLink,callback){
         callback(msg);
     });
 }
+function reduceUserObject(callback) {
+    log("danilo-req AdminMessage: reducing the pbxTableUser object to send to user");
+    var list_users = [];
+    pbxTableUsers.forEach(function (u) {
+        list_users.push({ sip: u.columns.h323, dn: u.columns.dn, cn: u.columns.cn, guid: u.columns.guid })
+    })
+    if (callback) { return callback(list_users);}
+}
+function insertTblAvailability(obj) {
+    Database.insert("INSERT INTO tbl_agent_availability (guid, date, status, detail) VALUES ('" + obj.guid + "','" + obj.date + "','" + obj.status + "','" + obj.detail + "')")
+        .oncomplete(function () {
+            log("insertTblAvailability= Success for user "+ obj.guid);
+
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblAvailability= Erro " + errorText);
+        });
+}
+function insertTblCdrEventJson(cdrParsed) {
+    if (!cdrParsed || cdrParsed.tag !== "cdr") return;
+
+    var c = cdrParsed.attrs;
+    if (c.related) return;
+
+    var cdr_id = c.id;
+    var guid = c.guid;
+    var sip = c.h323 || "";
+    var cn = c.cn || "";
+    var node = c.node || "";
+    var dir = c.dir || "";
+    var utc = parseInt(c.utc || "0");
+    var call = c.call || "";
+    var flow = JSON.stringify(cdrParsed.children || []).replace(/'/g, "''");
+    var groups = JSON.stringify([]).replace(/'/g, "''");
+
+    var query = "INSERT INTO tbl_cdr_events " +
+        "(cdr_id, guid, sip, cn, node, dir, utc, call, flow, groups) VALUES (" +
+        "'" + cdr_id + "', " +
+        "'" + guid + "', " +
+        "'" + sip + "', " +
+        "'" + cn + "', " +
+        "'" + node + "', " +
+        "'" + dir + "', " +
+        utc + ", " +
+        "'" + call + "', " +
+        "'" + flow + "', " +
+        "'" + groups + "'" +
+        ")"; // <-- sem ponto e vírgula
+
+    log("insertTblCdrEventJson = record para a chamada " + cdr_id + " : " + query);
+
+    Database.insert(query)
+        .oncomplete(function () {
+            log("insertTblCdrEventJson = Sucesso para chamada " + cdr_id);
+        })
+        .onerror(function (error, errorText, dbErrorCode) {
+            log("insertTblCdrEventJson = Erro: " + errorText);
+        });
+}
+
+
+
+
+//CDR Event
+//trata o cdr recebido
+function requestCDREvent(xmlString) {
+    try {
+        var parsed = parseCDREventData(xmlString);
+        
+        if (parsed == null) {
+            var parsed = parseXmlToObject(xmlString)
+            log("requestCDREvent: XML parsed: " + JSON.stringify(parsed, null, 2));
+            insertTblCdrEventJson(parsed);
+        } else {
+            //log("requestCDREvent URI parsed: " + JSON.stringify(parsed));
+        }
+
+    }
+    catch (e) {
+        log("requestCDREvent: error: " + JSON.stringify(e.message))
+    };
+
+}
+
+//parser do cdr uri para json
+function parseCDREventData(data) {
+    if (data.indexOf("?event=") === 0) {
+        var query = data.substring(1); // remove o "?"
+        var parts = query.split("&");
+        var result = {};
+
+        for (var i = 0; i < parts.length; i++) {
+            var keyValue = parts[i].split("=");
+            var key = decodeURIComponent(keyValue[0]);
+            var value = keyValue.length > 1 ? decodeURIComponent(keyValue[1]) : "";
+            result[key] = value;
+        }
+
+        return result; // objeto com os campos extraídos
+    }
+
+    // fallback para XML, ou null se não for XML nem query string
+    return null;
+}
+
+//parser do xml para json
+function parseXmlToObject(xml) {
+    function parseAttrs(str) {
+        var attrs = {};
+        var re = /(\w+)=["'](.*?)["']/g;
+        var match;
+        while ((match = re.exec(str))) {
+            attrs[match[1]] = match[2];
+        }
+        return attrs;
+    }
+
+    function parseTag(xml, startIndex) {
+        var tagStart = xml.indexOf("<", startIndex);
+        if (tagStart === -1) return null;
+
+        // Checar se é fechamento
+        if (xml[tagStart + 1] === '/') {
+            var tagEnd = xml.indexOf(">", tagStart);
+            return {
+                type: "close",
+                tag: xml.slice(tagStart + 2, tagEnd).trim(),
+                next: tagEnd + 1
+            };
+        }
+
+        var tagEnd = xml.indexOf(">", tagStart);
+        var isSelfClosing = xml[tagEnd - 1] === '/';
+        var tagContent = xml.slice(tagStart + 1, isSelfClosing ? tagEnd - 1 : tagEnd);
+        var spaceIndex = tagContent.indexOf(" ");
+        var tagName = spaceIndex === -1 ? tagContent : tagContent.slice(0, spaceIndex);
+        var attrString = spaceIndex === -1 ? "" : tagContent.slice(spaceIndex + 1);
+
+        return {
+            type: isSelfClosing ? "self" : "open",
+            tag: tagName,
+            attrs: parseAttrs(attrString),
+            next: tagEnd + 1
+        };
+    }
+
+    function parseRecursive(xml, startIndex, expectedTag) {
+        var result = [];
+        var i = startIndex;
+
+        while (i < xml.length) {
+            var nextTag = parseTag(xml, i);
+            if (!nextTag) break;
+
+            i = nextTag.next;
+
+            if (nextTag.type === "close") {
+                if (nextTag.tag === expectedTag) break;
+                else continue;
+            }
+
+            var child = {
+                tag: nextTag.tag,
+                attrs: nextTag.attrs,
+                children: []
+            };
+
+            if (nextTag.type === "open") {
+                var parsedChildren = parseRecursive(xml, i, nextTag.tag);
+                child.children = parsedChildren.children;
+                i = parsedChildren.next;
+            }
+
+            result.push(child);
+        }
+
+        return { children: result, next: i };
+    }
+
+    // Limpar cabeçalho XML se existir
+    var xmlBody = xml.replace(/<\?xml.*?\?>/, '').trim();
+
+    // Começar pelo elemento raiz (esperamos <cdr>)
+    var rootTag = parseTag(xmlBody, 0);
+    if (!rootTag || rootTag.type !== "open") return null;
+
+    var root = {
+        tag: rootTag.tag,
+        attrs: rootTag.attrs,
+        children: []
+    };
+
+    var parsed = parseRecursive(xmlBody, rootTag.next, rootTag.tag);
+    root.children = parsed.children;
+
+    return root;
+}
+
+
