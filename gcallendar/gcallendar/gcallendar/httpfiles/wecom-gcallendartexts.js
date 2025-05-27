@@ -1,6 +1,6 @@
 ﻿
 var Wecom = Wecom || {};
-Wecom.gcalendarTexts = {
+Wecom.gcallendarTexts = {
     pt: {
         iptClientId: 'Google Client ID',
         labelClientId: 'Client ID Google',

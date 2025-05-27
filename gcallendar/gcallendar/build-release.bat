@@ -1,6 +1,6 @@
 @echo off
 
-set PROJECT=gcalendar
+set PROJECT=gcallendar
 
 set BUILD=1001
 set RELEASE_STATE=sr1

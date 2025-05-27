@@ -33,7 +33,7 @@
   },
   "javascript": {
     "eval": [
-      "wecom-gcalendarservice.js"
+      "wecom-gcallendarservice.js"
     ]
   },
   "config": {

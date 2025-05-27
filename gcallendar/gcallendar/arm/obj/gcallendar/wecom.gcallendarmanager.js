@@ -5,48 +5,48 @@
 
 var plugin = plugin || {};
 plugin.wecom = plugin.wecom || {};
-plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start, item, app) {
+plugin.wecom.gcallendarmanager = plugin.wecom.gcallendarmanager || function (start, item, app) {
     this.createNode("div", null, null, "item-node");
     innovaphone.lib1.loadCss(item.uri + ".css");
 
     var colorSchemes = {
         dark: {
-            "--wecom-gcalendar-item": "#333333",
-            "--wecom-gcalendar-item-text": "#f2f5f6",
-            "--wecom-gcalendar-c1": "#efefef",
-            "--wecom-gcalendar-c2": "#939393",
-            "--wecom-gcalendar-highlight-bg": "#595959",
-            "--wecom-gcalendar-input": "#191919",
-            "--wecom-gcalendar-input-text": "#f2f5f6",
-            "--wecom-gcalendar-button": "#191919",
-            "--wecom-gcalendar-button-text": "#f2f5f6",
-            "--wecom-gcalendar-button-bg": "#3D3D3D",
-            "--wecom-gcalendar-green": "#7cb270",
+            "--wecom-gcallendar-item": "#333333",
+            "--wecom-gcallendar-item-text": "#f2f5f6",
+            "--wecom-gcallendar-c1": "#efefef",
+            "--wecom-gcallendar-c2": "#939393",
+            "--wecom-gcallendar-highlight-bg": "#595959",
+            "--wecom-gcallendar-input": "#191919",
+            "--wecom-gcallendar-input-text": "#f2f5f6",
+            "--wecom-gcallendar-button": "#191919",
+            "--wecom-gcallendar-button-text": "#f2f5f6",
+            "--wecom-gcallendar-button-bg": "#3D3D3D",
+            "--wecom-gcallendar-green": "#7cb270",
         },
         light: {
-            "--wecom-gcalendar-item": "#e9eef1",
-            "--wecom-gcalendar-item-text": "#4a4a4a",
-            "--wecom-gcalendar-c1": "#444444",
-            "--wecom-gcalendar-c2": "#777777",
-            "--wecom-gcalendar-highlight-bg": "#eaeaea",
-            "--wecom-gcalendar-input": "white",
-            "--wecom-gcalendar-input-text": "#4a4a49",
-            "--wecom-gcalendar-button": "white",
-            "--wecom-gcalendar-button-text": "#4a4a49",
-            "--wecom-gcalendar-button-bg": "#CCCCCC",
-            "--wecom-gcalendar-green": "#7cb270",
+            "--wecom-gcallendar-item": "#e9eef1",
+            "--wecom-gcallendar-item-text": "#4a4a4a",
+            "--wecom-gcallendar-c1": "#444444",
+            "--wecom-gcallendar-c2": "#777777",
+            "--wecom-gcallendar-highlight-bg": "#eaeaea",
+            "--wecom-gcallendar-input": "white",
+            "--wecom-gcallendar-input-text": "#4a4a49",
+            "--wecom-gcallendar-button": "white",
+            "--wecom-gcallendar-button-text": "#4a4a49",
+            "--wecom-gcallendar-button-bg": "#CCCCCC",
+            "--wecom-gcallendar-green": "#7cb270",
         }
     };
 
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
     start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
 
-    var texts, add, gcalendarList, templatesList, templatesListCn, instance;
+    var texts, add, gcallendarList, templatesList, templatesListCn, instance;
 
-    var panel = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcalendar-panel"));
+    var panel = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcallendar-panel"));
     var src = new app.Src(pbx);
-    var typeText = ["gcalendar", "gcalendaradmin"];
-    var typeUrl = ["/wecom-gcalendar", "/wecom-gcalendaradmin"];
+    var typeText = ["gcallendar", "gcallendaradmin"];
+    var typeUrl = ["/wecom-gcallendar", "/wecom-gcallendaradmin"];
     var typeCheckmarks = [
         { web: false, websocket: true, hidden: false, pbx: true, pbxsignal: true, epsignal: false, messages: false, tableusers: true, admin: false, services: false, rcc: false },
         { web: false, websocket: false, hidden: false, pbx: false, pbxsignal: false, epsignal: false, messages: false, tableusers: false, admin: false, services: false, rcc: false }
@@ -56,7 +56,7 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
     var managerApi = start.consumeApi("com.innovaphone.manager");
 
     innovaphone.lib1.loadObjectScript(item.uri + "texts", function () {
-        texts = new innovaphone.lib1.Languages(wecom.gcalendarmanagertexts, start.lang);
+        texts = new innovaphone.lib1.Languages(wecom.gcallendarmanagertexts, start.lang);
         instance = new innovaphone.appwebsocket.Connection("ws" + item.uri.slice(4), "-", null, app.domain, instanceConnected, instanceMessage, null, null, instanceLogin);
     });
 
@@ -80,42 +80,42 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
 
     function read() {
         panel.clear();
-        var header = panel.add(new innovaphone.ui1.Div("display:flex; flex-direction:row;", null, "wecom-gcalendar-obj")).addEvent("click", onadd).testId("wecom-gcalendar-add");
-        add = header.add(new innovaphone.ui1.SvgInline("position:relative; left:10px; width:20px; top:10px; height:20px; fill:var(--wecom-gcalendar-item-text); cursor:pointer", "0 0 20 20", "<path d=\'M8.24,8.24V0h3.52V8.24H20v3.52H11.76V20H8.24V11.76H0V8.24Z'/>"));
-        header.add(new innovaphone.ui1.Div("padding: 5px 10px;", null, "wecom-gcalendar-label2")).addTranslation(texts, "addapp");
-        gcalendarList = panel.add(new innovaphone.ui1.Scrolling("position:absolute; left:0px; right:0px; top:60px; bottom:0px", -1, -1));
+        var header = panel.add(new innovaphone.ui1.Div("display:flex; flex-direction:row;", null, "wecom-gcallendar-obj")).addEvent("click", onadd).testId("wecom-gcallendar-add");
+        add = header.add(new innovaphone.ui1.SvgInline("position:relative; left:10px; width:20px; top:10px; height:20px; fill:var(--wecom-gcallendar-item-text); cursor:pointer", "0 0 20 20", "<path d=\'M8.24,8.24V0h3.52V8.24H20v3.52H11.76V20H8.24V11.76H0V8.24Z'/>"));
+        header.add(new innovaphone.ui1.Div("padding: 5px 10px;", null, "wecom-gcallendar-label2")).addTranslation(texts, "addapp");
+        gcallendarList = panel.add(new innovaphone.ui1.Scrolling("position:absolute; left:0px; right:0px; top:60px; bottom:0px", -1, -1));
         copyPwd = null;
         src.send({ mt: "GetAppObjects", api: "PbxAdminApi", uri: item.httpsUri.slice(0, item.httpsUri.lastIndexOf("/")) });
     }
 
     function onadd() {
         panel.clear();
-        var header = panel.add(new innovaphone.ui1.Div("position:absolute; box-sizing:border-box; padding:10px; width:100%; color: var(--wecom-gcalendar-c2); font-size: 18px;")).addTranslation(texts, "addapp");
+        var header = panel.add(new innovaphone.ui1.Div("position:absolute; box-sizing:border-box; padding:10px; width:100%; color: var(--wecom-gcallendar-c2); font-size: 18px;")).addTranslation(texts, "addapp");
         var content = panel.add(new innovaphone.ui1.Scrolling("position:absolute; width:100%; top:50px; bottom:40px; margin-top: 5px;", -1, -1, 9, "red"));
         var selection = content.add(new innovaphone.ui1.Div("position:relative; width:100%; display:flex; flex-wrap:wrap; align-content:flex-start"));
         var select = content.add(new innovaphone.ui1.Div("position:relative; width:100%; display:flex; flex-wrap:wrap; align-content:flex-start"));
-        addSelect(select, 0, "gcalendar", "/wecom-gcalendar.png");
-        addSelect(select, 1, "gcalendaradmin", "/wecom-gcalendaradmin.png");
+        addSelect(select, 0, "gcallendar", "/wecom-gcallendar.png");
+        addSelect(select, 1, "gcallendaradmin", "/wecom-gcallendaradmin.png");
 
         function addSelect(select, typeIndex, appid, iconpath) {
             if (!appid) appid = typeText[typeIndex];
             if (!iconpath) iconpath = typeUrl[typeIndex] + ".png";
-            var appselect = select.add(new innovaphone.ui1.Div("width:170px;height:50px;", null, "wecom-gcalendar-choice")).addEvent("click", function () {
+            var appselect = select.add(new innovaphone.ui1.Div("width:170px;height:50px;", null, "wecom-gcallendar-choice")).addEvent("click", function () {
                 select.clear();
-                selection.add(new innovaphone.ui1.Div("text-align: left; background-color: transparent; font-size: 16px;", null, "wecom-gcalendar-selection")).addTranslation(texts, appid);
-                new Editgcalendar({ type: typeIndex }, content);
-            }).testId("wecom-gcalendar-" + appid);
-            var appicon = appselect.add(new innovaphone.ui1.Div(null, null, "wecom-gcalendar-appicon"));
+                selection.add(new innovaphone.ui1.Div("text-align: left; background-color: transparent; font-size: 16px;", null, "wecom-gcallendar-selection")).addTranslation(texts, appid);
+                new Editgcallendar({ type: typeIndex }, content);
+            }).testId("wecom-gcallendar-" + appid);
+            var appicon = appselect.add(new innovaphone.ui1.Div(null, null, "wecom-gcallendar-appicon"));
             appicon.container.style.backgroundImage = "url(" + item.uri.slice(0, item.uri.lastIndexOf("/")) + iconpath + ")";
             appicon.container.style.backgroundSize = "cover";
-            appselect.add(new innovaphone.ui1.Div("position:absolute; left:50px; top:5px; height:30px;", null, "wecom-gcalendar-label2")).addTranslation(texts, appid);
+            appselect.add(new innovaphone.ui1.Div("position:absolute; left:50px; top:5px; height:30px;", null, "wecom-gcallendar-label2")).addTranslation(texts, appid);
         }
     }
 
     function pbx(msg) {
         if (msg.mt == "GetAppObjectsResult") {
             for (var i = 0; i < msg.objects.length; i++) {
-                gcalendarList.add(new gcalendar(msg.objects[i]));
+                gcallendarList.add(new gcallendar(msg.objects[i]));
             }
             templatesList = [];
             templatesListCn = [];
@@ -138,7 +138,7 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
         }
     }
 
-    function gcalendar(obj) {
+    function gcallendar(obj) {
 
         if (obj.type == undefined) {
             obj.type = 0;
@@ -146,10 +146,10 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
             else if (obj.url.slice(obj.url.lastIndexOf("/")) == typeUrl[1]) obj.type = 1;
         }
 
-        this.createNode("div", null, null, "wecom-gcalendar-obj").testId("wecom-gcalendar-obj-" + obj.sip);
+        this.createNode("div", null, null, "wecom-gcallendar-obj").testId("wecom-gcallendar-obj-" + obj.sip);
         this.addEvent("click", onedit);
-        var appName = this.add(new innovaphone.ui1.Div("width:100px; font-size:15px; color:var(--wecom-gcalendar-item-text);", null, "wecom-gcalendar-label2")).addTranslation(texts, typeText[obj.type]);
-        var header = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcalendar-header"));
+        var appName = this.add(new innovaphone.ui1.Div("width:100px; font-size:15px; color:var(--wecom-gcallendar-item-text);", null, "wecom-gcallendar-label2")).addTranslation(texts, typeText[obj.type]);
+        var header = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcallendar-header"));
         var title = header.add(new Text("title", obj.title, 120, 100));
         var sip = header.add(new Text("sip", obj.sip, 120));
         var url = header.add(new Text("url", obj.url.slice(obj.url.lastIndexOf("/")), 220));
@@ -162,32 +162,32 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
             function check(msg) {
                 if (msg.ok) {
                     if (!copyPwd) copyPwd = obj.sip;
-                    header.add(new innovaphone.ui1.SvgInline("position:relative; width:20px; height:20px; margin:5px; fill:var(--wecom-gcalendar-green)", "0 0 20 20", "<path d=\'M6.67,17.5,0,10.81,1.62,9.18l5.05,5.06L18.38,2.5,20,4.13Z'/>"));
+                    header.add(new innovaphone.ui1.SvgInline("position:relative; width:20px; height:20px; margin:5px; fill:var(--wecom-gcallendar-green)", "0 0 20 20", "<path d=\'M6.67,17.5,0,10.81,1.62,9.18l5.05,5.06L18.38,2.5,20,4.13Z'/>"));
                 }
             }
         }
         function onedit() {
             panel.clear();
-            var header = panel.add(new innovaphone.ui1.Div("position:absolute; box-sizing:border-box; padding:10px; width:100%; color: var(--wecom-gcalendar-c2); font-size: 18px;")).addTranslation(texts, "editapp");
+            var header = panel.add(new innovaphone.ui1.Div("position:absolute; box-sizing:border-box; padding:10px; width:100%; color: var(--wecom-gcallendar-c2); font-size: 18px;")).addTranslation(texts, "editapp");
             var content = panel.add(new innovaphone.ui1.Scrolling("position:absolute; width:100%; top:50px; bottom:40px; margin-top: 5px;", -1, -1, 9, "red"));
-            new Editgcalendar(obj, content);
+            new Editgcallendar(obj, content);
         }
     }
-    gcalendar.prototype = innovaphone.ui1.nodePrototype;
+    gcallendar.prototype = innovaphone.ui1.nodePrototype;
 
-    function Editgcalendar(obj, content) {
+    function Editgcallendar(obj, content) {
         var footer = panel.add(new innovaphone.ui1.Div("position:absolute; width:100%; bottom:0px; height:40px"));
-        if (obj.guid) footer.add(new innovaphone.ui1.Div("left:10px; bottom:10px", null, "wecom-gcalendar-button")).addTranslation(texts, "del").addEvent("click", ondel).testId("wecom-gcalendar-del");
-        footer.add(new innovaphone.ui1.Div("right:140px; bottom:10px", null, "wecom-gcalendar-button")).addTranslation(texts, "ok").addEvent("click", onok).testId("wecom-gcalendar-ok");
-        footer.add(new innovaphone.ui1.Div("right:10px; bottom:10px", null, "wecom-gcalendar-button")).addTranslation(texts, "cancel").addEvent("click", oncancel).testId("wecom-gcalendar-cancel");
+        if (obj.guid) footer.add(new innovaphone.ui1.Div("left:10px; bottom:10px", null, "wecom-gcallendar-button")).addTranslation(texts, "del").addEvent("click", ondel).testId("wecom-gcallendar-del");
+        footer.add(new innovaphone.ui1.Div("right:140px; bottom:10px", null, "wecom-gcallendar-button")).addTranslation(texts, "ok").addEvent("click", onok).testId("wecom-gcallendar-ok");
+        footer.add(new innovaphone.ui1.Div("right:10px; bottom:10px", null, "wecom-gcallendar-button")).addTranslation(texts, "cancel").addEvent("click", oncancel).testId("wecom-gcallendar-cancel");
 
         var general = content.add(new innovaphone.ui1.Div("position:relative; display:flex; flex-wrap: wrap;"));
-        var title = general.add(new ConfigText("title", obj.title, 150)).testId("wecom-gcalendar-cn");
-        var sip = general.add(new ConfigText("sip", obj.sip, 150)).testId("wecom-gcalendar-sip");
+        var title = general.add(new ConfigText("title", obj.title, 150)).testId("wecom-gcallendar-cn");
+        var sip = general.add(new ConfigText("sip", obj.sip, 150)).testId("wecom-gcallendar-sip");
         var tmp = [];
         var tmpSelected = [];
         for (var i = 0; i < templatesList.length; i++) {
-            tmp[i] = general.add(new ConfigTemplate(obj.sip, templatesList[i])).testId("wecom-gcalendar-temp-" + templatesList[i].cn);
+            tmp[i] = general.add(new ConfigTemplate(obj.sip, templatesList[i])).testId("wecom-gcallendar-temp-" + templatesList[i].cn);
         }
 
         function ondel() {
@@ -263,21 +263,21 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
             read();
         }
     }
-    Editgcalendar.prototype = innovaphone.ui1.nodePrototype;
+    Editgcallendar.prototype = innovaphone.ui1.nodePrototype;
 
     function Text(label, text, width, lwidth) {
         this.createNode("div", "position:relative; display:flex");
-        this.add(new innovaphone.ui1.Div(lwidth ? "width:" + lwidth + "px" : null, null, "wecom-gcalendar-label")).addTranslation(texts, label);
-        var text = this.add(new innovaphone.ui1.Div("width:" + width + "px", text, "wecom-gcalendar-value"));
+        this.add(new innovaphone.ui1.Div(lwidth ? "width:" + lwidth + "px" : null, null, "wecom-gcallendar-label")).addTranslation(texts, label);
+        var text = this.add(new innovaphone.ui1.Div("width:" + width + "px", text, "wecom-gcallendar-value"));
         this.set = function (t) { text.container.innerText = t; };
     }
     Text.prototype = innovaphone.ui1.nodePrototype;
 
     function ConfigText(label, text, width) {
         this.createNode("div", "position:relative; display:flex");
-        var label = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcalendar-label")).addTranslation(texts, label);
+        var label = this.add(new innovaphone.ui1.Div(null, null, "wecom-gcallendar-label")).addTranslation(texts, label);
         var inputDiv = this.add(new innovaphone.ui1.Div("position:relative; width:" + width + "px"));
-        var input = inputDiv.add(new innovaphone.ui1.Input(null, text, null, 100, null, "wecom-gcalendar-input"));
+        var input = inputDiv.add(new innovaphone.ui1.Input(null, text, null, 100, null, "wecom-gcallendar-input"));
 
         this.getValue = function () { return input.getValue(); };
         this.setValue = function (value) { input.setValue(value); };
@@ -288,8 +288,8 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
 
     function ConfigTemplate(sip, template) {
         this.createNode("div", "position:relative; display:flex; margin-right: 5px;");
-        var checkbox = this.add(new innovaphone.ui1.Checkbox("position:relative; margin: 7px 0px 7px 15px; width: 20px; height:20px; background-color:var(--wecom-gcalendar-green);", false, null, "var(--wecom-gcalendar-green)", "white", "var(--wecom-gcalendar-c1)"));
-        var label = this.add(new innovaphone.ui1.Div("padding: 3px 5px 3px 0px;", template.cn, "wecom-gcalendar-label"));
+        var checkbox = this.add(new innovaphone.ui1.Checkbox("position:relative; margin: 7px 0px 7px 15px; width: 20px; height:20px; background-color:var(--wecom-gcallendar-green);", false, null, "var(--wecom-gcallendar-green)", "white", "var(--wecom-gcallendar-c1)"));
+        var label = this.add(new innovaphone.ui1.Div("padding: 3px 5px 3px 0px;", template.cn, "wecom-gcallendar-label"));
         if (template.apps.indexOf(sip) >= 0) checkbox.setValue(true);
 
         this.getValue = function () { return checkbox.getValue(); };
@@ -300,4 +300,4 @@ plugin.wecom.gcalendarmanager = plugin.wecom.gcalendarmanager || function (start
     }
     ConfigTemplate.prototype = innovaphone.ui1.nodePrototype;
 }
-plugin.wecom.gcalendarmanager.prototype = innovaphone.ui1.nodePrototype;
+plugin.wecom.gcallendarmanager.prototype = innovaphone.ui1.nodePrototype;

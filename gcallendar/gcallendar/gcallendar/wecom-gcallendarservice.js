@@ -20,7 +20,7 @@ Config.onchanged(function () {
 });
 
 new JsonApi("user").onconnected(function (conn) {
-    if (conn.app == "wecom-gcalendar") {
+    if (conn.app == "wecom-gcallendar") {
         
         connectionList.push(conn);
         conn.onmessage(function(msg) {
@@ -78,7 +78,7 @@ new JsonApi("user").onconnected(function (conn) {
 });
 
 new JsonApi("admin").onconnected(function(conn) {
-    if (conn.app == "wecom-gcalendaradmin") {
+    if (conn.app == "wecom-gcallendaradmin") {
         conn.onmessage(function(msg) {
             var obj = JSON.parse(msg);
             if (obj.mt == "AdminMessage") {

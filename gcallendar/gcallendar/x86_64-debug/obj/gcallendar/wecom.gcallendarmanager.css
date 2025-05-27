@@ -1,55 +1,55 @@
 
-div.wecom-gcalendar-panel {
+div.wecom-gcallendar-panel {
     position:absolute;
     left:0px;
     right:0px;
     top:0px;
     bottom:0px;
-    color:var(--wecom-gcalendar-item-text);
+    color:var(--wecom-gcallendar-item-text);
     font-size:14px;
 }
 
-div.wecom-gcalendar-obj {
+div.wecom-gcallendar-obj {
     position:relative;
     margin:10px;
     padding:5px;
-    background-color:var(--wecom-gcalendar-item);
-    color:var(--wecom-gcalendar-item-text);
+    background-color:var(--wecom-gcallendar-item);
+    color:var(--wecom-gcallendar-item-text);
     font-size:14px;
 }
 
-div.wecom-gcalendar-header {
+div.wecom-gcallendar-header {
     position:relative;
     display:flex;
     flex-wrap:wrap;
 }
 
-div.wecom-gcalendar-label {
+div.wecom-gcallendar-label {
     position:relative;
     margin:5px 10px;
-    color:var(--wecom-gcalendar-c2);
+    color:var(--wecom-gcallendar-c2);
 }
 
-div.wecom-gcalendar-label2 {
+div.wecom-gcallendar-label2 {
     position:relative;
     width:100px;
     margin:5px 10px;
     font-size: 15px;
     text-align: left;
-    color: var(--innovaphone-gcalendar-item-text);
+    color: var(--innovaphone-gcallendar-item-text);
 }
 
-div.wecom-gcalendar-value {
+div.wecom-gcallendar-value {
     position:relative;
     margin:5px 0px;
-    /*background-color:var(--wecom-gcalendar-input);*/
-    color:var(--wecom-gcalendar-input-text);
+    /*background-color:var(--wecom-gcallendar-input);*/
+    color:var(--wecom-gcallendar-input-text);
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
 }
 
-div.wecom-gcalendar-appicon {
+div.wecom-gcallendar-appicon {
     background-size: cover;
     position: absolute;
     height: 50px;
@@ -58,38 +58,38 @@ div.wecom-gcalendar-appicon {
     width: 50px;
 }
 
-div.wecom-gcalendar-button {
+div.wecom-gcallendar-button {
     position:absolute;
     width:120px;
     height:25px;
-    background-color:var(--wecom-gcalendar-button);
-    color:var(--wecom-gcalendar-button-text);
+    background-color:var(--wecom-gcallendar-button);
+    color:var(--wecom-gcallendar-button-text);
     text-align:center;
     cursor:pointer;
 }
 
-input.wecom-gcalendar-input {
+input.wecom-gcallendar-input {
     width:100%;
     box-sizing:border-box;
     border:none;
     margin:5px 0px;
     padding: 5px 10px;
-    background-color:var(--wecom-gcalendar-input);
-    color:var(--wecom-gcalendar-input-text);
+    background-color:var(--wecom-gcallendar-input);
+    color:var(--wecom-gcallendar-input-text);
 }
 
-div.wecom-gcalendar-choice {
+div.wecom-gcallendar-choice {
     box-sizing: border-box;
     position:relative;
     width:120px;
     height:30px;
     text-align:center;
-    background-color:var(--wecom-gcalendar-button-bg);
+    background-color:var(--wecom-gcallendar-button-bg);
     margin:10px;
     padding: 5px;
 }
 
-div.wecom-gcalendar-choice:hover {
-    background-color:var(--wecom-gcalendar-highlight-bg);
+div.wecom-gcallendar-choice:hover {
+    background-color:var(--wecom-gcallendar-highlight-bg);
 }
 
