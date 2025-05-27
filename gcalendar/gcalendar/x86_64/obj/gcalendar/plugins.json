@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        {
+            "js": "wecom.gcalendarmanager",
+            "icon": "wecom-gcalendar.png",
+            "lang": "wecom.gcalendarmanagertexts",
+            "domains": false
+        }
+    ]
+}
