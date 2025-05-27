@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - Sysclient Implementation</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+</head>
+
+<body>
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>Sysclient</h1>
+    <p>
+        Interface for the sysclient.
+    </p>
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/sysclient.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#ISysclient">ISysclient</a><br />
+                <a href="#USysclient">USysclient</a><br />
+                <br />
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <h1>Classes</h1>
+    <h2 id="ISysclient">ISysclient</h2>
+    <pre><code class="language-cpp">class ISysclient {
+public:
+    <a href="#Create" style="text-decoration:none;">static class ISysclient * Create(class IIoMux * const iomux, class ISocketProvider * tcpSocketProvider, class ISocketProvider * tlsSocketProvider, class USysclient * uSysclient, const char * serverURI, class IInstanceLog * const log, const char * webserverPassword, const char * provisioningCode, const char * macAddress)</a>;
+    <a href="#SendIdentify" style="text-decoration:none;">virtual void SendIdentify(const char * challenge, const char * provisioningCode, const char * mac, const char * product, const char * version, const char * type)</a>;
+    <a href="#SendCustomIdentify" style="text-decoration:none;">virtual void SendCustomIdentify(const void * buff, size_t len)</a>;
+    <a href="#Close" style="text-decoration:none;">virtual void Close()</a>;
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="Create">Create (static function)</div>
+    <dl>
+        <dd>
+            The function is used to create a sysclient object.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">class IIoMux * const <b>iomux</b></td><td>To hold the architecture string</td></tr>
+                <tr><td class="param">class ISocketProvider * <b>tcpSocketProvider</b></td><td>The TCP socket provider</td></tr>
+                <tr><td class="param">class ISocketProvider * <b>tlsSocketProvider</b></td><td>The TLS socket provider</td></tr>
+                <tr><td class="param">class USysclient * <b>uSysclient</b></td><td>The USysclient instance to receive the callbacks.</td></tr>
+                <tr><td class="param">const char * <b>serverURI</b></td><td>The server URI (e.g. the Devices App URL)</td></tr>
+                <tr><td class="param">class IInstanceLog * const <b>log</b></td><td> The length of the buffer</td></tr>
+                <tr><td class="param">const char * <b>webserverPassword</b></td><td>The webserver password, which could be NULL</td></tr>
+                <tr><td class="param">const char * <b>provisioningCode</b></td><td>The provisioning code given by Devices</td></tr>
+                <tr><td class="param">const char * <b>macAddress</b></td><td>The MAC address of the device</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            Returns the sysclient object.
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SendIdentify">SendIdentify</div>
+    <dl>
+        <dd>
+            The function is used to send the Identify message, which is built using the parameters.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>challenge</b></td><td>The challenge, which could be set to NULL if there is no challenge yet</td></tr>
+                <tr><td class="param">const char * <b>provisioningCode</b></td><td>The provisioning code provided by Devices</td></tr>
+                <tr><td class="param">const char * <b>mac</b></td><td>The MAC address without whitespaces, ":" or "-" and in lowercase</td></tr>
+                <tr><td class="param">const char * <b>product</b></td><td>The product name</td></tr>
+                <tr><td class="param">const char * <b>version</b></td><td>The version (i.e. 13r1, 13r2...)</td></tr>
+                <tr><td class="param">const char * <b>type</b></td><td>The type of the device in JSON format (e.g. for a phone it will be { "type": "PHONE" })</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SendCustomIdentify">SendCustomIdentify</div>
+    <dl>
+        <dd>
+            The function is used to send a custom Identify message.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>buffer</b></td><td>The buffer with the JSON message</td></tr>
+                <tr><td class="param">size_t <b>len</b></td><td> The length of the buffer</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="Close">Close</div>
+    <dl>
+        <dd>
+            Closes the sysclient object. After it is closed, the function SysClientClosed will be called.
+        </dd>
+    </dl>
+
+    <h2 id="USysclient">USysclient</h2>
+    <pre><code class="language-cpp">class USysclient {
+public:
+    <a href="#SysclientConnected" style="text-decoration:none;">virtual void SysclientConnected(class ISysclient * sysclient)</a>;
+    <a href="#SetProvisioningCode" style="text-decoration:none;">virtual void SetProvisioningCode(const char * provisioningCode)</a>;
+    <a href="#SetManagerSysClientPassword" style="text-decoration:none;">virtual void SetManagerSysClientPassword(const char * password)</a>;
+    <a href="#SetPasswords" style="text-decoration:none;">virtual void SetPasswords(const char * admin_pwd)</a>;
+    <a href="#SetConfig" style="text-decoration:none;">virtual void SetConfig(char * buffer)</a>;
+    <a href="#GetManagerSysClientPassword" style="text-decoration:none;">virtual const char * GetManagerSysClientPassword()</a>;
+    <a href="#SysClientClosed" style="text-decoration:none;">virtual void SysClientClosed(class ISysclient * sysclient)</a>;
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead" id="SysclientConnected">SysclientConnected</div>
+    <dl>
+        <dd>
+            The function is used to create a sysclient object.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">class ISysclient * <b>sysclient</b></td><td>The ISysclient instance which will receive the callbacks.</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SetProvisioningCode">SetProvisioningCode</div>
+    <dl>
+        <dd>
+            The function will be called with the provisioning code.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>provisioningCode</b></td><td>The provisioning code provided by Devices</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SetManagerSysClientPassword">SetManagerSysClientPassword</div>
+    <dl>
+        <dd>
+            The function will be called with the manager sysclient password for the device.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>password</b></td><td>The manager sysclient password for the device</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SetPasswords">SetPasswords</div>
+    <dl>
+        <dd>
+            This function will be called with the admin password.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>admin_pwd</b></td><td>The admin password</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SetConfig">SetConfig</div>
+    <dl>
+        <dd>
+            Called with the config data of the device sent by Devices. This will be called several times and the last time the flag "last" will be set to too.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">char * <b>buffer</b></td><td>The buffer with config data on JSON format</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="GetManagerSysClientPassword">GetManagerSysClientPassword</div>
+    <dl>
+        <dd>
+            The function returns the manager sysclient password.
+
+            <h4>Return value</h4>
+            Returns the manager sysclient password.
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="SysClientClosed">SysClientClosed</div>
+    <dl>
+        <dd>
+            After the sysclient object is closed, this function is called so that the object can be deleted.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">class ISysclient * <b>sysclient</b></td><td>The ISysclient instance which will receive the callbacks.</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+</body>
+</html>

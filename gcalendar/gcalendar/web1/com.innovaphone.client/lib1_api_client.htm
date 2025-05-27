@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>com.innovaphone.client (Client API)</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>com.innovaphone.client (Client API)</h1>
+    <p>
+        This API is used for communicating with the client. It provides the following functionality for apps:
+        <ul>
+            <li>Presence and dialog subscriptions.</li>
+            <li>Manage <a href="#AppLinks">app links</a> on the home screen.</li>
+            <li>Notifying the client, if profile pictures need to be reloaded.</li>
+            <li>Displaying status info for active phone calls.</li>
+            <li>Information about the user and the myApps client.</li>
+        </ul>
+    </p>
+
+    <h2>Restictions</h2>
+    <p>
+        The API is exclusively provided by the myApps client. The corresponding provider name is "@client".
+    </p>
+
+    <h2>API model</h2>
+    <h3>Service info</h3>
+    <p>
+        The API doesn't define any service info.
+    </p>
+    <h3>Provider model</h3>
+    <p>
+    <p>
+        <pre><code class="json">{
+    "user": {
+        "domain": string,
+        "sip": string,
+        "guid": string,
+        "dn": string,
+        "num": string,
+        "email": string,
+        "prefix": {
+            "intl": string,
+            "ntl": string,
+            "subs": string,
+            "area": string,
+            "country": string
+        }
+    },
+    "connInfo": {
+        "up": boolean,
+        "standby": boolean,
+        "cur": string,
+        "pri": string,
+        "sec": string,
+        "phys": string
+    },
+    "home": [ string ],
+    "deviceApps": [
+        {
+            "name": string,
+            "title": string,
+            "deviceapp": string
+        } 
+    ],
+    "profileApp": string,
+    "tutorialApp": string,
+    "standby": boolean,
+    "lang": string,
+    "scheme": string,
+    "launcher": boolean,
+    "launcherUpdateBuild": string,
+    "appStoreUrl": string,
+    "adminSettings": object
+}</code></pre><br />
+        <dl>
+            <dt>user</dt>
+            <dd>An object containing the details about the user that is logged-in.</dd>
+            <dt>connInfo</dt>
+            <dd>An object containing information about the connection and alternative PBXes.</dd>
+            <dt>home</dt>
+            <dd>An object containing the <a href="#AppLinks">app links</a> that are attached to home for each app.</dd>
+            <dt>deviceApps</dt>
+            <dd>An array that contains the apps that can be used as a phone app by the user.</dd>
+            <dt>profileApp</dt>
+            <dd>The name of the app that shall be used to configure the user profile.</dd>
+            <dt>tutorialApp</dt>
+            <dd>The name of the tutorials app.</dd>
+            <dt>standby</dt>
+            <dd>true if the client is running on a standby PBX. Apps can use this information if they implement a special behaviour in that case.</dd>
+            <dt>lang</dt>
+            <dd>The two-letter code of the user's language.</dd>
+            <dt>scheme</dt>
+            <dd>The current color scheme ("light" or "dark").</dd>
+            <dt>launcher</dt>
+            <dd>true if myApps is running inside the myApps launcher for Windows, iOS or Android.</dd>
+            <dt>launcherUpdateBuild</dt>
+            <dd>The buildnumber that shall be used for automatic update of the launcher.</dd>
+            <dt>appStoreUrl</dt>
+            <dd>The URL of the app store that shall be used for automatic update of the launcher.</dd>
+            <dt>adminSettings</dt>
+            <dd>An object that contains administrative settings that are used by the launcher, by the myApps client or by apps. Each setting is represented by a named object that contains a "value" and "force" field. If "force" is true, the user should not be allowed to change that setting.</dd>
+        </dl>
+    </p>
+
+    <h2>API messages</h2>
+    <p>
+        All messages are JSON objects that have a mandatory attribute "mt" that specifies the message type. Providers must echo the "src" attribute from requests in the corresponding responses.
+        <pre><code class="json">{
+    "mt": string,
+    "src": string
+}</code></pre><br />
+    </p>
+
+    <u>Requests</u>
+    <ul>
+        <li><a href="#UpdateProfile">UpdateProfile</a> - Tells the client that the profile picture of the user has changed and shall be reloaded.</li>
+        <li><a href="#ShowApp">ShowApp</a> - Opens an <a href="#AppLinks">app link</a> within myapps.</li>
+        <li><a href="#SetAttachedToHome">SetAttachedToHome</a> - Attaches or detaches an <a href="#AppLinks">app link</a> to the home screen.</li>
+        <li><a href="#ShowStatusInfo">ShowStatusInfo</a> - Opens a status bar provided by the app that is shown while other apps are in the foreground.</li>
+        <li><a href="#CloseStatusInfo">CloseStatusInfo</a> - Closes a status bar.</li>
+        <li><a href="#SubscribePresence">SubscribePresence</a> - Starts a presence subscription.</li>
+        <li><a href="#UnsubscribePresence">UnsubscribePresence</a> - Closes a presence subscription.</li>
+        <li><a href="#SubscribeDialog">SubscribeDialog</a> - Starts a dialog subscription.</li>
+        <li><a href="#UnsubscribeDialog">UnsubscribeDialog</a> - Closes a dialog subscription.</li>
+        <li><a href="#GetAppIcon">GetAppIcon</a> - Gets the app icon URI for an app.</li>
+    </ul>
+
+    <u>Responses</u>
+    <ul>
+        <li><a href="#PresenceUpdated">PresenceUpdated</a> - An update for a presence subscription.</li>
+        <li><a href="#DialogInfo">DialogInfo</a> - An update for a dialog subscription.</li>
+        <li><a href="#GetAppIconResult">GetAppIconResult</a> - The response to the GetAppIcon request.</li>
+    </ul>
+
+    <a name="UpdateProfile"><h3>UpdateProfile</h3></a>
+    <p>
+        Tells the client that the profile picture of the user has changed and shall be reloaded.
+        <pre><code class="json">{
+    "mt": "UpdateProfile"
+}</code></pre><br />
+    </p>
+
+    <a name="ShowApp"><h3>ShowApp</h3></a>
+    <p>
+        Opens an <a href="#AppLinks">app link</a> within myapps.
+        <pre><code class="json">{
+    "mt": "ShowApp",
+    "app": string
+}</code></pre><br />
+        <dl>
+            <dt>app</dt>
+            <dd>The app link to show, possibly including parameters, e.g. "someapp?id=3".</dd>
+        </dl>
+    </p>
+
+    <a name="SetAttachedToHome"><h3>SetAttachedToHome</h3></a>
+    <p>
+        Attaches or detaches an <a href="#AppLinks">app link</a> to the home screen.
+        <pre><code class="json">{
+    "mt": "SetAttachedToHome",
+    "reference": string,
+    "attached": boolean
+}</code></pre><br />
+        <pre><code class="json">{
+    "mt": "SetAttachedToHome",
+    "link": string,
+    "attached": boolean
+}</code></pre><br />
+        <dl>
+            <dt>reference</dt>
+            <dd>Used for links to the app itself.</dd>
+            <dd>Contains only the parameter part of the app link, e.g. "?id=13#s=doe&d=John%20Doe".</dd>
+            <dd>The provider will prepend it with the ID of the app sending the request.</dd>
+            <dt>link</dt>
+            <dd>Used for links to another app.</dd>
+            <dd>Contains a full app link, e.g. "someapp?id=13#s=doe&d=John%20Doe".</dd>
+            <dt>attached</dt>
+            <dd>true if the app link shall be attached.</dd>
+            <dd>false if the app link shall be deatached.</dd>
+        </dl>
+    </p>
+
+    <a name="ShowStatusInfo"><h3>ShowStatusInfo</h3></a>
+    <p>
+        Opens an HTML page in the client as a status information. It is only shown, while the originating app is in the background.
+        When the originating app is closed, the client closes all related status informations.
+        <pre><code class="json">{
+    "mt": "ShowStatusInfo",
+    "url": string,
+    "id": string
+}</code></pre><br />
+        <dl>
+            <dt>url</dt>
+            <dd>The URL of the HTML page that shall be shown.</dd>
+            <dt>id</dt>
+            <dd>An id that must be unique for the app that created the notification.</dd>
+        </dl>
+    </p>
+
+    <a name="CloseStatusInfo"><h3>CloseStatusInfo</h3></a>
+    <p>
+        Closes a status information that has been opened using ShowStatusInfo.
+        <pre><code class="json">{
+    "mt": "CloseStatusInfo",
+    "id": string
+}</code></pre><br />
+        <dl>
+            <dt>id</dt>
+            <dd>The id that has been used to create the notification.</dd>
+            <dd>If no id is given, the client will close all status informations of the app.</dd>
+        </dl>
+    </p>
+
+    <a name="SubscribePresence"><h3>SubscribePresence</h3></a>
+    <p>
+        Starts a presence subscription to a given SIP URI or phone number. The provider will send PresenceUpdated messages until the consume stops the subscription using UnsubscribePresence.
+        <pre><code class="json">{
+    "mt": "SubscribePresence",
+    "sip": string,
+    "num": string
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"SubscribePresence"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the remote endpoint (optional, sip or num must be specified)</dd>
+            <dt>num</dt>
+            <dd>The phone number of the remote endpoint (optional, sip or num must be specified)</dd>
+        </dl><br />
+        Examples:<br />
+        <pre><code class="json">{ mt: "SubscribePresence", sip: "atlantis" }</code></pre><br />
+        <pre><code class="json">{ mt: "SubscribePresence", num: "201" }</code></pre><br />
+    </p>
+
+    <a name="UnsubscribePresence"><h3>UnsubscribePresence</h3></a>
+    <p>
+        Closes a presence subscription that was started using SubscribePresence. If no <code>sip</code> or <code>num</code> is given, all presence subscriptions of the consumer are closed.
+        <pre><code class="json">{
+    "mt": "UnsubscribePresence",
+    "sip": string,
+    "num": string
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"UnsubscribePresence"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the remote endpoint (optional)</dd>
+            <dt>num</dt>
+            <dd>The phone number of the remote endpoint (optional)</dd>
+        </dl><br />
+        Examples:<br />
+        <pre><code class="json">{ mt: "UnsubscribePresence", sip: "atlantis" }</code></pre><br />
+        <pre><code class="json">{ mt: "UnsubscribePresence", num: "201" }</code></pre><br />
+        <pre><code class="json">{ mt: "UnsubscribePresence" }</code></pre><br />
+    </p>
+
+    <a name="SubscribeDialog"><h3>SubscribeDialog</h3></a>
+    <p>
+        Starts a dialog subscription to a given SIP URI or phone number. The provider will send DialogInfo messages until the consume stops the subscription using UnsubscribeDialog.
+        <pre><code class="json">{
+    "mt": "SubscribeDialog",
+    "sip": string,
+    "num": string
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"SubscribeDialog"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the remote endpoint (optional, sip or num must be specified)</dd>
+            <dt>num</dt>
+            <dd>The phone number of the remote endpoint (optional, sip or num must be specified)</dd>
+        </dl><br />
+        Examples:<br />
+        <pre><code class="json">{ mt: "SubscribeDialog", sip: "atlantis" }</code></pre><br />
+        <pre><code class="json">{ mt: "SubscribeDialog", num: "201" }</code></pre><br />
+    </p>
+
+    <a name="UnsubscribeDialog"><h3>UnsubscribeDialog</h3></a>
+    <p>
+        Closes a dialog subscription that was started using SubscribeDialog. If no <code>sip</code> or <code>num</code> is given, all dialog subscriptions of the consumer are closed.
+        <pre><code class="json">{
+    "mt": "UnsubscribeDialog",
+    "sip": string,
+    "num": string
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"UnsubscribeDialog"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the remote endpoint (optional)</dd>
+            <dt>num</dt>
+            <dd>The phone number of the remote endpoint (optional)</dd>
+        </dl><br />
+        Examples:<br />
+        <pre><code class="json">{ mt: "UnsubscribeDialog", sip: "atlantis" }</code></pre><br />
+        <pre><code class="json">{ mt: "UnsubscribeDialog", num: "201" }</code></pre><br />
+        <pre><code class="json">{ mt: "UnsubscribeDialog" }</code></pre><br />
+    </p>
+
+    <a name="PresenceUpdated"><h3>PresenceUpdated</h3></a>
+    <p>
+        An update for a presence subscription that was started using <code>SubscribePresence</code>.
+        <pre><code class="json">{
+    "mt": "PresenceUpdated",
+    "sip": string,
+    "num": string,
+    "up": boolean,
+    "ep": {
+        "sip": string,
+        "num": string,
+        "dn": string
+    },
+    "presence" : [
+        {
+            "contact": string,
+            "activity", string,
+            "displayNote": string,
+            "note": string,
+            "status": string,
+            "params": object
+        }
+    ]
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"PresenceUpdated"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the remote endpoint, as specified by the consumer</dd>
+            <dt>num</dt>
+            <dd>The phone number of the remote endpoint, as specified by the consumer</dd>
+            <dt>up</dt>
+            <dd>The connection state of the presence subscription (true or false)</dd>
+            <dt>ep</dt>
+            <dd>
+                Information about the remote endpoint that was received over the presence subscription.
+                <dl>
+                    <dt>sip</dt>
+                    <dd>SIP URI</dd>
+                    <dt>num</dt>
+                    <dd>Phone number</dd>
+                    <dt>dn</dt>
+                    <dd>Display name</dd>
+                </dl>
+            </dd>
+            <dt>presence</dt>
+            <dd>
+                An array containing the list of presences for the different contacts.
+                <dl>
+                    <dt>contact</dt>
+                    <dd>Presence contact ("tel:", "im:", "calendar:")</dd>
+                    <dt>activity</dt>
+                    <dd>Presence activity ("", "away", "busy", "dnd")</dd>
+                    <dt>displayNote</dt>
+                    <dd>An additional text entered by the user that describes the presence in detail. Calendar presences are localized by the provider. Additional parameters (hashtags) are removed.</dd>
+                    <dt>note</dt>
+                    <dd>Same as displayNote, but not localized and possibly containing hashtags. Should not be used for displaying.</dd>
+                    <dt>status</dt>
+                    <dd>The availability using that contact ("open", "closed")</dd>
+                    <dt>params</dt>
+                    <dd>An object containing the parsed parameters from the presence note.</dd>
+                </dl>
+            </dd>
+        </dl>
+        Example:<br />
+        <pre><code class="json"> {
+    "mt": "PresenceUpdated",
+    "sip": "atlantis",
+    "up": true,
+    "ep": {
+        "sip": "atlantis",
+        "dn": "Atlantis",
+        "num": "201"
+    },
+    "presence": [
+        {
+            "contact": "calendar:",
+            "status": "open",
+            "activity": "",
+            "note": "Frei bis 26.04.2018, 11:00 (Beschäftigt: Fixes) #free #until:1524733200000 #next-activity:busy #next:41:5:42:5",
+            "displayNote": "Frei bis 26.4.2018 11:00 (Beschäftigt: Fixes)",
+            "params": {
+                "free": "",
+                "until": 1524733200000,
+                "next-activity": "busy",
+                "next": "41:5:42:5"
+            }
+        },
+        {
+            "contact": "im:",
+            "status": "closed",
+            "activity": "",
+            "displayNote": "",
+            "params": {}
+        }
+    ]
+}
+</code></pre><br />
+    </p>
+
+    <a name="DialogInfo"><h3>DialogInfo</h3></a>
+    <p>
+        An update for a dialog subscription that was started using <code>SubscribeDialog</code>.
+        <pre><code class="json">{
+    "mt": "DialogInfo",
+    "sip": string,
+    "callId": string,
+    "confId": string,
+    "remote": {
+        "sip": string,
+        "dn": string,
+        "num": string,
+    },
+    "state": {
+        "name": string,
+        "outgoing": boolean,
+        "hold": boolean
+    }
+}</code></pre><br />
+        <dl>
+            <dt>mt</dt>
+            <dd>"DialogInfo"</dd>
+            <dt>sip</dt>
+            <dd>The SIP URI of the monitored endpoint, as specified by the consumer</dd>
+            <dt>num</dt>
+            <dd>The phone number of the monitored endpoint, as specified by the consumer</dd>
+            <dt>callId</dt>
+            <dd>The unique ID of the call. It can be used for further actions using JSON signalling like pickup.</dd>
+            <dt>confId</dt>
+            <dd>The conference ID of the call.</dd>
+            <dt>remote</dt>
+            <dd>
+                Information about the remote endpoint of the call.
+                <dl>
+                    <dt>sip</dt>
+                    <dd>SIP URI</dd>
+                    <dt>num</dt>
+                    <dd>Phone number</dd>
+                    <dt>dn</dt>
+                    <dd>Display name</dd>
+                </dl>
+            </dd>
+            <dt>state</dt>
+            <dd>
+                An object containing the state of the call.
+                <dl>
+                    <dt>name</dt>
+                    <dd>The state itself. Possible values are "idle", "calling", "incomplete", "complete", "alerting", "connected", "disconnecting", "disconnected" and "parked".</dd>
+                    <dt>outgoing</dt>
+                    <dd><code>true</code> for outgoing calls. <code>false</code> for incoming calls.</dd>
+                    <dt>hold (optional)</dt>
+                    <dd><code>true</code> if the call is put on hold by the monitored endpoint.</dd>
+                    <dt>held (optional)</dt>
+                    <dd><code>true</code> if the call is put on hold by the remote endpoint.</dd>
+                    <dt>waiting (optional)</dt>
+                    <dd><code>true</code> if the call is waiting.</dd>
+                </dl>
+            </dd>
+            <dt>deleted (optional)</dt>
+            <dd><code>true</code> if the call is finished. The consumer can remove the call from its local model.</dd>
+        </dl>
+        Example:<br />
+        <pre><code class="json">{
+    "mt": "DialogInfo",
+    "sip": "endeavour",
+    "callId": "e44379a033ec5a01ebd500903328631a",
+    "confId": "13d9c5a033ec5a01ead500903328631a",
+    "remote": {
+        "sip": "atlantis",
+        "dn": "Atlantis",
+        "num": "201"
+    },
+    "state": {
+        "name": "connected",
+        "outgoing": true,
+        "hold": true
+    }
+}
+</code></pre><br />
+    </p>
+
+    <h2>Concepts</h2>
+    <a name="AppLinks"><h3>App links</h3></a>
+    <p>
+        The URI format for app links consists of
+        <dl>
+            <dt>app name</dt>
+            <dd>The name of app as defined in the app object in the PBX. The client will open this app, when the app link is clicked by the user.</dd>
+            <dt>app parameters (optional)</dt>
+            <dd>A search string (?) with the parameters that are passed to the app.</dd>
+            <dt>client parameters (optional)</dt>
+            <dd>
+                A fragment identifier (#) with parameters for the client. Currently the following parameters are defined:
+                <dl>
+                    <dt>d</dt>
+                    <dd>The display name that shall be shown on the app tile or in the tooltip of the app icon. If no display name is given, the client will show the name of the app.</dd>
+                    <dt>s</dt>
+                    <dd>A SIP URI for presence monitoring and retrieval of a profile picture. The presence will be shown on the app tile on the home screen.</dd>
+                </dl>
+            </dd>
+        </dl>
+    </p>
+    <p>
+        Example: <code>contacts?id=13#s=doe&d=John%20Doe</code>
+    </p>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - conference protocol</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>Conference protocol</h1>
+
+    <p>
+        The protocol described in this article is used between the PBX conference object in the PBX and a conference interface.
+        It's purpose is to handle additional calls from a client endpoint to the conference interface. This calls are established to handle more than one video streams from the conference interface.
+        The following facility messages are currently known:
+        <ul>
+            <li>Video setup</li>
+            <li>Video connect</li>
+            <li>Video priority</li>
+            <li>Video capabilities</li>
+        </ul>
+    </p>
+
+    <a name="FacilityObjects"><h2>Facility objects</h2></a>
+    <p>
+        Depending on the value of the type property, different objects are defined. The following
+        types are known:
+        <table>
+            <tr><td><a href="#fty_video_setup">video_setup</a></td><td>Video setup</td></tr>
+            <tr><td><a href="#fty_video_conn">video_conn</a></td><td>Video connect</td></tr>
+            <tr><td><a href="#fty_video_priority">video_priority</a></td><td>Video priority</td></tr>
+            <tr><td><a href="#fty_video_capabilities">video_capabilities</a></td><td>Video capabilities</td></tr>
+        </table>
+    </p>
+
+    <a name="fty_video_setup"><div class="fnhead">Video setup facility</div></a>
+    <p>
+        This facility marks the call as a video call, informs about the direction and requests optionally a individual video stream with a given id.
+        The bitrate argument informs about the own quality capability or the quality of a requested stream.
+    </p>
+    <pre><code class="json">{
+    "type": "video_setup",
+    "mode": <a href="#video_direction_mode">Video Direction Mode</a>,
+    "guid": string,
+    "id": unsigned,
+    "bitrate": unsigned,
+}</code></pre><br />
+
+    <a name="video_direction_mode"><div class="fnhead">Video Direction Mode</div></a>
+    <p>
+        This is a string defining the mode of the video direction. The following values are defined for this property:
+        <table>
+            <tr><td><b>sendonly</b></td><td>The call sends only video.</td></tr>
+            <tr><td><b>recvonly</b></td><td>The call receives only video.</td></tr>
+            <tr><td><b>sendrecv</b></td><td>The call sends and receives video.</td></tr>
+        </table>
+    </p>
+
+    <a name="fty_video_conn"><div class="fnhead">Video connect facility</div></a>
+    <p>
+        This facility informs about the guid and video stream id and is an optional response to a created video channel or a message to set the requested stream quality.
+    </p>
+    <pre><code class="json">{
+    "type": "video_conn",
+    "guid": string,
+    "id": unsigned,
+    "bitrate": unsigned,
+}</code></pre><br />
+
+    <a name="fty_video_priority"><div class="fnhead">Video priority facility</div></a>
+    <p>
+        This facility is used to temporarily pause speaker detection. Can be used when desktop sharing is started (on=true) and stopped (on=false).
+    </p>
+    <pre><code class="json">{
+    "type": "video_priority",
+    "on": boolean
+}</code></pre><br />
+
+    <a name="fty_video_capabilities"><div class="fnhead">Video capabilities facility</div></a>
+    <p>
+        This facility is used to indicate support for "multi-video".<br />
+        A multi-video-capable endpoint sends this facility when initiating a call ("setup" message).<br />
+        The multi-video-capable conference sends this facility when accepting a call ("conn" message).<br />
+        <dl>
+            <dt>If both ends of a call indicate multi-video-support</dt>
+            <dd>The main call connection is established with audio-only. For video separate connections are opened by the endpoint (sendonly and recvonly).</dd>
+            <dt>If <b>NOT</b> both ends of a call indicate multi-video-support</dt>
+            <dd>The main call connection is established with audio and video channel. E.g. endpoint-to-endpoint call.</dd>
+        </dl>
+    </p>
+    <pre><code class="json">{
+    "type": "video_capabilities",
+    "multivideo": boolean
+}</code></pre>
+    <p>
+        Examples:
+        <dl>
+            <dt>Legacy endpoint calls lagacy conference:</dt>
+            <dd>
+                EP sends "setup" <b>without</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>without</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Legacy endpoint calls multi-video conference:</dt>
+            <dd>
+                EP sends "setup" <b>without</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>with</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Multi-video endpoint calls lagacy conference:</dt>
+            <dd>
+                EP sends "setup" <b>with</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>without</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Multi-video endpoint calls multi-video conference:</dt>
+            <dd>
+                EP sends "setup" <b>with</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>with</b> video_capabilities(multivideo=true) and Audio-Only answer.<br />
+                Audio only is transported over main call connection.
+                EP opens additional video-only connections to CONF.
+            </dd>
+        </dl>
+    </p>
+
+</body>
+</html>
