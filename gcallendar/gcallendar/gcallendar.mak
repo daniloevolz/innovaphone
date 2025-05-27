@@ -1,5 +1,5 @@
 
-PROJECT		= gcallendar
+PROJECT		= gcalendar
 
 include sdk/platform/sdk-defs.mak
 

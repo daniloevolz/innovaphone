@@ -18,4 +18,4 @@ FILES	+=	\
 	label.txt \
 	config.json \
     plugins.json \
-	wecom-gcallendarservice.js
+	wecom-gcalendarservice.js

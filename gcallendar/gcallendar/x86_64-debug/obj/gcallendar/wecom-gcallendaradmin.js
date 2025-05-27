@@ -4,7 +4,7 @@
 /// <reference path="../../web1/ui1.lib/innovaphone.ui1.lib.js" />
 
 var Wecom = Wecom || {};
-Wecom.gcallendarAdmin = Wecom.gcallendarAdmin || function (start, args) {
+Wecom.gcalendarAdmin = Wecom.gcalendarAdmin || function (start, args) {
     this.createNode("body");
     var that = this;
     var clientId;
@@ -26,7 +26,7 @@ Wecom.gcallendarAdmin = Wecom.gcallendarAdmin || function (start, args) {
     var schemes = new innovaphone.ui1.CssVariables(colorSchemes, start.scheme);
     start.onschemechanged.attach(function () { schemes.activate(start.scheme) });
 
-    var texts = new innovaphone.lib1.Languages(Wecom.gcallendarTexts, start.lang);
+    var texts = new innovaphone.lib1.Languages(Wecom.gcalendarTexts, start.lang);
 
     var app = new innovaphone.appwebsocket.Connection(start.url, start.name);
     app.checkBuild = true;
@@ -73,7 +73,7 @@ Wecom.gcallendarAdmin = Wecom.gcallendarAdmin || function (start, args) {
 
     }
 
-    // Função para criar um toast de notificação
+    // Funï¿½ï¿½o para criar um toast de notificaï¿½ï¿½o
     function createToast(message) {
         var toast = that.add(new innovaphone.ui1.Div(null, message, "toast show"));
         //var toast = document.createElement("div");
@@ -85,11 +85,11 @@ Wecom.gcallendarAdmin = Wecom.gcallendarAdmin || function (start, args) {
         // Adicionar a classe 'show' para mostrar o toast
         //toast.className = "toast show";
 
-        // Remover o toast após 15 segundos
+        // Remover o toast apï¿½s 15 segundos
         setTimeout(function () {
             document.getElementById('toast').remove();
         }, 5000); // 15 segundos
     }
 }
 
-Wecom.gcallendarAdmin.prototype = innovaphone.ui1.nodePrototype;
+Wecom.gcalendarAdmin.prototype = innovaphone.ui1.nodePrototype;

@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5dcca249-c705-4cc5-b255-5678c5bf9b40}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>gcallendar</RootNamespace>
+    <RootNamespace>gcalendar</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
@@ -70,76 +70,76 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak x86_64 "DEBUG=1"</BuildCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak x86_64 "DEBUG=1"</BuildCommandLine>
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-x86_64 DEBUG=1 &amp;&amp; call common/build/buildnum gcallendar.mak clean-x86_64 "DEBUG=1"</ReBuildCommandLine>
-    <CleanCommandLine>make -f gcallendar.mak clean-x86_64 DEBUG=1</CleanCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-x86_64 DEBUG=1 &amp;&amp; call common/build/buildnum gcalendar.mak clean-x86_64 "DEBUG=1"</ReBuildCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-x86_64 DEBUG=1</CleanCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\x86_64-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
-    <RemoteDebuggerCommand>/apps/gcallendar/gcallendar</RemoteDebuggerCommand>
+    <RemoteDebuggerCommand>/apps/gcalendar/gcalendar</RemoteDebuggerCommand>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak arm "DEBUG=1"</BuildCommandLine>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-arm DEBUG=1 &amp;&amp; call common/build/buildnum gcallendar.mak arm "DEBUG=1"</ReBuildCommandLine>
-    <CleanCommandLine>make -f gcallendar.mak clean-arm DEBUG=1</CleanCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak arm "DEBUG=1"</BuildCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-arm DEBUG=1 &amp;&amp; call common/build/buildnum gcalendar.mak arm "DEBUG=1"</ReBuildCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-arm DEBUG=1</CleanCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\arm-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
-    <RemoteDebuggerCommand>/apps/gcallendar/gcallendar</RemoteDebuggerCommand>
+    <RemoteDebuggerCommand>/apps/gcalendar/gcalendar</RemoteDebuggerCommand>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak arm</BuildCommandLine>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-arm &amp;&amp; call common/build/buildnum gcallendar.mak arm</ReBuildCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak arm</BuildCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-arm &amp;&amp; call common/build/buildnum gcalendar.mak arm</ReBuildCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\arm-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
-    <CleanCommandLine>make -f gcallendar.mak clean-arm</CleanCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-arm</CleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak arm64</BuildCommandLine>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-arm64 &amp;&amp; call common/build/buildnum gcallendar.mak arm64</ReBuildCommandLine>
-    <CleanCommandLine>make -f gcallendar.mak clean-arm64</CleanCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak arm64</BuildCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-arm64 &amp;&amp; call common/build/buildnum gcalendar.mak arm64</ReBuildCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-arm64</CleanCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\aarch64-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak arm64 "DEBUG=1"</BuildCommandLine>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-arm64 DEBUG=1 &amp;&amp; call common/build/buildnum gcallendar.mak arm64 "DEBUG=1"</ReBuildCommandLine>
-    <CleanCommandLine>make -f gcallendar.mak clean-arm64 DEBUG=1</CleanCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak arm64 "DEBUG=1"</BuildCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-arm64 DEBUG=1 &amp;&amp; call common/build/buildnum gcalendar.mak arm64 "DEBUG=1"</ReBuildCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-arm64 DEBUG=1</CleanCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\aarch64-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
-    <RemoteDebuggerCommand>/apps/gcallendar/gcallendar</RemoteDebuggerCommand>
+    <RemoteDebuggerCommand>/apps/gcalendar/gcalendar</RemoteDebuggerCommand>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <BuildCommandLine>call common/build/buildnum gcallendar.mak x86_64</BuildCommandLine>
-    <ReBuildCommandLine>make -f gcallendar.mak clean-x86_64 &amp;&amp; call common/build/buildnum gcallendar.mak x86_64</ReBuildCommandLine>
-    <CleanCommandLine>make -f gcallendar.mak clean-x86_64</CleanCommandLine>
+    <BuildCommandLine>call common/build/buildnum gcalendar.mak x86_64</BuildCommandLine>
+    <ReBuildCommandLine>make -f gcalendar.mak clean-x86_64 &amp;&amp; call common/build/buildnum gcalendar.mak x86_64</ReBuildCommandLine>
+    <CleanCommandLine>make -f gcalendar.mak clean-x86_64</CleanCommandLine>
     <ExecutablePath>$(innovaphone-sdk)\app-platform-buildtls;$(innovaphone-sdk)\x86_64-7.2.0-linux-gnu\bin;$(ExecutablePath)</ExecutablePath>
     <LocalRemoteCopySources>false</LocalRemoteCopySources>
   </PropertyGroup>
   <ItemGroup>
     <None Include="build-release.bat" />
     <None Include="build.ps1" />
-    <None Include="gcallendar.mak" />
-    <None Include="gcallendar\gcallendar.mak" />
-    <None Include="gcallendar\config.json" />
-    <None Include="gcallendar\plugins.json" />
-    <None Include="gcallendar\wecom-gcallendarservice.js" />
-    <None Include="gcallendar\httpfiles\httpfiles.mak" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendar.css" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendar.htm" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendar.js" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendaradmin.htm" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendaradmin.js" />
-    <None Include="gcallendar\httpfiles\wecom-gcallendartexts.js" />
-    <None Include="gcallendar\httpfiles\wecom.gcallendarmanager.css" />
-    <None Include="gcallendar\httpfiles\wecom.gcallendarmanager.js" />
-    <None Include="gcallendar\httpfiles\wecom.gcallendarmanagertexts.js" />
+    <None Include="gcalendar.mak" />
+    <None Include="gcalendar\gcalendar.mak" />
+    <None Include="gcalendar\config.json" />
+    <None Include="gcalendar\plugins.json" />
+    <None Include="gcalendar\wecom-gcalendarservice.js" />
+    <None Include="gcalendar\httpfiles\httpfiles.mak" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendar.css" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendar.htm" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendar.js" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendaradmin.htm" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendaradmin.js" />
+    <None Include="gcalendar\httpfiles\wecom-gcalendartexts.js" />
+    <None Include="gcalendar\httpfiles\wecom.gcalendarmanager.css" />
+    <None Include="gcalendar\httpfiles\wecom.gcalendarmanager.js" />
+    <None Include="gcalendar\httpfiles\wecom.gcalendarmanagertexts.js" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="gcallendar\httpfiles\wecom-gcallendar.png" />
-    <Image Include="gcallendar\httpfiles\wecom-gcallendaradmin.png" />
-    <Image Include="gcallendar\gcallendar.png" />
+    <Image Include="gcalendar\httpfiles\wecom-gcalendar.png" />
+    <Image Include="gcalendar\httpfiles\wecom-gcalendaradmin.png" />
+    <Image Include="gcalendar\gcalendar.png" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

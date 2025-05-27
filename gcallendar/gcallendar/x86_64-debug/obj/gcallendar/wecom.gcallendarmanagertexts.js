@@ -1,10 +1,10 @@
 
 var wecom = wecom || {};
-wecom.gcallendarmanagertexts = {
+wecom.gcalendarmanagertexts = {
     en: {
-        pluginTitle: "gcallendar",
-        gcallendar: "gcallendar",
-        gcallendaradmin: "gcallendar Admin",
+        pluginTitle: "gcalendar",
+        gcalendar: "gcalendar",
+        gcalendaradmin: "gcalendar Admin",
         title: "Name",
         sip: "SIP",
         url: "URL",
@@ -15,9 +15,9 @@ wecom.gcallendarmanagertexts = {
         editapp: "Edit the App",
     },
     de: {
-        pluginTitle: "gcallendar",
-        gcallendar: "gcallendar",
-        gcallendaradmin: "gcallendar Admin",
+        pluginTitle: "gcalendar",
+        gcalendar: "gcalendar",
+        gcalendaradmin: "gcalendar Admin",
         title: "Name",
         sip: "SIP",
         url: "URL",
