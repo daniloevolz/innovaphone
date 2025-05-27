@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - PbxTableUsers protocol</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>PbxTableUsers</h1>
+
+    <p>
+        The PbxTableUsers protocol is available on AppWebsocket connections to innovaphone PBX objects, if
+        the object is enabled for the TableUsers. It allows the App to replicate the User Objects from the PBX using the Replicator.
+    </p>
+
+    <a name="General structure"><h2>General structure</h2></a>
+
+    <pre><code class="json">{
+    "api": "PbxTableUsers",
+    "src": string,
+    "mt": string,
+    }
+</code></pre><br />
+
+    <dl>
+        <dt>api</dt>
+        <dd>
+            To address this interface the value "PbxTableUsers" has t0 be used for the api property
+        </dd>
+        <dt>src</dt>
+        <dd>
+            The AppWebsocket src mechanism is supported on the interface. So a src property may be used
+        </dd>
+        <dt>mt</dt>
+        <dd>
+            The message type identifies the requested operation
+        </dd>
+    </dl>
+
+    <p>
+        In general operatios are performed by sending a message with a message type &lt;name&gt; to the
+        PBX. The result is retured with a message with message type &lt;name&gt;Result.
+    </p>
+
+    <u><a href="Replication.htm#BaseMessage">Replicator Messages</u>
+    <ul>
+        <li><a href="Replication.htm#ReplicateStart">ReplicateStart</a> - Start the replication</li>
+        <li><a href="Replication.htm#ReplicateNext">ReplicateNext</a> - Get next rows</li>
+        <li><a href="Replication.htm#ReplicateAdd">ReplicateAdd</a> - Add a row</li>
+        <li><a href="Replication.htm#ReplicateDel">ReplicateDel</a> - Delete a row</li>
+        <li><a href="Replication.htm#ReplicateUpdate">ReplicateUpdate</a> - Update a row</li>
+    </ul>
+
+    <u><a href="#Tables">Tables</u>
+    <ul>
+        <li><a href="#users">users</a> - users table</li>
+        <li><a href="#emails">emails</a> - emails table</li>
+        <li><a href="#allows">allows</a> - privacy settings configured on the user object</li>
+        <li><a href="#t-allows">t-allows (depricated)</a> - privacy settings inherited from the config templates</li>
+        <li><a href="#grps">grps</a> - groups table</li>
+        <li><a href="#devices">devices</a> - devices table</li>
+        <li><a href="#cds">cds</a> - call diversions table</li>
+        <li><a href="#forks">forks</a> - forks table</li>
+        <li><a href="#wakeups">wakeups</a> - wakeups table</li>
+    </ul>
+
+    <u><a href="#Examples">Examples</u>
+    <ul>
+        <li><a href="#ReplicateUpdate">ReplicateUpdate</a> - how the ReplicateUpdate message should look like</li>
+    </ul>
+
+    <h2><a name="Tables">Tables</a></h2>
+
+    <h3><a name="users">users</a></h3>
+    <p>Table with the user data</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>guid</b></td><td>Globally unique identifier</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>h323</b></td><td>Username</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>pwd</b></td><td>Password</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>cn</b></td><td>Common name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>dn</b></td><td>Display name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>apps-my</b></td><td>List of the apps displayed on the home screen</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>config</b></td><td>Config template</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>node</b></td><td>Node</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>loc</b></td><td>Location</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>hide</b></td><td>Hide from LDAP</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>e164</b></td><td>Phone number</td></tr>
+        <tr><td class="param">ReplicationTristate</td><td><b>cfpr</b></td><td>Call forward based on Presence</td></tr>
+        <tr><td class="param">ReplicationTristate</td><td><b>t-cfpr</b></td><td>Call forward based on Presence inherited from the config template</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>pseudo</b></td><td>Pseudo information of the object</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>h323-email</b></td><td>If true, the email is the username</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>apps</b></td><td>List of the apps that the user has rights to access</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>fax</b></td><td>If true, the user has a fax license</td></tr>
+    </table>
+
+    <h3><a name="emails">emails</a></h3>
+    <p>Table with the emails of the users</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>email</b></td><td>Email</td></tr>
+    </table>
+
+    <h3><a name="allows">allows</a></h3>
+    <p>Table with the visibility filters defined for the user</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>name</b></td><td>Filter name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>grp</b></td><td>If true, the name is a group name</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>visible</b></td><td>Visible</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>online</b></td><td>Online</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>presence</b></td><td>Presence</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>otf</b></td><td>On the phone</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>note</b></td><td>Presence note</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>dialog</b></td><td>Calls</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>ids</b></td><td>Calls with id</td></tr>
+    </table>
+
+    <h3><a name="t-allows">t-allows (depricated)</a></h3>
+    <p>
+        Table with the visibility filters defined on the config templates. Do not use anymore, this does not work together
+        with the new replication alogoritm, which only replicates changes after reconnect.
+    </p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>name</b></td><td>Filter name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>grp</b></td><td>If true, the name is a group name</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>visible</b></td><td>Visible</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>online</b></td><td>Online</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>presence</b></td><td>Presence</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>otf</b></td><td>On the phone</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>note</b></td><td>Presence note</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>dialog</b></td><td>Calls</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>ids</b></td><td>Calls with id</td></tr>
+    </table>
+
+    <h3><a name="grps">grps</a></h3>
+    <p>Table with the users groups</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>name</b></td><td>Group name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>mode</b></td><td>Mode</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>dyn</b></td><td>Dynamic</td></tr>
+    </table>
+
+    <h3><a name="devices">devices</a></h3>
+    <p>Table with the users devices</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>hw</b></td><td>Hardware ID</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>text</b></td><td>Name</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>app</b></td><td>App</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>admin</b></td><td>PBX Pwd</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>no-filter</b></td><td>No IP Filter</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>tls</b></td><td>TLS only</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>no-mob</b></td><td>No Mobility</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>trusted</b></td><td>Reverse Proxy</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>sreg</b></td><td>Single Reg.</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>mr</b></td><td>Media Relay</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>voip</b></td><td>Config VOIP</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>gk-id</b></td><td>Gatekeeper ID</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>prim</b></td><td>Primary gatekeeper</td></tr>
+    </table>
+
+    <h3><a name="cds">cds</a></h3>
+    <p>Table with the users call diversions</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>type</b></td><td>Diversion type (cfu, cfb or cfnr)</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>bool</b></td><td>Boolean object</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>bool-not</b></td><td>Not flag (boolean object)</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>e164</b></td><td>Phone number</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>h323</b></td><td>Username</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>src</b></td><td>Filters data on XML format</td></tr>
+    </table>
+
+    <h3><a name="forks">forks</a></h3>
+    <p>Table with the users forks</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationString</td><td><b>e164</b></td><td>Phone number</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>h323</b></td><td>Username</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>bool</b></td><td>Boolean object</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>bool-not</b></td><td>Not flag (boolean object)</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>mobility</b></td><td>Mobility object</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>app</b></td><td>App</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>delay</b></td><td>Delay</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>hw</b></td><td>Device</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>off</b></td><td>Disable</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>cw</b></td><td>Call-Waiting</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>min</b></td><td>Min-Alert</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>max</b></td><td>Max-Alert</td></tr>
+    </table>
+
+    <h3><a name="wakeups">wakeups</a></h3>
+    <p>Table with the users wakeups</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationUnsigned</td><td><b>h</b></td><td>Hour</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>m</b></td><td>Minute</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>s</b></td><td>Second</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>name</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>num</b></td><td></td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>retry</b></td><td></td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>mult</b></td><td></td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>to</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>fallback</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>bool</b></td><td>Boolean object</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>bool-not</b></td><td>Not flag (boolean object)</td></tr>
+    </table>
+
+    <h2><a name="Examples">Examples</a></h2>
+
+    <h3><a name="ReplicateUpdate">ReplicateUpdate</a></h3>
+    <p>After the user object has been edited on the PBX side, a <code>ReplicateUpdate</code> message is sent to the app instance including all the user object data. An example of how the message would look like is this one:</p>
+    <pre><code class="json">
+{
+    "mt":"ReplicateUpdate",
+    "api":"PbxTableUsers",
+    "columns":
+    {
+        "guid":"c9ebcc5914bd5e01c8020090334106ee",
+        "h323":"user0",
+        "pwd":"05a14fa93ec663b04deaf54277b1eb874612793587f0b287",
+        "cn":"User0",
+        "apps-my":"apps,usersadmin,profile,phone,users,users2,softphone,devices,pbxmanager",
+        "config":"Config",
+        "node":"root",
+        "loc":"master",
+        "hide":false,
+        "e164":"201",
+        "emails":[
+            {
+                "email":"user0@example.com"
+            }
+        ],
+        "allows":[
+            {
+                "name":"@test1.com",
+                "presence":true,
+                "visible":true
+            },
+            {
+                "name":"@test2.com",
+                "presence":true,
+                "visible":true
+            }
+        ],
+        "t-allows":[
+            {
+                "name":"@test1.com",
+                "online":true,
+                "presence":true,
+                "visible":true
+            }
+        ],
+        "grps":[
+            {
+                "name":"group1",
+                "mode":"active",
+                "dyn":"in"
+            }
+        ],
+        "devices":[
+            {
+                "hw":"Swphone_user0",
+                "text":"softphone",
+                "app":"softphone",
+                "tls":true,
+                "sreg":true
+            }
+        ],
+        "cds":[
+            {
+                "type":"cfnr",
+                "bool":"booltest",
+                "e164":"203"
+            },
+            {
+                "type":"cfb",
+                "h323":"test",
+                "src":"&lt;src type=\"do\"&gt;&lt;ep ext=\"false\" fwd=\"fwd\" /&gt;&lt;/src&gt;"
+            }
+        ],
+        "forks":[
+            {
+                "e164":"9999",
+                "bool":"booltest",
+                "bool-not":true,
+                "mobility":"Mobility",
+                "delay":30,
+                "hw":"Smartphone",
+                "app":"rcc",
+                "cw":true,
+                "min":1,
+                "max":10
+            }
+        ]
+    }
+}
+</code></pre>
+
+    <h3><a name="ReplicateStart_specific">ReplicateStart for specific object types</a></h3>
+        <p>It is possible to replicate PBX object of other types than User Objects. Therefore a <code>ReplicateStart</code> message is extended by the property <code>pseudo</code> which is an array of types that should be replicated. In the example below the PBX objects of type Waiting Queue are replicated.</p>
+
+<pre><code class="json">
+{
+    "mt": "ReplicateStart",
+    "api": "PbxTableUsers",
+    "columns": {
+        "cn": {
+            "update": true
+        },
+        "guid": {},
+        "h323": {
+            "update": true
+        },
+        "pseudo": {
+            "update": true
+        }
+    },
+    "pseudo": [
+        "waiting"
+    ]
+}
+</code></pre>
+
+</body>
+</html>

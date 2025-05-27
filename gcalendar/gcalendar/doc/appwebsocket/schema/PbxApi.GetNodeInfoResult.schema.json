@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pbxapi.getnodeinforesult.schema.json",
+  "description": "Contains information about the node of the user that is authenticated on the underlying AppWebsocket connection.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "name",
+    "prefix_intl",
+    "prefix_ntl",
+    "prefix_subs",
+    "country_code"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "GetNodeInfoResult"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the node."
+    },
+    "prefix_intl": {
+      "type": "string",
+      "description": "Prefix for dialing international numbers."
+    },
+    "prefix_ntl": {
+      "type": "string",
+      "description": "Prefix for dialing national numbers."
+    },
+    "prefix_subs": {
+      "type": "string",
+      "description": "Subscriber number prefix."
+    },
+    "country_code": {
+      "type": "string",
+      "description": "Country code."
+    }
+  }
+}

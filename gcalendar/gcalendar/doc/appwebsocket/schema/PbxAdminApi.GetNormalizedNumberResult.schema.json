@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getnormalizednumberresult.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": ["PbxAdminApi"]
+      },
+      "mt": {
+        "type": "string",
+        "enum": ["GetNormalizedNumberResult"]
+      },
+      "number": {
+        "type": "string"
+      }
+    }
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "pbxapi.updateprofile.schema.json",
+  "description": "Changes the name of a profile identified by id.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "id",
+    "name"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "UpdateProfile"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "id": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The nummerical id of the profile"
+    },
+    "name": {
+      "type": "string",
+      "description": "The title of the profile"
+    }
+  }
+}
