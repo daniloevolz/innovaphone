@@ -494,7 +494,8 @@ var i = Timers.setInterval(function () {
                                         if (originalPresence.presence[0].activity) {
                                             activity = originalPresence.presence[0].activity
                                         }
-                                        log('INTERVAL: endedMeetingUser restaurando presenca do usuario para originalPresence: ' + JSON.stringify(originalPresence));
+                                        var user = pbxTableUsers.filter(function (u) { return u.columns.guid == item.guid })[0]
+                                        log('INTERVAL: endedMeetingUser restaurando presenca do usuario '+ JSON.stringify(user.columns.cn)+' para originalPresence: ' + JSON.stringify(originalPresence));
                                         handleSetPresenceMessage(user, note, activity);
                                     } else {
                                         log('INTERVAL: endedMeetingUser nao tem originalPresence: ' + JSON.stringify(originalPresence));

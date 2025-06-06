@@ -21,16 +21,16 @@ Config.onchanged(function () {
 
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-gcallendar") {
-        if (conn.unlicensed) {
-            log("user: unlicensed");
-        } else {
+        //if (conn.unlicensed) {
+        //    log("user: unlicensed");
+        //} else {
             connectionList.push(conn);
-        }
+        //}
         conn.onmessage(function (msg) {
-            if (conn.unlicensed) {
-                conn.send(JSON.stringify({ api: "user", mt: "noLicense" }));
+            //if (conn.unlicensed) {
+            //    conn.send(JSON.stringify({ api: "user", mt: "noLicense" }));
 
-            } else {
+            //} else {
                 var obj = JSON.parse(msg);
                 if (obj.mt == "UserMessage") {
                     Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + conn.guid + "';")
@@ -57,7 +57,7 @@ new JsonApi("user").onconnected(function (conn) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", message: errorText }));
                         });
                 }
-            }
+            //}
         });
         conn.onclose(function () {
             log("user: disconnected");
@@ -494,7 +494,8 @@ var i = Timers.setInterval(function () {
                                         if (originalPresence.presence[0].activity) {
                                             activity = originalPresence.presence[0].activity
                                         }
-                                        log('INTERVAL: endedMeetingUser restaurando presenca do usuario para originalPresence: ' + JSON.stringify(originalPresence));
+                                        var user = pbxTableUsers.filter(function (u) { return u.columns.guid == item.guid })[0]
+                                        log('INTERVAL: endedMeetingUser restaurando presenca do usuario '+ JSON.stringify(user.columns.cn)+' para originalPresence: ' + JSON.stringify(originalPresence));
                                         handleSetPresenceMessage(user, note, activity);
                                     } else {
                                         log('INTERVAL: endedMeetingUser nao tem originalPresence: ' + JSON.stringify(originalPresence));
