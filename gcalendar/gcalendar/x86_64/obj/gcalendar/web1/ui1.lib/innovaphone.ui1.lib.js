@@ -501,12 +501,12 @@ innovaphone.ui1.lib = innovaphone.ui1.lib || (function () {
         var ua = window.navigator.userAgent;
         if (ua.indexOf("myApps/") != -1) {
             if (ua.indexOf("Windows") != -1) return { name: "myApps for Windows", webkit: true, simulator: false };
-            if (ua.indexOf("Linux") != -1) return { name: "myApps for Linux", webkit: true, simulator: false };
             if (ua.indexOf("Android") != -1) return { name: "myApps for Android", webkit: true, simulator: false };
+            if (ua.indexOf("Linux") != -1) return { name: "myApps for Linux", webkit: true, simulator: false };
             if (ua.indexOf("iOS Simulator") != -1) return { name: "myApps for iOS Simulator", webkit: true, simulator: true };
             if (ua.indexOf("iOS") != -1) return { name: "myApps for iOS", webkit: true, simulator: false };
             if (ua.indexOf("macOS") != -1) return { name: "myApps for macOS", webkit: true, simulator: false };
-            if (ua.indexOf("IP232") != -1) return { name: "myApps for IP232", webkit: true, simulator: false };
+            if (ua.indexOf("IP270") != -1) return { name: "myApps for IP270", webkit: true, simulator: false };
             return {};
         }
         else if (ua.indexOf("OPR/") != -1 || ua.indexOf("Opera/") != -1) return { name: "Opera", webkit: true, simulator: false };

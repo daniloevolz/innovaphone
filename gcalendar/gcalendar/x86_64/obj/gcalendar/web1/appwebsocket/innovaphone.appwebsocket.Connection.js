@@ -222,10 +222,13 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
 
     function onerror(error) {
         console.log(app + ": error");
-        ws.onclose = null;
-        ws.onmessage = null;
-        ws.onopen = null;
-        ws.onerror = null;
+        if (ws) {
+            ws.onclose = null;
+            ws.onmessage = null;
+            ws.onopen = null;
+            ws.onerror = null;
+            ws = null;
+        }
         close("WEBSOCKET_ERROR");
     }
 
@@ -250,7 +253,14 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     // general control functions
     function connect() {
         state = states.CONNECT;
-        if (ws) ws.close();
+        if (ws) {
+            ws.onopen = null;
+            ws.onmessage = null;
+            ws.onerror = null;
+            ws.onclose = null;
+            ws.close();
+            ws = null;
+        }
         ws = new WebSocket(url);
         ws.onopen = onopen;
         ws.onmessage = onmessage;
@@ -263,8 +273,14 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         if (state != states.CLOSED) {
             console.log(app + ": closing");
             state = states.CLOSED;
-            if (ws) ws.close();
-            ws = null;
+            if (ws) {
+                ws.onopen = null;
+                ws.onmessage = null;
+                ws.onerror = null;
+                ws.onclose = null;
+                ws.close();
+                ws = null;
+            }
             if (error) {
                 if (instance.onerror(error)) error = null;
             }

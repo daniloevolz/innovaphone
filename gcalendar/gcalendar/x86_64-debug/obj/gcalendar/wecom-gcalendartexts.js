@@ -12,7 +12,8 @@ Wecom.gcalendarTexts = {
         updated: 'Atualizado!',
         btnConnect: 'Conectar',
         btnDisconnect: 'Desconectar',
-        labelUri: 'Você vai precisar da URL abaixo para autorizar no Portal OAuth do Google'
+        labelUri: 'Você vai precisar da URL abaixo para autorizar no Portal OAuth do Google',
+        noLicense: 'Sem licença para usar o Google Calendar'
     },
     en: {
         iptClientId: 'Google Client ID',
@@ -25,7 +26,8 @@ Wecom.gcalendarTexts = {
         updated: 'Updated!',
         btnConnect: 'Connect',
         btnDisconnect: 'Disconnect',
-        labelUri: 'You will need the URL below to authorize on the Google OAuth Portal'
+        labelUri: 'You will need the URL below to authorize on the Google OAuth Portal',
+        noLicense: 'No license to use Google Calendar'
     },
     de: {
         iptClientId: 'Google Client-ID',
@@ -38,7 +40,8 @@ Wecom.gcalendarTexts = {
         updated: 'Aktualisiert!',
         btnConnect: 'Verbinden',
         btnDisconnect: 'Trennen',
-        labelUri: 'Sie benötigen die folgende URL, um sich im Google OAuth-Portal zu autorisieren.'
+        labelUri: 'Sie benötigen die folgende URL, um sich im Google OAuth-Portal zu autorisieren.',
+        noLicense: 'Keine Lizenz zur Nutzung des Google Kalenders'
     },
     es: {
         iptClientId: 'Google Cliente ID',
@@ -51,6 +54,7 @@ Wecom.gcalendarTexts = {
         updated: 'Actualizado!',
         btnConnect: 'Conectar',
         btnDisconnect: 'Desconectar',
-        labelUri: 'Necesitará la siguiente URL para realizar la autorizaciõn en el Portal OAuth de Google'
+        labelUri: 'Necesitará la siguiente URL para realizar la autorizaciõn en el Portal OAuth de Google',
+        noLicense: 'Sin licencia para usar Google Calendar'
     }
 }

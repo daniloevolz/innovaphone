@@ -52,6 +52,10 @@ Wecom.gcalendar = Wecom.gcalendar || function (start, args) {
             createBody(that);
             createToast(texts.text("updated"))
         }
+        if (obj.api == "user" && obj.mt == "NoLLicensed") {
+            token = [];
+            createToast(texts.text("noLicense"))
+        }
     }
     function createBody(t) {
         t.clear();

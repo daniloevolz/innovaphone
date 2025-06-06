@@ -256,7 +256,7 @@ free(buffer);
                 </code></pre>
         </dd>
     </dl>
-    
+
     <div class="fnhead" id="WriteBinaryFile">WriteBinaryFile (static function)</div>
     <dl>
         <dd>
@@ -792,6 +792,8 @@ public:
     bool <a href="#ElfClose" style="text-decoration:none;">Close()</a>;
     class IElfUserData * <a href="#ElfGetUserData" style="text-decoration:none;">GetUserData(UserDataID userDataID)</a>;
     UserDataID <a href="#ElfMakeUserID" style="text-decoration:none;">MakeUserID</a>(word userDefinedValue);
+    size_t <a href="#ElfGetSharedLibrariesCount" style="text-decoration:none;">GetSharedLibrariesCount()</a>;
+    const char * <a href="#ElfGetSharedLibrary" style="text-decoration:none;">GetSharedLibrary(size_t index)</a>;
 };</code></pre>
     <h3>Overview</h3>
     An instance of this class is created after a call to FileSystem::OpenElfBinary(). After this object is no longer needed, it should be deleted.
@@ -883,6 +885,31 @@ public:
 
             <h4>Return value</h4>
             The ID for your user data added to the ELF binary as a UserDataID enum type.
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="ElfGetSharedLibrariesCount">GetSharedLibrariesCount</div>
+    <dl>
+        <dd>
+            Returns the count of shared libraries against which this binary is linked.
+
+            <h4>Return value</h4>
+            size_t
+        </dd>
+    </dl>
+
+    <div class="fnhead" id="ElfGetSharedLibrary">GetSharedLibrary</div>
+    <dl>
+        <dd>
+            Gets the relative name of the shared library at the given index.
+
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">size_t <b>index</b></td><td>The index of the shared library name (must be within GetSharedLibrariesCount()).</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            Name of the shared library. The name mustn't be freed!
         </dd>
     </dl>
 

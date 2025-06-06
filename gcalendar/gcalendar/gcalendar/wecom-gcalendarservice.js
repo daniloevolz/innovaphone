@@ -9,7 +9,7 @@ var PbxSignal = [];
 var PbxSignalUsers = [];
 var pbxTable = [];
 var pbxTableUsers = [];
-var pbxApi = {}
+var pbxApi = [];
 var presences = [];
 var in_meeting_now = [];
 var status = false;
@@ -176,7 +176,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
 
 new PbxApi("PbxApi").onconnected(function (conn) {
     log("PbxApi conectada", conn)
-    pbxApi = conn
+    pbxApi.push(conn);
     conn.onmessage(function (msg) {
         var obj = JSON.parse(msg);
         log("PbxApi msg: " + msg);
@@ -203,40 +203,53 @@ new PbxApi("PbxApi").onconnected(function (conn) {
     })
 
     conn.onclose(function () {
-        pbxApi = {}
+        pbxApi.splice(pbxApi.indexOf(conn), 1);
         log("PbxApi: disconnected");
     });
 });
 
 function subscribePresence(obj) {
-    pbxApi.send(JSON.stringify({
-        "api": "PbxApi",
-        "mt": "SubscribePresence",
-        "sip": obj.columns.h323,
-        "src": obj.columns.guid
-    }));
+    pbxApi.forEach(function (c) {
+        if (c.pbx == obj.src) {
+            c.send(JSON.stringify({
+                "api": "PbxApi",
+                "mt": "SubscribePresence",
+                "sip": obj.columns.h323,
+                "src": obj.columns.guid
+            }));
+
+        }
+    })
 }
 
 function unsubscribePresence(obj) {
-    pbxApi.send(JSON.stringify({
-        "api": "PbxApi",
-        "mt": "UnsubscribePresence",
-        "sip": obj.columns.h323,
-        "src": obj.columns.guid
-    }));
+    pbxApi.forEach(function (c) {
+        if (c.pbx == obj.src) {
+            c.send(JSON.stringify({
+                "api": "PbxApi",
+                "mt": "UnsubscribePresence",
+                "sip": obj.columns.h323,
+                "src": obj.columns.guid
+            }));
+
+        }
+    })
 }
 
-function handleSetPresenceMessage(sip, note, activity) {
-    log("handle LOG - SET PRESENCE MSG:", sip, note)
-    // Enviar a mensagem para a conexao PbxApi
-    pbxApi.send(JSON.stringify({
-        "api": "PbxApi",
-        "mt": "SetPresence",
-        "sip": sip,
-        "activity": activity,
-        "note": note
-    }));
+function handleSetPresenceMessage(obj, note, activity) {
+    log("handle LOG - SET PRESENCE MSG:", obj.columns.h323, note)
+    pbxApi.forEach(function (c) {
+        if (c.pbx == obj.src) {
+            c.send(JSON.stringify({
+                "api": "PbxApi",
+                "mt": "SetPresence",
+                "sip": obj.columns.h323,
+                "activity": activity,
+                "note": note
+            }));
 
+        }
+    })
 }
 
 //#endregion
@@ -456,7 +469,7 @@ var i = Timers.setInterval(function () {
                                             if (originalPresence) {
                                                 in_meeting_now.push({ guid: item.guid, originalPresence: originalPresence, meeting: meeting.summary });
                                                 log('INTERVAL: user: handleSetPresenceMessage ' + JSON.stringify(meeting.summary));
-                                                handleSetPresenceMessage(user.columns.h323, 'GMEET: ' + meeting.summary, 'dnd')
+                                                handleSetPresenceMessage(user, 'GMEET: ' + meeting.summary, 'dnd')
 
                                             }
                                         }
@@ -470,7 +483,7 @@ var i = Timers.setInterval(function () {
                                                         m.meeting = meeting.summary
                                                     }
                                                 })
-                                                handleSetPresenceMessage(user.columns.h323, 'GMEET: ' + meeting.summary, 'dnd')
+                                                handleSetPresenceMessage(user, 'GMEET: ' + meeting.summary, 'dnd')
                                             }
 
                                         }
@@ -499,7 +512,7 @@ var i = Timers.setInterval(function () {
                                             activity = originalPresence.presence[0].activity
                                         }
                                         log('INTERVAL: endedMeetingUser restaurando presenca do usuario para originalPresence: ' + JSON.stringify(originalPresence));
-                                        handleSetPresenceMessage(user.columns.h323, note, activity);
+                                        handleSetPresenceMessage(user, note, activity);
                                     } else {
                                         log('INTERVAL: endedMeetingUser nao tem originalPresence: ' + JSON.stringify(originalPresence));
                                     }
