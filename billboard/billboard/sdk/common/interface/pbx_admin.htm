@@ -51,6 +51,7 @@
     virtual void SendGetNodes(ulong64 limit, const char* last) = 0;
     virtual void SendGetStun() = 0;
     virtual void SendGetBooleans(ulong64 limit, const char* last) = 0;
+    virtual void SendTestFilter(const char* sip, int num) = 0;
     };
 </code></pre>
 
@@ -227,6 +228,22 @@ pbxAdminApi->SendUpdateObject(msg, buffer, base);</code></pre>
     <p>Use SendGetBooleans to requests a list of all the boolean objects to the PBX. SendGetBooleans must be called until an empty array is received. Example:</p>
 
 <pre><code class="C++">pbxAdminApi->SendGetBooleans(200, "BoolTest");</code></pre>
+
+    <div class="fnhead">SendTestFilter</div>
+
+    <p>Tests if a number can be set as call diversion</p>
+    <dl>
+        <dt>Parameters</dt>
+        <dd>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char* <b>sip</b></td><td>The user where the call diversion is added</td></tr>
+                <tr><td class="param">const char* <b>num</b></td><td>The number that the user wants to set on the call diversion</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <p>Example:</p>
+
+<pre><code class="C++">pbxAdminApi->SendTestFilter("atlantis", "200");</code></pre>
 
     <a name="UPbxMonitorAdminObject"><h2>UPbxMonitorAdminObject</h2></a>
 

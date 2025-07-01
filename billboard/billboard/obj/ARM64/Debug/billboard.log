@@ -3,7 +3,7 @@
       Project output dirctory : arm64-debug/billboard
       Temp directory          : arm64-debug\obj\billboard
       Runtime binary          : jse/arm64/generic
-      Build Number            : 13C44
+      Build Number            : 13C45
   
   Copying runtime jse/arm64/generic to arm64-debug\billboard\billboard...
   Copying icon billboard/billboard.png to arm64-debug\billboard\billboard.png...

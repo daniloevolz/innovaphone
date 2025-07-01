@@ -26,7 +26,7 @@
         ISocketProvider used to created it.
     </p>
     <p>
-        Generally, eacht type of socket will be handled in the same way by ISocketProvider and ISocket, with two exceptions:
+        Generally, each type of socket will be handled in the same way by ISocketProvider and ISocket, with two exceptions:
         <ul>
             <li>
                 <b>ISocket::SendTo() / USocket::SocketRecvFromResult()</b>: Because of the nature of UDP sockets, the address to send data to
@@ -475,7 +475,8 @@ public:
             <table style="margin-left:-12px">
                 <tr><td class="param">const void * <b>buf</b></td><td>The buffer with the data to send. Must not be nullptr!</td></tr>
                 <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to send. That means, that the size of the buffer should be at least the same as the value passed to len.</td></tr>
-                <tr><td class="param">sockaddr:storage <b>dstAddr</b></td><td><i>Deprecated, will be replaced with an interface-only solution.</i></td></tr>
+                <tr><td class="param">IPaddr <b>dstAddr</b></td><td>Destination address to send to.</td></tr>
+                <tr><td class="param">word <b>dstPort</b></td><td>Destination port to send to.</td></tr>
             </table>
             <h4>Callbacks</h4>
             On success, USocket::SocketSendResult() will be called when, ISocket has sent the data.<br>
@@ -533,7 +534,7 @@ public:
     virtual void SocketShutdown(ISocket * const socket, shutdownreason_t reason);
     virtual void SocketSendResult(ISocket * const socket) {};
     virtual void SocketRecvResult(ISocket * const socket, void * buf, size_t len) {};
-    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, IPaddr dstAddr) {};
+    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, IPaddr srcAddr, word srcPort) {};
     virtual void SocketRecvCanceled(ISocket * const socket, void * buf);
     virtual void SocketUpgradeToTLSComplete(ISocket * const socket) {}
     virtual bool SocketAcceptSelectedALPNProtocol(ISocket * const socket, const char * protocol) { return true; };
@@ -625,7 +626,7 @@ public:
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance. Because the socket is closed, the given instance can be deleted here.</td></tr>
-                <tr><td class="param">shutdownreason_t <b>reason</b></td><td>The reason why the socket had been closed. See data type <a href="shutdownreason_t">shutdownreason_t</a> for more informations.</td></tr>
+                <tr><td class="param">shutdownreason_t <b>reason</b></td><td>The reason why the socket had been closed. See data type <a href="#shutdownreason_t">shutdownreason_t</a> for more informations.</td></tr>
             </table>
         </dd>
     </dl>
@@ -677,7 +678,8 @@ public:
                         to ISocket::Recv(). If ISocket::Recv() is called with recvPartitial fase, it is guaranteed, that len is the same as passed to ISocket::Recv() before.
                     </td>
                 </tr>
-                <tr><td class="param">sockaddr_storage * <b>dstAddr</b></td><td><i>Depracated, will be replaced by an interface internaly data type</i></td></tr>
+                <tr><td class="param">IPaddr <b>srcAddr</b></td><td>Source address from where it was received.</td></tr>
+                <tr><td class="param">word <b>srcPort</b></td><td>Source port from where it was received.</td></tr>
             </table>
             <h4>Remarks</h4>
             This callback will only be called from UDP ISocket instances.

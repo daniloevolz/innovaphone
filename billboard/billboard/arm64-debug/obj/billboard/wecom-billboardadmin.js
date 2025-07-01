@@ -347,11 +347,6 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         worktable.setAttribute('id', 'worktable')
         worktable.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
     
-        worktable.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
-        worktable.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
-
-        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
-        worktable.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 15px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
         var lic = texts.text("labelTemporary");
         if (licenseActive != "null") {
             lic = licenseActive

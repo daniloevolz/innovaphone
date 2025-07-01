@@ -8,30 +8,25 @@ var licenseAppFile = Config.licenseAppFile;
 var licenseInstallDate = Config.licenseInstallDate;
 
 var now = new Date();  // Cria uma instância da data atual
-var futureDate = new Date(now);  // Cria uma cópia da instância atual
-futureDate.setDate(futureDate.getDate() + 29);  // Adiciona 29 dias à data
-log("danilo-req:futureDate:  " + futureDate);
-Config.appInstallDate = String(futureDate);
-Config.save();
 
 var appInstallDate = Config.appInstallDate;
 log("danilo-req:START:appInstallDate:  " + appInstallDate);
-if (licenseAppToken == "") {
+if (appInstallDate == "") {
     var rand = Random.bytes(16);
     Config.licenseAppToken = String(rand);
-    
+
     var now = new Date();  // Cria uma instância da data atual
-    var futureDate = new Date(now);  // Cria uma cópia da instância atual
-    futureDate.setDate(futureDate.getDate() + 29);  // Adiciona 29 dias à data
-    log("danilo-req:futureDate:  " + futureDate);
-    Config.appInstallDate = futureDate;
+    var appInstallDate = new Date(now);  // Cria uma cópia da instância atual
+    appInstallDate.setDate(appInstallDate.getDate());
+    log("danilo-req:appInstallDate:  " + appInstallDate);
+    Config.appInstallDate = appInstallDate;
     Config.save();
 }
 
 Config.onchanged(function () {
     licenseAppFile = Config.licenseAppFile;
     licenseInstallDate = Config.licenseInstallDate;
-    appInstallDate =  Config.appInstallDate;
+    appInstallDate = Config.appInstallDate;
 })
 WebServer.onrequest("get-departments", function (req) {
     if (req.method == "OPTIONS") {
@@ -55,33 +50,33 @@ WebServer.onrequest("get-departments", function (req) {
             })
             .onerror(function (error, errorText, dbErrorCode) {
                 req.cancel();
-            });    
-    }   
-    });
+            });
+    }
+});
 WebServer.onrequest("get-posts", function (req) {
-        if (req.method == "OPTIONS") {
-            log("get-departments: OPTIONS request");
-            req.responseHeader("Access-Control-Allow-Origin", "*");
-            req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
-            req.sendResponse();
-        }
-        if (req.method == "POST") {
-            var postID = "" ;
-            req.onrecv(function (req, data) {
-                //log("Data" + data)
-                if (data) {
-                    postID += (new TextDecoder("utf-8").decode(data));
-                    //postID += JSON.parse(data)
-                    req.recv();
-                }else{
-                    var now = getDateNow();
-                    var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public' AND date_start <= '" + now + "' AND date_end >= '" + now + "'";
+    if (req.method == "OPTIONS") {
+        log("get-departments: OPTIONS request");
+        req.responseHeader("Access-Control-Allow-Origin", "*");
+        req.responseHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT");
+        req.sendResponse();
+    }
+    if (req.method == "POST") {
+        var postID = "";
+        req.onrecv(function (req, data) {
+            //log("Data" + data)
+            if (data) {
+                postID += (new TextDecoder("utf-8").decode(data));
+                //postID += JSON.parse(data)
+                req.recv();
+            } else {
+                var now = getDateNow();
+                var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public' AND date_start <= '" + now + "' AND date_end >= '" + now + "'";
 
-                    //var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public'";
-                    //  var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department +
-                    // //        "' AND date_start >= '" + start + "' AND date_end <= '" + end + "'";
-                    
-                    Database.exec(querySelect)
+                //var querySelect = "SELECT * FROM tbl_posts WHERE department = '" + postID + "' AND type = 'public'";
+                //  var query = "SELECT * FROM tbl_posts WHERE department ='" + obj.department +
+                // //        "' AND date_start >= '" + start + "' AND date_end <= '" + end + "'";
+
+                Database.exec(querySelect)
                     .oncomplete(function (dataPosts) {
                         log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
                         msg = { status: 200, data: JSON.stringify(dataPosts) };
@@ -94,25 +89,29 @@ WebServer.onrequest("get-posts", function (req) {
                     .onerror(function (error, errorText, dbErrorCode) {
                         log("ERROR TEXT" + errorText)
                         req.cancel();
-                    });    
-                }
+                    });
+            }
         })
-        }   
-    
-        });
-    
+    }
+
+});
+
 new JsonApi("user").onconnected(function (conn) {
     if (conn.app == "wecom-billboard") {
         // log("connectionsUser: license.Users " + license.Users);
         connectionsUser.push(conn);
         log("Usuario Conectado:  " + connectionsUser.length);
-        
+
         conn.onmessage(function (msg) {
             var now = Date();
             var appInstallDate = Config.appInstallDate;
             log("danilo-req:Now:  " + now);
             log("danilo-req:appInstallDate:  " + appInstallDate);
-            if (license != null && connectionsUser.length <= license.Users || now <= appInstallDate  ) {
+            var futureDate = new Date(appInstallDate);  // Cria uma cópia da instância atual
+            futureDate.setDate(futureDate.getDate() + 0);  // Adiciona 90 dias à data
+            log("erick-req:futureDate:  " + futureDate);
+            log("erick-req:conn.unlicensed:  " + conn.unlicensed);
+            if (conn.unlicensed || futureDate <= now) {
                 var obj = JSON.parse(msg);
                 if (obj.mt == "Ping") {
                     conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
@@ -131,7 +130,7 @@ new JsonApi("user").onconnected(function (conn) {
                     var query = "SELECT create_department FROM tbl_admins WHERE guid ='" + conn.guid + "'";
                     Database.exec(query)
                         .oncomplete(function (data) {
-                            log("tbl_admins:result=" + JSON.stringify(data, null, 4)+" data.lenght="+data.lenght);
+                            log("tbl_admins:result=" + JSON.stringify(data, null, 4) + " data.lenght=" + data.lenght);
                             var adm = data;
                             if (adm.length > 0) {
                                 adm = true;
@@ -143,7 +142,7 @@ new JsonApi("user").onconnected(function (conn) {
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
                         });
-                    
+
                 }
                 if (obj.mt == "InsertPost") {
                     var now = getDateNow();
@@ -201,7 +200,7 @@ new JsonApi("user").onconnected(function (conn) {
                     Database.exec(query)
                         .oncomplete(function () {
                             log("UpdateDeletedColumns:result=success");
-                            conn.send(JSON.stringify({ api: "user", mt: "DeletePostSuccess", src:obj.src }));
+                            conn.send(JSON.stringify({ api: "user", mt: "DeletePostSuccess", src: obj.src }));
                         })
                         .onerror(function (error, errorText, dbErrorCode) {
                             conn.send(JSON.stringify({ api: "user", mt: "Error", result: String(errorText) }));
@@ -264,7 +263,7 @@ new JsonApi("user").onconnected(function (conn) {
                         var start = getDateNow();
                         query += " AND date_start <= '" + start + "' AND date_end >= '" + end + "' AND deleted IS NULL";
                     }
-                
+
                     Database.exec(query)
                         .oncomplete(function (data) {
                             log("SelectPosts:result=" + JSON.stringify(data, null, 4));
@@ -329,7 +328,7 @@ new JsonApi("user").onconnected(function (conn) {
                         });
                 }
                 if (obj.mt == "InsertDepartment") {
-                    Database.exec("INSERT INTO tbl_departments (name, color, creator_guid) VALUES ('" + obj.name.replace(/'/g, "''") + "','" + obj.color + "','" + conn.guid +"') RETURNING id;")
+                    Database.exec("INSERT INTO tbl_departments (name, color, creator_guid) VALUES ('" + obj.name.replace(/'/g, "''") + "','" + obj.color + "','" + conn.guid + "') RETURNING id;")
                         .oncomplete(function (id) {
                             log("InsertDepartment:result=success " + JSON.stringify(id[0].id));
 
@@ -465,9 +464,9 @@ new JsonApi("user").onconnected(function (conn) {
             }
             // fechamento do if de licença 
             else {
-                 log("danilo req: No license Available")
+                log("danilo req: No license Available")
                 conn.send(JSON.stringify({ api: "user", mt: "NoLicense", result: String("Seu período de avaliação terminou! Por favor, contate o administrador do sistema para realizar o licenciamento.") }));
-             }
+            }
         });
         conn.onclose(function () {
             connectionsUser = connectionsUser.filter(deleteBySip(conn.sip));
@@ -498,11 +497,11 @@ new JsonApi("admin").onconnected(function (conn) {
                 licenseAppFile = Config.licenseAppFile;
                 var licUsed = connectionsUser.length;
                 var lic = decrypt(licenseAppToken, licenseAppFile)
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult",licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate, appInstallDate: appDate }));
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate, appInstallDate: appDate }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
-                    var lic = decrypt(obj.licenseToken,obj.licenseFile)
+                    var lic = decrypt(obj.licenseToken, obj.licenseFile)
                     log("UpdateConfigLicenseMessage: License decrypted: " + JSON.stringify(lic));
                     Config.licenseAppFile = obj.licenseFile;
                     Config.licenseInstallDate = getDateNow();
@@ -522,19 +521,19 @@ new JsonApi("admin").onconnected(function (conn) {
                             Database.exec("INSERT INTO tbl_admins (guid,create_department) VALUES ('" + guid + "'," + true + ")")
                                 .oncomplete(function () {
                                     log("InsertAdmin:result=success");
-                                    
+
                                 })
                                 .onerror(function (error, errorText, dbErrorCode) {
                                     conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                                 });
                         })
                         conn.send(JSON.stringify({ api: "admin", mt: "InsertAdminsSuccess", src: obj.src }));
-                        
+
                     })
                     .onerror(function (error, errorText, dbErrorCode) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
-                
+
             }
             if (obj.mt == "SelectAdmins") {
                 Database.exec("SELECT * FROM tbl_admins")
@@ -612,7 +611,7 @@ new JsonApi("admin").onconnected(function (conn) {
             }
             if (obj.mt == "SelectDepartmentOnClick") {
                 var queryViewer = "SELECT * FROM tbl_department_viewers WHERE department_id =" + obj.department + ";"
-                
+
                 Database.exec(queryViewer)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
@@ -622,7 +621,7 @@ new JsonApi("admin").onconnected(function (conn) {
                         conn.send(JSON.stringify({ api: "admin", mt: "Error", result: String(errorText) }));
                     });
 
-                var queryEditor = "SELECT * FROM tbl_department_editors WHERE department_id = "+obj.department+";"
+                var queryEditor = "SELECT * FROM tbl_department_editors WHERE department_id = " + obj.department + ";"
                 Database.exec(queryEditor)
                     .oncomplete(function (dataUsersViewer) {
                         log("SelectDepartments:result=" + JSON.stringify(dataUsersViewer, null, 4));
@@ -759,7 +758,7 @@ new PbxApi("PbxSignal").onconnected(function (conn) {
             var src = obj.src;
             var myArray = src.split(",");
             var pbx = myArray[0];
-            
+
             //Teste Danilo 05/08: armazenar o conteudo call em nova lista
             var sip = obj.sig.cg.sip;
             var call = obj.call;
@@ -927,15 +926,15 @@ function getLicense() {
     var hash = Config.licenseAppFile;
     var lic = '';
     try {
-       lic = decrypt(key, hash);
+        lic = decrypt(key, hash);
     } catch (e) {
-        
+
     }
-    
+
     return lic;
 }
 
-function decrypt(key,hash) {
+function decrypt(key, hash) {
     //var iv = iv.substring(0, 16);
 
     log("Key : " + key)
@@ -953,10 +952,10 @@ function decrypt(key,hash) {
     } catch (e) {
         log("ERRO decrypt: " + e);
     }
-    
+
     // Esta dando erro aqui 
     return JSON.parse(decrypted);
- }
+}
 
 //Internal supporters functions
 function selectViewsHistory(sip, connOld) {
@@ -992,12 +991,12 @@ function selectViewsHistory(sip, connOld) {
                     // Dados retornados da consulta na tabela 'tbl_posts'
                     log("SelectPosts:result=" + JSON.stringify(dataPosts, null, 4));
                     connectionsUser.forEach(function (conn) {
-                        if (conn.sip==sip) {
+                        if (conn.sip == sip) {
                             log("SelectPosts:conn to notify= " + JSON.stringify(conn, null, 4));
                             conn.send(JSON.stringify({ api: "user", mt: "SelectViewsHistoryResult", result: JSON.stringify(dataPosts, null, 4) }));
                         }
                     })
-                    
+
                     updateBadge(sip, dataPosts.length)
 
                 })
