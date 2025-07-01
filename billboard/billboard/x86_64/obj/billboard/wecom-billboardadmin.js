@@ -18,6 +18,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     //license
     var licenseToken = null;
     var appInstall = null;
+    var trialExpired = null
     var licenseFile = null;
     var licenseActive = null;
     var licenseInstallDate = null;
@@ -73,7 +74,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         app.send({ api: "admin", mt: "TableUsers" });
         app.send({ api: "admin", mt: "SelectAdmins" });
         constructor();
-        
+
         setInterval(function () {
             if (currentState == "Connected") {
                 var msg = { api: "user", mt: "Ping" };
@@ -93,7 +94,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         }
         if (obj.api == "admin" && obj.mt == "UpdateConfigLicenseMessageSuccess") {
             app.send({ api: "admin", mt: "ConfigLicense" });
-            makePopup(texts.text("labelAlert"),texts.text("labelConfigSaveSuccess"), 500, 200);
+            makePopup(texts.text("labelAlert"), texts.text("labelConfigSaveSuccess"), 500, 200);
         }
         if (obj.api == "admin" && obj.mt == "LicenseMessageResult") {
             try {
@@ -103,16 +104,16 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 licenseInstallDate = obj.licenseInstallDate;
                 licenseUsed = obj.licenseUsed;
                 appInstall = obj.appInstallDate;
-
+                trialExpired = obj.TrialExpired
             } catch (e) {
                 console.log("ERRO LicenseMessageResult:" + e)
             }
             makeDivLicense(_colDireita);
         }
-        if (obj.api == "admin" && obj.mt == "InsertAdminsSuccess"){
-            makePopup(texts.text("labelAlert"),texts.text("labelUsersInsertAlert"), 500, 200);
+        if (obj.api == "admin" && obj.mt == "InsertAdminsSuccess") {
+            makePopup(texts.text("labelAlert"), texts.text("labelUsersInsertAlert"), 500, 200);
         }
-        if (obj.api == "admin" && obj.mt == "SelectAdminsResult"){
+        if (obj.api == "admin" && obj.mt == "SelectAdminsResult") {
             list_admins = JSON.parse(obj.result)
             makeDivUsers(_colDireita, list_tableUsers, list_admins);
         }
@@ -126,7 +127,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 // Faça o que quiser com os dados aqui
                 makeDivDepart(_colDireita, list_departments, list_tableUsers);
                 // Limpe o array de fragmentos recebidos
-                
+
             }
 
             //list_departments = JSON.parse(obj.result)
@@ -142,7 +143,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 // Faça o que quiser com os dados aqui
                 makeDivPost(_colDireita, list_post, list_tableUsers, list_departments);
                 // Limpe o array de fragmentos recebidos
-                
+
             }
 
             //list_post = JSON.parse(obj.result)
@@ -176,13 +177,13 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     function constructor() {
         that.clear();
         // col direita
-        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita").setAttribute("id","coldireita"));
+        var colDireita = that.add(new innovaphone.ui1.Div(null, null, "colunadireita").setAttribute("id", "coldireita"));
         //Título
         colDireita.add(new innovaphone.ui1.Div("position:absolute; left:0px; width:100%; top:5%; font-size:25px; text-align:center", texts.text("labelTituloAdmin")));
 
         // col Esquerda
         var colEsquerda = that.add(new innovaphone.ui1.Div(null, null, "colunaesquerda"));
-        colEsquerda.setAttribute("id","colesquerda")
+        colEsquerda.setAttribute("id", "colesquerda")
         var divreport = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; border-bottom: 1px solid #4b545c; border-width: 100%; height: 10%; width: 100%; background-color: #02163F;  display: flex; align-items: center;", null, null));
         var imglogo = divreport.add(new innovaphone.ui1.Node("img", "max-height: 33px; position: absolute; left: 10px; opacity: 0.8;", null, null).setAttribute("src", "./images/logo-wecom.png"));
         var spanreport = divreport.add(new innovaphone.ui1.Div("font-size: 1.00rem; position: absolute; left: 43px; color:white; margin: 5px;", appdn, null));
@@ -196,7 +197,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var relatorios = colEsquerda.add(new innovaphone.ui1.Div("position: absolute; top: 24%; height: 40%;"));
         var prelatorios = relatorios.add(new innovaphone.ui1.Node("p", "text-align: center; font-size: 20px;", texts.text("labelAdmin"), null));
         var br = relatorios.add(new innovaphone.ui1.Node("br", null, null, null));
-    
+
         var lirelatorios1 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         var lirelatorios2 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
         var lirelatorios3 = relatorios.add(new innovaphone.ui1.Node("li", "opacity: 0.9", null, "liOptions"));
@@ -229,35 +230,35 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         //Aconfig.setAttribute("href", "#");
 
         var a = document.getElementById("CfgUsers");
-            a.addEventListener("click", function () { 
-            ChangeView("CfgUsers", colDireita) 
-            });
+        a.addEventListener("click", function () {
+            ChangeView("CfgUsers", colDireita)
+        });
 
         var a = document.getElementById("CfgLicense");
-            a.addEventListener("click", function () { 
-            ChangeView("CfgLicense", colDireita) 
-            });
+        a.addEventListener("click", function () {
+            ChangeView("CfgLicense", colDireita)
+        });
         var a = document.getElementById("CfgDepartment");
-            a.addEventListener("click", function () { 
-            ChangeView("CfgDepartment", colDireita) 
-            });
+        a.addEventListener("click", function () {
+            ChangeView("CfgDepartment", colDireita)
+        });
 
         var a = document.getElementById("CfgPost");
-            a.addEventListener("click", function () { 
-            ChangeView("CfgPost", colDireita) 
-            });
+        a.addEventListener("click", function () {
+            ChangeView("CfgPost", colDireita)
+        });
         var a = document.getElementById("CfgUrl");
         a.addEventListener("click", function () {
             var link = appUrl + '/Posts.htm';
 
-            var popup =  `<div style="position:absolute; left:82%; width:15%; top:70%; font-size:12px; text-align:center;" id="popupbtn" class= "button-inn";>${texts.text("labelSite")}</div>.`
-            
+            var popup = `<div style="position:absolute; left:82%; width:15%; top:70%; font-size:12px; text-align:center;" id="popupbtn" class= "button-inn";>${texts.text("labelSite")}</div>.`
+
             makePopup("URL", link + popup, 800, 200);
 
             var b = document.getElementById("popupbtn")
             b.addEventListener("click", function () {
-            window.open(link, '_blank');
-            removeEventListener("click", b);
+                window.open(link, '_blank');
+                removeEventListener("click", b);
             });
         });
         _colDireita = colDireita;
@@ -265,12 +266,12 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
     function ChangeView(ex, colDireita) {
 
         if (ex == "CfgUsers") {
-           // app.send({ api: "admin", mt: "TableUsers" });
-           app.send({ api: "admin", mt: "SelectAdmins" });
-            
+            // app.send({ api: "admin", mt: "TableUsers" });
+            app.send({ api: "admin", mt: "SelectAdmins" });
+
         }
         if (ex == "CfgLicense") {
-            app.send({ api: "admin", mt: "ConfigLicense"});
+            app.send({ api: "admin", mt: "ConfigLicense" });
 
         }
         if (ex == "CfgDepartment") {
@@ -289,10 +290,10 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         // app.send({ api: "admin", mt: "SelectAdmins" });
         var scrollcontainer = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"))
 
-        var divSearch = scrollcontainer.add(new innovaphone.ui1.Node("div","position:absolute;",texts.text("labelSearchUsers"),"divSearch"))
-        var iptSearch = scrollcontainer.add(new innovaphone.ui1.Input(null,null,texts.text("labelSearchUsers"),100,"text","iptSearch").setAttribute("id","iptSearch"))
-        
-            scrollcontainer.add(new innovaphone.ui1.Node("div", null, texts.text("labelSave"), "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
+        var divSearch = scrollcontainer.add(new innovaphone.ui1.Node("div", "position:absolute;", texts.text("labelSearchUsers"), "divSearch"))
+        var iptSearch = scrollcontainer.add(new innovaphone.ui1.Input(null, null, texts.text("labelSearchUsers"), 100, "text", "iptSearch").setAttribute("id", "iptSearch"))
+
+        scrollcontainer.add(new innovaphone.ui1.Node("div", null, texts.text("labelSave"), "button-inn").setAttribute("id", "btnSave")).addEvent("click", function () {
 
             var checkboxes = document.querySelectorAll(".userCheckbox");
             // var btnSave = document.getElementById("btnSave");
@@ -311,75 +312,86 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         tableMain.add(new innovaphone.ui1.Node("th", null, "Nome", null));
         tableMain.add(new innovaphone.ui1.Node("th", null, "Pode Criar Departamento", null));
 
-       function updateTable(filter) {
-        var adminGuids = admins.map(admin => admin.guid);
+        function updateTable(filter) {
+            var adminGuids = admins.map(admin => admin.guid);
 
-        document.getElementById("local-table").innerHTML = '';
+            document.getElementById("local-table").innerHTML = '';
 
-        users.forEach(function (user) {
-            if (user.cn.toLowerCase().includes(filter.toLowerCase())) {
-                var isChecked = adminGuids.includes(user.guid) ? 'checked' : '';
-                var html = `
+            users.forEach(function (user) {
+                if (user.cn.toLowerCase().includes(filter.toLowerCase())) {
+                    var isChecked = adminGuids.includes(user.guid) ? 'checked' : '';
+                    var html = `
                   <tr>
                     <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
                     <td style="text-align: center;"><input type="checkbox" id="${user.guid}" class="userCheckbox" ${isChecked}></td>
                   </tr>
                 `;
-                document.getElementById("local-table").innerHTML += html;
-            }
+                    document.getElementById("local-table").innerHTML += html;
+                }
+            });
+        }
+        document.getElementById("iptSearch").addEventListener("input", function () {
+            updateTable(this.value);
         });
+        updateTable("");
     }
-    document.getElementById("iptSearch").addEventListener("input", function () {
-        updateTable(this.value);
-    });
-    updateTable("");
+
+    function formatDateToLocal(dateString) {
+        // Adicionar "T" entre a data e a hora caso não exista
+        if (!dateString.includes('T')) {
+            dateString = dateString.replace(' ', 'T');
+        }
+
+        const date = new Date(dateString);
+
+        // Verificar se a data é válida
+        if (isNaN(date)) {
+            console.error('Data inválida:', dateString);
+            return null;
+        }
+
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false  // Para usar o formato de 24 horas
+        };
+        const formattedDate = date.toLocaleDateString(undefined, options);
+        return formattedDate;
     }
 
     function makeDivLicense(t, user) {
         t.clear();
         //Título
-
+        console.log('makeDivLicence PASSEI AQUI')
         // var imgMenu = t.add(new innovaphone.ui1.Node("img",null,null,"imgMenu"));
         // imgMenu.setAttribute("src","menu-icon.png");
         // imgMenu.setAttribute("id","imgmenu");
         //document.getElementById("imgmenu").addEventListener("click",openMenu);
-        var worktable = t.add(new innovaphone.ui1.Div(null, null,"list-box scrolltable"));
+        var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
         worktable.setAttribute('id', 'worktable')
-        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"),"DivLicenseTitle"));
-    
-        worktable.add(new innovaphone.ui1.Div(null, texts.text("lblLicenseToken"), "DivLicenseTokenTitle"));
-        worktable.add(new innovaphone.ui1.Div(null, licenseToken, "DivLicenseToken"));
+        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelTituloLicense"), "DivLicenseTitle"));
 
-        worktable.add(new innovaphone.ui1.Div(null, texts.text("labelLicenseFile"),"DivLicenseKey"));
-        worktable.add(new innovaphone.ui1.Input("position: absolute;  top: 35%; left: 40%; height: 15px; padding:5px; width: 50%; border-radius: 10px; border: 2px solid; border-color:#02163F;", licenseFile, null, null, null, "DivLicenseIptKey").setAttribute("id", "InputLicenseFile"));
         var lic = texts.text("labelTemporary");
         if (licenseActive != "null") {
             lic = licenseActive
         }
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"),"DivLicenseActive"));
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 6%; font-weight: bold;", texts.text("labelLicenseActive"), "DivLicenseActive"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 25%; left: 40%; font-weight: bold;", lic, "DivLicenseSystem"));
 
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", appInstall, "DivAppDate"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 6%; font-weight: bold;", texts.text("labelAppInstallDate"), "DivAppDateTitle"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 35%; left: 40%; font-weight: bold;", formatDateToLocal(appInstall), "DivAppDate"));
 
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"),"DivLicenseDateTitle"));
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", licenseInstallDate, "DivLicenseDate"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 6%; font-weight: bold;", texts.text("labelLicenseInstallDate"), "DivLicenseDateTitle"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 45%; left: 40%; font-weight: bold;", formatDateToLocal(licenseInstallDate), "DivLicenseDate"));
 
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
-        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 75%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 6%; font-weight: bold;", texts.text("labelAppTrialExpired"), "DivLicenseDateTitle"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 55%; left: 40%; font-weight: bold;", formatDateToLocal(trialExpired), "DivLicenseTemporateDate"));
 
-
-        // buttons
-        worktable.add(new innovaphone.ui1.Div("position:absolute; left:82%; width:15%; top:90%; font-size:12px; text-align:center;", null, "button-inn")).addTranslation(texts, "btnOk").addEvent("click", function () {
-            licenseFile = document.getElementById("InputLicenseFile").value;
-            if (licenseFile.length > 0) {
-                app.send({ api: "admin", mt: "UpdateConfigLicenseMessage", licenseToken: licenseToken, licenseFile: licenseFile });
-                //waitConnection(t);
-            } else {
-                makePopup(texts.text("labelAlert"),texts.text("labelLicenseKeyAlert"), 500, 200);
-            }
-            
-        });
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 6%; font-weight: bold;", texts.text("labelLicenseUsed"), "DivLicenseInUse"));
+        worktable.add(new innovaphone.ui1.Div("position: absolute; text-align: right; top: 65%; left: 40%; font-weight: bold;", String(licenseUsed), "DivLicenseUsed"));
 
     }
     function makeDivDepart(t, depart, tableUser) {
@@ -427,7 +439,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                     `;
 
             document.getElementById("local-table").innerHTML += html;
-           
+
         });
         var divs = document.getElementsByClassName("btnChgDpto");
 
@@ -466,7 +478,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
             var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
-            
+
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
             })[0];
@@ -482,7 +494,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
 
             var viewerCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
-            
+
 
             var viewerCheckbox = viewerCol.add(new innovaphone.ui1.Input(null, null, null, null, "checkbox", "checkbox viewercheckbox").setAttribute("id", "viewercheckbox_" + user.guid));
             viewerCheckbox.setAttribute("name", "viewerDepartments");
@@ -518,7 +530,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             return item.id === parseInt(dep_id, 10);
         })[0];
         t.clear()
-       
+
         var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
         worktable.setAttribute('id', 'worktable')
         //insideDiv.className = 'insideDiv';
@@ -532,7 +544,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             makeDivDepart(_colDireita, list_departments, list_tableUsers);
         });
         var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, "nameDepDiv").setAttribute("id", "nameDepDiv"))
-        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="`+ department.name + `" style="color: #000000;">`
+        document.getElementById("nameDepDiv").innerHTML = `<input id="namedep" type="text" value="` + department.name + `" style="color: #000000;">`
         //var nameDepDiv = postMsgDiv.add(new innovaphone.ui1.Node("div", null, department.name, 'nameDepDiv').setAttribute("id", "nameDepDiv"));
         var userTable = editUsersDepartmentsGrid();
         postMsgDiv.add(userTable);
@@ -572,7 +584,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         });
 
     }
-    
+
     function getSelectedUsersDepartments(departmentType) {
         var checkboxes = document.getElementsByName(departmentType + 'Departments');
         var selectedUsers = Array.prototype.slice.call(checkboxes)
@@ -607,7 +619,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
                 return post.user_guid === user.guid;
             });
 
-            var departments = list_department.filter(function(dep){
+            var departments = list_department.filter(function (dep) {
                 return post.department == dep.id
             })
             console.log("dep" + JSON.stringify(departments))
@@ -723,7 +735,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var worktable = t.add(new innovaphone.ui1.Div(null, null, "list-box scrolltable"));
         worktable.setAttribute('id', 'worktable')
 
-        
+
         var postMsgDiv = worktable.add(new innovaphone.ui1.Node("div", null, null, 'postmsg').setAttribute("id", "postmsg"));
         document.getElementById('postmsg').style.backgroundColor = clickedPost.color;
 
@@ -791,9 +803,9 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             var colorPost = document.getElementById("postmsg").style.backgroundColor
             var currentDate = getDateNow()
             if (msgPost === "" || msgPost === " " || titlePost === "" || startPost == "" || endPost == "") {
-                makePopup(texts.text("labelAlert"),texts.text("labelFullAllPosts"), 500, 200);
+                makePopup(texts.text("labelAlert"), texts.text("labelFullAllPosts"), 500, 200);
             } else if (endPost < startPost) {
-                makePopup(texts.text("labelAlert"),texts.text("labelDataEndPostAlert"), 500, 200);
+                makePopup(texts.text("labelAlert"), texts.text("labelDataEndPostAlert"), 500, 200);
             }
             //else if (startPost < currentDate) {
             //    makePopup(texts.text("labelAlert"),texts.text("labelUpdateDateAlert"), 500, 200);

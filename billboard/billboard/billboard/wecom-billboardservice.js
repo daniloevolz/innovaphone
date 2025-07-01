@@ -103,15 +103,16 @@ new JsonApi("user").onconnected(function (conn) {
         log("Usuario Conectado:  " + connectionsUser.length);
 
         conn.onmessage(function (msg) {
-            var now = Date();
+            var now = new Date();
             var appInstallDate = Config.appInstallDate;
             log("danilo-req:Now:  " + now);
             log("danilo-req:appInstallDate:  " + appInstallDate);
             var futureDate = new Date(appInstallDate);  // Cria uma cópia da instância atual
-            futureDate.setDate(futureDate.getDate() + 0);  // Adiciona 90 dias à data
-            log("erick-req:futureDate:  " + futureDate);
-            log("erick-req:conn.unlicensed:  " + conn.unlicensed);
-            if (!conn.unlicensed || futureDate <= now) {
+            futureDate.setDate(futureDate.getDate() + 90);  // Adiciona 90 dias à data
+            log("erick-req:futureDate: " + futureDate);
+            log("erick-req:conn.unlicensed: false " + conn.unlicensed);
+            log("erick-req: futureDate maior que now: " + (futureDate >= now));
+            if (conn.unlicensed == false || futureDate >= now) {
                 var obj = JSON.parse(msg);
                 if (obj.mt == "Ping") {
                     conn.send(JSON.stringify({ api: "user", mt: "Pong", src: obj.src }));
@@ -497,7 +498,10 @@ new JsonApi("admin").onconnected(function (conn) {
                 licenseAppFile = Config.licenseAppFile;
                 var licUsed = connectionsUser.length;
                 var lic = decrypt(licenseAppToken, licenseAppFile)
-                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate, appInstallDate: appDate }));
+                var futureDate = new Date(appInstallDate);  // Cria uma cópia da instância atual
+                futureDate.setDate(futureDate.getDate() + 90);
+
+                conn.send(JSON.stringify({ api: "admin", mt: "LicenseMessageResult", TrialExpired: futureDate, licenseUsed: licUsed, licenseToken: licenseAppToken, licenseFile: licenseAppFile, licenseActive: JSON.stringify(lic), licenseInstallDate: licenseInstallDate, appInstallDate: appDate }));
             }
             if (obj.mt == "UpdateConfigLicenseMessage") {
                 try {
