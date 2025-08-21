@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Queue Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start p-6 space-y-10">
+
+    <h1 id="queueTitle" class="text-4xl font-bold text-center mt-4">Queue Dashboard</h1>
+    <div id="queueData" class="flex flex-col md:flex-row gap-6 w-full items-start justify-center">
+        <!-- Calls Count Box -->
+        <div class="flex-1 bg-gray-800 rounded-lg p-6 w-full max-w-sm text-center shadow-lg">
+            <p class="text-lg">Número de Chamadas em Fila</p>
+            <p id="callsCount" class="text-5xl font-bold mt-2">0</p>
+        </div>
+
+        <!-- Gauge Chart -->
+        <div class="flex-1 w-full max-w-md bg-gray-800 rounded-lg p-6 shadow-lg">
+            <p class="text-lg text-center mb-4">Maior Tempo em Fila</p>
+            <canvas id="elapsedGauge"></canvas>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="flex-1 w-full max-w-md bg-gray-800 rounded-lg p-6 shadow-lg">
+            <p class="text-lg text-center mb-4">Atendentes</p>
+            <canvas id="atendentesPie"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const queue = urlParams.get('queue') || 'default-queue';
+        document.getElementById('queueTitle').innerText = 'Fila: ' + queue;
+
+        const callsCountElement = document.getElementById('callsCount');
+
+        const gaugeCtx = document.getElementById('elapsedGauge').getContext('2d');
+        const pieCtx = document.getElementById('atendentesPie').getContext('2d');
+
+        // Create a Gauge chart (simulating with a doughnut chart)
+        const gaugeChart = new Chart(gaugeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tempo decorrido', 'Restante'],
+                datasets: [{
+                    data: [0, 100], // default 0% preenchido
+                    backgroundColor: ['#34d399', '#374151'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                rotation: -90,
+                circumference: 180,
+                cutout: '80%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    title: {
+                        display: true,
+                        text: '00:00:00',
+                        color: '#fff',
+                        font: { size: 18 }
+                    }
+                }
+            }
+        });
+
+        // Create a Pie chart
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Atendentes Logados (in)', 'Total de Atendentes (out)'],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: ['#3b82f6', '#9ca3af']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateDashboard() {
+            fetch('../../analytics?queue=' + encodeURIComponent(queue))
+                .then(response => response.json())
+                .then(data => {
+                    // Atualiza o número de chamadas
+                    callsCountElement.innerText = data.callsCount;
+
+                    // Atualiza o Gauge
+                    const elapsedParts = data.callsElapsedTime.split(':');
+                    const totalSeconds = (+elapsedParts[0]) * 3600 + (+elapsedParts[1]) * 60 + (+elapsedParts[2]);
+
+                    // Simplesmente normalizar: vamos supor 10 min (600 seg) como 100% do gauge
+                    const maxSeconds = 600;
+                    const percent = Math.min((totalSeconds / maxSeconds) * 100, 100);
+
+                    gaugeChart.data.datasets[0].data = [percent, 100 - percent];
+                    gaugeChart.options.plugins.title.text = data.callsElapsedTime;
+                    gaugeChart.update();
+
+                    // Atualiza o Pie chart
+                    pieChart.data.datasets[0].data = [data.atendentesInCount, data.atendentesCount - data.atendentesInCount];
+                    pieChart.update();
+                })
+                .catch(err => {
+                    console.error('Erro ao buscar dados:', err);
+                });
+        }
+
+        // Atualiza já ao carregar
+        updateDashboard();
+
+        // Atualiza a cada 5 segundos
+        setInterval(updateDashboard, 5000);
+    </script>
+</body>
+</html>

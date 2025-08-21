@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Chat</title>
+</head>
+<body class="bg-gray-100">
+    <script>
+        var url = window.location.href;
+        var baseUrl = url
+            .replace(/\/[^\/]+\/chatwidget\/test\.html(\?.*)?$/, "/chatwidget");
+        (function(d, t) {
+            var BASE_URL = baseUrl; //"https:////inn-lab-ap.wecom.com.br/wecom.com.br/wecallDC-danilo/chatwidget";
+            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+            g.src = BASE_URL + "/sdk.js";
+            g.defer = true;
+            g.async = true;
+            s.parentNode.insertBefore(g, s);
+            g.onload = function () {
+            window.wecomChatWidget.init({
+                baseUrl: BASE_URL,
+                wecallUrl: "https://cswecall.cabergs.org.br/webchathook/inicio/"
+            });
+            };
+        })(document, "script");
+    </script>
+
+</body>
+</html>

@@ -89,8 +89,96 @@ WebServer.onrequest("value", function (req) {
     }
 });
 
-log("pietro req: License " + JSON.stringify(license));
+function getQueryStringParams(queryString) {
+    var params = {};
+    var pairs = queryString.slice(1).split('&');
+    for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        params[pair[0]] = pair[1];
+    }
+    return params;
+}
+
+log("wecall-service STARTING: License " + JSON.stringify(license));
 if (license != null && license.System == true) {
+    WebServer.onrequest("analytics", function (req) {
+        if (req.method == "GET") {
+            var uri = req.relativeUri;
+            var params = getQueryStringParams(uri); // Obter um objeto com os parâmetros
+
+            var queue = params['queue']; // Obter o valor do parâmetro 'id'
+
+            // Filtrar calls
+            var filteredCalls = [];
+            var oldestTimestamp = null;
+
+            for (var i = 0; i < calls.length; i++) {
+                if (calls[i].sip === queue) {
+                    filteredCalls.push(calls[i]);
+                    if (oldestTimestamp === null || calls[i].timestamp < oldestTimestamp) {
+                        oldestTimestamp = calls[i].timestamp;
+                    }
+                }
+            }
+
+            // Calcular tempo decorrido
+            var elapsed = null;
+            if (oldestTimestamp !== null) {
+                var nowTimestamp = Math.floor(Date.now() / 1000); // timestamp atual em segundos
+                var elapsedSeconds = nowTimestamp - oldestTimestamp;
+
+                function formatTime(seconds) {
+                    var h = Math.floor(seconds / 3600);
+                    var m = Math.floor((seconds % 3600) / 60);
+                    var s = seconds % 60;
+                    return (h < 10 ? "0" : "") + h + ":" +
+                        (m < 10 ? "0" : "") + m + ":" +
+                        (s < 10 ? "0" : "") + s;
+                }
+
+                elapsed = formatTime(elapsedSeconds);
+            } else {
+                elapsed = "00:00:00";
+            }
+
+            // Filtrar pbxTableUsers
+            var totalAtendentes = 0;
+            var totalIn = 0;
+
+            for (var j = 0; j < pbxTableUsers.length; j++) {
+                var grps = pbxTableUsers[j].columns && pbxTableUsers[j].columns.grps;
+                if (grps) {
+                    for (var k = 0; k < grps.length; k++) {
+                        if (grps[k].name.indexOf(queue) === 0) {
+                            totalAtendentes++;
+                            if (grps[k].dyn === 'in') {
+                                totalIn++;
+                            }
+                            break; // já achou a fila nesse usuário
+                        }
+                    }
+                }
+            }
+
+            // Montar resposta
+            var responseData = {
+                queue: queue,
+                callsCount: filteredCalls.length,
+                callsElapsedTime: elapsed,
+                atendentesCount: totalAtendentes,
+                atendentesInCount: totalIn
+            };
+
+            var jsonString = JSON.stringify(responseData);
+
+            req.responseContentType("application/json")
+                .sendResponse()
+                .onsend(function (req) {
+                    req.send(new TextEncoder("utf-8").encode(jsonString), true);
+                });
+        }
+    });
+
     WebServer.onrequest("makecall", function (req) {
         if (req.method == "POST") {
             var newValue = "";
@@ -682,8 +770,19 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         }
 
         if (obj.mt == "ReplicateAdd") {
-            pbxTableUsers.push(obj);
-            subscribePresence(obj)
+            //pbxTableUsers.push(obj);
+            //editado em 05/05/25 para corrigir problemas na Feluma
+            var exists = false;
+            for (var i = 0; i < pbxTableUsers.length; i++) {
+                if (pbxTableUsers[i].columns && pbxTableUsers[i].columns.h323 === obj.columns.h323) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                pbxTableUsers.push(obj);
+                subscribePresence(obj);
+            }
         }
         if (obj.mt == "ReplicateUpdate") {
             var foundTableUser = pbxTableUsers.filter(function (pbx) { return pbx.columns.guid === obj.columns.guid });
@@ -750,7 +849,8 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
                                     }
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             //Obj vindo do PBX NaO possui Grupo
                             log("ReplicateUpdate= user " + obj.columns.h323 + " received from pbx has no grups at this moment and group presence changed to out for all!!!");
                             log("ReplicateUpdate= user " + obj.columns.h323 + " group presence changed to OUT for group " + grps1[j].name);
@@ -810,7 +910,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
             
             var found = false;
             pbxTableUsers.forEach(function (user) {
-                if (user.columns.guid == obj.columns.guid) {
+                if (user.columns.guid == obj.columns.guid || user.columns.h323 == obj.columns.h323) { // para atualizar pelo sip caso o usuário tenha sido excluído e recriado
                     log("ReplicateUpdate: Updating the object for user " + obj.columns.h323)
                     Object.assign(user, obj)
                     found = true;
@@ -823,7 +923,9 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
         }
 
         if (obj.mt == "ReplicateDel") {
-            pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+            //pbxTableUsers.splice(pbxTableUsers.indexOf(obj), 1);
+            //editado em 05/05/25 para corrigir problemas na Feluma
+            removePbxTableUserByGuid(obj.columns.guid);
             unsubscribePresence(obj)
         }
     });
@@ -1392,8 +1494,8 @@ new PbxApi("RCC").onconnected(function (conn) {
             var pbx = myArray[1];
             var num = myArray[2];
             if (obj.call != 0) {
-
-                calls.push({ call: obj.call, sip: sip, src: src, num: num })
+                var nowTimestamp = Math.floor(Date.now() / 1000);
+                calls.push({ call: obj.call, sip: sip, src: src, num: num, timestamp: nowTimestamp })
                 log("RCC: UserCallResult: after addCall " + JSON.stringify(calls));
             }
         }
@@ -1676,7 +1778,7 @@ new PbxApi("RCC").onconnected(function (conn) {
                                 break;
                             }
                         }
-
+                        var nowTimestamp = Math.floor(Date.now() / 1000);
                         // 2. Cria o novo objeto call
                         var call = {
                             call: obj.call,
@@ -1684,7 +1786,8 @@ new PbxApi("RCC").onconnected(function (conn) {
                             src: src,
                             num: num,
                             conf: obj.conf,
-                            msg: obj.msg
+                            msg: obj.msg,
+                            timestamp: nowTimestamp
                         };
 
                         // 3. Se já existe uma conversa associada, reaproveite-a
@@ -1755,15 +1858,20 @@ function unsubscribePresence(obj) {
 function setPresenceStatusMessage(sip, note, activity) {
     log("setPresenceStatusMessage: SET PRESENCE ON :", sip +" to "+activity)
     // Enviar a mensagem para a conexao PbxApi
-    pbxApi.send(JSON.stringify({
-        "api": "PbxApi",
-        "mt": "SetPresence",
-        "sip": sip,
-        "activity": activity,
-        "note": note,
-        "src": sip
-    }));
 
+    try {
+        pbxApi.send(JSON.stringify({
+            "api": "PbxApi",
+            "mt": "SetPresence",
+            "sip": sip,
+            "activity": activity,
+            "note": note,
+            "src": sip
+        }));
+
+    } catch (e) {
+        log("ERRO setPresenceStatusMessage: SET PRESENCE ON :", sip + " to " + activity+" ERRO:"+e)
+    }
 }
 
 function handlePresenceUpdate(newPresenceEvent) {
@@ -2494,7 +2602,6 @@ function pbxTableRequest(obj) {
 
     var found = false;
     
-
     if (user[0].columns.grps) {
         log("pbxTableRequest: User Object " + user[0].columns.cn +" contem colunms.grps" + JSON.stringify(user[0].columns.grps));
         user[0].columns.grps.forEach(function (grp) {
@@ -2515,50 +2622,48 @@ function pbxTableRequest(obj) {
             if (obj.mode == "Login") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "in" })
 
-                if (pbxTable.length > 0) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    pbxTable[0].send(JSON.stringify(user[0]));
-                } else {
-                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                }
+                //if (pbxTable.length > 0) {
+                //    user[0].mt = "ReplicateUpdate";
+                //    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+                //    pbxTable[0].send(JSON.stringify(user[0]));
+                //} else {
+                //    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+                //}
             }
             if (obj.mode == "Logout") {
                 user[0].columns.grps.push({ name: obj.group, dyn: "out" })
 
-                if (pbxTable.length > 0) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    pbxTable[0].send(JSON.stringify(user[0]));
-                } else {
-                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                }
+                //if (pbxTable.length > 0) {
+                //    user[0].mt = "ReplicateUpdate";
+                //    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+                //    pbxTable[0].send(JSON.stringify(user[0]));
+                //} else {
+                //    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+                //}
             }
         }
-        else {
-            if (obj.mode == "Login") {
-                if (pbxTable.length > 0) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    pbxTable[0].send(JSON.stringify(user[0]));
-                } else {
-                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                }
-            }
-            if (obj.mode == "Logout") {
-                user[0].columns.grps.push({ name: obj.group, dyn: "out" })
-
-                if (pbxTable.length > 0) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    pbxTable[0].send(JSON.stringify(user[0]));
-                } else {
-                    log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
-                }
-            }
-
-        }
-
+        //else {
+        //    if (obj.mode == "Login") {
+        //        if (pbxTable.length > 0) {
+        //            user[0].mt = "ReplicateUpdate";
+        //            log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+        //            pbxTable[0].send(JSON.stringify(user[0]));
+        //        } else {
+        //            log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+        //        }
+        //    }
+        //    if (obj.mode == "Logout") {
+        //        //user[0].columns.grps.push({ name: obj.group, dyn: "out" })
+        //        //editado em 05/05/2025 devido a problemas na Feluma
+        //        if (pbxTable.length > 0) {
+        //            user[0].mt = "ReplicateUpdate";
+        //            log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+        //            pbxTable[0].send(JSON.stringify(user[0]));
+        //        } else {
+        //            log("pbxTableRequest: User Object " + user[0].columns.cn + " no PBX connection");
+        //        }
+        //    }
+        //}
     }
     else {
         log("pbxTableRequest: User Object " + user[0].columns.cn +" nno contem colunms.grps" + JSON.stringify(user[0].columns));
@@ -2575,13 +2680,13 @@ function pbxTableRequest(obj) {
             user[0].columns.grps.push({ name: obj.group, dyn: "in" })
 
 
-            pbxTable.forEach(function (conn) {
-                if (conn.pbx == user[0].src) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    conn.send(JSON.stringify(user[0]));
-                }
-            })
+            //pbxTable.forEach(function (conn) {
+            //    if (conn.pbx == user[0].src) {
+            //        user[0].mt = "ReplicateUpdate";
+            //        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+            //        conn.send(JSON.stringify(user[0]));
+            //    }
+            //})
 
         }
         if (obj.mode == "Logout") {
@@ -2596,14 +2701,22 @@ function pbxTableRequest(obj) {
             user[0].columns.grps = grps;
             user[0].columns.grps.push({ name: obj.group, dyn: "out" })
 
-            pbxTable.forEach(function (conn) {
-                if (conn.pbx == user[0].src) {
-                    user[0].mt = "ReplicateUpdate";
-                    log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
-                    conn.send(JSON.stringify(user[0]));
-                }
-            })
+            //pbxTable.forEach(function (conn) {
+            //    if (conn.pbx == user[0].src) {
+            //        user[0].mt = "ReplicateUpdate";
+            //        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+            //        conn.send(JSON.stringify(user[0]));
+            //    }
+            //})
         }
+    }
+
+    if (pbxTable.length > 0) {
+        user[0].mt = "ReplicateUpdate";
+        log("pbxTableRequest: Update user " + JSON.stringify(user[0].columns.cn) + " for " + obj.mode + " on group " + JSON.stringify(obj.group) + " on PBX " + JSON.stringify(user[0].src));
+        pbxTable[0].send(JSON.stringify(user[0]));
+    } else {
+        log("pbxTableRequest: WECALL has no PBX connection to update the user Object" + user[0].columns.cn);
     }
 }
 function pbxTableRequestObject(value) {
@@ -2876,6 +2989,19 @@ function removeObjectByCall(arr, pbx, callToRemove) {
                     break;
                 }
             }
+        }
+    }
+}
+
+//Funcions to delete user Call from PbxTableuser API Array
+function removePbxTableUserByGuid(guid) {
+    log("removePbxTableUserByGuid+++++++++++++++++++++++++++++++is " + JSON.stringify(pbxTableUsers.length));
+    for (var j = 0; j < pbxTableUsers.length; j++) {
+        if (pbxTableUsers.columns.guid == guid) {
+            log("pbxTableUsers[j].columns.guid == guid:" + pbxTableUsers[j].columns.guid + " == " + guid);
+            pbxTableUsers.splice(j, 1);
+            log("removePbxTableUserByGuid+++++++++++++++++++++++++++++++result " + JSON.stringify(pbxTableUsers.length));
+            break;
         }
     }
 }
