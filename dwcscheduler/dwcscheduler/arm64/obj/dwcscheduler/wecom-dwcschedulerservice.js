@@ -1262,7 +1262,7 @@ new JsonApi("admin").onconnected(function(conn) {
                                     log("result=" + JSON.stringify(data, null, 4));
 
                                     var jsonData = JSON.stringify(data, null, 4);
-                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                    var maxFragmentSize = 40000; // Defina o tamanho máximo de cada fragmento
                                     var fragments = [];
                                     for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
                                         fragments.push(jsonData.substr(i, maxFragmentSize));
@@ -1300,7 +1300,7 @@ new JsonApi("admin").onconnected(function(conn) {
                                     log("result=" + JSON.stringify(data, null, 4));
 
                                     var jsonData = JSON.stringify(data, null, 4);
-                                    var maxFragmentSize = 50000; // Defina o tamanho máximo de cada fragmento
+                                    var maxFragmentSize = 40000; // Defina o tamanho máximo de cada fragmento
                                     var fragments = [];
                                     for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
                                         fragments.push(jsonData.substr(i, maxFragmentSize));
@@ -1345,7 +1345,7 @@ new JsonApi("admin").onconnected(function(conn) {
                                     log("result=" + JSON.stringify(data, null, 4));
 
                                     var jsonData = JSON.stringify(data, null, 4);
-                                    var maxFragmentSize = 50000; // Para dividir em partes menores no WebSocket
+                                    var maxFragmentSize = 40000; // Para dividir em partes menores no WebSocket
                                     var fragments = [];
                                     for (var i = 0; i < jsonData.length; i += maxFragmentSize) {
                                         fragments.push(jsonData.substr(i, maxFragmentSize));
@@ -1666,27 +1666,35 @@ function handlePresenceUpdate(newPresenceEvent) {
 
     // Obter último status e nota anteriores
     var lastStatus = "online";
+    var lastTelStatus = null;
     var oldNotes = [];
 
     if (oldPresenceEvent) {
         for (var i = 0; i < oldPresenceEvent.presence.length; i++) {
-            var act = oldPresenceEvent.presence[i].activity;
-            var note = oldPresenceEvent.presence[i].note;
+            var pres = oldPresenceEvent.presence[i];
+            var act = pres.activity;
+            var note = pres.note;
+            var contact = pres.contact;
             if (act) lastStatus = act;
             if (note) oldNotes.push(note);
+            if (contact === "tel:") lastTelStatus = pres.status;
         }
     }
     var oldNoteConcat = oldNotes.join("|");
 
     // Novo status e nova nota
     var newStatus = null;
+    var newTelStatus = null;
     var newNotes = [];
 
     for (var i = 0; i < newPresenceList.length; i++) {
-        var act = newPresenceList[i].activity;
-        var note = newPresenceList[i].note;
+        var pres = newPresenceList[i];
+        var act = pres.activity;
+        var note = pres.note;
+        var contact = pres.contact;
         if (act && !newStatus) newStatus = act;
         if (note) newNotes.push(note);
+        if (contact === "tel:") newTelStatus = pres.status;
     }
     if (!newStatus) newStatus = "online";
     var newNoteConcat = newNotes.join("|");
@@ -1694,9 +1702,14 @@ function handlePresenceUpdate(newPresenceEvent) {
     var today = getDateNow();
 
     if (license.Reports) {
-        if (newStatus !== lastStatus) {
+        if (newTelStatus !== lastTelStatus) {
+            var msg = { guid: src, date: today, status: newTelStatus == 'closed' ? 'Logout' : 'Login' , detail: newTelStatus };
+            log("handlePresenceUpdate: Status Softphone alterado por " + sip + ": " + JSON.stringify(msg));
+            insertTblAvailability(msg);
+        }
+        else if (newStatus !== lastStatus) {
             var msg = { guid: src, date: today, status: newStatus, detail: newNoteConcat || newStatus };
-            log("handlePresenceUpdate: Status alterado por " + sip + ": " + JSON.stringify(msg));
+            log("handlePresenceUpdate: Status IM alterado por " + sip + ": " + JSON.stringify(msg));
             insertTblAvailability(msg);
         } else if (newNoteConcat !== oldNoteConcat) {
             var msg = { guid: src, date: today, status: newStatus, detail: newNoteConcat };
@@ -1730,7 +1743,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     if (signalFound.length == 0) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
-        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": ["", "bool", "waiting", "trunk"], "src": conn.pbx }));
+        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": [""], "src": conn.pbx }));
 
     }
     conn.onmessage(function (msg) {
@@ -2234,6 +2247,37 @@ function insertTblCdrEventJson(cdrParsed) {
     var c = cdrParsed.attrs;
     if (c.related) return;
 
+    // Normaliza children
+    var children = Array.isArray(cdrParsed.children) ? cdrParsed.children : [];
+
+    // --- Regra do pseudo no primeiro filho ---
+    var firstChild = children[0] || {};
+    var firstChildAttrs = firstChild.attrs || {};
+    var pseudoFromFirstChild = firstChildAttrs.pseudo;
+
+    if (typeof pseudoFromFirstChild === "string" &&
+        pseudoFromFirstChild.toLowerCase() === "app") {
+        log("insertTblCdrEventJson = Ignorado pois children[0].pseudo == 'app' para cdr_id " + (c.id || ""));
+        return;
+    }
+    if (typeof pseudoFromFirstChild === "string" &&
+        pseudoFromFirstChild.toLowerCase() === "gw") {
+        log("insertTblCdrEventJson = Ignorado pois children[0].pseudo == 'gw' para cdr_id " + (c.id || ""));
+        return;
+    }
+    // --- Captura conf do primeiro <event> que possuir attrs.conf ---
+    var conf = "";
+    for (var i = 0; i < children.length; i++) {
+        var ch = children[i];
+        if (ch && ch.tag === "event" && ch.attrs && ch.attrs.conf) {
+            conf = String(ch.attrs.conf);
+            break;
+        }
+    }
+
+    // --- Define pseudo a salvar (fallback 'user') ---
+    var pseudoToSave = pseudoFromFirstChild ? String(pseudoFromFirstChild) : "user";
+
     var cdr_id = c.id;
     var guid = c.guid;
     var sip = c.h323 || "";
@@ -2244,30 +2288,36 @@ function insertTblCdrEventJson(cdrParsed) {
     var call = c.call || "";
     var flow = JSON.stringify(cdrParsed.children || []).replace(/'/g, "''");
     var groups = JSON.stringify([]).replace(/'/g, "''");
+    if (call != '00000000000000000000000000000000') {
 
-    var query = "INSERT INTO tbl_cdr_events " +
-        "(cdr_id, guid, sip, cn, node, dir, utc, call, flow, groups) VALUES (" +
-        "'" + cdr_id + "', " +
-        "'" + guid + "', " +
-        "'" + sip + "', " +
-        "'" + cn + "', " +
-        "'" + node + "', " +
-        "'" + dir + "', " +
-        utc + ", " +
-        "'" + call + "', " +
-        "'" + flow + "', " +
-        "'" + groups + "'" +
-        ")"; // <-- sem ponto e vírgula
+        var query = "INSERT INTO tbl_cdr_events " +
+            "(cdr_id, conf, pseudo, guid, sip, cn, node, dir, utc, call, flow, groups) VALUES (" +
+            "'" + cdr_id + "', " +
+            "'" + conf + "', " +
+            "'" + pseudoToSave + "', " +
+            "'" + guid + "', " +
+            "'" + sip + "', " +
+            "'" + cn + "', " +
+            "'" + node + "', " +
+            "'" + dir + "', " +
+            utc + ", " +
+            "'" + call + "', " +
+            "'" + flow + "', " +
+            "'" + groups + "'" +
+            ")"; // <-- sem ponto e vírgula
 
-    log("insertTblCdrEventJson = record para a chamada " + cdr_id + " : " + query);
+        log("insertTblCdrEventJson = record para a chamada " + cdr_id + " : " + query);
 
-    Database.insert(query)
-        .oncomplete(function () {
-            log("insertTblCdrEventJson = Sucesso para chamada " + cdr_id);
-        })
-        .onerror(function (error, errorText, dbErrorCode) {
-            log("insertTblCdrEventJson = Erro: " + errorText);
-        });
+        Database.insert(query)
+            .oncomplete(function () {
+                log("insertTblCdrEventJson = Sucesso para chamada " + cdr_id);
+            })
+            .onerror(function (error, errorText, dbErrorCode) {
+                log("insertTblCdrEventJson = Erro: " + errorText);
+            });
+    } else {
+        log("insertTblCdrEventJson = Ignorado record para a chamada " + cdr_id + " :call " + call);
+    }
 }
 
 
@@ -2281,6 +2331,7 @@ function requestCDREvent(xmlString) {
         
         if (parsed == null) {
             var parsed = parseXmlToObject(xmlString)
+            removeGrpTags(parsed); // limpa os grp antes de salvar
             log("requestCDREvent: XML parsed: " + JSON.stringify(parsed, null, 2));
             insertTblCdrEventJson(parsed);
         } else {
@@ -2293,6 +2344,22 @@ function requestCDREvent(xmlString) {
     };
 
 }
+function removeGrpTags(obj) {
+    if (!obj || typeof obj !== 'object') return;
+
+    if (obj.children && Object.prototype.toString.call(obj.children) === '[object Array]') {
+        var newChildren = [];
+        for (var i = 0; i < obj.children.length; i++) {
+            var child = obj.children[i];
+            if (child.tag !== "grp") {
+                removeGrpTags(child); // chamada recursiva
+                newChildren.push(child);
+            }
+        }
+        obj.children = newChildren;
+    }
+}
+
 
 //parser do cdr uri para json
 function parseCDREventData(data) {

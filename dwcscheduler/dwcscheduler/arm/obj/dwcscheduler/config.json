@@ -204,6 +204,16 @@
           },
           {
             "cmd": "column",
+            "name": "conf",
+            "type": "VARCHAR(255)"
+          },
+          {
+            "cmd": "column",
+            "name": "pseudo",
+            "type": "VARCHAR(255)"
+          },
+          {
+            "cmd": "column",
             "name": "guid",
             "type": "VARCHAR(255) NOT NULL"
           },

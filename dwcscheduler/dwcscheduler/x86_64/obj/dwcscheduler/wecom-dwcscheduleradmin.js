@@ -65,6 +65,21 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     var clientTimeZone = "-03:00";
     var fragments = [];
 
+    // === Estado de visualização e cache dos dados ===
+    var availabilityViewMode = "table"; // "table" | "summary"
+    var availabilityDataCache = [];
+    // util: garante que exista um container para o resumo (fica oculto por padrão)
+    function ensureAvailabilitySummaryContainer(wrapper) {
+        var sum = document.getElementById("availability-view-summary");
+        if (!sum) {
+            sum = document.createElement("div");
+            sum.id = "availability-view-summary";
+            sum.style.display = "none";
+            sum.style.marginTop = "16px";
+            wrapper.appendChild(sum);
+        }
+        return sum;
+    }
 
     const diasSemana = [
         { nome: "Segunda-feira", id: 1 },
@@ -298,7 +313,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         // Footer logo
         var divFooter = colEsquerda.add(new innovaphone.ui1.Div("height: 10%; display: flex; justify-content: center; align-items: center; padding: 10px;", null, "footer-logo"));
         var imgconfig = divFooter.add(new innovaphone.ui1.Node("img", "width: 80%; opacity: 0.9;", null));
-        imgconfig.setAttribute("src", "wecom-white.svg");
+        imgconfig.setAttribute("src", "logoTransp.png");
 
         var a = document.getElementById("CfgGeral");
         a.addEventListener("click", function () {
@@ -1675,8 +1690,10 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
     }
 
+    //#region REPORTS UI
     function createAvailabilityReportUI(colDireita) {
         colDireita.clear();
+        availabilityDataCache = [];
 
         //mobile
         var imgMenu = colDireita.add(new innovaphone.ui1.Node("img", null, null, "imgMenu"));
@@ -1689,6 +1706,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         if (!container) return;
 
         var wrapper = document.createElement("div");
+        wrapper.id = "report-availability-wrapper";
         wrapper.className = "max-w-6xl mx-auto mt-[50px] p-[10px]";
 
         // Título
@@ -1742,27 +1760,62 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     `;
         filterWrapper.appendChild(toDiv);
 
+        // === Botões de ação (Buscar / Exportar) ===
+        var actionsDiv = document.createElement("div");
+        actionsDiv.className = "flex gap-2 items-end";
+
         // Botão Consultar
         var btnConsultar = document.createElement("button");
         btnConsultar.className = "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded";
         btnConsultar.textContent = texts.text("labelBtnQuery");
         btnConsultar.addEventListener("click", requestAvailabilityReport);
-        filterWrapper.appendChild(btnConsultar);
+        actionsDiv.appendChild(btnConsultar);
+
 
         // Botão Exportar CSV
         var btnExportar = document.createElement("button");
         btnExportar.className = "bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded";
         btnExportar.textContent = texts.text("labelExportCsv");
         btnExportar.addEventListener("click", exportTableAvailabilityToCSV);
-        filterWrapper.appendChild(btnExportar);
+        actionsDiv.appendChild(btnExportar);
 
+        // Botão Exportar PDF
+        var btnExportarPdf = document.createElement("button");
+        btnExportarPdf.className = "bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded";
+        btnExportarPdf.textContent = texts.text("labelExportPdf");
+        btnExportarPdf.addEventListener("click", () => exportTableAvailabilityToPdf());
+        actionsDiv.appendChild(btnExportarPdf);
+
+        
         wrapper.appendChild(filterWrapper);
+        wrapper.appendChild(actionsDiv);
 
         // Resumo
         var resumo = document.createElement("div");
         resumo.id = "summary";
-        resumo.className = "mb-4 text-gray-700";
+        resumo.style = "border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; margin-bottom: 12px; margin-top:10px; margin-bottom:10px; background-color: white";
         wrapper.appendChild(resumo);
+
+        // === Botões de ação (Resumo / Detalhado) ===
+        var actions2Div = document.createElement("div");
+        actions2Div.className = "flex gap-2 justify-end pb-2";
+        // === Botão ÚNICO: alterna entre Detalhado (table) e Resumido (summary) ===
+        var btnToggle = document.createElement("button");
+        btnToggle.id = "btn-availability-toggle";
+        btnToggle.className = "font-semibold px-4 py-2 hidden rounded transition-colors";
+        //updateAvailabilityToggleButtonUI(btnToggle); // seta rótulo/cores conforme modo atual
+
+        btnToggle.addEventListener("click", function () {
+            availabilityViewMode = (availabilityViewMode === "table" ? "summary" : "table");
+            if (availabilityViewMode === "summary") {
+                renderSummaryAvailabilityFromCache();
+            } else {
+                renderTableAvailability(availabilityDataCache);
+            }
+            updateAvailabilityToggleButtonUI(btnToggle);
+        });
+        actions2Div.appendChild(btnToggle);
+        wrapper.appendChild(actions2Div);
 
         // Tabela
         var tableWrapper = document.createElement("div");
@@ -1771,16 +1824,22 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         var table = document.createElement("table");
         table.className = "min-w-full bg-white border rounded shadow-sm";
 
+        table.id = "table-data";
         var thead = document.createElement("thead");
         thead.className = "bg-gray-200";
+        thead.style.position = "sticky";
+        thead.style.top = "0";
+        thead.style.zIndex = "1";
+        thead.style.boxShadow = "inset 0 -1px 0 #e5e7eb";
         thead.innerHTML = `
-        <tr>
-            <th class="px-4 py-2 text-left">`+ texts.text("cabecalhoSchedules1") +`</th>
-            <th class="px-4 py-2 text-left">`+texts.text("labelFrom")+`</th>
-            <th class="px-4 py-2 text-left">`+ texts.text("labelStatus") +`</th>
-            <th class="px-4 py-2 text-left">`+ texts.text("labelDetail") +`</th>
-        </tr>
-    `;
+            <tr>
+                <th class="px-4 py-2 text-left">`+ texts.text("cabecalhoSchedules1") +`</th>
+                <th class="px-4 py-2 text-left">`+texts.text("labelFrom")+`</th>
+                <th class="px-4 py-2 text-left">`+ texts.text("labelStatus") +`</th>
+                <th class="px-4 py-2 text-left">`+ texts.text("labelDetail") +`</th>
+            </tr>
+        `;
+
         table.appendChild(thead);
 
         var tbody = document.createElement("tbody");
@@ -1802,6 +1861,21 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             iptUser.appendChild(opt);
         });
 
+        // Opcional: garantir container do resumo no wrapper do relatório
+        ensureAvailabilitySummaryContainer(wrapper);
+
+    }
+    function updateAvailabilityToggleButtonUI(btn) {
+        // Quando o modo atual é "table" (detalhado), o clique levará a "Resumo"
+        if (availabilityViewMode === "table") {
+            btn.textContent = texts.text("labelDailySummary");
+            // cor “vai para resumo”
+            btn.className = "bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded transition-colors";
+        } else {
+            btn.textContent = texts.text("labelBackToTable");
+            // cor “voltar para detalhado”
+            btn.className = "bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded transition-colors";
+        }
     }
     function createSchedulesReportUI(colDireita) {
         colDireita.clear();
@@ -1855,26 +1929,43 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     `;
         filterWrapper.appendChild(toDiv);
 
+        // === Botões de ação (Buscar / Exportar) ===
+        var actionsDiv = document.createElement("div");
+        actionsDiv.className = "flex gap-2 items-end";
+
+
         // Botão Consultar
         var btnConsultar = document.createElement("button");
         btnConsultar.className = "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded";
         btnConsultar.textContent = texts.text("labelBtnQuery");
         btnConsultar.addEventListener("click", requestScheduleReport);
-        filterWrapper.appendChild(btnConsultar);
+        actionsDiv.appendChild(btnConsultar);
 
         // Botão Exportar CSV
         var btnExportar = document.createElement("button");
         btnExportar.className = "bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded";
         btnExportar.textContent = texts.text("labelExportCsv");
         btnExportar.addEventListener("click", exportTableSchedulesToCSV);
-        filterWrapper.appendChild(btnExportar);
+        actionsDiv.appendChild(btnExportar);
+
+
+        // Botão Exportar PDF
+        var btnExportarPdf = document.createElement("button");
+        btnExportarPdf.className = "bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded";
+        btnExportarPdf.textContent = texts.text("labelExportPdf");
+        btnExportarPdf.addEventListener("click", () => exportTableSchedulesToPdf(texts.text("labelTitleRptSchedule")));
+        actionsDiv.appendChild(btnExportarPdf);
 
         wrapper.appendChild(filterWrapper);
+        wrapper.appendChild(actionsDiv);
+
+
+        
 
         // Resumo
         var resumo = document.createElement("div");
         resumo.id = "summary";
-        resumo.className = "mb-4 text-gray-700";
+        resumo.style = "border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; margin-bottom: 12px; margin-top:10px; margin-bottom:10px; background-color: white";
         wrapper.appendChild(resumo);
 
         // Tabela
@@ -1883,7 +1974,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         var table = document.createElement("table");
         table.className = "min-w-full bg-white border rounded shadow-sm";
-
+        table.id = "table-data";
         var thead = document.createElement("thead");
         thead.className = "bg-gray-200";
         thead.innerHTML = `
@@ -1958,26 +2049,39 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
     `;
         filterWrapper.appendChild(toDiv);
 
+        // === Botões de ação (Buscar / Exportar) ===
+        var actionsDiv = document.createElement("div");
+        actionsDiv.className = "flex gap-2 items-end";
+
         //Botão consultar
         var btnConsultar = document.createElement("button");
         btnConsultar.className = "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded";
         btnConsultar.textContent = texts.text("labelBtnQuery");
         btnConsultar.addEventListener("click", requestCallsReport);
-        filterWrapper.appendChild(btnConsultar);
+        actionsDiv.appendChild(btnConsultar);
 
         // Botão Exportar CSV
         var btnExportar = document.createElement("button");
         btnExportar.className = "bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded";
         btnExportar.textContent = texts.text("labelExportCsv");
         btnExportar.addEventListener("click", exportTableCallsToCSV);
-        filterWrapper.appendChild(btnExportar);
+        actionsDiv.appendChild(btnExportar);
+
+        // Botão Exportar PDF
+        var btnExportarPdf = document.createElement("button");
+        btnExportarPdf.className = "bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded";
+        btnExportarPdf.textContent = texts.text("labelExportPdf");
+        btnExportarPdf.addEventListener("click", () => exportTableCallsToPdf(texts.text("labelTitleRptCall")));
+        actionsDiv.appendChild(btnExportarPdf);
 
         wrapper.appendChild(filterWrapper);
+        wrapper.appendChild(actionsDiv);
+
 
         // Resumo
         var resumo = document.createElement("div");
         resumo.id = "summary";
-        resumo.className = "mb-4 text-gray-700";
+        resumo.style = "border: 1px solid rgb(229, 231, 235); border-radius: 8px; padding: 12px; margin-bottom: 12px; margin-top:10px; margin-bottom:10px; background-color: white";
         wrapper.appendChild(resumo);
 
         // Tabela
@@ -1986,18 +2090,32 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         var table = document.createElement("table");
         table.className = "min-w-full bg-white border rounded shadow-sm";
-
+        table.id = "table-data";
         var thead = document.createElement("thead");
         thead.className = "bg-gray-200";
-        thead.innerHTML = `
-        <tr>
-            <th class="px-4 py-2 text-left">${texts.text("labelDateTime")}</th>
-            <th class="px-4 py-2 text-left">${texts.text("labelName")}</th>
-            <th class="px-4 py-2 text-left">${texts.text("labelCallHistory")}</th>
-            <th class="px-4 py-2 text-left">${texts.text("labelCallDuration")}</th>
-            <th class="px-4 py-2 text-left">${texts.text("labelWaitTime")}</th>
-        </tr>
-    `;
+        //    thead.innerHTML = `
+        //    <tr>
+        //        <th class="px-4 py-2 text-left">${texts.text("labelDateTime")}</th>
+        //        <th class="px-4 py-2 text-left">${texts.text("labelName")}</th>
+        //        <th class="px-4 py-2 text-left">${texts.text("labelCallHistory")}</th>
+        //        <th class="px-4 py-2 text-left">${texts.text("labelCallDuration")}</th>
+        //        <th class="px-4 py-2 text-left">${texts.text("labelWaitTime")}</th>
+        //    </tr>
+        //`;
+        thead.innerHTML = '\
+            <tr>\
+                <th class="px-4 py-2 text-left">' + texts.text("callId") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelDateTime") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelQuemLigou") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelDirection") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("cabecalhoSchedules6") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelWaitingQueue") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelHouveAtendimento") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelCallDuration") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelWaitTime") + '</th>\
+              <th class="px-4 py-2 text-left">' + texts.text("labelHouveTransbordo") + '</th>\
+            </tr>';
+        table.appendChild(thead);
         table.appendChild(thead);
 
         var tbody = document.createElement("tbody");
@@ -2011,6 +2129,10 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         // Preenche os atendentes no select
         var iptUser = document.getElementById("select-user");
+        var opt = document.createElement("option");
+        opt.textContent = texts.text("all");
+        opt.value = "";
+        iptUser.appendChild(opt);
         list_users.forEach(function (user) {
             var opt = document.createElement("option");
             opt.textContent = user.cn || user.dn;
@@ -2018,10 +2140,724 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             iptUser.appendChild(opt);
         });
     }
+    //#endregion
+
+    //#region CALLS REPORT
+    // ===== Helpers =====
+
+    // Agrupa os registros por conf
+    function groupCdrByConf(data){
+        try{
+            console.log('groupCdrByConf: data', data )
+            // -------- Helpers --------
+            function parseChildren(flowStr) {
+                try {
+                var parsed = JSON.parse(flowStr || "[]");
+                if (Array.isArray(parsed)) return parsed;
+                if (parsed && parsed.children && Array.isArray(parsed.children)) return parsed.children;
+                } catch (e) {}
+                return [];
+            }
+            function getConfFromChildren(children) {
+                if (children[0] && children[0].attrs && children[0].attrs.conf) {
+                return String(children[0].attrs.conf);
+                }
+                for (var i = 0; i < children.length; i++) {
+                var ch = children[i];
+                if (ch && ch.tag === "event" && ch.attrs && ch.attrs.conf) return String(ch.attrs.conf);
+                }
+                return "";
+            }
+            // -------- Agrupar por conf (com fallback via flow) --------
+            var groupsByConf = {}; // confKey -> { conf, rows:[], flows:[], firstUtc, firstRow }
+            for (var i = 0; i < data.length; i++) {
+                var row = data[i];
+                var children = parseChildren(row.flow);
+                var confKey = (row.conf && String(row.conf)) || getConfFromChildren(children);
+                var key = confKey || "__sem_conf__" + (row.call || ("utc" + row.utc + "_" + i));
+
+                if (!groupsByConf[key]) {
+                    groupsByConf[key] = { conf: confKey || "", rows: [], flows: [], firstUtc: row.utc || Infinity, firstRow: row };
+                }
+                var g = groupsByConf[key];
+                g.rows.push({ raw: row, children: children });
+                g.flows = g.flows.concat(children);
+                if (row.utc && row.utc < g.firstUtc) {
+                    g.firstUtc = row.utc;
+                    g.firstRow = row;
+                }
+            }
+
+            // Ordenar grupos por primeiro UTC
+            var groups = Object.keys(groupsByConf).map(function(k){ return groupsByConf[k]; });
+            groups.sort(function(a,b){ return (a.firstUtc||0) - (b.firstUtc||0); });
+
+            // Guardar para CSV/summary
+            window.__lastCallGroupsByConf = groups;
+            console.log('groupCdrByConf: groups', groups )
+            return groups;
+        } catch (e){
+            console.log('groupCdrByConf: error ', e )
+            return [];
+        }
+    }
+
+    // Tudo '00'
+    const pad2 = (n) => String(n).padStart(2, "0");
+
+    // recebe segundos e retorna HH:mm:ss
+    function secToHHMMSS(s) {
+        if (typeof s !== "number" || !isFinite(s) || s < 0) return "-";
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = Math.floor(s % 60);
+        return `${pad2(h)}:${pad2(m)}:${pad2(sec)}`;
+    }
+        
+    // Extrai tempos-chave de UM row
+    function getRowTimes(row){
+        const evs = (row?.children||[])
+            .filter(n => n.tag === "event" && n.attrs)
+            .map(e => ({ msg: e.attrs.msg, t: Number(e.attrs.time) }))
+            .filter(x => x.msg && Number.isFinite(x.t))
+            .sort((a,b)=>a.t-b.t);
+
+        if (!evs.length) return { firstAlert:null, firstSetup:null, lastRel:null, lastEvent:null };
+
+        const firstAlert = evs.find(e=>isAlert(e.msg))?.t ?? null;
+        const firstSetup = evs.find(e=>isSetup(e.msg))?.t ?? null;
+        const firstConn = evs.find(e=>isConn(e.msg))?.t ?? null;
+        const lastRel    = [...evs].reverse().find(e=>isRel(e.msg))?.t ?? null;
+        const lastEvent  = evs[evs.length-1].t;
+
+        return { firstAlert, firstSetup, firstConn, lastRel, lastEvent };
+    }
+
+    // (A) Espera de UM row waiting: (alert|setup) -> (rel|lastEvent)
+    function waitSecondsFromWaitingRow(row){
+        const { firstAlert, firstSetup, firstConn, lastRel, lastEvent } = getRowTimes(row);
+        const start = (firstAlert!=null) ? firstAlert : firstSetup;
+        const end   = (lastRel!=null)    ? lastRel    : lastEvent;
+        if (start!=null && end!=null && end>=start) return end - start;
+        return 0;
+    }
+
+    // (B) Espera TOTAL do conf: soma de todos os rows waiting
+    function waitSecondsForConf(rows){
+        return (rows||[])
+            .filter(isWaitingRow)
+            .reduce((acc,r)=> acc + waitSecondsFromWaitingRow(r), 0);
+    }
+
+    // (C) Duração de UM row sem pseudo (atendente): (alert|setup) -> (rel|lastEvent)
+    function durationSecondsFromAgentRow(row){
+        const { firstAlert, firstSetup, firstConn, lastRel, lastEvent } = getRowTimes(row);
+        let start = (firstAlert!=null) ? firstAlert : firstSetup;
+        start = (firstConn!=null) ? firstConn : start;
+        const end   = (lastRel!=null)    ? lastRel    : lastEvent;
+        if (start!=null && end!=null && end>=start) return end - start;
+        return 0;
+    }
+
+    function hmsToSec(hms) {
+        if (!hms || hms === "-") return 0;
+        var parts = String(hms).split(":").map(function(n){ return parseInt(n,10)||0; });
+        if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+        if (parts.length === 2) return parts[0]*60 + parts[1];
+        return parseInt(hms, 10) || 0;
+    }
+
+    const isSetup = (msg) => msg === "setup-to" || msg === "setup-from";
+    const isConn  = (msg) => msg === "conn-to"   || msg === "conn-from";
+    const isRel   = (msg) => msg === "rel-to"    || msg === "rel-from";
+    const isAlert = (msg) => msg === "alert-to"  || msg === "alert-from";
+
+    function flatEvents(children) {
+        const out = [];
+        (children || []).forEach(node => { if (node.tag === "event") out.push(node); });
+        return out;
+    }
+
+    // Obtem evento mais importante para identidade da chamada
+    function getFirstSetupInfo(rows) {
+        // Retorna o DN do setup inicial + todas as filas (cf.dn) vistas nos setups (ordem preservada, sem duplicar)
+        let dnOut = "-";
+        const queues = [];
+        const seen = new Set();
+
+        // processa em ordem temporal (mais antigo primeiro)
+        const ordered = (rows || []).slice().sort(
+            (a, b) => (Number(a.raw?.utc) || 0) - (Number(b.raw?.utc) || 0)
+        );
+
+        for (const r of ordered) {
+
+            const relevant = (isNoPseudo(r) || isWaitingRow(r));
+            if (!relevant) continue;
+
+            const kids = r?.children || [];
+            for (const node of kids) {
+            if (node?.tag !== "event" || !node.attrs) continue;
+            const msg = node.attrs.msg;
+            if (msg === "setup-to" || msg === "setup-from") {
+                // 1) DN do chamador/contato
+                if (dnOut === "-") {
+                dnOut = node.attrs.dn || node.attrs.e164 || "-";
+                }
+                // 2) Filas (cf) declaradas como filhos do setup
+                const evChildren = node.children || [];
+                for (const ch of evChildren) {
+                if (ch?.tag === "cf" && ch.attrs) {
+                    const name = ch.attrs.dn || ch.attrs.e164 || ch.attrs.h323;
+                    if (name && !seen.has(name)) {
+                    seen.add(name);
+                    queues.push(String(name));
+                    }
+                }
+                }
+            }
+            }
+        }
+
+        return { dn: dnOut, queues };
+    }
 
 
+    // detectar "waiting" / "sem pseudo" ===
+    function isWaitingRow(row) {
+        return (row.children || []).some(n => n.tag === "user" && n.attrs && n.attrs.pseudo === "waiting");
+    }
+    function isNoPseudo(row) {
+        return !(row.children || []).some(n => n.tag === "user" && n.attrs && "pseudo" in n.attrs);
+    }
+
+    // Remove CDRs duplicados por GUID
+    function dedupeEarliestRelevantByGuid(rows) {
+        const byGuid = new Map();
+        const ordered = (rows || []).slice().sort(
+            (a, b) => (Number(a.raw?.utc) || 0) - (Number(b.raw?.utc) || 0)
+        );
+        for (const r of ordered) {
+            // só consideramos sem pseudo ou waiting
+            if (!(isNoPseudo(r) || isWaitingRow(r))) continue;
+
+            const guid = r.raw?.guid || "__no_guid__" + (Number(r.raw?.utc) || 0);
+            if (!byGuid.has(guid)) {
+            byGuid.set(guid, r); // guarda a 1ª ocorrência
+            } else {
+            // mesmo utc? preferir 'to' (mantém “entrada” como direção)
+            const cur = byGuid.get(guid);
+            const curUtc = Number(cur.raw?.utc) || 0;
+            const rUtc   = Number(r.raw?.utc) || 0;
+            if (rUtc === curUtc) {
+                const curTo = cur.raw?.dir === "to";
+                const rTo   = r.raw?.dir === "to";
+                if (rTo && !curTo) byGuid.set(guid, r);
+            }
+            // se rUtc > curUtc, mantemos o mais antigo já salvo
+            }
+        }
+        return Array.from(byGuid.values());
+    }
+
+    // Direção baseada só em (sem pseudo) OU (waiting) ===
+    function getDirection(rows) {
+        const deduped = dedupeEarliestRelevantByGuid(rows);
+        if (!deduped.length) return "-";
+
+        const someTo = deduped.some(r => r.raw && r.raw.dir === "to");
+        // Se houver QUALQUER 'to' entre os primeiros por guid, consideramos RECEBIDA.
+        // Só marcamos REALIZADA quando não há 'to' nesses primeiros.
+        return someTo ? texts.text("labelReceived") : texts.text("labelDone");
+    }
 
 
+    // Filas de espera SEM depender de forwarded; preserva ordem e remove duplicados
+    function getQueuesWaiting(rows) {
+        const names = [];
+        const seen = new Set();
+        // iteramos em ordem temporal crescente
+        const ordered = [...rows].sort((a,b)=>(Number(a.raw?.utc)||0)-(Number(b.raw?.utc)||0));
+        for (const r of ordered) {
+        if (!isWaitingRow(r)) continue;
+        // procurar <cf dn="..."> em eventos
+        (r.children || []).forEach(node => {
+            if (node.tag !== "event" || !Array.isArray(node.children)) return;
+            node.children.forEach(ch => {
+            if (ch.tag === "cf" && ch.attrs?.dn) {
+                const dn = String(ch.attrs.dn);
+                if (!seen.has(dn)) {
+                seen.add(dn);
+                names.push(dn);
+                }
+            }
+            });
+        });
+        }
+        return names;
+    }
+
+
+    // Localiza destino do encaminhamento
+    function getForwardTarget(rows) {
+        let forwarded = false;
+        let target = null;
+        for (const r of rows) {
+        const evs = flatEvents(r.children);
+        if (evs.some(e => e.attrs?.msg === "forwarded")) forwarded = true;
+        const follow = evs.find(e => (e.attrs?.msg === "alert-to" || e.attrs?.msg === "transfer-to") && e.attrs?.dn);
+        if (follow?.attrs?.dn) target = follow.attrs.dn;
+        }
+        return { forwarded, target };
+    }
+
+    // A chamda foi atendida por um atendente?
+    function hasConnNoPseudo(row) {
+        if (!isNoPseudo(row)) return false;
+        const evs = flatEvents(row.children);
+        return evs.some(e => isConn(e.attrs?.msg));
+    }
+
+
+    function pickUserCN(row) {
+        return (row && row.raw && row.raw.cn) ? row.raw.cn : "-";
+    }
+
+    // Deduplicar por GUID dentro do conf (preferir quem tem conn-*)
+    function dedupeByGuid(rows) {
+        const byGuid = new Map();
+        function score(row) {
+        const evs = flatEvents(row.children);
+        const hasConn = evs.some(e => isConn(e.attrs?.msg)) ? 1 : 0;
+        const utc = Number(row.raw?.utc) || 0;
+        return { hasConn, utc };
+        }
+        for (const r of rows) {
+        const guid = r.raw?.guid || "__no_guid__" + (Number(r.raw?.utc) || 0);
+        if (!byGuid.has(guid)) {
+            byGuid.set(guid, r);
+        } else {
+            const cur = byGuid.get(guid);
+            const a = score(cur);
+            const b = score(r);
+            // preferimos: (tem conn) > (não tem); empate: menor utc (mais antigo)
+            if (b.hasConn > a.hasConn || (b.hasConn === a.hasConn && b.utc < a.utc)) {
+            byGuid.set(guid, r);
+            }
+        }
+        }
+        return Array.from(byGuid.values());
+    }
+    // Fim dos HELPERS
+
+    function renderTableCalls(data) {
+        const tbody = document.getElementById("calls-table-body");
+        if (!tbody) return;
+
+        var confArray = groupCdrByConf(data);
+        // ===== Render =====
+        tbody.innerHTML = "";
+
+        (confArray || []).forEach(group => {
+            const { conf, rows = [], firstUtc } = group;
+
+            const dataHoraUTC = ajustarHora((firstUtc || 0) * 1000, "+00:00");
+            //const { dn: numeroDN } = getFirstSetupInfo(rows);
+            const direcao = getDirection(rows);
+
+            // CALCULA UMA VEZ por conf
+            const waitSecConf = waitSecondsForConf(rows);
+            const waitHmsConf = secToHHMMSS(waitSecConf);
+
+            //const filas = getQueuesWaiting(rows);
+            const { forwarded, target } = getForwardTarget(rows);
+
+            const { dn: numeroDN, queues: setupQueues } = getFirstSetupInfo(rows);
+            const filasFromWaiting = getQueuesWaiting(rows);
+
+            // união mantendo ordem (waiting primeiro, depois setups)
+            const filasMerged = [];
+            const seenFilas = new Set();
+            for (const q of (filasFromWaiting || [])) {
+            if (q && !seenFilas.has(q)) { seenFilas.add(q); filasMerged.push(q); }
+            }
+            for (const q of (setupQueues || [])) {
+            if (q && !seenFilas.has(q)) { seenFilas.add(q); filasMerged.push(q); }
+            }
+
+
+            // só SEM pseudo, depois deduplicamos por guid
+            const noPseudoRowsAll = rows.filter(isNoPseudo);
+            const noPseudoRows = dedupeByGuid(noPseudoRowsAll)
+            .sort((a,b) => (Number(a.raw?.utc)||0) - (Number(b.raw?.utc)||0));
+
+            // Se não houver sem pseudo, renderiza uma linha “placeholder”
+            const toRender = noPseudoRows.length ? noPseudoRows : [null];
+
+            toRender.forEach((row, idx) => {
+                const tr = document.createElement("tr");
+                tr.className = "text-gray-600";
+
+                function td(text) {
+                    const el = document.createElement("td");
+                    el.textContent = text == null ? "" : String(text);
+                    return el;
+                }
+
+                if (idx === 0) {
+                    tr.appendChild(td(conf));                 // ID (conf)
+                    tr.appendChild(td(dataHoraUTC));          // Data hora (utc)
+                    tr.appendChild(td(numeroDN));             // Número (dn)
+                    tr.appendChild(td(direcao));              // Direção (dir) — já filtrada
+                } else {
+                    tr.appendChild(td(""));                   // ID (conf)
+                    tr.appendChild(td(""));                   // Data hora (utc)
+                    tr.appendChild(td(""));                   // Número (dn)
+                    tr.appendChild(td(""));                   // Direção (dir)
+                }
+
+                // Usuário (cn)
+                const cn = row ? pickUserCN(row) : (rows[0]?.raw?.cn || "-");
+                tr.appendChild(td(cn));
+
+                // Filas de Espera (sempre mostram as 'waiting'; se houver forwarded, só acrescenta o destino)
+                let filasTxt = filasMerged.join(", ");
+                // (opcional) acrescentar destino de forwarded, sem ocultar as filas iniciais
+                if (idx === 0 && forwarded && target && !seenFilas.has(target)) {
+                filasTxt = filasTxt ? `${filasTxt} -> ${target}` : target;
+                }
+                tdFilasEl = td(filasTxt || "");
+                tr.appendChild(tdFilasEl);
+
+
+                // Atendida
+                const atendida = row ? (hasConnNoPseudo(row) ? texts.text("labelYes") : texts.text("labelNo")) : texts.text("labelNo");
+                tr.appendChild(td(atendida));
+
+                // // Duração / Tempo de espera
+                // let dur = "-", wait = "-";
+                // if (row) {
+                //     const t = calcDurAndWait(row);
+                //     dur = t.duration;
+                //     wait = t.waiting;
+                // }
+                // tr.appendChild(td(dur));
+                // tr.appendChild(td(wait));
+                // Duração / Tempo de espera
+                let dur = "-", wait = waitHmsConf; // espera do CONF para todas as linhas
+                if (row) {
+                    const durSec = durationSecondsFromAgentRow(row); // (alert|setup)->(rel|lastEvent)
+                    const newWaitTimeSec = waitSecConf - durSec;
+
+                    wait = secToHHMMSS(newWaitTimeSec);
+                    dur = secToHHMMSS(durSec);
+                }
+                tr.appendChild(td(dur));
+                tr.appendChild(td(wait));
+
+                // Encaminhada (por conf)
+                // Encaminhada (apenas na linha pai)
+                const enc = (idx === 0 && forwarded) ? texts.text("labelYes") : texts.text("labelNo");
+                tr.appendChild(td(enc));
+
+                tbody.appendChild(tr);
+            });
+        });
+        // -------- Summary (mesmas linhas da TABELA) --------
+        // var summaryData = [];
+
+        // for (var si = 0; si < confArray.length; si++) {
+        //     var g2 = confArray[si];
+
+        //     // 1) mesmas linhas que vão para a tabela: sem pseudo + dedupe por guid
+        //     var rowsNoPseudoAll = (g2.rows || []).filter(isNoPseudo);
+        //     var rowsNoPseudo = dedupeByGuid(rowsNoPseudoAll)
+        //         .sort(function(a,b){ return (Number(a.raw && a.raw.utc) || 0) - (Number(b.raw && b.raw.utc) || 0); });
+
+        //     // 2) para cada sublinha (atendente), usar a MESMA função calcDurAndWait()
+        //     if (!rowsNoPseudo.length) {
+        //         // chamada sem atendente (ex.: abandonada) -> não soma tempos de conversa/espera do atendente
+        //         // (se quiser somar "espera de abandonadas", posso te passar o bloco opcional depois)
+        //         continue;
+        //     }
+
+        //     for (var ri = 0; ri < rowsNoPseudo.length; ri++) {
+        //         var row = rowsNoPseudo[ri];
+        //         var times = calcDurAndWait(row); // {duration: "HH:MM:SS"|- , waiting: "HH:MM:SS"|-}
+        //         var durSec  = hmsToSec(times.duration);
+        //         var waitSec = hmsToSec(times.waiting);
+
+        //         var guidAgg = (row.raw && row.raw.guid) ? row.raw.guid : "unknown";
+        //         var cnAgg   = (row.raw && row.raw.cn)   ? row.raw.cn   : "-";
+
+        //         summaryData.push({
+        //         guid: guidAgg,          // chave do atendente
+        //         cn: cnAgg,              // nome (útil para debug/inspeção se quiser)
+        //         duration: durSec,       // em segundos
+        //         wait_time: waitSec      // em segundos
+        //         });
+        //     }
+        // }
+        // -------- Summary (tempo no atendente e tempo de espera) --------
+        var summaryData = [];
+
+        for (var si = 0; si < confArray.length; si++) {
+            var g2 = confArray[si];
+
+            // (1) Espera do conf (sempre)
+            var waitSecConf = waitSecondsForConf(g2.rows);
+            summaryData.push({
+                guid: "__wait__:" + (g2.conf || si),
+                cn: "Fila",
+                duration: 0,
+                wait_time: waitSecConf,
+                non_agent: true
+            });
+
+            // (2) Durações por atendente (sem pseudo, dedupe por guid)
+            var rowsNoPseudo = dedupeByGuid((g2.rows || []).filter(isNoPseudo))
+                .sort(function(a,b){ return (Number(a.raw?.utc)||0) - (Number(b.raw?.utc)||0); });
+
+            for (var ri = 0; ri < rowsNoPseudo.length; ri++) {
+                var row = rowsNoPseudo[ri];
+                var durSec = durationSecondsFromAgentRow(row);
+
+                summaryData.push({
+                guid: (row.raw && row.raw.guid) ? row.raw.guid : "unknown",
+                cn:   (row.raw && row.raw.cn)   ? row.raw.cn   : "-",
+                duration: durSec,  // segundos de fala/atendimento
+                wait_time: 0       // espera já foi adicionada pelo item do conf
+                });
+            }
+        }
+
+        // render
+        renderSummaryCalls(summaryData, confArray.length);
+    }
+
+    function renderSummaryCalls(data, totalConfs){
+        var resumo = document.getElementById("summary");
+
+        var totalCalls = (typeof totalConfs === "number") ? totalConfs : data.length;
+
+        var users = {};
+        var totalCallDuration = 0; // soma de (durations + waits)
+        var totalWaitTime = 0;
+
+        for (var i = 0; i < data.length; i++) {
+            var row = data[i];
+
+            // Somatórios
+            totalWaitTime     += row.wait_time || 0;
+            totalCallDuration += (row.duration || 0) + (row.wait_time || 0);
+
+            // Contagem de agentes (ignora itens de 'fila')
+            if (row.non_agent) continue;
+
+            if (!users[row.guid]) users[row.guid] = { cn: row.cn || row.guid, callCount: 0, totalDuration: 0, totalWait: 0 };
+            users[row.guid].callCount++;
+            users[row.guid].totalDuration += row.duration || 0;
+            users[row.guid].totalWait     += row.wait_time || 0; // sempre 0 nos itens de agente
+        }
+
+        var userCount = Object.keys(users).length;
+        var avgCallsPerUser = userCount ? (totalCalls / userCount) : 0;
+        var avgCallDuration = totalCalls ? (totalCallDuration / totalCalls) : 0;
+        var avgWaitTime     = totalCalls ? (totalWaitTime / totalCalls) : 0;
+
+        function formatDuration(seconds) {
+            var s = Math.max(0, parseInt(seconds || 0, 10));
+            var min = Math.floor(s / 60);
+            var sec = s % 60;
+            return min + ":" + (sec < 10 ? "0" + sec : sec);
+        }
+
+        resumo.innerHTML =
+            "<p id='totalCalls' class='text-sm'>" + texts.text("labelTotalCalls") + " <strong>" + totalCalls + "</strong></p>" +
+            "<p id='totalAgents' class='text-sm'>" + texts.text("labelTotalAgents") + " <strong>" + userCount + "</strong></p>" +
+            "<p id='avgPerUser' class='text-sm'>" + texts.text("labelAvgCallsPerUser") + " <strong>" + avgCallsPerUser.toFixed(2) + "</strong></p>" +
+            "<p id='totalDuration' class='text-sm'>" + texts.text("labelTotalCallTime") + " <strong>" + formatDuration(totalCallDuration) + "</strong></p>" +
+            "<p id='avgDuration' class='text-sm'>" + texts.text("labelAvgCallTime") + " <strong>" + formatDuration(avgCallDuration) + "</strong></p>" +
+            "<p id='totalWait' class='text-sm'>" + texts.text("labelTotalWaitTime") + " <strong>" + formatDuration(totalWaitTime) + "</strong></p>" +
+            "<p id='avgWait' class='text-sm'>" + texts.text("labelAvgWaitTime") + " <strong>" + formatDuration(avgWaitTime) + "</strong></p>";
+    }
+
+
+    function exportTableCallsToCSV() {
+        // ===== textos do cabeçalho/summary =====
+        var title = texts.text("labelTitleRptCall");
+        var summaryValues = {
+            totalCalls:    document.getElementById("totalCalls")    ? document.getElementById("totalCalls").innerText    : "",
+            totalAgents:   document.getElementById("totalAgents")   ? document.getElementById("totalAgents").innerText   : "",
+            avgPerUser:    document.getElementById("avgPerUser")    ? document.getElementById("avgPerUser").innerText    : "",
+            totalDuration: document.getElementById("totalDuration") ? document.getElementById("totalDuration").innerText : "",
+            avgDuration:   document.getElementById("avgDuration")   ? document.getElementById("avgDuration").innerText   : "",
+            totalWait:     document.getElementById("totalWait")     ? document.getElementById("totalWait").innerText     : "",
+            avgWait:       document.getElementById("avgWait")       ? document.getElementById("avgWait").innerText       : ""
+        };
+
+        // ===== CSV base =====
+        var csv = '"' + title + '"\n\n';
+        csv += '"' + summaryValues.totalCalls    + '"\n';
+        csv += '"' + summaryValues.totalAgents   + '"\n';
+        csv += '"' + summaryValues.avgPerUser    + '"\n';
+        csv += '"' + summaryValues.totalDuration + '"\n';
+        csv += '"' + summaryValues.avgDuration   + '"\n';
+        csv += '"' + summaryValues.totalWait     + '"\n';
+        csv += '"' + summaryValues.avgWait       + '"\n';
+        csv += "\n";
+
+        // ===== Cabeçalhos (1 linha por conf) =====
+        var h1 = texts.text("callId");                 // ID (conf)
+        var h2 = texts.text("labelDateTime");          // Data e hora
+        var h3 = texts.text("labelQuemLigou");         // Solicitante
+        var h4 = texts.text("labelDirection");         // Direção
+        var h5 = texts.text("cabecalhoSchedules6");    // Atendente
+        var h6 = texts.text("labelWaitingQueue");      // Zona/Setor
+        var h7 = texts.text("labelHouveAtendimento");  // Foi atendida
+        var h8 = texts.text("labelCallDuration");      // Tempo no atendente
+        var h9 = texts.text("labelWaitTime");          // Tempo de espera
+        var h10 = texts.text("labelHouveTransbordo");  // Transbordo
+        csv += '"' + h1 + '";"' + h2 + '";"' + h3 + '";"' + h4 + '";"' + h5 + '";"' + h6 + '";"' + h7 + '";"' + h8 +'";"' + h9 +'";"' + h10 +'"\n';
+
+        // ===== Grupos (gerados no render) =====
+        var groups = window.__lastCallGroupsByConf || [];
+
+        // ===== Linhas =====
+        for (var gi = 0; gi < groups.length; gi++) {
+            var g = groups[gi];
+            var rows = g.rows || [];
+
+            // ID (conf)
+            var confId = g.conf || (g.firstRow && g.firstRow.conf) || "";
+
+            // Direção (mesma da tabela)
+            var direcao = getDirection(rows);
+
+            // Solicitante + filas (mesma lógica da tabela)
+            var setupInfo = getFirstSetupInfo(rows);           // { dn, queues }
+            var caller = setupInfo.dn;
+            var setupQueues = setupInfo.queues || [];
+            var filasFromWaiting = getQueuesWaiting(rows);
+            var merged = [];
+            var seen = new Set();
+            (filasFromWaiting || []).forEach(function(q){ if(q && !seen.has(q)){ seen.add(q); merged.push(q); }});
+            (setupQueues || []).forEach(function(q){ if(q && !seen.has(q)){ seen.add(q); merged.push(q); }});
+            var fwd = getForwardTarget(rows);                  // { forwarded, target }
+            var zonaSetor = merged.join(", ");
+            if (fwd.forwarded && fwd.target && !seen.has(fwd.target)) {
+            zonaSetor = zonaSetor ? (zonaSetor + " -> " + fwd.target) : fwd.target;
+            }
+
+            // Atendentes (sem pseudo) dedupe por guid
+            var agentRows = dedupeByGuid(rows.filter(isNoPseudo))
+            .sort(function(a,b){ return (Number(a.raw && a.raw.utc) || 0) - (Number(b.raw && b.raw.utc) || 0); });
+
+            var namesSet = new Set();
+            agentRows.forEach(function(r){
+            var nm = (r.raw && r.raw.cn) ? r.raw.cn : (r.raw && r.raw.guid) ? r.raw.guid : "-";
+            if (nm) namesSet.add(nm);
+            });
+            var atendentes = Array.from(namesSet).join(", ");
+
+            // Foi atendida / Transbordo
+            var houveAt = agentRows.some(hasConnNoPseudo) ? texts.text('labelYes') : texts.text('labelNo');
+            var houveTb = fwd.forwarded ? texts.text('labelYes') : texts.text('labelNo');
+
+            // Tempos (mesma regra da tabela/sumário)
+            var waitSecConf = waitSecondsForConf(rows);                          // soma dos 'waiting' do conf
+            var durAgentsSec = agentRows.reduce(function(acc,r){
+            return acc + durationSecondsFromAgentRow(r);                       // (alert|setup)->(rel|lastEvent)
+            }, 0);
+
+            // Monta linha (10 colunas, mesma ordem do cabeçalho)
+            var rowCsv = [
+            confId,
+            ajustarHora((g.firstUtc || 0) * 1000, "+00:00"),
+            caller,
+            direcao,
+            atendentes || "-",
+            zonaSetor || "",
+            houveAt,
+            secToHHMMSS(durAgentsSec),
+            secToHHMMSS(waitSecConf),
+            houveTb
+            ];
+
+            csv += '"' + rowCsv.map(function (s) {
+            return (String(s)).replace(/\n/g," ").replace(/\r/g," ");
+            }).join('";"') + '"\n';
+        }
+
+        // ===== Download =====
+        var blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "relatorio_chamadas.csv";
+        link.click();
+    }
+    function exportTableCallsToPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
+
+        // Título
+        const title = texts.text("labelTitleRptCall");
+        doc.setFontSize(14);
+        doc.text(title, 10, 12);
+
+        // --- Sumário compacto (lendo do DOM, como no CSV) ---
+        const getTxt = id => (document.getElementById(id)?.innerText || "").trim();
+        const summaryRows = [
+            [getTxt("totalCalls")],
+            [getTxt("totalAgents")],
+            [getTxt("avgPerUser")],
+            [getTxt("totalDuration")],
+            [getTxt("avgDuration")],
+            [getTxt("totalWait")],
+            [getTxt("avgWait")],
+        ];
+
+        doc.autoTable({
+            head: [[texts.text("labelMetric")]],
+            body: summaryRows,
+            startY: 16,
+            theme: "plain",
+            styles: { fontSize: 9, cellPadding: 1.5 },
+            headStyles: { fontStyle: "bold" },
+            margin: { left: 10, right: 10 }
+        });
+
+        const startY = (doc.lastAutoTable?.finalY || 16) + 4;
+
+        // --- Tabela principal: usa o HTML do DOM ---
+        doc.autoTable({
+            html: `#table-data`,
+            startY,
+            theme: "grid",
+            styles: { fontSize: 8, cellPadding: 2, overflow: "linebreak" },
+            headStyles: { fillColor: [9, 33, 62], textColor: 255, fontStyle: "bold" }, // opcional
+            bodyStyles: { valign: "top" },
+            // Evita quebrar linhas muito curtas, ajuda na paginação de tabelas largas
+            columnStyles: {
+            0: { cellWidth: 55 },   // ID (conf)
+            // ajuste fino opcional para outras colunas, se quiser:
+            // 1: { cellWidth: 28 }, // Data e hora
+            // 2: { cellWidth: 32 }, // Solicitante
+            // 5: { cellWidth: 60 }, // Zona/Setor
+            },
+            didDrawPage: (data) => {
+            const page = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.text(`${texts.text("labelPage")} ${page}`, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 6);
+            }
+        });
+
+        doc.save("relatorio_chamadas.pdf");
+    }
+
+    //#endregion
+
+    //#region Requisita Relatórios ao Backend
 
     function requestAvailabilityReport() {
         if (!app || !app.connected) {
@@ -2106,11 +2942,29 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
         app.send(payload);
     }
+    //#endregion
 
-
+    //#region AVAILABILITY REPORT
     function renderTableAvailability(data) {
         var container = document.getElementById("table-body");
         container.innerHTML = "";
+
+        // Cache global para permitir alternar sem nova consulta
+        availabilityDataCache = Array.isArray(data) ? data.slice() : [];
+
+        if(availabilityDataCache.length>0) {
+            var btn = document.getElementById("btn-availability-toggle")
+            btn.style.display = "flex";
+        }else{
+            var btn = document.getElementById("btn-availability-toggle")
+            btn.style.display = "none";
+        }
+
+        // Se o usuário clicou em "Resumo", apenas renderiza o resumo e sai
+        if (availabilityViewMode === "summary") {
+            renderSummaryAvailabilityFromCache();
+            return;
+        }
 
         data.forEach(function (row) {
             //Ajusta a data para o GMT do cliente
@@ -2130,6 +2984,155 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
            <td class='px-4 py-2 text-blue-700'>${texts.text(row.status) || row.status }</td>
            <td class='px-4 py-2 text-blue-700'>${texts.text(row.detail) || row.detail}</td>`;
             container.appendChild(tr);
+        });
+
+        // Mostrar a tabela normal e esconder o resumo
+        var tableEl = document.querySelector("#table-body")?.closest("table");
+        if (tableEl) tableEl.style.display = "";
+        var summaryEl = document.getElementById("availability-view-summary");
+        if (summaryEl) summaryEl.style.display = "none";
+
+        var toggleBtn = document.getElementById("btn-availability-toggle");
+        if (toggleBtn) updateAvailabilityToggleButtonUI(toggleBtn);
+    }
+    function renderSummaryAvailabilityFromCache() {
+        var wrapper = document.getElementById("report-availability-wrapper") || document.body; // ajuste se tiver um wrapper específico
+        var summaryHost = ensureAvailabilitySummaryContainer(wrapper);
+
+        // Esconde a tabela original
+        var tableEl = document.querySelector("#table-body")?.closest("table");
+        if (tableEl) tableEl.style.display = "none";
+
+        // Mostra o container do resumo
+        summaryHost.style.display = "block";
+        summaryHost.innerHTML = ""; // limpa
+
+        var data = availabilityDataCache || [];
+        if (!data.length) {
+            summaryHost.innerHTML = '<div style="opacity:.7">Sem dados para resumir.</div>';
+            return;
+        }
+
+        // Helpers (usa seu fuso/local; adapte se já tiver util de formatação)
+        function toLocalDate(dIso) { return new Date(ajustarHora(dIso, clientTimeZone)); }
+        function dayKey(dIso) {
+            var d = toLocalDate(dIso);
+            var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), da = String(d.getDate()).padStart(2,"0");
+            return `${y}-${m}-${da}`;
+        }
+        function fmtDateTime(d) {
+            var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), da=String(d.getDate()).padStart(2,"0");
+            var H=String(d.getHours()).padStart(2,"0"), M=String(d.getMinutes()).padStart(2,"0"), S=String(d.getSeconds()).padStart(2,"0");
+            return `${da}/${m}/${y} ${H}:${M}:${S}`;
+        }
+        function fmtHM(ms) {
+            var s = Math.max(0, Math.floor(ms/1000));
+            var hh = Math.floor(s/3600), mm = Math.floor((s%3600)/60), ss = s%60;
+            return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+        }
+
+        // Agrupa por dia -> guid
+        var byDayGuid = {};
+        data.forEach(function(r){
+            var key = dayKey(r.date);
+            (byDayGuid[key] ||= {});
+            (byDayGuid[key][r.guid] ||= []).push(r);
+        });
+
+        // Para cada dia, criamos um "card" com tabela – e para cada guid, 2 linhas (principal + interior)
+        Object.keys(byDayGuid).sort().forEach(function(dk){
+            var card = document.createElement("div");
+            card.style.border = "1px solid #e5e7eb";
+            card.style.borderRadius = "8px";
+            card.style.padding = "12px";
+            card.style.marginBottom = "12px";
+            card.style.backgroundColor = "white";
+
+            var title = document.createElement("div");
+            title.textContent = `Dia: ${dk}`;
+            title.style.fontWeight = "600";
+            title.style.marginBottom = "8px";
+            card.appendChild(title);
+
+            var tbl = document.createElement("table");
+            tbl.style.width = "100%";
+            tbl.style.borderCollapse = "collapse";
+            var thead = document.createElement("thead");
+            thead.innerHTML = `
+            <tr style="border-bottom:1px solid #e5e7eb;">
+                <th style="text-align:left;padding:8px">${texts.text("labelName")}</th>
+                <th style="text-align:left;padding:8px">${texts.text("labelFirstLogin")}</th>
+                <th style="text-align:left;padding:8px">${texts.text("labelLastLogout")}</th>
+            </tr>`;
+            tbl.appendChild(thead);
+
+            var tbody = document.createElement("tbody");
+
+            Object.keys(byDayGuid[dk]).sort().forEach(function(guid){
+            var rows = byDayGuid[dk][guid].slice().sort(function(a,b){
+                return toLocalDate(a.date) - toLocalDate(b.date);
+            });
+
+            var firstLogin = null, lastLogout = null;
+            var openLogin = null, totalLoggedMs = 0;
+
+            rows.forEach(function(r){
+                var isLogin  = String(r.status).toLowerCase() === "login";
+                var isLogout = String(r.status).toLowerCase() === "logout";
+                var t = toLocalDate(r.date);
+
+                if (isLogin) {
+                if (!firstLogin) firstLogin = t;
+                openLogin = t; // mantém o último login aberto
+                } else if (isLogout) {
+                lastLogout = t;
+                if (openLogin && t >= openLogin) {
+                    totalLoggedMs += (t - openLogin);
+                    openLogin = null;
+                }
+                }
+            });
+
+            var workedMs = (firstLogin && lastLogout && lastLogout >= firstLogin) ? (lastLogout - firstLogin) : 0;
+
+
+            // Localiza o usuário correspondente
+            var user = list_users.find(function (u) {
+                return u.guid === guid;
+            });
+            // Usa o nome amigável, ou o GUID se não encontrado
+            var displayName = user ? (user.cn || user.dn || user.sip) : guid;
+            // Linha principal
+            var trMain = document.createElement("tr");
+            trMain.style.borderBottom = "1px solid #f3f4f6";
+            trMain.innerHTML = `
+                <td style="padding:8px">${displayName}</td>
+                <td style="padding:8px">${firstLogin ? fmtDateTime(firstLogin) : "-"}</td>
+                <td style="padding:8px">${lastLogout ? fmtDateTime(lastLogout) : "-"}</td>
+            `;
+            tbody.appendChild(trMain);
+
+            // Linha interior (indentada)
+            var trInner = document.createElement("tr");
+            trInner.style.borderBottom = "1px solid #e5e7eb";
+            var tdInner = document.createElement("td");
+            tdInner.colSpan = 3;
+            tdInner.style.padding = "8px 8px 12px 32px";
+            tdInner.style.fontSize = "12px";
+            tdInner.style.opacity = ".9";
+            tdInner.innerHTML = `
+                <div style="display:flex;gap:24px;flex-wrap:wrap">
+                <div><strong>${texts.text("labelTotalWorked")}</strong> ${fmtHM(workedMs)}</div>
+                <div><strong>${texts.text("labelTotalLogged")}</strong> ${fmtHM(totalLoggedMs)}</div>
+                </div>
+            `;
+            trInner.appendChild(tdInner);
+            tbody.appendChild(trInner);
+            });
+
+            tbl.appendChild(tbody);
+            card.appendChild(tbl);
+            summaryHost.appendChild(card);
         });
     }
     function renderSummaryAvailability(data) {
@@ -2177,17 +3180,21 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         var avgPerAgent = loginAgentCount > 0 ? (totalMinutes / loginAgentCount) : 0;
 
         resumo.innerHTML = `
-        <p id='loginAgentCount' class='text-sm'>${texts.text("labelTotalAgent")} <strong>${loginAgentCount}</strong></p>
-        <p id='loginCount' class='text-sm'>${texts.text("labelLoginCount")} <strong>${loginCount}</strong></p>
-        <p id='lastLogin' class='text-sm'>${texts.text("labelLastLogin")} <strong>${loginCount == 0 ? lastLogin : ajustarHora(lastLogin, clientTimeZone)}</strong></p>
-        <p id='totalMinutes' class='text-sm'>${texts.text("labelTotalTime")} <strong>${Math.round(totalMinutes)} minutos</strong></p>
-        <p id='avgPerDay' class='text-sm'>${texts.text("labelAverageDay")} <strong>${Math.round(avgPerDay)} minutos</strong></p>
-        <p id='avgPerAgent' class='text-sm'>${texts.text("labelAverageAgent")} <strong>${Math.round(avgPerAgent)} minutos</strong></p>
-    `;
+            <p id='loginAgentCount' class='text-sm'>${texts.text("labelTotalAgent")} <strong>${loginAgentCount}</strong></p>
+            <p id='loginCount' class='text-sm'>${texts.text("labelLoginCount")} <strong>${loginCount}</strong></p>
+            <p id='lastLogin' class='text-sm'>${texts.text("labelLastLogin")} <strong>${loginCount == 0 ? lastLogin : ajustarHora(lastLogin, clientTimeZone)}</strong></p>
+            <p id='totalMinutes' class='text-sm'>${texts.text("labelTotalTime")} <strong>${secToHHMMSS(totalMinutes * 60)}</strong></p>
+            <p id='avgPerDay' class='text-sm'>${texts.text("labelAverageDay")} <strong>${secToHHMMSS(avgPerDay * 60)}</strong></p>
+            <p id='avgPerAgent' class='text-sm'>${texts.text("labelAverageAgent")} <strong>${secToHHMMSS(avgPerAgent * 60)}</strong></p>
+        `;
+        var toggleBtn = document.getElementById("btn-availability-toggle");
+        if (toggleBtn) updateAvailabilityToggleButtonUI(toggleBtn);
+
     }
     function exportTableAvailabilityToCSV() {
+        var csv = "";
+        
         var title = texts.text("labelTitleRptAgent");
-
         // Título e resumo
         var summaryValues = {
             loginAgentCount: document.getElementById("loginAgentCount")?.innerText || "",
@@ -2198,7 +3205,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             avgPerAgent: document.getElementById("avgPerAgent")?.innerText || ""
         };
 
-        let csv = `"${title}"\n\n`; // título
+        csv = `"${title}"\n\n`; // título
         csv += `"${summaryValues.loginAgentCount}"\n`;
         csv += `"${summaryValues.loginCount}"\n`;
         csv += `"${summaryValues.lastLogin}"\n`;
@@ -2207,28 +3214,197 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         csv += `"${summaryValues.avgPerAgent}"\n`;
         csv += `\n`; // linha em branco antes da tabela
 
-        // Cabeçalho da tabela
-        csv += `"${texts.text("cabecalhoSchedules1")}","${texts.text("labelFrom")}","${texts.text("labelStatus")}","${texts.text("labelDetail")}"\n`;
-
-        // Conteúdo da tabela
-        var rows = document.querySelectorAll("#table-body tr");
-        for (var i = 0; i < rows.length; i++) {
-            var cols = rows[i].querySelectorAll("td");
-            var row = [];
-            for (var j = 0; j < cols.length; j++) {
-                row.push('"' + cols[j].innerText + '"');
+        if (availabilityViewMode === "summary") {
+            // Exporta o RESUMO mostrado na tela
+            var host = document.getElementById("availability-view-summary");
+            if (!host || host.style.display === "none") {
+            alert("Nada para exportar.");
+            return;
             }
-            csv += row.join(",") + "\n";
-        }
+            // Para cada card (dia)
+            var cards = host.querySelectorAll("div[style*='border']");
+            cards.forEach(function(card, idx){
+                var dayTitle = card.querySelector("div[style*='font-weight']")?.textContent || ("Dia " + (idx+1));
+                csv += `"${dayTitle}"\n`;
+                csv += `"${texts.text("cabecalhoSchedules6")}";"${texts.text("labelFirstLogin")}";"${texts.text("labelLastLogout")}";"${texts.text("labelTotalWorked")}";"${texts.text("labelTotalLogged")}"\n`;
 
-        // Gera e baixa o arquivo CSV
-        var blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+
+                var rows = card.querySelectorAll("tbody tr");
+                for (var i = 0; i < rows.length; i += 2) { // 2 linhas por guid (main + inner)
+                    var mainTds = rows[i].querySelectorAll("td");
+                    var inner   = rows[i+1]?.querySelector("td")?.innerText || "";
+                    // Extrai tempos da linha interior
+                    var worked  = (inner.match(/Trabalhado:\s+([0-9:]+)/) || [,""])[1];
+                    var logged  = (inner.match(/Logado:\s+([0-9:]+)/) || [,""])[1];
+
+                    var guid  = mainTds[0]?.innerText || "";
+                    var first = mainTds[1]?.innerText || "";
+                    var last  = mainTds[2]?.innerText || "";
+
+                    csv += `"${guid}";"${first}";"${last}";"${worked}";"${logged}"\n`;
+                }
+                csv += `\n`;
+            });
+        }else{
+            // Cabeçalho da tabela
+            csv += `"${texts.text("cabecalhoSchedules1")}";"${texts.text("labelFrom")}";"${texts.text("labelStatus")}";"${texts.text("labelDetail")}"\n`;
+
+            // Conteúdo da tabela
+            var rows = document.querySelectorAll("#table-body tr");
+            for (var i = 0; i < rows.length; i++) {
+                var cols = rows[i].querySelectorAll("td");
+                var row = [];
+                for (var j = 0; j < cols.length; j++) {
+                    row.push('"' + cols[j].innerText + '"');
+                }
+                csv += row.join(";") + "\n";
+            }
+        }
+        //download
+        var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
         var link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "relatorio_disponibilidade.csv";
+        link.download = "relatorio_disponibilidade_resumo.csv";
         link.click();
+        return;
+    }
+    function exportTableAvailabilityToPdf(tableId = 'table-data') {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+
+        // Título
+        const title = texts?.text('labelTitleRptAgent');
+        doc.setFontSize(14);
+        doc.text(title, 10, 12);
+
+        // --- Summary (pega cada <p> do #summary como 1 linha) ---
+        const summaryEl = document.getElementById('summary');
+        const summaryRows = summaryEl
+            ? Array.from(summaryEl.querySelectorAll('p'))
+                .map(p => (p.innerText || '').trim())
+                .filter(Boolean)
+                .map(t => [t])
+            : [];
+
+        if (summaryRows.length) {
+            doc.autoTable({
+            head: [[texts?.text('labelMetric')]],
+            body: summaryRows,
+            startY: 16,
+            theme: 'plain',
+            styles: { fontSize: 9, cellPadding: 1.5 },
+            headStyles: { fontStyle: 'bold' },
+            margin: { left: 10, right: 10 },
+            didDrawPage: () => {
+                const page = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.text(
+                `${texts?.text('labelPage')} ${page}`,
+                doc.internal.pageSize.getWidth() - 20,
+                doc.internal.pageSize.getHeight() - 6
+                );
+            },
+            });
+        }
+
+        let startY = (doc.lastAutoTable?.finalY || 16) + 4;
+
+        // --- Decide o que exportar conforme availabilityViewMode ---
+        const mode = String(availabilityViewMode || 'table').toLowerCase();
+
+        if (mode === 'table') {
+            // Exporta a tabela principal (#table-data por padrão)
+            const tableEl = document.getElementById(tableId) || document.querySelector('#' + tableId);
+            if (!tableEl) {
+            console.warn('Tabela de disponibilidade não encontrada: #' + tableId);
+            } else {
+            doc.autoTable({
+                html: tableEl,
+                startY,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                headStyles: { fillColor: [9, 33, 62], textColor: 255, fontStyle: 'bold' },
+                bodyStyles: { valign: 'top' },
+                didDrawPage: () => {
+                const page = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.text(
+                    `${texts?.text('labelPage') || 'Página'} ${page}`,
+                    doc.internal.pageSize.getWidth() - 20,
+                    doc.internal.pageSize.getHeight() - 6
+                );
+                },
+            });
+            }
+        } else {
+            // Exporta a visão de resumo de disponibilidade
+            const viewEl = document.getElementById('availability-view-summary');
+            if (!viewEl) {
+            console.warn('Div de resumo de disponibilidade não encontrada: #availability-view-summary');
+            } else {
+            const innerTables = Array.from(viewEl.querySelectorAll('table'));
+            if (innerTables.length) {
+                // Se houver tabelas internas, exporta cada uma
+                innerTables.forEach((tbl, idx) => {
+                if (idx > 0) startY = (doc.lastAutoTable?.finalY || startY) + 4;
+                doc.autoTable({
+                    html: tbl,
+                    startY,
+                    theme: 'grid',
+                    styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                    headStyles: { fillColor: [9, 33, 62], textColor: 255, fontStyle: 'bold' },
+                    bodyStyles: { valign: 'top' },
+                    didDrawPage: () => {
+                    const page = doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.text(
+                        `${texts?.text('labelPage')} ${page}`,
+                        doc.internal.pageSize.getWidth() - 20,
+                        doc.internal.pageSize.getHeight() - 6
+                    );
+                    },
+                });
+                });
+            } else {
+                // Sem tabelas: transforma blocos de texto em linhas simples
+                const blocks = Array.from(
+                viewEl.querySelectorAll('h1,h2,h3,h4,h5,h6,.metric,li,p')
+                )
+                .map(n => (n.innerText || '').trim())
+                .filter(Boolean)
+                .map(t => [t]);
+
+                if (blocks.length) {
+                doc.autoTable({
+                    head: [[texts?.text('labelAvailabilityView') || 'Disponibilidade']],
+                    body: blocks,
+                    startY,
+                    theme: 'plain',
+                    styles: { fontSize: 9, cellPadding: 1.5 },
+                    headStyles: { fontStyle: 'bold' },
+                    margin: { left: 10, right: 10 },
+                    didDrawPage: () => {
+                    const page = doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.text(
+                        `${texts?.text('labelPage')} ${page}`,
+                        doc.internal.pageSize.getWidth() - 20,
+                        doc.internal.pageSize.getHeight() - 6
+                    );
+                    },
+                });
+                }
+            }
+            }
+        }
+
+        doc.save('disponibilidade.pdf');
     }
 
+
+    //#endregion
+
+    //#region SCHEDULES REPORT
     function renderTableSchedules(data) {
         var container = document.getElementById("table-body");
         container.innerHTML = "";
@@ -2308,9 +3484,9 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         <p id='schedAgentCount' class='text-sm'>${texts.text("labelTotalScheduler")} <strong>${schedAgentCount}</strong></p>
         <p id='schedCount' class='text-sm'>${texts.text("labelSchedulerCount")} <strong>${count}</strong></p>
         <p id='lastSched' class='text-sm'>${texts.text("labelLastScheduler")} <strong>${count == 0 ? lastSched : ajustarHora(lastSched, clientTimeZone)}</strong></p>
-        <p id='totalMinutes' class='text-sm'>${texts.text("labelTotalTime")} <strong>${Math.round(totalMinutes)} minutos</strong></p>
-        <p id='avgPerDay' class='text-sm'>${texts.text("labelAverageDay")} <strong>${Math.round(avgPerDay)} minutos</strong></p>
-        <p id='avgPerAgent' class='text-sm'>${texts.text("labelAverageAgent")} <strong>${Math.round(avgPerAgent)} minutos</strong></p>
+        <p id='totalMinutes' class='text-sm'>${texts.text("labelTotalTime")} <strong>${Math.round(totalMinutes)} ${texts.text("labelMinutes")}</strong></p>
+        <p id='avgPerDay' class='text-sm'>${texts.text("labelAverageDay")} <strong>${Math.round(avgPerDay)} ${texts.text("labelMinutes")}</strong></p>
+        <p id='avgPerAgent' class='text-sm'>${texts.text("labelAverageAgent")} <strong>${Math.round(avgPerAgent)} ${texts.text("labelMinutes")}</strong></p>
     `;
     }
     function exportTableSchedulesToCSV() {
@@ -2336,7 +3512,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         csv += `\n`; // linha em branco antes da tabela
 
         // Cabeçalho da tabela
-        csv += `"${texts.text("cabecalhoSchedules0")}","${texts.text("cabecalhoSchedules6")}","${texts.text("cabecalhoSchedules1")}","${texts.text("cabecalhoSchedules2")}","${texts.text("cabecalhoSchedules3")}","${texts.text("cabecalhoSchedules4")}","${texts.text("cabecalhoSchedules5")}"\n"`;
+        csv += `"${texts.text("cabecalhoSchedules0")}";"${texts.text("cabecalhoSchedules6")}";"${texts.text("cabecalhoSchedules1")}";"${texts.text("cabecalhoSchedules2")}";"${texts.text("cabecalhoSchedules3")}";"${texts.text("cabecalhoSchedules4")}";"${texts.text("cabecalhoSchedules5")}"\n"`;
 
         // Conteúdo da tabela
         var rows = document.querySelectorAll("#table-body tr");
@@ -2350,7 +3526,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
                     row.push('"' + cols[j].innerText + '"');
                 }
             }
-            csv += row.join(",") + "\n";
+            csv += row.join(";") + "\n";
         }
 
         // Gera e baixa o arquivo CSV
@@ -2360,161 +3536,80 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         link.download = "relatorio_agedamentos.csv";
         link.click();
     }
+    function exportTableSchedulesToPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
 
+        // Título
+        const title = texts.text("labelTitleRptSchedule");
+        doc.setFontSize(14);
+        doc.text(title, 10, 12);
 
-    function renderTableCalls(data) {
-        var container = document.getElementById("calls-table-body");
-        container.innerHTML = "";
+        // --- Sumário (usa os mesmos elementos do DOM) ---
+        const getTxt = (id) => (document.getElementById(id)?.innerText || "").trim();
+        const summaryLines = [
+            getTxt("schedAgentCount"),
+            getTxt("schedCount"),
+            getTxt("lastSched"),
+            getTxt("totalMinutes"),
+            getTxt("avgPerDay"),
+            getTxt("avgPerAgent"),
+        ].filter(Boolean).map(s => [s]); // uma coluna, mesma pegada que você usou nos calls
 
-        data.forEach(function (row) {
-            var flow = JSON.parse(row.flow) || [];
-            var name = row.cn || row.guid;
-            var utc = ajustarHora(row.utc * 1000, clientTimeZone); // Supondo que seja timestamp em segundos
-
-            var historyHTML = "";
-            var setupTime = null, connTime = null, relTime = null;
-            console.log("Iniciando a rederizaçãodos dados na tabela");
-            flow.forEach(function (ev) {
-                if (ev.tag === "event") {
-                    var msg = ev.attrs.msg;
-                    var icon = "↔";
-                    if (msg.indexOf("setup") === 0) icon = "↪";
-                    else if (msg.indexOf("conn") === 0) icon = "📞";
-                    else if (msg.indexOf("rel") === 0) icon = "❌";
-                    else if (msg.indexOf("transfer") === 0) icon = "➡️";
-
-                    var info = ev.attrs.dn || ev.attrs.e164 || msg;
-                    historyHTML += `<span class="inline-block mr-2">${icon} ${info}</span>`;
-
-                    if (msg.indexOf("setup") === 0) setupTime = parseInt(ev.attrs.time);
-                    if (msg.indexOf("conn") === 0) connTime = parseInt(ev.attrs.time);
-                    if (msg.indexOf("rel") === 0) relTime = parseInt(ev.attrs.time);
-                }
-            });
-
-            // Calcular duração e tempo de espera
-            var duration = (relTime !== null && connTime !== null) ? relTime - connTime : 0;
-            var wait_time = (connTime !== null && flow.length > 0) ? connTime - setupTime : 0;
-
-            var duracao = connTime && relTime ? formatarDuracao(relTime - connTime) : "-";
-            var espera = setupTime && connTime ? formatarDuracao(connTime - setupTime) : "-";
-
-            row.duration = duration;
-            row.wait_time = wait_time;
-
-            var tr = document.createElement("tr");
-            tr.className = "border-b";
-            tr.innerHTML = `
-            <td class='px-4 py-2 text-blue-700 whitespace-nowrap'>${utc}</td>
-            <td class='px-4 py-2 text-blue-700 whitespace-nowrap'>${name}</td>
-            <td class='px-4 py-2 text-blue-700 flex flex-col flex-end'>${historyHTML}</td>
-            <td class='px-4 py-2 text-blue-700 text-center'>${formatarDuracao(duration) ? formatarDuracao(duration) : "-"}</td>
-            <td class='px-4 py-2 text-blue-700 text-center'>${formatarDuracao(wait_time) ? formatarDuracao(wait_time) : "-"}</td>
-        `;
-            container.appendChild(tr);
-        });
-        renderSummaryCalls(data);
-    }
-    function formatarDuracao(segundos) {
-        if (!segundos || isNaN(segundos)) return "00:00";
-        var s = parseInt(segundos);
-        var min = Math.floor(s / 60);
-        var seg = s % 60;
-        return `${String(min).padStart(2, "0")}:${String(seg).padStart(2, "0")}`;
-    }
-    function renderSummaryCalls(data) {
-        var resumo = document.getElementById("summary");
-
-        var totalCalls = data.length;
-        var users = {};
-        var totalCallDuration = 0;
-        var totalWaitTime = 0;
-
-        data.forEach(function (row) {
-            // Agrupar por usuário
-            if (!users[row.guid]) users[row.guid] = {
-                callCount: 0,
-                totalDuration: 0,
-                totalWait: 0
-            };
-
-            users[row.guid].callCount++;
-            users[row.guid].totalDuration += row.duration || 0;
-            users[row.guid].totalWait += row.wait_time || 0;
-
-            totalCallDuration += row.duration || 0;
-            totalWaitTime += row.wait_time || 0;
+        doc.autoTable({
+            head: [[texts.text("labelMetric")]],
+            body: summaryLines,
+            startY: 16,
+            theme: "plain",
+            styles: { fontSize: 9, cellPadding: 1.5 },
+            headStyles: { fontStyle: "bold" },
+            margin: { left: 10, right: 10 }
         });
 
-        var userCount = Object.keys(users).length;
-        var avgCallsPerUser = userCount ? totalCalls / userCount : 0;
-        var avgCallDuration = totalCalls ? totalCallDuration / totalCalls : 0;
-        var avgWaitTime = totalCalls ? totalWaitTime / totalCalls : 0;
+        const startY = (doc.lastAutoTable?.finalY || 16) + 4;
 
-        function formatDuration(seconds) {
-            var min = Math.floor(seconds / 60);
-            var sec = Math.floor(seconds % 60);
-            return `${min}:${sec.toString().padStart(2, '0')}`;
+        // --- Localiza a tabela de agendamentos ---
+        let tableEl =
+            document.getElementById('table-data') ||
+            document.querySelector('#table-body')?.closest('table');
+
+        if (!tableEl) {
+            console.warn('Tabela de agendamentos não encontrada. Passe o ID do <table> para exportSchedulesToPdf().');
+            return;
         }
 
-        resumo.innerHTML = `
-        <p id='totalCalls' class='text-sm'>${texts.text("labelTotalCalls")} <strong>${totalCalls}</strong></p>
-        <p id='totalAgents' class='text-sm'>${texts.text("labelTotalAgents")} <strong>${userCount}</strong></p>
-        <p id='avgPerUser' class='text-sm'>${texts.text("labelAvgCallsPerUser")} <strong>${avgCallsPerUser.toFixed(2)}</strong></p>
-        <p id='totalDuration' class='text-sm'>${texts.text("labelTotalCallTime")} <strong>${formatDuration(totalCallDuration)}</strong></p>
-        <p id='avgDuration' class='text-sm'>${texts.text("labelAvgCallTime")} <strong>${formatDuration(avgCallDuration)}</strong></p>
-        <p id='totalWait' class='text-sm'>${texts.text("labelTotalWaitTime")} <strong>${formatDuration(totalWaitTime)}</strong></p>
-        <p id='avgWait' class='text-sm'>${texts.text("labelAvgWaitTime")} <strong>${formatDuration(avgWaitTime)}</strong></p>
-    `;
-    }
-    function exportTableCallsToCSV() {
-        var title = texts.text("labelTitleRptCall");
-
-        // Captura dos elementos de resumo
-        var summaryValues = {
-            totalCalls: document.getElementById("totalCalls")?.innerText || "",
-            totalAgents: document.getElementById("totalAgents")?.innerText || "",
-            avgPerUser: document.getElementById("avgPerUser")?.innerText || "",
-            totalDuration: document.getElementById("totalDuration")?.innerText || "",
-            avgDuration: document.getElementById("avgDuration")?.innerText || "",
-            totalWait: document.getElementById("totalWait")?.innerText || "",
-            avgWait: document.getElementById("avgWait")?.innerText || ""
-        };
-
-        let csv = `"${title}"\n\n`; // título do relatório
-        csv += `"${summaryValues.totalCalls}"\n`;
-        csv += `"${summaryValues.totalAgents}"\n`;
-        csv += `"${summaryValues.avgPerUser}"\n`;
-        csv += `"${summaryValues.totalDuration}"\n`;
-        csv += `"${summaryValues.avgDuration}"\n`;
-        csv += `"${summaryValues.totalWait}"\n`;
-        csv += `"${summaryValues.avgWait}"\n`;
-        csv += `\n`; // linha em branco antes da tabela
-
-        // Cabeçalhos da tabela
-        csv += `"${texts.text("labelDateTime")}","${texts.text("labelName")}","${texts.text("labelCallHistory")}","${texts.text("labelCallDuration")}","${texts.text("labelWaitTime")}"\n`;
-
-        // Linhas da tabela
-        var rows = document.querySelectorAll("#calls-table-body tr");
-        for (var i = 0; i < rows.length; i++) {
-            var cols = rows[i].querySelectorAll("td");
-            var row = [];
-            for (var j = 0; j < cols.length; j++) {
-                // Remove quebras de linha internas
-                row.push('"' + cols[j].innerText.replace(/\n/g, ' ').replace(/\r/g, '') + '"');
+        // --- Tabela principal: usa o HTML do DOM (cabeçalho repete automático) ---
+        doc.autoTable({
+            html: tableEl,                 // pode ser o elemento direto
+            startY,
+            theme: "grid",
+            styles: { fontSize: 8, cellPadding: 2, overflow: "linebreak" },
+            headStyles: { fillColor: [9, 33, 62], textColor: 255, fontStyle: "bold" }, // opcional
+            bodyStyles: { valign: "top" },
+            // Ajustes finos de largura (opcionais — comente/ajuste conforme seu cabeçalho)
+            // columnStyles: {
+            //   0: { cellWidth: 26 }, // ID
+            //   1: { cellWidth: 36 }, // Usuário
+            //   2: { cellWidth: 44 }, // Nome
+            //   3: { cellWidth: 46 }, // Email
+            //   4: { cellWidth: 30 }, // Início
+            //   5: { cellWidth: 30 }, // Fim
+            //   6: { cellWidth: 30 }, // Link
+            // },
+            didDrawPage: () => {
+            const page = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.text(`${texts.text("labelPage")} ${page}`,
+                doc.internal.pageSize.getWidth() - 20,
+                doc.internal.pageSize.getHeight() - 6
+            );
             }
-            csv += row.join(",") + "\n";
-        }
+        });
 
-        // Gera e aciona download do arquivo CSV
-        var blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "relatorio_chamadas.csv";
-        link.click();
+        doc.save("agendamentos.pdf");
     }
 
-
+    //#endregion
 }
 
 Wecom.dwcschedulerAdmin.prototype = innovaphone.ui1.nodePrototype;

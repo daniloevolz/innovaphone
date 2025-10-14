@@ -250,7 +250,7 @@ Wecom.dwcscheduler = Wecom.dwcscheduler || function (start, args) {
         // Footer logo
         var divFooter = colEsquerda.add(new innovaphone.ui1.Div("height: 10%; display: flex; justify-content: center; align-items: center; padding: 10px;", null, "footer-logo"));
         var imgconfig = divFooter.add(new innovaphone.ui1.Node("img", "width: 80%; opacity: 0.9;", null));
-        imgconfig.setAttribute("src", "wecom-white.svg");
+        imgconfig.setAttribute("src", "logoTransp.png");
 
 
         var a = document.getElementById("CfgGeral");

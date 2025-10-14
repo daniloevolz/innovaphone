@@ -1,6 +1,7 @@
 body {
     background-image: var(--bg);
     color: var(--text-standard);
+    background-size: cover;
 }
 table {
     border-collapse: collapse; /* CSS2 */
@@ -1239,6 +1240,22 @@ a {
     }
 }
     
+/* estilos só para impressão */
+@media print {
+  .no-print { display:none !important; }
+
+  /* paisagem (nem todo browser respeita 100%) */
+  @page { size: A4 landscape; margin: 12mm; }
+
+  /* repetir cabeçalho da tabela em cada página */
+  table { page-break-inside:auto; border-collapse: collapse; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr    { page-break-inside: avoid; }
+
+  /* evitar quebrar célula no meio */
+  td, th { break-inside: avoid; }
+}
 
     
     

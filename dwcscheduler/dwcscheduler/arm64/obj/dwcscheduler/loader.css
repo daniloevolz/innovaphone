@@ -7,9 +7,9 @@
     z-index: 999;
     background-position: center;
     background: #0075AC;
-    background: url(./images/wecom-white.svg) center top 150px no-repeat, -moz-linear-gradient(top, #0075AC 0%, #02163F 100%);
-    background: url(./images/wecom-white.svg) center top 150px no-repeat, -webkit-linear-gradient(top, #0075AC 0%,#02163F 100%);
-    background: url(./images/wecom-white.svg) center top 150px no-repeat, linear-gradient(to bottom, #0075AC 0%,#02163F 100%);
+    background: url(./images/logoTransp.png) center top 150px no-repeat, -moz-linear-gradient(top, #0075AC 0%, #02163F 100%);
+    background: url(./images/logoTransp.png) center top 150px no-repeat, -webkit-linear-gradient(top, #0075AC 0%,#02163F 100%);
+    background: url(./images/logoTransp.png) center top 150px no-repeat, linear-gradient(to bottom, #0075AC 0%,#02163F 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0075AC', endColorstr='#02163F',GradientType=0 );
     background-size: 350px auto, contain;
 }
