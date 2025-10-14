@@ -24,12 +24,12 @@ new JsonApi("user").onconnected(function (conn) {
         
         connectionList.push(conn);
         conn.onmessage(function(msg) {
-            if(conn.unlicensed) {
-                log("user: unlicensed connection, closing...");
-                conn.send(JSON.stringify({ api: "user", mt: "noLicensed", message: "Unlicensed connection" }));
-                conn.close();
-                return;
-            }
+            //if(conn.unlicensed) {
+            //    log("user: unlicensed connection, closing...");
+            //    conn.send(JSON.stringify({ api: "user", mt: "noLicensed", message: "Unlicensed connection" }));
+            //    conn.close();
+            //    return;
+            //}
             var obj = JSON.parse(msg);
             if (obj.mt == "UserMessage") {
                 Database.exec("SELECT * FROM tbl_tokens WHERE guid ='" + conn.guid + "';")
