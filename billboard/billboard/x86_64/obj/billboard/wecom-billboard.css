@@ -583,7 +583,7 @@ td.checkbox {
 .depcards{
     display: flex;
     flex-wrap: wrap;
-    align-content: center;
+    align-content: flex-start;
     width: 100%;
     overflow-y: auto;
     height: 100%;
