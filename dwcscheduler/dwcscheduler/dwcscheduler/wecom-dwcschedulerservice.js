@@ -1743,7 +1743,7 @@ new PbxApi("PbxTableUsers").onconnected(function (conn) {
     if (signalFound.length == 0) {
         pbxTable.push(conn);
         // register to the PBX in order to acceppt incoming presence calls
-        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": [""], "src": conn.pbx }));
+        conn.send(JSON.stringify({ "api": "PbxTableUsers", "mt": "ReplicateStart", "add": true, "del": true, "columns": { "guid": {}, "dn": {}, "cn": {}, "h323": {}, "e164": {}, "node": {}, "grps": {}, "devices": {} }, "pseudo": ["", "waiting"], "src": conn.pbx }));
 
     }
     conn.onmessage(function (msg) {

@@ -2410,6 +2410,207 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
         }
         return { forwarded, target };
     }
+    function _new_getForwardTarget(rows) {
+        let forwarded = false;
+        let target = null;
+        for (const r of rows) {
+            const evs = flatEvents(r.children);
+            // Se encontrar qualquer evento "forwarded", marca como true
+            if (evs.some(e => e.attrs?.msg === "forwarded")) forwarded = true;
+            // Procura o destino do transfer (pode ser transfer-to, transfer-from, alert-to, etc)
+            const follow = evs.find(e =>
+                (e.attrs?.msg === "alert-to" ||
+                e.attrs?.msg === "transfer-to" ||
+                e.attrs?.msg === "transfer-from") &&
+                (e.attrs?.dn || (e.children && e.children[0]?.attrs?.dn))
+            );
+            // Pega o destino do transfer, se existir
+            if (follow) {
+                target = follow.attrs?.dn || (follow.children && follow.children[0]?.attrs?.dn) || target;
+            }
+        }
+        return { forwarded, target };
+    }
+    //Função que funciona para o caso do TRE Bah
+    function getForwardInfoSmart(rows) {
+    // === utils locais (não poluem global) ===
+    const zoneCodeFromString = (s) => {
+        if (!s) return null;
+        const str = String(s);
+        // ZE-123  |  123-ZE
+        let m = str.match(/\bZE[-\s]*([0-9]{2,3})\b/i);
+        if (m) return m[1];
+        m = str.match(/\b([0-9]{2,3})[-\s]*ZE\b/i);
+        if (m) return m[1];
+        // zona123
+        m = str.match(/\bzona[-\s]*([0-9]{2,3})\b/i);
+        if (m) return m[1];
+        // ...-ze(-informativa) com número em qualquer lugar
+        if (/ze/i.test(str)) {
+        const g = str.match(/([0-9]{2,3})/g);
+        if (g && g.length) return g[g.length - 1];
+        }
+        return null;
+    };
+
+    const zoneCodeFromRow = (row) => {
+        if (!row) return null;
+        const cand = [row.raw?.cn, row.raw?.sip, row.raw?.h323];
+        const evs = flatEvents(row.children) || [];
+        for (const e of evs) {
+        if (e?.attrs?.dn) cand.push(e.attrs.dn);
+        if (e?.attrs?.h323) cand.push(e.attrs.h323);
+        if (e?.attrs?.e164) cand.push(e.attrs.e164);
+        }
+        for (const s of cand) {
+        const code = zoneCodeFromString(s);
+        if (code) return code;
+        }
+        return null;
+    };
+
+    const isWaitingRow = (row) =>
+        (row.children || []).some(n => n.tag === "user" && n.attrs && n.attrs.pseudo === "waiting");
+    const isNoPseudo = (row) =>
+        !(row.children || []).some(n => n.tag === "user" && n.attrs && "pseudo" in n.attrs);
+
+    const hasConnNoPseudo = (row) => {
+        if (!isNoPseudo(row)) return false;
+        const evs = flatEvents(row.children);
+        return evs.some(e => {
+        const m = e?.attrs?.msg;
+        return m === "conn-to" || m === "conn-from";
+        });
+    };
+
+    // --- coleta transfer/forwarded em linhas waiting (regra principal) ---
+    const waitingRows = (rows || [])
+        .filter(isWaitingRow)
+        .sort((a,b)=>(Number(a.raw?.utc)||0)-(Number(b.raw?.utc)||0));
+
+    const transfersInWaiting = [];
+    for (const r of waitingRows) {
+        for (const e of (flatEvents(r.children) || [])) {
+        const msg = e?.attrs?.msg;
+        if (msg === "transfer-to" || msg === "transfer-from" || msg === "forwarded") {
+            const t = Number(e?.attrs?.time) || Number(r.raw?.utc) || 0;
+            transfersInWaiting.push({ t, e, r });
+        }
+        }
+    }
+    transfersInWaiting.sort((a,b)=>a.t-b.t);
+
+    // último waiting "ativo" (com maior conn-*; senão o último por utc)
+    const lastWaitingRow = (() => {
+        let best = null, bestT = -1;
+        for (const r of waitingRows) {
+        for (const e of (flatEvents(r.children) || [])) {
+            const msg = e?.attrs?.msg;
+            if (msg && msg.startsWith("conn-")) {
+            const t = Number(e.attrs.time) || Number(r.raw?.utc) || 0;
+            if (t > bestT) { bestT = t; best = r; }
+            }
+        }
+        }
+        return best || waitingRows[waitingRows.length - 1] || null;
+    })();
+
+    const lastQueueCodeFromWaiting = zoneCodeFromRow(lastWaitingRow);
+
+    // primeiro atendente real (sem pseudo) que conectou
+    const agentRows = (rows || []).filter(r => isNoPseudo(r) && hasConnNoPseudo(r));
+    const agentWithFirstConn = (() => {
+        let best = null, bestT = Infinity;
+        for (const r of agentRows) {
+        const times = (flatEvents(r.children) || [])
+            .filter(e => (e?.attrs?.msg || "").startsWith("conn-"))
+            .map(e => Number(e.attrs.time))
+            .filter(Number.isFinite)
+            .sort((a,b)=>a-b);
+        if (times.length && times[0] < bestT) { bestT = times[0]; best = r; }
+        }
+        return best;
+    })();
+    const agentCode = zoneCodeFromRow(agentWithFirstConn);
+
+    // alvo do último transfer em waiting (se houver)
+    let target = null, destCode = null;
+    if (transfersInWaiting.length) {
+        const lastT = transfersInWaiting[transfersInWaiting.length-1].e;
+        const toNode = (lastT.children || []).find(ch => ch.tag === "to" && (ch.attrs?.dn || ch.attrs?.h323 || ch.attrs?.e164));
+        const targetStr = toNode?.attrs?.dn || toNode?.attrs?.h323 || toNode?.attrs?.e164
+                    || lastT?.attrs?.dn || lastT?.attrs?.h323 || lastT?.attrs?.e164;
+        if (targetStr) {
+        target = String(targetStr);
+        destCode = zoneCodeFromString(targetStr);
+        }
+    }
+
+    // === FALLBACK: inferir ZE via cadeia de CF em qualquer setup-* (quando waiting não veio no filtro)
+    // coleta todos <cf> em ordem temporal (por time do evento se existir; senão utc da row)
+    const cfHints = [];
+    const orderedRows = (rows || []).slice().sort((a,b)=>(Number(a.raw?.utc)||0)-(Number(b.raw?.utc)||0));
+    for (const r of orderedRows) {
+        for (const ev of (flatEvents(r.children) || [])) {
+        const msg = ev?.attrs?.msg || "";
+        if (msg.startsWith("setup-")) {
+            const t = Number(ev?.attrs?.time) || Number(r.raw?.utc) || 0;
+            for (const ch of (ev.children || [])) {
+            if (ch?.tag === "cf") {
+                const s = ch.attrs?.dn || ch.attrs?.h323 || ch.attrs?.e164;
+                const code = zoneCodeFromString(s);
+                if (code) cfHints.push({ t, code, s });
+            }
+            }
+        }
+        }
+    }
+    cfHints.sort((a,b)=>a.t-b.t);
+    // heurística: pegue o ÚLTIMO cf (normalmente é a ZE efetiva depois da informativa)
+    const inferredQueueCodeFromCF = cfHints.length ? cfHints[cfHints.length - 1].code : null;
+
+    // ===== Decisão =====
+    let forwarded = false;
+
+    if (transfersInWaiting.length) {
+        // regra principal (com waiting)
+        if (agentWithFirstConn) {
+        if (lastQueueCodeFromWaiting && agentCode) forwarded = agentCode !== lastQueueCodeFromWaiting;
+        else if (lastQueueCodeFromWaiting && !agentCode) forwarded = true; // saiu da ZE para fora (ex.: COJUR)
+        else forwarded = true; // sem base de comparação, mas houve transfer em waiting + houve atendimento
+        } else {
+        if (lastQueueCodeFromWaiting && destCode) forwarded = destCode !== lastQueueCodeFromWaiting;
+        else forwarded = true; // sem atendente: qualquer transfer em waiting conta
+        }
+    } else {
+        // --- FALLBACK (sem transfer visível em waiting: dados filtrados) ---
+        // Se conseguimos inferir ZE via CF e houve atendimento:
+        if (inferredQueueCodeFromCF && agentWithFirstConn) {
+        if (agentCode && agentCode === inferredQueueCodeFromCF) {
+            forwarded = false; // mesma ZE => sem transbordo
+        } else {
+            forwarded = true;  // ZE diferente ou agente "fora de ZE" (null) => transbordo
+        }
+        } else {
+        // sem atendente: não marcamos transbordo só por CF (evita falso positivo)
+        forwarded = false;
+        }
+    }
+
+    // alvo amigável
+    if (!target && agentWithFirstConn) {
+        target = agentWithFirstConn.raw?.cn || agentWithFirstConn.raw?.sip || agentWithFirstConn.raw?.guid || null;
+    }
+
+    return {
+        forwarded,
+        target,
+        lastQueueCode: lastQueueCodeFromWaiting || inferredQueueCodeFromCF || null,
+        agentCode: agentCode || null,
+        destCode: destCode || null,
+        inferredQueueCodeFromCF: inferredQueueCodeFromCF || null
+    };
+    }
 
     // A chamda foi atendida por um atendente?
     function hasConnNoPseudo(row) {
@@ -2471,7 +2672,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
             //const filas = getQueuesWaiting(rows);
             const { forwarded, target } = getForwardTarget(rows);
-
+            //const { forwarded, target } = getForwardInfoSmart(rows);
             const { dn: numeroDN, queues: setupQueues } = getFirstSetupInfo(rows);
             const filasFromWaiting = getQueuesWaiting(rows);
 
@@ -2682,7 +2883,6 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             "<p id='avgWait' class='text-sm'>" + texts.text("labelAvgWaitTime") + " <strong>" + formatDuration(avgWaitTime) + "</strong></p>";
     }
 
-
     function exportTableCallsToCSV() {
         // ===== textos do cabeçalho/summary =====
         var title = texts.text("labelTitleRptCall");
@@ -2743,50 +2943,52 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             var seen = new Set();
             (filasFromWaiting || []).forEach(function(q){ if(q && !seen.has(q)){ seen.add(q); merged.push(q); }});
             (setupQueues || []).forEach(function(q){ if(q && !seen.has(q)){ seen.add(q); merged.push(q); }});
-            var fwd = getForwardTarget(rows);                  // { forwarded, target }
-            var zonaSetor = merged.join(", ");
-            if (fwd.forwarded && fwd.target && !seen.has(fwd.target)) {
-            zonaSetor = zonaSetor ? (zonaSetor + " -> " + fwd.target) : fwd.target;
-            }
+
+            var fwd = getForwardTarget(rows);  
+            //var fwd = getForwardInfoSmart(rows);                // { forwarded, target }
 
             // Atendentes (sem pseudo) dedupe por guid
             var agentRows = dedupeByGuid(rows.filter(isNoPseudo))
-            .sort(function(a,b){ return (Number(a.raw && a.raw.utc) || 0) - (Number(b.raw && b.raw.utc) || 0); });
+                .sort(function(a,b){ return (Number(a.raw && a.raw.utc) || 0) - (Number(b.raw && b.raw.utc) || 0); });
 
-            var namesSet = new Set();
-            agentRows.forEach(function(r){
-            var nm = (r.raw && r.raw.cn) ? r.raw.cn : (r.raw && r.raw.guid) ? r.raw.guid : "-";
-            if (nm) namesSet.add(nm);
+            // Se não houver sem pseudo, renderiza uma linha “placeholder”
+            var toRender = agentRows.length ? agentRows : [null];
+
+            toRender.forEach(function(row, idx) {
+                // Atendente
+                var atendente = row ? ((row.raw && row.raw.cn) ? row.raw.cn : (row.raw && row.raw.guid) ? row.raw.guid : "-") : "-";
+                // Filas de Espera
+                var zonaSetor = merged.join(", ");
+                if (idx === 0 && fwd.forwarded && fwd.target && !seen.has(fwd.target)) {
+                    zonaSetor = zonaSetor ? (zonaSetor + " -> " + fwd.target) : fwd.target;
+                }
+                // Foi atendida
+                var houveAt = row ? (hasConnNoPseudo(row) ? texts.text('labelYes') : texts.text('labelNo')) : texts.text('labelNo');
+                // Duração
+                var durAgentsSec = row ? durationSecondsFromAgentRow(row) : 0;
+                // Tempo de espera (do conf, só na primeira linha)
+                var waitSecConf = waitSecondsForConf(rows);
+                var waitTime = idx === 0 ? secToHHMMSS(waitSecConf) : "";
+                // Transbordo: só "Sim" na primeira linha do grupo se houve forwarded
+                var houveTb = (idx === 0 && fwd.forwarded) ? texts.text("labelYes") : texts.text("labelNo");
+
+                var rowCsv = [
+                    idx === 0 ? confId : "",
+                    idx === 0 ? ajustarHora((g.firstUtc || 0) * 1000, "+00:00") : "",
+                    idx === 0 ? caller : "",
+                    idx === 0 ? direcao : "",
+                    atendente,
+                    zonaSetor,
+                    houveAt,
+                    secToHHMMSS(durAgentsSec),
+                    waitTime,
+                    houveTb
+                ];
+
+                csv += '"' + rowCsv.map(function (s) {
+                    return (String(s)).replace(/\n/g," ").replace(/\r/g," ");
+                }).join('";"') + '"\n';
             });
-            var atendentes = Array.from(namesSet).join(", ");
-
-            // Foi atendida / Transbordo
-            var houveAt = agentRows.some(hasConnNoPseudo) ? texts.text('labelYes') : texts.text('labelNo');
-            var houveTb = fwd.forwarded ? texts.text('labelYes') : texts.text('labelNo');
-
-            // Tempos (mesma regra da tabela/sumário)
-            var waitSecConf = waitSecondsForConf(rows);                          // soma dos 'waiting' do conf
-            var durAgentsSec = agentRows.reduce(function(acc,r){
-            return acc + durationSecondsFromAgentRow(r);                       // (alert|setup)->(rel|lastEvent)
-            }, 0);
-
-            // Monta linha (10 colunas, mesma ordem do cabeçalho)
-            var rowCsv = [
-            confId,
-            ajustarHora((g.firstUtc || 0) * 1000, "+00:00"),
-            caller,
-            direcao,
-            atendentes || "-",
-            zonaSetor || "",
-            houveAt,
-            secToHHMMSS(durAgentsSec),
-            secToHHMMSS(waitSecConf),
-            houveTb
-            ];
-
-            csv += '"' + rowCsv.map(function (s) {
-            return (String(s)).replace(/\n/g," ").replace(/\r/g," ");
-            }).join('";"') + '"\n';
         }
 
         // ===== Download =====
@@ -3221,12 +3423,13 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
             alert("Nada para exportar.");
             return;
             }
+            csv += `"${texts.text("cabecalhoSchedules6")}";"${texts.text("labelFirstLogin")}";"${texts.text("labelLastLogout")}";"${texts.text("labelTotalWorked")}";"${texts.text("labelTotalLogged")}"\n`;
             // Para cada card (dia)
             var cards = host.querySelectorAll("div[style*='border']");
             cards.forEach(function(card, idx){
-                var dayTitle = card.querySelector("div[style*='font-weight']")?.textContent || ("Dia " + (idx+1));
-                csv += `"${dayTitle}"\n`;
-                csv += `"${texts.text("cabecalhoSchedules6")}";"${texts.text("labelFirstLogin")}";"${texts.text("labelLastLogout")}";"${texts.text("labelTotalWorked")}";"${texts.text("labelTotalLogged")}"\n`;
+                //var dayTitle = card.querySelector("div[style*='font-weight']")?.textContent || ("Dia " + (idx+1));
+                //csv += `"${dayTitle}"\n`;
+                //csv += `"${texts.text("cabecalhoSchedules6")}";"${texts.text("labelFirstLogin")}";"${texts.text("labelLastLogout")}";"${texts.text("labelTotalWorked")}";"${texts.text("labelTotalLogged")}"\n`;
 
 
                 var rows = card.querySelectorAll("tbody tr");
@@ -3243,7 +3446,7 @@ Wecom.dwcschedulerAdmin = Wecom.dwcschedulerAdmin || function (start, args) {
 
                     csv += `"${guid}";"${first}";"${last}";"${worked}";"${logged}"\n`;
                 }
-                csv += `\n`;
+                //csv += `\n`;
             });
         }else{
             // Cabeçalho da tabela
