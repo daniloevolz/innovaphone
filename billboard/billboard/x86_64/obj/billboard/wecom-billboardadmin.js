@@ -224,7 +224,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         var liconfig = config.add(new innovaphone.ui1.Node("li", "display:flex; aligns-items: center", null, "config"));
 
         var imgconfig = liconfig.add(new innovaphone.ui1.Node("img", "width: 100%; opacity: 0.9; margin: 2px; ", null, null));
-        imgconfig.setAttribute("src", "./images/wecom-white.svg");
+        imgconfig.setAttribute("src", "./images/wecom-white.png");
         //var Aconfig = liconfig.add(new innovaphone.ui1.Node("a", "display: flex; align-items: center; justify-content: center;", texts.text("labelConfig"), null));
         //Aconfig.setAttribute("href", "#");
 

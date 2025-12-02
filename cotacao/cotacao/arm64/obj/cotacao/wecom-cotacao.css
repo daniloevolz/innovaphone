@@ -75,6 +75,12 @@ div#logowecom {
     font-size:15px;
     background-color: rgb(2, 22, 63);
     text-align:left;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 10px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
 }
 
 /* .linha1 {
@@ -173,6 +179,18 @@ li {
     font-size: 15px;
     font-weight: bold;
 }
+.colunaesquerda ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.colunaesquerda li {
+    padding: 0;
+    font-weight: 500;
+}
 .nav1{
     background-color: none;
 }
@@ -186,11 +204,27 @@ a {
     font-size: 16px;
 }
 
+.colunaesquerda a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 6px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
     a:hover {
         color: white;
         font-weight: bold;
         font-size: 20px;
     }
+
+.colunaesquerda a:hover {
+    background-color: rgba(255,255,255,0.12);
+    font-size: inherit;
+    font-weight: 600;
+}
 
 .div-dolar {
     width: 300px;
