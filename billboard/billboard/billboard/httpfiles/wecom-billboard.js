@@ -600,6 +600,12 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         return dateString.slice(0, -8);
     }
 
+    function getVisibleUserName(obj) {
+        var base = obj || {};
+        var columns = base.columns || {};
+        return columns.dn || columns.cn || columns.sip || columns.guid || base.dn || base.cn || base.sip || base.guid || "";
+    }
+
     function makeDivPostMessage(id, dep_id, user) {
 
         var post = list_posts.filter(function (item) {
@@ -679,7 +685,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
                     var user = list_tableUsers.filter(function (item) {
                         return item.guid == view.user_guid;
                     })[0];
-                    var nameCol = row.add(new innovaphone.ui1.Node('td', null, user.cn, 'column'));
+                    var nameCol = row.add(new innovaphone.ui1.Node('td', null, getVisibleUserName(user), 'column'));
                     var dateString = view.date;
                     var date = new Date(dateString);
                     var day = date.getDate();
@@ -743,7 +749,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         var formattedDateEnd = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year + ' - ' + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 
         footInfo(footShowPost, texts.text("labelType"), postType)
-        footInfo(footShowPost, texts.text("labelCreator"), user.cn)
+        footInfo(footShowPost, texts.text("labelCreator"), getVisibleUserName(user))
         footInfo(footShowPost, texts.text("labelStart"), formattedDateStart)
         footInfo(footShowPost, texts.text("labelEnd"), formattedDateEnd)
         // var creatorPost = footShowPost.add(new innovaphone.ui1.Node('div', null, texts.text("labelCreator") + user.cn, 'creatorPost').setAttribute('id', 'creatorPost'));
@@ -1041,7 +1047,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
 
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, getVisibleUserName(user), "column"))
 
             var editorCol = row.add(new innovaphone.ui1.Node("td", null, null, "column"))
 
@@ -1106,7 +1112,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, getVisibleUserName(user), "column"))
 
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
@@ -1309,7 +1315,7 @@ Wecom.billboard = Wecom.billboard || function (start, args) {
             var user = list_tableUsers.filter(function (item) {
                 return item.guid == view.user_guid;
             })[0];
-            var nameCol = row.add(new innovaphone.ui1.Node('td', null, user.cn, 'column'));
+            var nameCol = row.add(new innovaphone.ui1.Node('td', null, getVisibleUserName(user), 'column'));
             var dateCol = row.add(new innovaphone.ui1.Node('td', null, formattedDate, 'column'));
             var dateString = view.date;
             var date = new Date(dateString);

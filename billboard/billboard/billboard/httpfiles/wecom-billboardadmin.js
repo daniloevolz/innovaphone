@@ -284,6 +284,12 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         }
 
     }
+    function getVisibleUserName(obj) {
+        var base = obj || {};
+        var columns = base.columns || {};
+        return columns.dn || columns.cn || columns.sip || columns.guid || base.dn || base.cn || base.sip || base.guid || "";
+    }
+
     function makeDivUsers(t, users, admins) {
         t.clear();
         // app.send({ api: "admin", mt: "SelectAdmins" });
@@ -317,11 +323,12 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         document.getElementById("local-table").innerHTML = '';
 
         users.forEach(function (user) {
-            if (user.cn.toLowerCase().includes(filter.toLowerCase())) {
+            var visibleUserName = getVisibleUserName(user);
+            if (visibleUserName.toLowerCase().includes(filter.toLowerCase())) {
                 var isChecked = adminGuids.includes(user.guid) ? 'checked' : '';
                 var html = `
                   <tr>
-                    <td style="text-transform: capitalize; text-align: center;">${user.cn}</td>
+                    <td style="text-transform: capitalize; text-align: center;">${visibleUserName}</td>
                     <td style="text-align: center;"><input type="checkbox" id="${user.guid}" class="userCheckbox" ${isChecked}></td>
                   </tr>
                 `;
@@ -399,7 +406,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
             });
 
 
-            var userName = users.length > 0 ? users[0].cn : '';
+            var userName = users.length > 0 ? getVisibleUserName(users[0]) : '';
 
             if (depart.deleted == null) {
                 var departDel = texts.text("labelNo")
@@ -465,7 +472,7 @@ Wecom.billboardAdmin = Wecom.billboardAdmin || function (start, args) {
         list_tableUsers.forEach(function (user) {
             var row = table.add(new innovaphone.ui1.Node("tr", null, null, "row"))
 
-            var nameCol = row.add(new innovaphone.ui1.Node("td", null, user.cn, "column"))
+            var nameCol = row.add(new innovaphone.ui1.Node("td", null, getVisibleUserName(user), "column"))
             
             var userV = list_viewers_departments.filter(function (item) {
                 return item.viewer_guid === user.guid;
