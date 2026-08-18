@@ -1,5 +1,6 @@
 
 
+/* ===== Base Styles ===== */
 body {
     background-color: var(--bg);
     color: var(--text-standard);
@@ -7,13 +8,14 @@ body {
     background-position: center center;
     background-attachment: fixed;
     background-size: cover;
-    background-size: 100%;
     margin: 0px;
     overflow-x: hidden;
     overflow-y: hidden;
     background-image: url('background.jpg');
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Button - Modern Style */
 div.button {
     position: absolute;
     left: 10px;
@@ -27,28 +29,42 @@ div.button {
     font-size: 14px;
     text-align: center;
     cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
 }
+
+div.button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ===== Sidebar (Left Column) ===== */
 
 /*EdiÃ§Ã£o VersÃ£o Cesar*/
 div#logowecom {
     z-index: 0;
     display: flex;
     position: absolute;
-    bottom: 0;
+    bottom: 20px;
     right: 20px;
-    width: 300px;
-    height: 100px;
+    width: 200px;
+    height: 60px;
     background-image: url('wecom-white.png');
     background-repeat: no-repeat;
-    background-size: 300px;
-    opacity: 0.2;
+    background-size: contain;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
 }
+
+div#logowecom:hover {
+    opacity: 0.5;
+}
+
 #divWecomEsquerda {
     z-index: 0;
     display: flex;
     position: absolute;
     bottom: 0;
-    /* right: 20px; */
     width: 100%;
     top: 90%;
     background-image: url(wecom-color.png);
@@ -56,31 +72,101 @@ div#logowecom {
     background-size: 100%;
     opacity: 0.7;
 }
+
+/* Right Column - Main Content */
 .colunadireita {
     width: 88%;
     height: 100%;
     float: right;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
+/* Left Column - Sidebar */
 .colunaesquerda {
-    /* background-image: url("background.png"); */
     background-size: cover;
     margin-left: 0%;
     float: left;
-    position:absolute;
-    left:0px;
-    width:12%;
-    height:100%;
-    top:0px;
-    font-size:15px;
-    background-color: rgb(2, 22, 63);
-    text-align:left;
+    position: absolute;
+    left: 0px;
+    width: 12%;
+    height: 100%;
+    top: 0px;
+    font-size: 15px;
+    background: linear-gradient(135deg, rgb(2, 22, 63) 0%, rgb(0, 30, 85) 100%);
+    text-align: left;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 12px 10px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    padding: 15px 10px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+/* Sidebar Navigation */
+.colunaesquerda nav {
+    width: 100%;
+}
+
+.colunaesquerda ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.colunaesquerda li {
+    padding: 0;
+    font-weight: 500;
+}
+
+.colunaesquerda a {
+    display: block;
+    padding: 12px 10px;
+    border-radius: 8px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.colunaesquerda a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(3px);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.colunaesquerda a.active {
+    background-color: rgba(255, 255, 255, 0.25);
+    font-weight: 600;
+    color: white;
+}
+
+/* Sidebar Scrollbar Styling */
+.colunaesquerda::-webkit-scrollbar {
+    width: 6px;
+}
+
+.colunaesquerda::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.colunaesquerda::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.colunaesquerda::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* .linha1 {
@@ -96,29 +182,28 @@ div#logowecom {
     text-align:left;
 
 } */
-.logo-inn{
-    width: 18%;
-    height: auto;
-    padding-top: 20px;
-    padding-left: 30px;
+/* Logo - Hidden as per current design */
+.logo-inn {
+    display: none;
 }
 
+/* ===== Main Content Area ===== */
 .linha2 {
     order: 2;
     background-image: url("background.jpg");
     background-size: cover;
-    align-content: center;
+    background-position: center;
     width: 100%;
     height: 100%;
-    top: 00%;
-    align-items: flex-start;
-    justify-content: center;
-    display: flex;
-    align-items: center;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
+    align-content: center;
+    padding: 20px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .linha2b3 {
@@ -471,5 +556,85 @@ label {
 
 }
 
+/* ============================================
+   MODERN STYLES - User Page
+   ============================================ */
 
+/* Override Currency Cards for Modern Look */
+.div-dolar,
+.div-euro,
+.div-libra {
+    margin-top: 20px !important;
+}
+
+.div-dolar {
+    margin-top: 10px !important;
+}
+
+.div-data {
+    margin-top: 20px !important;
+}
+
+/* Currency Icons - Enhanced */
+.img-item {
+    width: 90px !important;
+    height: 90px !important;
+    transition: transform 0.3s ease !important;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) !important;
+}
+
+.img-item:hover {
+    transform: scale(1.05) !important;
+}
+
+/* Currency Value Labels - Modern Cards */
+label {
+    width: 100% !important;
+    display: block !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(10px) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    margin-top: 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+label:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+#item-dolar,
+#item-euro,
+#item-libra {
+    color: white !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+}
+
+/* BCB Data Label */
+#item-data {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    padding: 8px 15px !important;
+    border-radius: 8px !important;
+}
+
+/* Sidebar Active State */
+.colunaesquerda a.active {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    font-weight: 600 !important;
+    color: white !important;
+}
+
+/* Remove duplicate div-dolar margin */
 
