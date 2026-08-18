@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.searchusersresult.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "SearchUsersResult"
+        ]
+      },
+      "user": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "cn": {
+                    "type": "string"
+                },
+                "dn": {
+                    "type": "string"
+                },
+                "guid": {
+                    "type": "string"
+                },
+                "h323": {
+                    "type": "string"
+                },
+                "emails": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minimum": 1
+                }
+            },
+            "required":["cn", "dn", "guid", "h323", "emails"]
+        }
+      }
+    },
+    "required":["api", "mt", "user"]
+}

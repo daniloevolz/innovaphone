@@ -37,14 +37,33 @@ innovaphone.Config = innovaphone.Config || function() {
         switch (message.mt) {
             case "GetConfigItemsResult": recvConfigItems(message); break;
             case "ReadConfigResult": recvConfigValues(message, false); break;
-            case "WriteConfigResult": if (message.src == appWebsocket.src) evOnConfigSaveResult.notify(message.result == "ok"); break;
+            case "WriteConfigResult": recvWriteConfig(message); break;
             case "ConfigUpdate": recvConfigValues(message, true); break;
         }
+    }
+
+    function recvWriteConfig(message)
+    {
+        if (message.src != appWebsocket.src) return;
+
+        if (message.result == "AccessDenied") {
+            evOnConfigSaveResult.notify(message.result);
+            console.warn("config write " + message.result);
+            return;
+        }
+
+        evOnConfigSaveResult.notify(message.result == "ok");
     }
 
     function recvConfigItems(message)
     {
         if (message.src != appWebsocket.src) return;
+
+        if (message.result == "AccessDenied") {
+            evOnConfigItemsReceived.notify(message.result);
+            console.warn("config items " + message.result);
+            return;
+        }
 
         for (var i = 0; i < message.ConfigItems.length; ++i) {
             var obj = message.ConfigItems[i];
@@ -72,7 +91,7 @@ innovaphone.Config = innovaphone.Config || function() {
             }
         }
 
-        evOnConfigItemsReceived.notify();
+        evOnConfigItemsReceived.notify(true);
         appWebsocket.send({ "api": "Config", "mt": "ReadConfig" });
     }
 

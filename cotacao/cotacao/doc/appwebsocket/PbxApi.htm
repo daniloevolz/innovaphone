@@ -15,15 +15,15 @@
     <p>
         The PbxApi protocol is available on AppWebsocket connections to innovaphone PBX objects, if
         the object is enabled for the PbxApi. It allows access to the presence, favourties and node information.
-	</p>
+    </p>
 
     <a name="General structure"></a><h2>General structure</h2>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "api": "PbxApi",
     "src": string,
     "mt": string,
-}</code></pre><br/>
+}</code></pre><br />
 
     <dl>
         <dt>api</dt>
@@ -47,27 +47,33 @@
         turn on monitoring and cause additional update messages sent by the PBX.
     </p>
 
-	<u>Operations</u>
+    <u>Operations</u>
 
-	<ul>
-		<li><a href="#SubscribePresence">SubscribePresence</a> - start monitoring the presence of a PBX object</li>
-		<li><a href="#UnsubscribePresence">UnsubscribePresence</a> - stop monitoring the presence of a PBX object</li>
-		<li><a href="#SetPresence">SetPresence</a> - sets the presence of a PBX object</li>
-		<li><a href="#SubscribeProfile">SubscribeProfile</a> - start monitoring the profiles / favourites of a PBX object</li>
-		<li><a href="#UnsubscribeProfile">UnsubscribeProfile</a> - stop monitoring the profiles / favourites of a PBX object</li>
+    <ul>
+        <li><a href="#SubscribePresence">SubscribePresence</a> - start monitoring the presence of a PBX object</li>
+        <li><a href="#UnsubscribePresence">UnsubscribePresence</a> - stop monitoring the presence of a PBX object</li>
+        <li><a href="#SetPresence">SetPresence</a> - sets the presence of a PBX object</li>
+        <li><a href="#SubscribeProfile">SubscribeProfile</a> - start monitoring the profiles / favourites of a PBX object</li>
+        <li><a href="#UnsubscribeProfile">UnsubscribeProfile</a> - stop monitoring the profiles / favourites of a PBX object</li>
         <li><a href="#AddProfile">AddProfile</a> - add a profile to a PBX object</li>
         <li><a href="#DelProfile">DelProfile</a> - delete a profile from a PBX object</li>
         <li><a href="#UpdateProfile">UpdateProfile</a> - change the name of a profile</li>
         <li><a href="#AddProfileContact">AddProfileContact</a> - add a favourite to a profile of a PBX object</li>
         <li><a href="#DelProfileContact">DelProfileContact</a> - delete a favourite from a profile of a PBX object</li>
-		<li><a href="#UpdateProfileContact">UpdateProfileContact</a> - change a favourite in the profile of a PBX object</li>
-		<li><a href="#GetNodeInfo">GetNodeInfo</a> - Retrieves information about a PBX node</li>
-	</ul>
+        <li><a href="#UpdateProfileContact">UpdateProfileContact</a> - change a favourite in the profile of a PBX object</li>
+        <li><a href="#GetNodeInfo">GetNodeInfo</a> - Retrieves information about a PBX node</li>
+        <li><a href="#AddAlienCall">AddAlienCall</a> - add an alien call this maybe a call the user has on another PBX</li>
+        <li><a href="#DelAlienCall">DelAlienCall</a> - delete an alien call</li>
+        <li><a href="#AddDiversion">AddDiversion</a> - add a diversion (cfu, cfb, cfnr) but no admin diversion</li>
+        <li><a href="#DelDiversion">DelDiversion</a> - delete a diversion (cfu, cfb, cfnr) but no admin diversion</li>
+        <li><a href="#GetDiversion">GetDiversion</a> - get a diversion (cfu, cfb, cfnr) of a PBX object but no admin diversion</li>
+        <li><a href="#AppNotify">AppNotify</a> - send an app notification to a user</li>
+    </ul>
 
     <div><a href="#Objects">Objects</a> - recurring definitions</div>
 
-	<h2><a name="SubscribePresence"></a>SubscribePresence</h2>
-	<pre><code class="json">{
+    <h2><a name="SubscribePresence"></a>SubscribePresence</h2>
+    <pre><code class="json">{
     "api": "PbxApi",
     "mt": "SubscribePresence",
     "sip": string,
@@ -76,14 +82,14 @@
     <p>
         Start monitoring of the presence of the object defined by <code>sip</code> or <code>num</code>.
     </p>
-	<pre><code class="json">{
+    <pre><code class="json">{
     "api": "PbxApi",
     "mt": "SubscribePresenceResult"
 }</code></pre>
     <p>
         Message sent back to confirm start of the monitoring
     </p>
-	<pre><code class="json">{
+    <pre><code class="json">{
     "api": "PbxApi",
     "mt": "PresenceState"
     "up": boolean
@@ -118,7 +124,7 @@
         </dd>
     </dl>
     <br />
-	<pre><code class="json">{
+    <pre><code class="json">{
     "api": "PbxApi",
     "mt": "PresenceUpdate",
     "presence": [<a href="#presence">presence</a>]
@@ -354,8 +360,174 @@
     </dl>
     <br />
 
-	
-	<h2><a name="Objects"></a>Objects</h2>
+    <h2><a name="AddAlienCall"></a>AddAlienCall</h2>
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "AddAlienCall",
+}</code></pre>
+    <p>
+        Adds a call to the PBX, which will result in a busy state of the user and
+        also shows up as on the phone presence
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "AddAlienCallResult",
+    "id": unsigned
+}</code></pre>
+    <p>
+        The id can be used to delete the call
+    </p>
+
+    <h2><a name="DelAlienCall"></a>DelAlienCall</h2>
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "DelAlienCall",
+    "id": unsigned
+}</code></pre>
+    <p>
+        Deletes a call added with AddAlienCall. The id identifies the call to be deleted
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "DelAlienCallResult",
+}</code></pre>
+
+    <h2><a name="AddDiversion"></a>AddDiversion</h2>
+    <pre><code class="json">
+    {
+    "api": "PbxApi",
+    "mt": "AddDiversion",
+    "sip": string,
+    "guid": string,
+    "ep-sip":string,
+    "ep-num":string,
+    "type":string,
+    }
+</code></pre>
+    <p>
+        Adds a diversion (cfb, cfu, cfnr) to the PBX but no admin diversion
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "AddDiversionResult",
+    "ok": boolean,
+}</code></pre>
+    <p>
+        OK indicates that the diversion can be set.
+    </p>
+
+    <h2><a name="DelDiversion"></a>DelDiversion</h2>
+    <pre><code class="json">
+    {
+    "api": "PbxApi",
+    "mt": "DelDiversion",
+    "sip": string,
+    "guid": string,
+    "type":string,
+    }
+</code></pre>
+    <p>
+        Deletes a diversion (cfb, cfu, cfnr) of that type of the PBX but no admin diversion
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "DelDiversionResult",
+    "ok": boolean,
+}</code></pre>
+    <p>
+        OK indicates that the diversion can be deleted.
+    </p>
+
+    <h2><a name="GetDiversion"></a>GetDiversion</h2>
+    <pre><code class="json">
+    {
+    "api": "PbxApi",
+    "mt": "GetDiversion",
+    "sip": string,
+    "guid": string,
+    "type":string,
+    }
+</code></pre>
+    <p>
+        Get a diversion of the types (cfb, cfu, cfnr) from the PBX but no admin diversion
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "GetDiversionResult",
+    "num": string,
+    "sip":string,
+}</code></pre>
+    <p>
+        Number and/or SIP are delivered if a diversion of that type persists.
+    </p>
+
+    <h2><a name="AppNotify"></a>AppNotify</h2>
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "AppNotify",
+    "sip": string,
+    "link": string,
+    "title":string,
+    "text":string,
+}</code></pre>
+    <p>
+        Sends an app notification to a specified user.
+        The notification will be displayed by all myApps sessions of the user that have app notifications enabled.
+    </p>
+    <dl>
+        <dt>sip</dt>
+        <dd>
+            The SIP URI of the user.
+        </dd>
+        <dt>link</dt>
+        <dd>
+            An app link that shall be opened if the user clicks the notification.
+            This is the SIP URI of the corresponding app object with optional parameters.
+        </dd>
+        <dd>
+            Examples: <code>someapp</code>, <code>someapp?discussion=3&action=show</code>
+        </dd>
+        <dd>
+            Implementation hint: The app can process the the app link by listening to the start.onargschanged event.
+            It fires if a user clicks a notification linking to the app. start.args contains the parameters given with the link.
+        </dd>
+        <dt>title</dt>
+        <dd>
+            The title of the notification.
+        </dd>
+        <dt>text</dt>
+        <dd>
+            The text body of the notification.
+        </dd>
+    </dl>
+
+    <pre><code class="json">{
+    "api": "PbxApi",
+    "mt": "AppNotifyResult",
+    "error": string,
+}</code></pre>
+    <p>
+        The response to the AppNotify message.
+    </p>
+    <dl>
+        <dt>error</dt>
+        <dd>
+            An optional error string that is only present if the notification could not be sent.
+        </dd>
+        <dd>
+            <dl>
+                <dt>"not found"</dt>
+                <dd>The user specified by "sip" was not found.</dd>
+            </dl>
+        </dd>
+    </dl>
+
+    <h2><a name="Objects"></a>Objects</h2>
     <a name="presence"></a><div class="fnhead">presence</div>
     <pre><code class="json">{
     "contact": string,
@@ -378,7 +550,7 @@
         </dd>
         <dt>status</dt>
         <dd>
-            Tells if the user can be contacted using the given contact. Possible values are "open", "closed". 
+            Tells if the user can be contacted using the given contact. Possible values are "open", "closed".
         </dd>
         <dt>activity</dt>
         <dd>

@@ -19,6 +19,8 @@
         <ul>
             <li>Video setup</li>
             <li>Video connect</li>
+            <li>Video priority</li>
+            <li>Video capabilities</li>
         </ul>
     </p>
 
@@ -29,6 +31,8 @@
         <table>
             <tr><td><a href="#fty_video_setup">video_setup</a></td><td>Video setup</td></tr>
             <tr><td><a href="#fty_video_conn">video_conn</a></td><td>Video connect</td></tr>
+            <tr><td><a href="#fty_video_priority">video_priority</a></td><td>Video priority</td></tr>
+            <tr><td><a href="#fty_video_capabilities">video_capabilities</a></td><td>Video capabilities</td></tr>
         </table>
     </p>
 
@@ -43,14 +47,14 @@
     "guid": string,
     "id": unsigned,
     "bitrate": unsigned,
-}</code></pre><br/>
+}</code></pre><br />
 
     <a name="video_direction_mode"><div class="fnhead">Video Direction Mode</div></a>
     <p>
         This is a string defining the mode of the video direction. The following values are defined for this property:
         <table>
-            <tr><td><b>send</b></td><td>The call sends only video.</td></tr>
-            <tr><td><b>recv</b></td><td>The call receives only video.</td></tr>
+            <tr><td><b>sendonly</b></td><td>The call sends only video.</td></tr>
+            <tr><td><b>recvonly</b></td><td>The call receives only video.</td></tr>
             <tr><td><b>sendrecv</b></td><td>The call sends and receives video.</td></tr>
         </table>
     </p>
@@ -64,7 +68,63 @@
     "guid": string,
     "id": unsigned,
     "bitrate": unsigned,
-}</code></pre><br/>
+}</code></pre><br />
+
+    <a name="fty_video_priority"><div class="fnhead">Video priority facility</div></a>
+    <p>
+        This facility is used to temporarily pause speaker detection. Can be used when desktop sharing is started (on=true) and stopped (on=false).
+    </p>
+    <pre><code class="json">{
+    "type": "video_priority",
+    "on": boolean
+}</code></pre><br />
+
+    <a name="fty_video_capabilities"><div class="fnhead">Video capabilities facility</div></a>
+    <p>
+        This facility is used to indicate support for "multi-video".<br />
+        A multi-video-capable endpoint sends this facility when initiating a call ("setup" message).<br />
+        The multi-video-capable conference sends this facility when accepting a call ("conn" message).<br />
+        <dl>
+            <dt>If both ends of a call indicate multi-video-support</dt>
+            <dd>The main call connection is established with audio-only. For video separate connections are opened by the endpoint (sendonly and recvonly).</dd>
+            <dt>If <b>NOT</b> both ends of a call indicate multi-video-support</dt>
+            <dd>The main call connection is established with audio and video channel. E.g. endpoint-to-endpoint call.</dd>
+        </dl>
+    </p>
+    <pre><code class="json">{
+    "type": "video_capabilities",
+    "multivideo": boolean
+}</code></pre>
+    <p>
+        Examples:
+        <dl>
+            <dt>Legacy endpoint calls lagacy conference:</dt>
+            <dd>
+                EP sends "setup" <b>without</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>without</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Legacy endpoint calls multi-video conference:</dt>
+            <dd>
+                EP sends "setup" <b>without</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>with</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Multi-video endpoint calls lagacy conference:</dt>
+            <dd>
+                EP sends "setup" <b>with</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>without</b> video_capabilities(multivideo=true) and A+V answer.<br />
+                Audio and video are transported over main call connection.
+            </dd>
+            <dt>Multi-video endpoint calls multi-video conference:</dt>
+            <dd>
+                EP sends "setup" <b>with</b> video_capabilities(multivideo=true) and A+V offer.<br />
+                CONF sends "conn" <b>with</b> video_capabilities(multivideo=true) and Audio-Only answer.<br />
+                Audio only is transported over main call connection.
+                EP opens additional video-only connections to CONF.
+            </dd>
+        </dl>
+    </p>
 
 </body>
 </html>

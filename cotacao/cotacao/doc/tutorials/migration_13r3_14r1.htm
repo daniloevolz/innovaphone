@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>SDK migration from 13r2 to 13r3</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>SDK migration from 13r3 to 14r1</h1>
+    <p>
+        This article describes changes in the SDK and APIs between the major software releases 13r3 and 14r1.
+    </p>
+
+    <h2>Content</h2>
+    <dl>
+        <dt><a href="#compatibility">Compatibility Statement</a></dt>
+        <dd>
+            General statement to compatibility of the Apps in 13r3 and 14r1 environments.
+        </dd>
+                <dt><a href="#project-upgrade">Visual Studio Project Upgrade</a></dt>
+        <dd>
+            Visual Studio Project upgrade from 13r3 to 14r1 SDK.
+        </dd>
+        <dt><a href="#license-upgrade">License Upgrade</a></dt>
+        <dd>
+            App License upgrade policy.
+        </dd>
+        <dt><a href="#api-changes">API changes</a></dt>
+        <dd>
+            Changes in the APIs of the SDK Libraries, PBX and Apps. 
+        </dd>
+    </dl>
+
+    <a name="compatibility"></a><h2>Compatibility Statement</h2>
+    <p>
+        The Apps compiled with 13r3 SDK are compatible to 14r1 App Platform Manager, however the Apps compiled with 14r1 SDK should be only executed on 14r1 App Platform Manager.
+    </p>        
+    <p>
+        The 13r3 Apps intended to communicate with 13r3 PBX are also compatible to 14r1 PBX APIs in most cases. The possible incompatibilities are listed in the chapter "API changes" below.
+    </p>
+
+
+    <a name="project-upgrade"></a><h2>Visual Studio Project Upgrade</h2>
+    <p>Prior upgrading the VisualStudio project to a new SDK version the local SDK version must be updated using the "innovaphone SDK Setup". The "innovaphone SDK Setup" is available for download on the <a href="https://store.innovaphone.com/release/download.htm">App Store</a> under "Software" tab.</p>
+    <p>The current version of the SDK used in the Visual Studio Project is stored in the file <code>common/sdk.version</code>.</p>
+    <p>The innovaphone Visual Studio plugin will detect an older version of the SDK in the project and will ask for upgrade. The manual update via "Tools" -> "innovaphone SDK" -> "Install/Update SDK" is available too.</p>
+
+
+    <a name="license-upgrade"></a><h2>License Upgrade</h2>
+    <p>
+        The App licenses issued for major version 13 are not valid for major releases 14. This means the customers without SSA have to acquire the App licenses for the version 14.
+    </p>
+
+
+    <a name="api-changes"></a><h2>API changes</h2>
+    <h3>SDK Client Library innovaphone.lib.js is deprecated and is removed</h3>
+    <p>
+        The library innovaphone.lib.js is removed from 14r1 SDK. The projects started with 13r2 SDK should not be affected. Older projects should migrate to innovaphone.lib1.js library.
+    </p>
+
+</body>
+</html>

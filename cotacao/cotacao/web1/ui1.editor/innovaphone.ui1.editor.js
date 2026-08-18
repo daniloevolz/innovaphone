@@ -1,22 +1,15 @@
-
+﻿
 /// <reference path="../lib1/innovaphone.lib1.js" />
 /// <reference path="../ui1.lib/innovaphone.ui1.lib.js" />
-/// <reference path="../ui1.scrolling/innovaphone.ui1.scrolling.js" />
 
 var innovaphone = innovaphone || {};
 innovaphone.ui1 = innovaphone.ui1 || {};
-innovaphone.ui1.ListViewResources = innovaphone.ui1.ListViewResources || function (onload) {
-    innovaphone.lib.loadObjectScripts(["web/ui1.scrolling/innovaphone.ui1.scrolling"], function () {
-        innovaphone.ui1.ListViewResourcesLoaded = true;
-        onload();
-    });
-};
-
-innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth, scrollColor, scrollStyle, onCtrlEnter, onEsc, onChanged, onFocus, onEmphasis) {
-    var scrolling = new innovaphone.ui1.Scrolling(style, -1, 0, scrollWidth, scrollColor, scrollStyle);
-    var content = scrolling.content;
-    this.container = scrolling.container;
+innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth, scrollColor, scrollStyle, onCtrlEnter, onEsc, onChanged, onFocus, onEmphasis, onUndo, onRedo) {
+    this.createNode("div", style + "; overflow-x:hidden; overflow-y:auto");
+    var that = this;
+    var content = this.add(new innovaphone.ui1.Div(scrollStyle));
     this.content = content;
+    const zeroWidthSpace = "​"; // \u200B
 
     content.container.contentEditable = true;
     content.container.style.outlineStyle = "none";
@@ -28,26 +21,28 @@ innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth,
     content.addEvent('keydown', onKeyDown);
     content.addEvent('keyup', onKeyUp);
     content.addEvent('mouseup', onMouseUp);
-    content.addEvent('paste', function () { setTimeout(function () { normalize(content.container) }, 0) });
+    content.addEvent('paste', onPaste);
+    content.addEvent('input', function (e) { if (onChanged) onChanged(0, getSelection(), e) });
     if (onEmphasis) document.addEventListener('selectionchange', onSelectionChange);
 
     var ctrl = false;
     var shift = false;
     var alt = false;
 
+    // event handler
+
     function onKeyDown(e) {
 
         switch (e.keyCode) {
             case 13:
+                e.preventDefault();
                 if (onCtrlEnter) {
                     if (onCtrlEnter(ctrl, empty(content.container))) {
-                        e.preventDefault();
                         ctrl = false;
                         return;
                     }
                 }
                 enter();
-                e.preventDefault();
                 break;
             case 16:
                 shift = true;
@@ -63,78 +58,64 @@ innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth,
                     onEsc();
                 }
                 return;
+            case 89:
+                if (ctrl && onRedo) {
+                    e.preventDefault();
+                    onRedo();
+                    return;
+                }
+                break;
+            case 90:
+                if (ctrl && onUndo) {
+                    e.preventDefault();
+                    onUndo();
+                    return;
+                }
+                break;
         }
         if (onChanged) onChanged(e.keyCode, getSelection(), e);
     }
 
     function enter() {
-        var sel = selection();
+        var sel = getSelection();
+        var r = sel.focusNode;
+        var n = split(r, sel.focusOffset);
+        if (n) r = n.parentNode;
 
-        console.log("Enter: " + sel.p[0].nodeName);
-        if (sel.p[0].tagName == "DIV") {
-            sel.p.shift();
-            var n = document.createElement("P");
-            if (!sel.p[0].tagName) {
-                n.innerHTML = (sel.f.textContent && sel.f.textContent.length > sel.o) ? sel.f.textContent.slice(sel.o) : "<br/>";
-                sel.p[0].textContent = sel.p[0].textContent.slice(0, sel.o);
-                sel.p[0].parentNode.insertBefore(n, sel.p[0].nextSibling);
-            }
-            else {
-                var s = split(sel.p, sel.o);
-                if (s) n.appendChild(s); else n.innerHTML = "<br/>";
-                sel.p[0].parentNode.insertBefore(n, sel.p[0].nextSibling);
-            }
-            if (sel.p[0].textContent == "") {
-                var r = document.createElement("P");
-                r.innerHTML = "<br/>";
-                sel.p[0].parentNode.insertBefore(r, sel.p[0].nextSibling);
-            }
-            focus(n, sel.selection);
+        while (n?.tagName == "BR") {
+            let t = n;
+            n = n.nextSibling;
+            t.remove();
         }
-        else if (sel.p[0].tagName == "P") {
-            var n = document.createElement("P");
-            var s = split(sel.p, sel.o);
-            if (s) { n = s; if (empty(sel.p[0])) sel.p[0].innerHTML = "<br/>"; }
-            else n.innerHTML = "<br/>";
-            sel.p[0].parentNode.insertBefore(n, sel.p[0].nextSibling);
-            focus(n, sel.selection);
-        }
-        else if (sel.p[0].tagName == "LI") {
-            if (empty(sel.p[0])) {
-                unindentli(sel.p);
-                sel.selection.collapse(sel.f, sel.o);
-            }
-            else {
-                var s = split(sel.p, sel.o);
-                var n = document.createElement("LI");
-                if (s) n = s; else n.innerHTML = "<br/>";
-                sel.p[0].parentNode.insertBefore(n, sel.p[0].nextSibling);
-                focus(n, sel.selection);
-            }
-        }
-        else if (sel.p[0].tagName == "DT" || sel.p[0].tagName == "DD") {
-            var s = split(sel.p, sel.o);
-            if (empty(sel.p[0]) && sel.p[0].tagName == "DT") {
-                unindentli(sel.p);
-                sel.selection.collapse(sel.f, sel.o);
-            }
-            else {
-                var n = document.createElement(empty(sel.p[0]) ? "DT" : "DD");
-                if (s) n = s; else n.innerHTML = "<br/>";
-                sel.p[0].parentNode.insertBefore(n, sel.p[0].nextSibling);
-                if (empty(sel.p[0])) sel.p[0].parentNode.removeChild(sel.p[0]);
-                focus(n, sel.selection);
-            }
-        }
-    }
 
-    function focus(n, s) {
-        while (n.firstChild && n.firstChild.tagName && n.firstChild.tagName != "BR") {
-            n = n.firstChild;
+        if (empty(r)) {
+            if (isItemNode(r)) {
+                let t;
+                if (r.nextSibling) {
+                    t = r.parentNode.parentNode.insertBefore(document.createElement(r.parentNode.tagName), r.parentNode.nextSibling);
+                    while (r.nextSibling) t.appendChild(r.parentNode.removeChild(r.nextSibling));
+                }
+                t = r;
+                r = r.parentNode;
+                t.remove();
+                p = r.parentNode.insertBefore(document.createElement(isItemNode(r.parentNode) ? r.parentNode.tagName : "P"), r.nextSibling);
+            }
+            else {
+                if (r.tagName == "P") p = r.parentNode.insertBefore(document.createElement("P"), r.nextSibling);
+                else p = r.appendChild(document.createElement("P"));
+            }
         }
-        s.collapse(n, 0);
-        var s = n.offsetTop + n.offsetHeight - scrolling.container.offsetHeight;
-        if (s > scrolling.container.scrollTop) scrolling.container.scrollTop = s;
+        else {
+            var p;
+            if (r == content.container) p = r.insertBefore(document.createElement("P"), n);
+            else p = r.parentNode.insertBefore(document.createElement(r.tagName), r.nextSibling);
+            while (n) {
+                p.appendChild(r.removeChild(n));
+                n = n.nextSibling;
+            }
+        }
+        if (empty(p, true)) p.appendChild(document.createTextNode(zeroWidthSpace));
+        setCursor(p, true);
     }
 
     function onKeyUp(e) {
@@ -152,378 +133,457 @@ innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth,
     }
 
     function onMouseUp(e) {
-        console.log("onMouseUp");
     }
 
-    function onSelectionChange(e) {
-        var selection = getSelection();
-        if (content.container.contains(selection.focusNode)) {
-            var p = emphasis(selection.focusNode);
-            var b = false, i = false, u = false;
-            for (var j = 0; j < p.length; j++) {
-                switch (p[j].nodeName) {
-                    case 'B': b = true; break;
-                    case 'I': i = true; break;
-                    case 'U': u = true; break;
-                }
-            }
-            onEmphasis(b, i, u, p[0].tagName == "LI" ? p[0].parentNode.tagName : p[0].tagName);
-        }
-    }
+    function onPaste(e) {
+        if (e.clipboardData.getData('text/html')) {
+            e.preventDefault();
+            e.stopPropagation();
+            var sel = getSelection();
 
-    function normalize(node, parent, before) {
-        if (!parent) parent = node;
-        var n;
-        for (n = node.firstChild; n;) {
-            var p = node;
-            if (['B', 'I', 'U', 'P', 'UL', 'OL', 'DL', 'LI', 'DT', 'DD', 'DIV', 'BR'].indexOf(n.nodeName) != -1) {
-                p = document.createElement(n.nodeName);
-                parent.insertBefore(p, parent == node ? n : before);
-                before = null;
-                normalize(n, p, before);
-            }
-            else if (['SPAN', 'A'].indexOf(n.nodeName) != -1) {
-                normalize(n, parent, before);
-            }
-            else if (n.nodeType == 3) {
-                parent.insertBefore(document.createTextNode(n.textContent), parent == node ? n : before);
-            }
-            var d = n;
-            n = n.nextSibling;
-            node.removeChild(d);
-        }
-    }
-
-    function emphasis(node, name) {
-        var r = [];
-        r.unshift(node);
-        do {
-            if (node.nodeName == name) break;
-            node = node.parentNode;
-            r.unshift(node);
-        } while (['B', 'I', 'U'].indexOf(node.nodeName) != -1);
-        return r;
-    }
-
-    function split(p, ofs) {
-        console.log("split(" + p[0].tagName + ") " + p[0].innerHTML + " at " + ofs);
-        var r = document.createElement(p[0].nodeName);
-        var c = r;
-        for (var j = 1; j < p.length; j++) {
-            var i;
-            if (p[j].nodeType == 3) {
-                i = c.appendChild(document.createTextNode(p[j].textContent.slice(ofs)));
-                p[j].textContent = p[j].textContent.slice(0, ofs);
+            var insert = document.createElement("span");
+            insert.innerHTML = (sel.anchorNode.nodeType == 3 ? sel.anchorNode.textContent.slice(0, sel.anchorOffset) : "") + cleanupHTML(e.clipboardData.getData('text/html'));
+            var end = document.createElement("span");
+            if (sel.anchorNode.nodeType == 3) {
+                if (sel.focusNode.nodeType == 3) end.appendChild(document.createTextNode(sel.focusNode.textContent.slice(sel.focusOffset)));
+                insert.appendChild(end);
+                sel.anchorNode.parentNode.insertBefore(insert, sel.anchorNode);
+                sel.anchorNode.parentNode.removeChild(sel.anchorNode);
             }
             else {
-                i = c.appendChild(document.createElement(p[j].nodeName));
+                insert.appendChild(end);
+                sel.anchorNode.insertBefore(insert, sel.anchorNode.firstChild);
             }
-            while (p[j].nextSibling) {
-                c.appendChild(p[j - 1].removeChild(p[j].nextSibling));
-            }
-            c = i;
+            sel.deleteFromDocument();
+            var p = end.firstChild;
+            normalize(insert.parentNode);
+            setCursor(p);
         }
-        if (empty(r.firstChild)) r.removeChild(r.firstChild);
-        console.log(p[0].innerHTML + " - " + (empty(r) ? "<empty>" : r.innerHTML));
-        if (!empty(r)) return r;
-        return null;
     }
 
-    function empty(node, next) {
-        if (node.nodeType == 3 && node.textContent.length) return false;
+    function onSelectionChange() {
+        var sel = getSelection();
+        if (!content.container.contains(sel.anchorNode) || !content.container.contains(sel.focusNode)) return;
+
+        var b, i, u, ul, ol, dl;
+        traverseSel(function (n) {
+            var e;
+            if (n.nodeType != 3 || !n.nodeValue.length) return;
+            if (exists(content.container, n, "B")) b = b == undefined ? true : b; else b = false;
+            if (exists(content.container, n, "I")) i = i == undefined ? true : i; else i = false;
+            if (exists(content.container, n, "U")) u = u == undefined ? true : u; else u = false;
+            e = exists(content.container, n, "UL");
+            if (ul === undefined) ul = e; else if (ul !== e) ul = null;
+            e = exists(content.container, n, "OL");
+            if (ol === undefined) ol = e; else if (ol !== e) ol = null;
+            e = exists(content.container, n, "DL");
+            if (dl === undefined) dl = e; else if (dl !== e) dl = null;
+        });
+        b = b |= document.queryCommandState("bold");
+        i = i |= document.queryCommandState("italic");
+        u = u |= document.queryCommandState("underline");
+        onEmphasis(b, i, u, ul, ol, dl);
+
+        function exists(r, n, t) {
+            if (!r.contains(n)) return null;
+            if (n.nodeType == 1 && n.tagName == t) return n;
+            if (n === r) return null;
+            return exists(r, n.parentNode, t);
+        }
+    }
+
+    // helper functions
+
+    // traverese thru all nodes of the current selection
+    // callback is done on going up and going to next sibling, so no callbacks on the "way down" to last node
+    function traverseSel(onnode) {
+        var sel = getSelection();
+        var start = sel.anchorNode;
+        var startOfs = sel.anchorOffset;
+        var end = sel.focusNode;
+        var endOfs = sel.focusOffset;
+        var p = sel.anchorNode.compareDocumentPosition(sel.focusNode);
+        if (p == 2) [start, startOfs, end, endOfs] = [end, endOfs, start, startOfs];
+        else if (p == 0 && startOfs > endOfs) [startOfs, endOfs] = [endOfs, startOfs];
+        node(start);
+
+        function node(i) {
+            var n;
+            if (i !== end) {
+                if (i.nextSibling) {
+                    n = i.nextSibling;
+                    while (n != end && n.firstChild) n = n.firstChild;
+                }
+                else {
+                    n = i.parentNode;
+                }
+            }
+            onnode(i, i === start ? startOfs : 0, i === end ? endOfs : undefined);
+            if (n) node(n);
+        }
+    }
+
+    // returns element which was created for after the split element
+    // split is done on the level of the first non-text node (text, B, I, U) or the node type provided as tag
+    function split(r, ofs, tag) {
+        var n;
+        while (isTextNode(r)) {
+            if (r.nodeType == 3) {
+                n = document.createTextNode(r.nodeValue.slice(ofs));
+                r.nodeValue = r.nodeValue.slice(0, ofs);
+                if (empty(r, true)) r.parentNode.insertBefore(document.createTextNode(zeroWidthSpace), r);
+                r.parentNode.insertBefore(n, r.nextSibling);
+            }
+            else {
+                var i = n;
+                n = r.parentNode.insertBefore(document.createElement(r.tagName), r.nextSibling);
+                while (i) {
+                    let t = i.nextSibling;
+                    n.appendChild(r.removeChild(i));
+                    i = t;
+                }
+                if (r.tagName == tag) break;
+            }
+            r = r.parentNode;
+        }
+        return n;
+    }
+
+    // use normalize to cleanup an HTML
+    function cleanupHTML(text) {
+        const parser = new DOMParser();
+        const html = parser.parseFromString(text, 'text/html');
+        html.normalize();
+        normalize(html.body);
+        return html.body.innerHTML;
+    }
+
+    // removes all but the supported nodes and all attributes except href on A
+    function normalize(node, parent, before) {
+        for (var n = node.firstChild; n;) {
+            var x = n.nextSibling;
+            if (['B', 'STRONG', 'I', 'U', 'P', 'UL', 'OL', 'DL', 'LI', 'DT', 'DD', 'DIV', 'BR', 'TABLE', 'TR', 'TD'].indexOf(n.nodeName) != -1) {
+                let p = document.createElement(n.nodeName);
+                (parent ? parent : node).insertBefore(p, parent ? before : n);
+                normalize(n, p, null);
+            }
+            else if (['CODE', 'PRE'].indexOf(n.nodeName) != -1) {
+                (parent ? parent : node).insertBefore(document.createTextNode(n.textContent), parent ? before : n);
+            }
+            else if (['A'].indexOf(n.nodeName) != -1) {
+                let p = document.createElement(n.nodeName);
+                p.setAttribute("href", n.getAttribute("href"));
+                p.setAttribute("target", "_blank");
+                (parent ? parent : node).insertBefore(p, parent ? before : n);
+                normalize(n, p, null);
+            }
+            else if (['SPAN', 'TBODY'].indexOf(n.nodeName) != -1) {
+                normalize(n, parent ? parent : node, parent ? before : n);
+            }
+            else if (n.nodeType == 3) {
+                if (!empty(n) || n.nextSibling || n.prevSibling) n.nodeValue = n.nodeValue.replace(/\u200B/g, '');
+                (parent ? parent : node).insertBefore(n.parentNode.removeChild(n), parent ? before : x);
+            }
+            if (n.nodeType != 3) node.removeChild(n);
+            n = x;
+        }
+    }
+
+    // creates a selection at given position and collapses it to set cursor anywhere
+    function setCursor(node, end) {
+        if (!node) {
+            node = content.container;
+            if (end) while (node.lastChild) node = node.lastChild;
+            else while (node.firstChild) node = node.firstChild;
+        }
+        var r = document.createRange();
+        for (var e = node; e.lastChild; e = e.lastChild);
+        r.setStart(e, e.nodeType == 3 && end ? e.nodeValue.length : 0);
+        r.setEnd(e, e.nodeType == 3 && end ? e.nodeValue.length : 0);
+        r.collapse();
+        getSelection().removeAllRanges();
+        getSelection().addRange(r);
+        if (node.nodeType == 1 && node.getBoundingClientRect().bottom > that.container.getBoundingClientRect().bottom) {
+            that.container.scrollTop += (node.getBoundingClientRect().bottom - that.container.getBoundingClientRect().bottom)
+        }
+    }
+
+    function isTextNode(node) {
+        return node && (node.nodeType == 3 || node.tagName == "B" || node.tagName == "U" || node.tagName == "I" || node.tagName == "SPAN" || node.tagName == "BR");
+    }
+
+    function isListNode(node) {
+        return node && (node.tagName == "UL" || node.tagName == "OL" || node.tagName == "DL");
+    }
+
+    function isItemNode(node) {
+        return node && (node.tagName == "LI" || node.tagName == "DT" || node.tagName == "DD");
+    }
+
+    function empty(node, zero, next) {
+        if (node.nodeType == 3 && node.textContent.length) {
+            let s = node.textContent;
+            if (!zero) s = s.replace(/\u200B/g, '');
+            if (s.search(/\S/) != -1) return false;
+        }
         if (node.firstChild) {
-            if (!empty(node.firstChild, true)) return false;
+            if (!empty(node.firstChild, zero, true)) return false;
         }
         if (next && node.nextSibling) {
-            if (!empty(node.nextSibling, true)) return false;
+            if (!empty(node.nextSibling, zero, true)) return false;
         }
         return true;
     }
 
-    function selection() {
-        var s = {};
-        s.selection = getSelection();
-        s.f = s.selection.focusNode;
-        if (!content.container.contains(s.f)) return null;
-        s.o = s.selection.focusOffset;
-        if (s.f.tagName) {
-            if (s.f.tagName == "BR") {
-                s.f = s.f.parentNode.insertBefore(document.createTextNode(""), s.f);
+    // text manipulation
+
+    function emphasis(tag, off) {
+        var sel = getSelection();
+        if (sel.isCollapsed) {
+            if (off) {
+                document.execCommand(tag == "B" ? "bold" : (tag == "I" ? "italic" : "underline"));
+                if (exists(content.container, sel.focusNode, tag)) {
+                    let t = split(sel.focusNode, sel.focusOffset, tag);
+                    t = t.parentNode.insertBefore(document.createTextNode(zeroWidthSpace), t.nextSibling);
+                    setCursor(t, true);
+                }
             }
             else {
-                s.f = s.f.appendChild(document.createTextNode(""));
+                let f = sel.focusNode;
+                if (!exists(content.container, f, tag)) {
+                    let t = document.createElement(tag);
+                    if (f.nodeType == 3) {
+                        f.parentNode.insertBefore(t, f.nextSibling);
+                        if (sel.focusOffset != f.textContent.length) {
+                            f.parentNode.insertBefore(document.createTextNode(f.textContent.slice(sel.focusOffset)), t.nextSibling);
+                            f.textContent = f.textContent.slice(0, sel.focusOffset);
+                        };
+                    }
+                    else {
+                        f.insertBefore(t, f.firstChild);
+                    }
+                    t.innerHTML = zeroWidthSpace;
+                    setCursor(t, true);
+                }
             }
-            s.o = 0;
-        }
-        s.p = emphasis(s.f, "X");
-        return s;
-    }
-
-    function list(p, tag) {
-        var l = document.createElement(tag);
-        p[0].insertBefore(l, p[1]);
-        p[0].removeChild(p[1]);
-        var li = document.createElement("LI");
-        l.appendChild(li);
-        li.appendChild(p[1]);
-    }
-
-    function listli(p, tag) {
-        var r = p[0].parentNode;
-        if (r.tagName == tag) {
-            var n = r.nextSibling;
-            while (p[0].firstChild) r.parentNode.insertBefore(p[0].removeChild(p[0].firstChild), n);
-            if (p[0].nextSibling) {
-                var t = r.parentNode.insertBefore(document.createElement(tag), n);
-                while (p[0].nextSibling) t.appendChild(r.removeChild(p[0].nextSibling));
-            }
-            r.removeChild(p[0]);
         }
         else {
-            var l = document.createElement(tag);
-            while (r.firstChild) l.appendChild(r.removeChild(r.firstChild));
-            r.parentNode.replaceChild(l, r);
-        }
-    }
+            var e = [];
+            var last, lastOfs;
 
-    function dlist(p) {
-        var dl = document.createElement("DL");
-        p[0].insertBefore(dl, p[1]);
-        p[0].removeChild(p[1]);
-        var dt = document.createElement("DT");
-        dl.appendChild(dt);
-        dt.appendChild(p[1]);
-        var dd = dl.appendChild(document.createElement("DD"));
-        dd.innerHTML = "<br/>";
-        return dd;
-    }
+            traverseSel(function (n, sOfs, eOfs) {
+                var t = exists(content.container, n, tag);
+                if (t && e.indexOf(t) == -1) e.push(t);
+                if (n.nodeType == 3) {
+                    last = n;
+                    lastOfs = eOfs;
+                }
+            });
 
-    function dlistdt(p) {
-        var r = p[0].parentNode;
-        if (r.tagName == "DL") {
-            var n = r.nextSibling;
-            while (p[0].firstChild) r.parentNode.insertBefore(p[0].removeChild(p[0].firstChild), n);
-            if (p[0].nextSibling) {
-                var t = r.parentNode.insertBefore(document.createElement("DL"), n);
-                while (p[0].nextSibling) t.appendChild(r.removeChild(p[0].nextSibling));
+            while (e.length) {
+                var n = e.pop();
+                while (n.firstChild) n.parentNode.insertBefore(n.removeChild(n.firstChild), n);
+                n.parentNode.removeChild(n);
             }
-            r.removeChild(p[0]);
+
+            if (!off) {
+                traverseSel(function (n, sOfs, eOfs) {
+                    if (n.nodeType == 3 && n.nodeValue.length && !exists(content.container, n, tag)) {
+                        var t = document.createElement(tag);
+                        var text = t.appendChild(document.createTextNode(n.nodeValue.slice(sOfs, eOfs)));
+
+                        if (sOfs) n.parentNode.insertBefore(document.createTextNode(n.nodeValue.slice(0, sOfs)), n);
+                        n.parentNode.insertBefore(t, n);
+                        if (eOfs) n.parentNode.insertBefore(document.createTextNode(n.nodeValue.slice(eOfs)), n);
+                        n.parentNode.removeChild(n);
+                        last = text;
+                        lastOfs = eOfs - sOfs;
+                    }
+                });
+            }
+            sel.collapse(last, lastOfs);
+        }
+        onSelectionChange();
+
+        function exists(r, n, t) {
+            if (!r.contains(n)) return null;
+            if (n.nodeType == 1 && n.tagName == t) return n;
+            if (n === r) return null;
+            return exists(r, n.parentNode, t);
         }
     }
 
-    function indentli(p) {
-        if (p[0].previousSibling) {
-            var l = document.createElement(p[0].parentNode.tagName);
-            p[0].previousSibling.appendChild(l);
-            var li = l.appendChild(document.createElement("LI"));
-            li.appendChild(p[1]);
-            p[0].parentNode.removeChild(p[0]);
-        }
-    }
-
-    function unindentli(p) {
-        if (p[0].nextElementSibling) {
-            var l = document.createElement(p[0].parentNode.tagName);
-            p[0].parentNode.parentNode.insertBefore(l, p[0].parentNode.nextSibling);
-            while (p[0].nextSibling) l.appendChild(p[0].nextSibling);
-        }
-        if (p[0].parentNode.parentNode.nodeName == "LI") {
-            var li = p[0].parentNode.parentNode.parentNode.insertBefore(document.createElement("LI"), p[0].parentNode.parentNode.nextSibling);
-            li.appendChild(p[1]);
-            p[0].parentNode.removeChild(p[0]);
-        }
-        else {
-            p[0].parentNode.parentNode.insertBefore(p[1], p[0].parentNode.nextSibling);
-            p[0].parentNode.removeChild(p[0]);
-        }
-    }
-
-    this.selection = function (tag) {
-        var selection = getSelection();
-        console.log("selection(" + tag + ")");
-        var f = selection.focusNode;
-        var o = selection.focusOffset;
-        var p = emphasis(f, tag);
-        if (selection.isCollapsed) {
-            if (p[0].tagName != tag) {
-                var node = document.createElement(tag);
-                if (f.nodeType == 3) {
-                    f.parentNode.insertBefore(node, f.nextSibling);
-                    if (selection.focusOffset != f.textContent.length) {
-                        f.parentNode.insertBefore(document.createTextNode(f.textContent.slice(selection.focusOffset)), node.nextSibling);
-                        f.textContent = f.textContent.slice(0, o);
-                    };
+    function createList(tag) {
+        var root;
+        var leafs = [];
+        traverseSel(function (n) {
+            if (n.nodeType == 3 && n.nodeValue.length) {
+                leafs.push(n);
+                if (!root) {
+                    root = n.parentNode;
                 }
                 else {
-                    f.insertBefore(node, f.firstChild);
+                    while (!n.contains(root)) n = n.parentNode;
+                    root = n;
                 }
-                selection.collapse(node, 0);
+                while (isTextNode(root) || root.tagName == "LI" || root.tagName == "DD") root = root.parentNode;
             }
-            else {
-                var s = split(p, o);
-                var t = document.createTextNode("");
-                var c;
-                for (var j = 1; j < p.length; j++) {
-                    if (p[j].nodeType != 3) {
-                        var n = document.createElement(p[j].nodeName);
-                        if (c) c.appendChild(n);
-                        else p[0].parentNode.insertBefore(n, p[0].nextSibling);
-                        c = n;
+        });
+        if (!tag) {
+            if (root?.tagName == "UL" || root?.tagName == "OL") tag = root.tagName;
+            else tag = "DL";
+        }
+        if (!root && getSelection().isCollapsed) {
+            root = getSelection().focusNode;
+            if (!root.firstChild) {
+                let p = root.appendChild(document.createElement("P"));
+                leafs.push(p.appendChild(document.createTextNode(zeroWidthSpace)));
+            }
+        }
+        if (root && content.container.contains(root)) {
+            normalize(root);
+
+            var l, li, n;
+            for (var c = root.firstChild, i = 0; c; c = n) {
+                n = c.nextSibling;
+                if (c.contains(leafs[i])) {
+                    while (c.contains(leafs[i])) i++;
+                    while (isTextNode(c) && isTextNode(c.previousSibling)) { n = c; c = c.previousSibling; };
+                    if (!l) {
+                        if (isListNode(root)) {
+                            if (c.previousSibling) {
+                                l = c.previousSibling.appendChild(document.createElement(tag));
+                            }
+                            else {
+                                var t = root.insertBefore(document.createElement(tag == "DL" ? "DD" : "LI"), c);
+                                t.appendChild(document.createTextNode(zeroWidthSpace));
+                                l = t.appendChild(document.createElement(tag));
+                            }
+                        }
+                        else {
+                            l = root.insertBefore(document.createElement(tag), c);
+                        }
+                    }
+                    if (!li || !isTextNode(li.firstChild) || !isTextNode(c)) {
+                        li = l.appendChild(document.createElement(tag == "DL" ? "DD" : "LI"));
+                    }
+                    if (isTextNode(c)) {
+                        li.appendChild(root.removeChild(c));
+                        while (isTextNode(n)) {
+                            c = n; n = n.nextSibling;
+                            li.appendChild(root.removeChild(c));
+                        }
+                    }
+                    else if (c.tagName == "P") {
+                        root.removeChild(c);
+                        while (c.firstChild) li.appendChild(c.removeChild(c.firstChild));
+                    }
+                    else if (isListNode(c)) {
+                        li.appendChild(document.createTextNode(zeroWidthSpace));
+                        li.appendChild(root.removeChild(c));
+                    }
+                    else if (c.tagName == (tag == "DL" ? "DD" : "LI")) {
+                        while (c.firstChild) li.appendChild(c.removeChild(c.firstChild));
+                        root.removeChild(c);
+                    }
+                    else {
+                        li.appendChild(root.removeChild(c));
                     }
                 }
-                if (c) c.appendChild(t);
-                else p[0].parentNode.insertBefore(t, p[0].nextSibling)
-                if (s) p[0].parentNode.insertBefore(s, c ? p[0].nextSibling.nextSibling : t.nextSibling);
-                selection.collapse(t, 0);
             }
+            if (!root.firstChild) root.parentNode.removeChild(root);
+            setCursor(l, true);
         }
-        else {
-            var range = selection.getRangeAt(0);
-            if (p[0].tagName != tag) {
-                traverse(range.startContainer, range.endContainer, range.startOffset, range.endOffset, set);
-            }
-            else {
-                traverse(range.startContainer, range.endContainer, range.startOffset, range.endOffset, unset);
-            }
-        }
+    }
 
-        function traverse(start, end, sofs, eofs, op) {
-            var c = 0;
-            console.log("[traverse " + start.textContent + " (" + sofs + ")" + " -> " + end.textContent + " (" + eofs + ")");
-            var cur = start;
-            var up = false;
-            var next;
-            if (cur.nodeType == 3) {
-                var p = emphasis(cur, tag);
-                next = op(p, cur, sofs, start == end ? eofs : cur.textContent.length, tag);
-            }
-            while (cur != end) {
-                if (c++ == 100) {
-                    console.log("LOOP!");
-                    return;
+    function remList(rem) {
+        if (rem?.nodeType == 1) {
+            while (rem.firstChild) {
+                var c = rem.firstChild;
+                var p = document.createElement("P");
+                if (c.nodeType == 3) {
+                    p.appendChild(rem.removeChild(c));
                 }
-                if (next) cur = next;
-                next = null;
-                if (cur.firstChild && !up) { console.log("down"); cur = cur.firstChild; }
-                else if (cur.nextSibling) { console.log("next"); cur = cur.nextSibling; up = false }
-                else { console.log("up"); cur = cur.parentNode; up = true; };
-                console.log("cur ", cur.nodeName);
-                if (cur.nodeType == 3 && cur.textContent.length) {
-                    var p = emphasis(cur, tag);
-                    next = op(p, cur, 0, cur == end ? eofs : cur.textContent.length, tag);
-                    console.log("next ", next.nodeName);
+                else {
+                    while (c.firstChild) p.appendChild(c.removeChild(c.firstChild));
                 }
+                rem.parentNode.insertBefore(p, rem);
+                rem.removeChild(rem.firstChild);
             }
-            selection.collapse(content.container, 0);
-            content.container.blur();
-            console.log("traverse]");
+            rem.parentNode.removeChild(rem);
+            onSelectionChange();
         }
+    }
 
-        function set(p, node, start, end, name) {
-            console.log("set " + node.textContent + " (" + p[0].parentNode.innerHTML + ") " + p[0].nodeName + " " + start + "/" + end);
-            if (p[0].nodeName != name) {
-                if (start) {
-                    node.parentNode.insertBefore(document.createTextNode(node.textContent.slice(0, start)), node);
+    function unIndentSel() {
+        var s = [];
+        traverseSel(function (n) {
+            if (n.nodeType == 3 && n.nodeValue.length) {
+                s.push(n);
+            }
+        });
+        while (s.length) unIndent(s.shift());
+    }
+
+    function unIndent(node) {
+        if (content.container.contains(node)) {
+            var c = node;
+            var r = node.parentNode;
+            while (r != content.container && !isListNode(r)) {
+                c = r;
+                r = r.parentNode;
+            }
+            var p = r.parentNode;
+            if (r != content.container) {
+                var f = r.nextSibling;
+                var l;
+                if (c.nextSibling) {
+                    f = p.insertBefore(document.createElement(r.tagName), r.nextSibling);
+                    while (c.nextSibling) f.appendChild(r.removeChild(c.nextSibling));
                 }
-                var n = node.parentNode.insertBefore(document.createElement(name), node);
-                n.appendChild(document.createTextNode(node.textContent.slice(start, end)));
-                node.textContent = node.textContent.slice(end);
-                console.log("ret " + p[0].parentNode.innerHTML + " next=" + node.innerHTML);
+                r.removeChild(c);
+                if (!r.firstChild) p.removeChild(r);
+                var n = p.insertBefore(document.createElement(isItemNode(p) ? p.tagName : "P"), f);
+                while (c.firstChild) l = n.appendChild(c.removeChild(c.firstChild));
+                if (l) setCursor(l, true);
             }
-            return node;
-        }
-
-        function unset(p, node, start, end, name) {
-            console.log("unset " + node.textContent + " (" + p[0].parentNode.innerHTML + ") " + p[0].nodeName + " " + start + "/" + end);
-            if (p[0].nodeName == name) {
-                var t = document.createTextNode(node.textContent.slice(start, end));
-                var ret = t;
-                for (var i = p.length - 2; i; i--) {
-                    var n = document.createElement(p[i].nodeName);
-                    n.appendChild(t);
-                    t = n;
-                }
-                if (empty(t)) t = null;
-
-                var s = split(p, end);
-
-                if (s) p[0].parentNode.insertBefore(s, p[0].nextSibling);
-                if (t) p[0].parentNode.insertBefore(t, p[0].nextSibling);
-
-                node.textContent = node.textContent.slice(0, start);
-                console.log("ret " + p[0].parentNode.innerHTML + "next " + ret);
-                if (empty(p[0])) p[0].parentNode.removeChild(p[0]);
-
-                return t ? ret : s;
-            }
-            return node;
         }
     }
 
-    this.l = function (tag) {
-        var s = selection();
-        if (!s) return;
-        console.log("l(" + tag + ") f=" + s.f.nodeName + " p=" + s.p[0].nodeName + " " + (s.p[1] ? s.p[1].nodeName : "-"));
-        if (s.p[0].tagName == "LI") {
-            listli(s.p, tag);
-        }
-        else {
-            list(s.p, tag);
-        }
-        s.selection.collapse(s.f, s.o);
-        if (onChanged) onChanged();
-    }
-
-    this.dl = function () {
-        var s = selection();
-        if (!s) return;
-        console.log("dl f=" + s.f.nodeName + " p=" + s.p[0].nodeName + " " + s.p[1].nodeName);
-        if (s.p[0].tagName == "DT" || s.p[0].tagName == "DD") {
-            dlistdt(s.p);
-        }
-        else {
-            console.log("a");
-            s.selection.collapse(dlist(s.p), 0);
-        }
-        if (onChanged) onChanged();
-    }
-
-    this.indent = function () {
-        var s = selection();
-        if (!s) return;
-        console.log("indent f=" + s.f.nodeName + " p=" + s.p[0].nodeName + " " + s.p[1].nodeName);
-        if (s.p[0].tagName == "LI") {
-            indentli(s.p);
-            s.selection.collapse(s.f, s.o);
-        }
-    }
-
-    this.unIndent = function () {
-        var s = selection();
-        if (!s) return;
-        console.log("unIndent f=" + s.f.nodeName + " p=" + s.p[0].nodeName + " " + s.p[1].nodeName);
-        if (s.p[0].tagName == "LI") {
-            unindentli(s.p);
-            s.selection.collapse(s.f, s.o);
-        }
-    }
+    // interface functions
 
     this.insert = function (text) {
-        var s = selection();
-        if (s) s.f.textContent = s.f.textContent.slice(0, s.o) + text + s.f.textContent.slice(s.o);
-        s.selection.collapse(s.f, s.o + text.length);
+        var s = getSelection();
+        if (s && content.container.contains(s.focusNode)) {
+            var f = s.focusNode;
+            var o = s.focusOffset;
+            f.textContent = f.textContent.slice(0, o) + text + f.textContent.slice(o);
+            setCursor(f, true);
+        }
     }
 
     this.backspace = function (num) {
-        var s = selection();
-        if (s) s.f.textContent = s.f.textContent.slice(0, s.o - num) + s.f.textContent.slice(s.o);
-        s.selection.collapse(s.f, s.o - num);
+        var s = getSelection();
+        if (s && content.container.contains(s.focusNode)) {
+            var f = s.focusNode;
+            var o = s.focusOffset;
+            if (s) f.textContent = f.textContent.slice(0, o - num) + f.textContent.slice(o);
+            s.collapse(f, o - num);
+        }
     }
 
+    this.indent = createList;
+    this.unIndent = unIndentSel;
+    this.l = function (tag, rem) { if (rem) remList(rem); else createList(tag); };
+    this.emphasis = emphasis;
     this.text = function (noempty) { return noempty && empty(content.container) ? null : content.container.innerHTML.replace(/<br>/g, "<br/>"); }
-    this.setText = function (html) { content.addHTML(html); if (onChanged) onChanged(); return this };
+    this.setText = function (html, nochange) { content.addHTML(html); if (html) setTimeout(function () { setCursor(null, true) }, 10); if (!nochange && onChanged) onChanged(); return this };
     this.focus = function () { content.container.focus(); }
     this.blur = function () { content.container.blur(); }
-    this.contentHeight = function () { return scrolling.contentHeight(); };
+    this.contentHeight = function () { return content.container.scrollHeight; };
+    this.keydown = function (e) { onKeyDown(e) };
+    this.cleanupHTML = cleanupHTML;
+    this.normalize = normalize;
+    this.setCursor = setCursor;
 };
 innovaphone.ui1.Editor.prototype = innovaphone.ui1.nodePrototype;

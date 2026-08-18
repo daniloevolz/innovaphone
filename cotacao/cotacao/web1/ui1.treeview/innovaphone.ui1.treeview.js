@@ -207,9 +207,6 @@ innovaphone.ui1.TreeView = innovaphone.ui1.TreeView || function (out, id, config
             }
 
             function select() {
-                /*if (selectable) {
-                    innovaphone.lib.addClass(content, "ijs-selected");
-                }*/
                 if (onClick) onClick(node);
             }
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - FileSystem</title>
+    <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web1/doc/vs.css">
+    <script src="../../web1/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+    <h1>FileSystem</h1>
+    <p>
+        This document describes the FileSystem library available in the JavaScript environment for app serivices.
+    </p>
+    <p>
+        Important: innovaphone uses that library for very special purposes.
+        In general apps should not use the file system but store all data and configuration inside the database for several reasons:
+        <ul>
+            <li>Only the database content is included in backups.</li>
+            <li>Only the database content is included in replication.</li>
+            <li>The FileSystem library grants access using the user of the app service. So there is isolation between different app services. But there is no isolation between different app instances of one app service.</li>
+        </ul>
+    </p>
+
+    <h2>Table of content</h2>
+    <table>
+        <tr>
+            <td><b>Object</b></td>
+            <td><b><a href="#FileSystem">FileSystem</a></b><br /></td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#readFile">readFile</a><br />
+                <br />
+            </td>
+        </tr>
+    </table>
+
+    <h2><a name="FileSystem">FileSystem</a></h2>
+    <p>
+        The FileSystem object provides access to the file system of the app platform. All file access is done with the user account of app service.
+    </p>
+
+    <a name="readFile"><div class="fnhead" style="margin-top:5px">readFile</div></a>
+    <dd>
+        <p>
+            Returns the content of a file. If the file does not exist, null is returned.
+        </p>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>filename</b></td><td>The filename.</td></tr>
+            <tr><td class="param">bool <b>binary</b></td><td>Optional, default true. Specifies, if the file content shall be returned as a string or an Uint8Array.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string/Uint8Array</td><td>The file content as a string or binary data, depending on the binary parameter.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">// read text file as a string
+var content = FileSystem.readFile("filename.txt", false);</code></pre>
+    </dd>
+
+</body>
+</html>

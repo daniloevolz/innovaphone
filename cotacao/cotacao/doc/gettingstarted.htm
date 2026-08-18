@@ -14,15 +14,13 @@
     <h4><a href="#getting_started">Getting started</a></h4>
     <ul>
         <li><a href="#fixvs2017">Fix Visual Studio 2017 intellisense</a></li>
-        <li><a href="#pbxinstall">Prepare the PBX</a></li>
-        <li><a href="#pbx_vm">Using the PBX and App Platform on as virtual machines</a></li>
         <li><a href="#start">Run Visual Studio</a></li>
         <li><a href="#new_project">Creating an new project</a></li>
         <li><a href="#remoteconnection">Assign a remote connection</a></li>
         <li><a href="#addremoteconnection">Add remote connection</a></li>
-        <li><a href="#newappplatformconnection">New App Platform connection</a></li>
+        <li><a href="#newappplatformconnection">New AppPlatform connection</a></li>
         <li><a href="#runanddebug">Run and debug your application</a></li>
-        <li><a href="#additional_tipps">Additional tipps for development</a></li>
+        <li><a href="#additional_tools">Additional helpers for development</a></li>
     </ul>
 
     <h4><a href="#the_extension">The innovaphone SDK extension</a></h4>
@@ -37,9 +35,9 @@
     <br/>
     <h2><a name="getting_started">Getting started</a></h2>
     <p>
-        To start developing apps using innovaphone SDK, we highly recommend to use Visual Studio 2017 or newer. While you can use what ever IDE or environment you want to use,
+        To start developing apps using innovaphone SDK, we highly recommend to use Visual Studio 2017 or 2019 (2022 is and will be not supported). The community edition is also supported. While you can use whatever IDE or environment you want to use,
         the benefit of using Visual Studio is our integration. The innovaphone SDK comes with a Visual Studio extension to integrate everything you need into the IDE. So managing
-        connections to the PBX or the App Platform itself will be handled by the extension. It also offers a template which can be used as an example or as basis for your own app.<br/>
+        connections to the PBX or the AppPlatform itself will be handled by the extension. It also offers a template which can be used as an example or as basis for your own app.<br/>
         <br/>
         If you havn't done yet, download Visual Studio from the Microsoft page. Depending on your company it could be, that you even can use the free Community Edition of Visual Studio.
         Look at the Microsoft Visual Studio homepage for more information. It is important to select the Workload "Linux development with C++":<br/><br/>
@@ -48,9 +46,9 @@
         <b>NOTE:</b> Due a bug in some version of Visual Studio 2017, make sure to install at least version 15.9.6 or newer!
     </p>
     <p>
-        After installing Visual Studio, run the innovaphone SDK setup (or run it again if already done), to install the Visual Studio extension. If everything had been installed, you
-        are ready to go. The following guide shows you, how to setup the environment and start producing Apps. Please note that the following documentation is based on the usage for
-        Visual Studio 2017, but should be the same on newer version (more or less, depending on how much Microsoft has changed the UI).
+        After installing Visual Studio, run the innovaphone SDK setup (or run it again if already done), to install the Visual Studio extension. You can find the innovaphone SDK setup on <a href="https://store.innovaphone.com/">store.innovaphone.com</a> under the tab Software.
+		If everything had been installed, you are ready to go. The following guide shows you, how to setup the environment and start producing Apps. 
+		Please note that the following documentation is based on the usage for Visual Studio 2017, but should be the same on newer version (more or less, depending on how much Microsoft has changed the UI).
     </p>
     <p>
         The following parts will guide you step-by-step through the process from creating an app, setting up the connections needed and run your app to debug it. It is recommended
@@ -76,55 +74,6 @@
       &nbsp;&nbsp;&nbsp;&nbsp;&#x3C;Output TaskParameter=&#x22;CppIntelliSenseIncludePath&#x22; PropertyName=&#x22;CppIntelliSenseIncludePath&#x22;/&#x3E; <br/> 
     &#x3C;/ComputeHeaders&#x3E;
     </p>
-
-    <h3><a name="pbxinstall">Prepare the PBX</a></h3>
-    <p>
-        For development, you also need a PBX and App Platform to run / debug your application on (see the diagram in the chapter <a href="#remoteconnection">Assign a remote connection</a>  for an overview about how the service (your app), the PBX and the App Platform are connected to each other). This chapter describes how to prepare a real hardware (like IP811) for development. If you want to use the App Platform and PBX on a virtualization system, see the chapter below.
-    </p>
-    <p>
-        Before you start, make sure the IP811 is ready for install. To be sure, make a hard reset of the box by pressing the reset button (e. g. by using a pen). Wait until the green LED flashes rapidly. Release the reset button and wait, until the LED glows orange. Now disconnect the box from the energy and connect it again. You should now be ready to go through the install process.
-    </p>
-    <p>
-        At first you need to get the IP address of your hardware. If it is connected to the internet (which you need during the install process anyway), you can use <a href="https://config.innovaphone.com/">https://config.innovaphone.com/</a> and enter the serial number of your PBX. If that doesn't work, you can use the MAC address printed on the bottom side of your hardware. In case of doubts, ask your system administrator for more information.
-    </p>
-    <p>
-        If you know the IP address, use a browser (chrome or firefoxis recommened) and open the page "https://pbx-ip-address/install.htm?stdpwd=on". This will start the install process for the PBX. The parameter "stdpwd=on" will set the default user and passwords, which makes access during development easier. The default user is "admin", the default password is the name of your hardware (for IP811, the password is ip811), all in lowercase. The first page you will see offers you a selection of how to setup the PBX. For a development PBX, select "Master PBX to start a new system with local app platform". Click on "Next" to get to the next page.<br/><br/>
-        <img src="pics/pbx_install_page_0.png"/>
-        
-    </p>
-    <p>
-        The next page is to set up the network settings:<br/><br/>
-        <img src="pics/pbx_install_page_1.png"/><br/>
-        Just fill in the IP settings suitable for you network. This will be the IP address for the PBX. In the update section, let everything as it is. In the section "Install local App Platform", enter the IP address for your App Platform. When clicking on next, it can be that the PBX will install an update or reset itself to apply the IP settings. So after that, you will be back at the same page an click next again to proceed. The PBX will now download and install the App Platform. This can take a while, so please don't interrupt that step. After the App Platform is installed, you should see a screen similar like the one below. Again - click on next to continue.<br/><br/>
-        <img src="pics/pbx_install_appplatform_done.png"/><br/><br/>
-    </p>
-    <p>
-        Now you need to enter the details for the admin user of the app platform:<br/>
-        <img src="pics/pbx_install_page_2.png"/><br/><br/>
-        It is highly recommended to use an easy password for the admin user to make development easier. You are free to use whatever you want as domain name, but if something else than example.com will be entered, don't forget to change that value in the main file of your app, too (look for the line 'instanceArgs.appDomain = "example.com"' and replace the value there). If you won't do that, the PBX won't be able to connect to your app. This is only important for debugging your app. If the App Platform manager will start your it, he will set the domain like defined in it's settings and ignore the hard coded value.<br/><br/>The PBX location can be used in your code to identify the PBX for installations with more than one PBX running in a network. The Domain names should be empty and "User DNS to access myApps" deactivated (except you're know why you need to enabled it). Select a language for voicemail and click on "Next". The dialing prefixes settings can be ignored.
-    </p>
-    <p>
-        From now on, the last steps are straight forward. At first you will see the username and password for the PBX. Because you started it with the stdpwd=on option (as described above), that will be the default user and password as expected. Click on next for the email setting, where you only need to deactivate the option "Email account" and click on next. Then the base apps will be installed, which - again - can take a while. After all default apps had been installed, two pages follow where you have to install the PBX and App Platform certificates (just click on the buttons when shown).
-    </p>
-    <p>
-        The setup process is now completed. The only thing left is to enable the test mode and reboot the system:<br/>
-        <img src="pics/pbx_install_page_done.png"/><br/><br/>
-        After reboot, you must login yourself with "admin" and "pwd" (if you used that username password in the above step) and you will find yourself on the myApps page for your development installation. You can now proceed to startup Visual Studio and create your own great apps for that gorgeous platform.         
-    </p>
-    <br/>
-
-    <h3><a name="pbx_vm">Using the PBX and App Platform on as virtual machines</a></h3>
-    <p>
-        Instead of a real hardware PBX, you can also use a virtual machine for development. For this, you need to go to our <a href="https://store.innovaphone.com">AppStore</a> and download the latest for the IPVA (under "Firmware") and App Platform x86_64 (under "App Platform") images. The downloaded zip files contain images for Hyper-V or VMWare. Please read the documentation of your virtual machine solution to learn how to install an existing VM. When installed, just start the VM for the IPVA and App Platform and wait, until they have booted. Note that the first time start for the App Platform can take a while. So please wait, until you see the Linux login prompt.
-    </p>
-    <p>
-        The install process will be nearly the same as described above, with some little exceptions:
-    </p>
-        <ul>
-            <li>At the first page, select the first option ("Master PBX to start a new system with external App Platform")</li>
-            <li>After the step where you need to setup the network configuration, you will see a page where the IP address of the App Platform must be entered. The password is the default password (pwd). With click auf "connect" you can test if everything is ok. Now click on next. (To get the IP address of the App Platform, login to your App Platform VM (username: admin, password ipapps) and type ifconfig).</li>
-        </ul>
-    <p>The rest of the process is the same as described above.</p>
     
     <br/>
     <h3><a name="start">Run Visual Studio</a></h3>
@@ -158,8 +107,9 @@
     </p>
     <p>
         After the project has been created, you must install the SDK to the project. That means, that the SDK files will be copied to the source of the new created app. The innovaphone
-        SDK extension will do that for you, so just click on start. You can also cancel it, but your app won't compile (however, this also can be done later, see menu items). After the
-        files had been copied, your will be lead to the next step which is defining the connections you need to run.<br/>
+        SDK extension will do that for you, so just click on start. You can do this when clicking on Tools, then selecting innovaphone SDK and finally choosing the option Update/Install.
+		You can also cancel it, but your app won't compile (however, this also can be done later, see menu items). 
+		After the files had been copied, your will be lead to the next step which is defining the connections you need to run.<br/>
         <br/>
         <img src="pics/VSE_Install_SDK.png">
         <br/>
@@ -168,29 +118,29 @@
     <br/>
     <h3><a name="remoteconnection">Assign a remote connection</a></h3>
     <p>
-        Before creating your own app, you must at first understand, how an app for the innovaphone App Platform works. This is important to understand, how you need to setup the
+        Before creating your own app, you must at first understand, how an app for the innovaphone AppPlatform works. This is important to understand, how you need to setup the
         connections in Visual Studio used during development.<br/>
         <br/>
         An app generally has two parts: the UI, written with JavaScript/CSS/HTML, executed using a web browser or myApps, and the service which is written in C++. The C++ part will be
         cross-compiled on your Windows development machine using gcc shipped with the innovaphone SDK. Compiling on other platforms like macOS or Linux is not supported
         (even if the service itself will run on a Linux OS). However, a service must have at least one instance. The instance is finally that part the UI will connect to.<br/>
         <br/>
-        To run the app and make the UI available on myApps, the PBX and the App Platform must be configured for your app and the app itself must be deployed to the App Platform.
+        To run the app and make the UI available on myApps, the PBX and the AppPlatform must be configured for your app and the app itself must be deployed to the AppPlatform.
         While this can be done manually, the innovaphone SDK extension helps out a lot managing that stuff. This is why you need to setup a bunch of "connections". There
         are three types of connections:
     </p>
         <ul>
-            <li><b>App Platform connection:</b> This is the connection to the App Platform, technically a TCP connection to the App Platforms Linux OS.</li>
+            <li><b>AppPlatform connection:</b> This is the connection to the AppPlatform, technically a TCP connection to the AppPlatforms Linux OS.</li>
             <li><b>PBX connection:</b> To use the app on myApps or with a web browser, an PBX object for your app must be created. For this, the PBX connection is needed which
-            is the IP address of the PBX that connects to the service / App Platform.</li>
-            <li><b>Remote connection:</b> This is the connection to the service, based on the App Platform connection. Actually this is the user / password for an App Platform connection
+            is the IP address of the PBX that connects to the service / AppPlatform.</li>
+            <li><b>Remote connection:</b> This is the connection to the service, based on the AppPlatform connection. Actually this is the user / password for an AppPlatform connection
             to login using SSH. This is why it is called remote connection.</li>
         </ul>
     <p>
-        The remote connection together with the App Platform connection is the information the innovaphone SDK extension needs to get access to the App Platform, configure the
+        The remote connection together with the AppPlatform connection is the information the innovaphone SDK extension needs to get access to the AppPlatform, configure the
         service, add an instance, deploy the binary and access the service using SSH to be able to debug it from within Visual Studio. While the PBX connection is used to setup the
-        PBX app object, that is necessary for the UI to work and to let the PBX connect to your service via websocket. Please note that this also will enable the developer mode on
-        both, the PBX as well as the App Platform.
+        PBX app object, that is necessary for the UI to work and to let the PBX connect to your service via WebSocket. Please note that this also will enable the developer mode on
+        both, the PBX as well as the AppPlatform.
     </p>
     <p>
         The following graph give you an overview. You can see, how the innovaphone SDK extension uses the AppPlatform connection communicates with the AppPlatform manager, while
@@ -205,14 +155,11 @@
     <p>
         The first of that connections you will be asked about, is the remote connection. The name of this connection - which is the name of the service and because of this should always
         be the same as the name of the project - will also be used to setup the database system. So if there is a connection with the same name as your project available, this connection
-        will be selected by default. If not, you need to create a new one (see below)
+        will be selected by default. If not, you need to create a new one by opening the drop down box and clicking on "Create new connection":<br/><br/>
+        <img src="pics/VSE_Add_Remote_Connection.png">
     </p>
     <p>
-        <b>NOTE:</b> Connections only be available for debug builds and depends on the selected platform (arm or x64). By default, a new project will have arm selected. If that isn't the
-        platform you're gonna use, just click cancel, switch to the desired platform and dialog to assign a new connection should be shown again. You also can open the dialog by clicking
-        on themenu Tools - innovaphone SDK - Assign remote connection...<br/><br/>
-        If you have a remote connection created already (e. G. for another project), Visual Studio might use that one as default, which is wrong. In that case you have to open the
-        Assign remote connection dialog to assign an existing or create a new one.
+        <b>NOTE:</b> Connections only be available for debug builds and depends on the selected platform (arm or x64).
     </p>
     
     <br/>
@@ -223,15 +170,15 @@
         learn about howto add a new AppPlatform connection). After adding a new AppPlatform connection, it will automatically be selected in the dialog.
     </p>
     <p>
-        After selecting the AppPlatform connection, or in case that the connection has been selected automatically, all services the AppPlatform knows will be placed int the combo box
+        After selecting the AppPlatform connection, or in case that the connection has been selected automatically, all services the AppPlatform knows will be placed in the combo box
         "Service name". If there is a service that name matches the name of your new app, that name will be selected automatically. If not, do not use an other service name. Generally the
         service name (which finally will be the remote connection) must be the same as the name of your app. Note that some names are reserved. In that case, you will get an error message
         and need to change the name of your project.
     </p>
     <p>
-        Also make sure that "Assign PBX AppObject" is selected. (If you can not select it, there is no PBX connection assigned with the App Platform connection). The available app objects
+        Also make sure that "Assign PBX AppObject" is selected. (If you cannot select it, there is no PBX connection assigned with the AppPlatform connection). The available app objects
         will be listed in the "AppObjct name" dropdown box and - you might guess it - if one of them combines with the name of your app, it will be selected. If not, enter a name (and yes,
-        again use the same as the name of your object). The AppObject URI will be entered automatically buy using the IP address of the App Platform and the name of your app. You can change
+        again use the same as the name of your object). The AppObject URI will be entered automatically buy using the IP address of the AppPlatform and the name of your app. You can change
         it, if you want by editing the app object in the PBX admin page.<br/><br/>
         <img src="pics/VSE_Add_Remote_Connection.png"><br/>
         <br/>
@@ -240,16 +187,16 @@
     </p>
     
     <br/>
-    <h3><a name="newappplatformconnection">New App Platform connection</a></h3>
+    <h3><a name="newappplatformconnection">New AppPlatform connection</a></h3>
     <p>
-        Adding a new App Platform connection is quite simple. Only a couple of data must be given. This is a unique name for the connection, the IP address of the App Platform and the password
+        Adding a new AppPlatform connection is quite simple. Only a couple of data must be given. This is a unique name for the connection, the IP address of the AppPlatform and the password
         (generally the administration password given during the installation of the PBX - is the same needed when accessing the app manager using a browser). Even if you can create such
         a connection without a PBX connection, it generally is not a good idea. So also enter the IP address of PBX with the admin user name (generally admin, if not changed) and the password
         (also set during installation).<br/><br/>
         <img src="pics/VSE_New_AppPlatform_Connection.png">
     </p>
     <p>
-        To finalize click on connect. The innovaphone SDK extension will now establish a connection to the App Platform and PBX, enable developer mode for both of them and save the App Platform
+        To finalize click on connect. The innovaphone SDK extension will now establish a connection to the AppPlatform and PBX, enable developer mode for both of them and save the AppPlatform
         connection, which can now be used. In case of an error, you will get an message telling you why the connection could not be established.
     </p>
     <p>
@@ -266,7 +213,7 @@
     </p>
 
     <br/>
-    <h3><a href="additional_tipps">Additional tipps for development</a></h3>
+    <h3><a href="#additional_tools">Additional tipps development</a></h3>
     <p>
         Beside the debugging capatilities, here are some additional tipps:
     </p>
@@ -279,7 +226,7 @@
         <br/>
         <b><u>Use valgrind</u></b><br/>
         Valgrind is a tool to find memory related problems in an app. While the drawback is, that your app will run very slow (up to 40% slower), but only during the debugging session using valgrind.
-        An other drawback is, that you need to run valgrind manually. You need to connect to the App Platform using a SSH terminal and use the user for your app to login. The user and password normaly
+        An other drawback is, that you need to run valgrind manually. You need to connect to the AppPlatform using a SSH terminal and use the user for your app to login. The user and password normaly
         is the same as the name of your app, all in lower case. You also can use the innovaphone SDK menus to start a SSH terminal session (see below). When logged in, use the following commands to
         start valgrind with your app (replacing "appname" with the name of your application):<br/>
     </p>
@@ -367,21 +314,21 @@
         <li><b>Show documentation:</b> Will open the innovaphone SDK documentation.</li>
         <li><b>Install / Update SDK:</b> Using this menu item will open the dialog to install or update the SDK into your project. This can also be used to reinstall the SDK if you accidentally delete some files of the SDK.</li>
         <li><b>Assign remote connection:</b> This is to assign (which also means change) the remote connection used for the project.</li>
-        <li><b>App Platform admin:</b> This will open the App Platform manager where you can manage the available services and instances.</li>
+        <li><b>AppPlatform admin:</b> This will open the AppPlatform manager where you can manage the available services and instances.</li>
         <li><b>PBX admin:</b> This will open the PBX UI where you can manage the PBX which also includes the management of the available PBX app objects, users, etc.</li>
         <li><b>Linux terminal:</b> This will open PuTTY (or KiTTY) to give you access to a SSH terminal. This option will be greyed out if not SSH terminal application had been
                                    defined buy the innovaphone SDK setup. You can run the setup again to define or change it (e. G. from PuTTY to KiTTY).</li>
-        <li><b>WinSCP (current app):</b> Will open WinSCP to connect to the App Platform. The user for the connection is the one for your app (the same as used by the remote connection). This
+        <li><b>WinSCP (current app):</b> Will open WinSCP to connect to the AppPlatform. The user for the connection is the one for your app (the same as used by the remote connection). This
                                          helps copying additional files to your apps directory, if need. With this, you only have access to your apps directory.</li>
-        <li><b>WinSCP (Admin):</b> Will open WinSCP to connect to the App Platform. The user for the connection is the admin user giving you access to nearly all files. Note that it is the
-                                   admin user of the App Platform and not the root user from the underlying Linux OS.</li>
+        <li><b>WinSCP (Admin):</b> Will open WinSCP to connect to the AppPlatform. The user for the connection is the admin user giving you access to nearly all files. Note that it is the
+                                   admin user of the AppPlatform and not the root user from the underlying Linux OS.</li>
     </ul>
     
     <br/>
     <h3><a name="connection_manager">The Connection Manager</a></h3>
     <p>
-        The innovaphone Connection Manager is the place where you can edit and add Remote Connections as well as App Platform Connections. You have two tabs The first one is "Remote Connection", where you
-        can remove and test connections as well as add new ones. The second one is "App Platform Connections". Beside removing, testing and addin new connections, you can also access the App Platform
+        The innovaphone Connection Manager is the place where you can edit and add Remote Connections as well as AppPlatform Connections. You have two tabs The first one is "Remote Connection", where you
+        can remove and test connections as well as add new ones. The second one is "AppPlatform Connections". Beside removing, testing and addin new connections, you can also access the AppPlatform
         manager of a selected connection as well as the PBX UI assigned to it. Not that whatever changed had been made, they only will be saved when closing the Connection Manager by clicking on Accept.
         If the Connection Manager will be closed by pressing ESC or clicking on the X of the windows, changes made will be discarded.
     </p>
@@ -416,8 +363,8 @@
         A: This message can be ignored. Click on <i>Do not show again</i> to dismiss the error message.<br/>
         <br/>
         Q: Everything works, but it seems that there is not VisualStudioPackage directory under %APPDATA%\innovaphone.<br/>
-        A: Maybe that directory for the connection store had been changed. Look to the registry under HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\innovaphone\innovaphoneSDK, the key App PlatformStore. Be
-           careful to not edit the values in the registry until you're completely know what you're doing.<br/>
+        A: Maybe that directory for the connection store had been changed. Look to the registry under HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\innovaphone\innovaphoneSDK, the key AppPlatformStore. Be
+           careful to not edit the values in the registry until you completely know what you're doing.<br/>
         <br/>
         Q: I've accidentally deleted the connection info in the Visual Studio options under cross platform. What can I do now?<br/>
         A: Open the innovaphone SDK Connection Manager, delete every entry depending on the deleted Linux connection and create them again. Note that you also need to reassign that connection to
@@ -430,7 +377,10 @@
         A: When not assigning a remote connection, Visual Studio will take the first connection available. But this won't work, so you need to assign it before you try to run and debug your app.<br/>
         <br/>
         Q: When I try to run the app, it take a long time trying to upload the binary and finally I get an error message.<br/>
-        A: Make sure the App Platform is available. Also the <i>developer mode</i> must be enabled. To check this, open the App Platform Admin (using the innovaphone SDK menu in Visual Studio - the default password is pwd), go to Settings - General and check, if 'Enable developer mode' and 'Disable App security' are checked (note that 'Disable App security is only available, until 'Enable developer mode' has been enabled and the change had been saved).<br/>
+        A: Make sure the AppPlatform is available. Also the <i>developer mode</i> must be enabled. To check this, open the AppPlatform Admin (using the innovaphone SDK menu in Visual Studio - the default password is pwd), go to Settings - General and check, if 'Enable developer mode' and 'Disable App security' are checked (note that 'Disable App security is only available, until 'Enable developer mode' has been enabled and the change had been saved).<br/>
+        <br/>
+        Q: While trying to add a new connection in the "Add App Platform connection" dialogue i get an error message: "innovaphone SDK - Add App Platform connection, Mismatched App Platform Type. You've entered an address for an App Platform of type x64. However, this operation requires an App Platform of type ARM. Please provide a valid address for the correct type of App Platform." <br/>
+        A: The architecture (ARM, ARM64, x86) of the App Platform that is being added does not match the architecture of solution platform selected for the debugging in the Visual Studio. Cancel the process of adding a new App Platform connection, set the SolutionS Platform according to the architecture of the App Platform that will be added (e.g. "x86" for Hyper-V/VMWare, "ARM" for IP811, "ARM64" for IP6013) and try to add the App Platform connection again.<br/>
         <br/>
         Q: I run the app, but in myApps on my developer PBX, the app is not available.<br/>
         A: Maybe the app is not connected to the PBX or not assigned to the PBX user you use for development. Open the PBX Admin (using the innovaphone SDK menu in Visual Studio), go to PBX - Objects and click on show. Click on the user you're using for development, select Apps and make sure, that the app you're want to use is selected. If not, click on OK (maybe you need to scroll down a little). Note: If you're opening the PBX Admin and there is the install UI, select on manual configuration and click on continue.<br/>

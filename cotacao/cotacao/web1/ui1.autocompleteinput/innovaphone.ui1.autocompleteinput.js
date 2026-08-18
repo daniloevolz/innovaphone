@@ -4,13 +4,14 @@
 innovaphone = innovaphone || {};
 innovaphone.ui1 = innovaphone.ui1 || {};
 
-innovaphone.ui1.AutoCompleteInputConfig = innovaphone.ui1.AutoCompleteInputConfig || function (inputStyle, inputCl, suggestionStyle, suggestionCl, suggestionHighlightCl, dropDownCl) {
+innovaphone.ui1.AutoCompleteInputConfig = innovaphone.ui1.AutoCompleteInputConfig || function (inputStyle, inputCl, suggestionStyle, suggestionCl, suggestionHighlightCl, dropDownCl, disableMultiValue) {
     this.inputStyle = inputStyle;
     this.inputCl = inputCl;
     this.suggestionStyle = suggestionStyle;
     this.suggestionCl = suggestionCl;
     this.suggestionHighlightCl = suggestionHighlightCl;
     this.dropDownCl = dropDownCl;
+    this.disableMultiValue = disableMultiValue;
 }
 
 innovaphone.ui1.AutoCompleteInput = innovaphone.ui1.AutoCompleteInput || function (style, cl, config) {
@@ -38,27 +39,32 @@ innovaphone.ui1.AutoCompleteInput = innovaphone.ui1.AutoCompleteInput || functio
     
     function getCurrentValue() {
         var currentValue = inputBoxThis.value();
+        if (config.disableMultiValue) return currentValue;
+
         var valueArray = currentValue.split(separator);
         return valueArray[valueArray.length - 1];
-
     }
 
     function setNewValue(newValue) {
-        var currentValue = inputBoxThis.value(),
-            lastComma = currentValue.lastIndexOf(separator),
-            finalValue = currentValue.substring(0, lastComma + 1),
-            toChop = currentValue.substring(lastComma + 1, currentValue.length),
-            firstNonSpace = toChop.search(/\S|$/),
-            lastSpace = toChop.lastIndexOf(" "),
-            lastNonSpace = toChop.replace(/\s*$/, "").length;
-
-        finalValue += toChop.substring(0, firstNonSpace);
-        finalValue += newValue;
-        if (lastNonSpace > 0) {
-            finalValue += toChop.substring(lastNonSpace, toChop.length);
+        if (config.disableMultiValue) {
+            inputBoxThis.setValue(newValue);
         }
+        else {
+            var currentValue = inputBoxThis.value(),
+                lastComma = currentValue.lastIndexOf(separator),
+                finalValue = currentValue.substring(0, lastComma + 1),
+                toChop = currentValue.substring(lastComma + 1, currentValue.length),
+                firstNonSpace = toChop.search(/\S|$/),
+                lastSpace = toChop.lastIndexOf(" "),
+                lastNonSpace = toChop.replace(/\s*$/, "").length;
 
-        inputBoxThis.setValue(finalValue);
+            finalValue += toChop.substring(0, firstNonSpace);
+            finalValue += newValue;
+            if (lastNonSpace > 0) {
+                finalValue += toChop.substring(lastNonSpace, toChop.length);
+            }
+            inputBoxThis.setValue(finalValue);
+        }
     }
     
     function AutoSuggestControl(textbox) {

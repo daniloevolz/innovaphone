@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.monitoradminobjectinfo.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": ["PbxAdminApi"]
+      },
+      "mt": {
+        "type": "string",
+        "enum": ["MonitorAdminObjectInfo"]
+      },
+      "pwd": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      }
+    }
+}

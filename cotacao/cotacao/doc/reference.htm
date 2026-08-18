@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>App Service Interfaces</title>
+    <title>Reference</title>
     <link rel="stylesheet" href="../web1/doc/innovaphone.doc.css" type="text/css" />
     <link rel="stylesheet" href="../web1/doc/vs.css">
     <script src="../web1/doc/highlight.pack.js"></script>
@@ -72,6 +72,7 @@
         <tr><td><b><a href="../sdk/common/interface/worker.htm">worker</a></b></td><td> Run intensive tasks in a separate process.</td></tr>
         <tr><td><b><a href="../sdk/common/interface/system.htm">system</a></b></td><td>Interface to access system information.</td></tr>
         <tr><td><b><a href="../sdk/common/interface/users.htm">users</a></b></td><td>System user tools.</td></tr>
+        <tr><td><b><a href="../sdk/common/interface/translation.htm">translation</a></b></td><td>Translation of Texts with an external service.</td></tr>
     </table>
 
     <a name="CPP_AppPlatformLibraries"></a><h3>App Platform Libraries</h3>
@@ -136,6 +137,7 @@
         <tr><td><b><a href="../sdk/common/lib/httplib.htm">httplib</a></b></td><td>A set of classes to parse and create HTTP headers.</td></tr>
         <tr><td><b><a href="../sdk/common/interface/pdf.htm">pdf</a></b></td><td>Creation of PDF documents.</td></tr>
         <tr><td><b><a href="../sdk/common/interface/certificates.htm">certificates</a></b></td><td>Class to handle certificates.</td></tr>
+        <tr><td><b><a href="../common/ilib/zip.htm">zip</a></b></td><td>Simple librarary for creating small, uncompressed ZIP files.</td></tr>
     </table>
 
     <h4>Data types and structures</h4>
@@ -179,6 +181,7 @@
         <tr><td><b><a href="./javascript/Timers.htm">Timers</a></b></td><td>Library for timers.</td></tr>
         <tr><td><b><a href="./javascript/WebServer.htm">WebServer</a></b></td><td>Library for incoming HTTP requests.</td></tr>
         <tr><td><b><a href="./javascript/WebsocketClient.htm">WebsocketClient</a></b></td><td>Library for outgoing Websocket connections.</td></tr>
+        <tr><td><b><a href="./javascript/FileSystem.htm">FileSystem</a></b></td><td>Library for reading files.</td></tr>
     </table>
 
     <a name="JS_library"></a><h2>JavaScript library for Apps</h2>
@@ -192,6 +195,7 @@
         <tr><td><b><a href="../web1/lib1/lib1.htm">lib1</a></b></td><td>The fundamental library that is needed for all apps. It defines that start object that is the interface to the app runtime inside myApps. It also includes functions for translated texts and events.</td></tr>
         <tr><td><b><a href="../web1/appwebsocket/appwebsocket.htm">appwebsocket</a></b></td><td>Library for authentication and communicating with the app service using a websocket connection.</td></tr>
         <tr><td><b><a href="../web1/crypto/crypto.htm">crypto</a></b></td><td>Library for encryption, decryption and hashes.</td></tr>
+        <tr><td><b><a href="../web1/crypto/crypto_ecdh.htm">crypto.ecdh</a></b></td><td>Library for ECDH(E) key agreement.</td></tr>
         <tr><td><b><a href="../web1/config/config.htm">config</a></b></td><td>Library for configuration of the app.</td></tr>
         <tr><td><b><a href="../web1/countries/countries.htm">countries</a></b></td><td>List of country names in English and in the local language.</td></tr>
         <tr><td><b><a href="../web1/phonenumber/phonenumber.htm">phonenumber</a></b></td><td>Library that contains various functions related to phone numbers.</td></tr>
@@ -210,6 +214,7 @@
         <tr><td><b><a href="../web1/ui1.radiobutton/ui1.radiobutton.htm">ui1.radiobutton</a></b></td><td>Radio button</td></tr>
         <tr><td><b><a href="../web1/ui1.scrolling/ui1.scrolling.htm">ui1.scrolling</a></b></td><td>Container with styled scrollbar</td></tr>
         <tr><td><b><a href="../web1/ui1.switch/ui1.switch.htm">ui1.switch</a></b></td><td>On/off switch</td></tr>
+        <tr><td><b><a href="../web1/ui1.table/ui1.table.htm">ui1.table</a></b></td><td>Responsive HTML table</td></tr>
         <tr><td><b><a href="../web1/ui1.popup/ui1.popup.htm">ui1.popup</a></b></td><td>Popup</td></tr>
         <tr><td><b><a href="../web1/fonts/fonts.htm">fonts</a></b></td><td>Collection of fonts used in the innovaphone apps.</td></tr>
     </table>
@@ -318,6 +323,12 @@
             <td><b><a href="../web1/com.innovaphone.discussion/com.innovaphone.discussion.htm">com.innovaphone.discussion</a></b></td>
             <td>
                 Create an iframe containing a discussion
+            </td>
+        </tr>
+        <tr>
+            <td><b><a href="../web1/com.innovaphone.autostart/com.innovaphone.autostart.htm">com.innovaphone.autostart</a></b></td>
+            <td>
+                Autostart without user interaction for hidden apps.
             </td>
         </tr>
     </table>
@@ -480,6 +491,19 @@
             <td>
                 In phones as in gateway media-relay interfaces a recording URL can be configured, which
                 is used to write media data of any calls to a HTTP server.
+            </td>
+        </tr>
+    </table>
+
+    <h3>PBX Interface</h3>
+    <p>
+        There are PBX-Interfaces, which can be used by an app.
+    </p>
+    <table>
+        <tr>
+            <td><b><a href="pbx/textmedia.htm">Textmedia</a></b></td>
+            <td>
+                The PBX provides an interface for the transcription of Speech to Text.
             </td>
         </tr>
     </table>

@@ -37,7 +37,7 @@
 var innovaphone = innovaphone || {};
 innovaphone.appwebsocket = innovaphone.appwebsocket || {};
 innovaphone.appwebsocket.Test = innovaphone.appwebsocket.Test || {};
-innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || function (url, app, password, domain, fonconnected, fonmessage, fonerror, fonclosed, fgetlogin) {
+innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || function (url, app, password, domain, fonconnected, fonmessage, fonerror, fonclosed, fgetlogin, usr) {
     console.log("AppWebsocket(" + app + ") " + url);
     var TIMEOUT_MIN = 500,
         TIMEOUT_MAX = 32000,
@@ -51,6 +51,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         user = null,
         dn = null,
         sessionKey = null,
+        info = null,
         unique = 0,
         timeout = TIMEOUT_MIN,
         keepAlive = false,
@@ -75,7 +76,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         if (instance.checkBuild) {
             send({ mt: "CheckBuild", url: location.href });
         }
-        send({ mt: "AppChallenge" });
+        send({ mt: "AppChallenge", user:usr });
     }
 
     function onmessage(message) {
@@ -90,10 +91,11 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     else if (window.self == window.top) adminLogin(obj.challenge);
                     else {
                         loginSrc =  "" + Math.round(Math.random() * 1000000000);
-                        window.parent.postMessage(JSON.stringify({ mt: "getLogin", src: loginSrc, app: app, challenge: obj.challenge }), "*");
+                        window.parent.postMessage(JSON.stringify({ mt: "getLogin", src: loginSrc, app: app, challenge: obj.challenge, nonce: obj.nonce, dn: obj.dn }), "*");
                     }
                     break;
                 case "AppLoginResult":
+                    window.parent.postMessage(JSON.stringify({ mt: "loginResult", ok: obj.ok }), "*");
                     if (obj.ok) {
                         timeout = TIMEOUT_MIN;
                         state = states.CONNECTED;
@@ -171,6 +173,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         domain = obj.domain;
         dn = obj.dn;
         sessionKey = obj.key;
+        info = obj.info;
         delete obj.key;
         send({ mt: "AppLogin", app: obj.app, domain: obj.domain, sip: obj.sip, guid: obj.guid, dn: obj.dn, info: obj.info, digest: obj.digest, pbxObj: app });
     }
@@ -412,6 +415,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     this.decrypt = decrypt;
     this.hash = hash;
     this.key = function () { return sessionKey; };
+    this.info = function () { return info; };
 
     // public event handlers
     // session
@@ -459,6 +463,10 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         }
         this.close = function () {
             if (srcs.find(function (s) { return s.src == src })) srcs.splice(srcs.indexOf(this), 1);
+        }
+        this.restart = function () {
+            src = "src" + unique++;
+            this.src = src;
         }
         var s = srcs.find(function (s) { return s.src == src });
         if (s) {

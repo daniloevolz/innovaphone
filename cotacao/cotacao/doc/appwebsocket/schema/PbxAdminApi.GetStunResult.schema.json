@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getstunresult.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetStunResult"
+        ]
+      },
+      "stun":{"type":"string"},
+      "turn":{"type":"string"},
+      "turnUsr":{"type":"string"},
+      "turnPwd":{"type":"string"},
+      "stunSlow":{"type":"boolean"}
+    },
+    "additionalProperties": false,
+    "required": ["api", "mt", "stun", "turn", "turnUsr", "turnPwd", "stunSlow"]
+}

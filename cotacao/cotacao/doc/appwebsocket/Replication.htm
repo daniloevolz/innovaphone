@@ -61,6 +61,8 @@
 	<pre><code class="json">{
     "api": TableName,
     "mt": "ReplicateStart",
+    "guid": hexstring,
+    "usn": ulong64,
     "add": bool,
     "del": bool,
     "columns": <a href="#Columns">Columns</a>
@@ -71,6 +73,19 @@
         indicates it it ís able to add or delete rows and provides a list of columns it is interessted
         in.
     </p>
+
+    <dl>
+        <dt>guid</dt>
+        <dd>
+            This is a GUID as a hex string which identifies the replicated database. If this matches to guid stored on
+            the server side, only changes from the last replication have tp be sent.
+        </dd>
+        <dt>usn</dt>
+        <dd>
+            This is an "update sequence number" identifying the last information already replicated. Only rows with a higher
+            usn need to be replicated.
+        </dd>
+    </dl>
 	
 	<a name="ReplicateNext"><h2>ReplicateNext</h2></a>
 
@@ -120,6 +135,8 @@
 	<pre><code class="json">{
     "api": TableName,
     "mt": "ReplicateStartResult",
+    "guid": hexstring,
+    "usn": ulong64,
     "columns": <a href="#Columns">Columns</a>
 }</code></pre>
 
@@ -128,16 +145,37 @@
         avaliable on the publisher are indicated in this message
     </p>
 
+    <dl>
+        <dt>guid</dt>
+        <dd>
+            A GUID which identifies the connected database as a hex string. The replicator has to store this GUID and use it
+            when restarting the replication with a ReplicateStart message so that only updates need to be sent.
+        </dd>
+        <dt>usn</dt>
+        <dd>
+            The update sequence number, at which the replication continues.
+        </dd>
+    </dl>
+
 	<a name="ReplicateNextResult"><h2>ReplicateNextResult</h2></a>
 
 	<pre><code class="json">{
     "api": TableName,
-    "mt": "ReplicateAdd",
+    "mt": "ReplicateNextResult",
+    "usn": ulong64,
     "columns": <a href="#Columns">Columns</a>
 }</code></pre>
 
     <p>
     </p>
+
+    <dl>
+        <dt>usn</dt>
+        <dd>
+            The update sequence number of this row. The replicator should store the latest usn so that replication
+            can continue at this point.
+        </dd>
+    </dl>
 
 	<a name="Objects"><h2>Objects</h2></a>
 

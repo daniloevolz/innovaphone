@@ -156,6 +156,7 @@
         <tr><td class="param">string <b>sip </b></td><td>The SIP name of the provisioning user (optional).</td></tr>
         <tr><td class="param">boolean <b>rollout </b></td><td>If true, the provisioning code will be valid for 7 days, otherwise 15 minutes (optional, default false).</td></tr>
         <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+        <tr><td class="param">boolean <b>administrative </b></td><td>If true, the provisioned device will get the domain password as administrative password if the domain checkword to set these passwords is checked. (optional, default false)</td></tr>
     </table>
 
     <h3>GetProvisioningCodeResult</h3>    
@@ -174,7 +175,7 @@
 
     <p>
         Gets the device provisioned with a certain code. This is useful if a provisioning was interrupted and might have been finished in the meantime.<br/>
-        If not, a <a href="#DeviceProvisioned">DeviceProvisioned</a> message will be triggered later.
+        If not yet finished, a <a href="#DeviceProvisioned">DeviceProvisioned</a> message will be triggered on the actual provisioning.
     </p>
     <h4>Parameters</h4>
     <table style="margin-left:-12px">
@@ -445,7 +446,8 @@
         <tr><td class="param">string <b>url </b></td><td>The URL of an alarm server (optional).</td></tr>
         <tr><td class="param">string <b>logUrl </b></td><td>The URL of a logging server (optional).</td></tr>
         <tr><td class="param">string <b>logUser </b></td><td>The user name used for HTTP authentication (optional).</td></tr>
-        <tr><td class="param">string <b>logPassword </b></td><td>The password used for HTTP authentication, encrypted with the AppWebsocket encryption function and url value as seed (optional).</td></tr>
+        <tr><td class="param">string <b>logPassword </b></td><td>The password used for HTTP authentication, encrypted with the AppWebsocket encryption function (optional).</td></tr>
+        <tr><td class="param">string <b>seed </b></td><td>The seed used to encrypt the password (optional).</td></tr>
         <tr><td class="param">boolean <b>setLogUrl </b></td><td>If setLogUrl is set, also empty logging URLs are set.</td></tr>        
     </table>
     <p>Note: the logPassword field is transferred encrypted to 3rd party sysclients inside the configuration message! Instead of seed, use logSeed and see <a href="../protocol/sysclient.htm#AMTPassword">for how to decrypt it</a>!</p>
@@ -486,7 +488,8 @@
         <tr><td class="param">string <b>stunServer </b></td><td>STUN server (optional).</td></tr>
         <tr><td class="param">string <b>turnServer </b></td><td>TURN server (optional).</td></tr>
         <tr><td class="param">string <b>turnUser </b></td><td>TURN username (optional).</td></tr>
-        <tr><td class="param">string <b>turnPassword </b></td><td>The password used for TURN authentication, encrypted with the AppWebsocket encryption function and turnServer value as seed(optional).</td></tr>
+        <tr><td class="param">string <b>turnPassword </b></td><td>The password used for TURN authentication, encrypted with the AppWebsocket encryption function (optional).</td></tr>
+        <tr><td class="param">string <b>seed </b></td><td>The seed used to encrypt the password (optional).</td></tr>
         <tr><td class="param">string <b>tosRtp </b></td><td>TOS priority - RTP data. A string represending a hex value between 0x00 and 0xff (optional).</td></tr>
         <tr><td class="param">string <b>tosSig </b></td><td>TOS priority - signaling. A string represending a hex value between 0x00 and 0xff (optional).</td></tr>
         <tr><td class="param">boolean <b>setRtpPorts </b></td><td>If set, the RTP ports are sent (optional).</td></tr>

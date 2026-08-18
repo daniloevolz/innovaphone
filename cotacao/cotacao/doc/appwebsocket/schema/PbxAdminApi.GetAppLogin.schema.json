@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getapplogin.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetAppLogin"
+        ]
+      },
+      "app": {
+        "type": "string"
+      },
+      "challenge": {
+        "type": "string"
+      }
+    },
+    "required": ["api", "mt", "app", "challenge"]
+}

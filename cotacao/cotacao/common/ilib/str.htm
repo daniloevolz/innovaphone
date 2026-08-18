@@ -349,8 +349,36 @@
                 <dd>copy the characters from 'in' to a 64 bit integer, stop at NUL or after 8 characters, fill up with 0 bytes if necessary</dd>
 
             <dt>bool to_tm(const char * s, char ** ptr, struct tm & tm)</dt>
-                <dd>convert a string of the format tt.mm.yy-hh.mm.ss to a struct tm, return true if the format was accepted.<br/>
+                <dd>converts a string of the format tt.mm.yy-hh.mm.ss to a struct tm, return true if the format was accepted.<br/>
                     if 'ptr' is nonzero it points to first not converted character in 's' after return.
+                </dd>
+
+            <dt>unsigned to_time_iso8601(time_t time_gmt, char * out, dword out_len)</dt>
+                <dd>converts a GMT time_t to ISO-8601, e.g. "2005-02-15T11:26:44Z".<br/>
+                    out buffer is zero terminated.<br/>
+                    The length of out is returned.
+                </dd>
+                
+                <dt>unsigned to_time_rfc1123(time_t time_gmt, char * out, dword out_len)</dt>
+                <dd>converts a GMT time_t to ISO-8601, e.g. "Sun, 06 Nov 1994 08:49:37 GMT".<br/>
+                    out buffer is zero terminated.<br/>
+                    The length of out is returned.
+                </dd>
+                
+            <dt>time_t from_time_iso8601(const char * str)</dt>
+                <dd>converts an ISO-8601 string to time_t, e.g. "2005-02-15T07:54:34Z", "2002-11-26T20:27:11.000Z" or "2005-03-15T07:39:42Z-02:35".
+                </dd>
+                
+            <dt>time_t from_time_rfc1123(const char * str)</dt>
+                <dd>converts an RFC 1123 string to time_t, e.g. "Sun, 06 Nov 1994 08:49:37 GMT".
+                </dd>
+                
+            <dt>time_t from_time_rfc1036(const char * str)</dt>
+                <dd>converts an RFC 1036 string to time_t, e.g. "Sunday, 06-Nov-94 08:49:37 GMT".
+                </dd>
+                
+            <dt>time_t from_time_ansi(const char * str)</dt>
+                <dd>converts an ANSI string to time_t, e.g. "Sun Nov 6 08:49:37 1994".
                 </dd>
 
             <dt>bool is_dial_string(const char * s)</dt>

@@ -13,14 +13,14 @@
     <h1>Services</h1>
 
     <p>
-        The Services protocol is available on AppWebsocket connections to innovaphone PBX objects, if
-        the object is enabled for the Services api. It allows an application to find other app services that
-        provide a specific service on incoming AppWebsocket connections. Also a login for the that app service can
-        be optained. With that information an additional AppWebsocket connection can be established to the service.
+        The Services protocol is available on AppWebsocket connections to innovaphone PBX objects if the object is enabled for the 
+        Services API. It allows an application to find other app services that provide a specific service on incoming AppWebsocket 
+        connections. It is also possible to obtain a login for this app service. With this information an additional AppWebsocket 
+        connection to the service can be established.
 	</p>
     <p>
-        For finding and authenticating against a service, the permission for app providing the service must be
-        configured at the own app object.
+        For discovery and authentication against a service, the permission for the app providing the service must be configured on the 
+         own app object.
     </p>
 
 	<a name="General structure"><h2>General structure</h2></a>
@@ -123,7 +123,7 @@
 }</code></pre>
 
     <p>
-        Information about an existing call at at the time of the attach.
+        This message contains information about the services available on this AppWebsocket connection. The first message is delivered immediately after SubscribeServicesResult is received. If there are any any changes to the available services, an additional message is delivered.
     </p>
 
     <dl>

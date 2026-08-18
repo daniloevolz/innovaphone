@@ -71,6 +71,8 @@ phoneinfoApi.onmessage.attach(function (sender, obj) {
     num: "200",
     sip: "charlie.chaplin",
     dn: "Sir Charles Spencer Chaplin",
+    lastDiverting: "David Llewelyn Wark Griffith",
+    originalCalled: "Mary Wayne Marsh",
     state: "Connected"
  }</code></pre>
     
@@ -83,6 +85,8 @@ phoneinfoApi.onmessage.attach(function (sender, obj) {
         <tr><td class="param">string <b>num</b></td><td>Phonenumber (e.g. 202 or +49 7031 73009 0) [optional]</td></tr>
         <tr><td class="param">string <b>sip</b></td><td>SIP-URI (e.g. charlie.chaplin or charlie.chaplin@unitedartists.com) [optional]</td></tr>
         <tr><td class="param">string <b>dn</b></td><td>Displayname [optional]</td></tr>
+        <tr><td class="param">string <b>lastDiverting</b></td><td>Displayname or Phonenumber of last diverting party [optional]</td></tr>
+        <tr><td class="param">string <b>originalCalled</b></td><td>Displayname or Phonenumber of first diverting party [optional]</td></tr>
         <tr><td class="param">string <b>state</b></td><td>Setup | Dialing | Ringback | Queued | Alerting | Connected | Holding | Held | Disconnected [mandatory]</td></tr>
     </table>
 

@@ -60,7 +60,7 @@ innovaphone.Config = innovaphone.Config || function() {
     <h3>Public functions</h3>
     <div class="fnhead">init</div>
     <dd>
-        Initializes the object buy requesting the config items and the current configuration from the C++ Config library.
+        Initializes the object by requesting the config items and the current configuration from the C++ Config library.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -84,8 +84,8 @@ innovaphone.Config = innovaphone.Config || function() {
 
     <div class="fnhead">getItemChoices</div>
     <dd>
-        The C++ library provides an config item with type choice. Those items have a a list of choices. After receiving the items (noted by the evOnConfigItemsReceived event), the list
-        of an choice item can be accessed using getItemChoices.
+        The C++ library provides an config item with type choice. Those items have a list of choices. After receiving the items (noted by the evOnConfigItemsReceived event), the list
+        of a choice item can be accessed using getItemChoices.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -95,7 +95,7 @@ innovaphone.Config = innovaphone.Config || function() {
         </table>
 
         <h4>Return value</h4>
-        If the item given in itemName exist aand is a choice item and have a list of choices, getItemChoices() returns a JavaScript array with all the choices of the items.
+        If the item given in itemName exist and is a choice item and have a list of choices, getItemChoices() returns a JavaScript array with all the choices of the items.
         Else null will be returned.
     </dd>
 
@@ -126,7 +126,7 @@ innovaphone.Config = innovaphone.Config || function() {
         <h4>Remarks</h4>
         Please note that when receiving this event, the current config itself still had not been loaded. This
         will noticed by the evOnConfigLoaded event.<br/>
-        When this event had been reaised, the innovaphone.Config instance will have a property for each config item on the C++ side. The name of the property
+        When this event had been realised, the innovaphone.Config instance will have a property for each config item on the C++ side. The name of the property
         is the same as the name of the config item defined from the app service. See the <a href="../../common/lib/config.htm">C++ Config library</a> docu for details.
     </dd>
 
@@ -143,7 +143,7 @@ innovaphone.Config = innovaphone.Config || function() {
 
     <div class="fnhead">evOnConfigUpdate</div>
     <dd>
-        After cahgnes on the C++ Config side (for example, by an other instance of an app which edited the config), the config items will be send to the Config object and the evOnConfigUpdate
+        After changes on the C++ Config side (for example, by an other instance of an app which edited the config), the config items will be sent to the Config object and the evOnConfigUpdate
         event will be raied. You have to check each config item available to figure out, which one had been updated.
 
         <h4>Parameters</h4>
@@ -155,7 +155,7 @@ innovaphone.Config = innovaphone.Config || function() {
 
     <div class="fnhead">evOnConfigSaveResult</div>
     <dd>
-        After calling save() and after the config had been saved to the databsae on the app-service side, this event will be raised. The event will pass two parameters to an attached event handler.
+        After calling save() and after the config had been saved to the database on the app-service side, this event will be raised. The event will pass two parameters to an attached event handler.
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -165,8 +165,8 @@ innovaphone.Config = innovaphone.Config || function() {
         </table>
 
         <h4>Remarks</h4>
-        Note that the only information about saving the config is, if it was successfull or not. In case of doubts, more informations can be found inside the app-services log (if logging the config
-        is enabled). See see the <a href="../../common/lib/config.htm">C++ Config library</a> docu for details.
+        Note that the only information about saving the config is, if it was successful or not. In case of doubts, more informations can be found inside the app-services log (if logging the config
+        is enabled). See the <a href="../../common/lib/config.htm">C++ Config library</a> docu for details.
     </dd>
 
     <h1> Code Example </h1>

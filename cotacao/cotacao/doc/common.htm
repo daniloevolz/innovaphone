@@ -158,19 +158,80 @@ int main(void)
     </pre>
 
     <h3> App Service and App Instance </h3>
-    <p><div class="fixme">@hna Explain App Services, App Instances and the communication with the Taskmanager.</div></p>
+    <p>
+        Each app should have a main class <i>appservicename</i> (App Service class) which is derived from the base class AppService (found in appservice.h). This base class deals with the comunication with the App Platform Manager by establishing a local unix domain socket. Creation of new instances, stopping and starting them and enabling of log flags options are the core of such information exchange.
+        This class also defines and saves the main provided apps and provided plugins (PBX Manager plugins, if applicable)
+    </p>
+    <pre>
+    class ExampleService : public AppService {
+        //dependencies
+        class IIoMux * iomux;
+        class ISocketProvider * localSocketProvider;
+        class ISocketProvider * tcpSocketProvider;
+        class ISocketProvider * tlsSocketProvider;
+        class IWebserverPluginProvider * webserverPluginProvider;
+        class IDatabaseProvider * databaseProvider;
+
+    public:
+        ExampleService (class IIoMux * const iomux, class ISocketProvider * localSocketProvider, 
+                        class ISocketProvider * tcpSocketProvider, class ISocketProvider * tlsSocketProvider, 
+                        IWebserverPluginProvider * const webserverPluginProvider, class IDatabaseProvider * databaseProvider, AppServiceArgs * args);
+        ~ ExampleService ();
+        //creates the app instance class
+        class AppInstance * CreateInstance(AppInstanceArgs * args) override;
+        // creates and saves the provided apps
+        void AppServiceApps(istd::list<AppServiceApp> * appList) override;
+        //creates and saves the app plugins
+        void AppInstancePlugins(istd::list<AppInstancePlugin> * pluginList) override;
+    };
+    </pre>
+    <p>
+        The <i>ExampleService::CreateInstance(AppInstanceArgs * args)</i> function is then used to create a new app instance with a main class that is derived from the class AppInstance (found in appservice.h).
+    </p>
+    <pre>
+        class AppInstance * ExampleService::CreateInstance(AppInstanceArgs * args) {
+            return new Example(iomux, localSocketProvider, tcpSocketProvider, tlsSocketProvider, webserverPluginProvider, databaseProvider, args);
+        }
+    </pre>
+    <p>The new app instance class listens to incoming WebSocket messages. Therefore, WebSocket functions along with database related methods should be implemented in this class.
+    </p>
+    <pre>
+        class Example: public UWebserverPlugin, public UDatabase, public AppInstance {
+            //dependencies
+            class IIoMux * iomux;
+            class ISocketProvider * tcpSocketProvider;
+            class ISocketProvider * tlsSocketProvider;
+            class IWebserverPlugin * webserverPlugin;
+        public:
+            Example (IIoMux * const iomux, ISocketProvider * localSocketProvider, class ISocketProvider * tcpSocketProvider, 
+                     class ISocketProvider * tlsSocketProvider, IWebserverPluginProvider * const webserverPluginProvider, 
+                     IDatabaseProvider * databaseProvider, struct AppInstanceArgs * args);
+            ~ Example ();
+
+            void Stop() override;
+            //websocket and database methods
+            void WebserverPluginWebsocketListenResult(IWebserverPlugin * plugin, const char * path, const char * registeredPathForRequest, const char * host) override;
+            void DatabaseConnectComplete(IDatabase * const database) override;
+            void DatabaseShutdown(IDatabase * const database, db_error_t reason) override;
+            void DatabaseError(IDatabase * const database, db_error_t error) override;
+        };
+    </pre>
+    <p>
+        When an app is stopped, the function <i>Example::Stop()</i> is called. This function should be implemented in the main class and should close all WebSocket, database or HTTP connections. 
+        When all the connections are terminated, a call to <i>AppService::AppStopped(class AppInstance * instance)</i> is needed indicating that the app has stopped completely.
+    </p>
 
     <h3> Including HTTP static files </h3>
     <p>
         The App hosted by the App Service is a web application that consists of a number of static files. That files need to be included in the binary of the App Service. In order to achieve that you need to
-        <ul>
-            <li>include "common/interface/httpfile.h" inside the main.cpp.</li>
-            <li>add instructions to the make file appname/apps/apps.mak to include the needed files.</li>
+    <ul>
+    <li>include "common/interface/httpfile.h" inside the main.cpp.</li>
+    <li>add instructions to the make file appname/apps/apps.mak to include the needed files.</li>
         </ul>
     </p>
     <p>
         Example:
-        <pre>
+    <pre>
 $(OUTDIR)/obj/apps.cpp: apidemo/apps/*.*
     $(IP_SRC)/exe/httpfiles -k -d apidemo/apps -t $(OUTDIR) -o $(OUTDIR)/obj/apps.cpp \
     apidemo.htm,0,HTTP_GZIP \
@@ -190,7 +251,7 @@ $(OUTDIR)/obj/apps.cpp: apidemo/apps/*.*
     <h3> Braces </h3>
     <p>
         In general opening braces are put on the same line. Closing braces are put on a line on their own.
-        <pre>
+    <pre>
 if (x > 3) {
     ...
 }
@@ -201,7 +262,7 @@ else {
         </p>
     <p>
         However, there is one special case, namely functions: they have the opening brace at the beginning of the next line.
-        <pre>
+    <pre>
 int MyFunction(int x)
 {
     ...
@@ -215,20 +276,20 @@ int MyFunction(int x)
     <p>
         Additional spaces do not necessarily make code more readable. It is better to use spaces 
         the same way as in common written language or in mathematical expressions. 
-        <ul>
-            <li>No space before ','</li>
-            <li>No space before ';'</li>
-            <li>No space before ')'</li>
-            <li>No space between function names and '('</li>
+    <ul>
+    <li>No space before ','</li>
+    <li>No space before ';'</li>
+    <li>No space before ')'</li>
+    <li>No space between function names and '('</li>
         </ul>
         But
-        <ul>
-            <li>Single space after ','</li>
-            <li>Single space after ';'</li>
-            <li>Single space before and after operators (e.g. '=', '==', '+', ...)</li>
-            <li>Single space after keywords (e.g. 'if', 'while', ...)</li>
+    <ul>
+    <li>Single space after ','</li>
+    <li>Single space after ';'</li>
+    <li>Single space before and after operators (e.g. '=', '==', '+', ...)</li>
+    <li>Single space after keywords (e.g. 'if', 'while', ...)</li>
         </ul>
-        <pre>
+    <pre>
 int MyFunction(int a, int b, int c)
 {
     ...
@@ -318,7 +379,7 @@ public:
     </p>
     <p>
         Example:
-        <pre>
+    <pre>
 class ITask {
 public:
     virtual void Start(class UTask * user) = 0;

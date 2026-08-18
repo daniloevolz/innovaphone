@@ -28,14 +28,18 @@
     <p>
         Login messages
         <ul>
+            <li><a href="#LoginInfo">LoginInfo</a></li>
+            <li><a href="#LoginInfoResult">LoginInfoResult</a></li>
             <li><a href="#Login">Login</a></li>
             <li><a href="#Authenticate">Authenticate</a></li>
             <li><a href="#Authorize">Authorize</a></li>
             <li><a href="#LoginResult">LoginResult</a></li>
             <li><a href="#Redirect">Redirect</a></li>
+            <li><a href="#LoginCancel">LoginCancel</a></li>
             <li><a href="#Logout">Logout</a></li>
             <li><a href="#LogoutResult">LogoutResult</a></li>
             <li><a href="#StandbyBack">StandbyBack</a></li>
+            <li><a href="#Disconnect">Disconnect</a></li>
         </ul>
     </p>
     <p>
@@ -69,12 +73,28 @@
 
     <h2>Message Flow</h2>
 
+    <h3>Session and user authentication with the "digest method".</h3>
+
     <p>
         This message flow shows an attempt to login using session data from previous successful login. In this case the attempt fails with "Session expired" error. The following login with user credentials succeeds after a 2FA confirmation.
     </p>
 
     <p>
-        <img src="myAppsAppLoginSequence.svg" alt="AppLogin Sequence Diagramm"/>
+        <img src="myAppsAppLoginSequence.svg" alt="AppLogin Sequence Diagramm" />
+    </p>
+
+    <h3>User authentication with the "oauth2" method.</h3>
+
+    <p>
+        This message flow shows a login flow using OAuth2 and 2FA.
+        In that case the username and password are not verified by the PBX, but by an external ID provider.
+        The username is taken from the ID token and sent from the PBX to the myApps client. Instead of the password
+        that is unknown by the PBX and the myApps client, an ECDHE handshake is done in order to create a shared secret.
+        That shared secret is used instead of the user's password.
+    </p>
+
+    <p>
+        <img src="myAppsAppLoginSequenceOAuth2.svg" alt="AppLogin Sequence Diagramm" />
     </p>
 
     <h2>Messages</h2>
@@ -100,12 +120,17 @@
     </p>
 <pre><code class="json">{
     "mt": "CheckBuild",
-    "url": string
+    "url": string,
+    "always": boolean
 }</code></pre>
     <dl>
         <dt>url</dt>
         <dd>
             The URL of the used HTML page.
+        </dd>
+        <dt>always</dt>
+        <dd>
+            true, if the <code>CheckBuildResult</code> should trigger a redirect in any case. undefined otherwise.
         </dd>
     </dl>
 
@@ -116,6 +141,7 @@
 <pre><code class="json">{
     "mt": "CheckBuildResult",
     "url": string,
+    "version": string,
     "build": string,
     "launcherUpdateBuild": string,
 }</code></pre>
@@ -123,6 +149,10 @@
         <dt>url</dt>
         <dd>
             Given, if a redirect is needed. The new URL should be loaded instead of the URL from the CheckBuild message.
+        </dd>
+        <dt>build</dt>
+        <dd>
+            The version of the PBX firmware, e.g. "13r3".
         </dd>
         <dt>build</dt>
         <dd>
@@ -171,10 +201,70 @@
         </dd>
     </dl>
 
+    <a name="LoginInfo"></a><div class="fnhead">LoginInfo</div>
+    <p>
+        Sent by the client.
+    </p>
+    <p>
+        This message can be used to query the available authentication methods on the PBX. The PBX answers with the <a href="#LoginInfoResult">LoginInfoResult</a> message.
+    </p>
+<pre><code class="json">{
+    "mt": "LoginInfo"
+}</code></pre>
+
+    <a name="LoginInfoResult"></a><div class="fnhead">LoginInfoResult</div>
+    <p>
+        Sent by the PBX.
+    </p>
+    <p>
+        This message is sent by the PBX as an answer to the <a href="#LoginInfo">LoginInfo</a> message and contains the activated authentication methods.
+    </p>
+    <p>
+        Depending on the activated methods for login type "user" the client should display different elements in the login screen.
+        <ul>
+            <li>A login form including username and password (for digest and ntlm)</li>
+            <li>A "Login with Windows" button (for oauth2)</li>
+        </ul>
+    </p>
+<pre><code class="json">{
+    "mt": "LoginInfo",
+    "user": {
+        "digest": bool,
+        "ntlm": bool,
+        "oauth2": bool
+    },
+    "session": {
+        "digest": bool
+    }
+}</code></pre>
+    <dl>
+        <dt>user</dt>
+        <dd>
+            An object containing the available authentication methods for login type "user".
+        </dd>
+        <dt>session</dt>
+        <dd>
+            An object containing the available authentication methods for login type "session".
+        </dd>
+        <dt>digest</dt>
+        <dd>
+            true, if the method "digest" is available.
+        </dd>
+        <dt>ntlm</dt>
+        <dd>
+            true, if the method "ntlm" is available.
+        </dd>
+        <dt>oauth2</dt>
+        <dd>
+            true, if the method "oauth2" is available.
+        </dd>
+    </dl>
+
     <a name="Login"></a><div class="fnhead">Login</div>
     <p>
         Sent by the client.
     </p>
+    <h3>Methods "digest" and "ntlm".</h3>
     <p>
         During the login procedure the <a href="#Login">Login</a> message is sent twice. The first time it does not include any credentials and is responded with an <a href="#Authenticate">Authenticate</a> message including a challenge.
     </p>
@@ -195,6 +285,19 @@
     "response": string,
     "userAgent": string
 }</code></pre>
+    <h3>Method "oauth2"</h3>
+    <p>
+        When using Using OAuth2 the login message is only sent once.
+        It does not contain the username and response parameter, but an additional ECDHE key share.
+    </p>
+    <pre><code class="json">{
+    "mt": "Login",
+    "type": string,
+    "method": string,
+    "nonce": string,
+    "keyShare": string,
+    "userAgent": string
+}</code></pre>
     <p>
         If the authentication was successful the PBX will respond with <a href="#LoginResult">LoginResult</a>.
         If two-factor authentication is enabled the PBX will first send an <a href="#Authorize">Authorize</a> and wait with the <a href="#LoginResult">LoginResult</a> until the session
@@ -209,11 +312,12 @@
             "session" for login with session credentials that were created during a previous login with user credentials.
         </dd>
         <dt>method</dt>
-        <dd>"digest" or "ntlm".</dd>
+        <dd>"digest", "ntlm" or "oauth2".</dd>
         <dd>Must be the same method as requested in the <a href="#Authenticate">Authenticate</a> message.</dd>
         <dt>username</dt>
         <dd>The SIP URI of the user for type "user".</dd>
         <dd>The session ID for type "session".</dd>
+        <dd>undefined for method "oauth2".</dd>
         <dt>nonce</dt>
         <dd>A 16-byte hexstring, encoding 8 random bytes chosen by the client software.</dd>
         <dd>Nonces must be unique and should not be re-used for subsequent connections.</dd>
@@ -221,15 +325,19 @@
         <dd>A digest calculated to verify the knowledge of the shared secret that can be either the user password or the session password, depending on the login type.</dd>
         <dd>
             For type "digest"
-        </dd>
-        <dd>
             <pre>Hexstring(SHA256(innovaphoneAppClient:&lt;type&gt;:&lt;domain&gt;:&lt;username&gt;:&lt;password&gt;:&lt;nonce&gt;:&lt;challenge&gt;))</pre>
-        </dd>
-        <dd>
             For type "ntlm"
-        </dd>
-        <dd>
             <pre>Hexstring(NtlmResponse(&lt;username&gt;,&lt;password&gt))</pre>
+            For method "oauth2"
+            <pre>undefined</pre>
+        </dd>
+        <dt>keyShare</dt>
+        <dd>For method "oauth2" only. An 64 byte ECDHE key share encoded as a hexstring of 128 characters. The used curve is secp256r1. The used point format is uncompressed. The point format (04) is not part of the encoded hexstring.</dd>
+        <dd>
+            The shared secret is calculated like that:
+            <pre>Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;LoginResult.info.keyShare&gt;))</pre>
+            or
+            <pre>Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;Redirect.info.keyShare&gt;))</pre>
         </dd>
         <dt>userAgent</dt>
         <dd>A string describing the used software for this connection, like "myApps (Windows)".</dd>
@@ -247,6 +355,7 @@
     "type": string,
     "method": string,
     "domain": string,
+    "url": string,
     "challenge": string
 }</code></pre>
     <dl>
@@ -262,6 +371,8 @@
         <dd>Defines the hash calculation method that shall be used in the subsequent <a href="#Login">Login</a> message.</dd>
         <dt>domain</dt>
         <dd>The domain of the PBX.</dd>
+        <dt>url</dt>
+        <dd>Method "oauth2" only. The URL of the login page of the ID provider that shall be displayed.</dd>
         <dt>challenge</dt>
         <dd>An opaque string.</dd>
     </dl>
@@ -290,7 +401,7 @@
     <a name="LoginResult"></a><div class="fnhead">LoginResult</div>
     <p>
         Sent by the PBX as a response to the second <a href="#Login">Login</a> message.
-    </p> 
+    </p>
     <p>
         The message indicates that the login was successful and includes additional information for the client.
     </p>
@@ -310,7 +421,19 @@
 
         <dt>digest</dt>
         <dd>
-            A digest calculated to verify the knowledge of the shared secret that can be either the user password or the session password, depending on the login type.
+            A digest calculated to verify the knowledge of the shared secret and to protect the integrify of the included info structure.
+            The shared secret is different, depending on the login type and method:
+            <dl>
+                <dt>the user password</dt>
+                <dd>for login type "user" and methods "digest" and "ntlm"</dd>
+                <dt>the ECDHE shared secret</dt>
+                <dd>for login type "user" and method "oauth2"</dd>
+                <dd>
+                    <pre>&lt;password&gt; := Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;LoginResult.info.keyShare&gt;))</pre>
+                </dd>
+                <dt>the session password</dt>
+                <dd>for login type "session" and method "digest"</dd>
+            </dl>
             It also protects the integrity of the included info structure.
         </dd>
         <dd>
@@ -353,13 +476,33 @@
 
         <dt>digest</dt>
         <dd>
-            A digest calculated to verify the knowledge of the shared secret that can be either the user password or the session password, depending on the login type.
+            A digest calculated to verify the knowledge of the shared secret and to protect the integrify of the included info structure.
+            The shared secret is different, depending on the login type and method:
+            <dl>
+                <dt>the user password</dt>
+                <dd>for login type "user" and methods "digest" and "ntlm"</dd>
+                <dt>the ECDHE shared secret</dt>
+                <dd>for login type "user" and method "oauth2"</dd>
+                <dd>
+                    <pre>&lt;password&gt; := Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;Redirect.info.keyShare&gt;))</pre>
+                </dd>
+                <dt>the session password</dt>
+                <dd>for login type "session" and method "digest"</dd>
+            </dl>
             It also protects the integrity of the included info structure.
         </dd>
         <dd>
             <pre>Hexstring(SHA256(innovaphoneAppClient:redirect:&lt;username&gt;:&lt;password&gt;:&lt;nonce&gt;:&lt;challenge&gt;:&lt;info&gt;))</pre>
         </dd>
     </dl>
+
+    <a name="LoginCancel"></a><div class="fnhead">LoginCancel</div>
+    <p>
+        Sent by the client to cancel a started login with method "oauth2". The PBX responds with <a href="#LoginResult">LoginResult</a> with an error.
+    </p>
+<pre><code class="json">{
+    "mt": "LoginCancel"
+}</code></pre>
 
     <a name="Logout"></a><div class="fnhead">Logout</div>
     <p>
@@ -385,6 +528,15 @@
     </p>
 <pre><code class="json">{
     "mt": "StandbyBack"
+}</code></pre>
+
+    <a name="Disconnect"></a><div class="fnhead">Disconnect</div>
+    <p>
+        The PBX sends this message when it is turned off. The PBX terminates the connection after that message.
+        The client should reconnect and start its normal login procedure using the same session.
+    </p>
+<pre><code class="json">{
+    "mt": "Disconnect"
 }</code></pre>
 
     <a name="UpdateUser"></a><div class="fnhead">UpdateUser</div>
@@ -420,13 +572,13 @@
 
     <a name="SessionDeleted"></a><div class="fnhead">SessionDeleted</div>
     <p>
-        Sent by the PBX if a login-session for the user has been deleted. Connections in the context of the deleted session will receive the <a href="#LogoutResult">LogoutResult</a> message afterwards. 
+        Sent by the PBX if a login-session for the user has been deleted. Connections in the context of the deleted session will receive the <a href="#LogoutResult">LogoutResult</a> message afterwards.
     </p>
 <pre><code class="json">{
     "mt": "SessionDeleted",
     "id": string
 }</code></pre>
-    
+
     <a name="AuthorizeSession"></a><div class="fnhead">AuthorizeSession</div>
     <p>
         Sent by the client to complete two-factor authentication for sessions that are waiting for the second factor. Only own sessions (of the same PBX user) can be authorized.
@@ -635,7 +787,7 @@
         </dd>
         <dt>errorText</dt>
         <dd>
-            A text describing what went wrong the login.
+            A text describing what went wrong during the login.
         </dd>
     </dl>
 
@@ -765,7 +917,7 @@
             An array containing presence items.
         </dd>
     </dl>
-    
+
     <a name="SubscribeDialog"></a><div class="fnhead">SubscribeDialog</div>
     <p>
         Starts a dialog info subscription for a given SIP URI or phone number. The PBX will start sending <a href="#DialogInfo">DialogInfo</a> messages for that endpoint.
@@ -914,7 +1066,10 @@
     "dn": string,
     "num": string,
     "email": string,
-    "session": <a href="#Session">Session</a>
+    "session": <a href="#Session">Session</a>,
+    "keyShare": string,
+    "alt": string,
+    "altHttp": string
 }</code></pre>
     <p>
         The info object is generated by the PBX when a user logs in.
@@ -922,6 +1077,30 @@
     </p>
     <dl>
         <dt>host</dt>
+        <dd>
+            The target host name for the redirect.
+        </dd>
+        <dd>
+            Only present when used in the <a href="#Redirect">Redirect</a> message.
+        </dd>
+        <dt>http</dt>
+        <dd>
+            The target HTTP port name for the redirect.
+        </dd>
+        <dd>
+            Only present when used in the <a href="#Redirect">Redirect</a> message.
+        </dd>
+        <dd>
+            The target HTTPS port name for the redirect.
+        </dd>
+        <dt>https</dt>
+        <dd>
+            Only present when used in the <a href="#Redirect">Redirect</a> message.
+        </dd>
+        <dd>
+            The target PBX module name for the redirect.
+        </dd>
+        <dt>mod</dt>
         <dd>
             Only present when used in the <a href="#Redirect">Redirect</a> message.
         </dd>
@@ -953,6 +1132,22 @@
         <dd>
             A <a href="#Session">Session</a> object containing session credentials.
         </dd>
+        <dt>keyShare</dt>
+        <dd>For method "oauth2" only. An 64 byte ECDHE key share encoded as a hexstring of 128 characters. The used curve is secp256r1. The used point format is uncompressed. The point format (04) is not part of the encoded hexstring.</dd>
+        <dd>
+            The shared secret is calculated like that:
+            <pre>Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;LoginResult.info.keyShare&gt;))</pre>
+            or
+            <pre>Hexstring(ECDH(secp256r1, &lt;private-key&gt;, &lt;Login.keyShare&gt;, &lt;Redirect.info.keyShare&gt;))</pre>
+        </dd>
+        <dt>alt</dt>
+        <dd>Only present when used in the <a href="#LoginResult">LoginResult</a> message.</dd>
+        <dd>The alternative PBX of the current PBX when using HTTPS.</dd>
+        <dd>A string in the format <code>host:port/module-name</code>, e.g. <code>standby.example.com:4433/PBX0</code></dd>
+        <dt>altHttp</dt>
+        <dd>Only present when used in the <a href="#LoginResult">LoginResult</a> message.</dd>
+        <dd>The alternative PBX of the current PBX when using HTTP.</dd>
+        <dd>A string in the format <code>host:port/module-name</code>, e.g. <code>standby.example.com:8080/PBX0</code></dd>
     </dl>
 
     <a name="Session"></a><div class="fnhead">Session</div>
@@ -962,7 +1157,7 @@
 }</code></pre>
     <p>
         During logins of type "user" a persistent session is created. This structure contains the encrypted credentials of this session.
-        They are used for encrypting selected attributes of messages. Also, they are used for subsequent logins of type "session". 
+        They are used for encrypting selected attributes of messages. Also, they are used for subsequent logins of type "session".
     </p>
     <dl>
         <dt>usr</dt>
@@ -1000,7 +1195,7 @@
         </dd>
         <dt>current</dt>
         <dd>
-            True if it is the session that belongs to the current WebSocket connection.
+            True if it is the session that belongs to the current websocket connection.
         </dd>
         <dt>userAgent</dt>
         <dd>
@@ -1067,7 +1262,7 @@
     <a name="AppInfo"></a><div class="fnhead">AppInfo</div>
     <pre><code class="json">{
     "hidden": boolean,
-    "presence": boolean/string,
+    "presence": boolean,
     "apis": {
         string: object,
         ...
@@ -1084,9 +1279,7 @@
         </dd>
         <dt>presence</dt>
         <dd>
-            <code>true</code> The app answers presence subscriptions. The client should establish presence subscriptions for home screen items of that app to retrieve presence info like badge counts.<br/>
-            <code>string</code> If the app does not provide the presence itself, but a different SIP URI should be monitored, it can be specified as a string.<br/>
-            <code>undefined</code> If the client should not do a presence subscription for the app.
+            The app answers presence subscriptions. The client should establish presence subscriptions for home screen items of that app to retrieve presence info like badge counts.
         </dd>
         <dt>apis</dt>
         <dd>

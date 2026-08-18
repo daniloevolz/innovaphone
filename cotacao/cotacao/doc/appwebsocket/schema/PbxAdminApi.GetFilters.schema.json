@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getfilters.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetFilters"
+        ]
+      }
+    },
+    "required": ["api", "mt"]
+}

@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.checkapplic.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "CheckAppLic"
+        ]
+      },
+      "guid":{"type":"string"},
+      "cn":{"type":"string"},
+      "h323":{"type":"string"},
+      "lic":{"type":"string"}
+    },
+    "oneOf": [
+        {
+          "required": ["guid"]
+        },
+        {
+          "required": ["cn"]
+        },
+        {
+          "required": ["h323"]
+        }
+    ],
+    "required": ["api", "mt"]
+}

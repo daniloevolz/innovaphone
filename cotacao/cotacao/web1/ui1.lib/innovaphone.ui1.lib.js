@@ -93,8 +93,13 @@ innovaphone.ui1.nodePrototype = {
         return this;
     },
 
-    setAttribute: function (attribute, value) {
-        this.container.setAttribute(attribute, value);
+    setAttribute: function (name, value) {
+        this.container.setAttribute(name, value);
+        return this;
+    },
+
+    remAttribute: function (name) {
+        this.container.removeAttribute(name);
         return this;
     },
 
@@ -163,9 +168,21 @@ innovaphone.ui1.nodePrototype = {
     },
 
     testId: function (id) {
+        if (innovaphone.ui1.lib.browser.simulator) {
+            if (id) this.container.setAttribute("aria-label", "test-" + id);
+            else this.container.removeAttribute("aria-label");
+        }
         if (id) this.container.setAttribute("id", "test-" + id);
         else this.container.removeAttribute("id");
         return this;
+    },
+
+    isScrollBottom: function () {
+        return (this.container.scrollTop + this.container.clientHeight) >= this.container.scrollHeight;
+    },
+
+    isScrollTop: function () {
+        return this.container.scrollTop == 0;
     }
 }
 
@@ -231,6 +248,46 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
     this.getValue = getValue;
 }
 innovaphone.ui1.Input.prototype = innovaphone.ui1.nodePrototype;
+
+
+
+innovaphone.ui1.DropDown = innovaphone.ui1.DropDown || function (style, placeHolder, maxLength, type, cl) {
+    var that = this;
+
+    var node = this.createNode("select", style, null, cl);
+    if (placeHolder) this.container.placeholder = placeHolder;
+    if (maxLength) this.container.maxLength = maxLength;
+    if (type) {
+        this.container.setAttribute("type", type);
+    }
+
+    this.addOption = function addOption(value, texts) {
+        if (texts) var option = this.add(new innovaphone.ui1.Node("option", style)).addTranslation(texts, value);
+        else var option = this.add(new innovaphone.ui1.Node("option", style, value));
+        option.container.value = value;
+        return this;
+    }
+
+    this.getOptions = function getOptions() {
+        let options = [];
+        for (const element of that.container) {
+            options.push(element.value);
+        }
+        return options;
+    }
+
+    this.clearOptions = function clearOptions() { node.clear(); }
+    this.getSelected = function () { return that.container.value; }
+    this.setSelected = function (option) {
+        that.container.value = option;
+        return this;
+    }
+
+}
+innovaphone.ui1.DropDown.prototype = innovaphone.ui1.nodePrototype;
+
+
+
 
 
 innovaphone.ui1.Password = innovaphone.ui1.Password || function (style, value, placeHolder, maxLength, cl, styleInput, clInput) {
@@ -443,21 +500,24 @@ innovaphone.ui1.lib = innovaphone.ui1.lib || (function () {
     function getBrowserInfo() {
         var ua = window.navigator.userAgent;
         if (ua.indexOf("myApps/") != -1) {
-            if (ua.indexOf("Windows") != -1) return { name: "myApps for Windows", webkit: true };
-            if (ua.indexOf("Android") != -1) return { name: "myApps for Android", webkit: true };
-            if (ua.indexOf("iOS") != -1) return { name: "myApps for iOS", webkit: true };
-            if (ua.indexOf("macOS") != -1) return { name: "myApps for macOS", webkit: true };
+            if (ua.indexOf("Windows") != -1) return { name: "myApps for Windows", webkit: true, simulator: false };
+            if (ua.indexOf("Linux") != -1) return { name: "myApps for Linux", webkit: true, simulator: false };
+            if (ua.indexOf("Android") != -1) return { name: "myApps for Android", webkit: true, simulator: false };
+            if (ua.indexOf("iOS Simulator") != -1) return { name: "myApps for iOS Simulator", webkit: true, simulator: true };
+            if (ua.indexOf("iOS") != -1) return { name: "myApps for iOS", webkit: true, simulator: false };
+            if (ua.indexOf("macOS") != -1) return { name: "myApps for macOS", webkit: true, simulator: false };
+            if (ua.indexOf("IP232") != -1) return { name: "myApps for IP232", webkit: true, simulator: false };
             return {};
         }
-        else if (ua.indexOf("OPR/") != -1 || ua.indexOf("Opera/") != -1) return { name: "Opera", webkit: true };
-        else if (ua.indexOf("Edge/") != -1) return { name: "Edge", webkit: false };
-        else if (ua.indexOf("Edg/") != -1) return { name: "Edge", webkit: true };
-        else if (ua.indexOf("Teams/") != -1) return { name: "Teams", webkit: true };
-        else if (ua.indexOf("Firefox/") != -1) return { name: "Firefox", webkit: false };
-        else if (ua.indexOf("Chromium/") != -1) return { name: "Chromium", webkit: true };
-        else if (ua.indexOf("Chrome/") != -1) return { name: "Chrome", webkit: true };
-        else if (ua.indexOf("Safari/") != -1) return { name: "Safari", webkit: true };
-        else if (ua.indexOf("Trident/") != -1) return { name: "Internet Explorer", webkit: false };
+        else if (ua.indexOf("OPR/") != -1 || ua.indexOf("Opera/") != -1) return { name: "Opera", webkit: true, simulator: false };
+        else if (ua.indexOf("Edge/") != -1) return { name: "Edge", webkit: false, simulator: false };
+        else if (ua.indexOf("Edg/") != -1) return { name: "Edge", webkit: true, simulator: false };
+        else if (ua.indexOf("Teams/") != -1) return { name: "Teams", webkit: true, simulator: false };
+        else if (ua.indexOf("Firefox/") != -1) return { name: "Firefox", webkit: false, simulator: false };
+        else if (ua.indexOf("Chromium/") != -1) return { name: "Chromium", webkit: true, simulator: false };
+        else if (ua.indexOf("Chrome/") != -1) return { name: "Chrome", webkit: true, simulator: false };
+        else if (ua.indexOf("Safari/") != -1) return { name: "Safari", webkit: true, simulator: false };
+        else if (ua.indexOf("Trident/") != -1) return { name: "Internet Explorer", webkit: false, simulator: false };
         return {};
     }
 

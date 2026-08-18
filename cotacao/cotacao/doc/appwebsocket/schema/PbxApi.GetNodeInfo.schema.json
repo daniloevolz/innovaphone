@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pbxapi.getnodeinfo.schema.json",
+  "description": "Requests information about the node of the user that is authenticated on the underlying AppWebsocket connection.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "GetNodeInfo"
+      ],
+      "description": "The message type identifies the requested operation"
+    }
+  }
+}

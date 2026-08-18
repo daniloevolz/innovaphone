@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.monitorunallowed.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": ["PbxAdminApi"]
+      },
+      "mt": {
+        "type": "string",
+        "enum": ["MonitorUnallowed"]
+      },
+      "stop": {
+        "type": "boolean"
+      }
+    }
+}

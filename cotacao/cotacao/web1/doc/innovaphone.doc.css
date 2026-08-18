@@ -21,6 +21,7 @@ p {
 }
 
 dl {
+    margin:0px;
 }
 
 dt {
@@ -28,7 +29,6 @@ dt {
 }
 
 dd {
-    margin-bottom: 10px;
 }
 
 a, a:visited {

@@ -1,0 +1,341 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "mt": {
+        "type": "string",
+        "enum": ["UpdateObject"]
+      },
+      "api": {
+        "type": "string",
+        "enum": ["PbxAdminApi"]
+      },
+      "src": {
+        "type": "string"
+      },
+      "template": {
+        "type": "string",
+        "enum": ["with", "without"]
+      },
+      "copyPwd": {
+        "type": "string"
+      },
+      "guid": {
+        "type": "string"
+      },
+      "cn": {
+        "type": "string"
+      },
+      "dn": {
+        "type": "string"
+      },
+      "h323": {
+        "type": "string"
+      },
+      "e164": {
+        "type": "string"
+      },
+      "node": {
+        "type": "string"
+      },
+      "loc": {
+        "type": "string"
+      },
+      "fake": {
+        "type": "string"
+      },
+      "ext": {},
+      "ext-in": {},
+      "text": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "h323-email": {
+        "type": "boolean"
+      },
+      "emails": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "config": {
+        "type": "string"
+      },
+      "apps-my": {
+        "type": "string"
+      },
+      "gi": {
+        "type": "string"
+      },
+      "local": {},
+      "trace": {},
+      "hide": {},
+      "critical": {},
+      "no-dev": {},
+      "login-c": {},
+      "login-t": {},
+      "admin": {},
+      "admin-node": {},
+      "admin-pbx": {},
+      "filter": {},
+      "cd-filter": {},
+      "cfnr": {},
+      "busy-out": {},
+      "cd-block": {},
+      "rej-ext": {},
+      "no-disc": {},
+      "dnd": {},
+      "phone-config": {},
+      "discard-phone-config": {},
+      "colr": {},
+      "cfpr": {},
+      "apps": {},
+      "messages": {},
+      "push": {},
+      "allows": {},
+      "phone": {},
+      "uclic": {},
+      "voicemail": {},
+      "fax": {},
+      "mobility": {},
+      "mypbx": {},
+      "video": {},
+      "app-sharing": {},
+      "reporting": {},
+      "app-lics": {},
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/device"
+        }
+      },
+      "grp": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/group"
+        }
+      },
+      "presence": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/presence"
+        }
+      },
+      "cds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/diversion"
+        }
+      },
+      "forks": {},
+      "wakeups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/wakeup"
+        }
+      },
+      "gws": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/gw"
+        }
+      },
+      "profiles": {},
+      "pseudo": {
+        "$ref": "#/definitions/pseudo"
+      }
+    },
+    "definitions": {
+      "device": {
+        "type": "object",
+        "properties": {
+            "hw": {
+                "type": "string"
+            },
+            "text": {
+                "type": "string"
+            },
+            "app": {
+                "type": "string"
+            },
+            "admin": {
+                "type": "boolean"
+            },
+            "no-filter": {
+                "type": "boolean"
+            },
+            "tls": {
+                "type": "boolean"
+            },
+            "no-mob": {
+                "type": "boolean"
+            },
+            "trusted": {
+                "type": "boolean"
+            }
+        }
+      },
+      "group": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string"
+            },
+            "mode": {
+                "type": "string"
+            },
+            "dyn": {
+                "type": "string"
+            }
+        }
+      },
+      "presence": {
+        "type": "object",
+        "properties": {
+            "c": {
+                "type": "string"
+            },
+            "a": {
+                "type": "string"
+            },
+            "n": {
+                "type": "string"
+            }
+        }
+      },
+      "diversion": {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string"
+            },
+            "bool": {
+                "type": "string"
+            },
+            "bool-not": {
+                "type": "string"
+            },
+            "ep": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "properties": {
+                        "e164": {
+                            "type": "string"
+                        },
+                        "h323": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "src": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "ep": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "properties": {
+                                    "ext": {
+                                        "type": "string"
+                                    },
+                                    "fwd": {
+                                        "type": "string"
+                                    },
+                                    "e164": {
+                                        "type": "string"
+                                    },
+                                    "h323": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+      },
+      "wakeup": {
+        "type": "object",
+        "properties": {
+            "h": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "m": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "s": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "name": {
+                "type": "string"
+            },
+            "num": {
+                "type": "string"
+            },
+            "retry": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "mult": {
+                "type": "boolean"
+            },
+            "to": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "fallback": {
+                "type": "string"
+            },
+            "bool": {
+                "type": "string"
+            },
+            "bool-not": {
+                "type": "boolean"
+            }
+        },
+        "required": ["h", "m", "s", "name", "num", "retry", "mult", "to", "fallback", "bool-not"]
+      },
+      "gw": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string"
+            },
+            "idle": {
+                "type": "string"
+            },
+            "ipei": {
+                "type": "string"
+            },
+            "ac": {
+                "type": "string"
+            }
+        }
+      },
+      "pseudo": {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string",
+                "additionalProperties": true
+            }
+        }
+      }
+    }
+  }
+  

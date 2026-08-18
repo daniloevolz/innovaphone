@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "pbxapi.setpresence.schema.json",
+  "description": "Sets the presence for a given contact of a user, defined by the SIP URI or GUID.",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "sip",
+    "guid",
+    "contact",
+    "activity"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "SetPresence"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "sip": {
+      "type": "string",
+      "description": "The SIP URI of the monitored user."
+    },
+    "guid": {
+      "type": "string",
+      "description": "The GUID of the monitored user."
+    },
+    "contact": {
+      "type": "string",
+      "description": "A string defining the type of the presence."
+    },
+    "activity": {
+      "type": "string",
+      "description": "The presence activity. Typical values are \"\" for available, \"away\", \"busy\" and \"dnd\" for do not disturb."
+    },
+    "note": {
+      "type": "string",
+      "description": "A free text entered by the user giving additional information about the presence."
+    }
+  },
+  "additionalProperties": false
+}

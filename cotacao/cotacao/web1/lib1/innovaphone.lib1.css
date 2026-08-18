@@ -1,6 +1,15 @@
 @font-face {
     font-family: "titillium";
+    font-style: normal;
+    font-weight: normal;
     src: url('../fonts/titilliumweb-regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: "titillium";
+    font-style: normal;
+    font-weight: bold;
+    src: url('../fonts/titilliumweb-bold.ttf') format('truetype');
 }
 
 html
@@ -21,6 +30,7 @@ body, p
     margin: 0px;
     padding: 0px;
     border-width: 0px;
+    overflow:hidden;
 }
 
 ::-ms-clear

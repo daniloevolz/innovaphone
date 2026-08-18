@@ -1,4 +1,4 @@
-
+﻿
 if (!String.prototype.trim) {
     String.prototype.trim = function () {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
@@ -23,7 +23,15 @@ String.prototype.endsWith = function (suffix) {
 String.prototype.replaceAll = function (search, replace) {
     var replacer = new RegExp(search, "g");
     return this.replace(replacer, replace);
-}
+};
+
+String.prototype.diacritics = { "á": "a", "ă": "a", "ǟ": "a", "à": "a", "ǎ": "a", "ā": "a", "ą": "a", "ȧ": "a", "å": "a", "ã": "a", "ä": "a", "â": "a", "ḃ": "b", "ć": "c", "ç": "c", "č": "c", "ċ": "c", "ĉ": "c", "ḑ": "d", "ď": "d", "ḋ": "d", "ð": "d", "đ": "d", "é": "e", "ĕ": "e", "ȅ": "e", "è": "e", "ě": "e", "ē": "e", "ę": "e", "ė": "e", "ë": "e", "ê": "e", "ḟ": "f", "ğ": "g", "ģ": "g", "ǧ": "g", "ġ": "g", "ĝ": "g", "ȟ": "h", "ḣ": "h", "ḥ": "h", "ħ": "h", "ĥ": "h", "í": "i", "ĭ": "i", "ì": "i", "ǐ": "i", "ī": "i", "į": "i", "ı": "i", "ĩ": "i", "ï": "i", "î": "i", "ȷ": "j", "ĵ": "j", "ḱ": "k", "ķ": "k", "ǩ": "k", "ḳ": "k", "ĺ": "l", "ļ": "l", "ľ": "l", "ŀ": "l", "ḷ": "l", "ł": "l", "ṁ": "m", "ṃ": "m", "ń": "n", "ņ": "n", "ň": "n", "ṅ": "n", "ñ": "n", "ó": "o", "ŏ": "o", "ő": "o", "ò": "o", "ǒ": "o", "ō": "o", "ȫ": "o", "ȭ": "o", "ǫ": "o", "ọ": "o", "ȯ": "o", "ø": "o", "ǿ": "o", "õ": "o", "ö": "o", "ô": "o", "ṗ": "p", "ŕ": "r", "ŗ": "r", "ř": "r", "ṙ": "r", "ś": "s", "ş": "s", "š": "s", "ș": "s", "ṡ": "s", "ŝ": "s", "ţ": "t", "ť": "t", "ț": "t", "ṫ": "t", "ŧ": "t", "ú": "u", "ŭ": "u", "ű": "u", "ù": "u", "ǔ": "u", "ū": "u", "ų": "u", "ů": "u", "ũ": "u", "ü": "u", "û": "u", "ŵ": "w", "ý": "y", "ȳ": "y", "ÿ": "y", "ŷ": "y", "ź": "z", "ž": "z", "ż": "z", "ƶ": "z", "æ": "ae", "ﬁ": "fi", "ĳ": "ij", "œ": "oe", "ꜩ": "tz" };
+String.prototype.toNormalizedSearchString = function () {
+    var result = "";
+    var lower = this.toLocaleLowerCase();
+    for (ch of lower) result += String.prototype.diacritics[ch] || ch;
+    return result;
+};
 
 Node.prototype.isChildOf = function (node) {
     var parentNode = this;
@@ -34,6 +42,10 @@ Node.prototype.isChildOf = function (node) {
     }
     return false;
 }
+
+window.alert = function () { console.warn("alert() must not be used in apps"); };
+window.prompt = function () { console.warn("prompt() must not be used in apps"); };
+window.confirm = function () { console.warn("confirm() must not be used in apps"); };
 
 // static innovaphone.lib functions
 
@@ -284,7 +296,8 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             onchannelclosed = new Event(start),
             onchannelmessage = new Event(start),
             logins = [],
-            currentSrc = 0;
+            currentSrc = 0,
+            prefixSrc = Math.ceil(Math.random() * 0xffffffff).toString(16);
 
         if (navigator.userAgent.includes("myApps")) {
             try {
@@ -321,6 +334,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.onlangchanged = new Event(start);
         start.onschemechanged = new Event(start);
         start.onargschanged = new Event(start);
+        start.onshow = new Event(start);
         start.onmenustatechanged = new Event(start);
         start.postClientMessage = function (obj) {
             window.parent.postMessage(JSON.stringify(obj), "*");
@@ -415,7 +429,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
 
                 this.Src = function (onmessage) {
                     return new (function (onmessage, apiConsumer) {
-                        var src = "apisrc-" + (++currentSrc);
+                        var src = "apisrc-" + prefixSrc + "-" + (++currentSrc);
                         this.close = function () {
                             apiConsumer.onmessage.detach(onapiresult);
                             src = null;
@@ -533,6 +547,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                         start.args = obj.args;
                         start.onargschanged.notify();
                         break;
+                    case "Show":
+                        start.onshow.notify();
+                        break;
                     case "ConsumeApi":
                         if (e.source != opener && e.source != parent) {
                             new (function (iframe, api) {
@@ -647,6 +664,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.url = start.url.replace("http", "ws");
         start.originalUrl = start.originalUrl || location.href;
         start.originalUrl = start.originalUrl.slice(0, start.originalUrl.lastIndexOf("/"));
+        start.search = start.search || location.search;
         start.postClientMessage({ mt: "Alive" });
         if (langFile) loadObjectScript(langFile + "." + start.lang, function () { onload(start); });
         else onload(start);
@@ -689,18 +707,28 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
 
     function Languages(texts, lang) {
         var that = this;
-        this.current = lang;
-        if (!texts[this.current]) this.current = "en";
+        var fallback = { ca: "es", eu: "es" };
+        this.current = texts[lang] ? lang : texts[fallback[lang]] ? fallback[lang] : "en";
         this.onlangchanged = new Event(this);
         this.onnoderemoved = new Event(this);
 
         this.activate = function (newLang) {
-            that.current = texts[newLang] ? newLang : "en";
+            that.current = texts[newLang] ? newLang : texts[fallback[newLang]] ? fallback[newLang] : "en";
             that.onlangchanged.notify(that.current);
         };
 
         this.text = function (id, args) {
-            var t = texts[that.current][id] || texts["en"][id] || (id ? "{" + id + "}" : "");
+            var t = texts[that.current][id] || (fallback[that.current] ? texts[fallback[that.current]][id] : null) || texts["en"][id] || (id ? "{" + id + "}" : "");
+            if (t && args) {
+                for (var i = args.length - 1; i >= 0; i--) {
+                    t = t.replace(new RegExp("\\$" + i.toString(), "g"), args[i]);
+                }
+            }
+            return t;
+        };
+
+        this.langText = function (lang, id, args) {
+            var t = texts[lang] ? texts[lang][id] || "" : "";
             if (t && args) {
                 for (var i = args.length - 1; i >= 0; i--) {
                     t = t.replace(new RegExp("\\$" + i.toString(), "g"), args[i]);

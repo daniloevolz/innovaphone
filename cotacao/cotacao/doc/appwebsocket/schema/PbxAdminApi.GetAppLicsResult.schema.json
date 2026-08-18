@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getapplicsresult.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetAppLicsResult"
+        ]
+      },
+      "lic":{
+        "type":"array",
+        "items": {
+            "type":"object",
+            "properties": {
+                "name":{"type":"string"},
+                "version":{"type":"string"},
+                "count":{"type":"string"},
+                "used":{"type":"string"},
+                "local":{"type":"string"},
+                "slaves":{"type":"string"},
+                "key":{"type":"string"}
+            },
+            "additionalProperties": false,
+            "required": ["name", "version", "count", "used", "local", "slaves", "key"]
+        },
+        "additionalItems": true
+      }
+    },
+    "required": ["api", "mt", "lic"]
+}

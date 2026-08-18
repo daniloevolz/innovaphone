@@ -62,9 +62,8 @@
     <h2 id="app-id-texts-and-icons">App-ID, Texts and Icons</h2>
     <p>This chapter covers various settings that are relevant for an App Store entry.</p>
     <h3 id="app-id">App-ID</h3>
-    <p>As a unique identifier of your app in the innovaphone App Store an App-ID must be defined. The App-ID must contain a manufacturer name followed by the app name, separated by a dash, e.g.: <code>company-application</code></p>
-    <p>The App-ID is also used in the folder structure of a web server to point the App Store to the relevant files of the App.</p>
-    <p>The App-ID is also used in <a href="licensing.htm">the naming scheme of the license</a> of the App.</p>
+    <p>As a unique identifier of your app in the innovaphone App Store an App-ID must be defined. The App-ID must contain a manufacturer name followed by the app name, separated by a hyphen, e.g.: <code>company-application</code> . The allowed characters for the App-ID are ASCII letters, hyphens and underscores.</p>
+    <p>The App-ID is also used in the folder structure of a web server to point the App Store to the relevant files of the App and in <a href="licensing.htm">the naming scheme of the license</a> of the App.</p>
     <h3 id="manufacturer">Manufacturer</h3>
     <p>The manufacturer ID is defined while running through the innovaphone SDK Setup under the <em>"source-code" company name</em> field and is used to create new App projects in Visual Studio in the App templates for C++ and JavaScript. This ID is also used as prefix in the App-ID, App binary name etc.</p>
     <h3 id="texts">Texts</h3>
@@ -85,7 +84,7 @@
     <h2 id="app-binaries">App Binaries</h2>
     <p>The binaries of the Apps have the following properties, which are relevant in connection with the publication on the App Store and are defined at the compilation time:</p>
     <ul>
-        <li><strong>App Project Name</strong> - is defined by the VS project name that was used to create this App and is also used as the name of the executable binary file while developing the App</li>
+        <li><strong>App Project Name</strong> - is defined by the VS project name that was used to create this App and is also used as <strong>the file name</strong> of the executable binary, while developing the App</li>
         <li><strong>Build Number</strong> - specifies a consecutive version number, which allows a unique assignment of the version of the App, so it is used by the AP Manager and Devices App to detect newer Versions of the App</li>
         <li><strong>Release State Label</strong> - specifies a label for the build (e.g. beta1, final, hotfix2, sr3) that is used to identify the version</li>
         <li><strong>Target Platform</strong> - specifies a target platform architecture of the binary file</li>
@@ -115,13 +114,13 @@
     </ul>
     <p>This will make sure the App can be used on all types of AP capable innovaphone Gateways and Virtual Appliances.</p>
     <h3 id="building-the-app-binaries-for-the-release">Building the App Binaries for the Release</h3>
-    <p>In contrast to the development builds via Visual Studio (Build solution) the binaries for the release on the App Store should have set correct values for the buid number, a release state label and manufacturer prefix in the file names.</p>
+    <p>In contrast to the development builds via Visual Studio (Build solution) the binaries for the release on the App Store should have set correct values for the build number, a release state label and manufacturer prefix in the file names.</p>
     <p>The Visual Studio project created from a template in the innovaphone SDK contains a batch script <code>build-release.bat</code> that can be used to build the App binaries with specific build numbers and release state labels for all platforms.</p>
     <p>For example, to build release binaries from an App <code>demoapp</code> with the build number <code>1002</code> and release state label <code>sr2</code> use following command:</p>
         <pre><code class="language-bat">C:\projects\demoapp\demoapp&gt;build-release.bat 1002 sr2 company
     </code></pre>
     <p>The third command line parameter should match the <em>Manufacturer</em> value used while creating the app entry. If set properly in the bat file directly, the third command line parameter can be omitted.</p>
-    <p>Execute the script from the command line in the project folder. The resulting builds will be placed in the project folder, in the subfolder <code>release</code> in the corresponding platform subfolders (arm, arm64, x86_64).</p>
+    <p>Execute the script from the command line in the project folder or use the Developer Command Prompt. The resulting builds will be placed in the project folder, in the subfolder <code>release</code> in the corresponding platform subfolders (arm, arm64, x86_64).</p>
     <p>It is recommended to perform <em>Clear solution</em> in the Visual Studio before running the script.</p>
     <h3 id="binaries-for-javascript-runtime-based-apps">Binaries for JavaScript Runtime based Apps</h3>
     <p>In a special case of a JavaScript Runtime based App a so called <em>generic</em> binary (same for all JavaScript Runtime Apps) is supplemented by a custom ZIP file (httpfiles.zip) with a JavaScript implementation of the App. For the JavaScript Runtime based App Service the generic App binaries from the current service release should be used. This can be achieved by installing SDK from the current Service Release.</p>
@@ -148,7 +147,7 @@
 |       +-- sub-folder
 |           +-- binary-files
     </code></pre>
-    <p>The file tree of the app folder should look like this:</p>
+    <p>The file tree of the app folder should look like this (This is an example of the structure mentioned above):</p>
         <pre><code>+-- 1001
 |   +-- innovaphone-demoapp_files
 |   +-- arm
@@ -238,24 +237,28 @@
     
 
     <h2 id="publish-a-new-version-of-the-app">Publish a new Version of the App</h2>
-    <p>The new versions of a released App can be added to an app entry in the App Store App by placing the App files in the corresponding folder on the web server (see chapter <em>Prepare Local Web Server</em>).</p>
+    <p>The new versions of a released App can be added to an App entry in the App Store App by placing the App files in the corresponding folder on the web server (see chapter <em>Prepare Local Web Server</em>).</p>
     <p>The subsequent releases of the App must have higher build numbers, than previous releases (e.g. 1000, 1001, 1005, etc).</p>
     <p>To upload a new build, click on <em>Update</em> button in the upper right corner of the App Store App:</p>
     <p><img src="pics/HowtoAppStore_add_app_entry_02.png" alt="Update Notification" /></p>
-    <p>In the <em>Add new official build</em> window tick on the app, that will be released, and provide values for <em>Release</em>, <em>Build</em> and <em>Label</em>:</p>
+    <p>In the <em>Add new official build</em> window tick on the App, that will be released, and provide values for <em>Release</em>, <em>Build</em> and <em>Label</em>:</p>
     <p><img src="pics/HowtoAppStore_add_app_entry_021.png" alt="Update Notification" /></p>
     <p>To fetch the new version from the web server, click on <em>Upload</em> button.</p>
     <p>The upload will start and will take few minutes, depending on number of files and their size:</p>
     <p><img src="pics/HowtoAppStore_add_app_new_build_02.png" alt="Update Notification" /></p>
-    <p>After upload is finished you should be able to see new version of the App below the App Entry:</p>
+    <p>After the upload is finished you should be able to see the new version of the App below the App entry:</p>
     <p><img src="pics/HowtoAppStore_add_app_new_build_03.png" alt="Update Notification"/></p>
-    <p>Only the latest version is displayed. To see older versions, click on the arrow button in the lower right corner of the App Entry.</p>
+    <p>Only the latest version is displayed. To see older versions, click on the arrow button in the lower right corner of the App entry.</p>
     
     
     <h2 id="notify-innovaphone-3rd-party-team">Notify innovaphone 3rd-Party Team</h2>
-    <p>After you have tested your App Release using your own App Store and your App Platform a notification to <em>3rd-party@innovaphone.com</em> must be sent in order innovaphone Team can review and publish your App on the official innovaphone App Store.</p>
+    <p>After you have tested your App Release using your own App Store and your App Platform a notification to <em>3rd-party@innovaphone.com</em> must be sent in order innovaphone team can review and publish your App on the official innovaphone App Store.</p>
 
     <p>Prior publishing a new App on the innovaphone App Store, innovaphone team take the app through an App Review process to make sure, the App itself and the App Entry in the App Store meets the minimal technical requirements for publishing.</p>
+
+    <p>
+        For the sequential updates of an already published App (e.g. new service release for an existing App), please contact <em>AppStoreSupport@innovaphone.com</em>.
+    </p>
     
 
     <h2 id="troubleshooting">Troubleshooting</h2>

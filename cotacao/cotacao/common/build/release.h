@@ -2,10 +2,11 @@
 #if !defined(RELEASE_STATE)
 #define RELEASE_STATE "dvl "
 #endif
-
-#define VERSION_STR_MAJOR "13r2"
-#define VERSION_STR "13r2"
-#define VERSION_SOAP 1300
+#define UPDATE_IN_SUBMODULE "FINDME"
+#define VERSION_STR_MAJOR "14r1"
+#define VERSION_STR "14r1"
+#define VERSION_STR_HTTPBUILD "/14"
+#define VERSION_SOAP 1400
 
 #define BUILD_DO_QUOTE(X)         #X
 #define BUILD_QUOTE(X)            BUILD_DO_QUOTE(X)
@@ -26,7 +27,7 @@
   || ((BUILD_CONCATENATE(0x1,BUILD) >= 0x1a000000) && (BUILD_CONCATENATE(0x1,BUILD) <= 0x1fffffff)))
 #error BUILD must start with a digit 0..9
 #elif (BUILD_CONCATENATE(0x1,BUILD) == 0x1)
-#define BUILD_STRING              "13A000"
+#define BUILD_STRING              "141A000"
 #else
 #define BUILD_STRING              BUILD_QUOTE(BUILD)
 #endif
@@ -38,4 +39,5 @@ const char * __BUILD_STRING__ = "/" BUILD_STRING "/";
 const char * _VERSION_STR_ = VERSION_STR;
 const char * _RELEASE_STATE_ = RELEASE_STATE;
 const int _VERSION_SOAP_ = VERSION_SOAP;
+const char* _VERSION_STR_HTTPBUILD_ = VERSION_STR_HTTPBUILD;
 NAMESPACE_END

@@ -17,7 +17,6 @@ innovaphone.ui1.Switch = innovaphone.ui1.Switch || function (style, height, widt
         box.container.style.backgroundColor = that.container.state ? that.backgroundOn : that.backgroundOff;
         that.container.style.filter = that.container.disabled ? "grayscale(50%) contrast(50%)" : "";
         that.container.style.cursor = that.container.disabled ? "" : "pointer";
-        that.container.tabIndex = "";
     }
 
     that.getValue = function () { return that.container.state }
@@ -45,6 +44,7 @@ innovaphone.ui1.Switch = innovaphone.ui1.Switch || function (style, height, widt
     box.container.appendChild(label);
     box.container.appendChild(slider);
 
+    that.container.tabIndex = "";
     that.addEvent("click", input);
     that.addEvent("keydown", input);
 
@@ -55,7 +55,7 @@ innovaphone.ui1.Switch = innovaphone.ui1.Switch || function (style, height, widt
             draw();
             // call user's "change" handler (if any)
             var onchange = that.events.find(function (v) { return v.type == "change" && v.handler });
-            if (onchange) onchange.handler(e);
+            if (onchange) onchange.handler(e, onchange.obj);
         }
     };
 

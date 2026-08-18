@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getconfigsresult.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetConfigsResult"
+        ]
+      },
+      "configs": {
+        "type": "array",
+        "items": {
+            "type":"string"
+        },
+        "additionalItems": true
+      }
+    },
+    "required": ["api", "mt", "configs"]
+}

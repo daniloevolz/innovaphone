@@ -9,9 +9,9 @@
     <script>hljs.initHighlightingOnLoad();</script>
     <script type="text/javascript">
         function toggleSpoiler(id) {
-            var e = document.getElementById(id);
-            if (e.style.display == "none") e.style.display = "";
-            else e.style.display = "none";
+        var e = document.getElementById(id);
+        if (e.style.display == "none") e.style.display = "";
+        else e.style.display = "none";
         }
     </script>
 </head>
@@ -99,8 +99,7 @@
         </p>
     </div>
 
-    <p>
-        If the Users Admin App is used to provision several phones instead of the Profile App, the workflow is the next one:
+    <p>If the Users Admin App is used to provision several phones instead of the Profile App, the workflow is the next one:
         <ul>
             <li>ProvisioningPhone received for the first user: <code>{"mt":"ProvisioningPhone","mac":"112233445566",...}</code></li>
             <li>The app manages the sysclient connection and the phone configuration.</li>
@@ -108,11 +107,10 @@
             <li>Then ProvisioningPhone is received for the next user: <code>{"mt":"ProvisioningPhone","mac":"665544332211",...}</code></li>
         </ul>
     </p>
-    <p>
-        Users App Service already creates a device on the User PBX Object with a basic configuration. If any other configuration is needed for the provisioning, this must be managed by your app.
-        By default Hardware ID, Name and App are filled with the information provided on Profile or Users Admin App and TLS only and Reverse Proxy flags are selected.
+    <p>Users App Service already creates a device on the User PBX Object with a basic configuration. If any other configuration is needed for the provisioning, this must be managed by your app. 
+    By default Hardware ID, Name and App are filled with the information provided on Profile or Users Admin App and TLS only and Reverse Proxy flags are selected.
     </p>
-
+    
     <!-- Task 3: Get the published services to be able to connect with Devices later -->
 
     <h3>Task 3: Get the published services to be able to connect with Devices later</h3>

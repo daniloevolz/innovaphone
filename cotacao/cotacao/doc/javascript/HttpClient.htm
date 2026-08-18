@@ -48,6 +48,7 @@
                 <a href="#oncomplete">oncomplete</a><br />
                 <a href="#onerror">onerror</a><br />
                 <a href="#responseCode">responseCode</a><br />
+                <a href="#responseCode">responseCodeDescription</a><br />
                 <a href="#responseHeader">responseHeader</a><br />
                 <a href="#close">close</a><br />
                 <br />
@@ -70,7 +71,7 @@
         Creates an HttpClientRequest object. The actual request is started asynchronously. So synchronous function calls on that object are handled before the request is sent.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">string <b>method</b></td><td>The HTTP method to be used. Supported values are "GET", "PUT", "POST", "DELETE".</td></tr>
+            <tr><td class="param">string <b>method</b></td><td>The HTTP method to be used. Supported values are "GET", "PUT", "POST", "DELETE", "HEAD", "OPTIONS", "TRACE", "PROPFIND", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "PROPPATCH", "PATCH".</td></tr>
             <tr><td class="param">string <b>uri</b></td><td>An absolute http: or https: URI.</td></tr>
         </table>
         <h4>Return value</h4>
@@ -141,7 +142,7 @@
 
     <a name="contentType"><div class="fnhead" style="margin-top:5px">contentType</div></a>
     <dd>
-        Sets the content type of the request body (PUT or POST). If the function is not called, "text/plain" will be used as a default.<br />
+        Sets the content type of the request body. If the function is not called, "text/plain" will be used as a default.<br />
         Optional. Calls must be done before the request is sent, e.g. synchronously after creating the HttpClientRequest object.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -158,7 +159,7 @@
 
     <a name="contentLength"><div class="fnhead" style="margin-top:5px">contentLength</div></a>
     <dd>
-        Sets the content length of the request body (PUT or POST). If the function is not called, chunked encoding will be used.<br />
+        Sets the content length of the request body. If the function is not called, chunked encoding will be used.<br />
         Optional. Calls must be done before the request is sent, e.g. synchronously after creating the HttpClientRequest object.<br />
         Setting the content length requires the application to send excactly the specified number of bytes using the <a href="#send">send</a> function.
         <h4>Parameters</h4>
@@ -309,6 +310,20 @@ req.onrecv(function(req, data, last) {
     </dd>
     <dd>
         <pre><code class="JS">var code = req.responseCode();</code></pre>
+    </dd>
+
+    <a name="responseCodeDescription"><div class="fnhead" style="margin-top:5px">responseCodeDescription</div></a>
+    <dd>
+        Returns the HTTP response status code and reason phrase (e.g. "404 Not Found").<br />
+        Optional. Can be called after the request is completed and the response has been received.
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string</td><td>If the response header has been received already: The HTTP status code and reason phrase of the response.</td></tr>
+            <tr><td class="param">undefined</td><td>If the response header has not been received yet.</td></tr>
+        </table>
+    </dd>
+    <dd>
+        <pre><code class="JS">var description = req.responseCodeDescription();</code></pre>
     </dd>
 
     <a name="responseHeader"><div class="fnhead" style="margin-top:5px">responseHeader</div></a>

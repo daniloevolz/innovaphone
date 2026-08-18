@@ -60,7 +60,7 @@
         <li><a href="#users">users</a> - users table</li>
         <li><a href="#emails">emails</a> - emails table</li>
         <li><a href="#allows">allows</a> - privacy settings configured on the user object</li>
-        <li><a href="#t-allows">t-allows</a> - privacy settings inherited from the config templates</li>
+        <li><a href="#t-allows">t-allows (depricated)</a> - privacy settings inherited from the config templates</li>
         <li><a href="#grps">grps</a> - groups table</li>
         <li><a href="#devices">devices</a> - devices table</li>
         <li><a href="#cds">cds</a> - call diversions table</li>
@@ -117,8 +117,11 @@
         <tr><td class="param">ReplicationBool</td><td><b>ids</b></td><td>Calls with id</td></tr>
     </table>
 
-    <h3><a name="t-allows">t-allows</a></h3>
-    <p>Table with the visibility filters defined on the config templates</p>
+    <h3><a name="t-allows">t-allows (depricated)</a></h3>
+    <p>
+        Table with the visibility filters defined on the config templates. Do not use anymore, this does not work together
+        with the new replication alogoritm, which only replicates changes after reconnect.
+    </p>
     <table style="margin-left:-12px">
         <tr><td class="param">ReplicationString</td><td><b>name</b></td><td>Filter name</td></tr>
         <tr><td class="param">ReplicationString</td><td><b>grp</b></td><td>If true, the name is a group name</td></tr>

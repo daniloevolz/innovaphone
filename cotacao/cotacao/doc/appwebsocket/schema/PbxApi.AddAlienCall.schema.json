@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pbxapi.addaliencall.schema.json",
+  "description": "Adds a call to the PBX, which will result in a busy state of the user and also shows up as on the phone presence",
+  "type": "object",
+  "required": ["api", "mt"],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "AddAlienCall"
+      ],
+      "description": "The message type identifies the requested operation"
+    }
+  }
+}

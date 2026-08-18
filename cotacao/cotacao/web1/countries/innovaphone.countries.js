@@ -157,7 +157,7 @@ innovaphone.Countries = innovaphone.Countries || {
     "Serbia": { local: ["Србија / Srbija"]},
     "Seychelles": { local: ["Sesel"]},
     "Sierra Leone": { local: ["Sierra Leone"]},
-    "Singapore": { local: ["新加坡","Singapura","சிங்கப்பூர்"]},
+    "Singapore": { local: ["Singapore", "新加坡","Singapura","சிங்கப்பூர்"]},
     "Slovakia": { local: ["Slovensko"]},
     "Slovenia": { local: ["Slovenija"]},
     "Solomon Islands": { local: ["Solomon Islands"]},

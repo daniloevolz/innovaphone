@@ -25,9 +25,20 @@
             <td>
                 <a href="#serviceId">serviceId</a><br />
                 <a href="#serviceDns">serviceDns</a><br />
+                <a href="#serviceVersion">serviceVersion</a>
+                <a href="#serviceBuild">serviceBuild</a><br />
+                <a href="#serviceLabel">serviceLabel</a><br />
                 <a href="#name">name</a><br />
                 <a href="#domain">domain</a><br />
                 <a href="#password">password</a><br />
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Functions</b></td>
+            <td>
+                <a href="#httpfiles">httpfiles</a><br />
+                <a href="#httpfile">httpfile</a><br />
                 <br />
             </td>
         </tr>
@@ -53,6 +64,27 @@
         </p>
     </dd>
 
+    <a name="serviceVersion"><div class="fnhead" style="margin-top:5px">serviceVersion</div></a>
+    <dd>
+        <p>
+            A string containing the major version of the app service.
+        </p>
+    </dd>
+
+    <a name="serviceBuild"><div class="fnhead" style="margin-top:5px">serviceBuild</div></a>
+    <dd>
+        <p>
+            A string containing the build number of the app service.
+        </p>
+    </dd>
+
+    <a name="serviceLabel"><div class="fnhead" style="margin-top:5px">serviceLabel</div></a>
+    <dd>
+        <p>
+            A string containing the build label of the app service.
+        </p>
+    </dd>
+
     <a name="name"><div class="fnhead" style="margin-top:5px">name</div></a>
     <dd>
         <p>
@@ -72,6 +104,33 @@
         <p>
             A string containing the app instance password.
         </p>
+    </dd>
+
+    <a name="httpfiles"><div class="fnhead" style="margin-top:5px">httpfiles</div></a>
+    <dd>
+        <p>
+            Lists all files that come with the app service inside the httpfiles.zip.
+        </p>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">[string]</td><td>An array containing the file names.</td></tr>
+        </table>
+    </dd>
+
+    <a name="httpfile"><div class="fnhead" style="margin-top:5px">httpfile</div></a>
+    <dd>
+        <p>
+            Returns the content of an httpfile.
+        </p>
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string <b>filename</b></td><td>The filename.</td></tr>
+            <tr><td class="param">bool <b>binary</b></td><td>Optional, default false. Specifies, if the file content shall be returned as a string or an Uint8Array.</td></tr>
+        </table>
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">string/Uint8Array</td><td>The file content as a string or binary data, depending on the binary parameter.</td></tr>
+        </table>
     </dd>
 
 </body>

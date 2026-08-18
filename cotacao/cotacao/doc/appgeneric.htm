@@ -114,6 +114,7 @@
                     <li>Contains the build number of the app.</li>
                     <li>This build number is be displayed in the AP manager.</li>
                     <li>Also this build number is used for the CheckBuild mechanism of the web application.</li>
+                    <li>If not specified, the build number of the used JavaScript Runtime is displayed.</li>
                 </ul>
             </li>
             <li>
@@ -208,7 +209,7 @@
         If some initialization has to be done in an area, the object contains an array name "init",
         which contains a list objects for the commands, which are to be executed, when the
         App instance is started.
-        Each of the objects contain a property "cmd", which identifies the type ofcommand
+        Each of the objects contain a property "cmd", which identifies the type of command
         and a property "name", so that the result of the command can be referenced.
     </p>
 
@@ -315,8 +316,10 @@
                 </dd>
                 <dd>
                     If the name of an args property start with '@', it identifies a variable.
-                    There are some predefined variables: @domain - domain of logged in user,
-                    @sip - sip URI of logged in user, @dn - display name of logged in user.
+                    There are some predefined variables: @domain - domain of logged in user, 
+                    @sip - sip URI of logged in user, @dn - display name of logged in user, 
+                    @guid - GUID of logged in user, @random-guid - generated GUID that can be 
+                    used in the request as a unique identifier for a new entry in the database. 
                     Other variables may be defined dynamically by the return value of an
                     SQL INSERT statement.
                 </dd>
@@ -400,7 +403,7 @@
         </dd>
         <dt>mode</dt>
         <dd>
-            Defines in which modes the defined config items should be accessible. If not defined, no appwebsocket connections will have access to the config items.
+            Defines in which modes the defined config items should be accessible. If not defined, no AppWebsocket connections will have access to the config items.
             <pre><code class="json">{
     "cmd": "mode",
     "name": string,
@@ -410,7 +413,7 @@
             <dl>
                 <dt>name</dt>
                 <dd>
-                    The name of the mode. E.g. "owner.admin" or "owner".
+                    The name of the mode. E.g. "owner.admin", "owner" or "pbx-manager".
                 </dd>
                 <dt>read</dt>
                 <dd>
@@ -521,7 +524,7 @@
 
     <h3><a id="config-javascript">javascript</a></h3>
     <p>
-        The javascript object specifies the javascript files that shall be executed in the JavaScript Environment on the service-side, when the app instance is started. The structure is like follows:
+        The JavaScript object specifies the JavaScript files that shall be executed in the JavaScript Environment on the service-side, when the app instance is started. The structure is like follows:
     </p>
     <pre><code class="json">"javascript": {
     "eval": [ string ]
@@ -533,6 +536,18 @@
         "service1.js",
         "service2.js",
         "service3.js"
+    ]
+}</code></pre><br />
+    </p>
+    <p>
+        You can also use an asterisk as a wildcard at the end of an entry, in order to execute all JS files in a subtree of the httpfiles.zip.
+    </p>
+    <p>
+        Example:
+        <pre><code class="json">"javascript": {
+    "eval": [ 
+        "subfolder/*",
+        "service1.js"
     ]
 }</code></pre><br />
     </p>
@@ -556,7 +571,7 @@
     <dl>
         <dt>js</dt>
         <dd>
-            The Javascript file containing the Plugin Javascript code. An extension of ".js", will
+            The JavaScript file containing the Plugin JavaScript code. An extension of ".js", will
             be added automatically to the name configured here.
         </dd>
         <dt>icon</dt>
@@ -583,10 +598,9 @@
         which SQL statements may be executed and how config items can be accessed by a given user.
     </p>
     <p>
-        There is one mode, which is set automatically by the App Service, if the connected user
-        is from the App Instance domain and is authenticated using the App Instance password: "owner".
-        Using this mode different database operations can be defined for users of the domain
-        providing this service and other users.
+        There is one mode that is automatically set by the App Service, if the connected user
+        is from the App Instance domain and is authenticated with the App Instance password: "owner".
+        This mode can be used to define different database operations for the users of the domain that provides this service and for other users. There is a defined mode called "pbx-manager" that can be used for WebSocket connections coming from the PBX Manager Plugin.
     </p>
     <p>
         More modes maybe defined by the local PBX administrator, by adding these with '~' to the
@@ -745,7 +759,7 @@
     <h4><a id="client-DbFilesList">DbFilesList</a></h4>
 
     <p>
-        Read the list of files stored in the addressed dbfiles instance in the identified folder.
+        Read the list of files stored in the addressed dbfiles instance in the identified folder, sorted by id of the file.
         A folder may be any row in another database table as configured in config.json.
     </p>
 
@@ -753,7 +767,8 @@
     "mt": "DbFilesList",
     "src": string (see AppWebsocket protocol)
     "name": string,
-    "folder": ulong64
+    "folder": number,
+    "limit": number (optional)
 }</code></pre><br />
 
     <dl>
@@ -765,10 +780,14 @@
         <dd>
             The id of the database table row as configured in config.json.
         </dd>
+        <dt>limit</dt>
+        <dd>
+            Number of items delivered in one DbFilesListResult message. Default value is 50.
+        </dd>
     </dl>
 
     <p>
-        A single DbFilesListResult message is sent as response, which contains the list of files.
+        A single DbFilesListResult message is sent as response, which contains the list of files. Max. number of entries in one message is 50. The property "more" from the DbFilesListResult message can be used to request next batch of entries. If "more" property is missing, no further entries are left.
     </p>
 
     <pre><code class="json">{
@@ -776,11 +795,15 @@
     "src": string (see AppWebsocket protocol)
     "files": [
         {
-            id: ulong64,
+            id: number,
             url: string,
-            name: string
+            name: string,
+            size: number,
+            created: number,
+            modified: number
         }
-    ]
+    ],
+    "more": number
 }</code></pre><br />
     <dl>
         <dt>id</dt>
@@ -795,6 +818,22 @@
         <dd>
             Display name of the file. This is not necessarily unique.
         </dd>
+        <dt>size</dt>
+        <dd>
+            The size of the file in bytes.
+        </dd>
+        <dt>created</dt>
+        <dd>
+            The creation timestamp of the file, given as a Unix timestamp in milliseconds.
+        </dd>
+        <dt>modified</dt>
+        <dd>
+            The last modified timestamp of the file, given as a Unix timestamp in milliseconds.
+        </dd>
+        <dt>more</dt>
+        <dd>
+            The id of last file delivered. Can be used with sendScrMore function of the AppWebsocket connection.
+        </dd>
     </dl>
 
     <h3><a id="client-http">HTTP operations</a></h3>
@@ -802,7 +841,7 @@
         For some operations, as file upload or download, HTTP operations are implemented
     </p>
 
-    <h3><a id="cliet-POST">HTTP POST to dbfiles</a></h3>
+    <h3><a id="client-POST">HTTP POST to dbfiles</a></h3>
 
     <p>
         With HTTP POST new files may be added to a dbfiles folder or existing files maybe deleted.
@@ -829,10 +868,24 @@
         </dd>
         <dt>key</dt>
         <dd>
-            The session key. It is used to authenticate the request. In Javascript the session key
+            The session key. It is used to authenticate the request. In JavaScript the session key
             is calculated as SHA256 hash from the AppWebsocket key with a preceding "generic-dbfiles:"
             seed.
             <pre><code>sessionKey = innovaphone.crypto.sha256("generic-dbfiles:" + app.key());</code></pre>
+        </dd>
+    </dl>
+    <br />
+    <p>
+        The HTTP response to the POST request contains a JSON payload with result and file id: <code>{"ok": true, "id": 1}</code>. The JSON object can be accessed via json() method of the Fetch API.
+    </p>
+    <dl>
+        <dt>ok</dt>
+        <dd>
+            Boolean true if file was stored in the dbfiles instance.
+        </dd>
+        <dt>id</dt>
+        <dd>
+            Id of the created file.
         </dd>
     </dl>
 
@@ -855,7 +908,7 @@
             <li>The database connection is established.</li>
             <li>All initializations from the config.json are done.</li>
             <li>Then the JS files of your service are executed in the specified order.</li>
-            <li>The app instance starts to accept HTTP requests and Websocket connections.</li>
+            <li>The app instance starts to accept HTTP requests and WebSocket connections.</li>
         </ul>
         Note: The JS files declared as service files and the manifests (config.json, plugins.json) are not accessible using HTTP.
     </p>

@@ -40,7 +40,7 @@
         <ul>
             <li>The licenses are created by innovaphone on your behalf. We add the license to our official price list and market it over our established sales channel. We pay you the revenue reduced by the margin of innovaphone and the sales channel.</li>
             <li>Customers can buy or rent the licenses.</li>
-            <li>The licenses are always per-user.</li>
+            <li>Available license types are per-user or per-service/instance of the app.</li>
             <li>The PBX does the license check and provides the information to your app as part of the user login.</li>
         </ul>
     </p>
@@ -70,8 +70,25 @@
         <div>License name: <code>App(acme-calculator)</code></div>
 
         <h4>Example: Conference by ACME</h4>
-        <div>HTML file: <code>acme-conference.htm</code></div>
-        <div>License name: <code>Service(acme-conference)</code></div>
+        <div>HTML file: <code>acme-monitoring.htm</code></div>
+        <div>License name: <code>Service(acme-monitoring)</code></div>
+    </p>
+    <p>
+        Example XML file with licenses:
+        <pre><code lang="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+    &lt;licenses&gt;
+    &lt;license amount='10' type='PBX-App(innovaphone-switchboard)13' mac='00-90-33-01-02-ab' var='PBX0'&gt;038df...&lt;/license&gt;
+    &lt;license amount='10' type='PBX-App(acme-calculator)13' mac='00-90-33-01-02-ab' var='PBX0'&gt;038df...&lt;/license&gt;
+    &lt;license amount='10' type='PBX-Service(acme-monitoring)13' mac='00-90-33-01-02-ab' var='PBX0' &gt;8d0ea1...&lt;/license&gt;
+    &lt;license amount='20' type='PBX-Port13' mac='00-90-33-01-02-ab' var='PBX0'&gt;8d0ea...&lt;/license&gt;
+&lt;/licenses&gt;
+</code></pre>
+    </p>
+    <p>
+        <h4>Head Matching for License Names</h4>
+        <p>
+            The verification of a license for an app is based on a head-match of the string of the license against the app name string. For example a license <code>example-app</code> would be valid for the app <code>example-app</code> and <code>example-app-light</code>. This must be considered while defining the strings of the app names.
+        </p>
     </p>
 
     <h3>Checking the license</h3>
@@ -182,6 +199,31 @@ function app_connected(domain, user, dn, appdomain) {
         Depending on license requirements other license information available form the PBX can be used, like overall number of Port Licenses. The messages <a href="/appwebsocket/PbxAdminApi.htm#GetPbxLicenses">GetPbxLicenses</a> and <a href="/appwebsocket/PbxAdminApi.htm#GetAppLics">GetAppLics</a> are a good starting point to implement a custom license requirement.
     </p>
 
+    <a name="example_app"></a><h2>Example App</h2>
+    <p>
+        A Visual Studio project <a href="https://github.com/innovaphone/jslicenseexample">jslicenseexample</a> for an example App implementing various license check mechanisms can be used as a reference.
+    </p>
+    <a name="testing"></a><h2>Test Mode for Licenses</h2>
+    <p>
+        An innovaphone gateway or an IPVA running the PBX can be put into a so called <a href="http://wiki.innovaphone.com/index.php?title=Reference12r1:General/License">Test-Mode</a> which can be used to figure out which licenses are required for the proper functionality of the PBX and Apps. In this mode all license checks for Apps are positive, even if no licenses for particular App or Service are installed.
+    </p>
+    <p>
+        It is possible to detect if a PBX connecting to the App Service is running in the Test-Mode. The property <code>testmode</code> of the <code>info</code> object in the <code>AppLogin</code> message is set to true in this case.
+        <pre><code lang="cpp">new JsonApi("test").onconnected(function(conn) {
+    var info = JSON.parse(conn.info);
+    if ("testmode" in info) log("Test-Mode: " + info.testmode);
+});</code></pre>
+    </p>
+    <a name="dummy-lic"></a><h2>Dummy Licenses</h2>
+    <p>
+        A dummy licenses issued for the App(example-app) and the Service(example-service) are valid on any innovaphone gateway or an IPVA running the PBX. The dummy licenses are not bound to any MAC address and can be used to test license checking implementation for the App in case Test-Mode is not suitable for your scenario.
+    </p>
+    <p>
+        An innovaphone gateway or IPVA equipped with a dummy license will start a 99 hours test mode that can be prolonged any time. This test mode is not visible for the application and the behaviour of the license is the same as for real licenses.
+    </p>
+    <p>
+        The dummy license file is available for download <a href="dummy_lics.xml" target="_blank" download="dummy_lics.xml">here</a>.
+    </p>
     <a name="license-own"></a><h2>Your own licensing model</h2>
     <p>
         If you don't want to use the innovaphone licensing model, you can use your own one.

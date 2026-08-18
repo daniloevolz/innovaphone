@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxapi.unsubscribeprofile.schema.json",
+    "description": "Stops monitoring the users profile.",
+    "type": "object",
+    "required": [
+      "api",
+      "mt"
+    ],
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxApi"
+        ],
+        "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "UnsubscribeProfile"
+        ],
+        "description": "The message type identifies the requested operation"
+      }
+    }
+}

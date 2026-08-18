@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pbxapi.delaliencall.schema.json",
+  "description": "Deletes a call added with AddAlienCall. The id identifies the call to be deleted",
+  "type": "object",
+  "required": [
+    "api",
+    "mt",
+    "id"
+  ],
+  "properties": {
+    "api": {
+      "type": "string",
+      "enum": [
+        "PbxApi"
+      ],
+      "description": "To address this interface the value 'PbxApi' has to be used for the api property"
+    },
+    "mt": {
+      "type": "string",
+      "enum": [
+        "DelAlienCall"
+      ],
+      "description": "The message type identifies the requested operation"
+    },
+    "id": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The nummerical id of the call"
+    }
+  }
+}

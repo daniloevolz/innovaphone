@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "pbxadminapi.getnodes.schema.json",
+    "type": "object",
+    "properties": {
+      "api": {
+        "type": "string",
+        "enum": [
+          "PbxAdminApi"
+        ]
+      },
+      "mt": {
+        "type": "string",
+        "enum": [
+          "GetNodes"
+        ]
+      },
+      "nodes": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type":"string"
+                },
+                "node":{
+                    "type":"string"
+                },
+                "loc":{
+                    "type":"string"
+                }
+            },
+            "additionalProperties": true
+        }
+      }
+    },
+    "required": ["api", "mt", "nodes"]
+}

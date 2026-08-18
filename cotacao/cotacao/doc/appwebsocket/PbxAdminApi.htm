@@ -65,6 +65,7 @@
         <li><a href="#GetPhoneConfig">GetPhoneConfig</a> - Read phone config stored at an object</li>
         <li><a href="#GetRegs">GetRegs</a> - Read current registrations</li>
         <li><a href="#DeleteObject">DeleteObject</a> - Delete an object</li>
+        <li><a href="#GetApps">GetApps</a> - Get a list of all Apps</li>
         <li><a href="#GetAppObjects">GetAppObjects</a> - Read App objects base on some filters</li>
         <li><a href="#GetConfigObjects">GetConfigObjects</a> - Read config templates</li>
         <li><a href="#GetPseudoObjects">GetPseudoObjects</a> - Read pseudo objects of a given type</li>
@@ -250,44 +251,78 @@
     <h2><a name="UpdateObject">UpdateObject</a></h2>
 
     <pre><code class="json">{
-    "api": "PbxAdminApi",
     "mt": "UpdateObject",
+    "api": "PbxAdminApi",
+    "src": Source,
+    "template": "with"/"without",
+    "copyPwd": string,
+ 
     "guid": string,
     "cn": string,
     "dn": string,
     "h323": string,
     "e164": string,
-    "pwd": string,
-    "loc": string,
     "node": string,
-    "ext": string,
+    "loc": string,
+    "fake": string,
+    "ext": ?,
+    "ext-in": ?,
+    "text": string,
+    "url": string,
+    "h323-email": boolean,
+    "emails": [<a href="#email">email</a>],
     "config": string,
-    "apps": string,
-    "filter": string,
-    "cd-filter": string,
-    "push": string,
-    "messages": string,
-    "hide": boolean,
-    "critical": boolean,
-    "cfnr": unsigned,
-    "colr": bool,
-    "uclic": bool,
-    "voicemail": bool,
-    "fax": bool,
-    "mobility": bool,
-    "mypbx": bool,
-    "video": bool,
-    "app-sharing": bool,
-    "reporting": bool,
+    "apps-my": string,
+    "gi": string,
+    "local": ,
+    "trace": ,
+    "hide": ,
+    "critical": ,
+    "no-dev": ,
+    "login-c": ,
+    "login-t": ,
+    "admin": ,
+    "admin-node": ,
+    "admin-pbx": ,
+
+    "filter": ,
+    "cd-filter": ,
+    "cfnr": ,
+    "busy-out": ,
+    "cd-block": ,
+    "rej-ext": ,
+    "no-disc": ,
+    "dnd": ,
+    "phone-config": ,
+    "discard-phone-config": ,
+    "colr": ,
+    "cfpr": ,
+    "apps": ,
+    "messages": ,
+    "push": ,
+    "allows": ,
+    "phone": ,
+
+    "uclic": ,
+    "voicemail": ,
+    "fax": ,
+    "mobility": ,
+    "mypbx": ,
+    "video": ,
+    "app-sharing": ,
+    "reporting": ,
+    "app-lics": ,
+
     "devices": [<a href="#device">device</a>],
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
     "cds": [<a href="#diversion">diversion</a>],
+    "forks": ,
     "wakeups": [<a href="#wakeup">wakeup</a>],
     "gws": [<a href="#gw">gw</a>],
+    "profiles": ,
     "pseudo": <a href="#pseudo">pseudo</a>,
     "phone": <a href="#phone">phone</a>,
-    "copyPwd": string
 }</code></pre>
 
     <p>
@@ -297,6 +332,11 @@
     <p>
         If bool properties are sent as integers (e.g -1), the parameter is deleted, which means the
         value inherited from a config template is used
+    </p>
+    <p>
+        The argument template defines if the information stored shall take the information from the templates
+        into account. "without" means that the information is stored as sent. Default is to take
+        the templates into account.
     </p>
 
     <dl>
@@ -346,10 +386,6 @@
         <dt>node</dt>
         <dd>
             The numbering node
-        </dd>
-        <dt>ext</dt>
-        <dd>
-            The external number
         </dd>
         <dt>config</dt>
         <dd>
@@ -473,11 +509,14 @@
     <h2><a name="GetObject">GetObject</a></h2>
 
     <pre><code class="json">{
-    "api": "PbxAdminApi",
     "mt": "GetObject",
+    "api": "PbxAdminApi",
+    "src": Source,
     "guid": string,
     "cn": string,
-	"h323": string
+    "h323": string,
+    "properties": [string],
+    "template": "with"/"without"
 }</code></pre>
 
     <p>
@@ -496,50 +535,88 @@
         <dd>
             If no guid and no cn is present, the h323-id (Name) can be used to identify the object
         </dd>
+        <dt>properties</dt>
+        <dd>
+            To reduce the amount of data returned, an optional array of strings can be defined specifying the properties to be returned with the GetObjectResult message
+        </dd>
+        <dt>template</dt>
+        <dd>
+            Defines if the information is generated with the information from config templates or without.
+            Default is, that the information is generated without the information from the templates
+        </dd>
     </dl>
 
     <pre><code class="json">{
-    "api": "PbxAdminApi",
     "mt": "GetObjectResult",
+    "api": "PbxAdminApi",
+    "src": Source,
+ 
     "guid": string,
     "cn": string,
     "dn": string,
     "h323": string,
     "e164": string,
-    "pwd": string,
-    "loc": string,
     "node": string,
-    "ext": string,
+    "loc": string,
+    "fake": string,
+    "ext": ?,
+    "ext-in": ?,
+    "text": string,
+    "url": string,
     "h323-email": boolean,
     "emails": [<a href="#email">email</a>],
     "config": string,
-    "apps": string,
-    "filter": string,
-    "cd-filter": string,
-    "push": string,
-    "messages": string,
-    "hide": boolean,
-    "critical": boolean,
-    "no-dev": boolean,
-    "cfnr": unsigned,
-    "colr": bool,
-    "uclic": bool,
-    "voicemail": bool,
-    "fax": bool,
-    "mobility": bool,
-    "mypbx": bool,
-    "video": bool,
-    "app-sharing": bool,
-    "reporting": bool,
+    "apps-my": string,
+    "gi": string,
+    "local": ,
+    "trace": ,
+    "hide": ,
+    "critical": ,
+    "no-dev": ,
+    "login-c": ,
+    "login-t": ,
+    "admin": ,
+    "admin-node": ,
+    "admin-pbx": ,
+
+    "filter": ,
+    "cd-filter": ,
+    "cfnr": ,
+    "busy-out": ,
+    "cd-block": ,
+    "rej-ext": ,
+    "no-disc": ,
+    "dnd": ,
+    "phone-config": ,
+    "discard-phone-config": ,
+    "colr": ,
+    "cfpr": ,
+    "apps": ,
+    "messages": ,
+    "push": ,
+    "allows": ,
+    "phone": ,
+
+    "uclic": ,
+    "voicemail": ,
+    "fax": ,
+    "mobility": ,
+    "mypbx": ,
+    "video": ,
+    "app-sharing": ,
+    "reporting": ,
+    "app-lics": ,
+
     "devices": [<a href="#device">device</a>],
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
     "cds": [<a href="#diversion">diversion</a>],
+    "forks": ,
     "wakeups": [<a href="#wakeup">wakeup</a>],
     "gws": [<a href="#gw">gw</a>],
+    "profiles": ,
     "pseudo": <a href="#pseudo">pseudo</a>,
     "phone": <a href="#phone">phone</a>,
-    "copyPwd": string
 }</code></pre>
 
     <dl>
@@ -574,10 +651,6 @@
         <dt>node</dt>
         <dd>
             The numbering node
-        </dd>
-        <dt>ext</dt>
-        <dd>
-            The external number
         </dd>
         <dt>h323-email</dt>
         <dd>
@@ -840,6 +913,36 @@
         Returned when the delete request was accepted.
     </p>
 
+    <h2><a name="GetApps">GetApps</a></h2>
+
+    <pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetApps",
+    "more": string,
+    "limit": unsigned
+}</code></pre>
+
+    <p>
+        Request a list of all Apps available in the PBX. Only some basic information is
+        returned in the list to keep data volume low even with many Apps.
+    </p>
+    <p>
+        Only the number of objects defined with limit is returned. The maximum is 20. If there are more
+        Apps, more is set to the name of the last one in GetAppsResult. The next
+        can sending another GetApps with more set to the returned more value
+    </p>
+
+    <pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetAppsResult",
+    "more": string,
+    "objects": [<a href="#template">template</a>]
+}</code></pre>
+
+    <p>
+        Returns an array of Apps
+    </p>
+
     <h2><a name="GetAppObjects">GetAppObjects</a></h2>
 
     <pre><code class="json">{
@@ -879,17 +982,25 @@
 
     <pre><code class="json">{
     "api": "PbxAdminApi",
-    "mt": "GetConfigObjects"
+    "mt": "GetConfigObjects",
+    "more": string,
+    "limit": unsigned
 }</code></pre>
 
     <p>
         Request a list of all config templates available in the PBX. Only some basic information is
         returned in the list to keep data volume low even with many templates.
     </p>
+    <p>
+        Only the number of objects defined with limit is returned. The maximum is 50. If there are more
+        config templates, more is set to the name of the last one in GetConfigObjectsResult. The next
+        can sending another GetConfigObjects with more set to the returned more value
+    </p>
 
     <pre><code class="json">{
     "api": "PbxAdminApi",
     "mt": "GetConfigObjectsResult",
+    "more": string,
     "objects": [<a href="#template">template</a>]
 }</code></pre>
 
@@ -927,7 +1038,8 @@
     "api": "PbxAdminApi",
     "mt": "SearchUsers",
     "cn": string,
-    "includeMatch": boolen
+    "includeMatch": boolen,
+    "limit":unsigned
 }</code></pre>
 
     <p>
@@ -944,6 +1056,9 @@
 
         If you don't want to enumerate all objects but find also the object that exactly matches the specified cn,
         set the parameter includeMath to true. In all other cases the parameter can be omitted.
+    </p>
+    <p>
+        The property limit limits the results. The maximum and the default is 20.
     </p>
 
     <pre><code class="json">{
@@ -1730,7 +1845,8 @@
     "cn": string,
     "dn": string,
     "guid": string,
-    "h323":string
+    "h323":string,
+    "emails":[]
 }</code></pre>
 
     <dl>
@@ -1749,6 +1865,11 @@
         <dt>h323</dt>
         <dd>
             H.323 Id/SIP URI
+        </dd>
+        <dt>emails</dt>
+        <dd>
+            Array of configured email addresses. If the name is used as email as well, this email is provided
+            without domain.
         </dd>
     </dl>
 
