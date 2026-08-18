@@ -149,6 +149,14 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
    
         }
 
+    // Cache para armazenar as últimas cotações obtidas
+    var cotacoesCache = {
+        USD: null,
+        EUR: null,
+        GBP: null,
+        lastUpdate: null
+    };
+
     function cotacao() {
         //Buscar a primeira vez
         moedas();
@@ -161,185 +169,130 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
     function moedas() {
         const timeElapsed = Date.now();
         const today = new Date(timeElapsed);
-        var date = formatDate(today, 'mm-dd-aaaa');
-        //var result = dolar(date);
-        var result = updateValues(date, "%27&@moeda=%27USD%27&$format=json", "item-dolar", texts.text("usd"), texts.text("licBCB"))
-        console.log("Result:" + result);
-        while (result == false) {
-            today.setDate(today.getDate() - 1);
-            date = formatDate(today, 'mm-dd-aaaa');
-            //result = dolar(date);
-            result = updateValues(date, "%27&@moeda=%27USD%27&$format=json", "item-dolar", texts.text("usd"), texts.text("licBCB"))
-
-        }
-        //euro(date);
-        updateValues(date, "%27&@moeda=%27EUR%27&$format=json", "item-euro", texts.text("eur"), texts.text("licBCB"))
-        //libra(date);
-        updateValues(date, "%27&@moeda=%27GBP%27&$format=json", "item-libra", texts.text("gbp"), texts.text("licBCB"))
-    }
-    function dolar(date) {
-        console.log("Dolar Compra!" + date);
-        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27USD%27&$format=json"));
-
-        try {
-            console.log(json_obj);
-            //const dol = json_obj.value[4].cotacaoCompra;
-            const dol = json_obj.value[4].cotacaoVenda;
-            console.log("Dolar Compra: " + dol.toString());
-            document.getElementById('item-dolar').innerHTML
-                = "Dolar Comercial R$: " + dol.toString();
-            document.getElementById('item-data').innerHTML
-                = "Dados do BCB: " + json_obj.value[4].dataHoraCotacao;
-            return true;
-        } catch {
-            try {
-                //const dol = json_obj.value[3].cotacaoCompra;
-                const dol = json_obj.value[3].cotacaoVenda;
-                console.log("Dolar Compra: " + dol.toString());
-                document.getElementById('item-dolar').innerHTML
-                    = "Dolar Comercial R$: " + dol.toString();
-                document.getElementById('item-data').innerHTML
-                    = "Dados do BCB: " + json_obj.value[3].dataHoraCotacao;
-                return true;
-            } catch {
-                try {
-                    console.log("Dolar Compra! 2");
-                    //const dol = json_obj.value[2].cotacaoCompra;
-                    const dol = json_obj.value[2].cotacaoVenda;
-                    console.log("Dolar Compra: " + dol.toString());
-                    document.getElementById('item-dolar').innerHTML
-                        = "Dolar Comercial R$: " + dol.toString();
-                    document.getElementById('item-data').innerHTML
-                        = "Dados do BCB: " + json_obj.value[2].dataHoraCotacao;
-                    return true;
-                } catch {
-                    try {
-                        console.log("Dolar Compra! 1");
-                        //const dol = json_obj.value[1].cotacaoCompra;
-                        const dol = json_obj.value[1].cotacaoVenda;
-                        console.log("Dolar Compra: " + dol.toString());
-                        document.getElementById('item-dolar').innerHTML
-                            = "Dolar Comercial R$: " + dol.toString();
-                        document.getElementById('item-data').innerHTML
-                            = "Dados do BCB: " + json_obj.value[1].dataHoraCotacao;
-                        return true;
-                    } catch {
-                        try {
-                            console.log("Dolar Compra! 0");
-                            //const dol = json_obj.value[0].cotacaoCompra;
-                            const dol = json_obj.value[0].cotacaoVenda;
-                            console.log("Dolar Compra: " + dol.toString());
-                            document.getElementById('item-dolar').innerHTML
-                                = "Dolar Comercial R$: " + dol.toString();
-                            document.getElementById('item-data').innerHTML
-                                = "Dados do BCB: " + json_obj.value[0].dataHoraCotacao;
-                            return true;
-                        } catch {
-                            return false;
-                        }
-                    }
-                }
+        
+        // Verificar se cache está válido (menos de 5 minutos)
+        if (cotacoesCache.lastUpdate && (timeElapsed - cotacoesCache.lastUpdate) < 300000) {
+            // Usar valores do cache
+            if (cotacoesCache.USD) {
+                document.getElementById('item-dolar').innerHTML = texts.text("usd") + cotacoesCache.USD.value;
+                document.getElementById('item-data').innerHTML = texts.text("licBCB") + cotacoesCache.USD.date;
             }
-        }
-    }
-    function euro(date) {
-        console.log("Euro Compra!");
-        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27EUR%27&$format=json"));
-        try {
-            //const eur = json_obj.value[4].cotacaoCompra;
-            const eur = json_obj.value[4].cotacaoVenda;
-            console.log("Euro Compra: " + eur.toString());
-            document.getElementById('item-euro').innerHTML
-                = "Euro Comercial R$: " + eur.toString();
-            return true;
-        } catch {
-            try {
-                //const eur = json_obj.value[3].cotacaoCompra;
-                const eur = json_obj.value[3].cotacaoVenda;
-                console.log("Euro Compra: " + eur.toString());
-                document.getElementById('item-euro').innerHTML
-                    = "Euro Comercial R$: " + eur.toString();
-                return true;
-            } catch {
-                try {
-                    //const eur = json_obj.value[2].cotacaoCompra;
-                    const eur = json_obj.value[2].cotacaoVenda;
-                    console.log("Euro Compra: " + eur.toString());
-                    document.getElementById('item-euro').innerHTML
-                        = "Euro Comercial R$: " + eur.toString();
-                    return true;
-                } catch {
-                    try {
-                        //const eur = json_obj.value[1].cotacaoCompra;
-                        const eur = json_obj.value[1].cotacaoVenda;
-
-                        console.log("Euro Compra: " + eur.toString());
-                        document.getElementById('item-euro').innerHTML
-                            = "Euro Comercial R$: " + eur.toString();
-                        return true;
-                    } catch {
-                        try {
-                            const eur = json_obj.value[0].cotacaoVenda;
-                            console.log("Euro Compra: " + eur.toString());
-                            document.getElementById('item-euro').innerHTML
-                                = "Euro Comercial R$: " + eur.toString();
-                            return true;
-                        } catch {
-                            return false;
-                        }
-                    }
-                }
+            if (cotacoesCache.EUR) {
+                document.getElementById('item-euro').innerHTML = texts.text("eur") + cotacoesCache.EUR.value;
             }
-        }
-    }
-    function libra(date) {
-        console.log("Libra Compra!");
-        var json_obj = JSON.parse(Get(bcblink + date + "%27&@moeda=%27GBP%27&$format=json"));
-        try {
-            //const lib = json_obj.value[4].cotacaoCompra;
-            const lib = json_obj.value[4].cotacaoVenda;
-            console.log("Libra Compra: " + lib.toString());
-            document.getElementById('item-libra').innerHTML
-                = "Libra Comercial R$: " + lib.toString();
-            return true;
-        } catch {
-            try {
-                const lib = json_obj.value[3].cotacaoVenda;
-                console.log("Libra Compra: " + lib.toString());
-                document.getElementById('item-libra').innerHTML
-                    = "Libra Comercial R$: " + lib.toString();
-                return true;
-            } catch {
-                try {
-                    const lib = json_obj.value[2].cotacaoVenda;
-                    console.log("Libra Compra: " + lib.toString());
-                    document.getElementById('item-libra').innerHTML
-                        = "Libra Comercial R$: " + lib.toString();
-                    return true;
-                } catch {
-                    try {
-                        const lib = json_obj.value[1].cotacaoVenda;
-                        console.log("Libra Compra: " + lib.toString());
-                        document.getElementById('item-libra').innerHTML
-                            = "Libra Comercial R$: " + lib.toString();
-                        return true;
-                    } catch {
-                        try {
-                            const lib = json_obj.value[0].cotacaoVenda;
-                            console.log("Libra Compra: " + lib.toString());
-                            document.getElementById('item-libra').innerHTML
-                                = "Libra Comercial R$: " + lib.toString();
-                            return true;
-                        } catch {
-                            return false;
-                        }
-                    }
-                }
+            if (cotacoesCache.GBP) {
+                document.getElementById('item-libra').innerHTML = texts.text("gbp") + cotacoesCache.GBP.value;
             }
+            return;
         }
+        
+        // Limite máximo de tentativas (5 dias úteis)
+        const maxAttempts = 5;
+        let date = formatDate(today, 'mm-dd-aaaa');
+        let attempts = 0;
+        
+        // Função para buscar cotação de uma moeda com retry limitado
+        function fetchCotacao(moeda, elementId, moneyDescription) {
+            return new Promise((resolve) => {
+                let currentDate = new Date(today);
+                let currentAttempts = 0;
+                
+                function tryFetch() {
+                    const currentDateStr = formatDate(currentDate, 'mm-dd-aaaa');
+                    const url = bcblink + currentDateStr + "%27&@moeda=%27" + moeda + "%27&$format=json";
+                    
+                    // Usar requisição assíncrona
+                    var Httpreq = new XMLHttpRequest();
+                    Httpreq.open("GET", url, true);
+                    Httpreq.onreadystatechange = function() {
+                        if (Httpreq.readyState == 4) {
+                            if (Httpreq.status == 200) {
+                                try {
+                                    var json_obj = JSON.parse(Httpreq.responseText);
+                                    // Tentar diferentes índices (0-4)
+                                    for (let i = 4; i >= 0; i--) {
+                                        try {
+                                            const cotacaoVenda = json_obj.value[i].cotacaoVenda;
+                                            const dataHora = json_obj.value[i].dataHoraCotacao;
+                                            resolve({
+                                                success: true,
+                                                value: cotacaoVenda,
+                                                date: dataHora,
+                                                dateStr: currentDateStr
+                                            });
+                                            return;
+                                        } catch (e) {}
+                                    }
+                                    // Se não achou, tentar dia anterior
+                                    currentDate.setDate(currentDate.getDate() - 1);
+                                    currentAttempts++;
+                                    if (currentAttempts < maxAttempts) {
+                                        tryFetch();
+                                    } else {
+                                        resolve({ success: false, moeda: moeda });
+                                    }
+                                } catch (e) {
+                                    currentDate.setDate(currentDate.getDate() - 1);
+                                    currentAttempts++;
+                                    if (currentAttempts < maxAttempts) {
+                                        tryFetch();
+                                    } else {
+                                        resolve({ success: false, moeda: moeda });
+                                    }
+                                }
+                            } else {
+                                currentDate.setDate(currentDate.getDate() - 1);
+                                currentAttempts++;
+                                if (currentAttempts < maxAttempts) {
+                                    tryFetch();
+                                } else {
+                                    resolve({ success: false, moeda: moeda });
+                                }
+                            }
+                        }
+                    };
+                    Httpreq.send(null);
+                }
+                
+                tryFetch();
+            });
+        }
+        
+        // Buscar todas as moedas em paralelo
+        Promise.all([
+            fetchCotacao('USD', 'item-dolar', texts.text("usd")),
+            fetchCotacao('EUR', 'item-euro', texts.text("eur")),
+            fetchCotacao('GBP', 'item-libra', texts.text("gbp"))
+        ]).then(([usdResult, eurResult, gbpResult]) => {
+            // Processar resultados
+            if (usdResult.success) {
+                document.getElementById('item-dolar').innerHTML = texts.text("usd") + usdResult.value;
+                document.getElementById('item-data').innerHTML = texts.text("licBCB") + usdResult.date;
+                cotacoesCache.USD = { value: usdResult.value, date: usdResult.date };
+            } else {
+                console.log("Não foi possível obter cotação para USD");
+            }
+            
+            if (eurResult.success) {
+                document.getElementById('item-euro').innerHTML = texts.text("eur") + eurResult.value;
+                cotacoesCache.EUR = { value: eurResult.value, date: eurResult.date };
+            } else {
+                console.log("Não foi possível obter cotação para EUR");
+            }
+            
+            if (gbpResult.success) {
+                document.getElementById('item-libra').innerHTML = texts.text("gbp") + gbpResult.value;
+                cotacoesCache.GBP = { value: gbpResult.value, date: gbpResult.date };
+            } else {
+                console.log("Não foi possível obter cotação para GBP");
+            }
+            
+            cotacoesCache.lastUpdate = Date.now();
+        });
     }
+    // Função Get mantida para compatibilidade, mas não é mais usada
     function Get(yourUrl) {
-        var Httpreq = new XMLHttpRequest(); // a new request
+        var Httpreq = new XMLHttpRequest();
         Httpreq.open("GET", yourUrl, false);
         Httpreq.send(null);
         return Httpreq.responseText;
@@ -395,62 +348,7 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         }
      }
 
-    function updateValues(date, uri, elementId, moneyDescription, dateLabel) {
-        console.log(moneyDescription);
-        var json_obj = JSON.parse(Get(bcblink + date + uri));
-        try {
-            //const lib = json_obj.value[4].cotacaoCompra;
-            const lib = json_obj.value[4].cotacaoVenda;
-            console.log(moneyDescription + lib.toString());
-            document.getElementById(elementId).innerHTML
-                = moneyDescription + lib.toString();
-            document.getElementById('item-data').innerHTML
-                = dateLabel + json_obj.value[4].dataHoraCotacao;
-            return true;
-        } catch {
-            try {
-                const lib = json_obj.value[3].cotacaoVenda;
-                console.log(moneyDescription + lib.toString());
-                document.getElementById(elementId).innerHTML
-                    = moneyDescription + lib.toString();
-                document.getElementById('item-data').innerHTML
-                    = dateLabel + json_obj.value[3].dataHoraCotacao;
-                return true;
-            } catch {
-                try {
-                    const lib = json_obj.value[2].cotacaoVenda;
-                    console.log(moneyDescription + lib.toString());
-                    document.getElementById(elementId).innerHTML
-                        = moneyDescription + lib.toString();
-                    document.getElementById('item-data').innerHTML
-                        = dateLabel + json_obj.value[2].dataHoraCotacao;
-                    return true;
-                } catch {
-                    try {
-                        const lib = json_obj.value[1].cotacaoVenda;
-                        console.log(moneyDescription + lib.toString());
-                        document.getElementById(elementId).innerHTML
-                            = moneyDescription + lib.toString();
-                        document.getElementById('item-data').innerHTML
-                            = dateLabel + json_obj.value[1].dataHoraCotacao;
-                        return true;
-                    } catch {
-                        try {
-                            const lib = json_obj.value[0].cotacaoVenda;
-                            console.log(moneyDescription + lib.toString());
-                            document.getElementById(elementId).innerHTML
-                                = moneyDescription + lib.toString();
-                            document.getElementById('item-data').innerHTML
-                                = dateLabel + json_obj.value[0].dataHoraCotacao;
-                            return true;
-                        } catch {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 
     function createGraph(symbol) {
         var tdireita = document.getElementById("colunadireita")
