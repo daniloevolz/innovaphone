@@ -1,0 +1,204 @@
+/* Admin Panel - Modern Professional Design */
+
+/* Reset and Base */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+/* Admin Container */
+.wecom-admin-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.wecom-admin-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.wecom-admin-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.wecom-admin-subtitle {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+/* Sections */
+.wecom-admin-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.wecom-admin-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Form Groups */
+.wecom-admin-form-group {
+    margin-bottom: 15px;
+}
+
+.wecom-admin-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.wecom-admin-input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    color: #333;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.wecom-admin-input:hover {
+    border-color: #bdc3c7;
+}
+
+.wecom-admin-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Buttons */
+.wecom-admin-button {
+    display: inline-block;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    background: #3498db;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.wecom-admin-button:hover {
+    background: #2980b9;
+}
+
+.wecom-admin-button:active {
+    background: #1f618d;
+    transform: translateY(1px);
+}
+
+/* Button Container */
+.wecom-admin-button-container {
+    text-align: right;
+    margin-top: 10px;
+}
+
+/* URL Display */
+.wecom-admin-url-display {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #7f8c8d;
+    background: #ecf0f1;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Status Messages */
+.wecom-admin-status {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 13px;
+    display: none;
+}
+
+.wecom-admin-status.success {
+    background: #d4edda;
+    color: #155724;
+    display: block;
+}
+
+.wecom-admin-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .wecom-admin-container {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .wecom-admin-title {
+        font-size: 24px;
+    }
+    
+    .wecom-admin-button {
+        padding: 10px 20px;
+        width: 100%;
+    }
+    
+    .wecom-admin-button-container {
+        text-align: center;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.wecom-admin-section {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus States for Accessibility */
+.wecom-admin-input:focus,
+.wecom-admin-button:focus {
+    outline: none;
+}
+
+.wecom-admin-button:focus {
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}

@@ -188,17 +188,21 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         
         // Limite máximo de tentativas (5 dias úteis)
         const maxAttempts = 5;
-        let date = formatDate(today, 'mm-dd-aaaa');
-        let attempts = 0;
         
         // Função para buscar cotação de uma moeda com retry limitado
-        function fetchCotacao(moeda, elementId, moneyDescription) {
+        // Nota: A API do BCB já retorna todas as cotações do dia em um único endpoint.
+        // O problema original era que o código tentava dia a dia até encontrar dados,
+        // em vez de buscar diretamente o último dia com dados disponíveis.
+        function fetchCotacao(moeda) {
             return new Promise((resolve) => {
                 let currentDate = new Date(today);
                 let currentAttempts = 0;
                 
                 function tryFetch() {
-                    const currentDateStr = formatDate(currentDate, 'mm-dd-aaaa');
+                    const currentDateStr = formatDate(currentDate, 'MM-DD-aaaa');
+                    // A URL da API do BCB: os parâmetros @moeda e @dataCotacao já estão na base URL
+                    // bcblink já vem com: "...?@dataCotacao=%27"
+                    // então adicionamos a data e os outros parâmetros
                     const url = bcblink + currentDateStr + "%27&@moeda=%27" + moeda + "%27&$format=json";
                     
                     // Usar requisição assíncrona
@@ -209,21 +213,27 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                             if (Httpreq.status == 200) {
                                 try {
                                     var json_obj = JSON.parse(Httpreq.responseText);
-                                    // Tentar diferentes índices (0-4)
-                                    for (let i = 4; i >= 0; i--) {
+                                    // A API retorna um array value com todas as cotações do dia
+                                    // Tentamos do maior índice (4) para o menor (0) até encontrar um com cotacaoVenda
+                                    for (let i = 0; i <= 4; i++) {
                                         try {
-                                            const cotacaoVenda = json_obj.value[i].cotacaoVenda;
-                                            const dataHora = json_obj.value[i].dataHoraCotacao;
-                                            resolve({
-                                                success: true,
-                                                value: cotacaoVenda,
-                                                date: dataHora,
-                                                dateStr: currentDateStr
-                                            });
-                                            return;
-                                        } catch (e) {}
+                                            // Verificar se existe o registro e se tem cotacaoVenda
+                                            if (json_obj.value && json_obj.value[i] && json_obj.value[i].cotacaoVenda) {
+                                                const cotacaoVenda = json_obj.value[i].cotacaoVenda;
+                                                const dataHora = json_obj.value[i].dataHoraCotacao;
+                                                resolve({
+                                                    success: true,
+                                                    value: cotacaoVenda,
+                                                    date: dataHora,
+                                                    dateStr: currentDateStr
+                                                });
+                                                return;
+                                            }
+                                        } catch (e) {
+                                            // Continua para o próximo índice
+                                        }
                                     }
-                                    // Se não achou, tentar dia anterior
+                                    // Se não achou em nenhum índice, tentar dia anterior
                                     currentDate.setDate(currentDate.getDate() - 1);
                                     currentAttempts++;
                                     if (currentAttempts < maxAttempts) {
@@ -260,9 +270,9 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         
         // Buscar todas as moedas em paralelo
         Promise.all([
-            fetchCotacao('USD', 'item-dolar', texts.text("usd")),
-            fetchCotacao('EUR', 'item-euro', texts.text("eur")),
-            fetchCotacao('GBP', 'item-libra', texts.text("gbp"))
+            fetchCotacao('USD'),
+            fetchCotacao('EUR'),
+            fetchCotacao('GBP')
         ]).then(([usdResult, eurResult, gbpResult]) => {
             // Processar resultados
             if (usdResult.success) {
@@ -270,21 +280,21 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
                 document.getElementById('item-data').innerHTML = texts.text("licBCB") + usdResult.date;
                 cotacoesCache.USD = { value: usdResult.value, date: usdResult.date };
             } else {
-                console.log("Não foi possível obter cotação para USD");
+                console.log("Não foi possível obter cotação para USD - tentadas " + maxAttempts + " datas");
             }
             
             if (eurResult.success) {
                 document.getElementById('item-euro').innerHTML = texts.text("eur") + eurResult.value;
                 cotacoesCache.EUR = { value: eurResult.value, date: eurResult.date };
             } else {
-                console.log("Não foi possível obter cotação para EUR");
+                console.log("Não foi possível obter cotação para EUR - tentadas " + maxAttempts + " datas");
             }
             
             if (gbpResult.success) {
                 document.getElementById('item-libra').innerHTML = texts.text("gbp") + gbpResult.value;
                 cotacoesCache.GBP = { value: gbpResult.value, date: gbpResult.date };
             } else {
-                console.log("Não foi possível obter cotação para GBP");
+                console.log("Não foi possível obter cotação para GBP - tentadas " + maxAttempts + " datas");
             }
             
             cotacoesCache.lastUpdate = Date.now();
@@ -301,11 +311,13 @@ Wecom.cotacao = Wecom.cotacao || function (start, args) {
         const map = {
             mm: date.getMonth() + 1,
             dd: date.getDate(),
+            MM: String(date.getMonth() + 1).padStart(2, '0'),
+            DD: String(date.getDate()).padStart(2, '0'),
             aa: date.getFullYear().toString().slice(-2),
             aaaa: date.getFullYear()
         }
 
-        return format.replace(/mm|dd|aaaa|aa/gi, matched => map[matched])
+        return format.replace(/mm|dd|aaaa|aa|MM|DD/gi, matched => map[matched])
     }
 
     function MudarDiv(el) {
